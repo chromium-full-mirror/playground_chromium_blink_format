@@ -33,6 +33,7 @@
 #include "V8DOMWrapper.h"
 #include "V8IsolatedContext.h"
 #include "V8Proxy.h"
+#include "V8TestCallback.h"
 #include "V8log.h"
 #include <wtf/GetPtr.h>
 #include <wtf/RefCounted.h>
@@ -958,6 +959,44 @@ static v8::Handle<v8::Value> methodWithNonOptionalArgAndTwoOptionalArgsCallback(
   return v8::Handle<v8::Value>();
 }
 
+static v8::Handle<v8::Value> methodWithCallbackArgCallback(
+    const v8::Arguments& args) {
+  INC_STATS("DOM.TestObj.methodWithCallbackArg");
+  TestObj* imp = V8TestObj::toNative(args.Holder());
+  if (args.Length() <= 0 || !args[0]->IsObject())
+    return throwError(TYPE_MISMATCH_ERR);
+  RefPtr<TestCallback> callback = V8TestCallback::create(args[0]);
+  imp->methodWithCallbackArg(callback);
+  return v8::Handle<v8::Value>();
+}
+
+static v8::Handle<v8::Value> methodWithNonCallbackArgAndCallbackArgCallback(
+    const v8::Arguments& args) {
+  INC_STATS("DOM.TestObj.methodWithNonCallbackArgAndCallbackArg");
+  TestObj* imp = V8TestObj::toNative(args.Holder());
+  int nonCallback = toInt32(args[0]);
+  if (args.Length() <= 1 || !args[1]->IsObject())
+    return throwError(TYPE_MISMATCH_ERR);
+  RefPtr<TestCallback> callback = V8TestCallback::create(args[1]);
+  imp->methodWithNonCallbackArgAndCallbackArg(nonCallback, callback);
+  return v8::Handle<v8::Value>();
+}
+
+static v8::Handle<v8::Value> methodWithCallbackAndOptionalArgCallback(
+    const v8::Arguments& args) {
+  INC_STATS("DOM.TestObj.methodWithCallbackAndOptionalArg");
+  TestObj* imp = V8TestObj::toNative(args.Holder());
+  if (args.Length() <= 0) {
+    imp->methodWithCallbackAndOptionalArg();
+    return v8::Handle<v8::Value>();
+  }
+  if (args.Length() <= 0 || !args[0]->IsObject())
+    return throwError(TYPE_MISMATCH_ERR);
+  RefPtr<TestCallback> callback = V8TestCallback::create(args[0]);
+  imp->methodWithCallbackAndOptionalArg(callback);
+  return v8::Handle<v8::Value>();
+}
+
 static v8::Handle<v8::Value> overloadedMethod1Callback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.overloadedMethod1");
@@ -1228,6 +1267,8 @@ static const BatchedCallback TestObjCallbacks[] = {
      TestObjInternal::methodWithNonOptionalArgAndOptionalArgCallback},
     {"methodWithNonOptionalArgAndTwoOptionalArgs",
      TestObjInternal::methodWithNonOptionalArgAndTwoOptionalArgsCallback},
+    {"methodWithCallbackAndOptionalArg",
+     TestObjInternal::methodWithCallbackAndOptionalArgCallback},
     {"overloadedMethod", TestObjInternal::overloadedMethodCallback},
 };
 static const BatchedConstant TestObjConsts[] = {
@@ -1355,6 +1396,33 @@ static v8::Persistent<v8::FunctionTemplate> ConfigureV8TestObjTemplate(
              v8::FunctionTemplate::New(
                  TestObjInternal::customArgsAndExceptionCallback,
                  v8::Handle<v8::Value>(), customArgsAndExceptionSignature));
+
+  // Custom Signature 'methodWithCallbackArg'
+  const int methodWithCallbackArgArgc = 1;
+  v8::Handle<v8::FunctionTemplate>
+      methodWithCallbackArgArgv[methodWithCallbackArgArgc] = {
+          V8TestCallback::GetRawTemplate()};
+  v8::Handle<v8::Signature> methodWithCallbackArgSignature = v8::Signature::New(
+      desc, methodWithCallbackArgArgc, methodWithCallbackArgArgv);
+  proto->Set(v8::String::New("methodWithCallbackArg"),
+             v8::FunctionTemplate::New(
+                 TestObjInternal::methodWithCallbackArgCallback,
+                 v8::Handle<v8::Value>(), methodWithCallbackArgSignature));
+
+  // Custom Signature 'methodWithNonCallbackArgAndCallbackArg'
+  const int methodWithNonCallbackArgAndCallbackArgArgc = 2;
+  v8::Handle<v8::FunctionTemplate> methodWithNonCallbackArgAndCallbackArgArgv
+      [methodWithNonCallbackArgAndCallbackArgArgc] = {
+          v8::Handle<v8::FunctionTemplate>(), V8TestCallback::GetRawTemplate()};
+  v8::Handle<v8::Signature> methodWithNonCallbackArgAndCallbackArgSignature =
+      v8::Signature::New(desc, methodWithNonCallbackArgAndCallbackArgArgc,
+                         methodWithNonCallbackArgAndCallbackArgArgv);
+  proto->Set(
+      v8::String::New("methodWithNonCallbackArgAndCallbackArg"),
+      v8::FunctionTemplate::New(
+          TestObjInternal::methodWithNonCallbackArgAndCallbackArgCallback,
+          v8::Handle<v8::Value>(),
+          methodWithNonCallbackArgAndCallbackArgSignature));
   batchConfigureConstants(desc, proto, TestObjConsts,
                           sizeof(TestObjConsts) / sizeof(*TestObjConsts));
 
