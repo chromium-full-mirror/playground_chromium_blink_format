@@ -99,7 +99,7 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
 
   void enqueueStatement(PassRefPtr<SQLStatement>);
 
-  void checkAndHandleClosedDatabase();
+  void checkAndHandleClosedOrInterruptedDatabase();
 
   void acquireLock();
   void openTransactionAndPreflight();

@@ -88,7 +88,10 @@ bool SQLStatement::execute(Database* db) {
     LOG(StorageAPI,
         "Unable to verify correctness of statement %s - error %i (%s)",
         m_statement.ascii().data(), result, database->lastErrorMsg());
-    m_error = SQLError::create(SQLError::SYNTAX_ERR, database->lastErrorMsg());
+    m_error =
+        SQLError::create(result == SQLResultInterrupt ? SQLError::DATABASE_ERR
+                                                      : SQLError::SYNTAX_ERR,
+                         database->lastErrorMsg());
     return false;
   }
 
@@ -100,7 +103,7 @@ bool SQLStatement::execute(Database* db) {
     LOG(StorageAPI,
         "Bind parameter count doesn't match number of question marks");
     m_error = SQLError::create(
-        SQLError::SYNTAX_ERR,
+        db->isInterrupted() ? SQLError::DATABASE_ERR : SQLError::SYNTAX_ERR,
         "number of '?'s in statement string does not match argument count");
     return false;
   }

@@ -154,6 +154,10 @@ ThreadIdentifier currentThread() {
   return establishIdentifierForThread(currentThread);
 }
 
+void yield() {
+  g_thread_yield();
+}
+
 Mutex::Mutex() : m_mutex(g_mutex_new()) {}
 
 Mutex::~Mutex() {}

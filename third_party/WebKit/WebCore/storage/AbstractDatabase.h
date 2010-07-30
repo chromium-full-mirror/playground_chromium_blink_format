@@ -68,6 +68,8 @@ class AbstractDatabase : public ThreadSafeShared<AbstractDatabase> {
 
   unsigned long long maximumSize() const;
   void incrementalVacuumIfNeeded();
+  void interrupt();
+  bool isInterrupted();
 
   // FIXME: move all version-related methods to a DatabaseVersionTracker class
   bool versionMatchesExpected() const;
