@@ -115,6 +115,10 @@ class PluginView : public WebCore::PluginViewBase,
   virtual void cancelStreamLoad(uint64_t streamID);
   virtual NPObject* windowScriptNPObject();
   virtual NPObject* pluginElementNPObject();
+  virtual bool evaluate(NPObject*,
+                        const WebCore::String& scriptString,
+                        NPVariant* result,
+                        bool allowPopups);
   virtual void setStatusbarText(const WebCore::String&);
 
   // WebFrame::LoadListener

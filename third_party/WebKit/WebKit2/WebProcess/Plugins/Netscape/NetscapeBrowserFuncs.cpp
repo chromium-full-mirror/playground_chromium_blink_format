@@ -583,11 +583,14 @@ static bool NPN_InvokeDefault(NPP,
 }
 
 static bool NPN_Evaluate(NPP npp,
-                         NPObject* npobj,
+                         NPObject* npObject,
                          NPString* script,
                          NPVariant* result) {
-  notImplemented();
-  return false;
+  RefPtr<NetscapePlugin> plugin = NetscapePlugin::fromNPP(npp);
+  String scriptString = String::fromUTF8WithLatin1Fallback(
+      script->UTF8Characters, script->UTF8Length);
+
+  return plugin->evaluate(npObject, scriptString, result);
 }
 
 static bool NPN_GetProperty(NPP,
