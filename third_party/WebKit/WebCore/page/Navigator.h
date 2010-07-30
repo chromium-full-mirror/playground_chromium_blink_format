@@ -39,7 +39,7 @@ class Navigator : public NavigatorBase, public RefCounted<Navigator> {
   static PassRefPtr<Navigator> create(Frame* frame) {
     return adoptRef(new Navigator(frame));
   }
-  ~Navigator();
+  virtual ~Navigator();
 
   void disconnectFrame();
   Frame* frame() const { return m_frame; }
