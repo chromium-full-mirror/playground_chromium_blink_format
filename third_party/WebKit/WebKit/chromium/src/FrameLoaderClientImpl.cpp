@@ -1415,6 +1415,12 @@ bool FrameLoaderClientImpl::actionSpecifiesNavigationPolicy(
 PassOwnPtr<WebPluginLoadObserver> FrameLoaderClientImpl::pluginLoadObserver() {
   WebDataSourceImpl* ds = WebDataSourceImpl::fromDocumentLoader(
       m_webFrame->frame()->loader()->activeDocumentLoader());
+  if (!ds) {
+    // We can arrive here if a popstate event handler detaches this frame.
+    // FIXME: Remove this code once http://webkit.org/b/36202 is fixed.
+    ASSERT(!m_webFrame->frame()->page());
+    return 0;
+  }
   return ds->releasePluginLoadObserver();
 }
 
