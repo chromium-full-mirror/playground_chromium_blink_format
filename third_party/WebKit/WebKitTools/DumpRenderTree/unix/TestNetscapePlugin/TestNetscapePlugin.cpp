@@ -102,9 +102,9 @@ static NPError webkit_test_plugin_new_instance(NPMIMEType /*mimetype*/,
 
     browser->getvalue(instance, NPNVprivateModeBool,
                       (void*)&obj->cachedPrivateBrowsingMode);
-  }
 
-  obj->pluginTest = PluginTest::create(instance, testIdentifier);
+    obj->pluginTest = PluginTest::create(instance, testIdentifier);
+  }
 
   return NPERR_NO_ERROR;
 }
@@ -197,7 +197,7 @@ static NPError webkit_test_plugin_new_stream(NPP instance,
 }
 
 static NPError webkit_test_plugin_destroy_stream(NPP instance,
-                                                 NPStream* /*stream*/,
+                                                 NPStream* stream,
                                                  NPError reason) {
   PluginObject* obj = (PluginObject*)instance->pdata;
 
