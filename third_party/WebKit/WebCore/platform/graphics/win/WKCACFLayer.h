@@ -42,8 +42,6 @@
 #include "PlatformString.h"
 #include "TransformationMatrix.h"
 
-struct WKCACFContext;
-
 namespace WebCore {
 
 class WKCACFLayer;
@@ -96,7 +94,7 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
   }
 
   // Makes this layer the root when the passed context is rendered
-  void becomeRootLayerForContext(WKCACFContext*);
+  void becomeRootLayerForContext(CACFContextRef);
 
   static RetainPtr<CFTypeRef> cfValue(float value) {
     return RetainPtr<CFTypeRef>(
