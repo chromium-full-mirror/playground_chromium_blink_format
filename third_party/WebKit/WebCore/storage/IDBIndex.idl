@@ -27,7 +27,7 @@ module storage {
 
     interface [
         Conditional=INDEXED_DATABASE
-    ] IDBIndexRequest {
+    ] IDBIndex {
         // FIXME: Complete this file.
 
         readonly attribute DOMString name;

@@ -23,41 +23,39 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef IDBIndexProxy_h
-#define IDBIndexProxy_h
+#ifndef IDBIndexBackendImpl_h
+#define IDBIndexBackendImpl_h
 
-#include "IDBIndex.h"
-#include <wtf/OwnPtr.h>
-#include <wtf/PassOwnPtr.h>
-#include <wtf/PassRefPtr.h>
+#include "IDBIndexBackendInterface.h"
 
 #if ENABLE(INDEXED_DATABASE)
 
-namespace WebKit {
-class WebIDBIndex;
-}
-
 namespace WebCore {
 
-class IDBIndexProxy : public IDBIndex {
+class IDBIndexBackendImpl : public IDBIndexBackendInterface {
  public:
-  static PassRefPtr<IDBIndex> create(PassOwnPtr<WebKit::WebIDBIndex>);
-  virtual ~IDBIndexProxy();
+  static PassRefPtr<IDBIndexBackendImpl> create(const String& name,
+                                                const String& keyPath,
+                                                bool unique) {
+    return adoptRef(new IDBIndexBackendImpl(name, keyPath, unique));
+  }
+  virtual ~IDBIndexBackendImpl();
 
-  virtual String name();
-  virtual String keyPath();
-  virtual bool unique();
-
-  // FIXME: Add other methods.
+  // Implements IDBIndexBackendInterface.
+  virtual String name() { return m_name; }
+  virtual String keyPath() { return m_keyPath; }
+  virtual bool unique() { return m_unique; }
 
  private:
-  IDBIndexProxy(PassOwnPtr<WebKit::WebIDBIndex>);
+  IDBIndexBackendImpl(const String& name, const String& keyPath, bool unique);
 
-  OwnPtr<WebKit::WebIDBIndex> m_webIDBIndex;
+  String m_name;
+  String m_keyPath;
+  bool m_unique;
 };
 
 }  // namespace WebCore
 
 #endif
 
-#endif  // IDBIndexProxy_h
+#endif  // IDBIndexBackendImpl_h

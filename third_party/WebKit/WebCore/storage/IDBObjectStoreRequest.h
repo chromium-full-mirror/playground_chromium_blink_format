@@ -69,7 +69,7 @@ class IDBObjectStoreRequest : public RefCounted<IDBObjectStoreRequest> {
                                      const String& name,
                                      const String& keyPath,
                                      bool unique = false);
-  PassRefPtr<IDBIndexRequest> index(const String& name);
+  PassRefPtr<IDBIndex> index(const String& name);
   PassRefPtr<IDBRequest> removeIndex(ScriptExecutionContext*,
                                      const String& name);
 

@@ -24,18 +24,16 @@
  */
 
 #include "config.h"
-#include "IDBIndexImpl.h"
+#include "IDBIndex.h"
 
 #if ENABLE(INDEXED_DATABASE)
 
 namespace WebCore {
 
-IDBIndexImpl::IDBIndexImpl(const String& name,
-                           const String& keyPath,
-                           bool unique)
-    : m_name(name), m_keyPath(keyPath), m_unique(unique) {}
+IDBIndex::IDBIndex(PassRefPtr<IDBIndexBackendInterface> backend)
+    : m_backend(backend) {}
 
-IDBIndexImpl::~IDBIndexImpl() {}
+IDBIndex::~IDBIndex() {}
 
 }  // namespace WebCore
 

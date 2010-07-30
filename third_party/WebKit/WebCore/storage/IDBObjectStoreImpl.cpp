@@ -30,7 +30,7 @@
 #include "IDBBindingUtilities.h"
 #include "IDBCallbacks.h"
 #include "IDBDatabaseException.h"
-#include "IDBIndexImpl.h"
+#include "IDBIndexBackendImpl.h"
 #include "IDBKeyTree.h"
 
 #if ENABLE(INDEXED_DATABASE)
@@ -120,13 +120,15 @@ void IDBObjectStoreImpl::createIndex(const String& name,
     return;
   }
 
-  RefPtr<IDBIndex> index = IDBIndexImpl::create(name, keyPath, unique);
+  RefPtr<IDBIndexBackendInterface> index =
+      IDBIndexBackendImpl::create(name, keyPath, unique);
   ASSERT(index->name() == name);
   m_indexes.set(name, index);
   callbacks->onSuccess(index.release());
 }
 
-PassRefPtr<IDBIndex> IDBObjectStoreImpl::index(const String& name) {
+PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreImpl::index(
+    const String& name) {
   return m_indexes.get(name);
 }
 

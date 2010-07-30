@@ -30,7 +30,7 @@
 
 #include "IDBDatabaseRequest.h"
 #include "IDBFactory.h"
-#include "IDBIndexRequest.h"
+#include "IDBIndex.h"
 #include "IDBObjectStoreRequest.h"
 #include "SerializedScriptValue.h"
 
@@ -49,9 +49,9 @@ PassRefPtr<IDBDatabaseRequest> IDBAny::idbDatabaseRequest() {
   return m_idbDatabaseRequest;
 }
 
-PassRefPtr<IDBIndexRequest> IDBAny::idbIndexRequest() {
-  ASSERT(m_type == IDBIndexRequestType);
-  return m_idbIndexRequest;
+PassRefPtr<IDBIndex> IDBAny::idbIndex() {
+  ASSERT(m_type == IDBIndexType);
+  return m_idbIndex;
 }
 
 PassRefPtr<IDBKey> IDBAny::idbKey() {
@@ -85,10 +85,10 @@ void IDBAny::set(PassRefPtr<IDBDatabaseRequest> value) {
   m_idbDatabaseRequest = value;
 }
 
-void IDBAny::set(PassRefPtr<IDBIndexRequest> value) {
+void IDBAny::set(PassRefPtr<IDBIndex> value) {
   ASSERT(m_type == UndefinedType);
   m_type = IDBDatabaseRequestType;
-  m_idbIndexRequest = value;
+  m_idbIndex = value;
 }
 
 void IDBAny::set(PassRefPtr<IDBKey> value) {

@@ -61,7 +61,7 @@ class IDBObjectStoreImpl : public IDBObjectStore {
                    const String& keyPath,
                    bool unique,
                    PassRefPtr<IDBCallbacks>);
-  PassRefPtr<IDBIndex> index(const String& name);
+  PassRefPtr<IDBIndexBackendInterface> index(const String& name);
   void removeIndex(const String& name, PassRefPtr<IDBCallbacks>);
 
  private:
@@ -73,7 +73,7 @@ class IDBObjectStoreImpl : public IDBObjectStore {
   String m_keyPath;
   bool m_autoIncrement;
 
-  typedef HashMap<String, RefPtr<IDBIndex>> IndexMap;
+  typedef HashMap<String, RefPtr<IDBIndexBackendInterface>> IndexMap;
   IndexMap m_indexes;
 
   typedef IDBKeyTree<SerializedScriptValue> Tree;
