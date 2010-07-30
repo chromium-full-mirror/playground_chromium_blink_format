@@ -59,7 +59,7 @@ class SVGScriptElement : public SVGElement,
 
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
-  virtual bool shouldExecuteAsJavaScript() const { return false; }
+  virtual bool shouldExecuteAsJavaScript() const;
 
  protected:
   virtual bool haveLoadedRequiredResources();
