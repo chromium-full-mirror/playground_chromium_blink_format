@@ -96,7 +96,7 @@ class WKCACFRootLayer : public WKCACFLayer {
     return adoptRef(new WKCACFRootLayer(renderer));
   }
 
-  virtual void setNeedsRender() { m_renderer->renderSoon(); }
+  virtual void setNeedsRender() { m_renderer->layerTreeDidChange(); }
 
   // Overload this to avoid calling setNeedsDisplay on the layer, which would
   // override the contents
@@ -329,6 +329,11 @@ void WKCACFLayerRenderer::setRootChildLayer(WKCACFLayer* layer) {
     // Adjust the scroll frame accordingly
     updateScrollFrame();
   }
+}
+
+void WKCACFLayerRenderer::layerTreeDidChange() {
+  WKCACFContextFlusher::shared().addContext(m_context.get());
+  renderSoon();
 }
 
 void WKCACFLayerRenderer::setNeedsDisplay() {
