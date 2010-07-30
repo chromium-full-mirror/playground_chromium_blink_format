@@ -37,6 +37,7 @@ class PluginTest {
 
   // Add more NPP functions here if needed.
   virtual NPError NPP_DestroyStream(NPStream* stream, NPReason reason);
+  virtual NPError NPP_GetValue(NPPVariable, void* value);
 
   template <typename TestClassTy>
   class Register {
@@ -55,10 +56,13 @@ class PluginTest {
   PluginTest(NPP npp, const std::string& identifier);
 
   // NPN functions.
+  NPObject* NPN_CreateObject(NPClass*);
 
   // FIXME: A plug-in test shouldn't need to know about it's NPP. Make this
   // private.
   NPP m_npp;
+
+  const std::string& identifier() const { return m_identifier; }
 
  private:
   typedef PluginTest* (*CreateTestFunction)(NPP, const std::string&);

@@ -284,6 +284,12 @@ static void webkit_test_plugin_url_notify(NPP instance,
 static NPError webkit_test_plugin_get_value(NPP instance,
                                             NPPVariable variable,
                                             void* value) {
+  PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
+
+  // First, check if the PluginTest object supports getting this value.
+  if (obj->pluginTest->NPP_GetValue(variable, value) == NPERR_NO_ERROR)
+    return NPERR_NO_ERROR;
+
   NPError err = NPERR_NO_ERROR;
 
   switch (variable) {
@@ -310,7 +316,6 @@ static NPError webkit_test_plugin_get_value(NPP instance,
 
   if (variable == NPPVpluginScriptableNPObject) {
     void** v = (void**)value;
-    PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
     browser->retainobject((NPObject*)obj);
     *v = obj;
     err = NPERR_NO_ERROR;
