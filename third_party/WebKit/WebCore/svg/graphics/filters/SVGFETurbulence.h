@@ -2,6 +2,8 @@
     Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
                   2005 Eric Seidel <eric@webkit.org>
+                  2009 Dirk Schulze <krit@webkit.org>
+                  2010 Renata Hodovan <reni@inf.u-szeged.hu>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -37,10 +39,10 @@ enum TurbulanceType {
 class FETurbulence : public FilterEffect {
  public:
   static PassRefPtr<FETurbulence> create(TurbulanceType,
-                                         const float&,
-                                         const float&,
-                                         const int&,
-                                         const float&,
+                                         float,
+                                         float,
+                                         int,
+                                         float,
                                          bool);
 
   TurbulanceType type() const;
@@ -66,12 +68,30 @@ class FETurbulence : public FilterEffect {
   TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
-  FETurbulence(TurbulanceType,
-               const float&,
-               const float&,
-               const int&,
-               const float&,
-               bool);
+  static const int s_blockSize = 256;
+  static const int s_blockMask = s_blockSize - 1;
+
+  struct PaintingData {
+    long seed;
+    int latticeSelector[2 * s_blockSize + 2];
+    float gradient[4][2 * s_blockSize + 2][2];
+    int width;  // How much to subtract to wrap for stitching.
+    int height;
+    int wrapX;  // Minimum value to wrap.
+    int wrapY;
+    int channel;
+    IntSize filterSize;
+
+    PaintingData(long paintingSeed, const IntSize& paintingSize);
+    inline long random();
+  };
+
+  FETurbulence(TurbulanceType, float, float, int, float, bool);
+
+  inline void initPaint(PaintingData&);
+  float noise2D(PaintingData&, const FloatPoint&);
+  unsigned char calculateTurbulenceValueForPoint(PaintingData&,
+                                                 const FloatPoint&);
 
   TurbulanceType m_type;
   float m_baseFrequencyX;

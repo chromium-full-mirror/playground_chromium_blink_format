@@ -94,6 +94,9 @@ void SVGFETurbulenceElement::synchronizeProperty(
 }
 
 PassRefPtr<FilterEffect> SVGFETurbulenceElement::build(SVGFilterBuilder*) {
+  if (baseFrequencyX() < 0 || baseFrequencyY() < 0)
+    return 0;
+
   return FETurbulence::create(static_cast<TurbulanceType>(type()),
                               baseFrequencyX(), baseFrequencyY(), numOctaves(),
                               seed(), stitchTiles() == SVG_STITCHTYPE_STITCH);
