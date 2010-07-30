@@ -25,6 +25,12 @@
 
 #include "PluginObject.h"
 
+#include "PluginTest.h"
+
+#include <string>
+
+using namespace std;
+
 #if XP_WIN
 #define STDCALL __stdcall
 
@@ -135,7 +141,11 @@ NPError NPP_New(NPMIMEType pluginType,
 #endif
 #endif  // XP_MACOSX
 
+  string testIdentifier;
+
   for (int i = 0; i < argc; i++) {
+    if (strcasecmp(argn[i], "test") == 0)
+      testIdentifier = argv[i];
     if (strcasecmp(argn[i], "onstreamload") == 0 && !obj->onStreamLoad)
       obj->onStreamLoad = strdup(argv[i]);
     else if (strcasecmp(argn[i], "onStreamDestroy") == 0 &&
@@ -164,8 +174,6 @@ NPError NPP_New(NPMIMEType pluginType,
       executeScript(obj, "document.body.innerHTML = ''");
     else if (!strcasecmp(argn[i], "ondestroy"))
       obj->onDestroy = strdup(argv[i]);
-    else if (strcasecmp(argn[i], "testdocumentopenindestroystream") == 0)
-      obj->testDocumentOpenInDestroyStream = TRUE;
     else if (strcasecmp(argn[i], "testwindowopen") == 0)
       obj->testWindowOpen = TRUE;
     else if (strcasecmp(argn[i], "drawingmodel") == 0) {
@@ -205,6 +213,8 @@ NPError NPP_New(NPMIMEType pluginType,
 
   browser->getvalue(instance, NPNVprivateModeBool,
                     (void*)&obj->cachedPrivateBrowsingMode);
+
+  obj->pluginTest = PluginTest::create(instance, testIdentifier);
 
   return NPERR_NO_ERROR;
 }
@@ -340,12 +350,7 @@ NPError NPP_DestroyStream(NPP instance, NPStream* stream, NPReason reason) {
     }
   }
 
-  if (obj->testDocumentOpenInDestroyStream) {
-    testDocumentOpen(instance);
-    obj->testDocumentOpenInDestroyStream = FALSE;
-  }
-
-  return NPERR_NO_ERROR;
+  return obj->pluginTest->NPP_DestroyStream(stream, reason);
 }
 
 int32_t NPP_WriteReady(NPP instance, NPStream* stream) {
