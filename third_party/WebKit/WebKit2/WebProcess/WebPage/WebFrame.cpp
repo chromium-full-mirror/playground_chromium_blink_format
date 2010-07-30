@@ -184,14 +184,6 @@ String WebFrame::url() const {
   return m_coreFrame->loader()->url().string();
 }
 
-static void childFrameRef(const void* frame) {
-  static_cast<WebFrame*>(const_cast<void*>(frame))->ref();
-}
-
-static void childFrameDeref(const void* frame) {
-  static_cast<WebFrame*>(const_cast<void*>(frame))->deref();
-}
-
 PassRefPtr<ImmutableArray> WebFrame::childFrames() {
   if (!m_coreFrame)
     return ImmutableArray::create();
@@ -200,7 +192,7 @@ PassRefPtr<ImmutableArray> WebFrame::childFrames() {
   if (!size)
     return ImmutableArray::create();
 
-  void** array = new void*[size];
+  APIObject** array = new APIObject*[size];
   unsigned i = 0;
   for (Frame *child = m_coreFrame->tree()->firstChild(); child;
        child = child->tree()->nextSibling(), ++i) {
@@ -211,9 +203,7 @@ PassRefPtr<ImmutableArray> WebFrame::childFrames() {
     array[i] = webFrame;
   }
 
-  ImmutableArray::ImmutableArrayCallbacks callbacks = {childFrameRef,
-                                                       childFrameDeref};
-  return ImmutableArray::adopt(array, size, &callbacks);
+  return ImmutableArray::adopt(array, size);
 }
 
 unsigned WebFrame::numberOfActiveAnimations() {

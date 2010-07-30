@@ -27,31 +27,24 @@
 
 namespace WebKit {
 
-ImmutableArray::ImmutableArray() : m_entries(0), m_size(0) {
-  memset(&m_callbacks, 0, sizeof(m_callbacks));
-}
+ImmutableArray::ImmutableArray() : m_entries(0), m_size(0) {}
 
-ImmutableArray::ImmutableArray(const void** entries,
-                               size_t size,
-                               const ImmutableArrayCallbacks* callbacks)
-    : m_entries(new void*[size]), m_size(size), m_callbacks(*callbacks) {
+ImmutableArray::ImmutableArray(APIObject** entries, size_t size)
+    : m_entries(new APIObject*[size]), m_size(size) {
   memcpy(m_entries, entries, m_size);
   for (size_t i = 0; i < m_size; ++i)
-    m_callbacks.ref(m_entries[i]);
+    m_entries[i]->ref();
 }
 
-ImmutableArray::ImmutableArray(void** entries,
-                               size_t size,
-                               const ImmutableArrayCallbacks* callbacks,
-                               AdoptTag)
-    : m_entries(entries), m_size(size), m_callbacks(*callbacks) {}
+ImmutableArray::ImmutableArray(APIObject** entries, size_t size, AdoptTag)
+    : m_entries(entries), m_size(size) {}
 
 ImmutableArray::~ImmutableArray() {
   if (!m_entries)
     return;
 
   for (size_t i = 0; i < m_size; ++i)
-    m_callbacks.deref(m_entries[i]);
+    m_entries[i]->deref();
   delete[] m_entries;
 }
 
