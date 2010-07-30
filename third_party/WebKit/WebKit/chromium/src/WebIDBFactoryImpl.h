@@ -25,19 +25,35 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "config.h"
-#include "IndexedDatabase.h"
 
-#include "ChromiumBridge.h"
+#ifndef WebIDBFactoryImpl_h
+#define WebIDBFactoryImpl_h
 
-#if ENABLE(INDEXED_DATABASE)
+#include "WebDOMStringList.h"
+#include "WebIDBFactory.h"
+#include <wtf/RefPtr.h>
 
 namespace WebCore {
-
-PassRefPtr<IndexedDatabase> IndexedDatabase::create() {
-  return ChromiumBridge::indexedDatabase();
+class IDBFactoryBackendInterface;
 }
 
-}  // namespace WebCore
+namespace WebKit {
 
-#endif  // ENABLE(INDEXED_DATABASE)
+class WebIDBFactoryImpl : public WebIDBFactory {
+ public:
+  WebIDBFactoryImpl();
+  virtual ~WebIDBFactoryImpl();
+
+  virtual void open(const WebString& name,
+                    const WebString& description,
+                    WebIDBCallbacks*,
+                    const WebSecurityOrigin&,
+                    WebFrame*);
+
+ private:
+  WTF::RefPtr<WebCore::IDBFactoryBackendInterface> m_idbFactoryBackend;
+};
+
+}  // namespace WebKit
+
+#endif  // WebIDBFactoryImpl_h

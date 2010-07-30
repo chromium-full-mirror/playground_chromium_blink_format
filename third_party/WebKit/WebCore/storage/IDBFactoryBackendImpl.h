@@ -10,6 +10,9 @@
  * 2.  Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
+ * 3.  Neither the name of Apple Computer, Inc. ("Apple") nor the names of
+ *     its contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY APPLE AND ITS CONTRIBUTORS "AS IS" AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -22,13 +25,42 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef IDBFactoryBackendImpl_h
+#define IDBFactoryBackendImpl_h
 
-module storage {
+#include "IDBFactoryBackendInterface.h"
+#include "StringHash.h"
+#include <wtf/HashMap.h>
 
-    interface [
-        Conditional=INDEXED_DATABASE
-    ] IndexedDatabaseRequest {
-        [CallWith=ScriptExecutionContext] IDBRequest open(in DOMString name, in DOMString description);
-    };
+#if ENABLE(INDEXED_DATABASE)
 
-}
+namespace WebCore {
+
+class DOMStringList;
+
+class IDBFactoryBackendImpl : public IDBFactoryBackendInterface {
+ public:
+  static PassRefPtr<IDBFactoryBackendImpl> create();
+  virtual ~IDBFactoryBackendImpl();
+
+  virtual void open(const String& name,
+                    const String& description,
+                    PassRefPtr<IDBCallbacks>,
+                    PassRefPtr<SecurityOrigin>,
+                    Frame*);
+
+ private:
+  IDBFactoryBackendImpl();
+
+  typedef HashMap<String, RefPtr<IDBDatabase>> IDBDatabaseMap;
+  IDBDatabaseMap m_databaseMap;
+
+  // We only create one instance of this class at a time.
+  static IDBFactoryBackendImpl* idbFactoryBackendImpl;
+};
+
+}  // namespace WebCore
+
+#endif
+
+#endif  // IDBFactoryBackendImpl_h

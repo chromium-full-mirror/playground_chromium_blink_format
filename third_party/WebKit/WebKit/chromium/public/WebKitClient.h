@@ -52,7 +52,7 @@ class WebCookieJar;
 class WebFileSystem;
 class WebGLES2Context;
 class WebGraphicsContext3D;
-class WebIndexedDatabase;
+class WebIDBFactory;
 class WebMessagePortChannel;
 class WebMimeRegistry;
 class WebPluginListBuilder;
@@ -145,7 +145,7 @@ class WebKitClient {
 
   // Indexed Database ----------------------------------------------------
 
-  virtual WebIndexedDatabase* indexedDatabase() { return 0; }
+  virtual WebIDBFactory* idbFactory() { return 0; }
 
   // Keygen --------------------------------------------------------------
 

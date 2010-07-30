@@ -25,46 +25,43 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef IndexedDatabaseRequest_h
-#define IndexedDatabaseRequest_h
 
-#include "ExceptionCode.h"
-#include "IndexedDatabase.h"
-#include "PlatformString.h"
-#include <wtf/PassRefPtr.h>
-#include <wtf/RefCounted.h>
-#include <wtf/RefPtr.h>
+#ifndef IDBFactoryBackendProxy_h
+#define IDBFactoryBackendProxy_h
+
+#include "IDBFactoryBackendInterface.h"
 
 #if ENABLE(INDEXED_DATABASE)
 
+namespace WebKit {
+class WebIDBFactory;
+}
+
 namespace WebCore {
 
-class IDBKey;
-class IDBKeyRange;
-class IDBRequest;
-class IndexedDatabase;
-class ScriptExecutionContext;
+class DOMStringList;
 
-class IndexedDatabaseRequest : public RefCounted<IndexedDatabaseRequest> {
+class IDBFactoryBackendProxy : public IDBFactoryBackendInterface {
  public:
-  static PassRefPtr<IndexedDatabaseRequest> create(
-      IndexedDatabase* indexedDatabase) {
-    return adoptRef(new IndexedDatabaseRequest(indexedDatabase));
-  }
-  ~IndexedDatabaseRequest();
+  static PassRefPtr<IDBFactoryBackendInterface> create();
+  virtual ~IDBFactoryBackendProxy();
 
-  PassRefPtr<IDBRequest> open(ScriptExecutionContext*,
-                              const String& name,
-                              const String& description);
+  PassRefPtr<DOMStringList> databases(void) const;
+  virtual void open(const String& name,
+                    const String& description,
+                    PassRefPtr<IDBCallbacks>,
+                    PassRefPtr<SecurityOrigin>,
+                    Frame*);
 
  private:
-  IndexedDatabaseRequest(IndexedDatabase*);
+  IDBFactoryBackendProxy();
 
-  RefPtr<IndexedDatabase> m_indexedDatabase;
+  // We don't own this pointer (unlike all the other proxy classes which do).
+  WebKit::WebIDBFactory* m_webIDBFactory;
 };
 
 }  // namespace WebCore
 
 #endif
 
-#endif  // IndexedDatabaseRequest_h
+#endif  // IDBFactoryBackendProxy_h

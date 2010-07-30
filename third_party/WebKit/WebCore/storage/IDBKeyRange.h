@@ -50,6 +50,7 @@ class IDBKeyRange : public RefCounted<IDBKeyRange> {
                                         unsigned short flags) {
     return adoptRef(new IDBKeyRange(left, right, flags));
   }
+
   ~IDBKeyRange() {}
 
   PassRefPtr<IDBKey> left() const { return m_left; }

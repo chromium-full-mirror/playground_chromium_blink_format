@@ -26,39 +26,52 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef IndexedDatabaseProxy_h
-#define IndexedDatabaseProxy_h
+#ifndef WebIDBFactory_h
+#define WebIDBFactory_h
 
-#include "IndexedDatabase.h"
-
-#if ENABLE(INDEXED_DATABASE)
+#include "WebCommon.h"
+#include "WebDOMStringList.h"
+#include "WebIDBCallbacks.h"
+#include "WebSecurityOrigin.h"
+#include "WebString.h"
 
 namespace WebKit {
-class WebIndexedDatabase;
-}
 
-namespace WebCore {
+class WebFrame;
+class WebIDBDatabase;
+class WebString;
+class WebSecurityOrigin;
 
-class IndexedDatabaseProxy : public IndexedDatabase {
+// The entry point into the IndexedDatabase API.  These classes match their Foo
+// and
+// FooSync counterparts in the spec, but operate only in an async manner.
+// http://dev.w3.org/2006/webapi/WebSimpleDB/
+class WebIDBFactory {
  public:
-  static PassRefPtr<IndexedDatabase> create();
-  virtual ~IndexedDatabaseProxy();
+  WEBKIT_API static WebIDBFactory* create();
 
-  virtual void open(const String& name,
-                    const String& description,
-                    PassRefPtr<IDBCallbacks>,
-                    PassRefPtr<SecurityOrigin>,
-                    Frame*);
+  virtual ~WebIDBFactory() {}
 
- private:
-  IndexedDatabaseProxy();
-
-  // We don't own this pointer (unlike all the other proxy classes which do).
-  WebKit::WebIndexedDatabase* m_webIndexedDatabase;
+  // The WebKit implementation of open ignores the WebFrame* parameter.
+  virtual void open(const WebString& name,
+                    const WebString& description,
+                    WebIDBCallbacks* callbacks,
+                    const WebSecurityOrigin& origin,
+                    WebFrame* webFrame) {
+    int exceptionCode;
+    open(name, description, callbacks, origin, webFrame, exceptionCode);
+  }
+  // FIXME: Delete soon.  Compatability hack.
+  virtual void open(const WebString& name,
+                    const WebString& description,
+                    WebIDBCallbacks* callbacks,
+                    const WebSecurityOrigin& origin,
+                    WebFrame* webFrame,
+                    int& exceptionCode) {
+    open(name, description, callbacks, origin, webFrame);
+  }
 };
 
-}  // namespace WebCore
+}  // namespace WebKit
 
-#endif
-
-#endif  // IndexedDatabaseProxy_h
+#endif  // WebIDBFactory_h

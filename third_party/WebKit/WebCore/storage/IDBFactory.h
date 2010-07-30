@@ -25,40 +25,46 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef IndexedDatabaseImpl_h
-#define IndexedDatabaseImpl_h
+#ifndef IDBFactory_h
+#define IDBFactory_h
 
-#include "IndexedDatabase.h"
-#include "StringHash.h"
-#include <wtf/HashMap.h>
+#include "DOMStringList.h"
+#include "ExceptionCode.h"
+#include "IDBFactoryBackendInterface.h"
+#include "PlatformString.h"
+#include <wtf/PassRefPtr.h>
+#include <wtf/RefCounted.h>
+#include <wtf/RefPtr.h>
 
 #if ENABLE(INDEXED_DATABASE)
 
 namespace WebCore {
 
-class IndexedDatabaseImpl : public IndexedDatabase {
- public:
-  static PassRefPtr<IndexedDatabaseImpl> create();
-  virtual ~IndexedDatabaseImpl();
+class IDBKey;
+class IDBKeyRange;
+class IDBRequest;
+class IDBFactoryBackendInterface;
+class ScriptExecutionContext;
 
-  virtual void open(const String& name,
-                    const String& description,
-                    PassRefPtr<IDBCallbacks>,
-                    PassRefPtr<SecurityOrigin>,
-                    Frame*);
+class IDBFactory : public RefCounted<IDBFactory> {
+ public:
+  static PassRefPtr<IDBFactory> create(IDBFactoryBackendInterface* factory) {
+    return adoptRef(new IDBFactory(factory));
+  }
+  ~IDBFactory();
+
+  PassRefPtr<IDBRequest> open(ScriptExecutionContext*,
+                              const String& name,
+                              const String& description);
 
  private:
-  IndexedDatabaseImpl();
+  IDBFactory(IDBFactoryBackendInterface*);
 
-  typedef HashMap<String, RefPtr<IDBDatabase>> IDBDatabaseMap;
-  IDBDatabaseMap m_databaseMap;
-
-  // We only create one instance of this class at a time.
-  static IndexedDatabaseImpl* indexedDatabaseImpl;
+  RefPtr<IDBFactoryBackendInterface> m_factoryBackend;
 };
 
 }  // namespace WebCore
 
 #endif
 
-#endif  // IndexedDatabaseImpl_h
+#endif  // IDBFactory_h

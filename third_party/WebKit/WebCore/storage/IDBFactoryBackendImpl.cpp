@@ -27,46 +27,41 @@
  */
 
 #include "config.h"
-#include "IndexedDatabaseRequest.h"
+#include "IDBFactoryBackendImpl.h"
 
-#include "Document.h"
-#include "ExceptionCode.h"
-#include "Frame.h"
-#include "IDBDatabase.h"
-#include "IDBKeyRange.h"
-#include "IDBRequest.h"
-#include "IndexedDatabase.h"
+#include "DOMStringList.h"
+#include "IDBDatabaseImpl.h"
+#include "SecurityOrigin.h"
+#include <wtf/Threading.h>
+#include <wtf/UnusedParam.h>
 
 #if ENABLE(INDEXED_DATABASE)
 
 namespace WebCore {
 
-IndexedDatabaseRequest::IndexedDatabaseRequest(IndexedDatabase* indexedDatabase)
-    : m_indexedDatabase(indexedDatabase) {
-  // We pass a reference to this object before it can be adopted.
-  relaxAdoptionRequirement();
+PassRefPtr<IDBFactoryBackendImpl> IDBFactoryBackendImpl::create() {
+  return adoptRef(new IDBFactoryBackendImpl);
 }
 
-IndexedDatabaseRequest::~IndexedDatabaseRequest() {}
+IDBFactoryBackendImpl::IDBFactoryBackendImpl() {}
 
-PassRefPtr<IDBRequest> IndexedDatabaseRequest::open(
-    ScriptExecutionContext* context,
-    const String& name,
-    const String& description) {
-  if (!context->isDocument()) {
-    // FIXME: make this work with workers.
-    return 0;
-  }
+IDBFactoryBackendImpl::~IDBFactoryBackendImpl() {}
 
-  Document* document = static_cast<Document*>(context);
-  if (!document->frame())
-    return 0;
+void IDBFactoryBackendImpl::open(const String& name,
+                                 const String& description,
+                                 PassRefPtr<IDBCallbacks> callbacks,
+                                 PassRefPtr<SecurityOrigin>,
+                                 Frame*) {
+  RefPtr<IDBDatabase> database;
+  IDBDatabaseMap::iterator it = m_databaseMap.find(name);
+  if (it == m_databaseMap.end()) {
+    // FIXME: What should the version be?  The spec doesn't define it yet.
+    database = IDBDatabaseImpl::create(name, description, "");
+    m_databaseMap.set(name, database);
+  } else
+    database = it->second;
 
-  RefPtr<IDBRequest> request =
-      IDBRequest::create(document, IDBAny::create(this));
-  m_indexedDatabase->open(name, description, request,
-                          document->securityOrigin(), document->frame());
-  return request;
+  callbacks->onSuccess(database.release());
 }
 
 }  // namespace WebCore

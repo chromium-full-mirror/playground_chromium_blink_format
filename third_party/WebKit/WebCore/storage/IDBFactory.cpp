@@ -27,39 +27,46 @@
  */
 
 #include "config.h"
-#include "IndexedDatabaseProxy.h"
+#include "IDBFactory.h"
 
-#include "IDBDatabaseError.h"
-#include "IDBDatabaseProxy.h"
-#include "WebFrameImpl.h"
-#include "WebIDBCallbacksImpl.h"
-#include "WebIDBDatabase.h"
-#include "WebIDBDatabaseError.h"
-#include "WebIndexedDatabase.h"
-#include "WebKit.h"
-#include "WebKitClient.h"
+#include "DOMStringList.h"
+#include "Document.h"
+#include "ExceptionCode.h"
+#include "Frame.h"
+#include "IDBDatabase.h"
+#include "IDBFactoryBackendInterface.h"
+#include "IDBKeyRange.h"
+#include "IDBRequest.h"
 
 #if ENABLE(INDEXED_DATABASE)
 
 namespace WebCore {
 
-PassRefPtr<IndexedDatabase> IndexedDatabaseProxy::create() {
-  return adoptRef(new IndexedDatabaseProxy());
+IDBFactory::IDBFactory(IDBFactoryBackendInterface* factory)
+    : m_factoryBackend(factory) {
+  // We pass a reference to this object before it can be adopted.
+  relaxAdoptionRequirement();
 }
 
-IndexedDatabaseProxy::IndexedDatabaseProxy()
-    : m_webIndexedDatabase(WebKit::webKitClient()->indexedDatabase()) {}
+IDBFactory::~IDBFactory() {}
 
-IndexedDatabaseProxy::~IndexedDatabaseProxy() {}
+PassRefPtr<IDBRequest> IDBFactory::open(ScriptExecutionContext* context,
+                                        const String& name,
+                                        const String& description) {
+  if (!context->isDocument()) {
+    // FIXME: make this work with workers.
+    return 0;
+  }
 
-void IndexedDatabaseProxy::open(const String& name,
-                                const String& description,
-                                PassRefPtr<IDBCallbacks> callbacks,
-                                PassRefPtr<SecurityOrigin> origin,
-                                Frame* frame) {
-  WebKit::WebFrame* webFrame = WebKit::WebFrameImpl::fromFrame(frame);
-  m_webIndexedDatabase->open(
-      name, description, new WebIDBCallbacksImpl(callbacks), origin, webFrame);
+  Document* document = static_cast<Document*>(context);
+  if (!document->frame())
+    return 0;
+
+  RefPtr<IDBRequest> request =
+      IDBRequest::create(document, IDBAny::create(this));
+  m_factoryBackend->open(name, description, request, document->securityOrigin(),
+                         document->frame());
+  return request;
 }
 
 }  // namespace WebCore

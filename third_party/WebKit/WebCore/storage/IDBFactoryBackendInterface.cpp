@@ -25,34 +25,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include "config.h"
+#include "IDBFactoryBackendInterface.h"
 
-#ifndef WebIndexedDatabaseImpl_h
-#define WebIndexedDatabaseImpl_h
+#include "IDBFactoryBackendImpl.h"
 
-#include "WebIndexedDatabase.h"
-#include <wtf/RefPtr.h>
+#if PLATFORM(CHROMIUM)
+#error \
+    "Chromium should not compile this file and instead define its own version of this factory that navigates the multi-process boundry."
+#endif
+
+#if ENABLE(INDEXED_DATABASE)
 
 namespace WebCore {
-class IndexedDatabase;
+
+PassRefPtr<IDBFactoryBackendInterface> IDBFactoryBackendInterface::create() {
+  return IDBFactoryBackendImpl::create();
 }
 
-namespace WebKit {
+}  // namespace WebCore
 
-class WebIndexedDatabaseImpl : public WebIndexedDatabase {
- public:
-  WebIndexedDatabaseImpl();
-  virtual ~WebIndexedDatabaseImpl();
-
-  virtual void open(const WebString& name,
-                    const WebString& description,
-                    WebIDBCallbacks*,
-                    const WebSecurityOrigin&,
-                    WebFrame*);
-
- private:
-  WTF::RefPtr<WebCore::IndexedDatabase> m_indexedDatabase;
-};
-
-}  // namespace WebKit
-
-#endif  // WebIndexedDatabaseImpl_h
+#endif  // ENABLE(INDEXED_DATABASE)

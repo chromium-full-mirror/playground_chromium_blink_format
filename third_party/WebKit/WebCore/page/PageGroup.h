@@ -36,7 +36,7 @@
 namespace WebCore {
 
 class KURL;
-class IndexedDatabase;
+class IDBFactoryBackendInterface;
 class Page;
 class StorageNamespace;
 
@@ -71,7 +71,7 @@ class PageGroup : public Noncopyable {
   bool hasLocalStorage() { return m_localStorage; }
 #endif
 #if ENABLE(INDEXED_DATABASE)
-  IndexedDatabase* indexedDatabase();
+  IDBFactoryBackendInterface* idbFactory();
 #endif
 
   void addUserScriptToWorld(DOMWrapperWorld*,
@@ -117,7 +117,7 @@ class PageGroup : public Noncopyable {
   RefPtr<StorageNamespace> m_localStorage;
 #endif
 #if ENABLE(INDEXED_DATABASE)
-  RefPtr<IndexedDatabase> m_indexedDatabase;
+  RefPtr<IDBFactoryBackendInterface> m_factoryBackend;
 #endif
 
   OwnPtr<UserScriptMap> m_userScripts;
