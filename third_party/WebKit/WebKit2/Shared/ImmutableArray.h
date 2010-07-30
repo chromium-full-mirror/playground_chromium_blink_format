@@ -53,7 +53,7 @@ class ImmutableArray : public APIObject {
     ASSERT(i < m_size);
     if (m_entries[i]->type() != T::APIType)
       return 0;
-    return m_entries[i];
+    return static_cast<T*>(m_entries[i]);
   }
 
   APIObject* at(size_t i) {
