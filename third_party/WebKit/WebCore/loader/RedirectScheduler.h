@@ -75,7 +75,8 @@ class RedirectScheduler : public Noncopyable {
   void timerFired(Timer<RedirectScheduler>*);
   void schedule(PassOwnPtr<ScheduledNavigation>);
 
-  static bool mustLockBackForwardList(Frame* targetFrame);
+  static bool mustLockBackForwardList(Frame* targetFrame,
+                                      bool mustLockIfDuringLoad);
 
   Frame* m_frame;
   Timer<RedirectScheduler> m_timer;
@@ -84,4 +85,4 @@ class RedirectScheduler : public Noncopyable {
 
 }  // namespace WebCore
 
-#endif  // FrameLoader_h
+#endif  // RedirectScheduler_h

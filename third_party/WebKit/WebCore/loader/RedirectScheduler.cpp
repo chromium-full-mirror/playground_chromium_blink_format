@@ -295,19 +295,26 @@ void RedirectScheduler::scheduleRedirect(double delay, const String& url) {
   if (url.isEmpty())
     return;
 
-  // We want a new history item if the refresh timeout is > 1 second.
+  // We want a new back forward list item if the refresh timeout is > 1 second.
   if (!m_redirect || delay <= m_redirect->delay())
     schedule(new ScheduledRedirect(delay, url, true, delay <= 1, false));
 }
 
-bool RedirectScheduler::mustLockBackForwardList(Frame* targetFrame) {
+bool RedirectScheduler::mustLockBackForwardList(Frame* targetFrame,
+                                                bool mustLockIfDuringLoad) {
+  // Non-user navigation before the page has loaded should not create a new
+  // back/forward item.
+  // See https://webkit.org/b/42861 for the original motivation for this.
+  if (mustLockIfDuringLoad && targetFrame->loader()->documentLoader() &&
+      targetFrame->loader()->documentLoader()->isLoadingInAPISense())
+    return true;
+
   // Navigation of a subframe during loading of an ancestor frame does not
   // create a new back/forward item.
   // The definition of "during load" is any time before all handlers for the
   // load event have been run.
   // See https://bugs.webkit.org/show_bug.cgi?id=14957 for the original
   // motivation for this.
-
   for (Frame* ancestor = targetFrame->tree()->parent(); ancestor;
        ancestor = ancestor->tree()->parent()) {
     Document* document = ancestor->document();
@@ -328,7 +335,8 @@ void RedirectScheduler::scheduleLocationChange(const String& url,
   if (url.isEmpty())
     return;
 
-  lockBackForwardList = lockBackForwardList || mustLockBackForwardList(m_frame);
+  lockBackForwardList =
+      lockBackForwardList || mustLockBackForwardList(m_frame, !wasUserGesture);
 
   FrameLoader* loader = m_frame->loader();
 
@@ -373,7 +381,7 @@ void RedirectScheduler::scheduleFormSubmission(
   // motivation for this.
 
   bool lockBackForwardList =
-      mustLockBackForwardList(m_frame) ||
+      mustLockBackForwardList(m_frame, false) ||
       (submission->state()->formSubmissionTrigger() == SubmittedByJavaScript &&
        m_frame->tree()->parent());
 
