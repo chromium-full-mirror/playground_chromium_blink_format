@@ -3,7 +3,6 @@
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  * Copyright (C) 2007 Ryan Leavengood <leavengood@gmail.com> All rights
  * reserved.
- * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  *
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,8 +37,6 @@
 #include "NotImplemented.h"
 #include "PlatformString.h"
 #include "SecurityOrigin.h"
-#include "PopupMenuHaiku.h"
-#include "SearchPopupMenuHaiku.h"
 
 #include <Alert.h>
 #include <String.h>
@@ -344,20 +341,6 @@ void ChromeClientHaiku::formStateDidChange(const Node*) {
 PassOwnPtr<HTMLParserQuirks> ChromeClientHaiku::createHTMLParserQuirks() {
   notImplemented();
   return 0;
-}
-
-bool ChromeClientHaiku::selectItemWritingDirectionIsNatural() {
-  return false;
-}
-
-PassRefPtr<PopupMenu> ChromeClientHaiku::createPopupMenu(
-    PopupMenuClient* client) const {
-  return adoptRef(new PopupMenuHaiku(client));
-}
-
-PassRefPtr<SearchPopupMenu> ChromeClientHaiku::createSearchPopupMenu(
-    PopupMenuClient* client) const {
-  return adoptRef(new SearchPopupMenuHaiku(client));
 }
 
 }  // namespace WebCore

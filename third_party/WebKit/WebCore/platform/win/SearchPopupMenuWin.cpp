@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2006, 2007 Apple Inc.
- * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,21 +18,16 @@
  */
 
 #include "config.h"
-#include "SearchPopupMenuWin.h"
+#include "SearchPopupMenu.h"
 
 #include "AtomicString.h"
 #include <wtf/RetainPtr.h>
 
 namespace WebCore {
 
-SearchPopupMenuWin::SearchPopupMenuWin(PopupMenuClient* client)
-    : m_popup(client) {}
+SearchPopupMenu::SearchPopupMenu(PopupMenuClient* client) : PopupMenu(client) {}
 
-PopupMenu* SearchPopupMenuWin::popupMenu() {
-  return &m_popup;
-}
-
-bool SearchPopupMenuWin::enabled() {
+bool SearchPopupMenu::enabled() {
   return true;
 }
 
@@ -42,8 +36,8 @@ static RetainPtr<CFStringRef> autosaveKey(const String& name) {
   return RetainPtr<CFStringRef>(AdoptCF, key.createCFString());
 }
 
-void SearchPopupMenuWin::saveRecentSearches(const AtomicString& name,
-                                            const Vector<String>& searchItems) {
+void SearchPopupMenu::saveRecentSearches(const AtomicString& name,
+                                         const Vector<String>& searchItems) {
   if (name.isEmpty())
     return;
 
@@ -63,8 +57,8 @@ void SearchPopupMenuWin::saveRecentSearches(const AtomicString& name,
   CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 }
 
-void SearchPopupMenuWin::loadRecentSearches(const AtomicString& name,
-                                            Vector<String>& searchItems) {
+void SearchPopupMenu::loadRecentSearches(const AtomicString& name,
+                                         Vector<String>& searchItems) {
   if (name.isEmpty())
     return;
 

@@ -3,7 +3,6 @@
  *           (C) 2008 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
  * Copyright (C) 2010 Google Inc. All rights reserved.
- * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -25,7 +24,6 @@
 #include "config.h"
 #include "RenderTextControlSingleLine.h"
 
-#include "Chrome.h"
 #include "CSSStyleSelector.h"
 #include "Event.h"
 #include "EventNames.h"
@@ -41,6 +39,7 @@
 #include "RenderLayer.h"
 #include "RenderScrollbar.h"
 #include "RenderTheme.h"
+#include "SearchPopupMenu.h"
 #include "SelectionController.h"
 #include "Settings.h"
 #include "SimpleFontData.h"
@@ -64,7 +63,7 @@ RenderTextControlSingleLine::RenderTextControlSingleLine(
 
 RenderTextControlSingleLine::~RenderTextControlSingleLine() {
   if (m_searchPopup) {
-    m_searchPopup->popupMenu()->disconnectClient();
+    m_searchPopup->disconnectClient();
     m_searchPopup = 0;
   }
 
@@ -107,7 +106,7 @@ void RenderTextControlSingleLine::addSearchResult() {
 
   const AtomicString& name = autosaveName();
   if (!m_searchPopup)
-    m_searchPopup = document()->page()->chrome()->createSearchPopupMenu(this);
+    m_searchPopup = SearchPopupMenu::create(this);
 
   m_searchPopup->saveRecentSearches(name, m_recentSearches);
 }
@@ -123,7 +122,7 @@ void RenderTextControlSingleLine::showPopup() {
     return;
 
   if (!m_searchPopup)
-    m_searchPopup = document()->page()->chrome()->createSearchPopupMenu(this);
+    m_searchPopup = SearchPopupMenu::create(this);
 
   if (!m_searchPopup->enabled())
     return;
@@ -144,14 +143,13 @@ void RenderTextControlSingleLine::showPopup() {
     m_searchPopup->saveRecentSearches(name, m_recentSearches);
   }
 
-  m_searchPopup->popupMenu()->show(absoluteBoundingBoxRect(true),
-                                   document()->view(), -1);
+  m_searchPopup->show(absoluteBoundingBoxRect(true), document()->view(), -1);
 }
 
 void RenderTextControlSingleLine::hidePopup() {
   ASSERT(node()->isHTMLElement());
   if (m_searchPopup)
-    m_searchPopup->popupMenu()->hide();
+    m_searchPopup->hide();
 }
 
 void RenderTextControlSingleLine::subtreeHasChanged() {
@@ -740,7 +738,7 @@ void RenderTextControlSingleLine::updateFromElement() {
   }
 
   if (m_searchPopupIsVisible)
-    m_searchPopup->popupMenu()->updateFromElement();
+    m_searchPopup->updateFromElement();
 }
 
 void RenderTextControlSingleLine::cacheSelection(int start, int end) {
@@ -941,8 +939,7 @@ void RenderTextControlSingleLine::valueChanged(unsigned listIndex,
       const AtomicString& name = autosaveName();
       if (!name.isEmpty()) {
         if (!m_searchPopup)
-          m_searchPopup =
-              document()->page()->chrome()->createSearchPopupMenu(this);
+          m_searchPopup = SearchPopupMenu::create(this);
         m_searchPopup->saveRecentSearches(name, m_recentSearches);
       }
     }
