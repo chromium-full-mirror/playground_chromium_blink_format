@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 Holger Hans Peter Freyther
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,8 +23,14 @@
 
 #include "ChromeClient.h"
 #include "KURL.h"
+#include "PopupMenu.h"
+#include "SearchPopupMenu.h"
 
 typedef struct _WebKitWebView WebKitWebView;
+
+namespace WebCore {
+class PopupMenuClient;
+}
 
 namespace WebKit {
 
@@ -142,6 +149,12 @@ class ChromeClient : public WebCore::ChromeClient {
   virtual void cancelGeolocationPermissionRequestForFrame(
       WebCore::Frame*,
       WebCore::Geolocation*);
+
+  virtual bool selectItemWritingDirectionIsNatural();
+  virtual PassRefPtr<WebCore::PopupMenu> createPopupMenu(
+      WebCore::PopupMenuClient*) const;
+  virtual PassRefPtr<WebCore::SearchPopupMenu> createSearchPopupMenu(
+      WebCore::PopupMenuClient*) const;
 
  private:
   WebKitWebView* m_webView;

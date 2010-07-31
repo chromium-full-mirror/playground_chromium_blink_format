@@ -25,7 +25,7 @@
  */
 
 #include "config.h"
-#include "PopupMenu.h"
+#include "PopupMenuQt.h"
 
 #include "Chrome.h"
 #include "ChromeClientQt.h"
@@ -36,14 +36,18 @@
 
 namespace WebCore {
 
-PopupMenu::PopupMenu(PopupMenuClient* client)
+PopupMenuQt::PopupMenuQt(PopupMenuClient* client)
     : m_popupClient(client), m_popup(0) {}
 
-PopupMenu::~PopupMenu() {
+PopupMenuQt::~PopupMenuQt() {
   delete m_popup;
 }
 
-void PopupMenu::show(const IntRect& rect, FrameView* view, int index) {
+void PopupMenuQt::disconnectClient() {
+  m_popupClient = 0;
+}
+
+void PopupMenuQt::show(const IntRect& rect, FrameView* view, int index) {
   ChromeClientQt* chromeClient =
       static_cast<ChromeClientQt*>(view->frame()->page()->chrome()->client());
   ASSERT(chromeClient);
@@ -62,16 +66,12 @@ void PopupMenu::show(const IntRect& rect, FrameView* view, int index) {
   m_popup->show();
 }
 
-void PopupMenu::hide() {
+void PopupMenuQt::hide() {
   m_popup->hide();
 }
 
-void PopupMenu::updateFromElement() {
-  client()->setTextFromItem(m_popupClient->selectedIndex());
-}
-
-bool PopupMenu::itemWritingDirectionIsNatural() {
-  return false;
+void PopupMenuQt::updateFromElement() {
+  m_popupClient->setTextFromItem(m_popupClient->selectedIndex());
 }
 }
 
