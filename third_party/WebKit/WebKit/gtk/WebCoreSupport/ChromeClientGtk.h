@@ -121,6 +121,7 @@ class ChromeClient : public WebCore::ChromeClient {
 #endif
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   virtual void reachedMaxAppCacheSize(int64_t spaceNeeded);
+  virtual void reachedApplicationCacheOriginQuota(WebCore::SecurityOrigin*);
 #endif
   virtual void runOpenPanel(WebCore::Frame*, PassRefPtr<WebCore::FileChooser>);
   virtual void chooseIconForFiles(const Vector<WebCore::String>&,

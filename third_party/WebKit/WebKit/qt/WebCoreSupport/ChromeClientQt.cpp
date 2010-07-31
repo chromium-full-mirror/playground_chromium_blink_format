@@ -457,6 +457,10 @@ void ChromeClientQt::reachedMaxAppCacheSize(int64_t) {
   // FIXME: Free some space.
   notImplemented();
 }
+
+void ChromeClientQt::reachedApplicationCacheOriginQuota(SecurityOrigin*) {
+  notImplemented();
+}
 #endif
 
 #if ENABLE(NOTIFICATIONS)

@@ -119,6 +119,7 @@ class ApplicationCacheGroup : public Noncopyable, ResourceHandleClient {
                                DocumentLoader*);
 
   void scheduleReachedMaxAppCacheSizeCallback();
+  void scheduleReachedOriginQuotaCallback();
 
   PassRefPtr<ResourceHandle> createResourceHandle(
       const KURL&,
@@ -148,11 +149,13 @@ class ApplicationCacheGroup : public Noncopyable, ResourceHandleClient {
   void didReceiveManifestData(const char*, int);
   void didFinishLoadingManifest();
   void didReachMaxAppCacheSize();
+  void didReachOriginQuota(PassRefPtr<Frame> frame);
 
   void startLoadingEntry();
   void deliverDelayedMainResources();
   void checkIfLoadIsComplete();
   void cacheUpdateFailed();
+  void cacheUpdateFailedDueToOriginQuota();
   void manifestNotFound();
 
   void addEntry(const String&, unsigned type);
@@ -237,8 +240,10 @@ class ApplicationCacheGroup : public Noncopyable, ResourceHandleClient {
 
   int64_t m_loadedSize;
   int64_t m_availableSpaceInQuota;
+  bool m_originQuotaReached;
 
   friend class ChromeClientCallbackTimer;
+  friend class OriginQuotaReachedCallbackTimer;
 };
 
 }  // namespace WebCore

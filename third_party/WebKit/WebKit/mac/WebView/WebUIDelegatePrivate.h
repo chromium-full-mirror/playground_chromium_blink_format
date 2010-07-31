@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -151,6 +152,20 @@ enum {
                                      frame:(WebFrame*)frame
     exceededDatabaseQuotaForSecurityOrigin:(WebSecurityOrigin*)origin
                                   database:(NSString*)databaseIdentifier;
+
+/*!
+    @method webView:exceededApplicationCacheOriginQuotaForSecurityOrigin:
+    @param sender The WebView sending the delegate method.
+    @param origin The security origin that needs a larger quota
+    @discussion This method is called when a page attempts to store more in the
+   Application Cache
+    for an origin than was allowed by the quota (or default) set for the origin.
+   This allows the
+    quota to be increased for the security origin.
+*/
+- (void)webView:(WebView*)sender
+    exceededApplicationCacheOriginQuotaForSecurityOrigin:
+        (WebSecurityOrigin*)origin;
 
 - (WebView*)webView:(WebView*)sender
     createWebViewWithRequest:(NSURLRequest*)request

@@ -36,6 +36,7 @@
 #include "Icon.h"
 #include "NotImplemented.h"
 #include "PlatformString.h"
+#include "SecurityOrigin.h"
 
 #include <Alert.h>
 #include <String.h>
@@ -305,6 +306,10 @@ void ChromeClientHaiku::exceededDatabaseQuota(Frame*,
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
 void ChromeClientWx::reachedMaxAppCacheSize(int64_t spaceNeeded) {
+  notImplemented();
+}
+
+void ChromeClientWx::reachedApplicationCacheOriginQuota(SecurityOrigin*) {
   notImplemented();
 }
 #endif

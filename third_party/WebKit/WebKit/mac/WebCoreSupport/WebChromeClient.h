@@ -134,6 +134,7 @@ class WebChromeClient : public WebCore::ChromeClient {
 #endif
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   virtual void reachedMaxAppCacheSize(int64_t spaceNeeded);
+  virtual void reachedApplicationCacheOriginQuota(WebCore::SecurityOrigin*);
 #endif
   virtual void populateVisitedLinks();
 

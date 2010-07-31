@@ -123,6 +123,7 @@ class ChromeClientEfl : public ChromeClient {
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   virtual void reachedMaxAppCacheSize(int64_t spaceNeeded);
+  virtual void reachedApplicationCacheOriginQuota(SecurityOrigin*);
 #endif
 
   virtual void runOpenPanel(Frame*, PassRefPtr<FileChooser>);

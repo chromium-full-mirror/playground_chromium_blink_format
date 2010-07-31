@@ -142,6 +142,7 @@ class ChromeClientQt : public ChromeClient {
 #endif
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   virtual void reachedMaxAppCacheSize(int64_t spaceNeeded);
+  virtual void reachedApplicationCacheOriginQuota(SecurityOrigin*);
 #endif
 
 #if ENABLE(NOTIFICATIONS)

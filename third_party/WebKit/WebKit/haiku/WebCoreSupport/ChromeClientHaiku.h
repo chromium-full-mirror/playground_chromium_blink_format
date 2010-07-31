@@ -146,6 +146,7 @@ class ChromeClientHaiku : public ChromeClient {
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   virtual void reachedMaxAppCacheSize(int64_t spaceNeeded);
+  virtual void reachedApplicationCacheOriginQuota(SecurityOrigin*);
 #endif
 
   // This is an asynchronous call. The ChromeClient can display UI asking the

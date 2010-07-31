@@ -28,8 +28,8 @@
 #define EmptyClients_h
 
 #include "ChromeClient.h"
-#include "ContextMenuClient.h"
 #include "Console.h"
+#include "ContextMenuClient.h"
 #include "DocumentLoader.h"
 #include "DragClient.h"
 #include "EditCommand.h"
@@ -160,6 +160,7 @@ class EmptyChromeClient : public ChromeClient {
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   virtual void reachedMaxAppCacheSize(int64_t) {}
+  virtual void reachedApplicationCacheOriginQuota(SecurityOrigin*) {}
 #endif
 
 #if ENABLE(NOTIFICATIONS)

@@ -71,7 +71,8 @@ ApplicationCacheGroup::ApplicationCacheGroup(const KURL& manifestURL,
       m_isCopy(isCopy),
       m_calledReachedMaxAppCacheSize(false),
       m_loadedSize(0),
-      m_availableSpaceInQuota(ApplicationCacheStorage::unknownQuota()) {}
+      m_availableSpaceInQuota(ApplicationCacheStorage::unknownQuota()),
+      m_originQuotaReached(false) {}
 
 ApplicationCacheGroup::~ApplicationCacheGroup() {
   if (m_isCopy) {
@@ -700,7 +701,7 @@ void ApplicationCacheGroup::didFinishLoading(ResourceHandle* handle) {
   // idea of the available quota space.
   if (m_availableSpaceInQuota < m_loadedSize) {
     m_currentResource = 0;
-    cacheUpdateFailed();
+    cacheUpdateFailedDueToOriginQuota();
     return;
   }
 
@@ -896,6 +897,13 @@ void ApplicationCacheGroup::didReachMaxAppCacheSize() {
   checkIfLoadIsComplete();
 }
 
+void ApplicationCacheGroup::didReachOriginQuota(PassRefPtr<Frame> frame) {
+  // Inform the client the origin quota has been reached,
+  // they may decide to increase the quota.
+  frame->page()->chrome()->client()->reachedApplicationCacheOriginQuota(
+      m_origin.get());
+}
+
 void ApplicationCacheGroup::cacheUpdateFailed() {
   stopLoading();
   m_manifestResource = 0;
@@ -903,6 +911,15 @@ void ApplicationCacheGroup::cacheUpdateFailed() {
   // Wait for master resource loads to finish.
   m_completionType = Failure;
   deliverDelayedMainResources();
+}
+
+void ApplicationCacheGroup::cacheUpdateFailedDueToOriginQuota() {
+  if (!m_originQuotaReached) {
+    m_originQuotaReached = true;
+    scheduleReachedOriginQuotaCallback();
+  }
+
+  cacheUpdateFailed();
 }
 
 void ApplicationCacheGroup::manifestNotFound() {
@@ -1012,12 +1029,15 @@ void ApplicationCacheGroup::checkIfLoadIsComplete() {
                              ? ApplicationCacheHost::UPDATEREADY_EVENT
                              : ApplicationCacheHost::CACHED_EVENT,
                          m_associatedDocumentLoaders);
+        // It is clear that the origin quota was not reached, so clear the flag
+        // if it was set.
+        m_originQuotaReached = false;
       } else {
         if (failureReason == ApplicationCacheStorage::OriginQuotaReached) {
           // We ran out of space for this origin. Roll back to previous state.
           if (oldNewestCache)
             setNewestCache(oldNewestCache.release());
-          cacheUpdateFailed();
+          cacheUpdateFailedDueToOriginQuota();
           return;
         }
 
@@ -1188,9 +1208,34 @@ class ChromeClientCallbackTimer : public TimerBase {
   ApplicationCacheGroup* m_cacheGroup;
 };
 
+class OriginQuotaReachedCallbackTimer : public TimerBase {
+ public:
+  OriginQuotaReachedCallbackTimer(ApplicationCacheGroup* cacheGroup,
+                                  Frame* frame)
+      : m_cacheGroup(cacheGroup), m_frame(frame) {}
+
+ private:
+  virtual void fired() {
+    m_cacheGroup->didReachOriginQuota(m_frame.release());
+    delete this;
+  }
+
+  ApplicationCacheGroup* m_cacheGroup;
+  RefPtr<Frame> m_frame;
+};
+
 void ApplicationCacheGroup::scheduleReachedMaxAppCacheSizeCallback() {
   ASSERT(isMainThread());
   ChromeClientCallbackTimer* timer = new ChromeClientCallbackTimer(this);
+  timer->startOneShot(0);
+  // The timer will delete itself once it fires.
+}
+
+void ApplicationCacheGroup::scheduleReachedOriginQuotaCallback() {
+  ASSERT(isMainThread());
+  RefPtr<Frame> frameProtector = m_frame;
+  OriginQuotaReachedCallbackTimer* timer =
+      new OriginQuotaReachedCallbackTimer(this, frameProtector.get());
   timer->startOneShot(0);
   // The timer will delete itself once it fires.
 }
