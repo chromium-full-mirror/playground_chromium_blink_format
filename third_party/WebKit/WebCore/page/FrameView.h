@@ -207,9 +207,10 @@ class FrameView : public ScrollView {
   void setIsVisuallyNonEmpty() { m_isVisuallyNonEmpty = true; }
 
   void forceLayout(bool allowSubtree = false);
-  void forceLayoutWithPageWidthRange(float minPageWidth,
-                                     float maxPageWidth,
-                                     bool adjustViewSize);
+  void forceLayoutForPagination(const FloatSize& pageSize,
+                                float maximumShrinkFactor,
+                                Frame::AdjustViewSizeOrNot);
+  int pageHeight() const { return m_pageHeight; }
 
   void adjustPageHeight(float* newBottom,
                         float oldTop,
@@ -363,6 +364,8 @@ class FrameView : public ScrollView {
 
   String m_mediaType;
   String m_mediaTypeWhenNotPrinting;
+
+  int m_pageHeight;
 
   unsigned m_enqueueEvents;
   Vector<ScheduledEvent*> m_scheduledEvents;

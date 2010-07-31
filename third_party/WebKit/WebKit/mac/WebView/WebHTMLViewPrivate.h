@@ -156,6 +156,7 @@ extern const float _WebHTMLViewPrintingMaximumShrinkFactor;
                                      limit:(WebCGFloat)bottomLimit;
 - (BOOL)_isInPrintMode;
 - (BOOL)_beginPrintModeWithPageWidth:(float)pageWidth
+                              height:(float)pageHeight
                          shrinkToFit:(BOOL)shrinkToFit;
 - (void)_endPrintMode;
 

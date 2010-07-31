@@ -156,10 +156,11 @@ class Frame : public RefCounted<Frame>
 
   Settings* settings() const;  // can be NULL
 
+  enum AdjustViewSizeOrNot { DoNotAdjustViewSize, AdjustViewSize };
   void setPrinting(bool printing,
-                   float minPageWidth,
-                   float maxPageWidth,
-                   bool adjustViewSize);
+                   const FloatSize& pageSize,
+                   float maximumShrinkRatio,
+                   AdjustViewSizeOrNot);
 
   bool inViewSourceMode() const;
   void setInViewSourceMode(bool = true);
