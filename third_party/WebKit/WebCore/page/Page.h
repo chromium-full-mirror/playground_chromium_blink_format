@@ -211,6 +211,19 @@ class Page : public Noncopyable {
   Settings* settings() const { return m_settings.get(); }
   ProgressTracker* progress() const { return m_progress.get(); }
 
+  enum ViewMode {
+    ViewModeInvalid,
+    ViewModeWindowed,
+    ViewModeFloating,
+    ViewModeFullscreen,
+    ViewModeMaximized,
+    ViewModeMinimized
+  };
+  static ViewMode stringToViewMode(const String&);
+
+  ViewMode viewMode() const { return m_viewMode; }
+  void setViewMode(ViewMode);
+
   void setTabKeyCyclesThroughElements(bool b) {
     m_tabKeyCyclesThroughElements = b;
   }
@@ -411,6 +424,8 @@ class Page : public Noncopyable {
 #if ENABLE(NOTIFICATIONS)
   NotificationPresenter* m_notificationPresenter;
 #endif
+
+  ViewMode m_viewMode;
 };
 
 }  // namespace WebCore

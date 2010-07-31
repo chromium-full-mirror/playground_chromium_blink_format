@@ -205,8 +205,6 @@ class QWebPagePrivate {
                                  // menu action
   Qt::DropAction m_lastDropAction;
 
-  QString viewMode;
-
   static bool drtRun;
 };
 
