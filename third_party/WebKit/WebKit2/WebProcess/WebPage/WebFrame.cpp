@@ -184,6 +184,13 @@ String WebFrame::url() const {
   return m_coreFrame->loader()->url().string();
 }
 
+String WebFrame::innerText() const {
+  if (!m_coreFrame)
+    return String();
+
+  return m_coreFrame->document()->documentElement()->innerText();
+}
+
 PassRefPtr<ImmutableArray> WebFrame::childFrames() {
   if (!m_coreFrame)
     return ImmutableArray::create();

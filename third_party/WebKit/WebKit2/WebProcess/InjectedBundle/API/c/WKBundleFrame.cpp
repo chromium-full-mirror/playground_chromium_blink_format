@@ -86,3 +86,7 @@ WKStringRef WKBundleFrameCopyMarkerText(WKBundleFrameRef frameRef,
                                         JSObjectRef element) {
   return toCopiedRef(toWK(frameRef)->markerText(element));
 }
+
+WKStringRef WKBundleFrameCopyInnerText(WKBundleFrameRef frameRef) {
+  return toCopiedRef(toWK(frameRef)->innerText());
+}
