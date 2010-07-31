@@ -54,6 +54,9 @@ class ApplicationCacheStorage : public Noncopyable {
   bool isMaximumSizeReached() const;
   int64_t spaceNeeded(int64_t cacheToSave);
 
+  int64_t defaultOriginQuota() const { return m_defaultOriginQuota; }
+  void setDefaultOriginQuota(int64_t quota);
+
   ApplicationCacheGroup* cacheGroupForURL(
       const KURL&);  // Cache to load a main resource from.
   ApplicationCacheGroup* fallbackCacheGroupForURL(
@@ -84,6 +87,8 @@ class ApplicationCacheStorage : public Noncopyable {
   bool deleteCacheGroup(const String& manifestURL);
   void vacuumDatabaseFile();
 
+  static int64_t noQuota() { return std::numeric_limits<int64_t>::max(); }
+
  private:
   ApplicationCacheStorage();
   PassRefPtr<ApplicationCache> loadCache(unsigned storageID);
@@ -112,6 +117,8 @@ class ApplicationCacheStorage : public Noncopyable {
 
   int64_t m_maximumSize;
   bool m_isMaximumSizeReached;
+
+  int64_t m_defaultOriginQuota;
 
   SQLiteDatabase m_database;
 
