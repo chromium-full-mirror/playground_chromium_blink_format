@@ -690,7 +690,9 @@ void ChromeClientImpl::attachRootGraphicsLayer(Frame* frame,
 void ChromeClientImpl::scheduleCompositingLayerSync() {
   m_webView->setRootLayerNeedsDisplay();
 }
+#endif
 
+#if USE(GLES2_RENDERING)
 PassOwnPtr<GLES2Context> ChromeClientImpl::getOnscreenGLES2Context() {
   return m_webView->getOnscreenGLES2Context();
 }

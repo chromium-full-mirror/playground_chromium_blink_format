@@ -160,7 +160,9 @@ class ChromeClientImpl : public WebCore::ChromeClientChromium {
   // Sets a flag to specify that the view needs to be updated, so we need
   // to do an eager layout before the drawing.
   virtual void scheduleCompositingLayerSync();
+#endif
 
+#if USE(GLES2_RENDERING)
   virtual PassOwnPtr<WebCore::GLES2Context> getOnscreenGLES2Context();
   virtual PassOwnPtr<WebCore::GLES2Context> getOffscreenGLES2Context();
 #endif
