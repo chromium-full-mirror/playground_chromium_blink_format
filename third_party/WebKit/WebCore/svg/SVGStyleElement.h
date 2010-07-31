@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This library is free software; you can redistribute it and/or
@@ -20,9 +20,9 @@
 
 #ifndef SVGStyleElement_h
 #define SVGStyleElement_h
-#if ENABLE(SVG)
 
-#include <SVGElement.h>
+#if ENABLE(SVG)
+#include "SVGElement.h"
 #include "SVGLangSpace.h"
 #include "StyleElement.h"
 
@@ -34,7 +34,6 @@ class SVGStyleElement : public SVGElement,
  public:
   SVGStyleElement(const QualifiedName&, Document*, bool createdByParser);
 
-  // Derived from: 'Element'
   virtual void parseMappedAttribute(Attribute*);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
@@ -45,7 +44,8 @@ class SVGStyleElement : public SVGElement,
 
   virtual void finishParsingChildren();
 
-  virtual bool sheetLoaded();
+  virtual bool isLoading() const { return StyleElement::isLoading(); }
+  virtual bool sheetLoaded() { return StyleElement::sheetLoaded(document()); }
 
   virtual const AtomicString& type() const;
   void setType(const AtomicString&, ExceptionCode&);
@@ -57,14 +57,9 @@ class SVGStyleElement : public SVGElement,
   void setTitle(const AtomicString&, ExceptionCode&);
 
   StyleSheet* sheet();
-
- protected:
-  bool m_createdByParser;
 };
 
 }  // namespace WebCore
 
 #endif  // ENABLE(SVG)
 #endif  // SVGStyleElement_h
-
-// vim:ts=4:noet

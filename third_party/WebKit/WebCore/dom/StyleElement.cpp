@@ -26,10 +26,17 @@
 #include "Element.h"
 #include "MediaList.h"
 #include "MediaQueryEvaluator.h"
+#include "ScriptableDocumentParser.h"
 
 namespace WebCore {
 
-StyleElement::StyleElement() {}
+StyleElement::StyleElement(Document* document, bool createdByParser)
+    : m_createdByParser(createdByParser),
+      m_loading(false),
+      m_startLineNumber(0) {
+  if (createdByParser && document && document->scriptableDocumentParser())
+    m_startLineNumber = document->scriptableDocumentParser()->lineNumber();
+}
 
 StyleSheet* StyleElement::sheet(Element* e) {
   if (!m_sheet)
@@ -37,11 +44,21 @@ StyleSheet* StyleElement::sheet(Element* e) {
   return m_sheet.get();
 }
 
-void StyleElement::insertedIntoDocument(Document*, Element* element) {
-  process(element, 0);
+void StyleElement::insertedIntoDocument(Document* document, Element* element) {
+  ASSERT(document);
+  ASSERT(element);
+  document->addStyleSheetCandidateNode(element, m_createdByParser);
+  if (m_createdByParser)
+    return;
+
+  process(element);
 }
 
-void StyleElement::removedFromDocument(Document* document) {
+void StyleElement::removedFromDocument(Document* document, Element* element) {
+  ASSERT(document);
+  ASSERT(element);
+  document->removeStyleSheetCandidateNode(element);
+
   // If we're in document teardown, then we don't need to do any notification of
   // our sheet's removal.
   if (!document->renderer())
@@ -53,7 +70,22 @@ void StyleElement::removedFromDocument(Document* document) {
     document->updateStyleSelector();
 }
 
-void StyleElement::process(Element* e, int startLineNumber) {
+void StyleElement::childrenChanged(Element* element) {
+  ASSERT(element);
+  if (m_createdByParser)
+    return;
+
+  process(element);
+}
+
+void StyleElement::finishParsingChildren(Element* element) {
+  ASSERT(element);
+  process(element);
+  sheet(element);
+  m_createdByParser = false;
+}
+
+void StyleElement::process(Element* e) {
   if (!e || !e->inDocument())
     return;
 
@@ -80,15 +112,16 @@ void StyleElement::process(Element* e, int startLineNumber) {
   }
   ASSERT(p == text + resultLength);
 
-  createSheet(e, startLineNumber, sheetText);
+  createSheet(e, m_startLineNumber, sheetText);
 }
 
 void StyleElement::createSheet(Element* e,
                                int startLineNumber,
                                const String& text) {
+  ASSERT(e);
   Document* document = e->document();
   if (m_sheet) {
-    if (static_cast<CSSStyleSheet*>(m_sheet.get())->isLoading())
+    if (m_sheet->isLoading())
       document->removePendingSheet();
     m_sheet = 0;
   }
@@ -104,18 +137,33 @@ void StyleElement::createSheet(Element* e,
     MediaQueryEvaluator printEval("print", true);
     if (screenEval.eval(mediaList.get()) || printEval.eval(mediaList.get())) {
       document->addPendingSheet();
-      setLoading(true);
+      m_loading = true;
       m_sheet =
           CSSStyleSheet::create(e, String(), KURL(), document->inputEncoding());
       m_sheet->parseStringAtLine(text, !document->inCompatMode(),
                                  startLineNumber);
       m_sheet->setMedia(mediaList.get());
       m_sheet->setTitle(e->title());
-      setLoading(false);
+      m_loading = false;
     }
   }
 
   if (m_sheet)
     m_sheet->checkLoaded();
+}
+
+bool StyleElement::isLoading() const {
+  if (m_loading)
+    return true;
+  return m_sheet ? m_sheet->isLoading() : false;
+}
+
+bool StyleElement::sheetLoaded(Document* document) {
+  ASSERT(document);
+  if (isLoading())
+    return false;
+
+  document->removePendingSheet();
+  return true;
 }
 }
