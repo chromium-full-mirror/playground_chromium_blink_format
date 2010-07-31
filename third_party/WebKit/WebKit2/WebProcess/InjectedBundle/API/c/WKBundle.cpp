@@ -41,8 +41,11 @@ void WKBundleSetClient(WKBundleRef bundleRef, WKBundleClient* wkClient) {
     toWK(bundleRef)->initializeClient(wkClient);
 }
 
-void WKBundlePostMessage(WKBundleRef bundleRef, WKStringRef messageRef) {
-  toWK(bundleRef)->postMessage(toWK(messageRef)->string());
+void WKBundlePostMessage(WKBundleRef bundleRef,
+                         WKStringRef messageNameRef,
+                         WKTypeRef messageBodyRef) {
+  toWK(bundleRef)->postMessage(toWK(messageNameRef)->string(),
+                               toWK(messageBodyRef));
 }
 
 void WKBundleSetShouldTrackVisitedLinks(WKBundleRef bundleRef,

@@ -86,7 +86,7 @@ class WebContext : public APIObject {
   void postMessageToInjectedBundle(const WebCore::String&, APIObject*);
 
   // InjectedBundle client
-  void didReceiveMessageFromInjectedBundle(const WebCore::String&);
+  void didReceiveMessageFromInjectedBundle(const WebCore::String&, APIObject*);
 
   // History client
   void didNavigateWithNavigationData(WebFrameProxy*,
@@ -109,6 +109,10 @@ class WebContext : public APIObject {
   WebCore::String applicationCacheDirectory();
 
   void registerURLSchemeAsEmptyDocument(const WebCore::String&);
+
+  void didReceiveMessage(CoreIPC::Connection*,
+                         CoreIPC::MessageID,
+                         CoreIPC::ArgumentDecoder&);
 
  private:
   WebContext(ProcessModel, const WebCore::String& injectedBundlePath);

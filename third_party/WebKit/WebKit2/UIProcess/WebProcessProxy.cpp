@@ -178,10 +178,6 @@ WebBackForwardListItem* WebProcessProxy::webBackForwardItem(
   return m_backForwardListItemMap.get(itemID).get();
 }
 
-void WebProcessProxy::forwardMessageToWebContext(const String& message) {
-  m_context->didReceiveMessageFromInjectedBundle(message);
-}
-
 void WebProcessProxy::getPlugins(bool refresh, Vector<PluginInfo>& plugins) {
   if (refresh)
     m_context->pluginInfoStore()->refresh();
@@ -225,14 +221,6 @@ void WebProcessProxy::didReceiveMessage(CoreIPC::Connection* connection,
                                         CoreIPC::ArgumentDecoder* arguments) {
   if (messageID.is<CoreIPC::MessageClassWebProcessProxy>()) {
     switch (messageID.get<WebProcessProxyMessage::Kind>()) {
-      case WebProcessProxyMessage::PostMessage: {
-        String message;
-        if (!arguments->decode(CoreIPC::Out(message)))
-          return;
-
-        forwardMessageToWebContext(message);
-        return;
-      }
       case WebProcessProxyMessage::AddBackForwardItem: {
         uint64_t itemID;
         String originalURL;
@@ -321,6 +309,11 @@ void WebProcessProxy::didReceiveMessage(CoreIPC::Connection* connection,
     }
   }
 
+  if (messageID.is<CoreIPC::MessageClassWebContext>()) {
+    m_context->didReceiveMessage(connection, messageID, *arguments);
+    return;
+  }
+
   uint64_t pageID = arguments->destinationID();
   if (!pageID)
     return;
@@ -373,7 +366,6 @@ void WebProcessProxy::didReceiveSyncMessage(CoreIPC::Connection* connection,
       case WebProcessProxyMessage::DidPerformServerRedirect:
       case WebProcessProxyMessage::DidUpdateHistoryTitle:
       case WebProcessProxyMessage::PopulateVisitedLinks:
-      case WebProcessProxyMessage::PostMessage:
       case WebProcessProxyMessage::AddBackForwardItem:
         ASSERT_NOT_REACHED();
         break;

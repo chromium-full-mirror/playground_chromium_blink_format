@@ -27,13 +27,13 @@
 
 #include "Arguments.h"
 #include "ImmutableArray.h"
+#include "WebContextMessageKinds.h"
 #include "InjectedBundleMessageKinds.h"
 #include "WKAPICast.h"
 #include "WKBundleAPICast.h"
 #include "WebCoreArgumentCoders.h"
 #include "WebPage.h"
 #include "WebProcess.h"
-#include "WebProcessProxyMessageKinds.h"
 #include <WebCore/PageGroup.h>
 #include <wtf/OwnArrayPtr.h>
 
@@ -41,51 +41,52 @@ using namespace WebCore;
 
 namespace WebKit {
 
-InjectedBundle::InjectedBundle(const WebCore::String& path)
-    : m_path(path), m_platformBundle(0) {
-  initializeClient(0);
-}
-
-InjectedBundle::~InjectedBundle() {}
-
-void InjectedBundle::initializeClient(WKBundleClient* client) {
-  if (client && !client->version)
-    m_client = *client;
-  else
-    memset(&m_client, 0, sizeof(m_client));
-}
-
-void InjectedBundle::postMessage(const String& message) {
-  WebProcess::shared().connection()->send(WebProcessProxyMessage::PostMessage,
-                                          0, CoreIPC::In(message));
-}
-
-void InjectedBundle::setShouldTrackVisitedLinks(bool shouldTrackVisitedLinks) {
-  PageGroup::setShouldTrackVisitedLinks(shouldTrackVisitedLinks);
-}
-
-void InjectedBundle::removeAllVisitedLinks() {
-  PageGroup::removeAllVisitedLinks();
-}
-
-void InjectedBundle::didCreatePage(WebPage* page) {
-  if (m_client.didCreatePage)
-    m_client.didCreatePage(toRef(this), toRef(page), m_client.clientInfo);
-}
-
-void InjectedBundle::willDestroyPage(WebPage* page) {
-  if (m_client.willDestroyPage)
-    m_client.willDestroyPage(toRef(this), toRef(page), m_client.clientInfo);
-}
-
-void InjectedBundle::didReceiveMessage(const WebCore::String& messageName,
-                                       APIObject* messageBody) {
-  if (m_client.didReceiveMessage)
-    m_client.didReceiveMessage(toRef(this), toRef(messageName.impl()),
-                               toRef(messageBody), m_client.clientInfo);
-}
-
 namespace {
+
+// FIXME: We should try to abstract out the shared logic from these and
+// and the PostMessageEncoder/PostMessageDecoders in WebContext.cpp into
+// a shared baseclass.
+
+// Encodes postMessage messages from the InjectedBundle -> UIProcess
+
+//   - Array -> Array
+//   - String -> String
+//   - BundlePage -> Page
+
+class PostMessageEncoder {
+ public:
+  PostMessageEncoder(APIObject* root) : m_root(root) {}
+
+  void encode(CoreIPC::ArgumentEncoder& encoder) const {
+    APIObject::Type type = m_root->type();
+    encoder.encode(static_cast<uint32_t>(type));
+    switch (type) {
+      case APIObject::TypeArray: {
+        ImmutableArray* array = static_cast<ImmutableArray*>(m_root);
+        encoder.encode(static_cast<uint64_t>(array->size()));
+        for (size_t i = 0; i < array->size(); ++i)
+          encoder.encode(PostMessageEncoder(array->at(i)));
+        break;
+      }
+      case APIObject::TypeString: {
+        WebString* string = static_cast<WebString*>(m_root);
+        encoder.encode(string->string());
+        break;
+      }
+      case APIObject::TypeBundlePage: {
+        WebPage* page = static_cast<WebPage*>(m_root);
+        encoder.encode(page->pageID());
+        break;
+      }
+      default:
+        ASSERT_NOT_REACHED();
+        break;
+    }
+  }
+
+ private:
+  APIObject* m_root;
+};
 
 // Decodes postMessage messages going from the UIProcess -> InjectedBundle
 
@@ -148,6 +149,52 @@ class PostMessageDecoder {
  private:
   APIObject** m_root;
 };
+}
+
+InjectedBundle::InjectedBundle(const String& path)
+    : m_path(path), m_platformBundle(0) {
+  initializeClient(0);
+}
+
+InjectedBundle::~InjectedBundle() {}
+
+void InjectedBundle::initializeClient(WKBundleClient* client) {
+  if (client && !client->version)
+    m_client = *client;
+  else
+    memset(&m_client, 0, sizeof(m_client));
+}
+
+void InjectedBundle::postMessage(const String& messageName,
+                                 APIObject* messageBody) {
+  WebProcess::shared().connection()->send(
+      WebContextMessage::PostMessage, 0,
+      CoreIPC::In(messageName, PostMessageEncoder(messageBody)));
+}
+
+void InjectedBundle::setShouldTrackVisitedLinks(bool shouldTrackVisitedLinks) {
+  PageGroup::setShouldTrackVisitedLinks(shouldTrackVisitedLinks);
+}
+
+void InjectedBundle::removeAllVisitedLinks() {
+  PageGroup::removeAllVisitedLinks();
+}
+
+void InjectedBundle::didCreatePage(WebPage* page) {
+  if (m_client.didCreatePage)
+    m_client.didCreatePage(toRef(this), toRef(page), m_client.clientInfo);
+}
+
+void InjectedBundle::willDestroyPage(WebPage* page) {
+  if (m_client.willDestroyPage)
+    m_client.willDestroyPage(toRef(this), toRef(page), m_client.clientInfo);
+}
+
+void InjectedBundle::didReceiveMessage(const String& messageName,
+                                       APIObject* messageBody) {
+  if (m_client.didReceiveMessage)
+    m_client.didReceiveMessage(toRef(this), toRef(messageName.impl()),
+                               toRef(messageBody), m_client.clientInfo);
 }
 
 void InjectedBundle::didReceiveMessage(CoreIPC::Connection* connection,

@@ -46,12 +46,14 @@ void WebContextInjectedBundleClient::initialize(
 
 void WebContextInjectedBundleClient::didReceiveMessageFromInjectedBundle(
     WebContext* context,
-    const String& message) {
+    const String& messageName,
+    APIObject* messageBody) {
   if (!m_client.didReceiveMessageFromInjectedBundle)
     return;
 
   m_client.didReceiveMessageFromInjectedBundle(
-      toRef(context), toRef(message.impl()), m_client.clientInfo);
+      toRef(context), toRef(messageName.impl()), toRef(messageBody),
+      m_client.clientInfo);
 }
 
 }  // namespace WebKit

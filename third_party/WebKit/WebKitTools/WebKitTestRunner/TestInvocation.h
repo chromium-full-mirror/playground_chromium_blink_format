@@ -37,7 +37,8 @@ class TestInvocation : public Noncopyable {
   ~TestInvocation();
 
   void invoke();
-  void didReceiveMessageFromInjectedBundle(WKStringRef message);
+  void didReceiveMessageFromInjectedBundle(WKStringRef messageName,
+                                           WKTypeRef messageBody);
 
  private:
   void dump(const char*);

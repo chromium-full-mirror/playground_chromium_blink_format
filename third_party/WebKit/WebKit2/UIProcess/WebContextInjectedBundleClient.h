@@ -34,6 +34,7 @@ class String;
 
 namespace WebKit {
 
+class APIObject;
 class WebContext;
 
 class WebContextInjectedBundleClient {
@@ -41,7 +42,9 @@ class WebContextInjectedBundleClient {
   WebContextInjectedBundleClient();
   void initialize(const WKContextInjectedBundleClient*);
 
-  void didReceiveMessageFromInjectedBundle(WebContext*, const WebCore::String&);
+  void didReceiveMessageFromInjectedBundle(WebContext*,
+                                           const WebCore::String&,
+                                           APIObject*);
 
  private:
   WKContextInjectedBundleClient m_client;

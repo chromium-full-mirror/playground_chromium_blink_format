@@ -76,7 +76,7 @@ void TestController::initialize(int argc, const char* argv[]) {
   m_context.adopt(WKContextCreateWithInjectedBundlePath(injectedBundlePath()));
 
   WKContextInjectedBundleClient injectedBundlePathClient = {
-      0, this, _didReceiveMessageFromInjectedBundle};
+      0, this, didReceiveMessageFromInjectedBundle};
   WKContextSetInjectedBundleClient(m_context.get(), &injectedBundlePathClient);
 
   _WKContextSetAdditionalPluginsDirectory(m_context.get(),
@@ -117,16 +117,20 @@ bool TestController::run() {
   return true;
 }
 
-void TestController::_didReceiveMessageFromInjectedBundle(
+void TestController::didReceiveMessageFromInjectedBundle(
     WKContextRef context,
-    WKStringRef message,
+    WKStringRef messageName,
+    WKTypeRef messageBody,
     const void* clientInfo) {
   static_cast<TestController*>(const_cast<void*>(clientInfo))
-      ->didReceiveMessageFromInjectedBundle(message);
+      ->didReceiveMessageFromInjectedBundle(messageName, messageBody);
 }
 
-void TestController::didReceiveMessageFromInjectedBundle(WKStringRef message) {
-  m_currentInvocation->didReceiveMessageFromInjectedBundle(message);
+void TestController::didReceiveMessageFromInjectedBundle(
+    WKStringRef messageName,
+    WKTypeRef messageBody) {
+  m_currentInvocation->didReceiveMessageFromInjectedBundle(messageName,
+                                                           messageBody);
 }
 
 }  // namespace WTR
