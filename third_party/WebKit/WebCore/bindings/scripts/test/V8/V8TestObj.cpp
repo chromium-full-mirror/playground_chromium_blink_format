@@ -34,6 +34,7 @@
 #include "V8IsolatedContext.h"
 #include "V8Proxy.h"
 #include "V8TestCallback.h"
+#include "V8bool.h"
 #include "V8log.h"
 #include <wtf/GetPtr.h>
 #include <wtf/RefCounted.h>
@@ -170,6 +171,45 @@ static void testObjAttrAttrSetter(v8::Local<v8::String> name,
                    ? V8TestObj::toNative(v8::Handle<v8::Object>::Cast(value))
                    : 0;
   imp->setTestObjAttr(WTF::getPtr(v));
+  return;
+}
+
+static v8::Handle<v8::Value> XMLObjAttrAttrGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
+  INC_STATS("DOM.TestObj.XMLObjAttr._get");
+  TestObj* imp = V8TestObj::toNative(info.Holder());
+  return toV8(imp->xmlObjAttr());
+}
+
+static void XMLObjAttrAttrSetter(v8::Local<v8::String> name,
+                                 v8::Local<v8::Value> value,
+                                 const v8::AccessorInfo& info) {
+  INC_STATS("DOM.TestObj.XMLObjAttr._set");
+  TestObj* imp = V8TestObj::toNative(info.Holder());
+  TestObj* v = V8TestObj::HasInstance(value)
+                   ? V8TestObj::toNative(v8::Handle<v8::Object>::Cast(value))
+                   : 0;
+  imp->setXMLObjAttr(WTF::getPtr(v));
+  return;
+}
+
+static v8::Handle<v8::Value> CREATEAttrGetter(v8::Local<v8::String> name,
+                                              const v8::AccessorInfo& info) {
+  INC_STATS("DOM.TestObj.CREATE._get");
+  TestObj* imp = V8TestObj::toNative(info.Holder());
+  return toV8(imp->isCreate());
+}
+
+static void CREATEAttrSetter(v8::Local<v8::String> name,
+                             v8::Local<v8::Value> value,
+                             const v8::AccessorInfo& info) {
+  INC_STATS("DOM.TestObj.CREATE._set");
+  TestObj* imp = V8TestObj::toNative(info.Holder());
+  bool* v = V8bool::HasInstance(value)
+                ? V8bool::toNative(v8::Handle<v8::Object>::Cast(value))
+                : 0;
+  imp->setCreate(WTF::getPtr(v));
   return;
 }
 
@@ -1105,6 +1145,16 @@ static const BatchedAttribute TestObjAttrs[] = {
     // Attribute 'testObjAttr' (Type: 'attribute' ExtAttr: '')
     {"testObjAttr", TestObjInternal::testObjAttrAttrGetter,
      TestObjInternal::testObjAttrAttrSetter, 0 /* no data */,
+     static_cast<v8::AccessControl>(v8::DEFAULT),
+     static_cast<v8::PropertyAttribute>(v8::None), 0 /* on instance */},
+    // Attribute 'XMLObjAttr' (Type: 'attribute' ExtAttr: '')
+    {"XMLObjAttr", TestObjInternal::XMLObjAttrAttrGetter,
+     TestObjInternal::XMLObjAttrAttrSetter, 0 /* no data */,
+     static_cast<v8::AccessControl>(v8::DEFAULT),
+     static_cast<v8::PropertyAttribute>(v8::None), 0 /* on instance */},
+    // Attribute 'CREATE' (Type: 'attribute' ExtAttr: '')
+    {"CREATE", TestObjInternal::CREATEAttrGetter,
+     TestObjInternal::CREATEAttrSetter, 0 /* no data */,
      static_cast<v8::AccessControl>(v8::DEFAULT),
      static_cast<v8::PropertyAttribute>(v8::None), 0 /* on instance */},
     // Attribute 'reflectedStringAttr' (Type: 'attribute' ExtAttr: 'Reflect')

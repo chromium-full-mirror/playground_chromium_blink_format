@@ -28,11 +28,13 @@
 #include "JSEventListener.h"
 #include "JSTestCallback.h"
 #include "JSTestObj.h"
+#include "JSbool.h"
 #include "JSlog.h"
 #include "KURL.h"
 #include "ScriptCallStack.h"
 #include "SerializedScriptValue.h"
 #include "TestObj.h"
+#include "bool.h"
 #include <runtime/Error.h>
 #include <runtime/JSNumberCell.h>
 #include <runtime/JSString.h>
@@ -51,7 +53,7 @@ ASSERT_CLASS_FITS_IN_CELL(JSTestObj);
 #define THUNK_GENERATOR(generator)
 #endif
 
-static const HashTableValue JSTestObjTableValues[32] = {
+static const HashTableValue JSTestObjTableValues[34] = {
     {"readOnlyIntAttr", DontDelete | ReadOnly,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
          jsTestObjReadOnlyIntAttr),
@@ -80,6 +82,12 @@ static const HashTableValue JSTestObjTableValues[32] = {
     {"testObjAttr", DontDelete,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(jsTestObjTestObjAttr),
      (intptr_t)setJSTestObjTestObjAttr THUNK_GENERATOR(0)},
+    {"XMLObjAttr", DontDelete,
+     (intptr_t) static_cast<PropertySlot::GetValueFunc>(jsTestObjXMLObjAttr),
+     (intptr_t)setJSTestObjXMLObjAttr THUNK_GENERATOR(0)},
+    {"CREATE", DontDelete,
+     (intptr_t) static_cast<PropertySlot::GetValueFunc>(jsTestObjCreate),
+     (intptr_t)setJSTestObjCreate THUNK_GENERATOR(0)},
     {"reflectedStringAttr", DontDelete,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
          jsTestObjReflectedStringAttr),
@@ -176,7 +184,7 @@ static const HashTableValue JSTestObjTableValues[32] = {
     {0, 0, 0, 0 THUNK_GENERATOR(0)}};
 
 #undef THUNK_GENERATOR
-static JSC_CONST_HASHTABLE HashTable JSTestObjTable = {68, 63,
+static JSC_CONST_HASHTABLE HashTable JSTestObjTable = {132, 127,
                                                        JSTestObjTableValues, 0};
 /* Hash table for constructor */
 #if ENABLE(JIT)
@@ -622,6 +630,26 @@ JSValue jsTestObjTestObjAttr(ExecState* exec,
   return result;
 }
 
+JSValue jsTestObjXMLObjAttr(ExecState* exec,
+                            JSValue slotBase,
+                            const Identifier&) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
+  UNUSED_PARAM(exec);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  JSValue result =
+      toJS(exec, castedThis->globalObject(), WTF::getPtr(imp->xmlObjAttr()));
+  return result;
+}
+
+JSValue jsTestObjCreate(ExecState* exec, JSValue slotBase, const Identifier&) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
+  UNUSED_PARAM(exec);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  JSValue result =
+      toJS(exec, castedThis->globalObject(), WTF::getPtr(imp->isCreate()));
+  return result;
+}
+
 JSValue jsTestObjReflectedStringAttr(ExecState* exec,
                                      JSValue slotBase,
                                      const Identifier&) {
@@ -908,6 +936,20 @@ void setJSTestObjTestObjAttr(ExecState* exec,
   JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   imp->setTestObjAttr(toTestObj(value));
+}
+
+void setJSTestObjXMLObjAttr(ExecState* exec,
+                            JSObject* thisObject,
+                            JSValue value) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  imp->setXMLObjAttr(toTestObj(value));
+}
+
+void setJSTestObjCreate(ExecState* exec, JSObject* thisObject, JSValue value) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  imp->setCreate(tobool(value));
 }
 
 void setJSTestObjReflectedStringAttr(ExecState* exec,

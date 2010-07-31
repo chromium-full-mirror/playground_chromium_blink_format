@@ -211,6 +211,14 @@ JSC::JSValue jsTestObjTestObjAttr(JSC::ExecState*,
                                   JSC::JSValue,
                                   const JSC::Identifier&);
 void setJSTestObjTestObjAttr(JSC::ExecState*, JSC::JSObject*, JSC::JSValue);
+JSC::JSValue jsTestObjXMLObjAttr(JSC::ExecState*,
+                                 JSC::JSValue,
+                                 const JSC::Identifier&);
+void setJSTestObjXMLObjAttr(JSC::ExecState*, JSC::JSObject*, JSC::JSValue);
+JSC::JSValue jsTestObjCreate(JSC::ExecState*,
+                             JSC::JSValue,
+                             const JSC::Identifier&);
+void setJSTestObjCreate(JSC::ExecState*, JSC::JSObject*, JSC::JSValue);
 JSC::JSValue jsTestObjReflectedStringAttr(JSC::ExecState*,
                                           JSC::JSValue,
                                           const JSC::Identifier&);
