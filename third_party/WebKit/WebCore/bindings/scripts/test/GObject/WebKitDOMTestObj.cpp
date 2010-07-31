@@ -28,7 +28,6 @@
 #include "JSMainThreadExecState.h"
 #include "TestObj.h"
 #include "WebKitDOMBinding.h"
-#include "bool.h"
 #include "gobject/ConvertToUTF8String.h"
 #include "webkit/WebKitDOMIDBKey.h"
 #include "webkit/WebKitDOMIDBKeyPrivate.h"
@@ -36,8 +35,6 @@
 #include "webkit/WebKitDOMSerializedScriptValuePrivate.h"
 #include "webkit/WebKitDOMTestObj.h"
 #include "webkit/WebKitDOMTestObjPrivate.h"
-#include "webkit/WebKitDOMbool.h"
-#include "webkit/WebKitDOMboolPrivate.h"
 #include "webkitmarshal.h"
 #include "webkitprivate.h"
 
@@ -489,24 +486,19 @@ void webkit_dom_test_obj_set_xml_obj_attr(WebKitDOMTestObj* self,
   item->setXMLObjAttr(converted_value);
 }
 
-WebKitDOMbool* webkit_dom_test_obj_get_create(WebKitDOMTestObj* self) {
+gboolean webkit_dom_test_obj_get_create(WebKitDOMTestObj* self) {
   WebCore::JSMainThreadNullState state;
   g_return_val_if_fail(self, 0);
   WebCore::TestObj* item = WebKit::core(self);
-  PassRefPtr<WebCore::bool> g_res = WTF::getPtr(item->isCreate());
-  WebKitDOMbool* res = static_cast<WebKitDOMbool*>(WebKit::kit(g_res.get()));
+  gboolean res = item->isCreate();
   return res;
 }
 
-void webkit_dom_test_obj_set_create(WebKitDOMTestObj* self,
-                                    WebKitDOMbool* value) {
+void webkit_dom_test_obj_set_create(WebKitDOMTestObj* self, gboolean value) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
-  g_return_if_fail(value);
-  WebCore::bool* converted_value = WebKit::core(value);
-  g_return_if_fail(converted_value);
-  item->setCreate(converted_value);
+  item->setCreate(value);
 }
 
 gchar* webkit_dom_test_obj_get_reflected_string_attr(WebKitDOMTestObj* self) {
@@ -1018,6 +1010,10 @@ static void webkit_dom_test_obj_set_property(GObject* object,
           WebCore::String::fromUTF8(g_value_get_string(value)));
       break;
     }
+    case PROP_CREATE: {
+      coreSelf->setCreate((g_value_get_boolean(value)));
+      break;
+    }
     case PROP_REFLECTED_STRING_ATTR: {
       coreSelf->setAttribute(
           WebCore::HTMLNames::reflectedstringattrAttr,
@@ -1177,8 +1173,7 @@ static void webkit_dom_test_obj_get_property(GObject* object,
       break;
     }
     case PROP_CREATE: {
-      RefPtr<WebCore::bool> ptr = coreSelf->isCreate();
-      g_value_set_object(value, WebKit::kit(ptr.get()));
+      g_value_set_boolean(value, coreSelf->isCreate());
       break;
     }
     case PROP_REFLECTED_STRING_ATTR: {
@@ -1428,13 +1423,12 @@ static void webkit_dom_test_obj_class_init(
           WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
       gobjectClass, PROP_CREATE,
-      g_param_spec_object(
-          "create",                                     /* name */
-          "test_obj_create",                            /* short description */
-          "read-write  WebKitDOMbool*  TestObj.create", /* longer - could do
-                                                           with some extra doc
-                                                           stuff here */
-          WEBKIT_TYPE_DOM_BOOL,                         /* gobject type */
+      g_param_spec_boolean(
+          "create",                              /* name */
+          "test_obj_create",                     /* short description */
+          "read-write  gboolean TestObj.create", /* longer - could do with some
+                                                    extra doc stuff here */
+          FALSE,                                 /* default */
           WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
       gobjectClass, PROP_REFLECTED_STRING_ATTR,
