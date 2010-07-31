@@ -41,6 +41,10 @@
 #include "PluginHalterClient.h"
 #include "ResourceError.h"
 
+#if USE(GLES2_RENDERING)
+#include "GLES2Context.h"
+#endif
+
 /*
  This file holds empty Client stubs for use by WebCore.
  Viewless element needs to create a dummy Page->Frame->FrameView tree for use in
@@ -184,6 +188,11 @@ class EmptyChromeClient : public ChromeClient {
   virtual void attachRootGraphicsLayer(Frame*, GraphicsLayer*){};
   virtual void setNeedsOneShotDrawingSynchronization(){};
   virtual void scheduleCompositingLayerSync(){};
+#endif
+
+#if USE(GLES2_RENDERING)
+  virtual PassOwnPtr<GLES2Context> getOnscreenGLES2Context() { return 0; }
+  virtual PassOwnPtr<GLES2Context> getOffscreenGLES2Context() { return 0; }
 #endif
 
 #if PLATFORM(WIN)
