@@ -93,8 +93,6 @@ class BackForwardList : public RefCounted<BackForwardList> {
   virtual void removeItem(HistoryItem*) = 0;
   virtual HistoryItemVector& entries() = 0;
 
-  virtual void pushStateItem(PassRefPtr<HistoryItem>) = 0;
-
 #if ENABLE(WML)
   virtual void clearWMLPageHistory() = 0;
 #endif

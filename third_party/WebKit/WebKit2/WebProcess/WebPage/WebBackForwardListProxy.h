@@ -68,8 +68,6 @@ class WebBackForwardListProxy : public WebCore::BackForwardList {
   void removeItem(WebCore::HistoryItem*);
   WebCore::HistoryItemVector& entries();
 
-  void pushStateItem(PassRefPtr<WebCore::HistoryItem>);
-
 #if ENABLE(WML)
   void clearWMLPageHistory();
 #endif

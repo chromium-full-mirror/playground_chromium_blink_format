@@ -239,8 +239,6 @@ HistoryItemVector& WebBackForwardListProxy::entries() {
   return noEntries;
 }
 
-void WebBackForwardListProxy::pushStateItem(PassRefPtr<HistoryItem>) {}
-
 #if ENABLE(WML)
 void WebBackForwardListProxy::clearWMLPageHistory() {}
 #endif
