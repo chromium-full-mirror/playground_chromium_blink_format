@@ -3,6 +3,7 @@
  * Copyright (C) 2008 INdT - Instituto Nokia de Tecnologia
  * Copyright (C) 2009-2010 ProFUSION embedded systems
  * Copyright (C) 2009-2010 Samsung Electronics
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -151,6 +152,11 @@ class ChromeClientEfl : public ChromeClient {
   virtual void didReceiveViewportArguments(
       Frame* frame,
       const ViewportArguments& arguments) const;
+
+  virtual bool selectItemWritingDirectionIsNatural();
+  virtual PassRefPtr<PopupMenu> createPopupMenu(PopupMenuClient*) const;
+  virtual PassRefPtr<SearchPopupMenu> createSearchPopupMenu(
+      PopupMenuClient*) const;
 
   Evas_Object* m_view;
   KURL m_hoveredLinkURL;

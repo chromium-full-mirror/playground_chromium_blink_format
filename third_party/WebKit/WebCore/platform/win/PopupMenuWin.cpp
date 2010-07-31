@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2007-2009 Torch Mobile Inc.
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,7 +21,7 @@
  */
 
 #include "config.h"
-#include "PopupMenu.h"
+#include "PopupMenuWin.h"
 
 #include "BitmapInfo.h"
 #include "Document.h"
@@ -84,7 +85,7 @@ static void translatePoint(LPARAM& lParam, HWND from, HWND to) {
   lParam = MAKELPARAM(pt.x, pt.y);
 }
 
-PopupMenu::PopupMenu(PopupMenuClient* client)
+PopupMenuWin::PopupMenuWin(PopupMenuClient* client)
     : m_popupClient(client),
       m_scrollbar(0),
       m_popup(0),
@@ -98,7 +99,7 @@ PopupMenu::PopupMenu(PopupMenuClient* client)
       m_scrollbarCapturingMouse(false),
       m_showPopup(false) {}
 
-PopupMenu::~PopupMenu() {
+PopupMenuWin::~PopupMenuWin() {
   if (m_bmp)
     ::DeleteObject(m_bmp);
   if (m_DC)
@@ -109,11 +110,15 @@ PopupMenu::~PopupMenu() {
     m_scrollbar->setParent(0);
 }
 
-LPCTSTR PopupMenu::popupClassName() {
+void PopupMenuWin::disconnectClient() {
+  m_popupClient = 0;
+}
+
+LPCTSTR PopupMenuWin::popupClassName() {
   return kPopupWindowClassName;
 }
 
-void PopupMenu::show(const IntRect& r, FrameView* view, int index) {
+void PopupMenuWin::show(const IntRect& r, FrameView* view, int index) {
   calculatePositionAndSize(r, view);
   if (clientRect().isEmpty())
     return;
@@ -269,7 +274,7 @@ void PopupMenu::show(const IntRect& r, FrameView* view, int index) {
   hide();
 }
 
-void PopupMenu::hide() {
+void PopupMenuWin::hide() {
   if (!m_showPopup)
     return;
 
@@ -284,7 +289,7 @@ void PopupMenu::hide() {
   ::PostMessage(m_popup, WM_NULL, 0, 0);
 }
 
-void PopupMenu::calculatePositionAndSize(const IntRect& r, FrameView* v) {
+void PopupMenuWin::calculatePositionAndSize(const IntRect& r, FrameView* v) {
   // r is in absolute document coordinates, but we want to be in screen
   // coordinates
 
@@ -384,7 +389,7 @@ void PopupMenu::calculatePositionAndSize(const IntRect& r, FrameView* v) {
   return;
 }
 
-bool PopupMenu::setFocusedIndex(int i, bool hotTracking) {
+bool PopupMenuWin::setFocusedIndex(int i, bool hotTracking) {
   if (i < 0 || i >= client()->listSize() || i == focusedIndex())
     return false;
 
@@ -405,19 +410,19 @@ bool PopupMenu::setFocusedIndex(int i, bool hotTracking) {
   return true;
 }
 
-int PopupMenu::visibleItems() const {
+int PopupMenuWin::visibleItems() const {
   return clientRect().height() / m_itemHeight;
 }
 
-int PopupMenu::listIndexAtPoint(const IntPoint& point) const {
+int PopupMenuWin::listIndexAtPoint(const IntPoint& point) const {
   return m_scrollOffset + point.y() / m_itemHeight;
 }
 
-int PopupMenu::focusedIndex() const {
+int PopupMenuWin::focusedIndex() const {
   return m_focusedIndex;
 }
 
-void PopupMenu::focusFirst() {
+void PopupMenuWin::focusFirst() {
   if (!client())
     return;
 
@@ -430,7 +435,7 @@ void PopupMenu::focusFirst() {
     }
 }
 
-void PopupMenu::focusLast() {
+void PopupMenuWin::focusLast() {
   if (!client())
     return;
 
@@ -443,7 +448,7 @@ void PopupMenu::focusLast() {
     }
 }
 
-bool PopupMenu::down(unsigned lines) {
+bool PopupMenuWin::down(unsigned lines) {
   if (!client())
     return false;
 
@@ -461,7 +466,7 @@ bool PopupMenu::down(unsigned lines) {
   return setFocusedIndex(lastSelectableIndex);
 }
 
-bool PopupMenu::up(unsigned lines) {
+bool PopupMenuWin::up(unsigned lines) {
   if (!client())
     return false;
 
@@ -479,7 +484,7 @@ bool PopupMenu::up(unsigned lines) {
   return setFocusedIndex(lastSelectableIndex);
 }
 
-void PopupMenu::invalidateItem(int index) {
+void PopupMenuWin::invalidateItem(int index) {
   if (!m_popup)
     return;
 
@@ -493,18 +498,18 @@ void PopupMenu::invalidateItem(int index) {
   ::InvalidateRect(m_popup, &r, TRUE);
 }
 
-IntRect PopupMenu::clientRect() const {
+IntRect PopupMenuWin::clientRect() const {
   IntRect clientRect = m_windowRect;
   clientRect.inflate(-popupWindowBorderWidth);
   clientRect.setLocation(IntPoint(0, 0));
   return clientRect;
 }
 
-void PopupMenu::incrementWheelDelta(int delta) {
+void PopupMenuWin::incrementWheelDelta(int delta) {
   m_wheelDelta += delta;
 }
 
-void PopupMenu::reduceWheelDelta(int delta) {
+void PopupMenuWin::reduceWheelDelta(int delta) {
   ASSERT(delta >= 0);
   ASSERT(delta <= abs(m_wheelDelta));
 
@@ -516,7 +521,7 @@ void PopupMenu::reduceWheelDelta(int delta) {
     return;
 }
 
-bool PopupMenu::scrollToRevealSelection() {
+bool PopupMenuWin::scrollToRevealSelection() {
   if (!m_scrollbar)
     return false;
 
@@ -535,7 +540,7 @@ bool PopupMenu::scrollToRevealSelection() {
   return false;
 }
 
-void PopupMenu::updateFromElement() {
+void PopupMenuWin::updateFromElement() {
   if (!m_popup)
     return;
 
@@ -546,13 +551,9 @@ void PopupMenu::updateFromElement() {
     ::UpdateWindow(m_popup);
 }
 
-bool PopupMenu::itemWritingDirectionIsNatural() {
-  return true;
-}
-
 const int separatorPadding = 4;
 const int separatorHeight = 1;
-void PopupMenu::paint(const IntRect& damageRect, HDC hdc) {
+void PopupMenuWin::paint(const IntRect& damageRect, HDC hdc) {
   if (!m_popup)
     return;
 
@@ -672,7 +673,7 @@ void PopupMenu::paint(const IntRect& damageRect, HDC hdc) {
     ::ReleaseDC(m_popup, localDC);
 }
 
-void PopupMenu::valueChanged(Scrollbar* scrollBar) {
+void PopupMenuWin::valueChanged(Scrollbar* scrollBar) {
   ASSERT(m_scrollbar);
 
   if (!m_popup)
@@ -709,15 +710,15 @@ void PopupMenu::valueChanged(Scrollbar* scrollBar) {
   ::UpdateWindow(m_popup);
 }
 
-void PopupMenu::invalidateScrollbarRect(Scrollbar* scrollbar,
-                                        const IntRect& rect) {
+void PopupMenuWin::invalidateScrollbarRect(Scrollbar* scrollbar,
+                                           const IntRect& rect) {
   IntRect scrollRect = rect;
   scrollRect.move(scrollbar->x(), scrollbar->y());
   RECT r = scrollRect;
   ::InvalidateRect(m_popup, &r, false);
 }
 
-void PopupMenu::registerClass() {
+void PopupMenuWin::registerClass() {
   static bool haveRegisteredWindowClass = false;
 
   if (haveRegisteredWindowClass)
@@ -751,10 +752,10 @@ void PopupMenu::registerClass() {
 #endif
 }
 
-LRESULT CALLBACK PopupMenu::PopupMenuWndProc(HWND hWnd,
-                                             UINT message,
-                                             WPARAM wParam,
-                                             LPARAM lParam) {
+LRESULT CALLBACK PopupMenuWin::PopupMenuWndProc(HWND hWnd,
+                                                UINT message,
+                                                WPARAM wParam,
+                                                LPARAM lParam) {
 #if OS(WINCE)
   LONG longPtr = GetWindowLong(hWnd, 0);
 #else
@@ -781,10 +782,10 @@ LRESULT CALLBACK PopupMenu::PopupMenuWndProc(HWND hWnd,
 
 const int smoothScrollAnimationDuration = 5000;
 
-LRESULT PopupMenu::wndProc(HWND hWnd,
-                           UINT message,
-                           WPARAM wParam,
-                           LPARAM lParam) {
+LRESULT PopupMenuWin::wndProc(HWND hWnd,
+                              UINT message,
+                              WPARAM wParam,
+                              LPARAM lParam) {
   LRESULT lResult = 0;
 
   switch (message) {
