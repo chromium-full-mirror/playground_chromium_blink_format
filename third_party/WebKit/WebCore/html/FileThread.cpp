@@ -56,26 +56,26 @@ bool FileThread::start() {
 }
 
 void FileThread::stop() {
-  return m_queue.kill();
+  m_queue.kill();
 }
 
 void FileThread::postTask(PassOwnPtr<Task> task) {
   m_queue.append(task);
 }
 
-class SameFilePredicate {
+class SameInstancePredicate {
  public:
-  SameFilePredicate(const FileStream* stream) : m_stream(stream) {}
+  SameInstancePredicate(const void* instance) : m_instance(instance) {}
   bool operator()(FileThread::Task* task) const {
-    return task->stream() == m_stream;
+    return task->instance() == m_instance;
   }
 
  private:
-  const FileStream* m_stream;
+  const void* m_instance;
 };
 
-void FileThread::unscheduleTasks(const FileStream* stream) {
-  SameFilePredicate predicate(stream);
+void FileThread::unscheduleTasks(const void* instance) {
+  SameInstancePredicate predicate(instance);
   m_queue.removeIf(predicate);
 }
 

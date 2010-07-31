@@ -45,6 +45,7 @@ class FileStream;
 class FileThread : public ThreadSafeShared<FileThread> {
  public:
   static PassRefPtr<FileThread> create() { return adoptRef(new FileThread()); }
+
   ~FileThread();
 
   bool start();
@@ -54,15 +55,16 @@ class FileThread : public ThreadSafeShared<FileThread> {
    public:
     virtual ~Task() {}
     virtual void performTask() = 0;
-    FileStream* stream() const { return m_stream; }
+    void* instance() const { return m_instance; }
 
    protected:
-    Task(FileStream* stream) : m_stream(stream) {}
-    FileStream* m_stream;
+    Task(void* instance) : m_instance(instance) {}
+    void* m_instance;
   };
 
   void postTask(PassOwnPtr<Task> task);
-  void unscheduleTasks(const FileStream*);
+
+  void unscheduleTasks(const void* instance);
 
  private:
   FileThread();
