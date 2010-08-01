@@ -1015,7 +1015,10 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
   // of it
   bool splitStart = isValidCaretPositionInTextNode(start);
   if (splitStart) {
-    splitTextElementAtStart(start, end);
+    if (shouldSplitTextElement(start.node()->parentElement(), style))
+      splitTextElementAtStart(start, end);
+    else
+      splitTextAtStart(start, end);
     start = startPosition();
     end = endPosition();
     startDummySpanAncestor = dummySpanAncestorForNode(start.node());
@@ -1025,7 +1028,10 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
   // it
   bool splitEnd = isValidCaretPositionInTextNode(end);
   if (splitEnd) {
-    splitTextElementAtEnd(start, end);
+    if (shouldSplitTextElement(end.node()->parentElement(), style))
+      splitTextElementAtEnd(start, end);
+    else
+      splitTextAtEnd(start, end);
     start = startPosition();
     end = endPosition();
     endDummySpanAncestor = dummySpanAncestorForNode(end.node());
@@ -1327,6 +1333,43 @@ bool ApplyStyleCommand::implicitlyStyledElementShouldBeRemovedWhenApplyingStyle(
   return false;
 }
 
+bool ApplyStyleCommand::removeInlineStyleFromElement(
+    CSSMutableStyleDeclaration* style,
+    HTMLElement* element,
+    InlineStyleRemovalMode mode) {
+  ASSERT(style);
+  ASSERT(element);
+
+  bool removed = false;
+
+  if (m_styledInlineElement &&
+      element->hasTagName(m_styledInlineElement->tagQName())) {
+    removed = true;
+    if (mode == RemoveAttributesAndElements)
+      removeNodePreservingChildren(element);
+  }
+
+  if (implicitlyStyledElementShouldBeRemovedWhenApplyingStyle(element, style)) {
+    removed = true;
+    if (mode == RemoveAttributesAndElements)
+      replaceWithSpanOrRemoveIfWithoutAttributes(element);
+  }
+
+  if (!element->inDocument())
+    return removed;
+
+  // If the node was converted to a span, the span may still contain relevant
+  // styles which must be removed (e.g. <b style='font-weight: bold'>)
+  if (removeHTMLFontStyle(style, element, mode))
+    removed = true;
+  if (removeHTMLBidiEmbeddingStyle(style, element, mode))
+    removed = true;
+  if (removeCSSStyle(style, element, mode))
+    removed = true;
+
+  return removed;
+}
+
 void ApplyStyleCommand::replaceWithSpanOrRemoveIfWithoutAttributes(
     HTMLElement*& elem) {
   bool removeNode = false;
@@ -1354,46 +1397,61 @@ void ApplyStyleCommand::replaceWithSpanOrRemoveIfWithoutAttributes(
   }
 }
 
-void ApplyStyleCommand::removeHTMLFontStyle(CSSMutableStyleDeclaration* style,
-                                            HTMLElement* elem) {
+bool ApplyStyleCommand::removeHTMLFontStyle(CSSMutableStyleDeclaration* style,
+                                            HTMLElement* elem,
+                                            InlineStyleRemovalMode mode) {
   ASSERT(style);
   ASSERT(elem);
 
   if (!elem->hasLocalName(fontTag))
-    return;
+    return false;
 
+  bool removed = false;
   CSSMutableStyleDeclaration::const_iterator end = style->end();
   for (CSSMutableStyleDeclaration::const_iterator it = style->begin();
        it != end; ++it) {
+    const QualifiedName* attrToRemove = 0;
     switch ((*it).id()) {
       case CSSPropertyColor:
-        removeNodeAttribute(elem, colorAttr);
+        attrToRemove = &colorAttr;
         break;
       case CSSPropertyFontFamily:
-        removeNodeAttribute(elem, faceAttr);
+        attrToRemove = &faceAttr;
         break;
       case CSSPropertyFontSize:
-        removeNodeAttribute(elem, sizeAttr);
+        attrToRemove = &sizeAttr;
         break;
+    }
+
+    if (attrToRemove) {
+      removed = true;
+      if (mode == RemoveAttributesAndElements)
+        removeNodeAttribute(elem, *attrToRemove);
     }
   }
 
-  if (isEmptyFontTag(elem))
+  if (isEmptyFontTag(elem) && mode == RemoveAttributesAndElements)
     removeNodePreservingChildren(elem);
+
+  return removed;
 }
 
-void ApplyStyleCommand::removeHTMLBidiEmbeddingStyle(
+bool ApplyStyleCommand::removeHTMLBidiEmbeddingStyle(
     CSSMutableStyleDeclaration* style,
-    HTMLElement* elem) {
+    HTMLElement* elem,
+    InlineStyleRemovalMode mode) {
   ASSERT(style);
   ASSERT(elem);
 
   if (!elem->hasAttribute(dirAttr))
-    return;
+    return false;
 
   if (!style->getPropertyCSSValue(CSSPropertyUnicodeBidi) &&
       !style->getPropertyCSSValue(CSSPropertyDirection))
-    return;
+    return false;
+
+  if (mode == RemoveNone)
+    return true;
 
   removeNodeAttribute(elem, dirAttr);
 
@@ -1401,17 +1459,21 @@ void ApplyStyleCommand::removeHTMLBidiEmbeddingStyle(
   // test.
   if (isUnstyledStyleSpan(elem))
     removeNodePreservingChildren(elem);
+
+  return true;
 }
 
-void ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclaration* style,
-                                       HTMLElement* elem) {
+bool ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclaration* style,
+                                       HTMLElement* elem,
+                                       InlineStyleRemovalMode mode) {
   ASSERT(style);
   ASSERT(elem);
 
   CSSMutableStyleDeclaration* decl = elem->inlineStyleDecl();
   if (!decl)
-    return;
+    return false;
 
+  bool removed = false;
   CSSMutableStyleDeclaration::const_iterator end = style->end();
   for (CSSMutableStyleDeclaration::const_iterator it = style->begin();
        it != end; ++it) {
@@ -1419,6 +1481,9 @@ void ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclaration* style,
     RefPtr<CSSValue> value = decl->getPropertyCSSValue(propertyID);
     if (value &&
         (propertyID != CSSPropertyWhiteSpace || !isTabSpanNode(elem))) {
+      removed = true;
+      if (mode == RemoveNone)
+        return true;
       removeCSSProperty(decl, propertyID);
       if (propertyID == CSSPropertyUnicodeBidi &&
           !decl->getPropertyValue(CSSPropertyDirection).isEmpty())
@@ -1433,6 +1498,8 @@ void ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclaration* style,
 
   if (isSpanWithoutAttributesOrUnstyleStyleSpan(elem))
     removeNodePreservingChildren(elem);
+
+  return removed;
 }
 
 static bool hasTextDecorationProperty(Node* node) {
@@ -1654,22 +1721,7 @@ void ApplyStyleCommand::removeInlineStyle(
       HTMLElement* elem = static_cast<HTMLElement*>(node);
       Node* prev = elem->traversePreviousNodePostOrder();
       Node* next = elem->traverseNextNode();
-      if (m_styledInlineElement &&
-          elem->hasTagName(m_styledInlineElement->tagQName()))
-        removeNodePreservingChildren(elem);
-
-      if (implicitlyStyledElementShouldBeRemovedWhenApplyingStyle(elem,
-                                                                  style.get()))
-        replaceWithSpanOrRemoveIfWithoutAttributes(elem);
-
-      // If the node was converted to a span, the span may still contain
-      // relevant
-      // styles which must be removed (e.g. <b style='font-weight: bold'>)
-      if (elem->inDocument()) {
-        removeHTMLFontStyle(style.get(), elem);
-        removeHTMLBidiEmbeddingStyle(style.get(), elem);
-        removeCSSStyle(style.get(), elem);
-      }
+      removeInlineStyleFromElement(style.get(), elem);
       if (!elem->inDocument()) {
         if (s.node() == elem) {
           // Since elem must have been fully selected, and it is at the start
@@ -1746,11 +1798,6 @@ void ApplyStyleCommand::splitTextAtEnd(const Position& start,
 
 void ApplyStyleCommand::splitTextElementAtStart(const Position& start,
                                                 const Position& end) {
-  Node* parent = start.node()->parentNode();
-  if (!parent || !parent->parentElement() ||
-      !parent->parentElement()->isContentEditable())
-    return splitTextAtStart(start, end);
-
   int endOffsetAdjustment =
       start.node() == end.node() ? start.deprecatedEditingOffset() : 0;
   Text* text = static_cast<Text*>(start.node());
@@ -1763,11 +1810,6 @@ void ApplyStyleCommand::splitTextElementAtStart(const Position& start,
 
 void ApplyStyleCommand::splitTextElementAtEnd(const Position& start,
                                               const Position& end) {
-  Node* parent = end.node()->parentNode();
-  if (!parent || !parent->parentElement() ||
-      !parent->parentElement()->isContentEditable())
-    return splitTextAtEnd(start, end);
-
   Text* text = static_cast<Text*>(end.node());
   splitTextNodeContainingElement(text, end.deprecatedEditingOffset());
 
@@ -1777,6 +1819,17 @@ void ApplyStyleCommand::splitTextElementAtEnd(const Position& start,
   ASSERT(startNode);
   updateStartEnd(Position(startNode, start.deprecatedEditingOffset()),
                  Position(prevNode->parent(), prevNode->nodeIndex() + 1));
+}
+
+bool ApplyStyleCommand::shouldSplitTextElement(
+    Element* element,
+    CSSMutableStyleDeclaration* style) {
+  if (!element || !element->isHTMLElement() || !element->parentElement() ||
+      !element->parentElement()->isContentEditable())
+    return false;
+
+  return shouldRemoveInlineStyleFromElement(style,
+                                            static_cast<HTMLElement*>(element));
 }
 
 bool ApplyStyleCommand::isValidCaretPositionInTextNode(
