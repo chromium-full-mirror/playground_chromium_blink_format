@@ -77,6 +77,8 @@ class PluginInfoStore {
   static bool getPluginInfo(const WebCore::String& pluginPath, Plugin& plugin);
   static bool shouldUsePlugin(const Plugin& plugin,
                               const Vector<Plugin>& loadedPlugins);
+  static WebCore::String getMIMETypeForExtension(
+      const WebCore::String& extension);
 
   Vector<WebCore::String> m_additionalPluginsDirectories;
   Vector<Plugin> m_plugins;
