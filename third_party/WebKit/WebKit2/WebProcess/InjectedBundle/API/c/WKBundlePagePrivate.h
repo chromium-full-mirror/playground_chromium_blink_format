@@ -40,6 +40,7 @@ WK_EXPORT void WKBundlePageExecuteEditingCommand(WKBundlePageRef page,
                                                  WKStringRef argument);
 WK_EXPORT bool WKBundlePageIsEditingCommandEnabled(WKBundlePageRef page,
                                                    WKStringRef commandName);
+WK_EXPORT void WKBundlePageClearMainFrameName(WKBundlePageRef page);
 
 #ifdef __cplusplus
 }

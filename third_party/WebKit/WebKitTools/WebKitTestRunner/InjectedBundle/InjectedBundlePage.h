@@ -40,6 +40,8 @@ class InjectedBundlePage {
 
   bool isLoading() { return m_isLoading; }
 
+  void reset();
+
  private:
   // Loader Client
   static void _didStartProvisionalLoadForFrame(WKBundlePageRef,

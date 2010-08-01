@@ -75,3 +75,7 @@ bool WKBundlePageIsEditingCommandEnabled(WKBundlePageRef pageRef,
                                          WKStringRef name) {
   return toWK(pageRef)->isEditingCommandEnabled(toWK(name)->string());
 }
+
+void WKBundlePageClearMainFrameName(WKBundlePageRef pageRef) {
+  toWK(pageRef)->clearMainFrameName();
+}
