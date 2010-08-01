@@ -50,6 +50,8 @@ class JSNPObject : public JSC::JSObjectWithGlobalObject {
 
   static const JSC::ClassInfo s_info;
 
+  NPObject* npObject() const { return m_npObject; }
+
  private:
   static const unsigned StructureFlags =
       JSC::OverridesGetOwnPropertySlot | JSObject::StructureFlags;
