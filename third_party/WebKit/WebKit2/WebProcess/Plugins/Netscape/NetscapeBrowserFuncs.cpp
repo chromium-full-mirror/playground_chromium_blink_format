@@ -616,10 +616,12 @@ static bool NPN_SetProperty(NPP,
   return false;
 }
 
-static bool NPN_RemoveProperty(NPP npp,
-                               NPObject* npobj,
+static bool NPN_RemoveProperty(NPP,
+                               NPObject* npObject,
                                NPIdentifier propertyName) {
-  notImplemented();
+  if (npObject->_class->removeProperty)
+    return npObject->_class->removeProperty(npObject, propertyName);
+
   return false;
 }
 

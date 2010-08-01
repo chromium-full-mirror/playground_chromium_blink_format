@@ -35,31 +35,43 @@
 typedef char (&no_tag)[1];
 typedef char (&yes_tag)[2];
 
-#define DEFINE_HAS_MEMBER_CHECK(member, returnType, argumentTypes)     \
-  template <typename T, returnType(T::*member) argumentTypes>          \
-  struct pmf_helper {};                                                \
-  template <typename T>                                                \
-  no_tag has_member_##member##_helper(...);                            \
-  template <typename T>                                                \
-  yes_tag has_member_##member##_helper(pmf_helper<T, &T::member>*);    \
-  template <typename T>                                                \
-  struct has_member_##member {                                         \
-    static const bool value =                                          \
-        sizeof(has_member_##member##_helper<T>(0)) == sizeof(yes_tag); \
+#define DEFINE_HAS_MEMBER_CHECK(member, returnType, argumentTypes)             \
+  template <typename T, returnType(T::*member) argumentTypes>                  \
+  struct pmf_##member##_helper {};                                             \
+  template <typename T>                                                        \
+  no_tag has_member_##member##_helper(...);                                    \
+  template <typename T>                                                        \
+  yes_tag has_member_##member##_helper(pmf_##member##_helper<T, &T::member>*); \
+  template <typename T>                                                        \
+  struct has_member_##member {                                                 \
+    static const bool value =                                                  \
+        sizeof(has_member_##member##_helper<T>(0)) == sizeof(yes_tag);         \
   };
 
+DEFINE_HAS_MEMBER_CHECK(hasMethod, bool, (NPIdentifier methodName));
+DEFINE_HAS_MEMBER_CHECK(
+    invoke,
+    bool,
+    (NPIdentifier methodName, const NPVariant*, uint32_t, NPVariant* result));
 DEFINE_HAS_MEMBER_CHECK(invokeDefault,
                         bool,
-                        (const NPVariant*, uint32_t, NPVariant* result))
+                        (const NPVariant*, uint32_t, NPVariant* result));
+DEFINE_HAS_MEMBER_CHECK(hasProperty, bool, (NPIdentifier propertyName));
 
 class PluginTest {
  public:
   static PluginTest* create(NPP, const std::string& identifier);
   virtual ~PluginTest();
 
-  // Add more NPP functions here if needed.
+  // NPP functions.
   virtual NPError NPP_DestroyStream(NPStream* stream, NPReason reason);
   virtual NPError NPP_GetValue(NPPVariable, void* value);
+
+  // NPN functions.
+  NPIdentifier NPN_GetStringIdentifier(const NPUTF8* name);
+  NPIdentifier NPN_GetIntIdentifier(int32_t intid);
+  NPObject* NPN_CreateObject(NPClass*);
+  bool NPN_RemoveProperty(NPObject*, NPIdentifier propertyName);
 
   template <typename TestClassTy>
   class Register {
@@ -76,9 +88,6 @@ class PluginTest {
 
  protected:
   PluginTest(NPP npp, const std::string& identifier);
-
-  // NPN functions.
-  NPObject* NPN_CreateObject(NPClass*);
 
   // FIXME: A plug-in test shouldn't need to know about it's NPP. Make this
   // private.
@@ -99,7 +108,25 @@ class PluginTest {
     }
 
     // These should never be called.
+    bool hasMethod(NPIdentifier methodName) {
+      assert(false);
+      return false;
+    }
+
+    bool invoke(NPIdentifier methodName,
+                const NPVariant*,
+                uint32_t,
+                NPVariant* result) {
+      assert(false);
+      return false;
+    }
+
     bool invokeDefault(const NPVariant*, uint32_t, NPVariant* result) {
+      assert(false);
+      return false;
+    }
+
+    bool hasProperty(NPIdentifier propertyName) {
       assert(false);
       return false;
     }
@@ -109,11 +136,26 @@ class PluginTest {
 
     virtual ~Object() {}
 
+    PluginTest* pluginTest() const { return m_pluginTest; }
+
    private:
     static NPObject* NP_Allocate(NPP npp, NPClass* aClass) { return new T; }
 
     static void NP_Deallocate(NPObject* npObject) {
       delete static_cast<T*>(npObject);
+    }
+
+    static bool NP_HasMethod(NPObject* npObject, NPIdentifier methodName) {
+      return static_cast<T*>(npObject)->hasMethod(methodName);
+    }
+
+    static bool NP_Invoke(NPObject* npObject,
+                          NPIdentifier methodName,
+                          const NPVariant* arguments,
+                          uint32_t argumentCount,
+                          NPVariant* result) {
+      return static_cast<T*>(npObject)->invoke(methodName, arguments,
+                                               argumentCount, result);
     }
 
     static bool NP_InvokeDefault(NPObject* npObject,
@@ -124,16 +166,20 @@ class PluginTest {
                                                       result);
     }
 
+    static bool NP_HasProperty(NPObject* npObject, NPIdentifier propertyName) {
+      return static_cast<T*>(npObject)->hasProperty(propertyName);
+    }
+
     static NPClass* npClass() {
       static NPClass npClass = {
           NP_CLASS_STRUCT_VERSION,
           NP_Allocate,
           NP_Deallocate,
           0,  // NPClass::invalidate
-          0,  // NPClass::hasMethod
-          0,  // NPClass::invoke
+          has_member_hasMethod<T>::value ? NP_HasMethod : 0,
+          has_member_invoke<T>::value ? NP_Invoke : 0,
           has_member_invokeDefault<T>::value ? NP_InvokeDefault : 0,
-          0,  // NPClass::hasProperty
+          has_member_hasProperty<T>::value ? NP_HasProperty : 0,
           0,  // NPClass::getProperty
           0,  // NPClass::setProperty
           0,  // NPClass::removeProperty
