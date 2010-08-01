@@ -40,7 +40,10 @@ SOFT_LINK(zlib1,
           uncompress,
           int,
           __cdecl,
-          (Bytef * dest, uLongf* destLen, const Bytef* source, uLong sourceLen),
+          (unsigned char* dest,
+           unsigned long* destLen,
+           const unsigned char* source,
+           unsigned long sourceLen),
           (dest, destLen, source, sourceLen));
 
 #if CPU(BIG_ENDIAN)
