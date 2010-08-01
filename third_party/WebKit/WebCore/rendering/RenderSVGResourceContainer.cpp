@@ -89,8 +89,14 @@ void RenderSVGResourceContainer::markAllClientsForInvalidation(
   HashSet<RenderObject*>::iterator end = m_clients.end();
   for (HashSet<RenderObject*>::iterator it = m_clients.begin(); it != end;
        ++it) {
-    markClientForInvalidation(*it, mode);
-    RenderSVGResource::markForLayoutAndParentResourceInvalidation(*it,
+    RenderObject* client = *it;
+    if (client->isSVGResourceContainer()) {
+      client->toRenderSVGResourceContainer()->invalidateClients();
+      continue;
+    }
+
+    markClientForInvalidation(client, mode);
+    RenderSVGResource::markForLayoutAndParentResourceInvalidation(client,
                                                                   needsLayout);
   }
 }

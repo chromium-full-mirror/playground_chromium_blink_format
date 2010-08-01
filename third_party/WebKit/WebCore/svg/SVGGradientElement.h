@@ -50,11 +50,7 @@ class SVGGradientElement : public SVGStyledElement,
 
   Vector<Gradient::ColorStop> buildStops();
 
-  void setFollowLink(bool followLink) { m_followLink = followLink; }
-
  protected:
-  bool m_followLink;
-
   DECLARE_ANIMATED_PROPERTY(SVGGradientElement,
                             SVGNames::spreadMethodAttr,
                             int,

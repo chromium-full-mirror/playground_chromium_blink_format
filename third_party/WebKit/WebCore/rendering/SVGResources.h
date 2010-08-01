@@ -74,6 +74,11 @@ class SVGResources {
     return m_fillStrokeData ? m_fillStrokeData->stroke : 0;
   }
 
+  // Chainable resources - linked through xlink:href
+  RenderSVGResourceContainer* linkedResource() const {
+    return m_linkedResource;
+  }
+
   void buildSetOfResources(HashSet<RenderSVGResourceContainer*>&);
 
   // Methods operating on all cached resources
@@ -98,6 +103,7 @@ class SVGResources {
   void resetMasker();
   void resetFill();
   void resetStroke();
+  void resetLinkedResource();
 
  private:
   bool setClipper(RenderSVGResourceClipper*);
@@ -110,6 +116,7 @@ class SVGResources {
   bool setMasker(RenderSVGResourceMasker*);
   bool setFill(RenderSVGResourceContainer*);
   bool setStroke(RenderSVGResourceContainer*);
+  bool setLinkedResource(RenderSVGResourceContainer*);
 
   // From SVG 1.1 2nd Edition
   // clipper: 'container elements' and 'graphics elements'
@@ -169,6 +176,7 @@ class SVGResources {
   OwnPtr<ClipperFilterMaskerData> m_clipperFilterMaskerData;
   OwnPtr<MarkerData> m_markerData;
   OwnPtr<FillStrokeData> m_fillStrokeData;
+  RenderSVGResourceContainer* m_linkedResource;
 };
 }
 

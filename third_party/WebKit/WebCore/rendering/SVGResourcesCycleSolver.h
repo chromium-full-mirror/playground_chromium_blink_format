@@ -38,7 +38,6 @@ class SVGResourcesCycleSolver : public Noncopyable {
 
  private:
   bool resourceContainsCycles(RenderObject*) const;
-  bool chainableResourceContainsCycles(RenderSVGResourceContainer*) const;
   void breakCycle(RenderSVGResourceContainer*);
 
   RenderObject* m_renderer;

@@ -58,7 +58,6 @@ SVGPatternElement::SVGPatternElement(const QualifiedName& tagName,
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
       SVGFitToViewBox(),
-      m_followLink(true),
       m_x(LengthModeWidth),
       m_y(LengthModeHeight),
       m_width(LengthModeWidth),
@@ -247,10 +246,8 @@ PatternAttributes SVGPatternElement::collectPatternProperties() const {
     processedPatterns.add(current);
 
     // Respect xlink:href, take attributes from referenced element
-    Node* refNode = m_followLink
-                        ? ownerDocument()->getElementById(
-                              SVGURIReference::getTarget(current->href()))
-                        : 0;
+    Node* refNode = ownerDocument()->getElementById(
+        SVGURIReference::getTarget(current->href()));
     if (refNode && refNode->hasTagName(SVGNames::patternTag)) {
       current = static_cast<const SVGPatternElement*>(
           const_cast<const Node*>(refNode));
