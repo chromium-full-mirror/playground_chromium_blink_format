@@ -45,6 +45,9 @@ struct FontCustomPlatformData : Noncopyable {
                                     bool bold,
                                     bool italic,
                                     FontRenderingMode = NormalRenderingMode);
+
+  static bool supportsFormat(const String&);
+
   String m_name;
 };
 

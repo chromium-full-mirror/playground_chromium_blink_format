@@ -56,4 +56,9 @@ FontCustomPlatformDataCairo* createFontCustomPlatformData(
 
   return new FontCustomPlatformDataCairo(fontFace);
 }
+
+bool FontCustomPlatformData::supportsFormat(const String& format) {
+  return equalIgnoringCase(format, "truetype") ||
+         equalIgnoringCase(format, "opentype");
+}
 }

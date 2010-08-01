@@ -198,4 +198,13 @@ FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {
   return 0;
 #endif
 }
+
+bool FontCustomPlatformData::supportsFormat(const String& format) {
+  return equalIgnoringCase(format, "truetype") ||
+         equalIgnoringCase(format, "opentype")
+#if ENABLE(OPENTYPE_SANITIZER)
+         || equalIgnoringCase(format, "woff")
+#endif
+      ;
+}
 }

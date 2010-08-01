@@ -28,8 +28,9 @@
 
 namespace WebCore {
 
-class SharedBuffer;
 class FontPlatformData;
+class SharedBuffer;
+class String;
 
 struct FontCustomPlatformData : Noncopyable {
   ~FontCustomPlatformData();
@@ -41,6 +42,8 @@ struct FontCustomPlatformData : Noncopyable {
                                     bool bold,
                                     bool italic,
                                     FontRenderingMode = NormalRenderingMode);
+
+  static bool supportsFormat(const String&);
 };
 
 FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer);

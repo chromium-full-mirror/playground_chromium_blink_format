@@ -21,8 +21,8 @@
 #include "config.h"
 #include "FontCustomPlatformData.h"
 
-#include "SharedBuffer.h"
 #include "FontPlatformData.h"
+#include "SharedBuffer.h"
 
 namespace WebCore {
 
@@ -69,5 +69,10 @@ FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {
   cairo_font_face_set_user_data(fontFace, &bufferKey, buffer, releaseData);
 
   return new FontCustomPlatformData(fontFace);
+}
+
+bool FontCustomPlatformData::supportsFormat(const String& format) {
+  return equalIgnoringCase(format, "truetype") ||
+         equalIgnoringCase(format, "opentype");
 }
 }

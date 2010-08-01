@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008, 2009, 2010 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -26,6 +26,7 @@
 #include "OpenTypeUtilities.h"
 #include "SharedBuffer.h"
 #include "SoftLinking.h"
+#include "WOFFFileFormat.h"
 #include <ApplicationServices/ApplicationServices.h>
 #include <WebKitSystemInterface/WebKitSystemInterface.h>
 #include <wtf/RetainPtr.h>
@@ -217,6 +218,16 @@ FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {
   ASSERT_ARG(buffer, buffer);
   ASSERT(T2embedLibrary());
 
+  RefPtr<SharedBuffer> sfntBuffer;
+  if (isWOFF(buffer)) {
+    Vector<char> sfnt;
+    if (!convertWOFFToSfnt(buffer, sfnt))
+      return 0;
+
+    sfntBuffer = SharedBuffer::adoptVector(sfnt);
+    buffer = sfntBuffer.get();
+  }
+
   // Introduce the font to GDI. AddFontMemResourceEx cannot be used, because it
   // will pollute the process's
   // font namespace (Windows has no API for creating an HFONT from data without
@@ -255,5 +266,11 @@ FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {
   }
 
   return new FontCustomPlatformData(fontReference, fontName);
+}
+
+bool FontCustomPlatformData::supportsFormat(const String& format) {
+  return equalIgnoringCase(format, "truetype") ||
+         equalIgnoringCase(format, "opentype") ||
+         equalIgnoringCase(format, "woff");
 }
 }

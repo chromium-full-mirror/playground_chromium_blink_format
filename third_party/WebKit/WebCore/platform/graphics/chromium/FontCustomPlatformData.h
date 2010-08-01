@@ -46,6 +46,7 @@ namespace WebCore {
 
 class FontPlatformData;
 class SharedBuffer;
+class String;
 
 struct FontCustomPlatformData : Noncopyable {
 #if OS(WINDOWS)
@@ -62,6 +63,8 @@ struct FontCustomPlatformData : Noncopyable {
                                     bool bold,
                                     bool italic,
                                     FontRenderingMode = NormalRenderingMode);
+
+  static bool supportsFormat(const String&);
 
 #if OS(WINDOWS)
   HANDLE m_fontReference;
