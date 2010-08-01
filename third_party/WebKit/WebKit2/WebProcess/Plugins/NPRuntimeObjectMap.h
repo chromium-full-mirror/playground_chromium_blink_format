@@ -78,6 +78,9 @@ class NPRuntimeObjectMap {
   JSC::JSGlobalObject* globalObject() const;
   JSC::ExecState* globalExec() const;
 
+  static void setGlobalException(const WebCore::String& exceptionString);
+  static void moveGlobalExceptionToExecState(JSC::ExecState*);
+
  private:
   PluginView* m_pluginView;
 
