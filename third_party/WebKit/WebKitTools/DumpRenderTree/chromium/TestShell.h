@@ -195,6 +195,6 @@ class TestShell {
 #endif
 };
 
-void platformInit();
+void platformInit(int*, char***);
 
 #endif  // TestShell_h

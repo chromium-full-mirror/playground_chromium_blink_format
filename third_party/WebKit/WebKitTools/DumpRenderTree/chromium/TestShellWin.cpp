@@ -96,7 +96,7 @@ void TestShell::waitTestFinished() {
   WaitForSingleObject(threadHandle, 1000);
 }
 
-void platformInit() {
+void platformInit(int*, char***) {
   // Set stdout/stderr binary mode.
   _setmode(_fileno(stdout), _O_BINARY);
   _setmode(_fileno(stderr), _O_BINARY);

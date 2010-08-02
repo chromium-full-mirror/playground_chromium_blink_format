@@ -85,7 +85,7 @@ static void runTest(TestShell& shell,
 
 int main(int argc, char* argv[]) {
   webkit_support::SetUpTestEnvironment();
-  platformInit();
+  platformInit(&argc, &argv);
 
   TestParams params;
   Vector<string> tests;
