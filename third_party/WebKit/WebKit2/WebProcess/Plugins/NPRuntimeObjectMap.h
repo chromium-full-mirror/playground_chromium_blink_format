@@ -84,7 +84,8 @@ class NPRuntimeObjectMap {
  private:
   PluginView* m_pluginView;
 
-  HashMap<JSC::JSObject*, NPJSObject*> m_objects;
+  HashMap<JSC::JSObject*, NPJSObject*> m_npJSObjects;
+  HashMap<NPObject*, JSNPObject*> m_jsNPObjects;
 };
 
 }  // namespace WebKit

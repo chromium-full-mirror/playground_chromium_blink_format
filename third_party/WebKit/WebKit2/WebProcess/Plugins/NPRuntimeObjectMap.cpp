@@ -44,33 +44,53 @@ NPRuntimeObjectMap::NPRuntimeObjectMap(PluginView* pluginView)
     : m_pluginView(pluginView) {}
 
 NPObject* NPRuntimeObjectMap::getOrCreateNPObject(JSObject* jsObject) {
+  // If this is a JSNPObject, we can just get its underlying NPObject.
+  if (jsObject->classInfo() == &JSNPObject::s_info) {
+    JSNPObject* jsNPObject = static_cast<JSNPObject*>(jsObject);
+    NPObject* npObject = jsNPObject->npObject();
+
+    retainNPObject(npObject);
+    return npObject;
+  }
+
   // First, check if we already know about this object.
-  if (NPJSObject* npJSObject = m_objects.get(jsObject)) {
+  if (NPJSObject* npJSObject = m_npJSObjects.get(jsObject)) {
     retainNPObject(npJSObject);
     return npJSObject;
   }
 
   NPJSObject* npJSObject = NPJSObject::create(this, jsObject);
-  m_objects.set(jsObject, npJSObject);
+  m_npJSObjects.set(jsObject, npJSObject);
 
   return npJSObject;
 }
 
 void NPRuntimeObjectMap::npJSObjectDestroyed(NPJSObject* npJSObject) {
   // Remove the object from the map.
-  ASSERT(m_objects.contains(npJSObject->jsObject()));
-  m_objects.remove(npJSObject->jsObject());
+  ASSERT(m_npJSObjects.contains(npJSObject->jsObject()));
+  m_npJSObjects.remove(npJSObject->jsObject());
 }
 
 JSObject* NPRuntimeObjectMap::getOrCreateJSObject(JSGlobalObject* globalObject,
                                                   NPObject* npObject) {
-  // FIXME: Check if we already have a wrapper for this NPObject!
-  return new (globalObject->globalData())
-      JSNPObject(globalObject, this, npObject);
+  // If this is an NPJSObject, we can just get the JSObject that it's wrapping.
+  if (NPJSObject::isNPJSObject(npObject))
+    return NPJSObject::toNPJSObject(npObject)->jsObject();
+
+  if (JSNPObject* jsNPObject = m_jsNPObjects.get(npObject))
+    return jsNPObject;
+
+  JSNPObject* jsNPObject =
+      new (globalObject->globalData()) JSNPObject(globalObject, this, npObject);
+  m_jsNPObjects.set(npObject, jsNPObject);
+
+  return jsNPObject;
 }
 
 void NPRuntimeObjectMap::jsNPObjectDestroyed(JSNPObject* jsNPObject) {
-  // FIXME: Implement.
+  // Remove the object from the map.
+  ASSERT(m_jsNPObjects.contains(jsNPObject->npObject()));
+  m_jsNPObjects.remove(jsNPObject->npObject());
 }
 
 JSValue NPRuntimeObjectMap::convertNPVariantToJSValue(
@@ -97,17 +117,8 @@ JSValue NPRuntimeObjectMap::convertNPVariantToJSValue(
       return jsString(exec, String::fromUTF8WithLatin1Fallback(
                                 variant.value.stringValue.UTF8Characters,
                                 variant.value.stringValue.UTF8Length));
-    case NPVariantType_Object: {
-      NPObject* npObject = variant.value.objectValue;
-
-      // Just get the object from the NPJSObject.
-      if (NPJSObject::isNPJSObject(npObject))
-        return NPJSObject::toNPJSObject(npObject)->jsObject();
-
-      ASSERT(globalObject);
-
-      return getOrCreateJSObject(globalObject, npObject);
-    }
+    case NPVariantType_Object:
+      return getOrCreateJSObject(globalObject, variant.value.objectValue);
   }
 
   ASSERT_NOT_REACHED();
@@ -154,18 +165,7 @@ void NPRuntimeObjectMap::convertJSValueToNPVariant(ExecState* exec,
   }
 
   if (value.isObject()) {
-    JSObject* jsObject = asObject(value);
-
-    if (jsObject->classInfo() == &JSNPObject::s_info) {
-      JSNPObject* jsNPObject = static_cast<JSNPObject*>(jsObject);
-      NPObject* npObject = jsNPObject->npObject();
-
-      retainNPObject(npObject);
-      OBJECT_TO_NPVARIANT(npObject, variant);
-      return;
-    }
-
-    NPObject* npObject = getOrCreateNPObject(jsObject);
+    NPObject* npObject = getOrCreateNPObject(asObject(value));
     OBJECT_TO_NPVARIANT(npObject, variant);
     return;
   }
@@ -209,14 +209,23 @@ bool NPRuntimeObjectMap::evaluate(NPObject* npObject,
 
 void NPRuntimeObjectMap::invalidate() {
   Vector<NPJSObject*> npJSObjects;
-  copyValuesToVector(m_objects, npJSObjects);
+  copyValuesToVector(m_npJSObjects, npJSObjects);
 
   // Deallocate all the object wrappers so we won't leak any JavaScript objects.
   for (size_t i = 0; i < npJSObjects.size(); ++i)
     deallocateNPObject(npJSObjects[i]);
 
-  // We shouldn't have any objects left now.
-  ASSERT(m_objects.isEmpty());
+  // We shouldn't have any NPJSObjects left now.
+  ASSERT(m_npJSObjects.isEmpty());
+
+  Vector<JSNPObject*> jsNPObjects;
+  copyValuesToVector(m_jsNPObjects, jsNPObjects);
+
+  // Invalidate all the JSObjects that wrap NPObjects.
+  for (size_t i = 0; i < jsNPObjects.size(); ++i)
+    jsNPObjects[i]->invalidate();
+
+  m_jsNPObjects.clear();
 }
 
 JSGlobalObject* NPRuntimeObjectMap::globalObject() const {

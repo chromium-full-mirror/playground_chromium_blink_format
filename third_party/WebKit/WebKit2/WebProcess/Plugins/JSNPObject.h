@@ -44,6 +44,8 @@ class JSNPObject : public JSC::JSObjectWithGlobalObject {
              NPObject* npObject);
   ~JSNPObject();
 
+  void invalidate();
+
   JSC::JSValue callMethod(JSC::ExecState*, NPIdentifier methodName);
   JSC::JSValue callObject(JSC::ExecState*);
   JSC::JSValue callConstructor(JSC::ExecState*);
