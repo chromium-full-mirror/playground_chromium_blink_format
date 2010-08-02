@@ -26,8 +26,7 @@
 #include "TestController.h"
 
 int main(int argc, const char* argv[]) {
-  WTR::TestController::shared().initialize(argc, argv);
-  WTR::TestController::shared().run();
+  { WTR::TestController controller(argc, argv); }
 
   return 0;
 }
