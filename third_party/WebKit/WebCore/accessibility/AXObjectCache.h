@@ -129,6 +129,8 @@ class AXObjectCache : public Noncopyable {
     AXRowCountChanged,
     AXRowCollapsed,
     AXRowExpanded,
+    AXScreenChanged,
+    AXElementsChanged
   };
 
   void postNotification(RenderObject*,
