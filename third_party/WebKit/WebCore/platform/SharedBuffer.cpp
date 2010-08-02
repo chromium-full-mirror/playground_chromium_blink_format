@@ -220,7 +220,7 @@ unsigned SharedBuffer::getSomeData(const char*& someData,
                                  : segmentSize - positionInSegment;
 }
 
-#if !PLATFORM(CF)
+#if !PLATFORM(CF) || PLATFORM(QT)
 
 inline void SharedBuffer::clearPlatformData() {}
 
