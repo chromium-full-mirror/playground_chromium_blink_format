@@ -2402,7 +2402,7 @@ VisiblePosition AccessibilityRenderObject::visiblePositionForIndex(
   if (isNativeTextControl())
     return toRenderTextControl(m_renderer)->visiblePositionForIndex(index);
 
-  if (!isTextControl() && !m_renderer->isText())
+  if (!allowsTextRanges() && !m_renderer->isText())
     return VisiblePosition();
 
   Node* node = m_renderer->node();
@@ -2678,7 +2678,7 @@ String AccessibilityRenderObject::doAXStringForRange(
 // on the display screen, in pixels.
 IntRect AccessibilityRenderObject::doAXBoundsForRange(
     const PlainTextRange& range) const {
-  if (isTextControl())
+  if (allowsTextRanges())
     return boundsForVisiblePositionRange(visiblePositionRangeForRange(range));
   return IntRect();
 }
