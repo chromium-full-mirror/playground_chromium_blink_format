@@ -214,8 +214,10 @@ void SVGResourcesCycleSolver::breakCycle(
         m_resources->resetStroke();
       break;
     case FilterResourceType:
+#if ENABLE(FILTERS)
       ASSERT(resourceLeadingToCycle == m_resources->filter());
       m_resources->resetFilter();
+#endif
       break;
     case ClipperResourceType:
       ASSERT(resourceLeadingToCycle == m_resources->clipper());
