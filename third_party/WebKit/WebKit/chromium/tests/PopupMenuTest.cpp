@@ -190,7 +190,7 @@ class SelectPopupMenuTest : public testing::Test {
   virtual void SetUp() {
     m_webView = static_cast<WebViewImpl*>(WebView::create(&m_webviewClient, 0));
     m_webView->initializeMainFrame(&m_webFrameClient);
-    m_popupMenu = new PopupMenuChromium(&m_popupMenuClient);
+    m_popupMenu = PopupMenu::create(&m_popupMenuClient);
   }
 
   virtual void TearDown() {

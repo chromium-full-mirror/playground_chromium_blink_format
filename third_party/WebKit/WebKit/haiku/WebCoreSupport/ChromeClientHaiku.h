@@ -2,7 +2,6 @@
  * Copyright (C) 2006 Zack Rusin <zack@kde.org>
  * Copyright (C) 2007 Ryan Leavengood <leavengood@gmail.com> All rights
  * reserved.
- * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  *
  *
  * Redistribution and use in source and binary forms, with or without
@@ -144,11 +143,6 @@ class ChromeClientHaiku : public ChromeClient {
   void print(Frame*);
 
   void exceededDatabaseQuota(Frame*, const String& databaseName);
-
-  virtual bool selectItemWritingDirectionIsNatural();
-  virtual PassRefPtr<PopupMenu> createPopupMenu(PopupMenuClient*) const;
-  virtual PassRefPtr<SearchPopupMenu> createSearchPopupMenu(
-      PopupMenuClient*) const;
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   virtual void reachedMaxAppCacheSize(int64_t spaceNeeded);
