@@ -232,12 +232,15 @@ PluginView::PluginView(WebCore::HTMLPlugInElement* pluginElement,
       m_parameters(parameters),
       m_isInitialized(false),
       m_isWaitingUntilMediaCanStart(false),
+      m_isBeingDestroyed(false),
       m_pendingURLRequestsTimer(RunLoop::main(),
                                 this,
                                 &PluginView::pendingURLRequestsTimerFired),
       m_npRuntimeObjectMap(this) {}
 
 PluginView::~PluginView() {
+  ASSERT(!m_isBeingDestroyed);
+
   if (m_isWaitingUntilMediaCanStart)
     m_pluginElement->document()->removeMediaCanStartListener(this);
 
@@ -248,8 +251,11 @@ PluginView::~PluginView() {
        it != end; ++it)
     it->first->setLoadListener(0);
 
-  if (m_plugin && m_isInitialized)
+  if (m_plugin && m_isInitialized) {
+    m_isBeingDestroyed = true;
     m_plugin->destroy();
+    m_isBeingDestroyed = false;
+  }
 
   // Invalidate the object map.
   m_npRuntimeObjectMap.invalidate();
@@ -296,6 +302,10 @@ void PluginView::initializePlugin() {
 }
 
 JSObject* PluginView::scriptObject(JSGlobalObject* globalObject) {
+  // The plug-in can be null here if it failed to initialize.
+  if (!m_plugin)
+    return 0;
+
   NPObject* scriptableNPObject = m_plugin->pluginScriptableNPObject();
   if (!scriptableNPObject)
     return 0;
@@ -682,8 +692,6 @@ bool PluginView::evaluate(NPObject* npObject,
   bool oldAllowPopups = frame()->script()->allowPopupsFromPlugin();
   frame()->script()->setAllowPopupsFromPlugin(allowPopups);
 
-  // FIXME: What happens if calling evaluate will cause the plug-in view to go
-  // away.
   bool returnValue =
       m_npRuntimeObjectMap.evaluate(npObject, scriptString, result);
 

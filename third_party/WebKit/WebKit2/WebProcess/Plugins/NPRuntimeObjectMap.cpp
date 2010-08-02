@@ -43,6 +43,16 @@ namespace WebKit {
 NPRuntimeObjectMap::NPRuntimeObjectMap(PluginView* pluginView)
     : m_pluginView(pluginView) {}
 
+NPRuntimeObjectMap::PluginProtector::PluginProtector(
+    NPRuntimeObjectMap* npRuntimeObjectMap) {
+  // If we're already in the plug-in view destructor, we shouldn't try to keep
+  // it alive.
+  if (!npRuntimeObjectMap->m_pluginView->isBeingDestroyed())
+    m_pluginView = npRuntimeObjectMap->m_pluginView;
+}
+
+NPRuntimeObjectMap::PluginProtector::~PluginProtector() {}
+
 NPObject* NPRuntimeObjectMap::getOrCreateNPObject(JSObject* jsObject) {
   // If this is a JSNPObject, we can just get its underlying NPObject.
   if (jsObject->classInfo() == &JSNPObject::s_info) {

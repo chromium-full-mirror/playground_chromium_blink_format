@@ -59,6 +59,8 @@ class PluginView : public WebCore::PluginViewBase,
 
   WebCore::Frame* frame();
 
+  bool isBeingDestroyed() const { return m_isBeingDestroyed; }
+
  private:
   PluginView(WebCore::HTMLPlugInElement*,
              PassRefPtr<Plugin>,
@@ -131,6 +133,7 @@ class PluginView : public WebCore::PluginViewBase,
 
   bool m_isInitialized;
   bool m_isWaitingUntilMediaCanStart;
+  bool m_isBeingDestroyed;
 
   // Pending URLRequests that the plug-in has made.
   Deque<RefPtr<URLRequest>> m_pendingURLRequests;
