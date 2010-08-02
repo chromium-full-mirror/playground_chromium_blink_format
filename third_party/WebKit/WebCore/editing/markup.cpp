@@ -595,20 +595,6 @@ static void appendStartMarkup(
   }
 }
 
-static String getStartMarkup(
-    const Node* node,
-    const Range* range,
-    EAnnotateForInterchange annotate,
-    EAbsoluteURLs absoluteURLs,
-    bool convertBlocksToInlines = false,
-    HashMap<AtomicStringImpl*, AtomicStringImpl*>* namespaces = 0,
-    RangeFullySelectsNode rangeFullySelectsNode = DoesFullySelectNode) {
-  Vector<UChar> result;
-  appendStartMarkup(result, node, range, annotate, absoluteURLs,
-                    convertBlocksToInlines, namespaces, rangeFullySelectsNode);
-  return String::adopt(result);
-}
-
 static inline bool doesHTMLForbidEndTag(const Node* node) {
   if (node->isHTMLElement()) {
     const HTMLElement* htmlElt = static_cast<const HTMLElement*>(node);
@@ -642,12 +628,6 @@ static void appendEndMarkup(Vector<UChar>& result, const Node* node) {
   result.append('/');
   append(result, static_cast<const Element*>(node)->nodeNamePreservingCase());
   result.append('>');
-}
-
-static String getEndMarkup(const Node* node) {
-  Vector<UChar> result;
-  appendEndMarkup(result, node);
-  return String::adopt(result);
 }
 
 class MarkupAccumulator {
@@ -782,30 +762,6 @@ static bool isElementPresentational(const Node* node) {
   return !propertyMissingOrEqualToNone(style.get(), CSSPropertyTextDecoration);
 }
 
-static String joinMarkups(const Vector<String>& preMarkups,
-                          const Vector<String>& postMarkups) {
-  size_t length = 0;
-
-  size_t preCount = preMarkups.size();
-  for (size_t i = 0; i < preCount; ++i)
-    length += preMarkups[i].length();
-
-  size_t postCount = postMarkups.size();
-  for (size_t i = 0; i < postCount; ++i)
-    length += postMarkups[i].length();
-
-  Vector<UChar> result;
-  result.reserveInitialCapacity(length);
-
-  for (size_t i = preCount; i > 0; --i)
-    append(result, preMarkups[i - 1]);
-
-  for (size_t i = 0; i < postCount; ++i)
-    append(result, postMarkups[i]);
-
-  return String::adopt(result);
-}
-
 static bool isSpecialAncestorBlock(Node* node) {
   if (!node || !isBlock(node))
     return false;
@@ -829,32 +785,100 @@ static bool shouldIncludeWrapperForFullySelectedRoot(
          style->getPropertyCSSValue(CSSPropertyBackgroundColor);
 }
 
-static void addStyleMarkup(Vector<String>& preMarkups,
-                           Vector<String>& postMarkups,
-                           CSSStyleDeclaration* style,
-                           Document* document,
-                           bool isBlock = false) {
-  // All text-decoration-related elements should have been treated as special
-  // ancestors
-  // If we ever hit this ASSERT, we should export StyleChange in
-  // ApplyStyleCommand and use it here
-  ASSERT(propertyMissingOrEqualToNone(style, CSSPropertyTextDecoration) &&
-         propertyMissingOrEqualToNone(
-             style, CSSPropertyWebkitTextDecorationsInEffect));
-  DEFINE_STATIC_LOCAL(const String, divStyle, ("<div style=\""));
-  DEFINE_STATIC_LOCAL(const String, divClose, ("</div>"));
-  DEFINE_STATIC_LOCAL(const String, styleSpanOpen,
-                      ("<span class=\"" AppleStyleSpanClass "\" style=\""));
-  DEFINE_STATIC_LOCAL(const String, styleSpanClose, ("</span>"));
-  Vector<UChar> openTag;
-  append(openTag, isBlock ? divStyle : styleSpanOpen);
-  appendAttributeValue(openTag, style->cssText(), document->isHTMLDocument());
-  openTag.append('\"');
-  openTag.append('>');
-  preMarkups.append(String::adopt(openTag));
+class MarkupAccumulatorWrapper {
+ public:
+  MarkupAccumulatorWrapper() {}
 
-  postMarkups.append(isBlock ? divClose : styleSpanClose);
-}
+  void insertString(const String& s) { postMarkups.append(s); }
+
+  void insertOpenTag(
+      const Node* node,
+      const Range* range,
+      EAnnotateForInterchange annotate,
+      EAbsoluteURLs absoluteURLs,
+      bool convertBlocksToInlines = false,
+      RangeFullySelectsNode rangeFullySelectsNode = DoesFullySelectNode) {
+    Vector<UChar> result;
+    appendStartMarkup(result, node, range, annotate, absoluteURLs,
+                      convertBlocksToInlines, 0, rangeFullySelectsNode);
+    postMarkups.append(String::adopt(result));
+  }
+
+  void insertEndTag(const Node* node) {
+    Vector<UChar> result;
+    appendEndMarkup(result, node);
+    postMarkups.append(String::adopt(result));
+  }
+
+  void wrapWithNode(
+      const Node* node,
+      const Range* range,
+      EAnnotateForInterchange annotate,
+      EAbsoluteURLs absoluteURLs,
+      bool convertBlocksToInlines = false,
+      RangeFullySelectsNode rangeFullySelectsNode = DoesFullySelectNode) {
+    Vector<UChar> result;
+    appendStartMarkup(result, node, range, annotate, absoluteURLs,
+                      convertBlocksToInlines, 0, rangeFullySelectsNode);
+    preMarkups.append(String::adopt(result));
+    insertEndTag(node);
+  }
+
+  void wrapWithStyleNode(CSSStyleDeclaration* style,
+                         Document* document,
+                         bool isBlock = false) {
+    // All text-decoration-related elements should have been treated as special
+    // ancestors
+    // If we ever hit this ASSERT, we should export StyleChange in
+    // ApplyStyleCommand and use it here
+    ASSERT(propertyMissingOrEqualToNone(style, CSSPropertyTextDecoration) &&
+           propertyMissingOrEqualToNone(
+               style, CSSPropertyWebkitTextDecorationsInEffect));
+    DEFINE_STATIC_LOCAL(const String, divStyle, ("<div style=\""));
+    DEFINE_STATIC_LOCAL(const String, divClose, ("</div>"));
+    DEFINE_STATIC_LOCAL(const String, styleSpanOpen,
+                        ("<span class=\"" AppleStyleSpanClass "\" style=\""));
+    DEFINE_STATIC_LOCAL(const String, styleSpanClose, ("</span>"));
+    Vector<UChar> openTag;
+    WebCore::append(openTag, isBlock ? divStyle : styleSpanOpen);
+    appendAttributeValue(openTag, style->cssText(), document->isHTMLDocument());
+    openTag.append('\"');
+    openTag.append('>');
+    preMarkups.append(String::adopt(openTag));
+    postMarkups.append(isBlock ? divClose : styleSpanClose);
+  }
+
+  // FIXME: This is a very inefficient way of accumulating the markup.
+  // We're converting results of appendStartMarkup and appendEndMarkup from
+  // Vector<UChar> to String
+  // and then back to Vector<UChar> and again to String here.
+  String takeResults() {
+    size_t length = 0;
+
+    size_t preCount = preMarkups.size();
+    for (size_t i = 0; i < preCount; ++i)
+      length += preMarkups[i].length();
+
+    size_t postCount = postMarkups.size();
+    for (size_t i = 0; i < postCount; ++i)
+      length += postMarkups[i].length();
+
+    Vector<UChar> result;
+    result.reserveInitialCapacity(length);
+
+    for (size_t i = preCount; i > 0; --i)
+      WebCore::append(result, preMarkups[i - 1]);
+
+    for (size_t i = 0; i < postCount; ++i)
+      WebCore::append(result, postMarkups[i]);
+
+    return String::adopt(result);
+  }
+
+ private:
+  Vector<String> preMarkups;
+  Vector<String> postMarkups;
+};
 
 // FIXME: Shouldn't we omit style info when annotate ==
 // DoNotAnnotateForInterchange?
@@ -901,8 +925,7 @@ String createMarkup(const Range* range,
 
   document->updateLayoutIgnorePendingStylesheets();
 
-  Vector<String> markups;
-  Vector<String> preMarkups;
+  MarkupAccumulatorWrapper accumulator;
   Node* pastEnd = updatedRange->pastLastNode();
   Node* lastClosed = 0;
   Vector<Node*> ancestorsToClose;
@@ -918,7 +941,7 @@ String createMarkup(const Range* range,
       return interchangeNewlineString;
     }
 
-    markups.append(interchangeNewlineString);
+    accumulator.insertString(interchangeNewlineString);
     startNode = visibleStart.next().deepEquivalent().node();
 
     if (pastEnd &&
@@ -958,8 +981,7 @@ String createMarkup(const Range* range,
 
     // Add the node to the markup.
     if (addMarkupForNode) {
-      markups.append(
-          getStartMarkup(n, updatedRange.get(), annotate, absoluteURLs));
+      accumulator.insertOpenTag(n, updatedRange.get(), annotate, absoluteURLs);
       if (nodes)
         nodes->append(n);
     }
@@ -968,7 +990,7 @@ String createMarkup(const Range* range,
       // Node has no children, or we are skipping it's descendants, add its
       // close tag now.
       if (addMarkupForNode) {
-        markups.append(getEndMarkup(n));
+        accumulator.insertEndTag(n);
         lastClosed = n;
       }
 
@@ -982,7 +1004,7 @@ String createMarkup(const Range* range,
               break;
             // Not at the end of the range, close ancestors up to sibling of
             // next node.
-            markups.append(getEndMarkup(ancestor));
+            accumulator.insertEndTag(ancestor);
             lastClosed = ancestor;
             ancestorsToClose.removeLast();
           } while (!ancestorsToClose.isEmpty());
@@ -1004,9 +1026,8 @@ String createMarkup(const Range* range,
             // or b) ancestors that we never encountered during a pre-order
             // traversal starting at startNode:
             ASSERT(startNode->isDescendantOf(parent));
-            preMarkups.append(getStartMarkup(parent, updatedRange.get(),
-                                             annotate, absoluteURLs));
-            markups.append(getEndMarkup(parent));
+            accumulator.wrapWithNode(parent, updatedRange.get(), annotate,
+                                     absoluteURLs);
             if (nodes)
               nodes->append(parent);
             lastClosed = parent;
@@ -1125,17 +1146,16 @@ String createMarkup(const Range* range,
                   CSSPropertyWebkitTextDecorationsInEffect))
             fullySelectedRootStyle->setProperty(
                 CSSPropertyWebkitTextDecorationsInEffect, CSSValueNone);
-          addStyleMarkup(preMarkups, markups, fullySelectedRootStyle.get(),
-                         document, true);
+          accumulator.wrapWithStyleNode(fullySelectedRootStyle.get(), document,
+                                        true);
         }
       } else {
         // Since this node and all the other ancestors are not in the selection
         // we want to set RangeFullySelectsNode to DoesNotFullySelectNode
         // so that styles that affect the exterior of the node are not included.
-        preMarkups.append(getStartMarkup(ancestor, updatedRange.get(), annotate,
-                                         absoluteURLs, convertBlocksToInlines,
-                                         0, DoesNotFullySelectNode));
-        markups.append(getEndMarkup(ancestor));
+        accumulator.wrapWithNode(ancestor, updatedRange.get(), annotate,
+                                 absoluteURLs, convertBlocksToInlines,
+                                 DoesNotFullySelectNode);
       }
       if (nodes)
         nodes->append(ancestor);
@@ -1175,7 +1195,7 @@ String createMarkup(const Range* range,
       style->removeBlockProperties();
 
     if (style->length() > 0)
-      addStyleMarkup(preMarkups, markups, style.get(), document);
+      accumulator.wrapWithStyleNode(style.get(), document);
   }
 
   if (lastClosed && lastClosed != document->documentElement()) {
@@ -1189,18 +1209,18 @@ String createMarkup(const Range* range,
             Position(document->documentElement(), 0));
 
     if (defaultStyle->length() > 0)
-      addStyleMarkup(preMarkups, markups, defaultStyle.get(), document);
+      accumulator.wrapWithStyleNode(defaultStyle.get(), document);
   }
 
   // FIXME: The interchange newline should be placed in the block that it's in,
   // not after all of the content, unconditionally.
   if (annotate && needInterchangeNewlineAfter(visibleEnd.previous()))
-    markups.append(interchangeNewlineString);
+    accumulator.insertString(interchangeNewlineString);
 
   if (deleteButton)
     deleteButton->enable();
 
-  return joinMarkups(preMarkups, markups);
+  return accumulator.takeResults();
 }
 
 PassRefPtr<DocumentFragment> createFragmentFromMarkup(
