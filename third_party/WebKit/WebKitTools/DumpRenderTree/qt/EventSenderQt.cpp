@@ -339,9 +339,15 @@ void EventSender::keyDown(const QString& string,
     } else if (string == QLatin1String("end")) {
       s = QString();
       code = Qt::Key_End;
+    } else if (string == QLatin1String("insert")) {
+      s = QString();
+      code = Qt::Key_Insert;
     } else if (string == QLatin1String("delete")) {
       s = QString();
       code = Qt::Key_Delete;
+    } else if (string == QLatin1String("printScreen")) {
+      s = QString();
+      code = Qt::Key_Print;
     }
   }
   QKeyEvent event(QEvent::KeyPress, code, modifs, s);
