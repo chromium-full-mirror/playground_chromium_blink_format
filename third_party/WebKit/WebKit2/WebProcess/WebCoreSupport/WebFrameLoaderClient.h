@@ -30,11 +30,13 @@
 
 namespace WebKit {
 
+class PluginView;
 class WebFrame;
 
 class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
  public:
-  WebFrameLoaderClient(WebFrame* frame) : m_frame(frame) {}
+  WebFrameLoaderClient(WebFrame*);
+  ~WebFrameLoaderClient();
 
   WebFrame* webFrame() const { return m_frame; }
 
@@ -294,6 +296,9 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                     const WebCore::String& textEncoding);
 
   WebFrame* m_frame;
+
+  RefPtr<PluginView> m_pluginView;
+  bool m_hasSentResponseToPluginView;
 };
 
 }  // namespace WebKit

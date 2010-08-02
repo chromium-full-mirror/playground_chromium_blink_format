@@ -63,6 +63,11 @@ using namespace WebCore;
 
 namespace WebKit {
 
+WebFrameLoaderClient::WebFrameLoaderClient(WebFrame* frame)
+    : m_frame(frame), m_hasSentResponseToPluginView(false) {}
+
+WebFrameLoaderClient::~WebFrameLoaderClient() {}
+
 void WebFrameLoaderClient::frameLoaderDestroyed() {
   m_frame->invalidate();
 
@@ -481,8 +486,13 @@ void WebFrameLoaderClient::revertToProvisionalState(DocumentLoader*) {
 }
 
 void WebFrameLoaderClient::setMainDocumentError(DocumentLoader*,
-                                                const ResourceError&) {
-  notImplemented();
+                                                const ResourceError& error) {
+  if (!m_pluginView)
+    return;
+
+  m_pluginView->manualLoadDidFail(error);
+  m_pluginView = 0;
+  m_hasSentResponseToPluginView = false;
 }
 
 void WebFrameLoaderClient::willChangeEstimatedProgress() {
@@ -537,7 +547,26 @@ void WebFrameLoaderClient::committedLoad(DocumentLoader* loader,
                                          int length) {
   const String& textEncoding = loader->response().textEncodingName();
 
-  receivedData(data, length, textEncoding);
+  if (!m_pluginView)
+    receivedData(data, length, textEncoding);
+
+  // Calling receivedData did not create the plug-in view.
+  if (!m_pluginView)
+    return;
+
+  if (!m_hasSentResponseToPluginView) {
+    m_pluginView->manualLoadDidReceiveResponse(
+        m_frame->coreFrame()->loader()->documentLoader()->response());
+    // manualLoadDidReceiveResponse sets up a new stream to the plug-in. on a
+    // full-page plug-in, a failure in
+    // setting up this stream can cause the main document load to be cancelled,
+    // setting m_pluginView
+    // to null
+    if (!m_pluginView)
+      return;
+    m_hasSentResponseToPluginView = true;
+  }
+  m_pluginView->manualLoadDidReceiveData(data, length);
 }
 
 void WebFrameLoaderClient::receivedData(const char* data,
@@ -559,7 +588,14 @@ void WebFrameLoaderClient::receivedData(const char* data,
 }
 
 void WebFrameLoaderClient::finishedLoading(DocumentLoader* loader) {
-  committedLoad(loader, 0, 0);
+  if (!m_pluginView) {
+    committedLoad(loader, 0, 0);
+    return;
+  }
+
+  m_pluginView->manualLoadDidFinishLoading();
+  m_pluginView = 0;
+  m_hasSentResponseToPluginView = false;
 }
 
 void WebFrameLoaderClient::updateGlobalHistory() {
@@ -848,7 +884,10 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
 }
 
 void WebFrameLoaderClient::redirectDataToPlugin(Widget* pluginWidget) {
-  notImplemented();
+  ASSERT(!m_pluginView);
+  ASSERT(pluginWidget);
+
+  m_pluginView = static_cast<PluginView*>(pluginWidget);
 }
 
 PassRefPtr<Widget> WebFrameLoaderClient::createJavaAppletWidget(

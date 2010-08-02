@@ -140,6 +140,15 @@ class NetscapePlugin : public Plugin {
                                     int length);
   virtual void streamDidFinishLoading(uint64_t streamID);
   virtual void streamDidFail(uint64_t streamID, bool wasCancelled);
+  virtual void manualStreamDidReceiveResponse(const WebCore::KURL& responseURL,
+                                              uint32_t streamLength,
+                                              uint32_t lastModifiedTime,
+                                              const WebCore::String& mimeType,
+                                              const WebCore::String& headers);
+  virtual void manualStreamDidReceiveData(const char* bytes, int length);
+  virtual void manualStreamDidFinishLoading();
+  virtual void manualStreamDidFail(bool wasCancelled);
+
   virtual bool handleMouseEvent(const WebMouseEvent&);
   virtual bool handleWheelEvent(const WebWheelEvent&);
   virtual bool handleMouseEnterEvent(const WebMouseEvent&);
@@ -170,6 +179,8 @@ class NetscapePlugin : public Plugin {
 
   bool m_isStarted;
   bool m_inNPPNew;
+  bool m_loadManually;
+  RefPtr<NetscapePluginStream> m_manualStream;
 
 #if PLATFORM(MAC)
   NPDrawingModel m_drawingModel;
