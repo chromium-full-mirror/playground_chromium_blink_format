@@ -206,7 +206,7 @@ class WebPageProxy : public APIObject {
                                const WebCore::String& url,
                                uint64_t listenerID);
 
-  WebPageProxy* createNewPage();
+  PassRefPtr<WebPageProxy> createNewPage();
   void showPage();
   void closePage();
   void runJavaScriptAlert(WebFrameProxy*, const WebCore::String&);

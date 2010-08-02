@@ -79,3 +79,7 @@ bool WKBundlePageIsEditingCommandEnabled(WKBundlePageRef pageRef,
 void WKBundlePageClearMainFrameName(WKBundlePageRef pageRef) {
   toWK(pageRef)->clearMainFrameName();
 }
+
+void WKBundlePageClose(WKBundlePageRef pageRef) {
+  toWK(pageRef)->sendClose();
+}

@@ -592,7 +592,7 @@ void WebPageProxy::didReceiveSyncMessage(CoreIPC::Connection* connection,
 
   switch (messageID.get<WebPageProxyMessage::Kind>()) {
     case WebPageProxyMessage::CreateNewPage: {
-      WebPageProxy* newPage = createNewPage();
+      RefPtr<WebPageProxy> newPage = createNewPage();
       if (newPage) {
         // FIXME: Pass the real size.
         reply.encode(CoreIPC::In(
@@ -805,7 +805,7 @@ void WebPageProxy::decidePolicyForMIMEType(WebFrameProxy* frame,
 }
 
 // UIClient
-WebPageProxy* WebPageProxy::createNewPage() {
+PassRefPtr<WebPageProxy> WebPageProxy::createNewPage() {
   return m_uiClient.createNewPage(this);
 }
 

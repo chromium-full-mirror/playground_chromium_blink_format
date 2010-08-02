@@ -63,10 +63,17 @@ class WKRetainPtr {
   }
 
   PtrType get() const { return m_ptr; }
-  PtrType releaseRef() {
-    PtrType tmp = m_ptr;
+
+  void clear() {
+    PtrType ptr = m_ptr;
     m_ptr = 0;
-    return tmp;
+    if (ptr)
+      WKRelease(ptr);
+  }
+  PtrType leakRef() {
+    PtrType ptr = m_ptr;
+    m_ptr = 0;
+    return ptr;
   }
 
   PtrType operator->() const { return m_ptr; }
@@ -88,6 +95,9 @@ class WKRetainPtr {
 
   void adopt(PtrType);
   void swap(WKRetainPtr&);
+
+  // FIXME: Remove once all callers are calling leakRef.
+  PtrType releaseRef() { leakRef(); }
 
  private:
   PtrType m_ptr;

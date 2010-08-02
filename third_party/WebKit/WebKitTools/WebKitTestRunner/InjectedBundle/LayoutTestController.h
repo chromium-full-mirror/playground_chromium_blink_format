@@ -65,6 +65,11 @@ class LayoutTestController : public JSWrappable {
   // Special options.
   void keepWebHistory();
   void setAcceptsEditing(bool value) { m_shouldAllowEditing = value; }
+  void setCanOpenWindows(bool);
+  void setCloseRemainingWindowsWhenComplete(bool value) {
+    m_shouldCloseExtraWindows = value;
+  }
+  unsigned windowCount();
 
   // Special DOM functions.
   JSValueRef computedStyleIncludingVisitedInfo(JSValueRef element);
@@ -103,12 +108,19 @@ class LayoutTestController : public JSWrappable {
 
   bool shouldAllowEditing() const { return m_shouldAllowEditing; }
 
+  bool shouldCloseExtraWindowsAfterRunningTest() const {
+    return m_shouldCloseExtraWindows;
+  }
+
  private:
   LayoutTestController();
 
   WhatToDump m_whatToDump;
   bool m_shouldDumpAllFrameScrollPositions;
+
   bool m_shouldAllowEditing;
+  bool m_shouldCloseExtraWindows;
+
   bool m_dumpEditingCallbacks;
   bool m_dumpStatusCallbacks;
   bool m_waitToDump;  // True if waitUntilDone() has been called, but
