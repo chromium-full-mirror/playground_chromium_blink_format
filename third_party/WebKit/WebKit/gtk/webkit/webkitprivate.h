@@ -206,10 +206,6 @@ struct _WebKitSecurityOriginPrivate {
   gboolean disposed;
 };
 
-PassRefPtr<WebCore::Frame> webkit_web_frame_init_with_web_view(
-    WebKitWebView*,
-    WebCore::HTMLFrameOwnerElement*);
-
 void webkit_web_frame_core_frame_gone(WebKitWebFrame*);
 
 // WebKitWebHistoryItem private

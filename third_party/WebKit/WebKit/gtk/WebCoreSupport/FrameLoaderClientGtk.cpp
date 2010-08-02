@@ -5,6 +5,7 @@
  *  Copyright (C) 2008, 2009 Collabora Ltd.  All rights reserved.
  *  Copyright (C) 2009, 2010 Gustavo Noronha Silva <gns@gnome.org>
  *  Copyright (C) Research In Motion Limited 2009. All rights reserved.
+ *  Copyright (C) 2010 Igalia S.L.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -533,15 +534,22 @@ PassRefPtr<Frame> FrameLoaderClient::createFrame(
     bool allowsScrolling,
     int marginWidth,
     int marginHeight) {
-  Frame* coreFrame = core(m_frame);
+  ASSERT(m_frame);
+  Frame* parentFrame = core(m_frame);
+  WebKitWebView* webView = getViewFromFrame(m_frame);
+  WebCore::Page* page = core(webView);
+  ASSERT(page == parentFrame->page());
 
-  ASSERT(core(getViewFromFrame(m_frame)) == coreFrame->page());
+  WebKitWebFrame* kitFrame =
+      WEBKIT_WEB_FRAME(g_object_new(WEBKIT_TYPE_WEB_FRAME, NULL));
+  WebKitWebFramePrivate* framePrivate = kitFrame->priv;
+  framePrivate->webView = webView;
 
-  RefPtr<Frame> childFrame = webkit_web_frame_init_with_web_view(
-      getViewFromFrame(m_frame), ownerElement);
+  RefPtr<Frame> childFrame =
+      Frame::create(page, ownerElement, new FrameLoaderClient(kitFrame));
+  framePrivate->coreFrame = childFrame.get();
 
-  coreFrame->tree()->appendChild(childFrame);
-
+  parentFrame->tree()->appendChild(childFrame);
   childFrame->tree()->setName(name);
   childFrame->init();
 
@@ -556,6 +564,7 @@ PassRefPtr<Frame> FrameLoaderClient::createFrame(
   if (!childFrame->tree()->parent())
     return 0;
 
+  g_signal_emit_by_name(webView, "frame-created", kitFrame);
   return childFrame.release();
 }
 
