@@ -110,6 +110,8 @@ class WebContext : public APIObject {
 
   void registerURLSchemeAsEmptyDocument(const WebCore::String&);
 
+  void addVisitedLink(const WebCore::String&);
+
   void didReceiveMessage(CoreIPC::Connection*,
                          CoreIPC::MessageID,
                          CoreIPC::ArgumentDecoder&);

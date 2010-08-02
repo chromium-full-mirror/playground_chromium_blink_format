@@ -125,6 +125,10 @@ bool PageGroup::isLinkVisited(LinkHash visitedLinkHash) {
 #endif
 }
 
+void PageGroup::addVisitedLinkHash(LinkHash hash) {
+  addVisitedLink(hash);
+}
+
 inline void PageGroup::addVisitedLink(LinkHash hash) {
   ASSERT(shouldTrackVisitedLinks);
 #if !PLATFORM(CHROMIUM)

@@ -28,6 +28,7 @@
 
 #include "Connection.h"
 #include "DrawingArea.h"
+#include <WebCore/LinkHash.h>
 #include <wtf/HashMap.h>
 
 namespace WebCore {
@@ -78,6 +79,7 @@ class WebProcess : CoreIPC::Connection::Client {
 #endif
   void setApplicationCacheDirectory(const WebCore::String&);
   void registerURLSchemeAsEmptyDocument(const WebCore::String&);
+  void addVisitedLinkHash(WebCore::LinkHash);
 
   // CoreIPC::Connection::Client
   void didReceiveMessage(CoreIPC::Connection*,

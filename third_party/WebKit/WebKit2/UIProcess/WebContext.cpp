@@ -39,6 +39,8 @@
 
 #include "WKContextPrivate.h"
 
+#include <WebCore/LinkHash.h>
+
 #ifndef NDEBUG
 #include <wtf/RefCountedLeakCounter.h>
 #endif
@@ -364,6 +366,15 @@ void WebContext::registerURLSchemeAsEmptyDocument(const String& urlScheme) {
 
   m_process->send(WebProcessMessage::RegisterURLSchemeAsEmptyDocument, 0,
                   CoreIPC::In(urlScheme));
+}
+
+void WebContext::addVisitedLink(const String& visitedURL) {
+  if (visitedURL.isEmpty())
+    return;
+
+  WebCore::LinkHash hash =
+      visitedLinkHash(visitedURL.characters(), visitedURL.length());
+  m_process->send(WebProcessMessage::AddVisitedLink, 0, CoreIPC::In(hash));
 }
 
 void WebContext::didReceiveMessage(CoreIPC::Connection* connection,
