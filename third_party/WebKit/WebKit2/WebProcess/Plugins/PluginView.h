@@ -120,6 +120,7 @@ class PluginView : public WebCore::PluginViewBase,
                        const Vector<char>& httpBody,
                        bool allowPopups);
   virtual void cancelStreamLoad(uint64_t streamID);
+  virtual void cancelManualStreamLoad();
   virtual NPObject* windowScriptNPObject();
   virtual NPObject* pluginElementNPObject();
   virtual bool evaluate(NPObject*,
