@@ -62,8 +62,8 @@ class DrawingAreaBase {
     Type type;
     DrawingAreaID id;
 
-    DrawingAreaInfo(Type type = None, DrawingAreaID indentifier = 0)
-        : type(type), id(indentifier) {}
+    DrawingAreaInfo(Type type = None, DrawingAreaID indentifer = 0)
+        : type(type), id(indentifer) {}
   };
 
   // The DrawingAreaProxy should never be decoded itself. Instead, the
@@ -72,8 +72,8 @@ class DrawingAreaBase {
   static bool decode(CoreIPC::ArgumentDecoder&, DrawingAreaInfo&);
 
  protected:
-  DrawingAreaBase(Type type, DrawingAreaID indentifier)
-      : m_type(type), m_id(indentifier) {}
+  DrawingAreaBase(Type type, DrawingAreaID indentifer)
+      : m_type(type), m_id(indentifer) {}
 
   Type m_type;
   DrawingAreaID m_id;
