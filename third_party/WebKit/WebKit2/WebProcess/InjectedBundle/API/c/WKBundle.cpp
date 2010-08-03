@@ -56,3 +56,7 @@ void WKBundleSetShouldTrackVisitedLinks(WKBundleRef bundleRef,
 void WKBundleRemoveAllVisitedLinks(WKBundleRef bundleRef) {
   toWK(bundleRef)->removeAllVisitedLinks();
 }
+
+void WKBundleActivateMacFontAscentHack(WKBundleRef bundleRef) {
+  toWK(bundleRef)->activateMacFontAscentHack();
+}

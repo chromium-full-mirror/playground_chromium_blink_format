@@ -71,6 +71,7 @@ class InjectedBundle : public APIObject {
   void postMessage(const WebCore::String&, APIObject*);
   void setShouldTrackVisitedLinks(bool);
   void removeAllVisitedLinks();
+  void activateMacFontAscentHack();
 
   // Callback hooks
   void didCreatePage(WebPage*);

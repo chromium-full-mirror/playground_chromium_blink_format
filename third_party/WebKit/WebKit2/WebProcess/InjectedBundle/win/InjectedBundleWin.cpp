@@ -27,6 +27,7 @@
 
 #include "WKBundleAPICast.h"
 #include "WKBundleInitialize.h"
+#include <WebCore/SimpleFontData.h>
 
 #include <windows.h>
 #include <winbase.h>
@@ -79,6 +80,10 @@ bool InjectedBundle::load() {
 
   initializeFunction(toRef(this));
   return true;
+}
+
+void InjectedBundle::activateMacFontAscentHack() {
+  SimpleFontData::setShouldApplyMacAscentHack(true);
 }
 
 }  // namespace WebKit

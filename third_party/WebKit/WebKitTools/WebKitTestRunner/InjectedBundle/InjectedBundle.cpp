@@ -77,6 +77,7 @@ void InjectedBundle::initialize(WKBundleRef bundle) {
   WKBundleSetClient(m_bundle, &client);
 
   activateFonts();
+  WKBundleActivateMacFontAscentHack(m_bundle);
 }
 
 void InjectedBundle::done() {
