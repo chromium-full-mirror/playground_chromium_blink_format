@@ -28,7 +28,7 @@
 
 #include "DOMStringList.h"
 #include "IDBCallbacksProxy.h"
-#include "IDBDatabase.h"
+#include "IDBDatabaseBackendInterface.h"
 #include "WebIDBCallbacks.h"
 #include "WebIDBObjectStoreImpl.h"
 
@@ -38,38 +38,40 @@ using namespace WebCore;
 
 namespace WebKit {
 
-WebIDBDatabaseImpl::WebIDBDatabaseImpl(PassRefPtr<IDBDatabase> database)
-    : m_database(database) {}
+WebIDBDatabaseImpl::WebIDBDatabaseImpl(
+    PassRefPtr<IDBDatabaseBackendInterface> databaseBackend)
+    : m_databaseBackend(databaseBackend) {}
 
 WebIDBDatabaseImpl::~WebIDBDatabaseImpl() {}
 
 WebString WebIDBDatabaseImpl::name() const {
-  return m_database->name();
+  return m_databaseBackend->name();
 }
 
 WebString WebIDBDatabaseImpl::description() const {
-  return m_database->description();
+  return m_databaseBackend->description();
 }
 
 WebString WebIDBDatabaseImpl::version() const {
-  return m_database->version();
+  return m_databaseBackend->version();
 }
 
 WebDOMStringList WebIDBDatabaseImpl::objectStores() const {
-  return m_database->objectStores();
+  return m_databaseBackend->objectStores();
 }
 
 void WebIDBDatabaseImpl::createObjectStore(const WebString& name,
                                            const WebString& keyPath,
                                            bool autoIncrement,
                                            WebIDBCallbacks* callbacks) {
-  m_database->createObjectStore(name, keyPath, autoIncrement,
-                                IDBCallbacksProxy::create(callbacks));
+  m_databaseBackend->createObjectStore(name, keyPath, autoIncrement,
+                                       IDBCallbacksProxy::create(callbacks));
 }
 
 WebIDBObjectStore* WebIDBDatabaseImpl::objectStore(const WebString& name,
                                                    unsigned short mode) {
-  RefPtr<IDBObjectStore> objectStore = m_database->objectStore(name, mode);
+  RefPtr<IDBObjectStore> objectStore =
+      m_databaseBackend->objectStore(name, mode);
   if (!objectStore)
     return 0;
   return new WebIDBObjectStoreImpl(objectStore);
@@ -77,7 +79,8 @@ WebIDBObjectStore* WebIDBDatabaseImpl::objectStore(const WebString& name,
 
 void WebIDBDatabaseImpl::removeObjectStore(const WebString& name,
                                            WebIDBCallbacks* callbacks) {
-  m_database->removeObjectStore(name, IDBCallbacksProxy::create(callbacks));
+  m_databaseBackend->removeObjectStore(name,
+                                       IDBCallbacksProxy::create(callbacks));
 }
 
 }  // namespace WebCore

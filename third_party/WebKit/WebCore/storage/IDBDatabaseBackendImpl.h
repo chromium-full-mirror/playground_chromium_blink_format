@@ -23,8 +23,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef IDBDatabaseImpl_h
-#define IDBDatabaseImpl_h
+#ifndef IDBDatabaseBackendImpl_h
+#define IDBDatabaseBackendImpl_h
 
 #include "IDBCallbacks.h"
 #include "IDBDatabase.h"
@@ -35,14 +35,13 @@
 
 namespace WebCore {
 
-class IDBDatabaseImpl : public IDBDatabase {
+class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
  public:
-  static PassRefPtr<IDBDatabase> create(const String& name,
-                                        const String& description,
-                                        const String& version) {
-    return adoptRef(new IDBDatabaseImpl(name, description, version));
+  static PassRefPtr<IDBDatabaseBackendInterface>
+  create(const String& name, const String& description, const String& version) {
+    return adoptRef(new IDBDatabaseBackendImpl(name, description, version));
   }
-  virtual ~IDBDatabaseImpl();
+  virtual ~IDBDatabaseBackendImpl();
 
   // Implements IDBDatabase
   virtual String name() const { return m_name; }
@@ -59,9 +58,9 @@ class IDBDatabaseImpl : public IDBDatabase {
   virtual void removeObjectStore(const String& name, PassRefPtr<IDBCallbacks>);
 
  private:
-  IDBDatabaseImpl(const String& name,
-                  const String& description,
-                  const String& version);
+  IDBDatabaseBackendImpl(const String& name,
+                         const String& description,
+                         const String& version);
 
   String m_name;
   String m_description;
@@ -75,4 +74,4 @@ class IDBDatabaseImpl : public IDBDatabase {
 
 #endif
 
-#endif  // IDBDatabaseImpl_h
+#endif  // IDBDatabaseBackendImpl_h

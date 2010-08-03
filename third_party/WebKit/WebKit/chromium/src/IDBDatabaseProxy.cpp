@@ -39,7 +39,7 @@
 
 namespace WebCore {
 
-PassRefPtr<IDBDatabase> IDBDatabaseProxy::create(
+PassRefPtr<IDBDatabaseBackendInterface> IDBDatabaseProxy::create(
     PassOwnPtr<WebKit::WebIDBDatabase> database) {
   return adoptRef(new IDBDatabaseProxy(database));
 }

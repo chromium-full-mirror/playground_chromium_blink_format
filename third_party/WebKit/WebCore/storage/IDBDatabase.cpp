@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#include "IDBDatabaseRequest.h"
+#include "IDBDatabase.h"
 
 #include "IDBAny.h"
 #include "IDBFactoryBackendInterface.h"
@@ -36,40 +36,40 @@
 
 namespace WebCore {
 
-IDBDatabaseRequest::IDBDatabaseRequest(PassRefPtr<IDBDatabase> database)
-    : m_database(database) {
+IDBDatabase::IDBDatabase(PassRefPtr<IDBDatabaseBackendInterface> backend)
+    : m_backend(backend) {
   // We pass a reference to this object before it can be adopted.
   relaxAdoptionRequirement();
 }
 
-IDBDatabaseRequest::~IDBDatabaseRequest() {}
+IDBDatabase::~IDBDatabase() {}
 
-PassRefPtr<IDBRequest> IDBDatabaseRequest::createObjectStore(
+PassRefPtr<IDBRequest> IDBDatabase::createObjectStore(
     ScriptExecutionContext* context,
     const String& name,
     const String& keyPath,
     bool autoIncrement) {
   RefPtr<IDBRequest> request =
       IDBRequest::create(context, IDBAny::create(this));
-  m_database->createObjectStore(name, keyPath, autoIncrement, request);
+  m_backend->createObjectStore(name, keyPath, autoIncrement, request);
   return request;
 }
 
-PassRefPtr<IDBObjectStoreRequest> IDBDatabaseRequest::objectStore(
+PassRefPtr<IDBObjectStoreRequest> IDBDatabase::objectStore(
     const String& name,
     unsigned short mode) {
-  RefPtr<IDBObjectStore> objectStore = m_database->objectStore(name, mode);
+  RefPtr<IDBObjectStore> objectStore = m_backend->objectStore(name, mode);
   ASSERT(
       objectStore);  // FIXME: If this is null, we should raise a NOT_FOUND_ERR.
   return IDBObjectStoreRequest::create(objectStore.release());
 }
 
-PassRefPtr<IDBRequest> IDBDatabaseRequest::removeObjectStore(
+PassRefPtr<IDBRequest> IDBDatabase::removeObjectStore(
     ScriptExecutionContext* context,
     const String& name) {
   RefPtr<IDBRequest> request =
       IDBRequest::create(context, IDBAny::create(this));
-  m_database->removeObjectStore(name, request);
+  m_backend->removeObjectStore(name, request);
   return request;
 }
 
