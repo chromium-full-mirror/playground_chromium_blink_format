@@ -1841,7 +1841,7 @@ void RenderBoxModelObject::clipBorderSidePolygon(
   firstQuad[1] = quad[1];
   firstQuad[2] = side == BSTop || side == BSBottom
                      ? FloatPoint(quad[3].x(), quad[2].y())
-                     : firstQuad[2] = FloatPoint(quad[2].x(), quad[3].y());
+                     : FloatPoint(quad[2].x(), quad[3].y());
   firstQuad[3] = quad[3];
   graphicsContext->clipConvexPolygon(4, firstQuad, !firstEdgeMatches);
 
