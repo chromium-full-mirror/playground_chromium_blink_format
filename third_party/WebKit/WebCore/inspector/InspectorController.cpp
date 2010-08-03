@@ -1817,17 +1817,18 @@ void InspectorController::editScriptSource(long callId,
   String result;
   bool success = ScriptDebugServer::shared().editScriptSource(
       sourceID, newContent, result);
-  RefPtr<SerializedScriptValue> callFrames;
+  RefPtr<InspectorValue> callFrames;
   if (success)
     callFrames = currentCallFrames();
-  m_frontend->didEditScriptSource(callId, success, result, callFrames.get());
+  m_remoteFrontend->didEditScriptSource(callId, success, result,
+                                        callFrames.get());
 }
 
 void InspectorController::getScriptSource(long callId, const String& sourceID) {
   if (!m_frontend)
     return;
   String scriptSource = m_scriptIDToContent.get(sourceID);
-  m_frontend->didGetScriptSource(callId, scriptSource);
+  m_remoteFrontend->didGetScriptSource(callId, scriptSource);
 }
 
 void InspectorController::resume() {
@@ -1844,14 +1845,14 @@ void InspectorController::setPauseOnExceptionsState(long pauseState) {
         ScriptDebugServer::shared().pauseOnExceptionsState());
 }
 
-PassRefPtr<SerializedScriptValue> InspectorController::currentCallFrames() {
+PassRefPtr<InspectorValue> InspectorController::currentCallFrames() {
   if (!m_pausedScriptState)
-    return 0;
+    return InspectorValue::null();
   InjectedScript injectedScript =
       m_injectedScriptHost->injectedScriptFor(m_pausedScriptState);
   if (injectedScript.hasNoValue()) {
     ASSERT_NOT_REACHED();
-    return 0;
+    return InspectorValue::null();
   }
   return injectedScript.callFrames();
 }
@@ -1961,8 +1962,8 @@ void InspectorController::failedToParseSource(const String& url,
 void InspectorController::didPause(ScriptState* scriptState) {
   ASSERT(scriptState && !m_pausedScriptState);
   m_pausedScriptState = scriptState;
-  RefPtr<SerializedScriptValue> callFrames = currentCallFrames();
-  m_frontend->pausedScript(callFrames.get());
+  RefPtr<InspectorValue> callFrames = currentCallFrames();
+  m_remoteFrontend->pausedScript(callFrames.get());
 }
 
 void InspectorController::didContinue() {

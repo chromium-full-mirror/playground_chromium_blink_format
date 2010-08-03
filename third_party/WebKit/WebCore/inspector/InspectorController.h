@@ -38,7 +38,6 @@
 #include "ScriptObject.h"
 #include "ScriptProfile.h"
 #include "ScriptState.h"
-#include "ScriptValue.h"
 #include "StringHash.h"
 #include "Timer.h"
 #include <wtf/HashMap.h>
@@ -321,7 +320,6 @@ class InspectorController
 
   void resume();
   void setPauseOnExceptionsState(long pauseState);
-  PassRefPtr<SerializedScriptValue> currentCallFrames();
 
   virtual void didParseSource(const String& sourceID,
                               const String& url,
@@ -368,6 +366,8 @@ class InspectorController
   void releaseFrontendLifetimeAgents();
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
+  PassRefPtr<InspectorValue> currentCallFrames();
+
   void setBreakpoint(long callId,
                      const String& sourceID,
                      unsigned lineNumber,

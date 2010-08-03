@@ -124,12 +124,6 @@ class InspectorFrontend : public Noncopyable {
   void pausedScript(SerializedScriptValue* callFrames);
   void resumedScript();
 
-  void didEditScriptSource(long callId,
-                           bool success,
-                           const String& result,
-                           SerializedScriptValue* newCallFrames);
-  void didGetScriptSource(long callId, const String& result);
-
   void profilerWasEnabled();
   void profilerWasDisabled();
   void addProfileHeader(const ScriptValue& profile);
