@@ -90,6 +90,9 @@ class WebPlugin : public QObject, public QWebKitPlatformPlugin {
   virtual QWebNotificationPresenter* createNotificationPresenter() const {
     return new WebNotificationPresenter();
   }
+  virtual QWebHapticFeedbackPlayer* createHapticFeedbackPlayer() const {
+    return 0;
+  }
 };
 
 #endif  // WEBPLUGIN_H
