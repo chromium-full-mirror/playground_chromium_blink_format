@@ -168,7 +168,7 @@ class WebPage : public APIObject {
   HashMap<uint64_t, WebFrame*> m_frameMap;
 
   WebCore::IntSize m_viewSize;
-  OwnPtr<DrawingArea> m_drawingArea;
+  RefPtr<DrawingArea> m_drawingArea;
 
   InjectedBundlePageEditorClient m_editorClient;
   InjectedBundlePageLoaderClient m_loaderClient;
