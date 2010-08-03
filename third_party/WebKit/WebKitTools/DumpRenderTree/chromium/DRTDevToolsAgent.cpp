@@ -36,7 +36,6 @@
 
 #include "public/WebCString.h"
 #include "public/WebDevToolsAgent.h"
-#include "public/WebDevToolsMessageData.h"
 #include "public/WebString.h"
 #include "public/WebView.h"
 #include "webkit/support/webkit_support.h"
@@ -57,8 +56,8 @@ void DRTDevToolsAgent::setWebView(WebView* webView) {
   m_webView = webView;
 }
 
-void DRTDevToolsAgent::sendMessageToFrontend(
-    const WebDevToolsMessageData& data) {
+void DRTDevToolsAgent::sendMessageToInspectorFrontend(
+    const WebKit::WebString& data) {
   if (m_drtDevToolsClient)
     m_drtDevToolsClient->asyncCall(DRTDevToolsCallArgs(data));
 }
@@ -91,7 +90,7 @@ void DRTDevToolsAgent::asyncCall(const DRTDevToolsCallArgs& args) {
 void DRTDevToolsAgent::call(const DRTDevToolsCallArgs& args) {
   WebDevToolsAgent* agent = webDevToolsAgent();
   if (agent)
-    agent->dispatchMessageFromFrontend(args.m_data);
+    agent->dispatchOnInspectorBackend(args.m_data);
   if (DRTDevToolsCallArgs::callsCount() == 1 && m_drtDevToolsClient)
     m_drtDevToolsClient->allMessagesProcessed();
 }

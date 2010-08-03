@@ -31,21 +31,13 @@
 #ifndef DRTDevToolsCallArgs_h
 #define DRTDevToolsCallArgs_h
 
-#include "public/WebDevToolsMessageData.h"
 #include "public/WebString.h"
 #include <wtf/Assertions.h>
 
 class DRTDevToolsCallArgs {
  public:
-  DRTDevToolsCallArgs(const WebKit::WebDevToolsMessageData& data)
-      : m_data(data) {
+  DRTDevToolsCallArgs(const WebKit::WebString& data) : m_data(data) {
     ++m_callsCount;
-
-    // The same behaviour as we have in case of IPC.
-    for (size_t i = 0; i < m_data.arguments.size(); ++i) {
-      if (m_data.arguments[i].isNull())
-        m_data.arguments[i] = WebKit::WebString::fromUTF8("");
-    }
   }
 
   DRTDevToolsCallArgs(const DRTDevToolsCallArgs& args) : m_data(args.m_data) {
@@ -59,7 +51,7 @@ class DRTDevToolsCallArgs {
 
   static int callsCount() { return m_callsCount; }
 
-  WebKit::WebDevToolsMessageData m_data;
+  WebKit::WebString m_data;
 
  private:
   static int m_callsCount;

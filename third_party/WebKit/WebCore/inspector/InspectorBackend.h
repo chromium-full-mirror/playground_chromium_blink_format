@@ -117,6 +117,7 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   void clearProfiles();
 
   void takeHeapSnapshot();
+  void getProfilerLogLines(long callId, long position);
 #endif
 
   void setInjectedScriptSource(const String& source);

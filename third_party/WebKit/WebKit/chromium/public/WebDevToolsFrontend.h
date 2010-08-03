@@ -38,7 +38,6 @@ namespace WebKit {
 class WebDevToolsFrontendClient;
 class WebString;
 class WebView;
-struct WebDevToolsMessageData;
 
 // WebDevToolsFrontend represents DevTools client sitting in the Glue. It
 // provides
@@ -52,7 +51,7 @@ class WebDevToolsFrontend {
 
   virtual ~WebDevToolsFrontend() {}
 
-  virtual void dispatchMessageFromAgent(const WebDevToolsMessageData&) = 0;
+  virtual void dispatchOnInspectorFrontend(const WebString&) = 0;
 };
 
 }  // namespace WebKit

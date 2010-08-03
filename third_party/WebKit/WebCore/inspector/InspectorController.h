@@ -310,8 +310,6 @@ class InspectorController
   void disableProfiler(bool always = false);
   bool profilerEnabled() const { return enabled() && m_profilerEnabled; }
 
-  void takeHeapSnapshot();
-
   void enableDebugger();
   void disableDebugger(bool always = false);
   bool debuggerEnabled() const { return m_debuggerEnabled; }
