@@ -48,10 +48,10 @@ PluginMessageThrottlerWin::PluginMessageThrottlerWin(PluginView* pluginView)
     : m_pluginView(pluginView),
       m_back(0),
       m_front(0),
-      m_lastMessageTime(0),
       m_messageThrottleTimer(
           this,
-          &PluginMessageThrottlerWin::messageThrottleTimerFired) {
+          &PluginMessageThrottlerWin::messageThrottleTimerFired),
+      m_lastMessageTime(0) {
   // Initialize the free list with our inline messages
   for (unsigned i = 0; i < NumInlineMessages - 1; i++)
     m_inlineMessages[i].next = &m_inlineMessages[i + 1];
