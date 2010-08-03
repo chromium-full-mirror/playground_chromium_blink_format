@@ -224,7 +224,9 @@ wxWebViewDOMElementInfo::wxWebViewDOMElementInfo()
     : m_isSelected(false),
       m_text(wxEmptyString),
       m_imageSrc(wxEmptyString),
-      m_link(wxEmptyString) {}
+      m_link(wxEmptyString),
+      m_urlElement(NULL),
+      m_innerNode(NULL) {}
 
 static wxWebViewCachePolicy gs_cachePolicy;
 
