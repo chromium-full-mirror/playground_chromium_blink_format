@@ -3,6 +3,7 @@
  * WebCore.
  *
  * Copyright (C) 2010 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,7 +23,7 @@
  */
 
 #include "config.h"
-#include "PopupMenu.h"
+#include "PopupMenuHaiku.h"
 
 #include "FrameView.h"
 
@@ -69,9 +70,9 @@ class PopupMenuHandler : public BHandler {
   PopupMenuClient* m_popupClient;
 };
 
-class PopupMenuHaiku : public BPopUpMenu {
+class HaikuPopup : public BPopUpMenu {
  public:
-  PopupMenuHaiku(PopupMenuClient* popupClient)
+  HaikuPopup(PopupMenuClient* popupClient)
       : BPopUpMenu("WebCore Popup", true, false),
         m_popupClient(popupClient),
         m_Handler(popupClient) {
@@ -82,7 +83,7 @@ class PopupMenuHaiku : public BPopUpMenu {
     SetAsyncAutoDestruct(false);
   }
 
-  virtual ~PopupMenuHaiku() {
+  virtual ~HaikuPopup() {
     if (be_app->Lock()) {
       be_app->RemoveHandler(&m_Handler);
       be_app->Unlock();
@@ -145,31 +146,31 @@ class PopupMenuHaiku : public BPopUpMenu {
   PopupMenuHandler m_Handler;
 };
 
-PopupMenu::PopupMenu(PopupMenuClient* client)
-    : m_popupClient(client), m_menu(new PopupMenuHaiku(client)) {
+PopupMenuHaiku::PopupMenuHaiku(PopupMenuClient* client)
+    : m_popupClient(client), m_menu(new HaikuPopup(client)) {
   // We don't need additional references to the client, since we completely
   // control any sub-objects we create that need it as well.
 }
 
-PopupMenu::~PopupMenu() {
+PopupMenuHaiku::~PopupMenuHaiku() {
   delete m_menu;
 }
 
-void PopupMenu::show(const IntRect& rect, FrameView* view, int index) {
+void PopupMenuHaiku::disconnectClient() {
+  m_popupClient = 0;
+}
+
+void PopupMenuHaiku::show(const IntRect& rect, FrameView* view, int index) {
   // The menu will update itself from the PopupMenuClient before showing.
   m_menu->show(rect, view, index);
 }
 
-void PopupMenu::hide() {
+void PopupMenuHaiku::hide() {
   m_menu->hide();
 }
 
-void PopupMenu::updateFromElement() {
+void PopupMenuHaiku::updateFromElement() {
   client()->setTextFromItem(m_popupClient->selectedIndex());
-}
-
-bool PopupMenu::itemWritingDirectionIsNatural() {
-  return false;
 }
 
 }  // namespace WebCore

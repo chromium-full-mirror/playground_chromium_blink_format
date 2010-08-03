@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006, 2007, 2008, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -199,6 +200,12 @@ class WebChromeClient : public WebCore::ChromeClient {
         m_notificationsDelegate.get());
   }
 #endif
+
+  virtual bool selectItemWritingDirectionIsNatural();
+  virtual PassRefPtr<WebCore::PopupMenu> createPopupMenu(
+      WebCore::PopupMenuClient*) const;
+  virtual PassRefPtr<WebCore::SearchPopupMenu> createSearchPopupMenu(
+      WebCore::PopupMenuClient*) const;
 
  private:
   COMPtr<IWebUIDelegate> uiDelegate();
