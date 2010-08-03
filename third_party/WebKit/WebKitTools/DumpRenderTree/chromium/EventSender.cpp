@@ -45,7 +45,6 @@
 
 #include "TestShell.h"
 #include "base/keyboard_codes.h"
-#include "base/time.h"
 #include "public/WebDragData.h"
 #include "public/WebDragOperation.h"
 #include "public/WebPoint.h"
@@ -117,9 +116,7 @@ inline bool outsideMultiClickRadius(const WebPoint& a, const WebPoint& b) {
 static uint32 timeOffsetMs = 0;
 
 static double getCurrentEventTimeSec() {
-  return (TimeTicks::Now().ToInternalValue() /
-              Time::kMicrosecondsPerMillisecond +
-          timeOffsetMs) /
+  return (webkit_support::GetCurrentTimeInMillisecond() + timeOffsetMs) /
          1000.0;
 }
 
