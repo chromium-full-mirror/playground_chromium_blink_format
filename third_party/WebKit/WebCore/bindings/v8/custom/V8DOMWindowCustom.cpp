@@ -855,12 +855,14 @@ v8::Handle<v8::Value> V8DOMWindow::openDatabaseCallback(
                                          true))
     return v8::Undefined();
 
+  ScriptExecutionContext* scriptExecutionContext = getScriptExecutionContext();
   RefPtr<DatabaseCallback> creationCallback;
   if (args.Length() >= 5) {
     if (!args[4]->IsObject())
       return throwError(TYPE_MISMATCH_ERR);
 
-    creationCallback = V8DatabaseCallback::create(args[4]);
+    creationCallback =
+        V8DatabaseCallback::create(args[4], scriptExecutionContext);
   }
 
   ExceptionCode ec = 0;

@@ -37,7 +37,6 @@
 
 namespace WebCore {
 
-class ScriptExecutionContext;
 class SQLTransactionSync;
 
 // Instances of this class should be created and used only on the worker's
@@ -46,7 +45,7 @@ class SQLTransactionSyncCallback
     : public RefCounted<SQLTransactionSyncCallback> {
  public:
   virtual ~SQLTransactionSyncCallback() {}
-  virtual bool handleEvent(ScriptExecutionContext*, SQLTransactionSync*) = 0;
+  virtual bool handleEvent(SQLTransactionSync*) = 0;
 };
 }
 

@@ -69,8 +69,8 @@ class DatabaseCreationCallbackTask : public ScriptExecutionContext::Task {
     return new DatabaseCreationCallbackTask(database, creationCallback);
   }
 
-  virtual void performTask(ScriptExecutionContext* context) {
-    m_creationCallback->handleEvent(context, m_database.get());
+  virtual void performTask(ScriptExecutionContext*) {
+    m_creationCallback->handleEvent(m_database.get());
   }
 
  private:

@@ -82,7 +82,7 @@ PassRefPtr<DatabaseSync> DatabaseSync::openDatabaseSync(
     database->m_expectedVersion = "";
     LOG(StorageAPI, "Invoking the creation callback for database %p\n",
         database.get());
-    creationCallback->handleEvent(context, database.get());
+    creationCallback->handleEvent(database.get());
   }
 
   return database;

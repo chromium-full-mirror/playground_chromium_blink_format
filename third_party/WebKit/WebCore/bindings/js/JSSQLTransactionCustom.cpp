@@ -95,7 +95,7 @@ JSValue JSSQLTransaction::executeSql(ExecState* exec) {
     }
 
     callback = JSSQLStatementCallback::create(
-        object, static_cast<JSDOMGlobalObject*>(exec->dynamicGlobalObject()));
+        object, static_cast<JSDOMGlobalObject*>(globalObject()));
   }
 
   RefPtr<SQLStatementErrorCallback> errorCallback;
@@ -107,7 +107,7 @@ JSValue JSSQLTransaction::executeSql(ExecState* exec) {
     }
 
     errorCallback = JSSQLStatementErrorCallback::create(
-        object, static_cast<JSDOMGlobalObject*>(exec->dynamicGlobalObject()));
+        object, static_cast<JSDOMGlobalObject*>(globalObject()));
   }
 
   ExceptionCode ec = 0;

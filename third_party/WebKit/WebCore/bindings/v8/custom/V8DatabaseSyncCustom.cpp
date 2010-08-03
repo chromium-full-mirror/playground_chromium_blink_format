@@ -54,12 +54,14 @@ v8::Handle<v8::Value> V8DatabaseSync::changeVersionCallback(
 
   DatabaseSync* database = V8DatabaseSync::toNative(args.Holder());
 
+  ScriptExecutionContext* scriptExecutionContext = getScriptExecutionContext();
   RefPtr<V8SQLTransactionSyncCallback> callback;
   if (args.Length() > 2 && !isUndefinedOrNull(args[2])) {
     if (!args[2]->IsObject())
       return throwError(TYPE_MISMATCH_ERR);
 
-    callback = V8SQLTransactionSyncCallback::create(args[2]);
+    callback =
+        V8SQLTransactionSyncCallback::create(args[2], scriptExecutionContext);
   }
 
   ExceptionCode ec = 0;
@@ -79,8 +81,9 @@ static v8::Handle<v8::Value> createTransaction(const v8::Arguments& args,
 
   DatabaseSync* database = V8DatabaseSync::toNative(args.Holder());
 
+  ScriptExecutionContext* scriptExecutionContext = getScriptExecutionContext();
   RefPtr<V8SQLTransactionSyncCallback> callback =
-      V8SQLTransactionSyncCallback::create(args[0]);
+      V8SQLTransactionSyncCallback::create(args[0], scriptExecutionContext);
 
   ExceptionCode ec = 0;
   database->transaction(callback.release(), readOnly, ec);

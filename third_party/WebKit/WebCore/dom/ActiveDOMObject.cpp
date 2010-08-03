@@ -37,29 +37,13 @@ ActiveDOMObject::ActiveDOMObject(ScriptExecutionContext* scriptExecutionContext,
                                  void* upcastPointer)
     : m_scriptExecutionContext(scriptExecutionContext),
       m_pendingActivityCount(0) {
-#if ENABLE(WORKERS)
-  ASSERT((m_scriptExecutionContext->isDocument() && isMainThread()) ||
-         (m_scriptExecutionContext->isWorkerContext() &&
-          currentThread() ==
-              static_cast<WorkerContext*>(m_scriptExecutionContext)
-                  ->thread()
-                  ->threadID()));
-#endif
-
+  ASSERT(m_scriptExecutionContext->isContextThread());
   m_scriptExecutionContext->createdActiveDOMObject(this, upcastPointer);
 }
 
 ActiveDOMObject::~ActiveDOMObject() {
   if (m_scriptExecutionContext) {
-#if ENABLE(WORKERS)
-    ASSERT((m_scriptExecutionContext->isDocument() && isMainThread()) ||
-           (m_scriptExecutionContext->isWorkerContext() &&
-            currentThread() ==
-                static_cast<WorkerContext*>(m_scriptExecutionContext)
-                    ->thread()
-                    ->threadID()));
-#endif
-
+    ASSERT(m_scriptExecutionContext->isContextThread());
     m_scriptExecutionContext->destroyedActiveDOMObject(this);
   }
 }

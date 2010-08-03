@@ -162,12 +162,14 @@ v8::Handle<v8::Value> V8WorkerContext::openDatabaseCallback(
 
   WorkerContext* workerContext = V8WorkerContext::toNative(args.Holder());
 
+  ScriptExecutionContext* scriptExecutionContext = getScriptExecutionContext();
   RefPtr<DatabaseCallback> creationCallback;
   if (args.Length() >= 5) {
     if (!args[4]->IsObject())
       return throwError(TYPE_MISMATCH_ERR);
 
-    creationCallback = V8DatabaseCallback::create(args[4]);
+    creationCallback =
+        V8DatabaseCallback::create(args[4], scriptExecutionContext);
   }
 
   ExceptionCode ec = 0;
@@ -192,12 +194,14 @@ v8::Handle<v8::Value> V8WorkerContext::openDatabaseSyncCallback(
 
   WorkerContext* workerContext = V8WorkerContext::toNative(args.Holder());
 
+  ScriptExecutionContext* scriptExecutionContext = getScriptExecutionContext();
   RefPtr<DatabaseCallback> creationCallback;
   if (args.Length() >= 5) {
     if (!args[4]->IsObject())
       return throwError(TYPE_MISMATCH_ERR);
 
-    creationCallback = V8DatabaseCallback::create(args[4]);
+    creationCallback =
+        V8DatabaseCallback::create(args[4], scriptExecutionContext);
   }
 
   ExceptionCode ec = 0;
