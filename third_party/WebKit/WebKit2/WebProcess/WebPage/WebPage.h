@@ -68,7 +68,7 @@ class WebPage : public APIObject {
   static PassRefPtr<WebPage> create(uint64_t pageID,
                                     const WebCore::IntSize& viewSize,
                                     const WebPreferencesStore&,
-                                    DrawingArea::Type);
+                                    const DrawingAreaBase::DrawingAreaInfo&);
   ~WebPage();
 
   void close();
@@ -134,7 +134,7 @@ class WebPage : public APIObject {
   WebPage(uint64_t pageID,
           const WebCore::IntSize& viewSize,
           const WebPreferencesStore&,
-          DrawingArea::Type);
+          const DrawingAreaBase::DrawingAreaInfo&);
 
   virtual Type type() const { return APIType; }
 

@@ -46,7 +46,6 @@ typedef struct __WKCARemoteLayerClientRef* WKCARemoteLayerClientRef;
 namespace WebCore {
 class GraphicsContext;
 class GraphicsLayer;
-class IntRect;
 }
 
 namespace WebKit {
@@ -54,7 +53,7 @@ namespace WebKit {
 class LayerBackedDrawingArea : public DrawingArea,
                                private WebCore::GraphicsLayerClient {
  public:
-  LayerBackedDrawingArea(WebPage*);
+  LayerBackedDrawingArea(DrawingAreaID identifier, WebPage*);
   virtual ~LayerBackedDrawingArea();
 
   virtual void invalidateWindow(const WebCore::IntRect& rect, bool immediate);

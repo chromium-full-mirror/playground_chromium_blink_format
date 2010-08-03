@@ -55,7 +55,7 @@ class WebProcess : CoreIPC::Connection::Client {
   WebPage* createWebPage(uint64_t pageID,
                          const WebCore::IntSize& viewSize,
                          const WebPreferencesStore&,
-                         DrawingArea::Type);
+                         const DrawingAreaBase::DrawingAreaInfo&);
   void removeWebPage(uint64_t pageID);
 
   InjectedBundle* injectedBundle() const { return m_injectedBundle.get(); }

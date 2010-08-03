@@ -27,8 +27,14 @@
 
 namespace WebKit {
 
-DrawingAreaProxy::DrawingAreaProxy(Type type) : m_type(type) {}
+DrawingAreaProxy::DrawingAreaProxy(Type type)
+    : DrawingAreaBase(type, nextDrawingAreaID()) {}
 
 DrawingAreaProxy::~DrawingAreaProxy() {}
+
+DrawingAreaProxy::DrawingAreaID DrawingAreaProxy::nextDrawingAreaID() {
+  static DrawingAreaID nextID = 1;
+  return ++nextID;
+}
 
 }  // namespace WebKit
