@@ -31,6 +31,7 @@
 #include <wtf/HashSet.h>
 #include <wtf/Noncopyable.h>
 #include <wtf/OwnPtr.h>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/Threading.h>
 
@@ -48,6 +49,7 @@
 namespace JSC {
 
 class CollectorBlock;
+class GCActivityCallback;
 class JSCell;
 class JSGlobalData;
 class JSValue;
@@ -85,6 +87,7 @@ class Heap : public Noncopyable {
 
   bool isBusy();  // true if an allocation or collection is in progress
   void collectAllGarbage();
+  void setActivityCallback(PassOwnPtr<GCActivityCallback>);
 
   static const size_t minExtraCost = 256;
   static const size_t maxExtraCost = 1024 * 1024;
@@ -172,6 +175,8 @@ class Heap : public Noncopyable {
   ProtectCountSet m_protectedValues;
 
   HashSet<MarkedArgumentBuffer*>* m_markListSet;
+
+  OwnPtr<GCActivityCallback> m_activityCallback;
 
 #if ENABLE(JSC_MULTIPLE_THREADS)
   void makeUsableFromMultipleThreads();
@@ -298,7 +303,6 @@ inline void* Heap::allocateNumber(size_t s) {
   m_heap.nextNumber = static_cast<char*>(result) + (CELL_SIZE / 2);
   return result;
 }
-
 }  // namespace JSC
 
 #endif /* Collector_h */
