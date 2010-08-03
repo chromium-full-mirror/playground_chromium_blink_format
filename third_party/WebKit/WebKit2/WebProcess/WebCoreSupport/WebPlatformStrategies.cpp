@@ -136,9 +136,11 @@ String WebPlatformStrategies::fileButtonNoFileSelectedLabel() {
                    "file is selected");
 }
 
+#if PLATFORM(MAC)
 String WebPlatformStrategies::copyImageUnknownFileLabel() {
   return UI_STRING("unknown", "Unknown filename");
 }
+#endif
 
 #if ENABLE(CONTEXT_MENUS)
 
@@ -468,6 +470,7 @@ String WebPlatformStrategies::AXDefinitionListDefinitionText() {
   return UI_STRING("definition", "definition phrase");
 }
 
+#if PLATFORM(MAC)
 String WebPlatformStrategies::AXARIAContentGroupText(const String& ariaType) {
   if (ariaType == "ARIAApplicationAlert")
     return UI_STRING("alert",
@@ -545,6 +548,7 @@ String WebPlatformStrategies::AXARIAContentGroupText(const String& ariaType) {
         "An ARIA accessibility group that contains mathematical symbols.");
   return String();
 }
+#endif
 
 String WebPlatformStrategies::AXButtonActionVerb() {
   return UI_STRING("press",

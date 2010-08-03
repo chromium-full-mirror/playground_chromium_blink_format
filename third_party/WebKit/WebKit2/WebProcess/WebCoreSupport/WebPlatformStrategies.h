@@ -61,7 +61,9 @@ class WebPlatformStrategies : public WebCore::PlatformStrategies,
   virtual WebCore::String submitButtonDefaultLabel();
   virtual WebCore::String fileButtonChooseFileLabel();
   virtual WebCore::String fileButtonNoFileSelectedLabel();
+#if PLATFORM(MAC)
   virtual WebCore::String copyImageUnknownFileLabel();
+#endif
 #if ENABLE(CONTEXT_MENUS)
   virtual WebCore::String contextMenuItemTagOpenLinkInNewWindow();
   virtual WebCore::String contextMenuItemTagDownloadLinkToDisk();
@@ -140,8 +142,10 @@ class WebPlatformStrategies : public WebCore::PlatformStrategies,
   virtual WebCore::String AXHeadingText();
   virtual WebCore::String AXDefinitionListTermText();
   virtual WebCore::String AXDefinitionListDefinitionText();
+#if PLATFORM(MAC)
   virtual WebCore::String AXARIAContentGroupText(
       const WebCore::String& ariaType);
+#endif
   virtual WebCore::String AXButtonActionVerb();
   virtual WebCore::String AXRadioButtonActionVerb();
   virtual WebCore::String AXTextFieldActionVerb();
