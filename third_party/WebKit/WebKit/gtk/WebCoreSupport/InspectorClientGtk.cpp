@@ -103,12 +103,16 @@ void InspectorClient::releaseFrontendPage() {
   m_frontendPage = 0;
 }
 
-void InspectorClient::highlight(Node* node) {
-  notImplemented();
+void InspectorClient::highlight(Node*) {
+  hideHighlight();
 }
 
 void InspectorClient::hideHighlight() {
-  notImplemented();
+  // FIXME: we should be able to only invalidate the actual rects of
+  // the new and old nodes. We need to track the nodes, and take the
+  // actual highlight size into account when calculating the damage
+  // rect.
+  gtk_widget_queue_draw(GTK_WIDGET(m_inspectedWebView));
 }
 
 void InspectorClient::populateSetting(const String& key, String* value) {
