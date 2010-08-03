@@ -193,11 +193,6 @@ void Connection::processIncomingMessage(MessageID messageID,
     }
   }
 
-  if (messageID == MessageID(CoreIPCMessage::SyncMessageReply)) {
-    // FIXME: We got a reply for another sync message someone sent, handle this.
-    ASSERT_NOT_REACHED();
-  }
-
   MutexLocker locker(m_incomingMessagesLock);
   m_incomingMessages.append(IncomingMessage(messageID, arguments));
 
