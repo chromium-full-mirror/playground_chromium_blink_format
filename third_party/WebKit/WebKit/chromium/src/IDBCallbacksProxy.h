@@ -53,7 +53,7 @@ class IDBCallbacksProxy : public IDBCallbacks {
   virtual void onSuccess(PassRefPtr<IDBDatabaseBackendInterface>);
   virtual void onSuccess(PassRefPtr<IDBIndexBackendInterface>);
   virtual void onSuccess(PassRefPtr<IDBKey>);
-  virtual void onSuccess(PassRefPtr<IDBObjectStore>);
+  virtual void onSuccess(PassRefPtr<IDBObjectStoreBackendInterface>);
   virtual void onSuccess(PassRefPtr<SerializedScriptValue>);
 
  private:

@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#include "IDBObjectStoreImpl.h"
+#include "IDBObjectStoreBackendImpl.h"
 
 #include "DOMStringList.h"
 #include "IDBBindingUtilities.h"
@@ -37,17 +37,17 @@
 
 namespace WebCore {
 
-IDBObjectStoreImpl::~IDBObjectStoreImpl() {}
+IDBObjectStoreBackendImpl::~IDBObjectStoreBackendImpl() {}
 
-IDBObjectStoreImpl::IDBObjectStoreImpl(const String& name,
-                                       const String& keyPath,
-                                       bool autoIncrement)
+IDBObjectStoreBackendImpl::IDBObjectStoreBackendImpl(const String& name,
+                                                     const String& keyPath,
+                                                     bool autoIncrement)
     : m_name(name),
       m_keyPath(keyPath),
       m_autoIncrement(autoIncrement),
       m_tree(Tree::create()) {}
 
-PassRefPtr<DOMStringList> IDBObjectStoreImpl::indexNames() const {
+PassRefPtr<DOMStringList> IDBObjectStoreBackendImpl::indexNames() const {
   RefPtr<DOMStringList> indexNames = DOMStringList::create();
   for (IndexMap::const_iterator it = m_indexes.begin(); it != m_indexes.end();
        ++it)
@@ -55,8 +55,8 @@ PassRefPtr<DOMStringList> IDBObjectStoreImpl::indexNames() const {
   return indexNames.release();
 }
 
-void IDBObjectStoreImpl::get(PassRefPtr<IDBKey> key,
-                             PassRefPtr<IDBCallbacks> callbacks) {
+void IDBObjectStoreBackendImpl::get(PassRefPtr<IDBKey> key,
+                                    PassRefPtr<IDBCallbacks> callbacks) {
   RefPtr<SerializedScriptValue> value = m_tree->get(key.get());
   if (!value) {
     callbacks->onError(
@@ -67,10 +67,10 @@ void IDBObjectStoreImpl::get(PassRefPtr<IDBKey> key,
   callbacks->onSuccess(value.get());
 }
 
-void IDBObjectStoreImpl::put(PassRefPtr<SerializedScriptValue> value,
-                             PassRefPtr<IDBKey> prpKey,
-                             bool addOnly,
-                             PassRefPtr<IDBCallbacks> callbacks) {
+void IDBObjectStoreBackendImpl::put(PassRefPtr<SerializedScriptValue> value,
+                                    PassRefPtr<IDBKey> prpKey,
+                                    bool addOnly,
+                                    PassRefPtr<IDBCallbacks> callbacks) {
   RefPtr<IDBKey> key = prpKey;
 
   if (!m_keyPath.isNull()) {
@@ -104,16 +104,17 @@ void IDBObjectStoreImpl::put(PassRefPtr<SerializedScriptValue> value,
   callbacks->onSuccess(key.get());
 }
 
-void IDBObjectStoreImpl::remove(PassRefPtr<IDBKey> key,
-                                PassRefPtr<IDBCallbacks> callbacks) {
+void IDBObjectStoreBackendImpl::remove(PassRefPtr<IDBKey> key,
+                                       PassRefPtr<IDBCallbacks> callbacks) {
   m_tree->remove(key.get());
   callbacks->onSuccess();
 }
 
-void IDBObjectStoreImpl::createIndex(const String& name,
-                                     const String& keyPath,
-                                     bool unique,
-                                     PassRefPtr<IDBCallbacks> callbacks) {
+void IDBObjectStoreBackendImpl::createIndex(
+    const String& name,
+    const String& keyPath,
+    bool unique,
+    PassRefPtr<IDBCallbacks> callbacks) {
   if (m_indexes.contains(name)) {
     callbacks->onError(IDBDatabaseError::create(
         IDBDatabaseException::CONSTRAINT_ERR, "Index name already exists."));
@@ -127,13 +128,14 @@ void IDBObjectStoreImpl::createIndex(const String& name,
   callbacks->onSuccess(index.release());
 }
 
-PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreImpl::index(
+PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreBackendImpl::index(
     const String& name) {
   return m_indexes.get(name);
 }
 
-void IDBObjectStoreImpl::removeIndex(const String& name,
-                                     PassRefPtr<IDBCallbacks> callbacks) {
+void IDBObjectStoreBackendImpl::removeIndex(
+    const String& name,
+    PassRefPtr<IDBCallbacks> callbacks) {
   if (!m_indexes.contains(name)) {
     callbacks->onError(IDBDatabaseError::create(
         IDBDatabaseException::NOT_FOUND_ERR, "Index name does not exist."));

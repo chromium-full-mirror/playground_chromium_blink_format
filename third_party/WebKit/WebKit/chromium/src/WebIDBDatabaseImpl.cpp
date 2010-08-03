@@ -70,7 +70,7 @@ void WebIDBDatabaseImpl::createObjectStore(const WebString& name,
 
 WebIDBObjectStore* WebIDBDatabaseImpl::objectStore(const WebString& name,
                                                    unsigned short mode) {
-  RefPtr<IDBObjectStore> objectStore =
+  RefPtr<IDBObjectStoreBackendInterface> objectStore =
       m_databaseBackend->objectStore(name, mode);
   if (!objectStore)
     return 0;

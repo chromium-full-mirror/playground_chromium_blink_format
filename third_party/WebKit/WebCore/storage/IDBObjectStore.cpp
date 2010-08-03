@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#include "IDBObjectStoreRequest.h"
+#include "IDBObjectStore.h"
 
 #include "DOMStringList.h"
 #include "IDBAny.h"
@@ -37,35 +37,34 @@
 
 namespace WebCore {
 
-IDBObjectStoreRequest::IDBObjectStoreRequest(
-    PassRefPtr<IDBObjectStore> idbObjectStore)
+IDBObjectStore::IDBObjectStore(
+    PassRefPtr<IDBObjectStoreBackendInterface> idbObjectStore)
     : m_objectStore(idbObjectStore) {
   // We pass a reference to this object before it can be adopted.
   relaxAdoptionRequirement();
 }
 
-String IDBObjectStoreRequest::name() const {
+String IDBObjectStore::name() const {
   return m_objectStore->name();
 }
 
-String IDBObjectStoreRequest::keyPath() const {
+String IDBObjectStore::keyPath() const {
   return m_objectStore->keyPath();
 }
 
-PassRefPtr<DOMStringList> IDBObjectStoreRequest::indexNames() const {
+PassRefPtr<DOMStringList> IDBObjectStore::indexNames() const {
   return m_objectStore->indexNames();
 }
 
-PassRefPtr<IDBRequest> IDBObjectStoreRequest::get(
-    ScriptExecutionContext* context,
-    PassRefPtr<IDBKey> key) {
+PassRefPtr<IDBRequest> IDBObjectStore::get(ScriptExecutionContext* context,
+                                           PassRefPtr<IDBKey> key) {
   RefPtr<IDBRequest> request =
       IDBRequest::create(context, IDBAny::create(this));
   m_objectStore->get(key, request);
   return request;
 }
 
-PassRefPtr<IDBRequest> IDBObjectStoreRequest::add(
+PassRefPtr<IDBRequest> IDBObjectStore::add(
     ScriptExecutionContext* context,
     PassRefPtr<SerializedScriptValue> value,
     PassRefPtr<IDBKey> key) {
@@ -75,7 +74,7 @@ PassRefPtr<IDBRequest> IDBObjectStoreRequest::add(
   return request;
 }
 
-PassRefPtr<IDBRequest> IDBObjectStoreRequest::put(
+PassRefPtr<IDBRequest> IDBObjectStore::put(
     ScriptExecutionContext* context,
     PassRefPtr<SerializedScriptValue> value,
     PassRefPtr<IDBKey> key) {
@@ -85,16 +84,15 @@ PassRefPtr<IDBRequest> IDBObjectStoreRequest::put(
   return request;
 }
 
-PassRefPtr<IDBRequest> IDBObjectStoreRequest::remove(
-    ScriptExecutionContext* context,
-    PassRefPtr<IDBKey> key) {
+PassRefPtr<IDBRequest> IDBObjectStore::remove(ScriptExecutionContext* context,
+                                              PassRefPtr<IDBKey> key) {
   RefPtr<IDBRequest> request =
       IDBRequest::create(context, IDBAny::create(this));
   m_objectStore->remove(key, request);
   return request;
 }
 
-PassRefPtr<IDBRequest> IDBObjectStoreRequest::createIndex(
+PassRefPtr<IDBRequest> IDBObjectStore::createIndex(
     ScriptExecutionContext* context,
     const String& name,
     const String& keyPath,
@@ -105,13 +103,13 @@ PassRefPtr<IDBRequest> IDBObjectStoreRequest::createIndex(
   return request;
 }
 
-PassRefPtr<IDBIndex> IDBObjectStoreRequest::index(const String& name) {
+PassRefPtr<IDBIndex> IDBObjectStore::index(const String& name) {
   RefPtr<IDBIndexBackendInterface> index = m_objectStore->index(name);
   ASSERT(index);  // FIXME: If this is null, we should raise a NOT_FOUND_ERR.
   return IDBIndex::create(index.release());
 }
 
-PassRefPtr<IDBRequest> IDBObjectStoreRequest::removeIndex(
+PassRefPtr<IDBRequest> IDBObjectStore::removeIndex(
     ScriptExecutionContext* context,
     const String& name) {
   RefPtr<IDBRequest> request =

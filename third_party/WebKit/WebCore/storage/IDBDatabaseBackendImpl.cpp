@@ -28,7 +28,7 @@
 
 #include "DOMStringList.h"
 #include "IDBDatabaseException.h"
-#include "IDBObjectStoreImpl.h"
+#include "IDBObjectStoreBackendImpl.h"
 
 #if ENABLE(INDEXED_DATABASE)
 
@@ -61,13 +61,13 @@ void IDBDatabaseBackendImpl::createObjectStore(
     return;
   }
 
-  RefPtr<IDBObjectStore> objectStore =
-      IDBObjectStoreImpl::create(name, keyPath, autoIncrement);
+  RefPtr<IDBObjectStoreBackendInterface> objectStore =
+      IDBObjectStoreBackendImpl::create(name, keyPath, autoIncrement);
   m_objectStores.set(name, objectStore);
   callbacks->onSuccess(objectStore.release());
 }
 
-PassRefPtr<IDBObjectStore> IDBDatabaseBackendImpl::objectStore(
+PassRefPtr<IDBObjectStoreBackendInterface> IDBDatabaseBackendImpl::objectStore(
     const String& name,
     unsigned short mode) {
   // FIXME: If no transaction is running, this should implicitly start one.

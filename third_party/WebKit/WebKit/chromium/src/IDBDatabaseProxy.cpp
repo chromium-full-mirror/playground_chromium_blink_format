@@ -73,8 +73,9 @@ void IDBDatabaseProxy::createObjectStore(const String& name,
                                       new WebIDBCallbacksImpl(callbacks));
 }
 
-PassRefPtr<IDBObjectStore> IDBDatabaseProxy::objectStore(const String& name,
-                                                         unsigned short mode) {
+PassRefPtr<IDBObjectStoreBackendInterface> IDBDatabaseProxy::objectStore(
+    const String& name,
+    unsigned short mode) {
   WebKit::WebIDBObjectStore* objectStore =
       m_webIDBDatabase->objectStore(name, mode);
   if (!objectStore)

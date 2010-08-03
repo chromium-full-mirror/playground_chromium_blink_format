@@ -65,8 +65,8 @@ void IDBCallbacksProxy::onSuccess() {
 }
 
 void IDBCallbacksProxy::onSuccess(
-    PassRefPtr<IDBDatabaseBackendInterface> idbDatabaseBackend) {
-  m_callbacks->onSuccess(new WebKit::WebIDBDatabaseImpl(idbDatabaseBackend));
+    PassRefPtr<IDBDatabaseBackendInterface> backend) {
+  m_callbacks->onSuccess(new WebKit::WebIDBDatabaseImpl(backend));
   m_callbacks.clear();
 }
 
@@ -81,8 +81,9 @@ void IDBCallbacksProxy::onSuccess(PassRefPtr<IDBKey> idbKey) {
   m_callbacks.clear();
 }
 
-void IDBCallbacksProxy::onSuccess(PassRefPtr<IDBObjectStore> idbObjectStore) {
-  m_callbacks->onSuccess(new WebKit::WebIDBObjectStoreImpl(idbObjectStore));
+void IDBCallbacksProxy::onSuccess(
+    PassRefPtr<IDBObjectStoreBackendInterface> backend) {
+  m_callbacks->onSuccess(new WebKit::WebIDBObjectStoreImpl(backend));
   m_callbacks.clear();
 }
 

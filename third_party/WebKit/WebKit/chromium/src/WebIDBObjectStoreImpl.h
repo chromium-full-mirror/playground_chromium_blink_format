@@ -32,7 +32,7 @@
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
-class IDBObjectStore;
+class IDBObjectStoreBackendInterface;
 }
 
 namespace WebKit {
@@ -42,7 +42,8 @@ class WebIDBIndex;
 // See comment in WebIndexedObjectStore for a high level overview these classes.
 class WebIDBObjectStoreImpl : public WebIDBObjectStore {
  public:
-  WebIDBObjectStoreImpl(WTF::PassRefPtr<WebCore::IDBObjectStore> objectStore);
+  WebIDBObjectStoreImpl(
+      WTF::PassRefPtr<WebCore::IDBObjectStoreBackendInterface>);
   ~WebIDBObjectStoreImpl();
 
   WebString name() const;
@@ -64,7 +65,7 @@ class WebIDBObjectStoreImpl : public WebIDBObjectStore {
   void removeIndex(const WebString& name, WebIDBCallbacks* callbacks);
 
  private:
-  WTF::RefPtr<WebCore::IDBObjectStore> m_objectStore;
+  WTF::RefPtr<WebCore::IDBObjectStoreBackendInterface> m_objectStore;
 };
 
 }  // namespace WebKit

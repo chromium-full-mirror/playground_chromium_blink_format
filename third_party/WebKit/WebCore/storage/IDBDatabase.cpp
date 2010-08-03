@@ -28,7 +28,7 @@
 
 #include "IDBAny.h"
 #include "IDBFactoryBackendInterface.h"
-#include "IDBObjectStoreRequest.h"
+#include "IDBObjectStore.h"
 #include "IDBRequest.h"
 #include "ScriptExecutionContext.h"
 
@@ -55,13 +55,13 @@ PassRefPtr<IDBRequest> IDBDatabase::createObjectStore(
   return request;
 }
 
-PassRefPtr<IDBObjectStoreRequest> IDBDatabase::objectStore(
-    const String& name,
-    unsigned short mode) {
-  RefPtr<IDBObjectStore> objectStore = m_backend->objectStore(name, mode);
+PassRefPtr<IDBObjectStore> IDBDatabase::objectStore(const String& name,
+                                                    unsigned short mode) {
+  RefPtr<IDBObjectStoreBackendInterface> objectStore =
+      m_backend->objectStore(name, mode);
   ASSERT(
       objectStore);  // FIXME: If this is null, we should raise a NOT_FOUND_ERR.
-  return IDBObjectStoreRequest::create(objectStore.release());
+  return IDBObjectStore::create(objectStore.release());
 }
 
 PassRefPtr<IDBRequest> IDBDatabase::removeObjectStore(

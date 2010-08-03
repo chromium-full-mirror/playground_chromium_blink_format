@@ -56,8 +56,9 @@ class IDBDatabaseProxy : public IDBDatabaseBackendInterface {
                                  const String& keyPath,
                                  bool autoIncrement,
                                  PassRefPtr<IDBCallbacks>);
-  virtual PassRefPtr<IDBObjectStore> objectStore(const String& name,
-                                                 unsigned short mode);
+  virtual PassRefPtr<IDBObjectStoreBackendInterface> objectStore(
+      const String& name,
+      unsigned short mode);
   virtual void removeObjectStore(const String& name, PassRefPtr<IDBCallbacks>);
 
  private:

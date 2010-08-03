@@ -37,7 +37,7 @@
 namespace WebCore {
 
 class IDBAny;
-class IDBObjectStoreRequest;
+class IDBObjectStore;
 class IDBRequest;
 class ScriptExecutionContext;
 
@@ -61,7 +61,7 @@ class IDBDatabase : public RefCounted<IDBDatabase> {
                                            const String& name,
                                            const String& keyPath = String(),
                                            bool autoIncrement = false);
-  PassRefPtr<IDBObjectStoreRequest> objectStore(
+  PassRefPtr<IDBObjectStore> objectStore(
       const String& name,
       unsigned short mode = 0);  // FIXME: Use constant rather than 0.
   PassRefPtr<IDBRequest> removeObjectStore(ScriptExecutionContext*,
