@@ -126,7 +126,8 @@ bool PageGroup::isLinkVisited(LinkHash visitedLinkHash) {
 }
 
 void PageGroup::addVisitedLinkHash(LinkHash hash) {
-  addVisitedLink(hash);
+  if (shouldTrackVisitedLinks)
+    addVisitedLink(hash);
 }
 
 inline void PageGroup::addVisitedLink(LinkHash hash) {
