@@ -46,12 +46,6 @@
 #include "AccessibilityObjectWrapper.h"
 #endif
 
-#if PLATFORM(MAC)
-#define SUPPORTS_JSACCESSIBILITY 1
-#else
-#define SUPPORTS_JSACCESSIBILITY 0
-#endif
-
 typedef struct _NSRange NSRange;
 
 #ifdef __OBJC__
@@ -586,16 +580,6 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   AccessibilityObjectWrapper* wrapper() const { return m_wrapper.get(); }
   void setWrapper(AccessibilityObjectWrapper* wrapper) { m_wrapper = wrapper; }
 #endif
-#endif
-
-#if SUPPORTS_JSACCESSIBILITY
-  bool isScreenReaderRunning() const;
-  Element* screenReaderFocusedElement() const;
-  String screenReaderVersion() const;
-#else
-  bool isScreenReaderRunning() const { return false; }
-  Element* screenReaderFocusedElement() const { return 0; }
-  String screenReaderVersion() const { return nullAtom; }
 #endif
 
 #if HAVE(ACCESSIBILITY)

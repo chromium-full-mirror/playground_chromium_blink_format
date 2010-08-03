@@ -27,7 +27,6 @@
 
 namespace WebCore {
 
-class Accessibility;
 class DOMMimeTypeArray;
 class DOMPluginArray;
 class Frame;
@@ -49,7 +48,6 @@ class Navigator : public NavigatorBase, public RefCounted<Navigator> {
   String language() const;
   DOMPluginArray* plugins() const;
   DOMMimeTypeArray* mimeTypes() const;
-  Accessibility* accessibility() const;
   bool cookieEnabled() const;
   bool javaEnabled() const;
 
@@ -70,7 +68,6 @@ class Navigator : public NavigatorBase, public RefCounted<Navigator> {
   mutable RefPtr<DOMPluginArray> m_plugins;
   mutable RefPtr<DOMMimeTypeArray> m_mimeTypes;
   mutable RefPtr<Geolocation> m_geolocation;
-  mutable RefPtr<Accessibility> m_accessibility;
 };
 }
 
