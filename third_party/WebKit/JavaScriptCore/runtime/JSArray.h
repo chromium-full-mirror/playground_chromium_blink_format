@@ -70,6 +70,9 @@ class JSArray : public JSObject {
   friend class Walker;
 
  public:
+  enum VPtrStealingHackType { VPtrStealingHack };
+  JSArray(VPtrStealingHackType);
+
   explicit JSArray(NonNullPassRefPtr<Structure>);
   JSArray(NonNullPassRefPtr<Structure>,
           unsigned initialLength,
