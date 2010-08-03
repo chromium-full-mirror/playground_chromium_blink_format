@@ -45,6 +45,9 @@ struct ArrayStorage {
   SparseArrayValueMap* m_sparseValueMap;
   void* subclassData;  // A JSArray subclass can use this to fill the vector
                        // lazily.
+  void* m_allocBase;   // Pointer to base address returned by malloc().  Keeping
+                       // this pointer does eliminate false positives from the
+                       // leak detector.
   size_t reportedMapCapacity;
 #if CHECK_ARRAY_CONSISTENCY
   bool m_inCompactInitialization;
