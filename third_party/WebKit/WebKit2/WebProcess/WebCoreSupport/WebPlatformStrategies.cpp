@@ -32,6 +32,8 @@
 #include "WebCoreArgumentCoders.h"
 #include "WebProcess.h"
 #include "WebProcessProxyMessageKinds.h"
+#include <WebCore/Page.h>
+#include <WebCore/PageGroup.h>
 #include <wtf/MathExtras.h>
 #include <wtf/text/CString.h>
 
@@ -58,6 +60,10 @@ PluginStrategy* WebPlatformStrategies::createPluginStrategy() {
 }
 
 LocalizationStrategy* WebPlatformStrategies::createLocalizationStrategy() {
+  return this;
+}
+
+VisitedLinkStrategy* WebPlatformStrategies::createVisitedLinkStrategy() {
   return this;
 }
 
@@ -851,6 +857,17 @@ String WebPlatformStrategies::validationMessageStepMismatchText() {
   return UI_STRING("step mismatch",
                    "Validation message for input form controls with value not "
                    "respecting the step attribute");
+}
+
+// VisitedLinkStrategy
+bool WebPlatformStrategies::isLinkVisited(Page* page, LinkHash hash) {
+  // FIXME: Have WebKit2 manage its own visited links
+  return page->group().isLinkVisited(hash);
+}
+
+void WebPlatformStrategies::addVisitedLink(Page* page, LinkHash hash) {
+  // FIXME: Have WebKit2 manage its own visited links
+  return page->group().addVisitedLinkHash(hash);
 }
 
 }  // namespace WebKit

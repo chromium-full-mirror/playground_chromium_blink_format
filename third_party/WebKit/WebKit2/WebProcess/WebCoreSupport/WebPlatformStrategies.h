@@ -31,12 +31,14 @@
 #include <WebCore/PlatformStrategies.h>
 #include <WebCore/PluginStrategy.h>
 #include <WebCore/LocalizationStrategy.h>
+#include <WebCore/VisitedLinkStrategy.h>
 
 namespace WebKit {
 
 class WebPlatformStrategies : public WebCore::PlatformStrategies,
                               private WebCore::PluginStrategy,
-                              private WebCore::LocalizationStrategy {
+                              private WebCore::LocalizationStrategy,
+                              private WebCore::VisitedLinkStrategy {
  public:
   static void initialize();
 
@@ -46,6 +48,7 @@ class WebPlatformStrategies : public WebCore::PlatformStrategies,
   // WebCore::PlatformStrategies
   virtual WebCore::PluginStrategy* createPluginStrategy();
   virtual WebCore::LocalizationStrategy* createLocalizationStrategy();
+  virtual WebCore::VisitedLinkStrategy* createVisitedLinkStrategy();
 
   // WebCore::PluginStrategy
   virtual void refreshPlugins();
@@ -177,6 +180,10 @@ class WebPlatformStrategies : public WebCore::PlatformStrategies,
   bool m_pluginCacheIsPopulated;
   bool m_shouldRefreshPlugins;
   Vector<WebCore::PluginInfo> m_cachedPlugins;
+
+  // WebCore::VisitedLinkStrategy
+  virtual bool isLinkVisited(WebCore::Page*, WebCore::LinkHash);
+  virtual void addVisitedLink(WebCore::Page*, WebCore::LinkHash);
 };
 
 }  // namespace WebKit
