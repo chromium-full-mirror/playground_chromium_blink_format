@@ -31,9 +31,11 @@
 
 #include "Collector.h"
 #include "JSLock.h"
-
-#if PLATFORM(CF)
 #include <CoreFoundation/CoreFoundation.h>
+
+#if !PLATFORM(CF)
+#error "This file should only be used on CF platforms."
+#endif
 
 namespace JSC {
 
@@ -76,5 +78,3 @@ void DefaultGCActivityCallback::operator()() {
   CFRunLoopTimerSetNextFireDate(d->timer, CFAbsoluteTimeGetCurrent() + 2);
 }
 }
-
-#endif
