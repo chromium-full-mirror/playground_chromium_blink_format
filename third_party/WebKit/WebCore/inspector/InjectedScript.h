@@ -39,7 +39,6 @@
 namespace WebCore {
 
 class InspectorValue;
-class SerializedScriptValue;
 class String;
 
 class InjectedScript {
@@ -53,7 +52,7 @@ class InjectedScript {
                 const String& methodName,
                 const String& arguments,
                 bool async,
-                RefPtr<SerializedScriptValue>* result,
+                RefPtr<InspectorValue>* result,
                 bool* hadException);
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   PassRefPtr<InspectorValue> callFrames();

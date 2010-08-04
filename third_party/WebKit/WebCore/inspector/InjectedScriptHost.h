@@ -45,7 +45,7 @@ class InjectedScript;
 class InspectorDOMAgent;
 class InspectorFrontend;
 class Node;
-class SerializedScriptValue;
+class RemoteInspectorFrontend;
 class Storage;
 
 class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
@@ -84,7 +84,7 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
   void didDestroyWorker(long id);
 #endif
   void reportDidDispatchOnInjectedScript(long callId,
-                                         SerializedScriptValue* result,
+                                         PassRefPtr<InspectorValue> result,
                                          bool isException);
 
   pair<long, ScriptObject> injectScript(const String& source, ScriptState*);
@@ -100,6 +100,7 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
   InjectedScriptHost(InspectorController* inspectorController);
   InspectorDOMAgent* inspectorDOMAgent();
   InspectorFrontend* inspectorFrontend();
+  RemoteInspectorFrontend* remoteFrontend();
   ScriptObject createInjectedScript(const String& source,
                                     ScriptState* scriptState,
                                     long id);

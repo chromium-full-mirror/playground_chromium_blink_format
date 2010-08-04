@@ -44,6 +44,7 @@
 #include "InspectorFrontend.h"
 #include "InspectorResource.h"
 #include "Pasteboard.h"
+#include "RemoteInspectorFrontend.h"
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 #include "ScriptDebugServer.h"
@@ -135,9 +136,9 @@ void InjectedScriptHost::selectDOMStorage(Storage* storage) {
 
 void InjectedScriptHost::reportDidDispatchOnInjectedScript(
     long callId,
-    SerializedScriptValue* result,
+    PassRefPtr<InspectorValue> result,
     bool isException) {
-  if (InspectorFrontend* frontend = inspectorFrontend())
+  if (RemoteInspectorFrontend* frontend = remoteFrontend())
     frontend->didDispatchOnInjectedScript(callId, result, isException);
 }
 
@@ -173,6 +174,12 @@ InspectorFrontend* InjectedScriptHost::inspectorFrontend() {
   if (!m_inspectorController)
     return 0;
   return m_inspectorController->m_frontend.get();
+}
+
+RemoteInspectorFrontend* InjectedScriptHost::remoteFrontend() {
+  if (!m_inspectorController)
+    return 0;
+  return m_inspectorController->m_remoteFrontend.get();
 }
 
 pair<long, ScriptObject> InjectedScriptHost::injectScript(

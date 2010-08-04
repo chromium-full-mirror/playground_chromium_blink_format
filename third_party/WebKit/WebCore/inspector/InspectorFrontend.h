@@ -38,14 +38,12 @@
 
 namespace WebCore {
 class ConsoleMessage;
-class Database;
 class Frame;
 class InspectorClient;
 class InspectorResource;
 class InspectorWorkerResource;
 class Node;
 class ScriptString;
-class SerializedScriptValue;
 class Storage;
 
 class InspectorFrontend : public Noncopyable {
@@ -111,8 +109,6 @@ class InspectorFrontend : public Noncopyable {
                                  int firstLine,
                                  int errorLine,
                                  const String& errorMessage);
-  void pausedScript(SerializedScriptValue* callFrames);
-  void resumedScript();
 
   void profilerWasEnabled();
   void profilerWasDisabled();
@@ -149,9 +145,6 @@ class InspectorFrontend : public Noncopyable {
   void didGetCookies(long callId,
                      const ScriptArray& cookies,
                      const String& cookiesString);
-  void didDispatchOnInjectedScript(long callId,
-                                   SerializedScriptValue* result,
-                                   bool isException);
 
   void contextMenuItemSelected(int itemId);
   void contextMenuCleared();
