@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2010 Apple Inc. All rights reserved.
+ * Copyright (C) 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,15 +23,59 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "WebDatabaseSecurityOrigin.h"
-#import <WebCore/SecurityOrigin.h>
+#import "WebApplicationCacheQuotaManager.h"
+
+#import "WebSecurityOriginInternal.h"
+#import <WebCore/ApplicationCacheStorage.h>
 
 using namespace WebCore;
 
-@implementation WebDatabaseSecurityOrigin
+@implementation WebApplicationCacheQuotaManager
 
-// FIXME: https://bugs.webkit.org/show_bug.cgi?id=40627
-// Proper steps should be taken to have subclass implementations of SecurityOrigin's
-// origin, quota, and setQuota methods.
+- (id)initWithOrigin:(WebSecurityOrigin *)origin
+{
+    self = [super init];
+    if (!self)
+        return nil;
+
+    _origin = origin;
+    return self;
+}
+
+- (WebSecurityOrigin *)origin
+{
+    return _origin;
+}
+
+- (unsigned long long)usage
+{
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+    long long usage;
+    if (cacheStorage().usageForOrigin([_origin _core], usage))
+        return usage;
+    return 0;
+#else
+    return 0;
+#endif
+}
+
+- (unsigned long long)quota
+{
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+    long long quota;
+    if (cacheStorage().quotaForOrigin([_origin _core], quota))
+        return quota;
+    return 0;
+#else
+    return 0;
+#endif
+}
+
+- (void)setQuota:(unsigned long long)quota
+{
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+    cacheStorage().storeUpdatedQuotaForOrigin([_origin _core], quota);
+#endif
+}
 
 @end

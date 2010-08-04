@@ -23,7 +23,10 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "WebSecurityOriginInternal.h"
+#import "WebQuotaManager.h"
 
-@interface WebApplicationCacheSecurityOrigin : WebSecurityOrigin
+@interface WebApplicationCacheQuotaManager : NSObject<WebQuotaManager> {
+  WebSecurityOrigin* _origin;
+}
+
 @end
