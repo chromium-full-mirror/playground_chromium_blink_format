@@ -880,8 +880,11 @@ class RenderStyle : public RefCounted<RenderStyle> {
   Hyphens hyphens() const {
     return static_cast<Hyphens>(rareInheritedData->hyphens);
   }
-  const AtomicString& hyphenateCharacter() const {
-    return rareInheritedData->hyphenateCharacter;
+  const AtomicString& hyphenationString() const {
+    return rareInheritedData->hyphenationString;
+  }
+  const AtomicString& hyphenationLocale() const {
+    return rareInheritedData->hyphenationLocale;
   }
   EBorderFit borderFit() const {
     return static_cast<EBorderFit>(rareNonInheritedData->m_borderFit);
@@ -1514,8 +1517,11 @@ class RenderStyle : public RefCounted<RenderStyle> {
     SET_VAR(rareInheritedData, highlight, h);
   }
   void setHyphens(Hyphens h) { SET_VAR(rareInheritedData, hyphens, h); }
-  void setHyphenateCharacter(const AtomicString& h) {
-    SET_VAR(rareInheritedData, hyphenateCharacter, h);
+  void setHyphenationString(const AtomicString& h) {
+    SET_VAR(rareInheritedData, hyphenationString, h);
+  }
+  void setHyphenationLocale(const AtomicString& h) {
+    SET_VAR(rareInheritedData, hyphenationLocale, h);
   }
   void setBorderFit(EBorderFit b) {
     SET_VAR(rareNonInheritedData, m_borderFit, b);
@@ -1845,7 +1851,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
   static const AtomicString& initialHighlight() { return nullAtom; }
   static Hyphens initialHyphens() { return HyphensManual; }
-  static const AtomicString& initialHyphenateCharacter() { return nullAtom; }
+  static const AtomicString& initialHyphenationString() { return nullAtom; }
+  static const AtomicString& initialHyphenationLocale() { return nullAtom; }
   static EBorderFit initialBorderFit() { return BorderFitBorder; }
   static EResize initialResize() { return RESIZE_NONE; }
   static ControlPart initialAppearance() { return NoControlPart; }

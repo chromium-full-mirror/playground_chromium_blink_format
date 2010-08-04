@@ -70,7 +70,8 @@ StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedData& o)
       userSelect(o.userSelect),
       colorSpace(o.colorSpace),
       hyphens(o.hyphens),
-      hyphenateCharacter(o.hyphenateCharacter) {}
+      hyphenationString(o.hyphenationString),
+      hyphenationLocale(o.hyphenationLocale) {}
 
 StyleRareInheritedData::~StyleRareInheritedData() {
   delete textShadow;
@@ -97,7 +98,8 @@ bool StyleRareInheritedData::operator==(const StyleRareInheritedData& o) const {
          nbspMode == o.nbspMode && khtmlLineBreak == o.khtmlLineBreak &&
          textSizeAdjust == o.textSizeAdjust && resize == o.resize &&
          userSelect == o.userSelect && colorSpace == o.colorSpace &&
-         hyphens == o.hyphens && hyphenateCharacter == o.hyphenateCharacter;
+         hyphens == o.hyphens && hyphenationString == o.hyphenationString &&
+         hyphenationLocale == o.hyphenationLocale;
 }
 
 bool StyleRareInheritedData::shadowDataEquivalent(

@@ -1685,6 +1685,11 @@ bool CSSParser::parseValue(int propId, bool important) {
         validPrimitive = true;
       break;
 
+    case CSSPropertyWebkitHyphenateLocale:
+      if (id == CSSValueAuto || value->unit == CSSPrimitiveValue::CSS_STRING)
+        validPrimitive = true;
+      break;
+
     case CSSPropertyWebkitBorderFit:
       if (id == CSSValueBorder || id == CSSValueLines)
         validPrimitive = true;

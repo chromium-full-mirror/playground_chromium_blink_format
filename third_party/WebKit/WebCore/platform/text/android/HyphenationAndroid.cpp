@@ -57,9 +57,15 @@ static HyphenDict* loadHyphenationDictionary() {
   return dict;
 }
 
+bool canHyphenate(const AtomicString& /* localeIdentifier */) {
+  // FIXME: Check that the locale identifier matches the available dictionary.
+  return true;
+}
+
 size_t lastHyphenLocation(const UChar* characters,
                           size_t length,
-                          size_t beforeIndex) {
+                          size_t beforeIndex,
+                          const AtomicString& /* localeIdentifier */) {
   static const size_t minWordLen = 5;
   static const size_t maxWordLen = 100;
   if (beforeIndex <= 0 || length < minWordLen || length > maxWordLen)

@@ -86,7 +86,8 @@ class StyleRareInheritedData : public RefCounted<StyleRareInheritedData> {
   unsigned colorSpace : 1;      // ColorSpace
   unsigned hyphens : 2;         // Hyphens
 
-  AtomicString hyphenateCharacter;
+  AtomicString hyphenationString;
+  AtomicString hyphenationLocale;
 
  private:
   StyleRareInheritedData();
