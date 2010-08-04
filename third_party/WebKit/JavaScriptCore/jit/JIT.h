@@ -428,7 +428,7 @@ class JIT : private JSInterfaceJIT {
   void emitLoadDouble(unsigned index, FPRegisterID value);
   void emitLoadInt32ToDouble(unsigned index, FPRegisterID value);
 
-  void testPrototype(Structure*, JumpList& failureCases);
+  void testPrototype(JSValue, JumpList& failureCases);
 
 #if USE(JSVALUE32_64)
   bool getOperandConstantImmediateInt(unsigned op1,
