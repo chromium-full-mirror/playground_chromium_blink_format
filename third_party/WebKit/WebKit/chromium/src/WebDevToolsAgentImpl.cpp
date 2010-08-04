@@ -253,6 +253,8 @@ void WebDevToolsAgentImpl::detach() {
   m_apuAgentEnabled = false;
 }
 
+void WebDevToolsAgentImpl::frontendLoaded() {}
+
 void WebDevToolsAgentImpl::didNavigate() {
   ClientMessageLoopAdapter::didNavigate();
   DebuggerAgentManager::onNavigate();
