@@ -32,35 +32,30 @@
 #define InspectorDatabaseResource_h
 
 #if ENABLE(DATABASE)
-
-#include "Database.h"
-#include "ScriptObject.h"
-#include "ScriptState.h"
-
+#include "PlatformString.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
-class InspectorFrontend;
+class Database;
+class RemoteInspectorFrontend;
 
 class InspectorDatabaseResource : public RefCounted<InspectorDatabaseResource> {
  public:
-  static PassRefPtr<InspectorDatabaseResource> create(Database* database,
-                                                      const String& domain,
-                                                      const String& name,
-                                                      const String& version) {
-    return adoptRef(
-        new InspectorDatabaseResource(database, domain, name, version));
-  }
+  static PassRefPtr<InspectorDatabaseResource> create(
+      PassRefPtr<Database> database,
+      const String& domain,
+      const String& name,
+      const String& version);
 
-  void bind(InspectorFrontend* frontend);
+  void bind(RemoteInspectorFrontend* frontend);
   void unbind();
   Database* database() { return m_database.get(); }
   long id() const { return m_id; }
 
  private:
-  InspectorDatabaseResource(Database*,
+  InspectorDatabaseResource(PassRefPtr<Database>,
                             const String& domain,
                             const String& name,
                             const String& version);
@@ -71,8 +66,6 @@ class InspectorDatabaseResource : public RefCounted<InspectorDatabaseResource> {
   String m_name;
   String m_version;
   bool m_scriptObjectCreated;
-
-  static int s_nextUnusedId;
 };
 
 }  // namespace WebCore

@@ -120,12 +120,6 @@ class InspectorFrontend : public Noncopyable {
   void didGetProfile(long callId, const ScriptValue& profile);
 #endif
 
-#if ENABLE(DATABASE)
-  bool addDatabase(const ScriptObject& dbObj);
-  void selectDatabase(int databaseId);
-  void didGetDatabaseTableNames(long callId, const ScriptArray& tableNames);
-#endif
-
 #if ENABLE(DOM_STORAGE)
   bool addDOMStorage(const ScriptObject& domStorageObj);
   void selectDOMStorage(long storageId);

@@ -241,7 +241,7 @@ class InspectorController
 #endif
 
 #if ENABLE(DATABASE)
-  void didOpenDatabase(Database*,
+  void didOpenDatabase(PassRefPtr<Database>,
                        const String& domain,
                        const String& name,
                        const String& version);

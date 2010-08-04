@@ -359,34 +359,6 @@ void InspectorFrontend::didDispatchOnInjectedScript(
   function.call();
 }
 
-#if ENABLE(DATABASE)
-bool InspectorFrontend::addDatabase(const ScriptObject& dbObject) {
-  ScriptFunctionCall function(m_webInspector, "dispatch");
-  function.appendArgument("addDatabase");
-  function.appendArgument(dbObject);
-  bool hadException = false;
-  function.call(hadException);
-  return !hadException;
-}
-
-void InspectorFrontend::selectDatabase(int databaseId) {
-  ScriptFunctionCall function(m_webInspector, "dispatch");
-  function.appendArgument("selectDatabase");
-  function.appendArgument(databaseId);
-  function.call();
-}
-
-void InspectorFrontend::didGetDatabaseTableNames(
-    long callId,
-    const ScriptArray& tableNames) {
-  ScriptFunctionCall function(m_webInspector, "dispatch");
-  function.appendArgument("didGetDatabaseTableNames");
-  function.appendArgument(callId);
-  function.appendArgument(tableNames);
-  function.call();
-}
-#endif
-
 #if ENABLE(DOM_STORAGE)
 bool InspectorFrontend::addDOMStorage(const ScriptObject& domStorageObj) {
   ScriptFunctionCall function(m_webInspector, "dispatch");
