@@ -33,6 +33,8 @@
 #include "launcherwindow.h"
 #include "urlloader.h"
 
+WindowOptions windowOptions;
+
 int launcherMain(const QApplication& app) {
 #ifndef NDEBUG
   int retVal = app.exec();
@@ -87,7 +89,7 @@ LauncherApplication::LauncherApplication(int& argc, char** argv)
 }
 
 static void requiresGraphicsView(const QString& option) {
-  if (LauncherWindow::gUseGraphicsView)
+  if (windowOptions.useGraphicsView)
     return;
   appQuit(1,
           QString("%1 only works in combination with the -graphicsbased option")
@@ -122,31 +124,31 @@ void LauncherApplication::handleUserOptions() {
   }
 
   if (args.contains("-graphicsbased"))
-    LauncherWindow::gUseGraphicsView = true;
+    windowOptions.useGraphicsView = true;
 
   if (args.contains("-no-compositing")) {
     requiresGraphicsView("-no-compositing");
-    LauncherWindow::gUseCompositing = false;
+    windowOptions.useCompositing = false;
   }
 
   if (args.contains("-show-fps")) {
     requiresGraphicsView("-show-fps");
-    LauncherWindow::gShowFrameRate = true;
+    windowOptions.showFrameRate = true;
   }
 
   if (args.contains("-cache-webview")) {
     requiresGraphicsView("-cache-webview");
-    LauncherWindow::gCacheWebView = true;
+    windowOptions.cacheWebView = true;
   }
 
   if (args.contains("-tiled-backing-store")) {
     requiresGraphicsView("-tiled-backing-store");
-    LauncherWindow::gUseTiledBackingStore = true;
+    windowOptions.useTiledBackingStore = true;
   }
 
   if (args.contains("-resizes-to-contents")) {
     requiresGraphicsView("-resizes-to-contents");
-    LauncherWindow::gResizesToContents = true;
+    windowOptions.resizesToContents = true;
   }
 
   QString arg1("-viewport-update-mode");
@@ -165,14 +167,14 @@ void LauncherApplication::handleUserOptions() {
                      .arg(arg1)
                      .arg(formatKeys(updateModes)));
 
-    LauncherWindow::gViewportUpdateMode =
+    windowOptions.viewportUpdateMode =
         static_cast<QGraphicsView::ViewportUpdateMode>(idx);
   }
 
   QString inspectorUrlArg("-inspector-url");
   int inspectorUrlIndex = args.indexOf(inspectorUrlArg);
   if (inspectorUrlIndex != -1)
-    LauncherWindow::gInspectorUrl = takeOptionValue(&args, inspectorUrlIndex);
+    windowOptions.inspectorUrl = takeOptionValue(&args, inspectorUrlIndex);
 
   int robotIndex = args.indexOf("-r");
   if (robotIndex != -1) {
@@ -220,7 +222,7 @@ int main(int argc, char** argv) {
   foreach (QString url, urls) {
     LauncherWindow* newWindow;
     if (!window)
-      newWindow = window = new LauncherWindow();
+      newWindow = window = new LauncherWindow(&windowOptions);
     else
       newWindow = window->newWindow();
 
