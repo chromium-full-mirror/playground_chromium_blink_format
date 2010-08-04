@@ -382,7 +382,7 @@ class InspectorController
   void enableDebuggerFromFrontend(bool always);
   void getProfileHeaders(long callId);
   void getProfile(long callId, unsigned uid);
-  ScriptObject createProfileHeader(const ScriptProfile& profile);
+  PassRefPtr<InspectorObject> createProfileHeader(const ScriptProfile& profile);
 #endif
 #if ENABLE(DATABASE)
   void selectDatabase(Database* database);
