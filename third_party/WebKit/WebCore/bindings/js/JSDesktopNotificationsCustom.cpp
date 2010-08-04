@@ -46,8 +46,15 @@ using namespace JSC;
 namespace WebCore {
 
 JSValue JSNotificationCenter::requestPermission(ExecState* exec) {
-  // Permission request is only valid from page context.
   ScriptExecutionContext* context = impl()->context();
+
+  // Make sure that script execution context is valid.
+  if (!context) {
+    setDOMException(exec, INVALID_STATE_ERR);
+    return jsUndefined();
+  }
+
+  // Permission request is only valid from page context.
   if (context->isWorkerContext())
     return throwSyntaxError(exec);
 
