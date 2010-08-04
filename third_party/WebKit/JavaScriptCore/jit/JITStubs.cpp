@@ -833,7 +833,7 @@ JITThunks::~JITThunks() {}
 
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
 
-NEVER_INLINE void JITThunks::tryCachePutByID(CallFrame* callFrame,
+NEVER_INLINE bool JITThunks::tryCachePutByID(CallFrame* callFrame,
                                              CodeBlock* codeBlock,
                                              ReturnAddressPtr returnAddress,
                                              JSValue baseValue,
@@ -844,69 +844,46 @@ NEVER_INLINE void JITThunks::tryCachePutByID(CallFrame* callFrame,
   // in CTI.
 
   if (!baseValue.isCell())
-    return;
+    return false;
 
   // Uncacheable: give up.
-  if (!slot.isCacheable()) {
-    ctiPatchCallByReturnAddress(
-        codeBlock, returnAddress,
-        FunctionPtr(direct ? cti_op_put_by_id_direct_generic
-                           : cti_op_put_by_id_generic));
-    return;
-  }
+  if (!slot.isCacheable())
+    return false;
 
   JSCell* baseCell = asCell(baseValue);
   Structure* structure = baseCell->structure();
 
-  if (structure->isUncacheableDictionary()) {
-    ctiPatchCallByReturnAddress(
-        codeBlock, returnAddress,
-        FunctionPtr(direct ? cti_op_put_by_id_direct_generic
-                           : cti_op_put_by_id_generic));
-    return;
-  }
+  if (structure->isUncacheableDictionary())
+    return false;
 
   // If baseCell != base, then baseCell must be a proxy for another object.
-  if (baseCell != slot.base()) {
-    ctiPatchCallByReturnAddress(
-        codeBlock, returnAddress,
-        FunctionPtr(direct ? cti_op_put_by_id_direct_generic
-                           : cti_op_put_by_id_generic));
-    return;
-  }
+  if (baseCell != slot.base())
+    return false;
 
   // Cache hit: Specialize instruction and ref Structures.
 
   // Structure transition, cache transition info
   if (slot.type() == PutPropertySlot::NewProperty) {
-    if (structure->isDictionary()) {
-      ctiPatchCallByReturnAddress(
-          codeBlock, returnAddress,
-          FunctionPtr(direct ? cti_op_put_by_id_direct_generic
-                             : cti_op_put_by_id_generic));
-      return;
-    }
+    if (structure->isDictionary())
+      return false;
 
     // put_by_id_transition checks the prototype chain for setters.
     normalizePrototypeChain(callFrame, baseCell);
 
     StructureChain* prototypeChain = structure->prototypeChain(callFrame);
-    stubInfo->initPutByIdTransition(structure->previousID(), structure,
-                                    prototypeChain);
-    JIT::compilePutByIdTransition(callFrame->scopeChain()->globalData,
-                                  codeBlock, stubInfo, structure->previousID(),
-                                  structure, slot.cachedOffset(),
-                                  prototypeChain, returnAddress, direct);
-    return;
+    return JIT::compilePutByIdTransition(
+        callFrame->scopeChain()->globalData, codeBlock, stubInfo,
+        structure->previousID(), structure, slot.cachedOffset(), prototypeChain,
+        returnAddress, direct);
   }
-
-  stubInfo->initPutByIdReplace(structure);
 
   JIT::patchPutByIdReplace(codeBlock, stubInfo, structure, slot.cachedOffset(),
                            returnAddress, direct);
+  stubInfo->initPutByIdReplace(structure);
+  return true;
 }
 
-NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
+NEVER_INLINE bool JITThunks::tryCacheGetByID(CallFrame* callFrame,
                                              CodeBlock* codeBlock,
                                              ReturnAddressPtr returnAddress,
                                              JSValue baseValue,
@@ -917,20 +894,15 @@ NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
   // like the interpreter does, then add a check for recursion.
 
   // FIXME: Cache property access for immediates.
-  if (!baseValue.isCell()) {
-    ctiPatchCallByReturnAddress(codeBlock, returnAddress,
-                                FunctionPtr(cti_op_get_by_id_generic));
-    return;
-  }
+  if (!baseValue.isCell())
+    return false;
 
   JSGlobalData* globalData = &callFrame->globalData();
 
   if (isJSArray(globalData, baseValue) &&
-      propertyName == callFrame->propertyNames().length) {
-    JIT::compilePatchGetArrayLength(callFrame->scopeChain()->globalData,
-                                    codeBlock, returnAddress);
-    return;
-  }
+      propertyName == callFrame->propertyNames().length)
+    return JIT::compilePatchGetArrayLength(callFrame->scopeChain()->globalData,
+                                           codeBlock, stubInfo, returnAddress);
 
   if (isJSString(globalData, baseValue) &&
       propertyName == callFrame->propertyNames().length) {
@@ -940,44 +912,32 @@ NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
     ctiPatchCallByReturnAddress(
         codeBlock, returnAddress,
         globalData->jitStubs->ctiStringLengthTrampoline());
-    return;
+    return true;
   }
 
   // Uncacheable: give up.
-  if (!slot.isCacheable()) {
-    ctiPatchCallByReturnAddress(codeBlock, returnAddress,
-                                FunctionPtr(cti_op_get_by_id_generic));
-    return;
-  }
+  if (!slot.isCacheable())
+    return false;
 
   JSCell* baseCell = asCell(baseValue);
   Structure* structure = baseCell->structure();
 
-  if (structure->isUncacheableDictionary()) {
-    ctiPatchCallByReturnAddress(codeBlock, returnAddress,
-                                FunctionPtr(cti_op_get_by_id_generic));
-    return;
-  }
+  if (structure->isUncacheableDictionary())
+    return false;
 
   // Cache hit: Specialize instruction and ref Structures.
 
   if (slot.slotBase() == baseValue) {
-    // set this up, so derefStructures can do it's job.
-    stubInfo->initGetByIdSelf(structure);
     if (slot.cachedPropertyType() != PropertySlot::Value)
-      ctiPatchCallByReturnAddress(codeBlock, returnAddress,
-                                  FunctionPtr(cti_op_get_by_id_self_fail));
-    else
-      JIT::patchGetByIdSelf(codeBlock, stubInfo, structure, slot.cachedOffset(),
-                            returnAddress);
-    return;
+      return false;
+    JIT::patchGetByIdSelf(codeBlock, stubInfo, structure, slot.cachedOffset(),
+                          returnAddress);
+    stubInfo->initGetByIdSelf(structure);
+    return true;
   }
 
-  if (structure->isDictionary()) {
-    ctiPatchCallByReturnAddress(codeBlock, returnAddress,
-                                FunctionPtr(cti_op_get_by_id_generic));
-    return;
-  }
+  if (structure->isDictionary())
+    return false;
 
   if (slot.slotBase() == structure->prototypeForLookup(callFrame)) {
     ASSERT(slot.slotBase().isObject());
@@ -991,16 +951,12 @@ NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
       slotBaseObject->flattenDictionaryObject();
       offset = slotBaseObject->structure()->get(propertyName);
     }
-
-    stubInfo->initGetByIdProto(structure, slotBaseObject->structure());
-
     ASSERT(!structure->isDictionary());
     ASSERT(!slotBaseObject->structure()->isDictionary());
-    JIT::compileGetByIdProto(callFrame->scopeChain()->globalData, callFrame,
-                             codeBlock, stubInfo, structure,
-                             slotBaseObject->structure(), propertyName, slot,
-                             offset, returnAddress);
-    return;
+    return JIT::compileGetByIdProto(callFrame->scopeChain()->globalData,
+                                    callFrame, codeBlock, stubInfo, structure,
+                                    slotBaseObject->structure(), propertyName,
+                                    slot, offset, returnAddress);
   }
 
   size_t offset = slot.cachedOffset();
@@ -1008,14 +964,14 @@ NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
                                          propertyName, offset);
   if (!count) {
     stubInfo->accessType = access_get_by_id_generic;
-    return;
+    return true;
   }
 
   StructureChain* prototypeChain = structure->prototypeChain(callFrame);
-  stubInfo->initGetByIdChain(structure, prototypeChain);
-  JIT::compileGetByIdChain(callFrame->scopeChain()->globalData, callFrame,
-                           codeBlock, stubInfo, structure, prototypeChain,
-                           count, propertyName, slot, offset, returnAddress);
+  return JIT::compileGetByIdChain(callFrame->scopeChain()->globalData,
+                                  callFrame, codeBlock, stubInfo, structure,
+                                  prototypeChain, count, propertyName, slot,
+                                  offset, returnAddress);
 }
 
 #endif  // ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
@@ -1424,10 +1380,15 @@ DEFINE_STUB_FUNCTION(void, op_put_by_id) {
   StructureStubInfo* stubInfo = &codeBlock->getStubInfo(STUB_RETURN_ADDRESS);
   if (!stubInfo->seenOnce())
     stubInfo->setSeen();
-  else
-    JITThunks::tryCachePutByID(callFrame, codeBlock, STUB_RETURN_ADDRESS,
-                               stackFrame.args[0].jsValue(), slot, stubInfo,
-                               false);
+  else {
+    JSValue baseValue = stackFrame.args[0].jsValue();
+    bool cached =
+        JITThunks::tryCachePutByID(callFrame, codeBlock, STUB_RETURN_ADDRESS,
+                                   baseValue, slot, stubInfo, false);
+    if (!cached && baseValue.isCell())
+      ctiPatchCallByReturnAddress(codeBlock, STUB_RETURN_ADDRESS,
+                                  FunctionPtr(cti_op_put_by_id_generic));
+  }
 
   CHECK_FOR_EXCEPTION_AT_END();
 }
@@ -1445,10 +1406,15 @@ DEFINE_STUB_FUNCTION(void, op_put_by_id_direct) {
   StructureStubInfo* stubInfo = &codeBlock->getStubInfo(STUB_RETURN_ADDRESS);
   if (!stubInfo->seenOnce())
     stubInfo->setSeen();
-  else
-    JITThunks::tryCachePutByID(callFrame, codeBlock, STUB_RETURN_ADDRESS,
-                               stackFrame.args[0].jsValue(), slot, stubInfo,
-                               true);
+  else {
+    JSValue baseValue = stackFrame.args[0].jsValue();
+    bool cached =
+        JITThunks::tryCachePutByID(callFrame, codeBlock, STUB_RETURN_ADDRESS,
+                                   baseValue, slot, stubInfo, true);
+    if (!cached && baseValue.isCell())
+      ctiPatchCallByReturnAddress(codeBlock, STUB_RETURN_ADDRESS,
+                                  FunctionPtr(cti_op_put_by_id_direct_generic));
+  }
 
   CHECK_FOR_EXCEPTION_AT_END();
 }
@@ -1592,9 +1558,14 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id) {
   StructureStubInfo* stubInfo = &codeBlock->getStubInfo(STUB_RETURN_ADDRESS);
   if (!stubInfo->seenOnce())
     stubInfo->setSeen();
-  else
-    JITThunks::tryCacheGetByID(callFrame, codeBlock, STUB_RETURN_ADDRESS,
-                               baseValue, ident, slot, stubInfo);
+  else {
+    bool cached =
+        JITThunks::tryCacheGetByID(callFrame, codeBlock, STUB_RETURN_ADDRESS,
+                                   baseValue, ident, slot, stubInfo);
+    if (!cached)
+      ctiPatchCallByReturnAddress(codeBlock, STUB_RETURN_ADDRESS,
+                                  FunctionPtr(cti_op_get_by_id_generic));
+  }
 
   CHECK_FOR_EXCEPTION_AT_END();
   return JSValue::encode(result);
@@ -1620,68 +1591,36 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_self_fail) {
 
     ASSERT(slot.slotBase().isObject());
 
-    PolymorphicAccessStructureList* polymorphicStructureList;
-    int listIndex = 1;
+    // If this is a regular self access (not yet upgraded to list), then switch
+    // the stubInfo over.
+    if (stubInfo->accessType == access_get_by_id_self)
+      stubInfo->initGetByIdSelfList(new PolymorphicAccessStructureList(
+          stubInfo->stubRoutine, stubInfo->u.getByIdSelf.baseObjectStructure));
 
-    if (stubInfo->accessType == access_get_by_id_self) {
-      ASSERT(!stubInfo->stubRoutine);
-      polymorphicStructureList = new PolymorphicAccessStructureList(
-          CodeLocationLabel(), stubInfo->u.getByIdSelf.baseObjectStructure);
-      stubInfo->initGetByIdSelfList(polymorphicStructureList, 1);
-    } else {
-      polymorphicStructureList = stubInfo->u.getByIdSelfList.structureList;
-      listIndex = stubInfo->u.getByIdSelfList.listSize;
+    // If there is room in the list, try to add a cached entry.
+    if (stubInfo->u.getByIdSelfList.listSize < POLYMORPHIC_LIST_CACHE_SIZE) {
+      bool cached = JIT::compileGetByIdSelfList(
+          callFrame->scopeChain()->globalData, codeBlock, stubInfo,
+          asCell(baseValue)->structure(), ident, slot, slot.cachedOffset());
+      if (cached)
+        return JSValue::encode(result);
     }
-    if (listIndex < POLYMORPHIC_LIST_CACHE_SIZE) {
-      stubInfo->u.getByIdSelfList.listSize++;
-      JIT::compileGetByIdSelfList(callFrame->scopeChain()->globalData,
-                                  codeBlock, stubInfo, polymorphicStructureList,
-                                  listIndex, asCell(baseValue)->structure(),
-                                  ident, slot, slot.cachedOffset());
-
-      if (listIndex == (POLYMORPHIC_LIST_CACHE_SIZE - 1))
-        ctiPatchCallByReturnAddress(codeBlock, STUB_RETURN_ADDRESS,
-                                    FunctionPtr(cti_op_get_by_id_generic));
-    }
-  } else
-    ctiPatchCallByReturnAddress(callFrame->codeBlock(), STUB_RETURN_ADDRESS,
-                                FunctionPtr(cti_op_get_by_id_generic));
+  }
+  ctiPatchCallByReturnAddress(callFrame->codeBlock(), STUB_RETURN_ADDRESS,
+                              FunctionPtr(cti_op_get_by_id_generic));
   return JSValue::encode(result);
 }
 
-static PolymorphicAccessStructureList* getPolymorphicAccessStructureListSlot(
-    StructureStubInfo* stubInfo,
-    int& listIndex) {
-  PolymorphicAccessStructureList* prototypeStructureList = 0;
-  listIndex = 1;
-
-  switch (stubInfo->accessType) {
-    case access_get_by_id_proto:
-      prototypeStructureList = new PolymorphicAccessStructureList(
-          stubInfo->stubRoutine, stubInfo->u.getByIdProto.baseObjectStructure,
-          stubInfo->u.getByIdProto.prototypeStructure);
-      stubInfo->stubRoutine = CodeLocationLabel();
-      stubInfo->initGetByIdProtoList(prototypeStructureList, 2);
-      break;
-    case access_get_by_id_chain:
-      prototypeStructureList = new PolymorphicAccessStructureList(
-          stubInfo->stubRoutine, stubInfo->u.getByIdChain.baseObjectStructure,
-          stubInfo->u.getByIdChain.chain);
-      stubInfo->stubRoutine = CodeLocationLabel();
-      stubInfo->initGetByIdProtoList(prototypeStructureList, 2);
-      break;
-    case access_get_by_id_proto_list:
-      prototypeStructureList = stubInfo->u.getByIdProtoList.structureList;
-      listIndex = stubInfo->u.getByIdProtoList.listSize;
-      if (listIndex < POLYMORPHIC_LIST_CACHE_SIZE)
-        stubInfo->u.getByIdProtoList.listSize++;
-      break;
-    default:
-      ASSERT_NOT_REACHED();
-  }
-
-  ASSERT(listIndex <= POLYMORPHIC_LIST_CACHE_SIZE);
-  return prototypeStructureList;
+static void setupPolymorphicProtoList(StructureStubInfo* stubInfo) {
+  if (stubInfo->accessType == access_get_by_id_proto)
+    stubInfo->initGetByIdProtoList(new PolymorphicAccessStructureList(
+        stubInfo->stubRoutine, stubInfo->u.getByIdProto.baseObjectStructure,
+        stubInfo->u.getByIdProto.prototypeStructure));
+  else if (stubInfo->accessType == access_get_by_id_chain)
+    stubInfo->initGetByIdProtoList(new PolymorphicAccessStructureList(
+        stubInfo->stubRoutine, stubInfo->u.getByIdChain.baseObjectStructure,
+        stubInfo->u.getByIdChain.chain));
+  ASSERT(stubInfo->accessType == access_get_by_id_proto_list);
 }
 
 DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_getter_stub) {
@@ -1748,56 +1687,45 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_proto_list) {
 
   size_t offset = slot.cachedOffset();
 
-  if (slot.slotBase() == baseValue)
-    ctiPatchCallByReturnAddress(codeBlock, STUB_RETURN_ADDRESS,
-                                FunctionPtr(cti_op_get_by_id_proto_fail));
-  else if (slot.slotBase() ==
-           asCell(baseValue)->structure()->prototypeForLookup(callFrame)) {
-    ASSERT(!asCell(baseValue)->structure()->isDictionary());
-    // Since we're accessing a prototype in a loop, it's a good bet that it
-    // should not be treated as a dictionary.
-    if (slotBaseObject->structure()->isDictionary()) {
-      slotBaseObject->flattenDictionaryObject();
-      offset = slotBaseObject->structure()->get(propertyName);
+  // Don't mix self & proto/chain accesses in the same list
+  if (slot.slotBase() != baseValue) {
+    if (slot.slotBase() ==
+        asCell(baseValue)->structure()->prototypeForLookup(callFrame)) {
+      ASSERT(!asCell(baseValue)->structure()->isDictionary());
+      // Since we're accessing a prototype in a loop, it's a good bet that it
+      // should not be treated as a dictionary.
+      if (slotBaseObject->structure()->isDictionary()) {
+        slotBaseObject->flattenDictionaryObject();
+        offset = slotBaseObject->structure()->get(propertyName);
+      }
+
+      setupPolymorphicProtoList(stubInfo);
+      if (stubInfo->u.getByIdProtoList.listSize < POLYMORPHIC_LIST_CACHE_SIZE) {
+        bool cached = JIT::compileGetByIdProtoList(
+            callFrame->scopeChain()->globalData, callFrame, codeBlock, stubInfo,
+            structure, slotBaseObject->structure(), propertyName, slot, offset);
+        if (cached)
+          return JSValue::encode(result);
+      }
+    } else if (size_t count = normalizePrototypeChain(callFrame, baseValue,
+                                                      slot.slotBase(),
+                                                      propertyName, offset)) {
+      ASSERT(!asCell(baseValue)->structure()->isDictionary());
+
+      setupPolymorphicProtoList(stubInfo);
+      if (stubInfo->u.getByIdProtoList.listSize < POLYMORPHIC_LIST_CACHE_SIZE) {
+        bool cached = JIT::compileGetByIdChainList(
+            callFrame->scopeChain()->globalData, callFrame, codeBlock, stubInfo,
+            structure, structure->prototypeChain(callFrame), count,
+            propertyName, slot, offset);
+        if (cached)
+          return JSValue::encode(result);
+      }
     }
+  }
 
-    int listIndex;
-    PolymorphicAccessStructureList* prototypeStructureList =
-        getPolymorphicAccessStructureListSlot(stubInfo, listIndex);
-    if (listIndex < POLYMORPHIC_LIST_CACHE_SIZE) {
-      JIT::compileGetByIdProtoList(
-          callFrame->scopeChain()->globalData, callFrame, codeBlock, stubInfo,
-          prototypeStructureList, listIndex, structure,
-          slotBaseObject->structure(), propertyName, slot, offset);
-
-      if (listIndex == (POLYMORPHIC_LIST_CACHE_SIZE - 1))
-        ctiPatchCallByReturnAddress(
-            codeBlock, STUB_RETURN_ADDRESS,
-            FunctionPtr(cti_op_get_by_id_proto_list_full));
-    }
-  } else if (size_t count = normalizePrototypeChain(
-                 callFrame, baseValue, slot.slotBase(), propertyName, offset)) {
-    ASSERT(!asCell(baseValue)->structure()->isDictionary());
-    int listIndex;
-    PolymorphicAccessStructureList* prototypeStructureList =
-        getPolymorphicAccessStructureListSlot(stubInfo, listIndex);
-
-    if (listIndex < POLYMORPHIC_LIST_CACHE_SIZE) {
-      StructureChain* protoChain = structure->prototypeChain(callFrame);
-      JIT::compileGetByIdChainList(
-          callFrame->scopeChain()->globalData, callFrame, codeBlock, stubInfo,
-          prototypeStructureList, listIndex, structure, protoChain, count,
-          propertyName, slot, offset);
-
-      if (listIndex == (POLYMORPHIC_LIST_CACHE_SIZE - 1))
-        ctiPatchCallByReturnAddress(
-            codeBlock, STUB_RETURN_ADDRESS,
-            FunctionPtr(cti_op_get_by_id_proto_list_full));
-    }
-  } else
-    ctiPatchCallByReturnAddress(codeBlock, STUB_RETURN_ADDRESS,
-                                FunctionPtr(cti_op_get_by_id_proto_fail));
-
+  ctiPatchCallByReturnAddress(codeBlock, STUB_RETURN_ADDRESS,
+                              FunctionPtr(cti_op_get_by_id_proto_fail));
   return JSValue::encode(result);
 }
 

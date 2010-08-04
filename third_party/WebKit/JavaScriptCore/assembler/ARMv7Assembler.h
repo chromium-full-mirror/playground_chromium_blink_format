@@ -1620,6 +1620,8 @@ class ARMv7Assembler {
 
   void* executableCopy(ExecutablePool* allocator) {
     void* copy = m_formatter.executableCopy(allocator);
+    if (!copy)
+      return 0;
 
     unsigned jumpCount = m_jumpsToLink.size();
     for (unsigned i = 0; i < jumpCount; ++i) {
@@ -1631,7 +1633,6 @@ class ARMv7Assembler {
     }
     m_jumpsToLink.clear();
 
-    ASSERT(copy);
     return copy;
   }
 

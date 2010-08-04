@@ -182,7 +182,7 @@ class JIT : private JSInterfaceJIT {
     return JIT(globalData, codeBlock).privateCompile(functionEntryArityCheck);
   }
 
-  static void compileGetByIdProto(JSGlobalData* globalData,
+  static bool compileGetByIdProto(JSGlobalData* globalData,
                                   CallFrame* callFrame,
                                   CodeBlock* codeBlock,
                                   StructureStubInfo* stubInfo,
@@ -193,63 +193,53 @@ class JIT : private JSInterfaceJIT {
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompileGetByIdProto(stubInfo, structure, prototypeStructure,
-                                   ident, slot, cachedOffset, returnAddress,
-                                   callFrame);
+    return jit.privateCompileGetByIdProto(
+        stubInfo, structure, prototypeStructure, ident, slot, cachedOffset,
+        returnAddress, callFrame);
   }
 
-  static void compileGetByIdSelfList(
-      JSGlobalData* globalData,
-      CodeBlock* codeBlock,
-      StructureStubInfo* stubInfo,
-      PolymorphicAccessStructureList* polymorphicStructures,
-      int currentIndex,
-      Structure* structure,
-      const Identifier& ident,
-      const PropertySlot& slot,
-      size_t cachedOffset) {
+  static bool compileGetByIdSelfList(JSGlobalData* globalData,
+                                     CodeBlock* codeBlock,
+                                     StructureStubInfo* stubInfo,
+                                     Structure* structure,
+                                     const Identifier& ident,
+                                     const PropertySlot& slot,
+                                     size_t cachedOffset) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompileGetByIdSelfList(stubInfo, polymorphicStructures,
-                                      currentIndex, structure, ident, slot,
-                                      cachedOffset);
+    return jit.privateCompileGetByIdSelfList(stubInfo, structure, ident, slot,
+                                             cachedOffset);
   }
-  static void compileGetByIdProtoList(
-      JSGlobalData* globalData,
-      CallFrame* callFrame,
-      CodeBlock* codeBlock,
-      StructureStubInfo* stubInfo,
-      PolymorphicAccessStructureList* prototypeStructureList,
-      int currentIndex,
-      Structure* structure,
-      Structure* prototypeStructure,
-      const Identifier& ident,
-      const PropertySlot& slot,
-      size_t cachedOffset) {
+  static bool compileGetByIdProtoList(JSGlobalData* globalData,
+                                      CallFrame* callFrame,
+                                      CodeBlock* codeBlock,
+                                      StructureStubInfo* stubInfo,
+                                      Structure* structure,
+                                      Structure* prototypeStructure,
+                                      const Identifier& ident,
+                                      const PropertySlot& slot,
+                                      size_t cachedOffset) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompileGetByIdProtoList(
-        stubInfo, prototypeStructureList, currentIndex, structure,
-        prototypeStructure, ident, slot, cachedOffset, callFrame);
+    return jit.privateCompileGetByIdProtoList(stubInfo, structure,
+                                              prototypeStructure, ident, slot,
+                                              cachedOffset, callFrame);
   }
-  static void compileGetByIdChainList(
-      JSGlobalData* globalData,
-      CallFrame* callFrame,
-      CodeBlock* codeBlock,
-      StructureStubInfo* stubInfo,
-      PolymorphicAccessStructureList* prototypeStructureList,
-      int currentIndex,
-      Structure* structure,
-      StructureChain* chain,
-      size_t count,
-      const Identifier& ident,
-      const PropertySlot& slot,
-      size_t cachedOffset) {
+  static bool compileGetByIdChainList(JSGlobalData* globalData,
+                                      CallFrame* callFrame,
+                                      CodeBlock* codeBlock,
+                                      StructureStubInfo* stubInfo,
+                                      Structure* structure,
+                                      StructureChain* chain,
+                                      size_t count,
+                                      const Identifier& ident,
+                                      const PropertySlot& slot,
+                                      size_t cachedOffset) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompileGetByIdChainList(stubInfo, prototypeStructureList,
-                                       currentIndex, structure, chain, count,
-                                       ident, slot, cachedOffset, callFrame);
+    return jit.privateCompileGetByIdChainList(stubInfo, structure, chain, count,
+                                              ident, slot, cachedOffset,
+                                              callFrame);
   }
 
-  static void compileGetByIdChain(JSGlobalData* globalData,
+  static bool compileGetByIdChain(JSGlobalData* globalData,
                                   CallFrame* callFrame,
                                   CodeBlock* codeBlock,
                                   StructureStubInfo* stubInfo,
@@ -261,12 +251,12 @@ class JIT : private JSInterfaceJIT {
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompileGetByIdChain(stubInfo, structure, chain, count, ident,
-                                   slot, cachedOffset, returnAddress,
-                                   callFrame);
+    return jit.privateCompileGetByIdChain(stubInfo, structure, chain, count,
+                                          ident, slot, cachedOffset,
+                                          returnAddress, callFrame);
   }
 
-  static void compilePutByIdTransition(JSGlobalData* globalData,
+  static bool compilePutByIdTransition(JSGlobalData* globalData,
                                        CodeBlock* codeBlock,
                                        StructureStubInfo* stubInfo,
                                        Structure* oldStructure,
@@ -276,9 +266,9 @@ class JIT : private JSInterfaceJIT {
                                        ReturnAddressPtr returnAddress,
                                        bool direct) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompilePutByIdTransition(stubInfo, oldStructure, newStructure,
-                                        cachedOffset, chain, returnAddress,
-                                        direct);
+    return jit.privateCompilePutByIdTransition(stubInfo, oldStructure,
+                                               newStructure, cachedOffset,
+                                               chain, returnAddress, direct);
   }
 
   static void compileCTIMachineTrampolines(
@@ -319,11 +309,12 @@ class JIT : private JSInterfaceJIT {
                                    JSObject*,
                                    ReturnAddressPtr);
 
-  static void compilePatchGetArrayLength(JSGlobalData* globalData,
+  static bool compilePatchGetArrayLength(JSGlobalData* globalData,
                                          CodeBlock* codeBlock,
+                                         StructureStubInfo* stubInfo,
                                          ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
-    return jit.privateCompilePatchGetArrayLength(returnAddress);
+    return jit.privateCompilePatchGetArrayLength(stubInfo, returnAddress);
   }
 
   static void linkCall(JSFunction* callee,
@@ -357,7 +348,7 @@ class JIT : private JSInterfaceJIT {
   void privateCompileLinkPass();
   void privateCompileSlowCases();
   JITCode privateCompile(CodePtr* functionEntryArityCheck);
-  void privateCompileGetByIdProto(StructureStubInfo*,
+  bool privateCompileGetByIdProto(StructureStubInfo*,
                                   Structure*,
                                   Structure* prototypeStructure,
                                   const Identifier&,
@@ -365,25 +356,19 @@ class JIT : private JSInterfaceJIT {
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress,
                                   CallFrame* callFrame);
-  void privateCompileGetByIdSelfList(StructureStubInfo*,
-                                     PolymorphicAccessStructureList*,
-                                     int,
+  bool privateCompileGetByIdSelfList(StructureStubInfo*,
                                      Structure*,
                                      const Identifier&,
                                      const PropertySlot&,
                                      size_t cachedOffset);
-  void privateCompileGetByIdProtoList(StructureStubInfo*,
-                                      PolymorphicAccessStructureList*,
-                                      int,
+  bool privateCompileGetByIdProtoList(StructureStubInfo*,
                                       Structure*,
                                       Structure* prototypeStructure,
                                       const Identifier&,
                                       const PropertySlot&,
                                       size_t cachedOffset,
                                       CallFrame* callFrame);
-  void privateCompileGetByIdChainList(StructureStubInfo*,
-                                      PolymorphicAccessStructureList*,
-                                      int,
+  bool privateCompileGetByIdChainList(StructureStubInfo*,
                                       Structure*,
                                       StructureChain* chain,
                                       size_t count,
@@ -391,7 +376,7 @@ class JIT : private JSInterfaceJIT {
                                       const PropertySlot&,
                                       size_t cachedOffset,
                                       CallFrame* callFrame);
-  void privateCompileGetByIdChain(StructureStubInfo*,
+  bool privateCompileGetByIdChain(StructureStubInfo*,
                                   Structure*,
                                   StructureChain*,
                                   size_t count,
@@ -400,7 +385,7 @@ class JIT : private JSInterfaceJIT {
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress,
                                   CallFrame* callFrame);
-  void privateCompilePutByIdTransition(StructureStubInfo*,
+  bool privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
                                        Structure*,
                                        Structure*,
                                        size_t cachedOffset,
@@ -416,7 +401,8 @@ class JIT : private JSInterfaceJIT {
   CodePtr privateCompileCTINativeCall(PassRefPtr<ExecutablePool> executablePool,
                                       JSGlobalData* data,
                                       NativeFunction func);
-  void privateCompilePatchGetArrayLength(ReturnAddressPtr returnAddress);
+  bool privateCompilePatchGetArrayLength(StructureStubInfo* stubInfo,
+                                         ReturnAddressPtr returnAddress);
 
   void addSlowCase(Jump);
   void addSlowCase(JumpList);

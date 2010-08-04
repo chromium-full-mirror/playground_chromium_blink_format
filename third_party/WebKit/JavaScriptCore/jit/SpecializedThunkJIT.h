@@ -136,6 +136,9 @@ class SpecializedThunkJIT : public JSInterfaceJIT {
 
   MacroAssemblerCodePtr finalize(MacroAssemblerCodePtr fallback) {
     LinkBuffer patchBuffer(this, m_pool.get());
+    // We can't continue if we can't call a function!
+    if (!patchBuffer.allocationSuccessful())
+      CRASH();
     patchBuffer.link(m_failures, CodeLocationLabel(fallback));
     return patchBuffer.finalizeCode().m_code;
   }
