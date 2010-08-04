@@ -61,7 +61,7 @@ void RunLoop::run() {
 }
 
 void RunLoop::stop() {
-  // implement
+  QCoreApplication::exit();
 }
 
 RunLoop::RunLoop() : m_timerObject(new TimerObject(this)) {}
