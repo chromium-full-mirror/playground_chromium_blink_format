@@ -41,6 +41,11 @@
 #include <wtf/PassOwnPtr.h>
 #include <wtf/Vector.h>
 
+#if PLATFORM(CG)
+#include <CoreGraphics/CGContext.h>
+#include <wtf/RetainPtr.h>
+#endif
+
 namespace WebCore {
 
 class GLES2Context;
@@ -168,7 +173,12 @@ class LayerRendererChromium : public Noncopyable {
   OwnPtr<skia::PlatformCanvas> m_rootLayerCanvas;
   OwnPtr<PlatformContextSkia> m_rootLayerSkiaContext;
   OwnPtr<GraphicsContext> m_rootLayerGraphicsContext;
+#elif PLATFORM(CG)
+  Vector<uint8_t> m_rootLayerBackingStore;
+  RetainPtr<CGContextRef> m_rootLayerCGContext;
+  OwnPtr<GraphicsContext> m_rootLayerGraphicsContext;
 #endif
+
   IntSize m_rootLayerCanvasSize;
 
   OwnPtr<GLES2Context> m_gles2Context;
