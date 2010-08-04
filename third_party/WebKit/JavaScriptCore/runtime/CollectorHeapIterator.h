@@ -74,7 +74,8 @@ inline bool CollectorHeapIterator::operator!=(
 }
 
 inline JSCell* CollectorHeapIterator::operator*() const {
-  return reinterpret_cast<JSCell*>(&m_heap.blocks[m_block]->cells[m_cell]);
+  return reinterpret_cast<JSCell*>(
+      &m_heap.collectorBlock(m_block)->cells[m_cell]);
 }
 
 // Iterators advance up to the next-to-last -- and not the last -- cell in a
@@ -101,7 +102,7 @@ inline LiveObjectIterator& LiveObjectIterator::operator++() {
     return *this;
 
   while (m_block < m_heap.usedBlocks &&
-         !m_heap.blocks[m_block]->marked.get(m_cell))
+         !m_heap.collectorBlock(m_block)->marked.get(m_cell))
     advance(HeapConstants::cellsPerBlock - 1);
   return *this;
 }
@@ -119,7 +120,7 @@ inline DeadObjectIterator& DeadObjectIterator::operator++() {
     ASSERT(m_block > m_heap.nextBlock ||
            (m_block == m_heap.nextBlock && m_cell >= m_heap.nextCell));
   } while (m_block < m_heap.usedBlocks &&
-           m_heap.blocks[m_block]->marked.get(m_cell));
+           m_heap.collectorBlock(m_block)->marked.get(m_cell));
   return *this;
 }
 
