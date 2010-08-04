@@ -177,11 +177,11 @@ void RenderMathMLOperator::updateFromElement() {
     if (!stretchDisabled && isStretchy && m_stretchHeight > 0 &&
         m_stretchHeight <= gMinimumStretchHeight &&
         m_stretchHeight > currentFontSize) {
-      FontDescription* desc = new FontDescription();
-      desc->setIsAbsoluteSize(true);
-      desc->setSpecifiedSize(m_stretchHeight);
-      desc->setComputedSize(m_stretchHeight);
-      newStyle->setFontDescription(*desc);
+      FontDescription desc;
+      desc.setIsAbsoluteSize(true);
+      desc.setSpecifiedSize(m_stretchHeight);
+      desc.setComputedSize(m_stretchHeight);
+      newStyle->setFontDescription(desc);
       newStyle->font().update(newStyle->font().fontSelector());
       newStyle->setVerticalAlign(BASELINE);
       m_isCentered = false;
@@ -300,11 +300,11 @@ RefPtr<RenderStyle> RenderMathMLOperator::createStackableStyle(
   newStyle->inheritFrom(style());
   newStyle->setDisplay(BLOCK);
 
-  FontDescription* desc = new FontDescription();
-  desc->setIsAbsoluteSize(true);
-  desc->setSpecifiedSize(gGlyphFontSize);
-  desc->setComputedSize(gGlyphFontSize);
-  newStyle->setFontDescription(*desc);
+  FontDescription desc;
+  desc.setIsAbsoluteSize(true);
+  desc.setSpecifiedSize(gGlyphFontSize);
+  desc.setComputedSize(gGlyphFontSize);
+  newStyle->setFontDescription(desc);
   newStyle->font().update(newStyle->font().fontSelector());
   newStyle->setLineHeight(Length(gGlyphLineHeight, Fixed));
   newStyle->setVerticalAlign(TOP);
