@@ -45,10 +45,8 @@ PassRefPtr<MathMLMathElement> MathMLMathElement::create(
 }
 
 RenderObject* MathMLMathElement::createRenderer(RenderArena* arena,
-                                                RenderStyle* style) {
-  RenderMathMLMath* renderer = new (arena) RenderMathMLMath(this);
-  renderer->setStyle(style);
-  return renderer;
+                                                RenderStyle*) {
+  return new (arena) RenderMathMLMath(this);
 }
 }
 
