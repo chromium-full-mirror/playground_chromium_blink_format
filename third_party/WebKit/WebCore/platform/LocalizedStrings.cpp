@@ -67,11 +67,13 @@ String fileButtonNoFileSelectedLabel() {
       ->fileButtonNoFileSelectedLabel();
 }
 
+#if PLATFORM(MAC)
 String copyImageUnknownFileLabel() {
   return platformStrategies()
       ->localizationStrategy()
       ->copyImageUnknownFileLabel();
 }
+#endif
 
 #if ENABLE(CONTEXT_MENUS)
 String contextMenuItemTagOpenLinkInNewWindow() {
@@ -170,11 +172,13 @@ String contextMenuItemTagLearnSpelling() {
       ->contextMenuItemTagLearnSpelling();
 }
 
+#if PLATFORM(MAC)
 String contextMenuItemTagSearchInSpotlight() {
   return platformStrategies()
       ->localizationStrategy()
       ->contextMenuItemTagSearchInSpotlight();
 }
+#endif
 
 String contextMenuItemTagSearchWeb() {
   return platformStrategies()
@@ -236,11 +240,13 @@ String contextMenuItemTagFontMenu() {
       ->contextMenuItemTagFontMenu();
 }
 
+#if PLATFORM(MAC)
 String contextMenuItemTagShowFonts() {
   return platformStrategies()
       ->localizationStrategy()
       ->contextMenuItemTagShowFonts();
 }
+#endif
 
 String contextMenuItemTagBold() {
   return platformStrategies()->localizationStrategy()->contextMenuItemTagBold();
@@ -264,6 +270,7 @@ String contextMenuItemTagOutline() {
       ->contextMenuItemTagOutline();
 }
 
+#if PLATFORM(MAC)
 String contextMenuItemTagStyles() {
   return platformStrategies()
       ->localizationStrategy()
@@ -293,6 +300,7 @@ String contextMenuItemTagStopSpeaking() {
       ->localizationStrategy()
       ->contextMenuItemTagStopSpeaking();
 }
+#endif
 
 String contextMenuItemTagWritingDirectionMenu() {
   return platformStrategies()
@@ -323,6 +331,8 @@ String contextMenuItemTagRightToLeft() {
       ->localizationStrategy()
       ->contextMenuItemTagRightToLeft();
 }
+
+#if PLATFORM(MAC)
 
 String contextMenuItemTagCorrectSpellingAutomatically() {
   return platformStrategies()
@@ -402,6 +412,8 @@ String contextMenuItemTagChangeBack(const String& replacedString) {
       ->contextMenuItemTagChangeBack(replacedString);
 }
 
+#endif  // PLATFORM(MAC)
+
 String contextMenuItemTagInspectElement() {
   return platformStrategies()
       ->localizationStrategy()
@@ -460,10 +472,12 @@ String AXDefinitionListDefinitionText() {
       ->AXDefinitionListDefinitionText();
 }
 
+#if PLATFORM(MAC)
 String AXARIAContentGroupText(const String& ariaType) {
   return platformStrategies()->localizationStrategy()->AXARIAContentGroupText(
       ariaType);
 }
+#endif
 
 String AXButtonActionVerb() {
   return platformStrategies()->localizationStrategy()->AXButtonActionVerb();
@@ -521,6 +535,16 @@ String multipleFileUploadText(unsigned numberOfFiles) {
 String unknownFileSizeText() {
   return platformStrategies()->localizationStrategy()->unknownFileSizeText();
 }
+
+#if PLATFORM(WIN)
+String uploadFileText() {
+  return platformStrategies()->localizationStrategy()->uploadFileText();
+}
+
+String allFilesText() {
+  return platformStrategies()->localizationStrategy()->allFilesText();
+}
+#endif
 
 String imageTitle(const String& filename, const IntSize& size) {
   return platformStrategies()->localizationStrategy()->imageTitle(filename,
