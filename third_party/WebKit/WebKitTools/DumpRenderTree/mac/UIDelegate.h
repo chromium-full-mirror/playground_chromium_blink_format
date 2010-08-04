@@ -31,6 +31,10 @@
 @interface UIDelegate : NSObject {
  @private
   NSRect m_frame;
+  NSMutableSet* m_pendingGeolocationPermissionListeners;
+  NSTimer* m_timer;
 }
+
+- (void)didSetMockGeolocationPermission;
 
 @end

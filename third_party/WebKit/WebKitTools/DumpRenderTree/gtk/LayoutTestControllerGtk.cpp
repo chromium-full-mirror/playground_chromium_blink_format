@@ -490,6 +490,11 @@ void LayoutTestController::setMockGeolocationError(int code,
   // See https://bugs.webkit.org/show_bug.cgi?id=28264.
 }
 
+void LayoutTestController::setGeolocationPermission(bool allow) {
+  // FIXME: Implement for Geolocation layout tests.
+  setGeolocationPermissionCommon(allow);
+}
+
 void LayoutTestController::setIconDatabaseEnabled(bool flag) {
   // FIXME: implement
 }
