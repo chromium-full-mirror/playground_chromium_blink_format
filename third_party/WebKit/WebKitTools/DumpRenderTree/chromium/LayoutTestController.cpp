@@ -194,6 +194,10 @@ LayoutTestController::LayoutTestController(TestShell* shell)
              &LayoutTestController::setPrivateBrowsingEnabled);
   bindMethod("setUseDashboardCompatibilityMode",
              &LayoutTestController::setUseDashboardCompatibilityMode);
+  bindMethod("clearAllApplicationCaches",
+             &LayoutTestController::clearAllApplicationCaches);
+  bindMethod("setApplicationCacheOriginQuota",
+             &LayoutTestController::setApplicationCacheOriginQuota);
 
   bindMethod("setJavaScriptCanAccessClipboard",
              &LayoutTestController::setJavaScriptCanAccessClipboard);
@@ -710,6 +714,19 @@ void LayoutTestController::setUseDashboardCompatibilityMode(
     const CppArgumentList&,
     CppVariant* result) {
   // We have no need to support Dashboard Compatibility Mode (mac-only)
+  result->setNull();
+}
+
+void LayoutTestController::clearAllApplicationCaches(const CppArgumentList&,
+                                                     CppVariant* result) {
+  // FIXME: implement to support Application Cache Quotas.
+  result->setNull();
+}
+
+void LayoutTestController::setApplicationCacheOriginQuota(
+    const CppArgumentList&,
+    CppVariant* result) {
+  // FIXME: implement to support Application Cache Quotas.
   result->setNull();
 }
 

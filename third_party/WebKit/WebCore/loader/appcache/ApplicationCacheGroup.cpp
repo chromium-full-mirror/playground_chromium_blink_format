@@ -1208,22 +1208,6 @@ class ChromeClientCallbackTimer : public TimerBase {
   ApplicationCacheGroup* m_cacheGroup;
 };
 
-class OriginQuotaReachedCallbackTimer : public TimerBase {
- public:
-  OriginQuotaReachedCallbackTimer(ApplicationCacheGroup* cacheGroup,
-                                  Frame* frame)
-      : m_cacheGroup(cacheGroup), m_frame(frame) {}
-
- private:
-  virtual void fired() {
-    m_cacheGroup->didReachOriginQuota(m_frame.release());
-    delete this;
-  }
-
-  ApplicationCacheGroup* m_cacheGroup;
-  RefPtr<Frame> m_frame;
-};
-
 void ApplicationCacheGroup::scheduleReachedMaxAppCacheSizeCallback() {
   ASSERT(isMainThread());
   ChromeClientCallbackTimer* timer = new ChromeClientCallbackTimer(this);
@@ -1232,12 +1216,9 @@ void ApplicationCacheGroup::scheduleReachedMaxAppCacheSizeCallback() {
 }
 
 void ApplicationCacheGroup::scheduleReachedOriginQuotaCallback() {
-  ASSERT(isMainThread());
-  RefPtr<Frame> frameProtector = m_frame;
-  OriginQuotaReachedCallbackTimer* timer =
-      new OriginQuotaReachedCallbackTimer(this, frameProtector.get());
-  timer->startOneShot(0);
-  // The timer will delete itself once it fires.
+  // FIXME: it might be nice to run this asynchronously, because there is no
+  // return value to wait for.
+  didReachOriginQuota(m_frame);
 }
 
 class CallCacheListenerTask : public ScriptExecutionContext::Task {

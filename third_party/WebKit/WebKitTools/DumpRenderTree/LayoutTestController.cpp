@@ -42,7 +42,8 @@
 
 LayoutTestController::LayoutTestController(const std::string& testPathOrURL,
                                            const std::string& expectedPixelHash)
-    : m_dumpAsPDF(false),
+    : m_dumpApplicationCacheDelegateCallbacks(false),
+      m_dumpAsPDF(false),
       m_dumpAsText(false),
       m_dumpBackForwardList(false),
       m_dumpChildFrameScrollPositions(false),
@@ -91,6 +92,19 @@ PassRefPtr<LayoutTestController> LayoutTestController::create(
 }
 
 // Static Functions
+
+static JSValueRef dumpApplicationCacheDelegateCallbacksCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setDumpApplicationCacheDelegateCallbacks(true);
+  return JSValueMakeUndefined(context);
+}
 
 static JSValueRef dumpAsPDFCallback(JSContextRef context,
                                     JSObjectRef function,
@@ -453,6 +467,21 @@ static JSValueRef callShouldCloseOnWebViewCallback(JSContextRef context,
       static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
 
   return JSValueMakeBoolean(context, controller->callShouldCloseOnWebView());
+}
+
+static JSValueRef clearAllApplicationCachesCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  // Has mac implementation
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->clearAllApplicationCaches();
+
+  return JSValueMakeUndefined(context);
 }
 
 static JSValueRef clearAllDatabasesCallback(JSContextRef context,
@@ -1216,6 +1245,28 @@ static JSValueRef setAppCacheMaximumSizeCallback(JSContextRef context,
   double size = JSValueToNumber(context, arguments[0], NULL);
   if (!isnan(size))
     controller->setAppCacheMaximumSize(static_cast<unsigned long long>(size));
+
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef setApplicationCacheOriginQuotaCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  // Has mac implementation
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+
+  double size = JSValueToNumber(context, arguments[0], NULL);
+  if (!isnan(size))
+    controller->setApplicationCacheOriginQuota(
+        static_cast<unsigned long long>(size));
 
   return JSValueMakeUndefined(context);
 }
@@ -2608,6 +2659,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"callShouldCloseOnWebView", callShouldCloseOnWebViewCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"clearAllApplicationCaches", clearAllApplicationCachesCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"clearAllDatabases", clearAllDatabasesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"clearBackForwardList", clearBackForwardListCallback,
@@ -2626,6 +2679,9 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"dispatchPendingLoadRequests", dispatchPendingLoadRequestsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"display", displayCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"dumpApplicationCacheDelegateCallbacks",
+       dumpApplicationCacheDelegateCallbacksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpAsText", dumpAsTextCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
@@ -2743,6 +2799,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setAlwaysAcceptCookies", setAlwaysAcceptCookiesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setAppCacheMaximumSize", setAppCacheMaximumSizeCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setApplicationCacheOriginQuota", setApplicationCacheOriginQuotaCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setAuthenticationPassword", setAuthenticationPasswordCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

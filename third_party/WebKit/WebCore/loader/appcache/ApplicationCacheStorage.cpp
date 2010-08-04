@@ -541,7 +541,7 @@ bool ApplicationCacheStorage::remainingSizeForOriginExcludingCache(
 bool ApplicationCacheStorage::storeUpdatedQuotaForOrigin(
     const SecurityOrigin* origin,
     int64_t quota) {
-  openDatabase(false);
+  openDatabase(true);
   if (!m_database.isOpen())
     return false;
 
