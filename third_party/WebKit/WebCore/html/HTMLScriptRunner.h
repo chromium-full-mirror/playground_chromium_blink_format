@@ -28,6 +28,7 @@
 
 #include "CachedResourceClient.h"
 #include "CachedResourceHandle.h"
+#include <wtf/Deque.h>
 #include <wtf/Noncopyable.h>
 #include <wtf/PassRefPtr.h>
 
@@ -54,6 +55,7 @@ class HTMLScriptRunner : public Noncopyable {
     return m_hasScriptsWaitingForStylesheets;
   }
   bool executeScriptsWaitingForStylesheets();
+  bool executeScriptsWaitingForParsing();
 
   bool isExecutingScript() { return !!m_scriptNestingLevel; }
 
@@ -65,9 +67,29 @@ class HTMLScriptRunner : public Noncopyable {
   // lifetime in order to guarantee that the data buffer will not be purged.
   //
   // FIXME: Finish turning this into a proper class.
-  class PendingScript : public CachedResourceClient, Noncopyable {
+  class PendingScript : public CachedResourceClient {
    public:
     PendingScript() : startingLineNumber(0), m_watchingForLoad(false) {}
+
+    PendingScript(const PendingScript& other)
+        : CachedResourceClient(other),
+          element(other.element),
+          startingLineNumber(other.startingLineNumber),
+          m_watchingForLoad(other.m_watchingForLoad) {
+      setCachedScript(other.cachedScript());
+    }
+
+    PendingScript& operator=(const PendingScript& other) {
+      if (this == &other)
+        return *this;
+
+      element = other.element;
+      startingLineNumber = other.startingLineNumber;
+      m_watchingForLoad = other.m_watchingForLoad;
+      setCachedScript(other.cachedScript());
+
+      return *this;
+    }
 
     ~PendingScript();
 
@@ -97,7 +119,9 @@ class HTMLScriptRunner : public Noncopyable {
   bool executeParsingBlockingScripts();
   void executePendingScript();
 
-  void requestScript(Element*);
+  bool requestScript(PendingScript&, Element*);
+  void requestParsingBlockingScript(Element*);
+  void requestDeferredScript(Element*);
   void runScript(Element*, int startingLineNumber);
 
   // Helpers for dealing with HTMLScriptRunnerHost
@@ -112,6 +136,7 @@ class HTMLScriptRunner : public Noncopyable {
   Document* m_document;
   HTMLScriptRunnerHost* m_host;
   PendingScript m_parsingBlockingScript;
+  Deque<PendingScript> m_scriptsToExecuteAfterParsing;
   unsigned m_scriptNestingLevel;
 
   // We only want stylesheet loads to trigger script execution if script
