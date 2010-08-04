@@ -213,8 +213,7 @@ class JSValue {
   getJSNumber();  // JSValue() if this is not a JSNumber or number object
 
   bool isCell() const;
-  JSCell*& asCell();
-  JSCell* const& asCell() const;
+  JSCell* asCell() const;
   bool isValidCallee();
 
 #ifndef NDEBUG
@@ -255,19 +254,11 @@ class JSValue {
       int32_t tag;
       int32_t payload;
     } asBits;
-    struct {
-      int32_t tag;
-      JSCell* ptr;
-    } asPtr;
 #else
     struct {
       int32_t payload;
       int32_t tag;
     } asBits;
-    struct {
-      JSCell* ptr;
-      int32_t tag;
-    } asPtr;
 #endif
   } u;
 #else   // USE(JSVALUE32_64)
@@ -495,7 +486,7 @@ inline JSValue::JSValue(JSCell* ptr) {
     u.asBits.tag = CellTag;
   else
     u.asBits.tag = EmptyValueTag;
-  u.asPtr.ptr = ptr;
+  u.asBits.payload = reinterpret_cast<int32_t>(ptr);
 #if ENABLE(JSC_ZOMBIES)
   ASSERT(!isZombie());
 #endif
@@ -506,7 +497,7 @@ inline JSValue::JSValue(const JSCell* ptr) {
     u.asBits.tag = CellTag;
   else
     u.asBits.tag = EmptyValueTag;
-  u.asPtr.ptr = const_cast<JSCell*>(ptr);
+  u.asBits.payload = reinterpret_cast<int32_t>(const_cast<JSCell*>(ptr));
 #if ENABLE(JSC_ZOMBIES)
   ASSERT(!isZombie());
 #endif
@@ -584,14 +575,9 @@ inline double JSValue::asDouble() const {
   return u.asDouble;
 }
 
-ALWAYS_INLINE JSCell* const& JSValue::asCell() const {
+ALWAYS_INLINE JSCell* JSValue::asCell() const {
   ASSERT(isCell());
-  return u.asPtr.ptr;
-}
-
-ALWAYS_INLINE JSCell*& JSValue::asCell() {
-  ASSERT(isCell());
-  return u.asPtr.ptr;
+  return reinterpret_cast<JSCell*>(u.asBits.payload);
 }
 
 ALWAYS_INLINE JSValue::JSValue(EncodeAsDoubleTag, ExecState*, double d) {

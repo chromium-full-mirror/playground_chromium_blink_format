@@ -113,8 +113,7 @@ class Structure : public RefCounted<Structure> {
 
   const TypeInfo& typeInfo() const { return m_typeInfo; }
 
-  const JSValue& storedPrototype() const { return m_prototype; }
-  JSValue& storedPrototype() { return m_prototype; }
+  JSValue storedPrototype() const { return m_prototype; }
   JSValue prototypeForLookup(ExecState*) const;
   StructureChain* prototypeChain(ExecState*) const;
 
