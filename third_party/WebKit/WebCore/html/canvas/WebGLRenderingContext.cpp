@@ -57,7 +57,7 @@
 
 namespace WebCore {
 
-static inline Platform3DObject objectOrZero(CanvasObject* object) {
+static inline Platform3DObject objectOrZero(WebGLObject* object) {
   return object ? object->object() : 0;
 }
 
@@ -941,7 +941,7 @@ bool WebGLRenderingContext::validateRenderingState(long numElementsRequired) {
   return numElementsRequired <= smallestNumElements;
 }
 
-bool WebGLRenderingContext::validateWebGLObject(CanvasObject* object) {
+bool WebGLRenderingContext::validateWebGLObject(WebGLObject* object) {
   if (!object) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return false;
@@ -3491,18 +3491,18 @@ void WebGLRenderingContext::viewport(long x,
   cleanupAfterGraphicsCall(false);
 }
 
-void WebGLRenderingContext::removeObject(CanvasObject* object) {
+void WebGLRenderingContext::removeObject(WebGLObject* object) {
   m_canvasObjects.remove(object);
 }
 
-void WebGLRenderingContext::addObject(CanvasObject* object) {
+void WebGLRenderingContext::addObject(WebGLObject* object) {
   removeObject(object);
   m_canvasObjects.add(object);
 }
 
 void WebGLRenderingContext::detachAndRemoveAllObjects() {
-  HashSet<RefPtr<CanvasObject>>::iterator pend = m_canvasObjects.end();
-  for (HashSet<RefPtr<CanvasObject>>::iterator it = m_canvasObjects.begin();
+  HashSet<RefPtr<WebGLObject>>::iterator pend = m_canvasObjects.end();
+  for (HashSet<RefPtr<WebGLObject>>::iterator it = m_canvasObjects.begin();
        it != pend; ++it)
     (*it)->detachContext();
 
@@ -3512,8 +3512,8 @@ void WebGLRenderingContext::detachAndRemoveAllObjects() {
 WebGLTexture* WebGLRenderingContext::findTexture(Platform3DObject obj) {
   if (!obj)
     return 0;
-  HashSet<RefPtr<CanvasObject>>::iterator pend = m_canvasObjects.end();
-  for (HashSet<RefPtr<CanvasObject>>::iterator it = m_canvasObjects.begin();
+  HashSet<RefPtr<WebGLObject>>::iterator pend = m_canvasObjects.end();
+  for (HashSet<RefPtr<WebGLObject>>::iterator it = m_canvasObjects.begin();
        it != pend; ++it) {
     if ((*it)->isTexture() && (*it)->object() == obj)
       return reinterpret_cast<WebGLTexture*>((*it).get());
@@ -3525,8 +3525,8 @@ WebGLRenderbuffer* WebGLRenderingContext::findRenderbuffer(
     Platform3DObject obj) {
   if (!obj)
     return 0;
-  HashSet<RefPtr<CanvasObject>>::iterator pend = m_canvasObjects.end();
-  for (HashSet<RefPtr<CanvasObject>>::iterator it = m_canvasObjects.begin();
+  HashSet<RefPtr<WebGLObject>>::iterator pend = m_canvasObjects.end();
+  for (HashSet<RefPtr<WebGLObject>>::iterator it = m_canvasObjects.begin();
        it != pend; ++it) {
     if ((*it)->isRenderbuffer() && (*it)->object() == obj)
       return reinterpret_cast<WebGLRenderbuffer*>((*it).get());
@@ -3537,8 +3537,8 @@ WebGLRenderbuffer* WebGLRenderingContext::findRenderbuffer(
 WebGLBuffer* WebGLRenderingContext::findBuffer(Platform3DObject obj) {
   if (!obj)
     return 0;
-  HashSet<RefPtr<CanvasObject>>::iterator pend = m_canvasObjects.end();
-  for (HashSet<RefPtr<CanvasObject>>::iterator it = m_canvasObjects.begin();
+  HashSet<RefPtr<WebGLObject>>::iterator pend = m_canvasObjects.end();
+  for (HashSet<RefPtr<WebGLObject>>::iterator it = m_canvasObjects.begin();
        it != pend; ++it) {
     if ((*it)->isBuffer() && (*it)->object() == obj)
       return reinterpret_cast<WebGLBuffer*>((*it).get());
@@ -3549,8 +3549,8 @@ WebGLBuffer* WebGLRenderingContext::findBuffer(Platform3DObject obj) {
 WebGLShader* WebGLRenderingContext::findShader(Platform3DObject obj) {
   if (!obj)
     return 0;
-  HashSet<RefPtr<CanvasObject>>::iterator pend = m_canvasObjects.end();
-  for (HashSet<RefPtr<CanvasObject>>::iterator it = m_canvasObjects.begin();
+  HashSet<RefPtr<WebGLObject>>::iterator pend = m_canvasObjects.end();
+  for (HashSet<RefPtr<WebGLObject>>::iterator it = m_canvasObjects.begin();
        it != pend; ++it) {
     if ((*it)->isShader() && (*it)->object() == obj)
       return reinterpret_cast<WebGLShader*>((*it).get());

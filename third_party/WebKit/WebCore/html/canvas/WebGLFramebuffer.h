@@ -26,14 +26,14 @@
 #ifndef WebGLFramebuffer_h
 #define WebGLFramebuffer_h
 
-#include "CanvasObject.h"
+#include "WebGLObject.h"
 
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
 namespace WebCore {
 
-class WebGLFramebuffer : public CanvasObject {
+class WebGLFramebuffer : public WebGLObject {
  public:
   virtual ~WebGLFramebuffer() { deleteObject(); }
 
@@ -49,7 +49,7 @@ class WebGLFramebuffer : public CanvasObject {
     return (m_depthStencilAttachment && m_depthStencilAttachment->object());
   }
 
-  void setAttachment(unsigned long, CanvasObject*);
+  void setAttachment(unsigned long, WebGLObject*);
 
   // This function is called right after a framebuffer is bound.
   // Because renderbuffers and textures attached to the framebuffer might
@@ -61,7 +61,7 @@ class WebGLFramebuffer : public CanvasObject {
   // current bound framebuffer; if the newly changed object is attached
   // to the framebuffer and the framebuffer becomes complete, we need to
   // clear un-initialized renderbuffers.
-  void onAttachedObjectChange(CanvasObject*);
+  void onAttachedObjectChange(WebGLObject*);
 
   unsigned long getColorBufferFormat();
 
@@ -73,16 +73,16 @@ class WebGLFramebuffer : public CanvasObject {
  private:
   virtual bool isFramebuffer() const { return true; }
 
-  bool isUninitialized(CanvasObject*);
-  void setInitialized(CanvasObject*);
+  bool isUninitialized(WebGLObject*);
+  void setInitialized(WebGLObject*);
   void initializeRenderbuffers();
 
   // These objects are kept alive by the global table in
   // WebGLRenderingContext.
-  CanvasObject* m_colorAttachment;
-  CanvasObject* m_depthAttachment;
-  CanvasObject* m_stencilAttachment;
-  CanvasObject* m_depthStencilAttachment;
+  WebGLObject* m_colorAttachment;
+  WebGLObject* m_depthAttachment;
+  WebGLObject* m_stencilAttachment;
+  WebGLObject* m_depthStencilAttachment;
 };
 
 }  // namespace WebCore
