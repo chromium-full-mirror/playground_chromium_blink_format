@@ -63,6 +63,7 @@ class DrawingAreaProxy;
 class PageClient;
 class WebBackForwardList;
 class WebBackForwardListItem;
+class WebData;
 class WebKeyboardEvent;
 class WebMouseEvent;
 class WebPageNamespace;
@@ -132,6 +133,9 @@ class WebPageProxy : public APIObject {
   double estimatedProgress() const { return m_estimatedProgress; }
 
   void terminateProcess();
+
+  PassRefPtr<WebData> sessionState() const;
+  void restoreFromSessionState(WebData*);
 
   void runJavaScriptInMainFrame(const WebCore::String&,
                                 PassRefPtr<ScriptReturnValueCallback>);

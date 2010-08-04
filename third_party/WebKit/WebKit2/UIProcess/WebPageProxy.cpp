@@ -32,6 +32,7 @@
 #include "WebBackForwardListItem.h"
 #include "WebContext.h"
 #include "WebCoreArgumentCoders.h"
+#include "WebData.h"
 #include "WebEvent.h"
 #include "WebPageMessageKinds.h"
 #include "WebPageNamespace.h"
@@ -328,6 +329,15 @@ void WebPageProxy::terminateProcess() {
     return;
 
   process()->terminate();
+}
+
+PassRefPtr<WebData> WebPageProxy::sessionState() const {
+  // FIXME: Return session state data for saving Page state.
+  return 0;
+}
+
+void WebPageProxy::restoreFromSessionState(WebData*) {
+  // FIXME: Restore the Page from the passed in session state data.
 }
 
 void WebPageProxy::runJavaScriptInMainFrame(
