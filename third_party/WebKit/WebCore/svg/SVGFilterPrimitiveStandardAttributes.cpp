@@ -73,7 +73,7 @@ void SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(
   if (attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
       attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr ||
       attrName == SVGNames::resultAttr)
-    invalidateFilter();
+    SVGFilterElement::invalidateFilter(this);
 }
 
 void SVGFilterPrimitiveStandardAttributes::synchronizeProperty(
@@ -110,7 +110,7 @@ void SVGFilterPrimitiveStandardAttributes::childrenChanged(
                                     childCountDelta);
 
   if (!changedByParser)
-    invalidateFilter();
+    SVGFilterElement::invalidateFilter(this);
 }
 
 void SVGFilterPrimitiveStandardAttributes::setStandardAttributes(

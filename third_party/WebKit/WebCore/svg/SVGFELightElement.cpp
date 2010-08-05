@@ -25,6 +25,7 @@
 #include "SVGFELightElement.h"
 
 #include "Attribute.h"
+#include "SVGFilterElement.h"
 #include "SVGNames.h"
 
 namespace WebCore {
@@ -59,6 +60,20 @@ void SVGFELightElement::parseMappedAttribute(Attribute* attr) {
     setLimitingConeAngleBaseValue(value.toFloat());
   else
     SVGElement::parseMappedAttribute(attr);
+}
+
+void SVGFELightElement::svgAttributeChanged(const QualifiedName& attrName) {
+  SVGElement::svgAttributeChanged(attrName);
+
+  if (attrName == SVGNames::azimuthAttr ||
+      attrName == SVGNames::elevationAttr || attrName == SVGNames::xAttr ||
+      attrName == SVGNames::yAttr || attrName == SVGNames::zAttr ||
+      attrName == SVGNames::pointsAtXAttr ||
+      attrName == SVGNames::pointsAtYAttr ||
+      attrName == SVGNames::pointsAtZAttr ||
+      attrName == SVGNames::specularExponentAttr ||
+      attrName == SVGNames::limitingConeAngleAttr)
+    SVGFilterElement::invalidateFilter(this);
 }
 
 void SVGFELightElement::synchronizeProperty(const QualifiedName& attrName) {
@@ -98,6 +113,17 @@ void SVGFELightElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeSpecularExponent();
   else if (attrName == SVGNames::limitingConeAngleAttr)
     synchronizeLimitingConeAngle();
+}
+
+void SVGFELightElement::childrenChanged(bool changedByParser,
+                                        Node* beforeChange,
+                                        Node* afterChange,
+                                        int childCountDelta) {
+  SVGElement::childrenChanged(changedByParser, beforeChange, afterChange,
+                              childCountDelta);
+
+  if (!changedByParser)
+    SVGFilterElement::invalidateFilter(this);
 }
 }
 

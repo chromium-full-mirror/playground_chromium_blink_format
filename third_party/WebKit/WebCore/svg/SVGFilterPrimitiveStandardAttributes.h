@@ -53,14 +53,6 @@ class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
 
   void setStandardAttributes(bool, FilterEffect*) const;
 
- protected:
-  void invalidateFilter() {
-    if (!inDocument() || !parentNode()->hasTagName(SVGNames::filterTag))
-      return;
-    if (RenderObject* object = parentNode()->renderer())
-      object->setNeedsLayout(true);
-  }
-
  private:
   DECLARE_ANIMATED_PROPERTY(SVGFilterPrimitiveStandardAttributes,
                             SVGNames::xAttr,
