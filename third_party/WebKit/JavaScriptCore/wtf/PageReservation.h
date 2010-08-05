@@ -247,7 +247,7 @@ inline PageReservation PageReservation::systemReserve(size_t size,
   DWORD protection =
       executable ? (writable ? PAGE_EXECUTE_READWRITE : PAGE_EXECUTE_READ)
                  : (writable ? PAGE_READWRITE : PAGE_READONLY);
-  PageReservation reservation(VirtualAlloc(0, size, MEM_RESERVE, m_protection),
+  PageReservation reservation(VirtualAlloc(0, size, MEM_RESERVE, protection),
                               size);
   reservation.m_protection = protection;
   return reservation;
