@@ -34,7 +34,6 @@ typedef struct _GCond GCond;
 typedef struct _GMutex GMutex;
 typedef struct _GPatternSpec GPatternSpec;
 typedef struct _GDir GDir;
-typedef struct _GHashTable GHashTable;
 typedef struct _GFile GFile;
 extern "C" void g_free(void*);
 
@@ -54,8 +53,6 @@ template <>
 void freeOwnedGPtr<GPatternSpec>(GPatternSpec*);
 template <>
 void freeOwnedGPtr<GDir>(GDir*);
-template <>
-void freeOwnedGPtr<GHashTable>(GHashTable*);
 template <>
 void freeOwnedGPtr<GFile>(GFile*);
 
