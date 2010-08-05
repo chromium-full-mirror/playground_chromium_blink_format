@@ -260,10 +260,13 @@ class CodeBlock : public FastAllocBase {
  protected:
   CodeBlock(ScriptExecutable* ownerExecutable,
             CodeType,
+            JSGlobalObject*,
             PassRefPtr<SourceProvider>,
             unsigned sourceOffset,
             SymbolTable* symbolTable,
             bool isConstructor);
+
+  JSGlobalObject* m_globalObject;
 
  public:
   virtual ~CodeBlock();
@@ -566,6 +569,8 @@ class CodeBlock : public FastAllocBase {
     return m_rareData->m_regexps[index].get();
   }
 
+  JSGlobalObject* globalObject() { return m_globalObject; }
+
   // Jump Tables
 
   size_t numberOfImmediateSwitchJumpTables() const {
@@ -735,16 +740,16 @@ class GlobalCodeBlock : public CodeBlock {
  public:
   GlobalCodeBlock(ScriptExecutable* ownerExecutable,
                   CodeType codeType,
+                  JSGlobalObject* globalObject,
                   PassRefPtr<SourceProvider> sourceProvider,
-                  unsigned sourceOffset,
-                  JSGlobalObject* globalObject)
+                  unsigned sourceOffset)
       : CodeBlock(ownerExecutable,
                   codeType,
+                  globalObject,
                   sourceProvider,
                   sourceOffset,
                   &m_unsharedSymbolTable,
-                  false),
-        m_globalObject(globalObject) {
+                  false) {
     m_globalObject->codeBlocks().add(this);
   }
 
@@ -756,8 +761,6 @@ class GlobalCodeBlock : public CodeBlock {
   void clearGlobalObject() { m_globalObject = 0; }
 
  private:
-  JSGlobalObject* m_globalObject;  // For program and eval nodes, the global
-                                   // object that marks the constant pool.
   SymbolTable m_unsharedSymbolTable;
 };
 
@@ -769,9 +772,9 @@ class ProgramCodeBlock : public GlobalCodeBlock {
                    PassRefPtr<SourceProvider> sourceProvider)
       : GlobalCodeBlock(ownerExecutable,
                         codeType,
+                        globalObject,
                         sourceProvider,
-                        0,
-                        globalObject) {}
+                        0) {}
 };
 
 class EvalCodeBlock : public GlobalCodeBlock {
@@ -782,9 +785,9 @@ class EvalCodeBlock : public GlobalCodeBlock {
                 int baseScopeDepth)
       : GlobalCodeBlock(ownerExecutable,
                         EvalCode,
+                        globalObject,
                         sourceProvider,
-                        0,
-                        globalObject),
+                        0),
         m_baseScopeDepth(baseScopeDepth) {}
 
   int baseScopeDepth() const { return m_baseScopeDepth; }
@@ -812,11 +815,13 @@ class FunctionCodeBlock : public CodeBlock {
   // in the destructor.
   FunctionCodeBlock(FunctionExecutable* ownerExecutable,
                     CodeType codeType,
+                    JSGlobalObject* globalObject,
                     PassRefPtr<SourceProvider> sourceProvider,
                     unsigned sourceOffset,
                     bool isConstructor)
       : CodeBlock(ownerExecutable,
                   codeType,
+                  globalObject,
                   sourceProvider,
                   sourceOffset,
                   SharedSymbolTable::create().releaseRef(),

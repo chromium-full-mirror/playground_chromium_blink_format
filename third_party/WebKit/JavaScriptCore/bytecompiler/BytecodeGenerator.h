@@ -703,6 +703,9 @@ class BytecodeGenerator : public FastAllocBase {
   JSGlobalData* m_globalData;
 
   OpcodeID m_lastOpcodeID;
+#ifndef NDEBUG
+  size_t m_lastOpcodePosition;
+#endif
 
   unsigned m_emitNodeDepth;
 

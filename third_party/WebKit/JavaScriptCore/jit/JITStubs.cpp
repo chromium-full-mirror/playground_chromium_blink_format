@@ -2819,9 +2819,10 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_resolve_global) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   CallFrame* callFrame = stackFrame.callFrame;
-  JSGlobalObject* globalObject = stackFrame.args[0].globalObject();
-  Identifier& ident = stackFrame.args[1].identifier();
-  unsigned globalResolveInfoIndex = stackFrame.args[2].int32();
+  CodeBlock* codeBlock = callFrame->codeBlock();
+  JSGlobalObject* globalObject = codeBlock->globalObject();
+  Identifier& ident = stackFrame.args[0].identifier();
+  unsigned globalResolveInfoIndex = stackFrame.args[1].int32();
   ASSERT(globalObject->isGlobalObject());
 
   PropertySlot slot(globalObject);
@@ -2831,7 +2832,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_resolve_global) {
         !globalObject->structure()->isUncacheableDictionary() &&
         slot.slotBase() == globalObject) {
       GlobalResolveInfo& globalResolveInfo =
-          callFrame->codeBlock()->globalResolveInfo(globalResolveInfoIndex);
+          codeBlock->globalResolveInfo(globalResolveInfoIndex);
       if (globalResolveInfo.structure)
         globalResolveInfo.structure->deref();
       globalObject->structure()->ref();
@@ -2844,10 +2845,9 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_resolve_global) {
     return JSValue::encode(result);
   }
 
-  unsigned vPCIndex =
-      callFrame->codeBlock()->bytecodeOffset(callFrame, STUB_RETURN_ADDRESS);
-  stackFrame.globalData->exception = createUndefinedVariableError(
-      callFrame, ident, vPCIndex, callFrame->codeBlock());
+  unsigned vPCIndex = codeBlock->bytecodeOffset(callFrame, STUB_RETURN_ADDRESS);
+  stackFrame.globalData->exception =
+      createUndefinedVariableError(callFrame, ident, vPCIndex, codeBlock);
   VM_THROW_EXCEPTION();
 }
 

@@ -230,7 +230,12 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
       m_nextConstantOffset(0),
       m_globalConstantIndex(0),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
-      m_lastOpcodeID(op_end),
+      m_lastOpcodeID(op_end)
+#ifndef NDEBUG
+      ,
+      m_lastOpcodePosition(0)
+#endif
+      ,
       m_emitNodeDepth(0),
       m_usesExceptions(false),
       m_regeneratingForExceptionInfo(false),
@@ -637,6 +642,13 @@ PassRefPtr<Label> BytecodeGenerator::emitLabel(Label* l0) {
 }
 
 void BytecodeGenerator::emitOpcode(OpcodeID opcodeID) {
+#ifndef NDEBUG
+  size_t opcodePosition = instructions().size();
+  ASSERT(opcodePosition - m_lastOpcodePosition ==
+             opcodeLength(m_lastOpcodeID) ||
+         m_lastOpcodeID == op_end);
+  m_lastOpcodePosition = opcodePosition;
+#endif
   instructions().append(globalData()->interpreter->getOpcode(opcodeID));
   m_lastOpcodeID = opcodeID;
 }
@@ -661,11 +673,13 @@ void BytecodeGenerator::retrieveLastUnaryOp(int& dstIndex, int& srcIndex) {
 void ALWAYS_INLINE BytecodeGenerator::rewindBinaryOp() {
   ASSERT(instructions().size() >= 4);
   instructions().shrink(instructions().size() - 4);
+  m_lastOpcodeID = op_end;
 }
 
 void ALWAYS_INLINE BytecodeGenerator::rewindUnaryOp() {
   ASSERT(instructions().size() >= 3);
   instructions().shrink(instructions().size() - 3);
+  m_lastOpcodeID = op_end;
 }
 
 PassRefPtr<Label> BytecodeGenerator::emitJump(Label* target) {
@@ -1174,7 +1188,6 @@ RegisterID* BytecodeGenerator::emitResolve(RegisterID* dst,
     emitOpcode(requiresDynamicChecks ? op_resolve_global_dynamic
                                      : op_resolve_global);
     instructions().append(dst->index());
-    instructions().append(globalObject);
     instructions().append(addConstant(property));
     instructions().append(0);
     instructions().append(0);
@@ -1212,7 +1225,6 @@ RegisterID* BytecodeGenerator::emitGetScopedVar(RegisterID* dst,
   if (globalObject) {
     emitOpcode(op_get_global_var);
     instructions().append(dst->index());
-    instructions().append(asCell(globalObject));
     instructions().append(index);
     return dst;
   }
@@ -1230,7 +1242,6 @@ RegisterID* BytecodeGenerator::emitPutScopedVar(size_t depth,
                                                 JSValue globalObject) {
   if (globalObject) {
     emitOpcode(op_put_global_var);
-    instructions().append(asCell(globalObject));
     instructions().append(index);
     instructions().append(value->index());
     return value;
@@ -1310,7 +1321,6 @@ RegisterID* BytecodeGenerator::emitResolveWithBase(RegisterID* baseDst,
   emitOpcode(requiresDynamicChecks ? op_resolve_global_dynamic
                                    : op_resolve_global);
   instructions().append(propDst->index());
-  instructions().append(globalObject);
   instructions().append(addConstant(property));
   instructions().append(0);
   instructions().append(0);

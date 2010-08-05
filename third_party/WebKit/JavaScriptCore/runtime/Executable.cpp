@@ -213,7 +213,8 @@ JSObject* FunctionExecutable::compileForCallInternal(
 
   ASSERT(!m_codeBlockForCall);
   m_codeBlockForCall = adoptPtr(new FunctionCodeBlock(
-      this, FunctionCode, source().provider(), source().startOffset(), false));
+      this, FunctionCode, globalObject, source().provider(),
+      source().startOffset(), false));
   OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
       body.get(), globalObject->debugger(), scopeChain,
       m_codeBlockForCall->symbolTable(), m_codeBlockForCall.get())));
@@ -264,8 +265,9 @@ JSObject* FunctionExecutable::compileForConstructInternal(
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
   ASSERT(!m_codeBlockForConstruct);
-  m_codeBlockForConstruct = adoptPtr(new FunctionCodeBlock(
-      this, FunctionCode, source().provider(), source().startOffset(), true));
+  m_codeBlockForConstruct = adoptPtr(
+      new FunctionCodeBlock(this, FunctionCode, globalObject,
+                            source().provider(), source().startOffset(), true));
   OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
       body.get(), globalObject->debugger(), scopeChain,
       m_codeBlockForConstruct->symbolTable(), m_codeBlockForConstruct.get())));
@@ -321,8 +323,8 @@ PassOwnPtr<ExceptionInfo> FunctionExecutable::reparseExceptionInfo(
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
   OwnPtr<CodeBlock> newCodeBlock(adoptPtr(new FunctionCodeBlock(
-      this, FunctionCode, source().provider(), source().startOffset(),
-      codeBlock->m_isConstructor)));
+      this, FunctionCode, globalObject, source().provider(),
+      source().startOffset(), codeBlock->m_isConstructor)));
   globalData->functionCodeBlockBeingReparsed = newCodeBlock.get();
 
   OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
