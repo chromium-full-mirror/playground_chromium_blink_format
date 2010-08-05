@@ -59,7 +59,7 @@ class QWebPageClient {
 #endif
 
 #if QT_VERSION >= 0x040600
-  virtual void setInputMethodHint(Qt::InputMethodHint hint, bool enable) = 0;
+  virtual void setInputMethodHints(Qt::InputMethodHints hint) = 0;
 #endif
 
 #ifndef QT_NO_CURSOR

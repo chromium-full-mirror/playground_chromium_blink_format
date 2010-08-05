@@ -55,7 +55,7 @@ class PageClientQWidget : public QWebPageClient {
   virtual void setInputMethodEnabled(bool enable);
   virtual bool inputMethodEnabled() const;
 #if QT_VERSION >= 0x040600
-  virtual void setInputMethodHint(Qt::InputMethodHint hint, bool enable);
+  virtual void setInputMethodHints(Qt::InputMethodHints hints);
 #endif
 
 #ifndef QT_NO_CURSOR
@@ -141,7 +141,7 @@ class PageClientQGraphicsWidget : public QWebPageClient {
   virtual void setInputMethodEnabled(bool enable);
   virtual bool inputMethodEnabled() const;
 #if QT_VERSION >= 0x040600
-  virtual void setInputMethodHint(Qt::InputMethodHint hint, bool enable);
+  virtual void setInputMethodHints(Qt::InputMethodHints hints);
 #endif
 
 #ifndef QT_NO_CURSOR
