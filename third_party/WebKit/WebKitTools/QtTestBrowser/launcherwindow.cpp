@@ -214,7 +214,7 @@ void LauncherWindow::createChrome() {
 
   QMenu* graphicsViewMenu = toolsMenu->addMenu("QGraphicsView");
   QAction* toggleGraphicsView = graphicsViewMenu->addAction(
-      "Toggle use of QGraphicsView", this, SLOT(initializeView(bool)));
+      "Toggle use of QGraphicsView", this, SLOT(initializeView()));
   toggleGraphicsView->setCheckable(true);
   toggleGraphicsView->setChecked(isGraphicsBased());
 
