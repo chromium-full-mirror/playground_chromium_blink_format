@@ -58,14 +58,10 @@ ComplexTextController::ComplexTextRun::ComplexTextRun(
   m_glyphCount = CTRunGetGlyphCount(m_coreTextRun.get());
   m_coreTextIndices = CTRunGetStringIndicesPtr(m_coreTextRun.get());
   if (!m_coreTextIndices) {
-    m_coreTextIndicesData.adoptCF(CFDataCreateMutable(
-        kCFAllocatorDefault, m_glyphCount * sizeof(CFIndex)));
-    CFDataIncreaseLength(m_coreTextIndicesData.get(),
-                         m_glyphCount * sizeof(CFIndex));
-    m_coreTextIndices = reinterpret_cast<const CFIndex*>(
-        CFDataGetMutableBytePtr(m_coreTextIndicesData.get()));
+    m_coreTextIndicesVector.grow(m_glyphCount);
     CTRunGetStringIndices(m_coreTextRun.get(), CFRangeMake(0, 0),
-                          const_cast<CFIndex*>(m_coreTextIndices));
+                          m_coreTextIndicesVector.data());
+    m_coreTextIndices = m_coreTextIndicesVector.data();
   }
 
   m_glyphs = CTRunGetGlyphsPtr(m_coreTextRun.get());
@@ -91,10 +87,10 @@ ComplexTextController::ComplexTextRun::ComplexTextRun(
 // order to match the fast text code path.
 void ComplexTextController::ComplexTextRun::createTextRunFromFontDataCoreText(
     bool ltr) {
-  Vector<CFIndex, 16> indices;
+  m_coreTextIndicesVector.reserveInitialCapacity(m_stringLength);
   unsigned r = 0;
   while (r < m_stringLength) {
-    indices.append(r);
+    m_coreTextIndicesVector.uncheckedAppend(r);
     if (U_IS_SURROGATE(m_characters[r])) {
       ASSERT(r + 1 < m_stringLength);
       ASSERT(U_IS_SURROGATE_LEAD(m_characters[r]));
@@ -103,19 +99,13 @@ void ComplexTextController::ComplexTextRun::createTextRunFromFontDataCoreText(
     } else
       r++;
   }
-  m_glyphCount = indices.size();
+  m_glyphCount = m_coreTextIndicesVector.size();
   if (!ltr) {
     for (unsigned r = 0, end = m_glyphCount - 1; r < m_glyphCount / 2;
          ++r, --end)
-      std::swap(indices[r], indices[end]);
+      std::swap(m_coreTextIndicesVector[r], m_coreTextIndicesVector[end]);
   }
-  m_coreTextIndicesData.adoptCF(
-      CFDataCreateMutable(kCFAllocatorDefault, m_glyphCount * sizeof(CFIndex)));
-  CFDataAppendBytes(m_coreTextIndicesData.get(),
-                    reinterpret_cast<const UInt8*>(indices.data()),
-                    m_glyphCount * sizeof(CFIndex));
-  m_coreTextIndices = reinterpret_cast<const CFIndex*>(
-      CFDataGetBytePtr(m_coreTextIndicesData.get()));
+  m_coreTextIndices = m_coreTextIndicesVector.data();
 
   // Synthesize a run of missing glyphs.
   m_glyphsVector.fill(0, m_glyphCount);
@@ -149,7 +139,7 @@ void ComplexTextController::collectComplexTextRunsForCharactersCoreText(
                                         fontData->getCFStringAttributes(
                                             m_font.typesettingFeatures())));
 
-  RetainPtr<CTTypesetterRef> typesetter;
+  RetainPtr<CTLineRef> line;
 
   if (!m_mayUseNaturalWritingDirection || m_run.directionalOverride()) {
     static const void* optionKeys[] = {kCTTypesetterOptionForcedEmbeddingLevel};
@@ -169,15 +159,15 @@ void ComplexTextController::collectComplexTextRunsForCharactersCoreText(
         kCFAllocatorDefault, optionKeys, rtlOptionValues,
         sizeof(optionKeys) / sizeof(*optionKeys),
         &kCFCopyStringDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-    typesetter.adoptCF(CTTypesetterCreateWithAttributedStringAndOptions(
-        attributedString.get(),
-        m_run.ltr() ? ltrTypesetterOptions : rtlTypesetterOptions));
-  } else
-    typesetter.adoptCF(
-        CTTypesetterCreateWithAttributedString(attributedString.get()));
+    RetainPtr<CTTypesetterRef> typesetter(
+        AdoptCF,
+        CTTypesetterCreateWithAttributedStringAndOptions(
+            attributedString.get(),
+            m_run.ltr() ? ltrTypesetterOptions : rtlTypesetterOptions));
 
-  RetainPtr<CTLineRef> line(
-      AdoptCF, CTTypesetterCreateLine(typesetter.get(), CFRangeMake(0, 0)));
+    line.adoptCF(CTTypesetterCreateLine(typesetter.get(), CFRangeMake(0, 0)));
+  } else
+    line.adoptCF(CTLineCreateWithAttributedString(attributedString.get()));
 
   CFArrayRef runArray = CTLineGetGlyphRuns(line.get());
 
