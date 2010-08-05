@@ -395,6 +395,11 @@ void LayoutTestController::setGeolocationPermission(bool allow) {
   setGeolocationPermissionCommon(allow);
 }
 
+void LayoutTestController::setMockSpeechInputResult(JSStringRef result) {
+  // FIXME: Implement for speech input layout tests.
+  // See https://bugs.webkit.org/show_bug.cgi?id=39485.
+}
+
 void LayoutTestController::setIconDatabaseEnabled(bool iconDatabaseEnabled) {
   // See also <rdar://problem/6480108>
   COMPtr<IWebIconDatabase> iconDatabase;

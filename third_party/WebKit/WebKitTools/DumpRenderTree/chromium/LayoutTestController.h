@@ -46,6 +46,13 @@
 #include "public/WebString.h"
 #include "public/WebURL.h"
 #include <wtf/Deque.h>
+#include <wtf/OwnPtr.h>
+
+namespace WebKit {
+class WebSpeechInputController;
+class WebSpeechInputControllerMock;
+class WebSpeechInputListener;
+}
 
 class TestShell;
 
@@ -301,10 +308,15 @@ class LayoutTestController : public CppBoundClass {
   // LayoutTestController.
   void abortModal(const CppArgumentList&, CppVariant*);
 
+  // Speech input related functions.
+  void setMockSpeechInputResult(const CppArgumentList&, CppVariant*);
+
  public:
   // The following methods are not exposed to JavaScript.
   void setWorkQueueFrozen(bool frozen) { m_workQueue.setFrozen(frozen); }
 
+  WebKit::WebSpeechInputController* speechInputController(
+      WebKit::WebSpeechInputListener*);
   bool shouldDumpAsText() { return m_dumpAsText; }
   bool shouldDumpEditingCallbacks() { return m_dumpEditingCallbacks; }
   bool shouldDumpFrameLoadCallbacks() { return m_dumpFrameLoadCallbacks; }
@@ -486,6 +498,8 @@ class LayoutTestController : public CppBoundClass {
   CppVariant m_webHistoryItemCount;
 
   WebKit::WebURL m_userStyleSheetLocation;
+
+  OwnPtr<WebKit::WebSpeechInputControllerMock> m_speechInputControllerMock;
 };
 
 #endif  // LayoutTestController_h

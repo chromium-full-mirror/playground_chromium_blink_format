@@ -1515,6 +1515,26 @@ static JSValueRef setMockGeolocationErrorCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setMockSpeechInputResultCallback(JSContextRef context,
+                                                   JSObjectRef function,
+                                                   JSObjectRef thisObject,
+                                                   size_t argumentCount,
+                                                   const JSValueRef arguments[],
+                                                   JSValueRef* exception) {
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  JSRetainPtr<JSStringRef> result(
+      Adopt, JSValueToStringCopy(context, arguments[0], exception));
+  ASSERT(!*exception);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setMockSpeechInputResult(result.get());
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setNewWindowsCopyBackForwardListCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -2846,6 +2866,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setMockGeolocationError", setMockGeolocationErrorCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setMockGeolocationPosition", setMockGeolocationPositionCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setMockSpeechInputResult", setMockSpeechInputResultCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setNewWindowsCopyBackForwardList",
        setNewWindowsCopyBackForwardListCallback,
