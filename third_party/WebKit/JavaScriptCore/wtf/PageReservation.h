@@ -83,10 +83,8 @@ class PageReservation : private PageAllocation {
 
   bool commit(void* start, size_t size) {
     ASSERT(m_base);
-    // size must be a multiple of pageSize.
-    ASSERT(!(size & (pageSize() - 1)));
-    // address must be aligned to pageSize.
-    ASSERT(!(reinterpret_cast<intptr_t>(start) & (pageSize() - 1)));
+    ASSERT(isPageAligned(start));
+    ASSERT(isPageAligned(size));
 
     bool commited = systemCommit(start, size);
 #ifndef NDEBUG
@@ -97,10 +95,8 @@ class PageReservation : private PageAllocation {
   }
   void decommit(void* start, size_t size) {
     ASSERT(m_base);
-    // size must be a multiple of pageSize.
-    ASSERT(!(size & (pageSize() - 1)));
-    // address must be aligned to pageSize.
-    ASSERT(!(reinterpret_cast<intptr_t>(start) & (pageSize() - 1)));
+    ASSERT(isPageAligned(start));
+    ASSERT(isPageAligned(size));
 
 #ifndef NDEBUG
     m_committed -= size;
@@ -112,8 +108,7 @@ class PageReservation : private PageAllocation {
                                  Usage usage = UnknownUsage,
                                  bool writable = true,
                                  bool executable = false) {
-    // size must be a multiple of pageSize.
-    ASSERT(!(size & (pageSize() - 1)));
+    ASSERT(isPageAligned(size));
     return systemReserve(size, usage, writable, executable);
   }
 
@@ -124,10 +119,8 @@ class PageReservation : private PageAllocation {
                                    Usage usage = UnknownUsage,
                                    bool writable = true,
                                    bool executable = false) {
-    // size must be a multiple of pageSize.
-    ASSERT(!(size & (pageSize() - 1)));
-    // address must be aligned to pageSize.
-    ASSERT(!(reinterpret_cast<intptr_t>(address) & (pageSize() - 1)));
+    ASSERT(isPageAligned(address));
+    ASSERT(isPageAligned(size));
     return systemReserveAt(address, fixed, size, usage, writable, executable);
   }
 #endif
@@ -137,6 +130,10 @@ class PageReservation : private PageAllocation {
     ASSERT(!m_committed);
     systemDeallocate(false);
   }
+
+#ifndef NDEBUG
+  using PageAllocation::lastError;
+#endif
 
  private:
 #if OS(SYMBIAN)

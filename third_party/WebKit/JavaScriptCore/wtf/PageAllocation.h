@@ -114,8 +114,7 @@ class PageAllocation {
                                  Usage usage = UnknownUsage,
                                  bool writable = true,
                                  bool executable = false) {
-    // size must be a multiple of pageSize.
-    ASSERT(!(size & (pageSize() - 1)));
+    ASSERT(isPageAligned(size));
     return systemAllocate(size, usage, writable, executable);
   }
 
@@ -126,10 +125,8 @@ class PageAllocation {
                                    Usage usage = UnknownUsage,
                                    bool writable = true,
                                    bool executable = false) {
-    // size must be a multiple of pageSize.
-    ASSERT(!(size & (pageSize() - 1)));
-    // address must be aligned to pageSize.
-    ASSERT(!(reinterpret_cast<intptr_t>(address) & (pageSize() - 1)));
+    ASSERT(isPageAligned(address));
+    ASSERT(isPageAligned(size));
     return systemAllocateAt(address, fixed, size, usage, writable, executable);
   }
 #endif
@@ -137,10 +134,8 @@ class PageAllocation {
 #if HAVE(PAGE_ALLOCATE_ALIGNED)
   static PageAllocation allocateAligned(size_t size,
                                         Usage usage = UnknownUsage) {
-    // size must be a multiple of pageSize.
-    ASSERT(!(size & (pageSize() - 1)));
-    // size must be a power of two.
-    ASSERT(!(size & (size - 1)));
+    ASSERT(isPageAligned(size));
+    ASSERT(isPowerOfTwo(size));
     return systemAllocateAligned(size, usage);
   }
 #endif
@@ -151,13 +146,20 @@ class PageAllocation {
   }
 
   static size_t pageSize() {
-    if (!s_pageSize) {
+    if (!s_pageSize)
       s_pageSize = systemPageSize();
-      // system page size must be a power of two.
-      ASSERT(!(s_pageSize & (s_pageSize - 1)));
-    }
+    ASSERT(isPowerOfTwo(s_pageSize));
     return s_pageSize;
   }
+
+#ifndef NDEBUG
+  static bool isPageAligned(void* address) {
+    return !(reinterpret_cast<intptr_t>(address) & (pageSize() - 1));
+  }
+  static bool isPageAligned(size_t size) { return !(size & (pageSize() - 1)); }
+  static bool isPowerOfTwo(size_t size) { return !(size & (size - 1)); }
+  static int lastError();
+#endif
 
  protected:
 #if OS(SYMBIAN)
