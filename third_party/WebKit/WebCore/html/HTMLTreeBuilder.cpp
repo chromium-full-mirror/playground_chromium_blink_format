@@ -1820,12 +1820,13 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomicHTMLToken& token) {
       token.name() == buttonTag || token.name() == centerTag ||
       token.name() == detailsTag || token.name() == dirTag ||
       token.name() == divTag || token.name() == dlTag ||
-      token.name() == fieldsetTag || token.name() == figureTag ||
-      token.name() == footerTag || token.name() == headerTag ||
-      token.name() == hgroupTag || token.name() == listingTag ||
-      token.name() == menuTag || token.name() == navTag ||
-      token.name() == olTag || token.name() == preTag ||
-      token.name() == sectionTag || token.name() == ulTag) {
+      token.name() == fieldsetTag || token.name() == figcaptionTag ||
+      token.name() == figureTag || token.name() == footerTag ||
+      token.name() == headerTag || token.name() == hgroupTag ||
+      token.name() == listingTag || token.name() == menuTag ||
+      token.name() == navTag || token.name() == olTag ||
+      token.name() == preTag || token.name() == sectionTag ||
+      token.name() == summaryTag || token.name() == ulTag) {
     if (!m_tree.openElements()->inScope(token.name())) {
       parseError(token);
       return;
