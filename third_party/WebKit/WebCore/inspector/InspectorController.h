@@ -339,6 +339,7 @@ class InspectorController
   InjectedScript injectedScriptForNodeId(long id);
   void addScriptToEvaluateOnLoad(const String& source);
   void removeAllScriptsToEvaluateOnLoad();
+  void setInspectorExtensionAPI(const String& source);
 
   static const String& inspectorStartsAttachedSettingName();
 
@@ -467,6 +468,7 @@ class InspectorController
 
   Vector<pair<long, String>> m_pendingEvaluateTestCommands;
   Vector<String> m_scriptsToEvaluateOnLoad;
+  String m_inspectorExtensionAPI;
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   bool m_debuggerEnabled;
   bool m_attachDebuggerWhenShown;
