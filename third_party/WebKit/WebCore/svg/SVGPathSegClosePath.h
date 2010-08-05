@@ -23,9 +23,11 @@
 
 #if ENABLE(SVG)
 
+#include "PlatformString.h"
 #include "SVGPathSeg.h"
 
 namespace WebCore {
+
 class SVGPathSegClosePath : public SVGPathSeg {
  public:
   static PassRefPtr<SVGPathSegClosePath> create() {
@@ -45,5 +47,3 @@ class SVGPathSegClosePath : public SVGPathSeg {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

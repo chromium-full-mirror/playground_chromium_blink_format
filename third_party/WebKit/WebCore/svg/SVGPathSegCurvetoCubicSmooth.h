@@ -23,6 +23,7 @@
 
 #if ENABLE(SVG)
 
+#include "PlatformString.h"
 #include "SVGPathSeg.h"
 
 namespace WebCore {
@@ -96,5 +97,3 @@ class SVGPathSegCurvetoCubicSmoothRel : public SVGPathSegCurvetoCubicSmooth {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet
