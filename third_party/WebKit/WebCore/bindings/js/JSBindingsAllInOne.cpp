@@ -140,7 +140,6 @@
 #include "JavaScriptCallFrame.cpp"
 #include "MemoryInfo.cpp"
 #include "ScheduledAction.cpp"
-#include "ScriptArray.cpp"
 #include "ScriptCachedFrameData.cpp"
 #include "ScriptCallFrame.cpp"
 #include "ScriptCallStack.cpp"
