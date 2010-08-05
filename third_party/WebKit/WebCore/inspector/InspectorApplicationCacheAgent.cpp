@@ -36,17 +36,16 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "InspectorController.h"
-#include "InspectorFrontend.h"
+#include "InspectorValues.h"
 #include "Page.h"
+#include "RemoteInspectorFrontend.h"
 #include "ResourceResponse.h"
-#include "ScriptArray.h"
-#include "ScriptObject.h"
 
 namespace WebCore {
 
 InspectorApplicationCacheAgent::InspectorApplicationCacheAgent(
     InspectorController* inspectorController,
-    InspectorFrontend* frontend)
+    RemoteInspectorFrontend* frontend)
     : m_inspectorController(inspectorController), m_frontend(frontend) {}
 
 void InspectorApplicationCacheAgent::didReceiveManifestResponse(
@@ -69,57 +68,57 @@ void InspectorApplicationCacheAgent::getApplicationCaches(long callId) {
                                        ->mainFrame()
                                        ->loader()
                                        ->documentLoader();
-  if (!documentLoader) {
-    m_frontend->didGetApplicationCaches(callId, ScriptValue::undefined());
-    return;
-  }
+  RefPtr<InspectorValue> applicationCaches;
+  if (documentLoader) {
+    ApplicationCacheHost* host = documentLoader->applicationCacheHost();
+    ApplicationCacheHost::CacheInfo info = host->applicationCacheInfo();
 
-  ApplicationCacheHost* host = documentLoader->applicationCacheHost();
-  ApplicationCacheHost::CacheInfo info = host->applicationCacheInfo();
+    ApplicationCacheHost::ResourceInfoList resources;
+    host->fillResourceList(&resources);
+    applicationCaches = buildObjectForApplicationCache(resources, info);
+  } else
+    applicationCaches = InspectorValue::null();
 
-  ApplicationCacheHost::ResourceInfoList resources;
-  host->fillResourceList(&resources);
-
-  m_frontend->didGetApplicationCaches(
-      callId, buildObjectForApplicationCache(resources, info));
+  m_frontend->didGetApplicationCaches(callId, applicationCaches);
 }
 
-ScriptObject InspectorApplicationCacheAgent::buildObjectForApplicationCache(
+PassRefPtr<InspectorObject>
+InspectorApplicationCacheAgent::buildObjectForApplicationCache(
     const ApplicationCacheHost::ResourceInfoList& applicationCacheResources,
     const ApplicationCacheHost::CacheInfo& applicationCacheInfo) {
-  ScriptObject value = m_frontend->newScriptObject();
-  value.set("size", applicationCacheInfo.m_size);
-  value.set("manifest", applicationCacheInfo.m_manifest.string());
-  value.set("lastPathComponent",
-            applicationCacheInfo.m_manifest.lastPathComponent());
-  value.set("creationTime", applicationCacheInfo.m_creationTime);
-  value.set("updateTime", applicationCacheInfo.m_updateTime);
-  value.set("resources",
-            buildArrayForApplicationCacheResources(applicationCacheResources));
+  RefPtr<InspectorObject> value = InspectorObject::create();
+  value->setNumber("size", applicationCacheInfo.m_size);
+  value->setString("manifest", applicationCacheInfo.m_manifest.string());
+  value->setString("lastPathComponent",
+                   applicationCacheInfo.m_manifest.lastPathComponent());
+  value->setNumber("creationTime", applicationCacheInfo.m_creationTime);
+  value->setNumber("updateTime", applicationCacheInfo.m_updateTime);
+  value->set("resources",
+             buildArrayForApplicationCacheResources(applicationCacheResources));
   return value;
 }
 
-ScriptArray
+PassRefPtr<InspectorArray>
 InspectorApplicationCacheAgent::buildArrayForApplicationCacheResources(
     const ApplicationCacheHost::ResourceInfoList& applicationCacheResources) {
-  ScriptArray resources = m_frontend->newScriptArray();
+  RefPtr<InspectorArray> resources = InspectorArray::create();
 
   ApplicationCacheHost::ResourceInfoList::const_iterator end =
       applicationCacheResources.end();
   ApplicationCacheHost::ResourceInfoList::const_iterator it =
       applicationCacheResources.begin();
   for (int i = 0; it != end; ++it, i++)
-    resources.set(i, buildObjectForApplicationCacheResource(*it));
+    resources->push(buildObjectForApplicationCacheResource(*it));
 
   return resources;
 }
 
-ScriptObject
+PassRefPtr<InspectorObject>
 InspectorApplicationCacheAgent::buildObjectForApplicationCacheResource(
     const ApplicationCacheHost::ResourceInfo& resourceInfo) {
-  ScriptObject value = m_frontend->newScriptObject();
-  value.set("name", resourceInfo.m_resource.string());
-  value.set("size", resourceInfo.m_size);
+  RefPtr<InspectorObject> value = InspectorObject::create();
+  value->setString("name", resourceInfo.m_resource.string());
+  value->setNumber("size", resourceInfo.m_size);
 
   String types;
   if (resourceInfo.m_isMaster)
@@ -137,7 +136,7 @@ InspectorApplicationCacheAgent::buildObjectForApplicationCacheResource(
   if (resourceInfo.m_isExplicit)
     types.append("Explicit ");
 
-  value.set("type", types);
+  value->setString("type", types);
   return value;
 }
 
