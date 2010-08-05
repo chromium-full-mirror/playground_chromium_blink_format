@@ -36,7 +36,8 @@ enum ViewportErrorCode {
   DeviceWidthShouldBeUsedWarning,
   DeviceHeightShouldBeUsedWarning,
   UnrecognizedViewportArgumentError,
-  MaximumScaleTooLargeError
+  MaximumScaleTooLargeError,
+  TargetDensityDpiTooSmallOrLargeError
 };
 
 struct ViewportArguments {
@@ -48,6 +49,7 @@ struct ViewportArguments {
         maximumScale(ValueUndefined),
         width(ValueUndefined),
         height(ValueUndefined),
+        targetDensityDpi(ValueUndefined),
         userScalable(ValueUndefined) {}
 
   float initialScale;
@@ -55,13 +57,15 @@ struct ViewportArguments {
   float maximumScale;
   float width;
   float height;
+  float targetDensityDpi;
 
   float userScalable;
 
   bool hasCustomArgument() const {
     return initialScale != ValueUndefined || minimumScale != ValueUndefined ||
            maximumScale != ValueUndefined || width != ValueUndefined ||
-           height != ValueUndefined || userScalable != ValueUndefined;
+           height != ValueUndefined || userScalable != ValueUndefined ||
+           targetDensityDpi != ValueUndefined;
   }
 };
 

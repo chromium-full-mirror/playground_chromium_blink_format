@@ -56,6 +56,20 @@ void setViewportFeature(const String& keyString,
     didUseConstants = true;
     if (document->page())
       value = document->page()->chrome()->windowRect().height();
+  } else if (equalIgnoringCase(valueString, "device-dpi")) {
+    didUseConstants = true;
+    // Default of today is 160dpi, resulting in a scaleFactor of 1.0.
+    if (document->page())
+      value = 160 * document->page()->chrome()->scaleFactor();
+  } else if (equalIgnoringCase(valueString, "low-dpi")) {
+    didUseConstants = true;
+    value = 120;
+  } else if (equalIgnoringCase(valueString, "medium-dpi")) {
+    didUseConstants = true;
+    value = 160;
+  } else if (equalIgnoringCase(valueString, "high-dpi")) {
+    didUseConstants = true;
+    value = 240;
   } else if (equalIgnoringCase(valueString, "default"))  // This allows us to
                                                          // distinguish the
                                                          // omission of a key
@@ -100,8 +114,13 @@ void setViewportFeature(const String& keyString,
              !didUseConstants)
       reportViewportWarning(document, DeviceHeightShouldBeUsedWarning,
                             keyString);
-
     arguments->height = value;
+  } else if (keyString == "target-densitydpi" ||
+             keyString == "target-densityDpi") {
+    if (!didUseConstants && (value < 70 || value > 400))
+      reportViewportWarning(document, TargetDensityDpiTooSmallOrLargeError,
+                            keyString);
+    arguments->targetDensityDpi = value;
   } else
     reportViewportWarning(document, UnrecognizedViewportArgumentError,
                           keyString);
@@ -115,7 +134,10 @@ static const char* viewportErrorMessageTemplate(ViewportErrorCode errorCode) {
       "\"device-height\" constant instead for future compatibility.",
       "Viewport argument \"%replacement\" not recognized. Content ignored.",
       "Viewport maximum-scale cannot be larger than 10.0.  The maximum-scale "
-      "will be set to 10.0."};
+      "will be set to 10.0.",
+      "Viewport target-densitydpi has to take a number between 70 and 400 as a "
+      "valid target dpi, try using \"device-dpi\", \"low-dpi\", \"medium-dpi\" "
+      "or \"high-dpi\" instead for future compatibility."};
 
   return errors[errorCode];
 }
