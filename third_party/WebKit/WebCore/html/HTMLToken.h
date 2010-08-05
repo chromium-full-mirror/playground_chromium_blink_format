@@ -234,7 +234,7 @@ class HTMLToken : public Noncopyable {
   // want to end up with a cleaner interface between the two classes.
   friend class AtomicHTMLToken;
 
-  class DoctypeData {
+  class DoctypeData : public Noncopyable {
    public:
     DoctypeData()
         : m_hasPublicIdentifier(false),
