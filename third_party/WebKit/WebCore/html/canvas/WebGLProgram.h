@@ -57,7 +57,7 @@ class WebGLProgram : public WebGLObject {
  protected:
   WebGLProgram(WebGLRenderingContext*);
 
-  virtual void _deleteObject(Platform3DObject);
+  virtual void deleteObjectImpl(Platform3DObject);
 
  private:
   virtual bool isProgram() const { return true; }

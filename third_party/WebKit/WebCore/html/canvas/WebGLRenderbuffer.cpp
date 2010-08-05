@@ -28,6 +28,7 @@
 #if ENABLE(3D_CANVAS)
 
 #include "WebGLRenderbuffer.h"
+
 #include "WebGLRenderingContext.h"
 
 namespace WebCore {
@@ -44,7 +45,7 @@ WebGLRenderbuffer::WebGLRenderbuffer(WebGLRenderingContext* ctx)
   setObject(context()->graphicsContext3D()->createRenderbuffer());
 }
 
-void WebGLRenderbuffer::_deleteObject(Platform3DObject object) {
+void WebGLRenderbuffer::deleteObjectImpl(Platform3DObject object) {
   context()->graphicsContext3D()->deleteRenderbuffer(object);
 }
 }

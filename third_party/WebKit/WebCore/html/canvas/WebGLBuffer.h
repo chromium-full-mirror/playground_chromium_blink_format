@@ -26,8 +26,8 @@
 #ifndef WebGLBuffer_h
 #define WebGLBuffer_h
 
-#include "WebGLObject.h"
 #include "ArrayBuffer.h"
+#include "WebGLObject.h"
 
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -63,7 +63,7 @@ class WebGLBuffer : public WebGLObject {
  protected:
   WebGLBuffer(WebGLRenderingContext*);
 
-  virtual void _deleteObject(Platform3DObject o);
+  virtual void deleteObjectImpl(Platform3DObject o);
 
  private:
   virtual bool isBuffer() const { return true; }

@@ -45,7 +45,7 @@ class WebGLShader : public WebGLObject {
  private:
   WebGLShader(WebGLRenderingContext*, GraphicsContext3D::WebGLEnumType);
 
-  virtual void _deleteObject(Platform3DObject);
+  virtual void deleteObjectImpl(Platform3DObject);
 
   virtual bool isShader() const { return true; }
 

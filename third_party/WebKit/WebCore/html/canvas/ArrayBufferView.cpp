@@ -28,6 +28,7 @@
 #if ENABLE(3D_CANVAS)
 
 #include "ArrayBufferView.h"
+
 #include "ArrayBuffer.h"
 
 namespace WebCore {

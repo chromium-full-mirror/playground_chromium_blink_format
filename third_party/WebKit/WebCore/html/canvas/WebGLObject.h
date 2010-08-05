@@ -26,10 +26,10 @@
 #ifndef WebGLObject_h
 #define WebGLObject_h
 
+#include "GraphicsContext3D.h"
+
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
-
-#include "GraphicsContext3D.h"
 
 namespace WebCore {
 
@@ -59,7 +59,7 @@ class WebGLObject : public RefCounted<WebGLObject> {
 
  protected:
   WebGLObject(WebGLRenderingContext*);
-  virtual void _deleteObject(Platform3DObject) = 0;
+  virtual void deleteObjectImpl(Platform3DObject) = 0;
 
  private:
   Platform3DObject m_object;

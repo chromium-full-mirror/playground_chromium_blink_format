@@ -68,7 +68,7 @@ class WebGLFramebuffer : public WebGLObject {
  protected:
   WebGLFramebuffer(WebGLRenderingContext*);
 
-  virtual void _deleteObject(Platform3DObject);
+  virtual void deleteObjectImpl(Platform3DObject);
 
  private:
   virtual bool isFramebuffer() const { return true; }

@@ -27,20 +27,18 @@
 #ifndef WebGLGetInfo_h
 #define WebGLGetInfo_h
 
-#include "wtf/PassRefPtr.h"
-#include "wtf/RefPtr.h"
-#include "PlatformString.h"
-
-#include "WebGLBuffer.h"
 #include "Float32Array.h"
-#include "WebGLFramebuffer.h"
 #include "Int32Array.h"
-// FIXME: implement WebGLObjectArray
-//#include "WebGLObjectArray.h"
+#include "PlatformString.h"
+#include "Uint8Array.h"
+#include "WebGLBuffer.h"
+#include "WebGLFramebuffer.h"
 #include "WebGLProgram.h"
 #include "WebGLRenderbuffer.h"
 #include "WebGLTexture.h"
-#include "Uint8Array.h"
+
+#include <wtf/PassRefPtr.h>
+#include <wtf/RefPtr.h>
 
 namespace WebCore {
 
@@ -74,7 +72,7 @@ class WebGLGetInfo {
   WebGLGetInfo(const bool* value, int size);
   WebGLGetInfo(float value);
   WebGLGetInfo(long value);
-  // Represents the NULL value and type
+  // Represents the null value and type.
   WebGLGetInfo();
   WebGLGetInfo(const String& value);
   WebGLGetInfo(unsigned long value);

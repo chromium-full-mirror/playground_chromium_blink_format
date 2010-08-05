@@ -29,11 +29,11 @@
 #include "CanvasRenderingContext.h"
 #include "ExceptionCode.h"
 #include "Float32Array.h"
-#include "WebGLGetInfo.h"
-#include "Int32Array.h"
-#include "Uint8Array.h"
 #include "GraphicsContext3D.h"
+#include "Int32Array.h"
 #include "PlatformString.h"
+#include "Uint8Array.h"
+#include "WebGLGetInfo.h"
 
 namespace WebCore {
 

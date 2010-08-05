@@ -50,7 +50,7 @@ class WebGLRenderbuffer : public WebGLObject {
  protected:
   WebGLRenderbuffer(WebGLRenderingContext*);
 
-  virtual void _deleteObject(Platform3DObject);
+  virtual void deleteObjectImpl(Platform3DObject);
 
  private:
   virtual bool isRenderbuffer() const { return true; }

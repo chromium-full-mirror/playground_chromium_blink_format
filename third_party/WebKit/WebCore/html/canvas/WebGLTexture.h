@@ -76,7 +76,7 @@ class WebGLTexture : public WebGLObject {
  protected:
   WebGLTexture(WebGLRenderingContext*);
 
-  virtual void _deleteObject(Platform3DObject);
+  virtual void deleteObjectImpl(Platform3DObject);
 
  private:
   virtual bool isTexture() const { return true; }
