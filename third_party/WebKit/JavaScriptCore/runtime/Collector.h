@@ -62,7 +62,7 @@ class LiveObjectIterator;
 #if OS(WINCE) || OS(SYMBIAN)
 const size_t BLOCK_SIZE = 64 * 1024;  // 64k
 #else
-const size_t BLOCK_SIZE = 64 * 4096;  // 256k
+const size_t BLOCK_SIZE = 256 * 1024;  // 256k
 #endif
 
 typedef AlignedMemoryAllocator<BLOCK_SIZE> AlignedAllocator;

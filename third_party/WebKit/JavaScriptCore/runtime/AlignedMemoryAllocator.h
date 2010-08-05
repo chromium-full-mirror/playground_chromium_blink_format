@@ -22,7 +22,7 @@
 #define AlignedMemoryAllocator_h
 
 #include <wtf/Bitmap.h>
-#include <wtf/PageAllocation.h>
+#include <wtf/PageReservation.h>
 
 namespace JSC {
 
@@ -46,7 +46,7 @@ class AlignedMemory;
 template <size_t blockSize>
 class AlignedMemoryAllocator;
 
-#if HAVE(ALIGNED_ALLOCATE)
+#if HAVE(PAGE_ALLOCATE_ALIGNED)
 
 template <size_t blockSize>
 class AlignedMemoryAllocator;
@@ -77,7 +77,8 @@ inline void AlignedMemoryAllocator<blockSize>::destroy() {}
 
 template <size_t blockSize>
 inline AlignedMemory<blockSize> AlignedMemoryAllocator<blockSize>::allocate() {
-  return AlignedMemory<blockSize>(PageAllocation::allocateAligned(blockSize));
+  return AlignedMemory<blockSize>(PageAllocation::allocateAligned(
+      blockSize, PageAllocation::JSGCHeapPages));
 }
 
 template <size_t blockSize>
@@ -126,7 +127,7 @@ class AlignedMemoryAllocator {
       AlignedMemoryAllocatorConstants::virtualMemoryReservation;
   static const size_t bitmapSize = reservationSize / blockSize;
 
-  PageAllocation m_reservation;
+  PageReservation m_reservation;
   size_t m_nextFree;
   uintptr_t m_reservationBase;
   WTF::Bitmap<bitmapSize> m_bitmap;
@@ -134,7 +135,8 @@ class AlignedMemoryAllocator {
 
 template <size_t blockSize>
 AlignedMemoryAllocator<blockSize>::AlignedMemoryAllocator()
-    : m_reservation(PageAllocation::reserve(reservationSize + blockSize)),
+    : m_reservation(PageReservation::reserve(reservationSize + blockSize,
+                                             PageAllocation::JSGCHeapPages)),
       m_nextFree(0) {
   // check that blockSize and reservationSize are powers of two
   ASSERT(!(blockSize & (blockSize - 1)));
@@ -142,7 +144,7 @@ AlignedMemoryAllocator<blockSize>::AlignedMemoryAllocator()
 
   // check that blockSize is a multiple of pageSize and that
   // reservationSize is a multiple of blockSize
-  ASSERT(!(blockSize & (PageAllocation::pagesize() - 1)));
+  ASSERT(!(blockSize & (PageAllocation::pageSize() - 1)));
   ASSERT(!(reservationSize & (blockSize - 1)));
 
   ASSERT(m_reservation);
