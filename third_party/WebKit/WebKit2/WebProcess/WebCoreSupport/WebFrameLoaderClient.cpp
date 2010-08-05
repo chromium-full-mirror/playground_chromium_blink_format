@@ -28,10 +28,7 @@
 #define DISABLE_NOT_IMPLEMENTED_WARNINGS 1
 #include "NotImplemented.h"
 
-#if PLATFORM(MAC)
 #include "NetscapePlugin.h"
-#endif
-
 #include "PluginView.h"
 #include "WebCoreArgumentCoders.h"
 #include "WebErrors.h"
@@ -861,9 +858,6 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
   if (pluginPath.isNull())
     return 0;
 
-// FIXME: This is Mac specific now because Windows doesn't have the necessary
-// parts of NetscapePluginModule implemented.
-#if PLATFORM(MAC)
   RefPtr<NetscapePluginModule> pluginModule =
       NetscapePluginModule::getOrCreate(pluginPath);
   if (!pluginModule)
@@ -878,9 +872,6 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
 
   RefPtr<Plugin> plugin = NetscapePlugin::create(pluginModule.release());
   return PluginView::create(pluginElement, plugin.release(), parameters);
-#else
-  return 0;
-#endif
 }
 
 void WebFrameLoaderClient::redirectDataToPlugin(Widget* pluginWidget) {

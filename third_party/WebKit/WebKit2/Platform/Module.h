@@ -55,6 +55,8 @@ class Module : public Noncopyable {
   WebCore::String m_path;
 #if PLATFORM(MAC)
   RetainPtr<CFBundleRef> m_bundle;
+#elif PLATFORM(WIN)
+  HMODULE m_module;
 #endif
 };
 
