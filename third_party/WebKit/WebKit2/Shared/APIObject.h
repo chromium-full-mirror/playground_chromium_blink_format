@@ -55,6 +55,7 @@ class APIObject : public RefCounted<APIObject> {
     TypeBundle,
     TypeBundleFrame,
     TypeBundlePage,
+    TypeBundleScriptWorld,
     TypeBundleNodeHandle,
 
     // Platform specific

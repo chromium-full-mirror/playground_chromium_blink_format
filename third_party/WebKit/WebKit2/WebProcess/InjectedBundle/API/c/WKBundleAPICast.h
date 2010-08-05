@@ -41,6 +41,7 @@ namespace WebKit {
 
 class InjectedBundle;
 class InjectedBundleNodeHandle;
+class InjectedBundleScriptWorld;
 class WebFrame;
 class WebPage;
 
@@ -61,6 +62,10 @@ struct BundleAPITypeInfo<WKBundleRef> {
 template <>
 struct BundleAPITypeInfo<WKBundleNodeHandleRef> {
   typedef InjectedBundleNodeHandle* ImplType;
+};
+template <>
+struct BundleAPITypeInfo<WKBundleScriptWorldRef> {
+  typedef InjectedBundleScriptWorld* ImplType;
 };
 template <>
 struct BundleAPITypeInfo<WKBundleNodeRef> {
@@ -84,6 +89,10 @@ struct BundleImplTypeInfo<InjectedBundle*> {
 template <>
 struct BundleImplTypeInfo<InjectedBundleNodeHandle*> {
   typedef WKBundleNodeHandleRef APIType;
+};
+template <>
+struct BundleImplTypeInfo<InjectedBundleScriptWorld*> {
+  typedef WKBundleScriptWorldRef APIType;
 };
 template <>
 struct BundleImplTypeInfo<WebFrame*> {
