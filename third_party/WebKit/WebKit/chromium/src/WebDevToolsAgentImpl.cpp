@@ -236,8 +236,6 @@ void WebDevToolsAgentImpl::attach() {
       ic->injectedScriptHost()->setInjectedScriptSource("(" + source + ")");
     }
   }
-
-  setInspectorFrontendProxyToInspectorController();
   m_attached = true;
 }
 
@@ -253,7 +251,13 @@ void WebDevToolsAgentImpl::detach() {
   m_apuAgentEnabled = false;
 }
 
-void WebDevToolsAgentImpl::frontendLoaded() {}
+void WebDevToolsAgentImpl::frontendLoaded() {
+  v8::HandleScope scope;
+  ScriptState* state =
+      ScriptState::forContext(v8::Local<v8::Context>::New(m_utilityContext));
+  InspectorController* ic = inspectorController();
+  ic->connectFrontend(ScriptObject(state, m_utilityContext->Global()));
+}
 
 void WebDevToolsAgentImpl::didNavigate() {
   ClientMessageLoopAdapter::didNavigate();
@@ -321,14 +325,6 @@ void WebDevToolsAgentImpl::createInspectorFrontendProxy() {
   WebCString debuggerScriptJs = m_client->debuggerScriptSource();
   WebCore::ScriptDebugServer::shared().setDebuggerScriptSource(
       WebCore::String(debuggerScriptJs.data(), debuggerScriptJs.length()));
-}
-
-void WebDevToolsAgentImpl::setInspectorFrontendProxyToInspectorController() {
-  v8::HandleScope scope;
-  ScriptState* state =
-      ScriptState::forContext(v8::Local<v8::Context>::New(m_utilityContext));
-  InspectorController* ic = inspectorController();
-  ic->connectFrontend(ScriptObject(state, m_utilityContext->Global()));
 }
 
 void WebDevToolsAgentImpl::setApuAgentEnabled(bool enabled) {

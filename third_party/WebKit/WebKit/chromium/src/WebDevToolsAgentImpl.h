@@ -116,7 +116,6 @@ class WebDevToolsAgentImpl : public WebDevToolsAgentPrivate,
   void compileUtilityScripts();
   void initDevToolsAgentHost();
   void createInspectorFrontendProxy();
-  void setInspectorFrontendProxyToInspectorController();
   void setApuAgentEnabled(bool enabled);
 
   WebCore::InspectorController* inspectorController();

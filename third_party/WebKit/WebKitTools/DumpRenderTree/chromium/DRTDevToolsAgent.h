@@ -68,7 +68,8 @@ class DRTDevToolsAgent : public WebKit::WebDevToolsAgentClient,
   void asyncCall(const DRTDevToolsCallArgs&);
 
   void attach(DRTDevToolsClient*);
-  void detach(DRTDevToolsClient*);
+  void detach();
+  void frontendLoaded();
 
   bool evaluateInWebInspector(long callID, const std::string& script);
   bool setTimelineProfilingEnabled(bool enable);
