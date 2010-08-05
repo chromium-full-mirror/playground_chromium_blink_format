@@ -78,6 +78,8 @@ static int calcScrollbarThicknessUsing(const Length& l, int containingLength) {
 }
 
 void RenderScrollbarPart::computeScrollbarWidth() {
+  if (!m_scrollbar->owningRenderer())
+    return;
   int visibleSize = m_scrollbar->owningRenderer()->width() -
                     m_scrollbar->owningRenderer()->borderLeft() -
                     m_scrollbar->owningRenderer()->borderRight();
@@ -96,6 +98,8 @@ void RenderScrollbarPart::computeScrollbarWidth() {
 }
 
 void RenderScrollbarPart::computeScrollbarHeight() {
+  if (!m_scrollbar->owningRenderer())
+    return;
   int visibleSize = m_scrollbar->owningRenderer()->height() -
                     m_scrollbar->owningRenderer()->borderTop() -
                     m_scrollbar->owningRenderer()->borderBottom();

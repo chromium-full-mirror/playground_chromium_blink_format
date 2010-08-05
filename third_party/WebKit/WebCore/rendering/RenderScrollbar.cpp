@@ -26,6 +26,8 @@
 #include "config.h"
 #include "RenderScrollbar.h"
 
+#include "Frame.h"
+#include "RenderPart.h"
 #include "RenderScrollbarPart.h"
 #include "RenderScrollbarTheme.h"
 
@@ -34,18 +36,22 @@ namespace WebCore {
 PassRefPtr<Scrollbar> RenderScrollbar::createCustomScrollbar(
     ScrollbarClient* client,
     ScrollbarOrientation orientation,
-    RenderBox* renderer) {
-  return adoptRef(new RenderScrollbar(client, orientation, renderer));
+    RenderBox* renderer,
+    Frame* owningFrame) {
+  return adoptRef(
+      new RenderScrollbar(client, orientation, renderer, owningFrame));
 }
 
 RenderScrollbar::RenderScrollbar(ScrollbarClient* client,
                                  ScrollbarOrientation orientation,
-                                 RenderBox* renderer)
+                                 RenderBox* renderer,
+                                 Frame* owningFrame)
     : Scrollbar(client,
                 orientation,
                 RegularScrollbar,
                 RenderScrollbarTheme::renderScrollbarTheme()),
-      m_owner(renderer) {
+      m_owner(renderer),
+      m_owningFrame(owningFrame) {
   // FIXME: We need to do this because RenderScrollbar::styleChanged is called
   // as soon as the scrollbar is created.
 
@@ -61,6 +67,14 @@ RenderScrollbar::RenderScrollbar(ScrollbarClient* client,
 
 RenderScrollbar::~RenderScrollbar() {
   ASSERT(m_parts.isEmpty());
+}
+
+RenderBox* RenderScrollbar::owningRenderer() const {
+  if (m_owningFrame) {
+    RenderBox* currentRenderer = m_owningFrame->ownerRenderer();
+    return currentRenderer;
+  }
+  return m_owner;
 }
 
 void RenderScrollbar::setParent(ScrollView* parent) {
@@ -135,8 +149,8 @@ PassRefPtr<RenderStyle> RenderScrollbar::getScrollbarPseudoStyle(
 
   s_styleResolvePart = partType;
   s_styleResolveScrollbar = this;
-  RefPtr<RenderStyle> result =
-      m_owner->getUncachedPseudoStyle(pseudoId, m_owner->style());
+  RefPtr<RenderStyle> result = owningRenderer()->getUncachedPseudoStyle(
+      pseudoId, owningRenderer()->style());
   s_styleResolvePart = NoPart;
   s_styleResolveScrollbar = 0;
   return result;
@@ -170,7 +184,7 @@ void RenderScrollbar::updateScrollbarParts(bool destroy) {
   if (newThickness != oldThickness) {
     setFrameRect(IntRect(x(), y(), isHorizontal ? width() : newThickness,
                          isHorizontal ? newThickness : height()));
-    m_owner->setChildNeedsLayout(true);
+    owningRenderer()->setChildNeedsLayout(true);
   }
 }
 
@@ -241,8 +255,8 @@ void RenderScrollbar::updateScrollbarPart(ScrollbarPart partType,
 
   RenderScrollbarPart* partRenderer = m_parts.get(partType);
   if (!partRenderer && needRenderer) {
-    partRenderer = new (m_owner->renderArena())
-        RenderScrollbarPart(m_owner->document(), this, partType);
+    partRenderer = new (owningRenderer()->renderArena())
+        RenderScrollbarPart(owningRenderer()->document(), this, partType);
     m_parts.set(partType, partRenderer);
   } else if (partRenderer && !needRenderer) {
     m_parts.remove(partType);

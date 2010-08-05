@@ -32,25 +32,27 @@
 
 namespace WebCore {
 
+class Frame;
 class RenderBox;
 class RenderScrollbarPart;
 class RenderStyle;
 
 class RenderScrollbar : public Scrollbar {
  protected:
-  RenderScrollbar(ScrollbarClient*, ScrollbarOrientation, RenderBox*);
+  RenderScrollbar(ScrollbarClient*, ScrollbarOrientation, RenderBox*, Frame*);
 
  public:
   friend class Scrollbar;
   static PassRefPtr<Scrollbar> createCustomScrollbar(ScrollbarClient*,
                                                      ScrollbarOrientation,
-                                                     RenderBox*);
+                                                     RenderBox*,
+                                                     Frame* owningFrame = 0);
   virtual ~RenderScrollbar();
 
   static ScrollbarPart partForStyleResolve();
   static RenderScrollbar* scrollbarForStyleResolve();
 
-  RenderBox* owningRenderer() const { return m_owner; }
+  RenderBox* owningRenderer() const;
   void clearOwningRenderer() { m_owner = 0; }
 
   void paintPart(GraphicsContext*, ScrollbarPart, const IntRect&);
@@ -80,6 +82,7 @@ class RenderScrollbar : public Scrollbar {
   void updateScrollbarPart(ScrollbarPart, bool destroy = false);
 
   RenderBox* m_owner;
+  Frame* m_owningFrame;
   HashMap<unsigned, RenderScrollbarPart*> m_parts;
 };
 
