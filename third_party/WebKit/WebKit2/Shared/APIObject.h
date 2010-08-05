@@ -36,6 +36,7 @@ class APIObject : public RefCounted<APIObject> {
     // Base types
     TypeArray,
     TypeData,
+    TypeError,
     TypeString,
     TypeURL,
 
