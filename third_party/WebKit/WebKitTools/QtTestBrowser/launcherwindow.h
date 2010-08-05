@@ -199,8 +199,6 @@ class LauncherWindow : public MainWindow {
   WindowOptions m_windowOptions;
 
   QAction* m_formatMenuAction;
-  QAction* m_flipAnimated;
-  QAction* m_flipYAnimated;
 
 #if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   QPropertyAnimation* m_zoomAnimation;
