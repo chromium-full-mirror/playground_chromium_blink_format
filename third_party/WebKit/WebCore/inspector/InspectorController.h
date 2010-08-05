@@ -124,6 +124,7 @@ class InspectorController
   InspectorBackendDispatcher* inspectorBackendDispatcher() {
     return m_inspectorBackendDispatcher.get();
   }
+  InspectorClient* inspectorClient() { return m_client; }
   InjectedScriptHost* injectedScriptHost() {
     return m_injectedScriptHost.get();
   }
@@ -215,7 +216,9 @@ class InspectorController
   void stopTimelineProfiler();
   InspectorTimelineAgent* timelineAgent() { return m_timelineAgent.get(); }
 
-  void getCookies(long callId);
+  void getCookies(long callId,
+                  RefPtr<InspectorArray>* cookies,
+                  WebCore::String* cookiesString);
   void deleteCookie(const String& cookieName, const String& domain);
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
@@ -250,12 +253,18 @@ class InspectorController
                         bool isLocalStorage,
                         Frame* frame);
   void selectDOMStorage(Storage* storage);
-  void getDOMStorageEntries(long callId, long storageId);
+  void getDOMStorageEntries(long callId,
+                            long storageId,
+                            RefPtr<InspectorArray>* entries);
   void setDOMStorageItem(long callId,
                          long storageId,
                          const String& key,
-                         const String& value);
-  void removeDOMStorageItem(long callId, long storageId, const String& key);
+                         const String& value,
+                         bool* success);
+  void removeDOMStorageItem(long callId,
+                            long storageId,
+                            const String& key,
+                            bool* success);
 #endif
 
   const ResourcesMap& resources() const { return m_resources; }
@@ -314,8 +323,13 @@ class InspectorController
 
   void editScriptSource(long callId,
                         const String& sourceID,
-                        const String& newContent);
-  void getScriptSource(long callId, const String& sourceID);
+                        const String& newContent,
+                        bool* success,
+                        String* result,
+                        RefPtr<InspectorValue>* newCallFrames);
+  void getScriptSource(long callId,
+                       const String& sourceID,
+                       String* scriptSource);
 
   void resume();
   void setPauseOnExceptionsState(long pauseState);
@@ -372,7 +386,9 @@ class InspectorController
                      const String& sourceID,
                      unsigned lineNumber,
                      bool enabled,
-                     const String& condition);
+                     const String& condition,
+                     bool* success,
+                     unsigned int* actualLineNumber);
   void removeBreakpoint(const String& sourceID, unsigned lineNumber);
 
   typedef HashMap<unsigned int, RefPtr<ScriptProfile>> ProfilesMap;
@@ -380,8 +396,10 @@ class InspectorController
   void startUserInitiatedProfilingSoon();
   void toggleRecordButton(bool);
   void enableDebuggerFromFrontend(bool always);
-  void getProfileHeaders(long callId);
-  void getProfile(long callId, unsigned uid);
+  void getProfileHeaders(long callId, RefPtr<InspectorArray>* headers);
+  void getProfile(long callId,
+                  unsigned uid,
+                  RefPtr<InspectorObject>* profileObject);
   PassRefPtr<InspectorObject> createProfileHeader(const ScriptProfile& profile);
 #endif
 #if ENABLE(DATABASE)
@@ -402,7 +420,9 @@ class InspectorController
   void addResource(InspectorResource*);
   void removeResource(InspectorResource*);
   InspectorResource* getTrackedResource(unsigned long identifier);
-  void getResourceContent(long callId, unsigned long identifier);
+  void getResourceContent(long callId,
+                          unsigned long identifier,
+                          String* content);
 
   void pruneResources(ResourcesMap*, DocumentLoader* loaderToKeep = 0);
   void removeAllResources(ResourcesMap* map) { pruneResources(map); }

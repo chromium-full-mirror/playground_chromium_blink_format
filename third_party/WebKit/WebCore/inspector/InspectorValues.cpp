@@ -509,6 +509,10 @@ bool InspectorValue::asNumber(unsigned long*) const {
   return false;
 }
 
+bool InspectorValue::asNumber(unsigned int*) const {
+  return false;
+}
+
 bool InspectorValue::asString(String*) const {
   return false;
 }
@@ -568,6 +572,13 @@ bool InspectorBasicValue::asNumber(unsigned long* output) const {
   if (type() != TypeDouble)
     return false;
   *output = static_cast<unsigned long>(m_doubleValue);
+  return true;
+}
+
+bool InspectorBasicValue::asNumber(unsigned int* output) const {
+  if (type() != TypeDouble)
+    return false;
+  *output = static_cast<unsigned int>(m_doubleValue);
   return true;
 }
 

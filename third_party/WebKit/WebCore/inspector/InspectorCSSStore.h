@@ -73,8 +73,7 @@ class InspectorCSSStore {
   DisabledStyleDeclaration* disabledStyleForId(long styleId,
                                                bool createIfAbsent);
   CSSStyleSheet* inspectorStyleSheet(Document* ownerDocument,
-                                     bool createIfAbsent,
-                                     long callId);
+                                     bool createIfAbsent);
   void removeDocument(Document*);
 
   long bindRule(CSSStyleRule* rule);

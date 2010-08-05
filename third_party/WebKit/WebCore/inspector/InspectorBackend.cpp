@@ -66,31 +66,29 @@ void InspectorBackend::takeHeapSnapshot() {
   ScriptProfiler::takeHeapSnapshot();
 }
 
-void InspectorBackend::getProfilerLogLines(long callId, long position) {
+void InspectorBackend::getProfilerLogLines(long,
+                                           long position,
+                                           long* outPosition,
+                                           String* data) {
   // FIXME: we should make inspector dispatcher pluggable, so that embedders
   // could contribute APIs instead of polluting the core one
   // https://bugs.webkit.org/show_bug.cgi?id=43357
-  if (RemoteInspectorFrontend* frontend = remoteFrontend()) {
-    String data;
-    int outPosition = ScriptProfiler::getProfilerLogLines(position, &data);
-    frontend->didGetProfilerLogLines(callId, outPosition, data);
-  }
+  *outPosition = ScriptProfiler::getProfilerLogLines(position, data);
 }
 #endif
 
 void InspectorBackend::setInjectedScriptSource(const String& source) {
-  if (m_inspectorController)
-    m_inspectorController->injectedScriptHost()->setInjectedScriptSource(
-        source);
+  m_inspectorController->injectedScriptHost()->setInjectedScriptSource(source);
 }
 
 void InspectorBackend::dispatchOnInjectedScript(long callId,
                                                 long injectedScriptId,
                                                 const String& methodName,
                                                 const String& arguments,
-                                                bool async) {
-  RemoteInspectorFrontend* frontend = remoteFrontend();
-  if (!frontend)
+                                                bool async,
+                                                RefPtr<InspectorValue>* result,
+                                                bool* hadException) {
+  if (!remoteFrontend())
     return;
 
   // FIXME: explicitly pass injectedScriptId along with node id to the frontend.
@@ -108,48 +106,38 @@ void InspectorBackend::dispatchOnInjectedScript(long callId,
   if (injectedScript.hasNoValue())
     return;
 
-  RefPtr<InspectorValue> result;
-  bool hadException = false;
-  injectedScript.dispatch(callId, methodName, arguments, async, &result,
-                          &hadException);
+  injectedScript.dispatch(callId, methodName, arguments, async, result,
+                          hadException);
   if (async)
     return;  // InjectedScript will return result asynchronously by means of
              // ::reportDidDispatchOnInjectedScript.
-  frontend->didDispatchOnInjectedScript(callId, result, hadException);
+  remoteFrontend()->didDispatchOnInjectedScript(callId, (*result).get(),
+                                                *hadException);
 }
 
-void InspectorBackend::clearConsoleMessages(long callId) {
+void InspectorBackend::clearConsoleMessages(long) {
   m_inspectorController->clearConsoleMessages();
-  if (RemoteInspectorFrontend* frontend = remoteFrontend())
-    frontend->didClearConsoleMessages(callId);
 }
 
 void InspectorBackend::releaseWrapperObjectGroup(long injectedScriptId,
                                                  const String& objectGroup) {
-  if (m_inspectorController)
-    m_inspectorController->injectedScriptHost()->releaseWrapperObjectGroup(
-        injectedScriptId, objectGroup);
+  m_inspectorController->injectedScriptHost()->releaseWrapperObjectGroup(
+      injectedScriptId, objectGroup);
 }
 
 #if ENABLE(DATABASE)
-void InspectorBackend::getDatabaseTableNames(long callId, long databaseId) {
-  if (RemoteInspectorFrontend* frontend = remoteFrontend()) {
-    RefPtr<InspectorArray> result = InspectorArray::create();
-    Database* database = m_inspectorController->databaseForId(databaseId);
-    if (database) {
-      Vector<String> tableNames = database->tableNames();
-      unsigned length = tableNames.size();
-      for (unsigned i = 0; i < length; ++i)
-        result->pushString(tableNames[i]);
-    }
-    frontend->didGetDatabaseTableNames(callId, result);
+void InspectorBackend::getDatabaseTableNames(long,
+                                             long databaseId,
+                                             RefPtr<InspectorArray>* names) {
+  Database* database = m_inspectorController->databaseForId(databaseId);
+  if (database) {
+    Vector<String> tableNames = database->tableNames();
+    unsigned length = tableNames.size();
+    for (unsigned i = 0; i < length; ++i)
+      (*names)->pushString(tableNames[i]);
   }
 }
 #endif
-
-InspectorFrontend* InspectorBackend::inspectorFrontend() {
-  return m_inspectorController->m_frontend.get();
-}
 
 RemoteInspectorFrontend* InspectorBackend::remoteFrontend() {
   return m_inspectorController->m_remoteFrontend.get();

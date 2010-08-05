@@ -39,6 +39,7 @@ namespace WebCore {
 class InspectorArray;
 class InspectorController;
 class InspectorObject;
+class InspectorValue;
 class RemoteInspectorFrontend;
 class ResourceResponse;
 
@@ -55,7 +56,8 @@ class InspectorApplicationCacheAgent : public Noncopyable {
   void updateNetworkState(bool isNowOnline);
 
   // From Frontend
-  void getApplicationCaches(long callId);
+  void getApplicationCaches(long callId,
+                            RefPtr<InspectorValue>* applicationCaches);
 
  private:
   PassRefPtr<InspectorObject> buildObjectForApplicationCache(

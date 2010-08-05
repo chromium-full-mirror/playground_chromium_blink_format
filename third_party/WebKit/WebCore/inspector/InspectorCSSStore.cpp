@@ -76,8 +76,7 @@ void InspectorCSSStore::removeDocument(Document* doc) {
 }
 
 CSSStyleSheet* InspectorCSSStore::inspectorStyleSheet(Document* ownerDocument,
-                                                      bool createIfAbsent,
-                                                      long callId) {
+                                                      bool createIfAbsent) {
   DocumentToStyleSheetMap::iterator it =
       m_documentNodeToInspectorStyleSheetMap.find(ownerDocument);
   if (it != m_documentNodeToInspectorStyleSheetMap.end())
@@ -90,18 +89,12 @@ CSSStyleSheet* InspectorCSSStore::inspectorStyleSheet(Document* ownerDocument,
     styleElement->setAttribute("type", "text/css", ec);
   if (!ec)
     ownerDocument->head()->appendChild(styleElement, ec);
-  if (ec) {
-    m_inspectorController->remoteInspectorFrontend()->didAddRule(
-        callId, InspectorValue::null(), false);
+  if (ec)
     return 0;
-  }
   StyleSheetList* styleSheets = ownerDocument->styleSheets();
   StyleSheet* styleSheet = styleSheets->item(styleSheets->length() - 1);
-  if (!styleSheet->isCSSStyleSheet()) {
-    m_inspectorController->remoteInspectorFrontend()->didAddRule(
-        callId, InspectorValue::null(), false);
+  if (!styleSheet->isCSSStyleSheet())
     return 0;
-  }
   CSSStyleSheet* inspectorStyleSheet = static_cast<CSSStyleSheet*>(styleSheet);
   m_documentNodeToInspectorStyleSheetMap.set(ownerDocument,
                                              inspectorStyleSheet);
