@@ -69,7 +69,7 @@ class Blob : public RefCounted<Blob> {
 
   const BlobItemList& items() const { return m_items; }
 
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
   PassRefPtr<Blob> slice(ScriptExecutionContext*,
                          long long start,
                          long long length,

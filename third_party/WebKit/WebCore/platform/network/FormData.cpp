@@ -34,7 +34,7 @@
 
 namespace WebCore {
 
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
 const long long FormDataElement::toEndOfFile = -1;
 const double FormDataElement::doNotCheckFileChange = 0;
 #endif
@@ -124,7 +124,7 @@ PassRefPtr<FormData> FormData::deepCopy() const {
         formData->m_elements.append(FormDataElement(e.m_data));
         break;
       case FormDataElement::encodedFile:
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
         formData->m_elements.append(FormDataElement(
             e.m_filename, e.m_fileStart, e.m_fileLength,
             e.m_expectedFileModificationTime, e.m_shouldGenerateFile));
@@ -148,7 +148,7 @@ void FormData::appendData(const void* data, size_t size) {
 }
 
 void FormData::appendFile(const String& filename, bool shouldGenerateFile) {
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
   m_elements.append(FormDataElement(filename, 0, FormDataElement::toEndOfFile,
                                     FormDataElement::doNotCheckFileChange,
                                     shouldGenerateFile));
@@ -177,7 +177,7 @@ void FormData::appendItem(const BlobItem* item, bool shouldGenerateFile) {
     return;
   }
 
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
   const FileRangeBlobItem* fileRangeItem = item->toFileRangeBlobItem();
   if (fileRangeItem) {
     appendFileRange(
@@ -190,7 +190,7 @@ void FormData::appendItem(const BlobItem* item, bool shouldGenerateFile) {
   appendFile(fileItem->path(), shouldGenerateFile);
 }
 
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
 void FormData::appendFileRange(const String& filename,
                                long long start,
                                long long length,
@@ -255,7 +255,7 @@ void FormData::appendKeyValuePairItems(const BlobItemList& items,
                                                       fileName);
 
 // If the item is sliced from a file, do not add the content type.
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
         if (!fileName.isEmpty() && !value->toFileRangeBlobItem()) {
 #else
         if (!fileName.isEmpty()) {

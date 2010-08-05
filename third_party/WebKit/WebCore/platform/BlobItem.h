@@ -70,13 +70,13 @@ class BlobItem : public RefCounted<BlobItem> {
   virtual const StringBlobItem* toStringBlobItem() const { return 0; }
   virtual const ByteArrayBlobItem* toByteArrayBlobItem() const { return 0; }
   virtual const FileBlobItem* toFileBlobItem() const { return 0; }
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
   virtual const DataRangeBlobItem* toDataRangeBlobItem() const { return 0; }
   virtual const FileRangeBlobItem* toFileRangeBlobItem() const { return 0; }
 
   // Note: no external methods except for Blob::slice should call this.
   virtual PassRefPtr<BlobItem> slice(long long start, long long length) = 0;
-#endif  // ENABLE(BLOB_SLICE)
+#endif  // ENABLE(BLOB)
 
  protected:
   BlobItem() {}
@@ -90,9 +90,9 @@ class DataBlobItem : public BlobItem {
 
   // BlobItem methods.
   virtual const DataBlobItem* toDataBlobItem() const { return this; }
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
   virtual PassRefPtr<BlobItem> slice(long long start, long long length);
-#endif  // ENABLE(BLOB_SLICE)
+#endif  // ENABLE(BLOB)
 };
 
 class FileBlobItem : public BlobItem {
@@ -111,9 +111,9 @@ class FileBlobItem : public BlobItem {
   // BlobItem methods.
   virtual unsigned long long size() const;
   virtual const FileBlobItem* toFileBlobItem() const { return this; }
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
   virtual PassRefPtr<BlobItem> slice(long long start, long long length);
-#endif  // ENABLE(BLOB_SLICE)
+#endif  // ENABLE(BLOB)
 
  protected:
   FileBlobItem(const String& path);
@@ -160,7 +160,7 @@ class ByteArrayBlobItem : public DataBlobItem {
   Vector<char> m_bytesArray;
 };
 
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
 
 // BlobItem class for sliced data (string or bytes-array).
 class DataRangeBlobItem : public DataBlobItem {
@@ -213,7 +213,7 @@ class FileRangeBlobItem : public FileBlobItem {
   double m_snapshotModificationTime;
 };
 
-#endif  // ENABLE(BLOB_SLICE)
+#endif  // ENABLE(BLOB)
 
 }  // namespace WebCore
 

@@ -68,7 +68,7 @@ const String& Blob::path() const {
   return m_items[0]->toFileBlobItem()->path();
 }
 
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
 PassRefPtr<Blob> Blob::slice(ScriptExecutionContext* scriptExecutionContext,
                              long long start,
                              long long length,
@@ -99,6 +99,6 @@ PassRefPtr<Blob> Blob::slice(ScriptExecutionContext* scriptExecutionContext,
   }
   return Blob::create(scriptExecutionContext, contentType, items);
 }
-#endif  // ENABLE(BLOB_SLICE)
+#endif  // ENABLE(BLOB)
 
 }  // namespace WebCore

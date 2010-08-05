@@ -73,7 +73,7 @@ bool WebHTTPBody::elementAt(size_t index, Element& result) const {
       result.type = Element::TypeData;
       result.data.assign(element.m_data.data(), element.m_data.size());
       result.filePath.reset();
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
       result.fileStart = 0;
       result.fileLength = 0;
       result.fileInfo.modificationTime = 0.0;
@@ -83,7 +83,7 @@ bool WebHTTPBody::elementAt(size_t index, Element& result) const {
       result.type = Element::TypeFile;
       result.data.reset();
       result.filePath = element.m_filename;
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
       result.fileStart = element.m_fileStart;
       result.fileLength = element.m_fileLength;
       result.fileInfo.modificationTime = element.m_expectedFileModificationTime;
@@ -117,7 +117,7 @@ void WebHTTPBody::appendFileRange(const WebString& filePath,
                                   long long fileStart,
                                   long long fileLength,
                                   const WebFileInfo& fileInfo) {
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
   ensureMutable();
   m_private->appendFileRange(filePath, fileStart, fileLength,
                              fileInfo.modificationTime);

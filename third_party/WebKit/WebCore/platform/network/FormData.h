@@ -36,7 +36,7 @@ class FormDataElement {
   FormDataElement() : m_type(data) {}
   FormDataElement(const Vector<char>& array) : m_type(data), m_data(array) {}
 
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
   FormDataElement(const String& filename,
                   long long fileStart,
                   long long fileLength,
@@ -58,7 +58,7 @@ class FormDataElement {
   enum { data, encodedFile } m_type;
   Vector<char> m_data;
   String m_filename;
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
   long long m_fileStart;
   long long m_fileLength;
   double m_expectedFileModificationTime;
@@ -66,7 +66,7 @@ class FormDataElement {
   String m_generatedFilename;
   bool m_shouldGenerateFile;
 
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
   static const long long toEndOfFile;
   static const double doNotCheckFileChange;
 #endif
@@ -80,7 +80,7 @@ inline bool operator==(const FormDataElement& a, const FormDataElement& b) {
     return false;
   if (a.m_data != b.m_data)
     return false;
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
   if (a.m_filename != b.m_filename || a.m_fileStart != b.m_fileStart ||
       a.m_fileLength != b.m_fileLength ||
       a.m_expectedFileModificationTime != b.m_expectedFileModificationTime)
@@ -113,7 +113,7 @@ class FormData : public RefCounted<FormData> {
   void appendData(const void* data, size_t);
   void appendItems(const BlobItemList&);
   void appendFile(const String& filename, bool shouldGenerateFile = false);
-#if ENABLE(BLOB_SLICE)
+#if ENABLE(BLOB)
   void appendFileRange(const String& filename,
                        long long start,
                        long long length,

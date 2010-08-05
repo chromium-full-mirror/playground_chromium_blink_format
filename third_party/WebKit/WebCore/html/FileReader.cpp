@@ -30,7 +30,7 @@
 
 #include "config.h"
 
-#if ENABLE(FILE_READER)
+#if ENABLE(BLOB)
 
 #include "FileReader.h"
 
@@ -305,4 +305,4 @@ void FileReader::convertToDataURL() {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(FILE_READER)
+#endif  // ENABLE(BLOB)

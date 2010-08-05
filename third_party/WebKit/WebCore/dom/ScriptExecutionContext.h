@@ -45,7 +45,7 @@ class DatabaseTaskSynchronizer;
 class DatabaseThread;
 #endif
 class DOMTimer;
-#if ENABLE(FILE_READER) || ENABLE(FILE_WRITER)
+#if ENABLE(BLOB) || ENABLE(FILE_WRITER)
 class FileThread;
 #endif
 class MessagePort;
@@ -142,7 +142,7 @@ class ScriptExecutionContext {
   JSC::JSGlobalData* globalData();
 #endif
 
-#if ENABLE(FILE_READER) || ENABLE(FILE_WRITER)
+#if ENABLE(BLOB) || ENABLE(FILE_WRITER)
   FileThread* fileThread();
   void stopFileThread();
 #endif
@@ -174,7 +174,7 @@ class ScriptExecutionContext {
                             // database thread is closed.
 #endif
 
-#if ENABLE(FILE_READER) || ENABLE(FILE_WRITER)
+#if ENABLE(BLOB) || ENABLE(FILE_WRITER)
   RefPtr<FileThread> m_fileThread;
 #endif
 };

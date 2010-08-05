@@ -448,7 +448,7 @@ v8::Handle<v8::Value> V8DOMWrapper::convertEventTargetToV8Object(
     return toV8(eventSource);
 #endif
 
-#if ENABLE(FILE_READER)
+#if ENABLE(BLOB)
   if (FileReader* fileReader = target->toFileReader())
     return toV8(fileReader);
 #endif

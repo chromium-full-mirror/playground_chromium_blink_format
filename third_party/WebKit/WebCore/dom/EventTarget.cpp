@@ -136,7 +136,7 @@ Notification* EventTarget::toNotification() {
 }
 #endif
 
-#if ENABLE(FILE_READER)
+#if ENABLE(BLOB)
 FileReader* EventTarget::toFileReader() {
   return 0;
 }

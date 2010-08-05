@@ -31,7 +31,7 @@
 #ifndef FileReader_h
 #define FileReader_h
 
-#if ENABLE(FILE_READER)
+#if ENABLE(BLOB)
 
 #include "ActiveDOMObject.h"
 #include "EventTarget.h"
@@ -164,6 +164,6 @@ class FileReader : public RefCounted<FileReader>,
 
 }  // namespace WebCore
 
-#endif
+#endif  // ENABLE(BLOB)
 
 #endif  // FileReader_h
