@@ -105,7 +105,7 @@ PlatformWheelEventBuilder::PlatformWheelEventBuilder(
 
 // MakePlatformKeyboardEvent --------------------------------------------------
 
-static inline const PlatformKeyboardEvent::Type toPlatformKeyboardEventType(
+static inline PlatformKeyboardEvent::Type toPlatformKeyboardEventType(
     WebInputEvent::Type type) {
   switch (type) {
     case WebInputEvent::KeyUp:
