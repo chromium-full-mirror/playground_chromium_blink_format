@@ -65,6 +65,11 @@ String ValidityState::validationMessage() const {
   return String();
 }
 
+void ValidityState::setCustomErrorMessage(const String& message) {
+  m_customErrorMessage = message;
+  m_control->setNeedsValidityCheck();
+}
+
 bool ValidityState::typeMismatch() const {
   if (!m_control->hasTagName(inputTag))
     return false;

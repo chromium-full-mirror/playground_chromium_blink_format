@@ -40,9 +40,7 @@ class ValidityState : public Noncopyable {
 
   String validationMessage() const;
 
-  void setCustomErrorMessage(const String& message) {
-    m_customErrorMessage = message;
-  }
+  void setCustomErrorMessage(const String&);
 
   bool valueMissing() const { return m_control->valueMissing(); }
   bool typeMismatch() const;
