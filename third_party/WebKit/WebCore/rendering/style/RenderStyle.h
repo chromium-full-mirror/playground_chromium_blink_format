@@ -1298,8 +1298,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
 
   void adjustBackgroundLayers() {
     if (backgroundLayers()->next()) {
-      accessBackgroundLayers()->fillUnsetProperties();
       accessBackgroundLayers()->cullEmptyLayers();
+      accessBackgroundLayers()->fillUnsetProperties();
     }
   }
 
@@ -1312,8 +1312,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
 
   void adjustMaskLayers() {
     if (maskLayers()->next()) {
-      accessMaskLayers()->fillUnsetProperties();
       accessMaskLayers()->cullEmptyLayers();
+      accessMaskLayers()->fillUnsetProperties();
     }
   }
 
