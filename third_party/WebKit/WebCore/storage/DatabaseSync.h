@@ -66,8 +66,9 @@ class DatabaseSync : public AbstractDatabase {
                      const String& newVersion,
                      PassRefPtr<SQLTransactionSyncCallback>,
                      ExceptionCode&);
-  void transaction(PassRefPtr<SQLTransactionSyncCallback>, ExceptionCode&);
-  void readTransaction(PassRefPtr<SQLTransactionSyncCallback>, ExceptionCode&);
+  void transaction(PassRefPtr<SQLTransactionSyncCallback>,
+                   bool readOnly,
+                   ExceptionCode&);
 
   virtual void markAsDeletedAndClose();
   virtual void closeImmediately();
@@ -78,9 +79,6 @@ class DatabaseSync : public AbstractDatabase {
                const String& expectedVersion,
                const String& displayName,
                unsigned long estimatedSize);
-  void runTransaction(PassRefPtr<SQLTransactionSyncCallback>,
-                      bool readOnly,
-                      ExceptionCode&);
 };
 
 }  // namespace WebCore

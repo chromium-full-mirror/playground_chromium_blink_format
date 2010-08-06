@@ -69,10 +69,8 @@ class Database : public AbstractDatabase {
                      PassRefPtr<VoidCallback> successCallback);
   void transaction(PassRefPtr<SQLTransactionCallback>,
                    PassRefPtr<SQLTransactionErrorCallback>,
-                   PassRefPtr<VoidCallback> successCallback);
-  void readTransaction(PassRefPtr<SQLTransactionCallback>,
-                       PassRefPtr<SQLTransactionErrorCallback>,
-                       PassRefPtr<VoidCallback> successCallback);
+                   PassRefPtr<VoidCallback> successCallback,
+                   bool readOnly);
 
   // Internal engine support
   Vector<String> tableNames();
@@ -105,10 +103,6 @@ class Database : public AbstractDatabase {
            const String& expectedVersion,
            const String& displayName,
            unsigned long estimatedSize);
-  void runTransaction(PassRefPtr<SQLTransactionCallback>,
-                      PassRefPtr<SQLTransactionErrorCallback>,
-                      PassRefPtr<VoidCallback> successCallback,
-                      bool readOnly);
 
   bool openAndVerifyVersion(bool setVersionInNewDatabase, ExceptionCode&);
   virtual bool performOpenAndVerify(bool setVersionInNewDatabase,

@@ -58,6 +58,8 @@
 #include "JSDOMWrapper.cpp"
 #include "JSDataGridColumnListCustom.cpp"
 #include "JSDataGridDataSource.cpp"
+#include "JSDatabaseCustom.cpp"
+#include "JSDatabaseSyncCustom.cpp"
 #include "JSDebugWrapperSet.cpp"
 #include "JSDedicatedWorkerContextCustom.cpp"
 #include "JSDesktopNotificationsCustom.cpp"
