@@ -29,6 +29,7 @@
 #include "APIObject.h"
 #include "DrawingArea.h"
 #include "InjectedBundlePageEditorClient.h"
+#include "InjectedBundlePageFormClient.h"
 #include "InjectedBundlePageLoaderClient.h"
 #include "InjectedBundlePageUIClient.h"
 #include <WebCore/FrameLoaderTypes.h>
@@ -102,11 +103,15 @@ class WebPage : public APIObject {
 
   // -- InjectedBundle methods
   void initializeInjectedBundleEditorClient(WKBundlePageEditorClient*);
+  void initializeInjectedBundleFormClient(WKBundlePageFormClient*);
   void initializeInjectedBundleLoaderClient(WKBundlePageLoaderClient*);
   void initializeInjectedBundleUIClient(WKBundlePageUIClient*);
 
   InjectedBundlePageEditorClient& injectedBundleEditorClient() {
     return m_editorClient;
+  }
+  InjectedBundlePageFormClient& injectedBundleFormClient() {
+    return m_formClient;
   }
   InjectedBundlePageLoaderClient& injectedBundleLoaderClient() {
     return m_loaderClient;
@@ -171,6 +176,7 @@ class WebPage : public APIObject {
   RefPtr<DrawingArea> m_drawingArea;
 
   InjectedBundlePageEditorClient m_editorClient;
+  InjectedBundlePageFormClient m_formClient;
   InjectedBundlePageLoaderClient m_loaderClient;
   InjectedBundlePageUIClient m_uiClient;
 

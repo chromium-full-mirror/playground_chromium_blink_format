@@ -43,6 +43,12 @@ void WKBundlePageSetEditorClient(WKBundlePageRef pageRef,
     toWK(pageRef)->initializeInjectedBundleEditorClient(wkClient);
 }
 
+void WKBundlePageSetFormClient(WKBundlePageRef pageRef,
+                               WKBundlePageFormClient* wkClient) {
+  if (wkClient && !wkClient->version)
+    toWK(pageRef)->initializeInjectedBundleFormClient(wkClient);
+}
+
 void WKBundlePageSetLoaderClient(WKBundlePageRef pageRef,
                                  WKBundlePageLoaderClient* wkClient) {
   if (wkClient && !wkClient->version)

@@ -151,6 +151,11 @@ void WebPage::initializeInjectedBundleEditorClient(
   m_editorClient.initialize(client);
 }
 
+void WebPage::initializeInjectedBundleFormClient(
+    WKBundlePageFormClient* client) {
+  m_formClient.initialize(client);
+}
+
 void WebPage::initializeInjectedBundleLoaderClient(
     WKBundlePageLoaderClient* client) {
   m_loaderClient.initialize(client);
