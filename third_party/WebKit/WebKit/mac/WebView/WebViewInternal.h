@@ -37,8 +37,9 @@
 #ifdef __cplusplus
 #import <WebCore/WebCoreKeyboardUIMode.h>
 
+#include <wtf/Forward.h>
+
 namespace WebCore {
-class String;
 class Frame;
 class KURL;
 class KeyboardEvent;

@@ -23,6 +23,7 @@
 
 #include "Blob.h"
 #include "TextEncoding.h"
+#include <wtf/Forward.h>
 #include <wtf/text/CString.h>
 
 namespace WebCore {
@@ -35,7 +36,7 @@ class FormDataList {
     appendString(key);
     appendString(value);
   }
-  void appendData(const String& key, const WTF::CString& value) {
+  void appendData(const String& key, const CString& value) {
     appendString(key);
     appendString(value);
   }
@@ -49,7 +50,7 @@ class FormDataList {
   const TextEncoding& encoding() const { return m_encoding; }
 
  private:
-  void appendString(const WTF::CString&);
+  void appendString(const CString&);
   void appendString(const String&);
 
   TextEncoding m_encoding;

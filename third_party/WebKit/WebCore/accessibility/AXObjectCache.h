@@ -30,6 +30,7 @@
 #include "AccessibilityObject.h"
 #include "Timer.h"
 #include <limits.h>
+#include <wtf/Forward.h>
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
 #include <wtf/RefPtr.h>
@@ -46,7 +47,6 @@ class HTMLAreaElement;
 class Node;
 class Page;
 class RenderObject;
-class String;
 class VisiblePosition;
 
 struct TextMarkerData {

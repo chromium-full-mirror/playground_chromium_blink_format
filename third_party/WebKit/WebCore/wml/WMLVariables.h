@@ -22,11 +22,12 @@
 #ifndef WMLVariables_h
 #define WMLVariables_h
 
+#include <wtf/Forward.h>
+
 #if ENABLE(WML)
 namespace WebCore {
 
 class Document;
-class String;
 
 enum WMLVariableEscapingMode {
   WMLVariableEscapingNone = 0,
