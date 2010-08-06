@@ -20,7 +20,7 @@
 #ifndef QtMaemoWebPopup_h
 #define QtMaemoWebPopup_h
 
-#include "QtAbstractWebPopup.h"
+#include "qwebkitplatformplugin.h"
 
 #include <QDialog>
 
@@ -32,7 +32,7 @@ namespace WebCore {
 class Maemo5Popup : public QDialog {
   Q_OBJECT
  public:
-  Maemo5Popup(QtAbstractWebPopup& data) : m_data(data) {}
+  Maemo5Popup(const QWebSelectData& data) : m_data(data) {}
 
  signals:
   void itemClicked(int idx);
@@ -43,17 +43,17 @@ class Maemo5Popup : public QDialog {
  protected:
   void populateList();
 
-  QtAbstractWebPopup& m_data;
+  const QWebSelectData& m_data;
   QListWidget* m_list;
 };
 
-class QtMaemoWebPopup : public QObject, public QtAbstractWebPopup {
+class QtMaemoWebPopup : public QWebSelectMethod {
   Q_OBJECT
  public:
   QtMaemoWebPopup();
   ~QtMaemoWebPopup();
 
-  virtual void show();
+  virtual void show(const QWebSelectData& data);
   virtual void hide();
 
  private slots:
@@ -63,21 +63,21 @@ class QtMaemoWebPopup : public QObject, public QtAbstractWebPopup {
  private:
   Maemo5Popup* m_popup;
 
-  Maemo5Popup* createPopup();
-  Maemo5Popup* createSingleSelectionPopup();
-  Maemo5Popup* createMultipleSelectionPopup();
+  Maemo5Popup* createPopup(const QWebSelectData& data);
+  Maemo5Popup* createSingleSelectionPopup(const QWebSelectData& data);
+  Maemo5Popup* createMultipleSelectionPopup(const QWebSelectData& data);
 };
 
 class Maemo5SingleSelectionPopup : public Maemo5Popup {
   Q_OBJECT
  public:
-  Maemo5SingleSelectionPopup(QtAbstractWebPopup& data);
+  Maemo5SingleSelectionPopup(const QWebSelectData& data);
 };
 
 class Maemo5MultipleSelectionPopup : public Maemo5Popup {
   Q_OBJECT
  public:
-  Maemo5MultipleSelectionPopup(QtAbstractWebPopup& data);
+  Maemo5MultipleSelectionPopup(const QWebSelectData& data);
 };
 }
 

@@ -188,7 +188,7 @@ class ChromeClientQt : public ChromeClient {
   virtual PassRefPtr<SearchPopupMenu> createSearchPopupMenu(
       PopupMenuClient*) const;
 
-  QtAbstractWebPopup* createSelectPopup();
+  QWebSelectMethod* createSelectPopup() const;
 
   virtual void didReceiveViewportArguments(Frame*,
                                            const ViewportArguments&) const;
@@ -203,7 +203,7 @@ class ChromeClientQt : public ChromeClient {
   bool menuBarVisible;
   QEventLoop* m_eventLoop;
 
-  QtPlatformPlugin m_platformPlugin;
+  mutable QtPlatformPlugin m_platformPlugin;
 };
 }
 

@@ -39,11 +39,11 @@ static const int gMaemoMaxVisibleItems = 5;
 void Maemo5Popup::populateList() {
   QListWidgetItem* listItem;
   for (int i = 0; i < m_data.itemCount(); ++i) {
-    if (m_data.itemType(i) == QtAbstractWebPopup::Option) {
+    if (m_data.itemType(i) == QWebSelectData::Option) {
       listItem = new QListWidgetItem(m_data.itemText(i));
       m_list->addItem(listItem);
       listItem->setSelected(m_data.itemIsSelected(i));
-    } else if (m_data.itemType(i) == QtAbstractWebPopup::Group) {
+    } else if (m_data.itemType(i) == QWebSelectData::Group) {
       listItem = new QListWidgetItem(m_data.itemText(i));
       m_list->addItem(listItem);
       listItem->setSelected(false);
@@ -59,34 +59,36 @@ void Maemo5Popup::onItemSelected(QListWidgetItem* item) {
     emit itemClicked(m_list->row(item));
 }
 
-QtMaemoWebPopup::QtMaemoWebPopup() : QtAbstractWebPopup(), m_popup(0) {}
+QtMaemoWebPopup::QtMaemoWebPopup() : m_popup(0) {}
 
 QtMaemoWebPopup::~QtMaemoWebPopup() {
   if (m_popup)
     m_popup->deleteLater();
 }
 
-Maemo5Popup* QtMaemoWebPopup::createSingleSelectionPopup() {
-  return new Maemo5SingleSelectionPopup(*this);
+Maemo5Popup* QtMaemoWebPopup::createSingleSelectionPopup(
+    const QWebSelectData& data) {
+  return new Maemo5SingleSelectionPopup(data);
 }
 
-Maemo5Popup* QtMaemoWebPopup::createMultipleSelectionPopup() {
-  return new Maemo5MultipleSelectionPopup(*this);
+Maemo5Popup* QtMaemoWebPopup::createMultipleSelectionPopup(
+    const QWebSelectData& data) {
+  return new Maemo5MultipleSelectionPopup(data);
 }
 
-Maemo5Popup* QtMaemoWebPopup::createPopup() {
-  Maemo5Popup* result = multiple() ? createMultipleSelectionPopup()
-                                   : createSingleSelectionPopup();
+Maemo5Popup* QtMaemoWebPopup::createPopup(const QWebSelectData& data) {
+  Maemo5Popup* result = data.multiple() ? createMultipleSelectionPopup(data)
+                                        : createSingleSelectionPopup(data);
   connect(result, SIGNAL(finished(int)), this, SLOT(popupClosed()));
   connect(result, SIGNAL(itemClicked(int)), this, SLOT(itemClicked(int)));
   return result;
 }
 
-void QtMaemoWebPopup::show() {
-  if (!pageClient() || m_popup)
+void QtMaemoWebPopup::show(const QWebSelectData& data) {
+  if (m_popup)
     return;
 
-  m_popup = createPopup();
+  m_popup = createPopup(data);
   m_popup->show();
 }
 
@@ -103,14 +105,15 @@ void QtMaemoWebPopup::popupClosed() {
 
   m_popup->deleteLater();
   m_popup = 0;
-  popupDidHide();
+  emit didHide();
 }
 
 void QtMaemoWebPopup::itemClicked(int idx) {
-  selectItem(idx, true, false);
+  emit selectItem(idx, true, false);
 }
 
-Maemo5SingleSelectionPopup::Maemo5SingleSelectionPopup(QtAbstractWebPopup& data)
+Maemo5SingleSelectionPopup::Maemo5SingleSelectionPopup(
+    const QWebSelectData& data)
     : Maemo5Popup(data) {
   // we try to get the standard list title the web browser is using
   const char* title = ::dgettext("osso-browser-ui", "weba_ti_texlist_single");
@@ -160,7 +163,7 @@ class MultipleItemListDelegate : public QStyledItemDelegate {
 };
 
 Maemo5MultipleSelectionPopup::Maemo5MultipleSelectionPopup(
-    QtAbstractWebPopup& data)
+    const QWebSelectData& data)
     : Maemo5Popup(data) {
   // we try to get the standard list title the web browser is using
   const char* title = ::dgettext("osso-browser-ui", "weba_ti_textlist_multi");

@@ -21,17 +21,21 @@
 #define PopupMenuQt_h
 
 #include "PopupMenu.h"
+#include <QObject>
+
+class QWebSelectData;
+class QWebSelectMethod;
 
 namespace WebCore {
 
+class ChromeClientQt;
 class FrameView;
-class QtAbstractWebPopup;
-class Scrollbar;
 class PopupMenuClient;
 
-class PopupMenuQt : public PopupMenu {
+class PopupMenuQt : public QObject, public PopupMenu {
+  Q_OBJECT
  public:
-  PopupMenuQt(PopupMenuClient*);
+  PopupMenuQt(PopupMenuClient*, const ChromeClientQt*);
   ~PopupMenuQt();
 
   virtual void show(const IntRect&, FrameView*, int index);
@@ -39,9 +43,15 @@ class PopupMenuQt : public PopupMenu {
   virtual void updateFromElement();
   virtual void disconnectClient();
 
+ private slots:
+  void didHide();
+  void selectItem(int index, bool ctrl, bool shift);
+
  private:
   PopupMenuClient* m_popupClient;
-  QtAbstractWebPopup* m_popup;
+  QWebSelectMethod* m_popup;
+  QWebSelectData* m_selectData;
+  const ChromeClientQt* m_chromeClient;
 };
 }
 
