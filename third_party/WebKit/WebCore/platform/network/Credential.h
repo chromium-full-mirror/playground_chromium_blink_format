@@ -27,8 +27,8 @@
 
 #include "PlatformString.h"
 
-#define CERTIFICATE_CREDENTIALS_SUPPORTED                                \
-  ((PLATFORM(MAC) || PLATFORM(IPHONE)) && !defined(BUILDING_ON_TIGER) && \
+#define CERTIFICATE_CREDENTIALS_SUPPORTED                             \
+  ((PLATFORM(MAC) || PLATFORM(IOS)) && !defined(BUILDING_ON_TIGER) && \
    !defined(BUILDING_ON_LEOPARD))
 
 #if CERTIFICATE_CREDENTIALS_SUPPORTED
