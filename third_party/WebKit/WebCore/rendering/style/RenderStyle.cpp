@@ -508,6 +508,9 @@ StyleDifference RenderStyle::diff(
     return StyleDifferenceLayout;
   }
 
+  if ((visibility() == COLLAPSE) != (other->visibility() == COLLAPSE))
+    return StyleDifferenceLayout;
+
   // Make sure these left/top/right/bottom checks stay below all layout checks
   // and above
   // all visible checks.
