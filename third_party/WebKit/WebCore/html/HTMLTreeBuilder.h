@@ -200,7 +200,8 @@ class HTMLTreeBuilder : public Noncopyable {
       bool foreign);  // Helper for resetInsertionModeAppropriately
   void resetInsertionModeAppropriately();
 
-  static bool isScriptingFlagEnabled(Frame* frame);
+  static bool scriptEnabled(Frame* frame);
+  static bool pluginsEnabled(Frame* frame);
 
   Document* m_document;
   HTMLConstructionSite m_tree;

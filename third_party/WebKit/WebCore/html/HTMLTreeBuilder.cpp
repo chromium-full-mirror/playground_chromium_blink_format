@@ -343,8 +343,9 @@ HTMLTokenizer::State HTMLTreeBuilder::adjustedLexerState(
     return HTMLTokenizer::RCDATAState;
 
   if (tagName == styleTag || tagName == iframeTag || tagName == xmpTag ||
-      tagName == noembedTag || tagName == noframesTag ||
-      (tagName == noscriptTag && isScriptingFlagEnabled(frame)))
+      (tagName == noembedTag && pluginsEnabled(frame)) ||
+      tagName == noframesTag ||
+      (tagName == noscriptTag && scriptEnabled(frame)))
     return HTMLTokenizer::RAWTEXTState;
 
   if (tagName == plaintextTag)
@@ -888,12 +889,11 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
     processGenericRawTextStartTag(token);
     return;
   }
-  if (token.name() == noembedTag) {
+  if (token.name() == noembedTag && pluginsEnabled(m_document->frame())) {
     processGenericRawTextStartTag(token);
     return;
   }
-  if (token.name() == noscriptTag &&
-      isScriptingFlagEnabled(m_document->frame())) {
+  if (token.name() == noscriptTag && scriptEnabled(m_document->frame())) {
     processGenericRawTextStartTag(token);
     return;
   }
@@ -2627,7 +2627,7 @@ bool HTMLTreeBuilder::processStartTagForInHead(AtomicHTMLToken& token) {
     return true;
   }
   if (token.name() == noscriptTag) {
-    if (isScriptingFlagEnabled(m_document->frame())) {
+    if (scriptEnabled(m_document->frame())) {
       processGenericRawTextStartTag(token);
       return true;
     }
@@ -2689,11 +2689,18 @@ void HTMLTreeBuilder::finished() {
     m_document->finishedParsing();
 }
 
-bool HTMLTreeBuilder::isScriptingFlagEnabled(Frame* frame) {
+bool HTMLTreeBuilder::scriptEnabled(Frame* frame) {
   if (!frame)
     return false;
   if (ScriptController* scriptController = frame->script())
     return scriptController->canExecuteScripts(NotAboutToExecuteScript);
   return false;
+}
+
+bool HTMLTreeBuilder::pluginsEnabled(Frame* frame) {
+  if (!frame)
+    return false;
+  return frame->loader()->subframeLoader()->allowPlugins(
+      NotAboutToInstantiatePlugin);
 }
 }
