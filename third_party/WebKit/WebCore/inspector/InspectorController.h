@@ -33,7 +33,6 @@
 #include "Cookie.h"
 #include "InspectorDOMAgent.h"
 #include "PlatformString.h"
-#include "ScriptBreakpoint.h"
 #include "ScriptProfile.h"
 #include "ScriptState.h"
 #include "StringHash.h"
@@ -43,10 +42,6 @@
 #include <wtf/ListHashSet.h>
 #include <wtf/RefCounted.h>
 #include <wtf/Vector.h>
-
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-#include "ScriptDebugListener.h"
-#endif
 
 namespace WebCore {
 
@@ -60,12 +55,14 @@ class GraphicsContext;
 class HitTestResult;
 class InjectedScript;
 class InjectedScriptHost;
+class InspectorArray;
 class InspectorBackend;
 class InspectorBackendDispatcher;
 class InspectorClient;
 class InspectorCSSStore;
 class InspectorDOMStorageResource;
 class InspectorDatabaseResource;
+class InspectorDebuggerAgent;
 class InspectorFrontend;
 class InspectorFrontendClient;
 class InspectorResource;
@@ -90,14 +87,7 @@ class StorageArea;
 class InspectorApplicationCacheAgent;
 #endif
 
-class InspectorController
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    : ScriptDebugListener,
-      public Noncopyable
-#else
-    : public Noncopyable
-#endif
-{
+class InspectorController : public Noncopyable {
  public:
   typedef HashMap<unsigned long, RefPtr<InspectorResource>> ResourcesMap;
   typedef HashMap<RefPtr<Frame>, ResourcesMap*> FrameResourcesMap;
@@ -234,7 +224,7 @@ class InspectorController
   void didRemoveDOMNode(Node*);
   void didModifyDOMAttr(Element*);
 #if ENABLE(WORKERS)
-  enum WorkerAction{WorkerCreated, WorkerDestroyed};
+  enum WorkerAction { WorkerCreated, WorkerDestroyed };
 
   void postWorkerNotificationToFrontend(const InspectorWorkerResource&,
                                         WorkerAction);
@@ -319,33 +309,11 @@ class InspectorController
 
   void enableDebugger();
   void disableDebugger(bool always = false);
-  bool debuggerEnabled() const { return m_debuggerEnabled; }
-
-  void editScriptSource(long callId,
-                        const String& sourceID,
-                        const String& newContent,
-                        bool* success,
-                        String* result,
-                        RefPtr<InspectorValue>* newCallFrames);
-  void getScriptSource(long callId,
-                       const String& sourceID,
-                       String* scriptSource);
-
+  bool debuggerEnabled() const { return m_debuggerAgent; }
+  InspectorDebuggerAgent* debuggerAgent() const {
+    return m_debuggerAgent.get();
+  }
   void resume();
-  void setPauseOnExceptionsState(long pauseState);
-
-  virtual void didParseSource(const String& sourceID,
-                              const String& url,
-                              const String& data,
-                              int firstLine,
-                              ScriptWorldType);
-  virtual void failedToParseSource(const String& url,
-                                   const String& data,
-                                   int firstLine,
-                                   int errorLine,
-                                   const String& errorMessage);
-  virtual void didPause(ScriptState*);
-  virtual void didContinue();
 #endif
 
   void evaluateForTestInFrontend(long callId, const String& script);
@@ -380,17 +348,6 @@ class InspectorController
   void releaseFrontendLifetimeAgents();
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
-  PassRefPtr<InspectorValue> currentCallFrames();
-
-  void setBreakpoint(long callId,
-                     const String& sourceID,
-                     unsigned lineNumber,
-                     bool enabled,
-                     const String& condition,
-                     bool* success,
-                     unsigned int* actualLineNumber);
-  void removeBreakpoint(const String& sourceID, unsigned lineNumber);
-
   typedef HashMap<unsigned int, RefPtr<ScriptProfile>> ProfilesMap;
 
   void startUserInitiatedProfilingSoon();
@@ -434,9 +391,10 @@ class InspectorController
   void didEvaluateForTestInFrontend(long callId, const String& jsonResult);
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
+  friend class InspectorDebuggerAgent;
   String breakpointsSettingKey();
-  void loadBreakpoints();
-  void saveBreakpoints();
+  PassRefPtr<InspectorValue> loadBreakpoints();
+  void saveBreakpoints(PassRefPtr<InspectorObject> breakpoints);
 #endif
 
   Page* m_inspectedPage;
@@ -490,14 +448,8 @@ class InspectorController
   Vector<String> m_scriptsToEvaluateOnLoad;
   String m_inspectorExtensionAPI;
 #if ENABLE(JAVASCRIPT_DEBUGGER)
-  bool m_debuggerEnabled;
   bool m_attachDebuggerWhenShown;
-  ScriptState* m_pausedScriptState;
-  HashMap<String, String> m_sourceIDToURL;
-  HashMap<String, String> m_scriptIDToContent;
-  HashMap<String, SourceBreakpoints> m_stickyBreakpoints;
-  HashMap<String, unsigned> m_breakpointsMapping;
-  bool m_breakpointsLoaded;
+  OwnPtr<InspectorDebuggerAgent> m_debuggerAgent;
 
   bool m_profilerEnabled;
   bool m_recordingUserInitiatedProfile;
