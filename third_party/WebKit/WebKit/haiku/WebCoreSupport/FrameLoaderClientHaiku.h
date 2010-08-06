@@ -34,7 +34,6 @@
 #include "FrameLoaderClient.h"
 #include "KURL.h"
 #include "ResourceResponse.h"
-#include <wtf/Forward.h>
 
 class BMessenger;
 class WebView;
@@ -46,6 +45,7 @@ class Element;
 class FormState;
 class NavigationAction;
 class ResourceLoader;
+class String;
 
 struct LoadErrorResetToken;
 

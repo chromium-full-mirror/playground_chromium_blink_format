@@ -34,10 +34,11 @@
 #if ENABLE(WORKERS)
 
 #include "ScriptExecutionContext.h"
-#include <wtf/Forward.h>
 #include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
+
+class String;
 
 // A proxy to talk to the loader context. Normally, the document on the main
 // thread

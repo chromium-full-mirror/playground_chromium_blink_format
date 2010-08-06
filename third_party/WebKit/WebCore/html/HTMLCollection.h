@@ -32,9 +32,12 @@
 
 namespace WebCore {
 
+class AtomicString;
+class AtomicStringImpl;
 class Element;
 class Node;
 class NodeList;
+class String;
 
 struct CollectionCache;
 

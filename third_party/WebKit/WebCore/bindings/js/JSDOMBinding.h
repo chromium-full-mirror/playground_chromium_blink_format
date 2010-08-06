@@ -32,7 +32,6 @@
 #include <runtime/Completion.h>
 #include <runtime/Lookup.h>
 #include <runtime/WeakGCMap.h>
-#include <wtf/Forward.h>
 #include <wtf/Noncopyable.h>
 
 namespace JSC {
@@ -47,6 +46,7 @@ class Frame;
 class JSNode;
 class KURL;
 class Node;
+class String;
 class ScriptController;
 class ScriptCachedFrameData;
 

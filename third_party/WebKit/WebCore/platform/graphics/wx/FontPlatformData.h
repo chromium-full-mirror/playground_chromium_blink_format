@@ -32,7 +32,6 @@
 #include "FontDescription.h"
 #include "AtomicString.h"
 #include "StringImpl.h"
-#include <wtf/Forward.h>
 #include <wtf/RefPtr.h>
 #include <wtf/text/CString.h>
 
@@ -58,6 +57,8 @@ inline CTFontRef toCTFontRef(NSFont* nsFont) {
 #endif
 
 namespace WebCore {
+
+class String;
 
 class FontHolder : public WTF::RefCounted<FontHolder> {
  public:

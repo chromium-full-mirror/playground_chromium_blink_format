@@ -27,7 +27,6 @@
 
 #include "RefCountedGDIHandle.h"
 #include "StringImpl.h"
-#include <wtf/Forward.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RetainPtr.h>
@@ -38,6 +37,7 @@ typedef struct CGFont* CGFontRef;
 namespace WebCore {
 
 class FontDescription;
+class String;
 
 class FontPlatformData {
  public:

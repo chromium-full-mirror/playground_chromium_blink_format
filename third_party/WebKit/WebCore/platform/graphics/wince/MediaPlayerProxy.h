@@ -22,13 +22,13 @@
 
 #if ENABLE(VIDEO)
 
-#include <wtf/Forward.h>
 #include "ScriptInstance.h"
 
 namespace WebCore {
 
 class IntRect;
 class IntSize;
+class String;
 class MediaPlayer;
 class PluginView;
 class HTMLMediaElement;

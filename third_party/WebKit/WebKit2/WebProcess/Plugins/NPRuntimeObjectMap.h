@@ -26,7 +26,6 @@
 #ifndef NPJSObjectWrapperMap_h
 #define NPJSObjectWrapperMap_h
 
-#include <wtf/Forward.h>
 #include <wtf/HashMap.h>
 
 struct NPObject;
@@ -37,6 +36,10 @@ class ExecState;
 class JSGlobalObject;
 class JSObject;
 class JSValue;
+}
+
+namespace WebCore {
+class String;
 }
 
 namespace WebKit {

@@ -74,7 +74,6 @@
 #include "ThemeTypes.h"
 #include "TimingFunction.h"
 #include "TransformOperations.h"
-#include <wtf/Forward.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/StdLibExtras.h>
@@ -113,6 +112,7 @@ class CSSStyleSelector;
 class CSSValueList;
 class CachedImage;
 class Pair;
+class StringImpl;
 class StyleImage;
 
 typedef Vector<RefPtr<RenderStyle>, 4> PseudoStyleCache;

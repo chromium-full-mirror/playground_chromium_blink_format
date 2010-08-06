@@ -24,7 +24,6 @@
 
 #if ENABLE(SVG)
 #include "SVGAnimatedPropertyTraits.h"
-#include <wtf/Forward.h>
 #include <wtf/HashMap.h>
 
 namespace WebCore {
@@ -35,6 +34,7 @@ class SVGLengthList;
 class SVGNumberList;
 class SVGPreserveAspectRatio;
 class SVGTransformList;
+class String;
 class QualifiedName;
 
 struct SVGAnimatedTypeWrapperKey {

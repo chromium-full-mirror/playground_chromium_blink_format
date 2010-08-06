@@ -48,6 +48,7 @@ class IntRect;
 class Node;
 class Page;
 class PopupMenuClient;
+class String;
 #if ENABLE(NOTIFICATIONS)
 class NotificationPresenter;
 #endif

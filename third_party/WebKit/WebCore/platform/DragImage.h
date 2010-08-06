@@ -28,7 +28,6 @@
 
 #include "IntSize.h"
 #include "FloatSize.h"
-#include <wtf/Forward.h>
 
 #if PLATFORM(MAC)
 #include <wtf/RetainPtr.h>
@@ -65,6 +64,7 @@ class Frame;
 class Image;
 class KURL;
 class Range;
+class String;
 
 #if PLATFORM(MAC)
 typedef RetainPtr<NSImage> DragImageRef;

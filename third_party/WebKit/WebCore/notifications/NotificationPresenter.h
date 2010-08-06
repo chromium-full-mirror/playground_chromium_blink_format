@@ -42,6 +42,7 @@ class Document;
 class Notification;
 class KURL;
 class ScriptExecutionContext;
+class String;
 
 class NotificationPresenter {
  public:
