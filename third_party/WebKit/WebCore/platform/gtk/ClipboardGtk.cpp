@@ -24,6 +24,7 @@
 #include "Element.h"
 #include "FileList.h"
 #include "Frame.h"
+#include "HTMLNames.h"
 #include "Image.h"
 #include "NotImplemented.h"
 #include "Pasteboard.h"
@@ -269,32 +270,37 @@ PassRefPtr<FileList> ClipboardGtk::files() const {
   return fileList.release();
 }
 
-IntPoint ClipboardGtk::dragLocation() const {
-  notImplemented();
-  return IntPoint(0, 0);
+void ClipboardGtk::setDragImage(CachedImage* image, const IntPoint& location) {
+  setDragImage(image, 0, location);
 }
 
-CachedImage* ClipboardGtk::dragImage() const {
-  notImplemented();
-  return 0;
+void ClipboardGtk::setDragImageElement(Node* element,
+                                       const IntPoint& location) {
+  setDragImage(0, element, location);
 }
 
-void ClipboardGtk::setDragImage(CachedImage*, const IntPoint&) {
-  notImplemented();
+void ClipboardGtk::setDragImage(CachedImage* image,
+                                Node* element,
+                                const IntPoint& location) {
+  if (policy() != ClipboardImageWritable && policy() != ClipboardWritable)
+    return;
+
+  if (m_dragImage)
+    m_dragImage->removeClient(this);
+  m_dragImage = image;
+  if (m_dragImage)
+    m_dragImage->addClient(this);
+
+  m_dragLoc = location;
+  m_dragImageElement = element;
 }
 
-Node* ClipboardGtk::dragImageElement() {
-  notImplemented();
-  return 0;
-}
+DragImageRef ClipboardGtk::createDragImage(IntPoint& location) const {
+  location = m_dragLoc;
+  if (!m_dragImage)
+    return 0;
 
-void ClipboardGtk::setDragImageElement(Node*, const IntPoint&) {
-  notImplemented();
-}
-
-DragImageRef ClipboardGtk::createDragImage(IntPoint&) const {
-  notImplemented();
-  return 0;
+  return createDragImageFromImage(m_dragImage->image());
 }
 
 static CachedImage* getCachedImage(Element* element) {
@@ -314,23 +320,19 @@ static CachedImage* getCachedImage(Element* element) {
 void ClipboardGtk::declareAndWriteDragImage(Element* element,
                                             const KURL& url,
                                             const String& label,
-                                            Frame*) {
-  CachedImage* cachedImage = getCachedImage(element);
-  if (!cachedImage || !cachedImage->isLoaded())
+                                            Frame* frame) {
+  m_dataObject->setURL(url, label);
+  m_dataObject->setMarkup(createMarkup(element, IncludeNode, 0, AbsoluteURLs));
+
+  CachedImage* image = getCachedImage(element);
+  if (!image || !image->isLoaded())
     return;
 
-  GdkPixbuf* pixbuf = cachedImage->image()->getGdkPixbuf();
+  GRefPtr<GdkPixbuf> pixbuf = adoptGRef(image->image()->getGdkPixbuf());
   if (!pixbuf)
     return;
 
-  GtkClipboard* imageClipboard =
-      gtk_clipboard_get(gdk_atom_intern_static_string("WebKitClipboardImage"));
-  gtk_clipboard_clear(imageClipboard);
-
-  gtk_clipboard_set_image(imageClipboard, pixbuf);
-  g_object_unref(pixbuf);
-
-  writeURL(url, label, 0);
+  m_dataObject->setImage(pixbuf.get());
 }
 
 void ClipboardGtk::writeURL(const KURL& url, const String& label, Frame*) {

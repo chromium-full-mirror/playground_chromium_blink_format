@@ -27,6 +27,7 @@
 #ifndef ClipboardGtk_h
 #define ClipboardGtk_h
 
+#include "CachedResourceClient.h"
 #include "Clipboard.h"
 #include "DataObjectGtk.h"
 
@@ -39,7 +40,7 @@ class PasteboardHelper;
 
 // State available during IE's events for drag and drop and copy/paste
 // Created from the EventHandlerGtk to be used by the dom
-class ClipboardGtk : public Clipboard {
+class ClipboardGtk : public Clipboard, public CachedResourceClient {
  public:
   static PassRefPtr<ClipboardGtk> create(ClipboardAccessPolicy policy,
                                          GtkClipboard* clipboard,
@@ -64,17 +65,17 @@ class ClipboardGtk : public Clipboard {
   virtual HashSet<String> types() const;
   virtual PassRefPtr<FileList> files() const;
 
-  IntPoint dragLocation() const;
-  CachedImage* dragImage() const;
   void setDragImage(CachedImage*, const IntPoint&);
-  Node* dragImageElement();
   void setDragImageElement(Node*, const IntPoint&);
+  void setDragImage(CachedImage*, Node*, const IntPoint&);
 
   virtual DragImageRef createDragImage(IntPoint&) const;
+#if ENABLE(DRAG_SUPPORT)
   virtual void declareAndWriteDragImage(Element*,
                                         const KURL&,
                                         const String&,
                                         Frame*);
+#endif
   virtual void writeURL(const KURL&, const String&, Frame*);
   virtual void writeRange(Range*, Frame*);
   virtual void writePlainText(const String&);
