@@ -33,11 +33,11 @@
 #if USE(ACCELERATED_COMPOSITING)
 #include "LayerRendererChromium.h"
 
+#include "CanvasLayerChromium.h"
 #include "GLES2Context.h"
 #include "LayerChromium.h"
 #include "NotImplemented.h"
 #include "TransformLayerChromium.h"
-#include "WebGLLayerChromium.h"
 #if PLATFORM(SKIA)
 #include "NativeImageSkia.h"
 #include "PlatformContextSkia.h"
@@ -743,6 +743,7 @@ void LayerRendererChromium::drawLayer(LayerChromium* layer) {
     if (layer->contentsDirty()) {
       // Update the backing texture contents for any dirty portion of the layer.
       layer->updateTextureContents(textureId);
+      m_gles2Context->makeCurrent();
     }
 
     if (layer->doubleSided())
@@ -825,9 +826,9 @@ bool LayerRendererChromium::initializeSharedGLObjects() {
       "\n"
       "}                                                   \n";
 
-  // WebGL layers need to be flipped vertically and their colors shouldn't be
+  // Canvas layers need to be flipped vertically and their colors shouldn't be
   // swizzled.
-  char webGLFragmentShaderString[] =
+  char canvasFragmentShaderString[] =
       "precision mediump float;                            \n"
       "varying vec2 v_texCoord;                            \n"
       "uniform sampler2D s_texture;                        \n"
@@ -879,12 +880,12 @@ bool LayerRendererChromium::initializeSharedGLObjects() {
   }
   LayerChromium::setShaderProgramId(ContentLayerProgram);
 
-  if (!createLayerShader(WebGLLayerProgram, vertexShaderString,
-                         webGLFragmentShaderString)) {
-    LOG_ERROR("Failed to create shader program for WebGL layers");
+  if (!createLayerShader(CanvasLayerProgram, vertexShaderString,
+                         canvasFragmentShaderString)) {
+    LOG_ERROR("Failed to create shader program for Canvas layers");
     return false;
   }
-  WebGLLayerChromium::setShaderProgramId(WebGLLayerProgram);
+  CanvasLayerChromium::setShaderProgramId(CanvasLayerProgram);
 
   if (!createLayerShader(ScrollLayerProgram, vertexShaderString,
                          scrollFragmentShaderString)) {
@@ -902,7 +903,7 @@ bool LayerRendererChromium::initializeSharedGLObjects() {
   // same for all programs to
   // avoid binding re-binding the vertex attributes.
   bindCommonAttribLocations(ContentLayerProgram);
-  bindCommonAttribLocations(WebGLLayerProgram);
+  bindCommonAttribLocations(CanvasLayerProgram);
   bindCommonAttribLocations(DebugBorderProgram);
   bindCommonAttribLocations(ScrollLayerProgram);
 

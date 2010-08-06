@@ -98,7 +98,7 @@ class LayerRendererChromium : public Noncopyable {
     DebugBorderProgram,
     ScrollLayerProgram,
     ContentLayerProgram,
-    WebGLLayerProgram,
+    CanvasLayerProgram,
     NumShaderProgramTypes
   };
 

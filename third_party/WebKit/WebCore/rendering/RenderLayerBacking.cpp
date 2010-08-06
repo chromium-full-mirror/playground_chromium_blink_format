@@ -28,13 +28,12 @@
 #if USE(ACCELERATED_COMPOSITING)
 
 #include "AnimationController.h"
-#if ENABLE(3D_CANVAS)
-#include "WebGLRenderingContext.h"
-#endif
+#include "CanvasRenderingContext.h"
 #include "CSSPropertyNames.h"
 #include "CSSStyleSelector.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
+#include "GraphicsContext3D.h"
 #include "GraphicsLayer.h"
 #include "HTMLCanvasElement.h"
 #include "HTMLElement.h"
@@ -66,10 +65,14 @@ static bool hasBoxDecorationsOrBackground(const RenderObject*);
 static bool hasBoxDecorationsOrBackgroundImage(const RenderStyle*);
 static IntRect clipBox(RenderBox* renderer);
 
-static inline bool is3DCanvas(RenderObject* renderer) {
-#if ENABLE(3D_CANVAS)
-  if (renderer->isCanvas())
-    return static_cast<HTMLCanvasElement*>(renderer->node())->is3D();
+static inline bool isAcceleratedCanvas(RenderObject* renderer) {
+#if ENABLE(3D_CANVAS) || ENABLE(ACCELERATED_2D_CANVAS)
+  if (renderer->isCanvas()) {
+    HTMLCanvasElement* canvas =
+        static_cast<HTMLCanvasElement*>(renderer->node());
+    if (CanvasRenderingContext* context = canvas->renderingContext())
+      return context->isAccelerated();
+  }
 #else
   UNUSED_PARAM(renderer);
 #endif
@@ -265,15 +268,14 @@ bool RenderLayerBacking::updateGraphicsLayerConfiguration() {
     m_graphicsLayer->setContentsToMedia(mediaElement->platformLayer());
   }
 #endif
-#if ENABLE(3D_CANVAS)
-  else if (is3DCanvas(renderer())) {
+#if ENABLE(3D_CANVAS) || ENABLE(ACCELERATED_2D_CANVAS)
+  else if (isAcceleratedCanvas(renderer())) {
     HTMLCanvasElement* canvas =
         static_cast<HTMLCanvasElement*>(renderer()->node());
-    WebGLRenderingContext* context =
-        static_cast<WebGLRenderingContext*>(canvas->renderingContext());
-    if (context->graphicsContext3D()->platformLayer())
-      m_graphicsLayer->setContentsToWebGL(
-          context->graphicsContext3D()->platformLayer());
+    if (CanvasRenderingContext* context = canvas->renderingContext())
+      if (context->graphicsContext3D())
+        if (PlatformLayer* pl = context->graphicsContext3D()->platformLayer())
+          m_graphicsLayer->setContentsToCanvas(pl);
   }
 #endif
 
@@ -812,8 +814,12 @@ bool RenderLayerBacking::containsPaintedContent() const {
   // fill the border box entirely,
   // and set background color on the layer in that case, instead of allocating
   // backing store and painting.
-  if (renderer()->isVideo() || is3DCanvas(renderer()))
+  if (renderer()->isVideo())
     return hasBoxDecorationsOrBackground(renderer());
+#if ENABLE(3D_CANVAS) || ENABLE(ACCELERATED_2D_CANVAS)
+  if (isAcceleratedCanvas(renderer()))
+    return hasBoxDecorationsOrBackground(renderer());
+#endif
 
   return true;
 }
@@ -834,8 +840,8 @@ void RenderLayerBacking::rendererContentChanged() {
     return;
   }
 
-#if ENABLE(3D_CANVAS)
-  if (is3DCanvas(renderer())) {
+#if ENABLE(3D_CANVAS) || ENABLE(ACCELERATED_2D_CANVAS)
+  if (isAcceleratedCanvas(renderer())) {
     m_graphicsLayer->setContentsNeedsDisplay();
     return;
   }

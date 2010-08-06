@@ -319,9 +319,7 @@ class GraphicsLayer {
   virtual void setContentsToImage(Image*) {}
   virtual void setContentsToMedia(PlatformLayer*) {}  // video or plug-in
   virtual void setContentsBackgroundColor(const Color&) {}
-#if ENABLE(3D_CANVAS)
-  virtual void setContentsToWebGL(PlatformLayer*) {}
-#endif
+  virtual void setContentsToCanvas(PlatformLayer*) {}
   virtual bool hasContentsLayer() const { return false; }
 
   // Callback from the underlying graphics system to draw layer contents.
