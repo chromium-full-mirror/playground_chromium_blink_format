@@ -38,6 +38,7 @@ class DOMStringList;
 class Frame;
 class IDBCallbacks;
 class IDBObjectStoreBackendInterface;
+class IDBTransactionBackendInterface;
 
 // This class is shared by IDBDatabase (async) and IDBDatabaseSync (sync).
 // This is implemented by IDBDatabaseBackendImpl and optionally others (in order
@@ -66,6 +67,10 @@ class IDBDatabaseBackendInterface
       unsigned short mode) = 0;
   virtual void removeObjectStore(const String& name,
                                  PassRefPtr<IDBCallbacks>) = 0;
+  virtual PassRefPtr<IDBTransactionBackendInterface> transaction(
+      DOMStringList* storeNames,
+      unsigned short mode,
+      unsigned long timeout) = 0;
 };
 
 }  // namespace WebCore

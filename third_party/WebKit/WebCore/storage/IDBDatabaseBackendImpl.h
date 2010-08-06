@@ -57,6 +57,10 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
       const String& name,
       unsigned short mode);
   virtual void removeObjectStore(const String& name, PassRefPtr<IDBCallbacks>);
+  virtual PassRefPtr<IDBTransactionBackendInterface> transaction(
+      DOMStringList* storeNames,
+      unsigned short mode,
+      unsigned long timeout);
 
  private:
   IDBDatabaseBackendImpl(const String& name,

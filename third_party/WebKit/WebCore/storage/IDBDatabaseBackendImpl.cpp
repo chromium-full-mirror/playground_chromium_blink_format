@@ -89,6 +89,15 @@ void IDBDatabaseBackendImpl::removeObjectStore(
   callbacks->onSuccess();
 }
 
+PassRefPtr<IDBTransactionBackendInterface> IDBDatabaseBackendImpl::transaction(
+    DOMStringList*,
+    unsigned short,
+    unsigned long) {
+  // FIXME: Ask the transaction manager for a new IDBTransactionBackendImpl.
+  ASSERT_NOT_REACHED();
+  return 0;
+}
+
 }  // namespace WebCore
 
 #endif  // ENABLE(INDEXED_DATABASE)

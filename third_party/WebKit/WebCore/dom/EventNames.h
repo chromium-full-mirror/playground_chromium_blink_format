@@ -31,11 +31,11 @@ namespace WebCore {
                                                                                                                                  \
   macro(abort) macro(beforecopy) macro(beforecut) macro(beforeload) macro(beforepaste) macro(                                    \
       beforeprocess) macro(beforeunload) macro(blur) macro(cached) macro(change) macro(checking)                                 \
-      macro(click) macro(close) macro(compositionend) macro(compositionstart) macro(compositionupdate) macro(                    \
-          connect) macro(contextmenu) macro(copy) macro(cut) macro(dblclick) macro(deviceorientation)                            \
-          macro(display) macro(downloading) macro(drag) macro(dragend) macro(                                                    \
-              dragenter) macro(dragleave) macro(dragover) macro(dragstart) macro(drop)                                           \
-              macro(error) macro(focus) macro(focusin) macro(focusout) macro(                                                    \
+      macro(click) macro(close) macro(complete) macro(compositionend) macro(compositionstart) macro(                             \
+          compositionupdate) macro(connect) macro(contextmenu) macro(copy) macro(cut)                                            \
+          macro(dblclick) macro(deviceorientation) macro(display) macro(downloading) macro(                                      \
+              drag) macro(dragend) macro(dragenter) macro(dragleave) macro(dragover)                                             \
+              macro(dragstart) macro(drop) macro(error) macro(focus) macro(focusin) macro(focusout) macro(                       \
                   hashchange) macro(input) macro(invalid) macro(keydown) macro(keypress)                                         \
                   macro(keyup) macro(load) macro(loadstart) macro(message) macro(                                                \
                       mousedown) macro(mousemove) macro(mouseout) macro(mouseover) macro(mouseup)                                \
@@ -77,16 +77,19 @@ namespace WebCore {
                                                                               macro(                                             \
                                                                                   orientationchange)                             \
                                                                                                                                  \
-                                                                                  macro(touchstart) macro(                       \
-                                                                                      touchmove) macro(touchend)                 \
-                                                                                      macro(                                     \
-                                                                                          touchcancel)                           \
+                                                                                  macro(                                         \
+                                                                                      timeout)                                   \
                                                                                                                                  \
+                                                                                      macro(touchstart) macro(                   \
+                                                                                          touchmove) macro(touchend)             \
                                                                                           macro(                                 \
-                                                                                              success)                           \
+                                                                                              touchcancel)                       \
                                                                                                                                  \
                                                                                               macro(                             \
-                                                                                                  loadend)                       \
+                                                                                                  success)                       \
+                                                                                                                                 \
+                                                                                                  macro(                         \
+                                                                                                      loadend)                   \
                                                                                                                                  \
       // end of DOM_EVENT_NAMES_FOR_EACH
 

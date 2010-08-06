@@ -28,6 +28,7 @@
 
 #include "DOMStringList.h"
 #include "IDBDatabaseBackendInterface.h"
+#include "IDBTransaction.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
@@ -63,10 +64,14 @@ class IDBDatabase : public RefCounted<IDBDatabase> {
                                            bool autoIncrement = false);
   PassRefPtr<IDBObjectStore> objectStore(
       const String& name,
-      unsigned short mode = 0);  // FIXME: Use constant rather than 0.
+      unsigned short mode = IDBTransaction::READ_ONLY);
   PassRefPtr<IDBRequest> removeObjectStore(ScriptExecutionContext*,
                                            const String& name);
-
+  PassRefPtr<IDBTransaction> transaction(
+      ScriptExecutionContext*,
+      DOMStringList* storeNames = 0,
+      unsigned short mode = IDBTransaction::READ_ONLY,
+      unsigned long timeout = 0);  // FIXME: what should the default timeout be?
  private:
   IDBDatabase(PassRefPtr<IDBDatabaseBackendInterface>);
 

@@ -74,9 +74,7 @@ class IDBRequest : public IDBCallbacks,
 
   // ActiveDOMObject
   virtual ScriptExecutionContext* scriptExecutionContext() const;
-  virtual void stop();
-  virtual void suspend();
-  virtual void resume();
+  virtual bool canSuspend() const;
 
   using RefCounted<IDBCallbacks>::ref;
   using RefCounted<IDBCallbacks>::deref;
@@ -103,7 +101,6 @@ class IDBRequest : public IDBCallbacks,
   RefPtr<IDBRequest>
       m_selfRef;  // This is set to us iff there's an event pending.
 
-  bool m_stopped;
   bool m_aborted;
   ReadyState m_readyState;
   EventTargetData m_eventTargetData;
