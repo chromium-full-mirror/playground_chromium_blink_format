@@ -21,6 +21,7 @@
 #include "config.h"
 #include "PageGroupLoadDeferrer.h"
 
+#include "AsyncScriptRunner.h"
 #include "Frame.h"
 #include "Page.h"
 #include "PageGroup.h"
@@ -46,7 +47,7 @@ PageGroupLoadDeferrer::PageGroupLoadDeferrer(Page* page, bool deferSelf) {
       for (Frame* frame = otherPage->mainFrame(); frame;
            frame = frame->tree()->traverseNext()) {
         frame->document()->suspendActiveDOMObjects();
-        frame->document()->suspendExecuteScriptSoonTimer();
+        frame->document()->asyncScriptRunner()->suspend();
       }
     }
   }
@@ -65,7 +66,7 @@ PageGroupLoadDeferrer::~PageGroupLoadDeferrer() {
       for (Frame* frame = page->mainFrame(); frame;
            frame = frame->tree()->traverseNext()) {
         frame->document()->resumeActiveDOMObjects();
-        frame->document()->resumeExecuteScriptSoonTimer();
+        frame->document()->asyncScriptRunner()->resume();
       }
     }
   }

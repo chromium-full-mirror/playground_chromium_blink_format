@@ -50,6 +50,7 @@
 
 namespace WebCore {
 
+class AsyncScriptRunner;
 class Attr;
 class AXObjectCache;
 class CDATASection;
@@ -961,11 +962,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   int docID() const { return m_docID; }
 
-  void executeScriptSoon(ScriptElementData*,
-                         CachedResourceHandle<CachedScript>);
-
-  void suspendExecuteScriptSoonTimer();
-  void resumeExecuteScriptSoonTimer();
+  AsyncScriptRunner* asyncScriptRunner() { return m_asyncScriptRunner.get(); }
 
 #if ENABLE(XSLT)
   void applyXSLTransform(ProcessingInstruction* pi);
@@ -1212,8 +1209,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   String encoding() const;
 
-  void executeScriptSoonTimerFired(Timer<Document>*);
-
   void updateTitle();
   void updateFocusAppearanceTimerFired(Timer<Document>*);
   void updateBaseURL();
@@ -1377,9 +1372,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   // points during the lifetime of the Document.
   int m_extraLayoutDelay;
 
-  Vector<std::pair<ScriptElementData*, CachedResourceHandle<CachedScript>>>
-      m_scriptsToExecuteSoon;
-  Timer<Document> m_executeScriptSoonTimer;
+  OwnPtr<AsyncScriptRunner> m_asyncScriptRunner;
 
 #if ENABLE(XSLT)
   OwnPtr<TransformSource> m_transformSource;
