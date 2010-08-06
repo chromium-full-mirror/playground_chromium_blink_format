@@ -33,6 +33,8 @@
 
 namespace WebKit {
 
+class WebIDBKeyRange;
+
 // See comment in WebIndexedDatabase for a high level overview these classes.
 class WebIDBObjectStore {
  public:
@@ -74,6 +76,11 @@ class WebIDBObjectStore {
     return 0;
   }
   virtual void removeIndex(const WebString& name, WebIDBCallbacks*) {
+    WEBKIT_ASSERT_NOT_REACHED();
+  }
+  virtual void openCursor(const WebIDBKeyRange&,
+                          unsigned short direction,
+                          WebIDBCallbacks*) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
   // FIXME: finish.

@@ -35,6 +35,7 @@
 #include "EventException.h"
 #include "EventListener.h"
 #include "EventNames.h"
+#include "IDBCursor.h"
 #include "IDBDatabase.h"
 #include "IDBIndex.h"
 #include "IDBErrorEvent.h"
@@ -66,6 +67,11 @@ void IDBRequest::onError(PassRefPtr<IDBDatabaseError> error) {
 void IDBRequest::onSuccess() {
   onEventCommon();
   m_result->set();
+}
+
+void IDBRequest::onSuccess(PassRefPtr<IDBCursorBackendInterface> backend) {
+  onEventCommon();
+  m_result->set(IDBCursor::create(backend));
 }
 
 void IDBRequest::onSuccess(PassRefPtr<IDBDatabaseBackendInterface> backend) {

@@ -30,6 +30,7 @@
 
 namespace WebKit {
 
+class WebIDBCursor;
 class WebIDBDatabase;
 class WebIDBDatabaseError;
 class WebIDBKey;
@@ -47,6 +48,7 @@ class WebIDBCallbacks {
     WEBKIT_ASSERT_NOT_REACHED();
   }
   virtual void onSuccess() { WEBKIT_ASSERT_NOT_REACHED(); }  // For "null".
+  virtual void onSuccess(WebIDBCursor*) { WEBKIT_ASSERT_NOT_REACHED(); }
   virtual void onSuccess(WebIDBDatabase*) { WEBKIT_ASSERT_NOT_REACHED(); }
   virtual void onSuccess(const WebIDBKey&) { WEBKIT_ASSERT_NOT_REACHED(); }
   virtual void onSuccess(WebIDBIndex*) { WEBKIT_ASSERT_NOT_REACHED(); }

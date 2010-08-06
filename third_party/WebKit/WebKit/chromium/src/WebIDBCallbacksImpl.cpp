@@ -27,6 +27,7 @@
 #include "WebIDBCallbacksImpl.h"
 
 #include "IDBCallbacks.h"
+#include "IDBCursorBackendProxy.h"
 #include "IDBDatabaseError.h"
 #include "IDBDatabaseProxy.h"
 #include "IDBIndexBackendProxy.h"
@@ -56,6 +57,11 @@ void WebIDBCallbacksImpl::onError(const WebKit::WebIDBDatabaseError& error) {
 
 void WebIDBCallbacksImpl::onSuccess() {
   m_callbacks->onSuccess();
+  m_callbacks.clear();
+}
+
+void WebIDBCallbacksImpl::onSuccess(WebKit::WebIDBCursor* cursor) {
+  m_callbacks->onSuccess(IDBCursorBackendProxy::create(cursor));
   m_callbacks.clear();
 }
 

@@ -63,6 +63,10 @@ class IDBObjectStoreProxy : public IDBObjectStoreBackendInterface {
   PassRefPtr<IDBIndexBackendInterface> index(const String& name);
   void removeIndex(const String& name, PassRefPtr<IDBCallbacks>);
 
+  virtual void openCursor(PassRefPtr<IDBKeyRange> range,
+                          unsigned short direction,
+                          PassRefPtr<IDBCallbacks>);
+
  private:
   IDBObjectStoreProxy(PassOwnPtr<WebKit::WebIDBObjectStore>);
 

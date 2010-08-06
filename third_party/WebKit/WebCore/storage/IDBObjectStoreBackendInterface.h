@@ -37,6 +37,7 @@ class DOMStringList;
 class IDBCallbacks;
 class IDBIndexBackendInterface;
 class IDBKey;
+class IDBKeyRange;
 class SerializedScriptValue;
 
 class IDBObjectStoreBackendInterface
@@ -61,6 +62,10 @@ class IDBObjectStoreBackendInterface
                            PassRefPtr<IDBCallbacks>) = 0;
   virtual PassRefPtr<IDBIndexBackendInterface> index(const String& name) = 0;
   virtual void removeIndex(const String& name, PassRefPtr<IDBCallbacks>) = 0;
+
+  virtual void openCursor(PassRefPtr<IDBKeyRange>,
+                          unsigned short direction,
+                          PassRefPtr<IDBCallbacks>) = 0;
 };
 
 }  // namespace WebCore
