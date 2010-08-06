@@ -383,7 +383,7 @@ void HTMLTreeBuilder::passTokenToLegacyParser(HTMLToken& token) {
       m_lastScriptElementStartLine = m_tokenizer->lineNumber();
     } else if (oldStyleToken.tagName == preTag ||
                oldStyleToken.tagName == listingTag)
-      m_tokenizer->skipLeadingNewLineForListing();
+      m_tokenizer->setSkipLeadingNewLineForListing(true);
     else
       m_tokenizer->setState(adjustedLexerState(
           m_tokenizer->state(), oldStyleToken.tagName, m_document->frame()));
@@ -429,6 +429,12 @@ void HTMLTreeBuilder::constructTreeFromToken(HTMLToken& rawToken) {
 
   AtomicHTMLToken token(rawToken);
   processToken(token);
+
+  // Swallowing U+0000 characters isn't in the HTML5 spec, but turning all
+  // the U+0000 characters into replacement characters has compatibility
+  // problems.
+  m_tokenizer->setForceNullCharacterReplacement(
+      m_insertionMode == TextMode || m_insertionMode == InForeignContentMode);
 }
 
 void HTMLTreeBuilder::processToken(AtomicHTMLToken& token) {
@@ -745,7 +751,7 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
   if (token.name() == preTag || token.name() == listingTag) {
     processFakePEndTagIfPInButtonScope();
     m_tree.insertHTMLElement(token);
-    m_tokenizer->skipLeadingNewLineForListing();
+    m_tokenizer->setSkipLeadingNewLineForListing(true);
     m_framesetOk = false;
     return;
   }
@@ -863,7 +869,7 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
   }
   if (token.name() == textareaTag) {
     m_tree.insertHTMLElement(token);
-    m_tokenizer->skipLeadingNewLineForListing();
+    m_tokenizer->setSkipLeadingNewLineForListing(true);
     m_tokenizer->setState(HTMLTokenizer::RCDATAState);
     m_originalInsertionMode = m_insertionMode;
     m_framesetOk = false;
