@@ -25,6 +25,7 @@
 #define Collector_h
 
 #include "AlignedMemoryAllocator.h"
+#include "GCHandle.h"
 #include <stddef.h>
 #include <string.h>
 #include <wtf/Bitmap.h>
@@ -65,13 +66,13 @@ const size_t BLOCK_SIZE = 64 * 1024;  // 64k
 const size_t BLOCK_SIZE = 256 * 1024;  // 256k
 #endif
 
-typedef AlignedMemoryAllocator<BLOCK_SIZE> AlignedAllocator;
-typedef AlignedMemory<BLOCK_SIZE> AlignedBlock;
+typedef AlignedMemoryAllocator<BLOCK_SIZE> CollectorBlockAllocator;
+typedef AlignedMemory<BLOCK_SIZE> AlignedCollectorBlock;
 
 struct CollectorHeap {
   size_t nextBlock;
   size_t nextCell;
-  AlignedBlock* blocks;
+  AlignedCollectorBlock* blocks;
 
   void* nextNumber;
 
@@ -134,6 +135,8 @@ class Heap : public Noncopyable {
   static bool isCellMarked(const JSCell*);
   static void markCell(JSCell*);
 
+  WeakGCHandle* addWeakGCHandle(JSCell*);
+
   void markConservatively(MarkStack&, void* start, void* end);
 
   HashSet<MarkedArgumentBuffer*>& markListSet() {
@@ -179,11 +182,15 @@ class Heap : public Noncopyable {
   void markOtherThreadConservatively(MarkStack&, Thread*);
   void markStackObjectsConservatively(MarkStack&);
 
+  void updateWeakGCHandles();
+  WeakGCHandlePool* weakGCHandlePool(size_t index);
+
   typedef HashCountedSet<JSCell*> ProtectCountSet;
 
   CollectorHeap m_heap;
 
   ProtectCountSet m_protectedValues;
+  WTF::Vector<AlignedMemory<WeakGCHandlePool::poolSize>> m_weakGCHandlePools;
 
   HashSet<MarkedArgumentBuffer*>* m_markListSet;
 
@@ -201,7 +208,8 @@ class Heap : public Noncopyable {
 #endif
 
   // Allocates collector blocks with correct alignment
-  AlignedAllocator m_blockallocator;
+  CollectorBlockAllocator m_blockallocator;
+  WeakGCHandlePool::Allocator m_weakGCHandlePoolAllocator;
 
   JSGlobalData* m_globalData;
 };
@@ -305,6 +313,10 @@ inline void* Heap::allocateNumber(size_t s) {
   void* result = allocate(s);
   m_heap.nextNumber = static_cast<char*>(result) + (CELL_SIZE / 2);
   return result;
+}
+
+inline WeakGCHandlePool* Heap::weakGCHandlePool(size_t index) {
+  return static_cast<WeakGCHandlePool*>(m_weakGCHandlePools[index].base());
 }
 }  // namespace JSC
 
