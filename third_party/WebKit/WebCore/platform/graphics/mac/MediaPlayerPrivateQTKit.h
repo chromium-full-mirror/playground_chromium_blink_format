@@ -127,6 +127,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
 
   void paint(GraphicsContext*, const IntRect&);
   void paintCurrentFrameInContext(GraphicsContext*, const IntRect&);
+  virtual void prepareForRendering();
 
 #if USE(ACCELERATED_COMPOSITING)
   bool supportsAcceleratedRendering() const;
@@ -180,7 +181,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
     return m_qtMovie && m_readyState >= MediaPlayer::HaveMetadata;
   }
 
-  bool isReadyForRendering() const;
+  bool isReadyForVideoSetup() const;
 
   MediaPlayer* m_player;
   RetainPtr<QTMovie> m_qtMovie;
@@ -207,6 +208,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   bool m_hasUnsupportedTracks;
   bool m_videoFrameHasDrawn;
   bool m_delayingLoad;
+  bool m_isAllowedToRender;
 #if DRAW_FRAME_RATE
   int m_frameCountWhilePlaying;
   double m_timeStartedPlaying;

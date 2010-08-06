@@ -131,6 +131,8 @@ class MediaPlayerPrivateInterface : public Noncopyable {
   virtual MediaPlayer::MovieLoadType movieLoadType() const {
     return MediaPlayer::Unknown;
   }
+
+  virtual void prepareForRendering() {}
 };
 }
 

@@ -199,6 +199,10 @@ class HTMLMediaElement : public HTMLElement,
   virtual void willMoveToNewOwnerDocument();
   virtual void didMoveToNewOwnerDocument();
 
+  enum DisplayMode { Unknown, None, Poster, Video };
+  DisplayMode displayMode() const { return m_displayMode; }
+  virtual void setDisplayMode(DisplayMode mode) { m_displayMode = mode; }
+
  private:
   virtual bool checkDTD(const Node* newChild);
   virtual void attributeChanged(Attribute*, bool preserveDecls);
@@ -216,7 +220,8 @@ class HTMLMediaElement : public HTMLElement,
   virtual void documentWillBecomeInactive();
   virtual void documentDidBecomeActive();
   virtual void mediaVolumeDidChange();
-  virtual void updatePosterImage() {}
+
+  virtual void updateDisplayState() {}
 
   void setReadyState(MediaPlayer::ReadyState);
   void setNetworkState(MediaPlayer::NetworkState);
@@ -275,6 +280,7 @@ class HTMLMediaElement : public HTMLElement,
   void pauseInternal();
 
   void prepareForLoad();
+  void allowVideoRendering();
 
   bool processingMediaPlayerCallback() const {
     return m_processingMediaPlayerCallback > 0;
@@ -359,15 +365,15 @@ class HTMLMediaElement : public HTMLElement,
 
   MediaPlayer::Preload m_preload;
 
-  bool m_playing;
+  DisplayMode m_displayMode;
 
   // Counter incremented while processing a callback from the media player, so
   // we can avoid
   // calling the media engine recursively.
   int m_processingMediaPlayerCallback;
 
-  bool m_isWaitingUntilMediaCanStart;
-
+  bool m_playing : 1;
+  bool m_isWaitingUntilMediaCanStart : 1;
   bool m_processingLoad : 1;
   bool m_delayingTheLoadEvent : 1;
   bool m_haveFiredLoadedData : 1;
