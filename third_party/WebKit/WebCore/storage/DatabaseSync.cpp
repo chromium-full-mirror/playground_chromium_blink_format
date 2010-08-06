@@ -151,8 +151,20 @@ void DatabaseSync::changeVersion(
 }
 
 void DatabaseSync::transaction(PassRefPtr<SQLTransactionSyncCallback> callback,
-                               bool readOnly,
                                ExceptionCode& ec) {
+  runTransaction(callback, false, ec);
+}
+
+void DatabaseSync::readTransaction(
+    PassRefPtr<SQLTransactionSyncCallback> callback,
+    ExceptionCode& ec) {
+  runTransaction(callback, true, ec);
+}
+
+void DatabaseSync::runTransaction(
+    PassRefPtr<SQLTransactionSyncCallback> callback,
+    bool readOnly,
+    ExceptionCode& ec) {
   ASSERT(m_scriptExecutionContext->isContextThread());
 
   if (sqliteDatabase().transactionInProgress()) {

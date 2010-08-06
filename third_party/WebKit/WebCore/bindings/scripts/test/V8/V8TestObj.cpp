@@ -29,6 +29,7 @@
 #include "ScriptCallStack.h"
 #include "SerializedScriptValue.h"
 #include "V8Binding.h"
+#include "V8BindingMacros.h"
 #include "V8BindingState.h"
 #include "V8DOMWrapper.h"
 #include "V8IsolatedContext.h"
@@ -630,12 +631,19 @@ static v8::Handle<v8::Value> voidMethodWithArgsCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.voidMethodWithArgs");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  int intArg = toInt32(args[0]);
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(int, intArg, toInt32(args[0]));
+  if (args.Length() <= 1)
+    return throwError(TYPE_MISMATCH_ERR);
   V8Parameter<> strArg = args[1];
-  TestObj* objArg =
+  if (args.Length() <= 2)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(
+      TestObj*, objArg,
       V8TestObj::HasInstance(args[2])
           ? V8TestObj::toNative(v8::Handle<v8::Object>::Cast(args[2]))
-          : 0;
+          : 0);
   imp->voidMethodWithArgs(intArg, strArg, objArg);
   return v8::Handle<v8::Value>();
 }
@@ -650,12 +658,19 @@ static v8::Handle<v8::Value> intMethodWithArgsCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.intMethodWithArgs");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  int intArg = toInt32(args[0]);
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(int, intArg, toInt32(args[0]));
+  if (args.Length() <= 1)
+    return throwError(TYPE_MISMATCH_ERR);
   V8Parameter<> strArg = args[1];
-  TestObj* objArg =
+  if (args.Length() <= 2)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(
+      TestObj*, objArg,
       V8TestObj::HasInstance(args[2])
           ? V8TestObj::toNative(v8::Handle<v8::Object>::Cast(args[2]))
-          : 0;
+          : 0);
   return v8::Integer::New(imp->intMethodWithArgs(intArg, strArg, objArg));
 }
 
@@ -669,12 +684,19 @@ static v8::Handle<v8::Value> objMethodWithArgsCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.objMethodWithArgs");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  int intArg = toInt32(args[0]);
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(int, intArg, toInt32(args[0]));
+  if (args.Length() <= 1)
+    return throwError(TYPE_MISMATCH_ERR);
   V8Parameter<> strArg = args[1];
-  TestObj* objArg =
+  if (args.Length() <= 2)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(
+      TestObj*, objArg,
       V8TestObj::HasInstance(args[2])
           ? V8TestObj::toNative(v8::Handle<v8::Object>::Cast(args[2]))
-          : 0;
+          : 0);
   return toV8(imp->objMethodWithArgs(intArg, strArg, objArg));
 }
 
@@ -684,11 +706,16 @@ static v8::Handle<v8::Value> methodThatRequiresAllArgsCallback(
   if (args.Length() < 2)
     return v8::Handle<v8::Value>();
   TestObj* imp = V8TestObj::toNative(args.Holder());
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
   V8Parameter<> strArg = args[0];
-  TestObj* objArg =
+  if (args.Length() <= 1)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(
+      TestObj*, objArg,
       V8TestObj::HasInstance(args[1])
           ? V8TestObj::toNative(v8::Handle<v8::Object>::Cast(args[1]))
-          : 0;
+          : 0);
   return toV8(imp->methodThatRequiresAllArgs(strArg, objArg));
 }
 
@@ -700,11 +727,16 @@ static v8::Handle<v8::Value> methodThatRequiresAllArgsAndThrowsCallback(
   TestObj* imp = V8TestObj::toNative(args.Holder());
   ExceptionCode ec = 0;
   {
+    if (args.Length() <= 0)
+      return throwError(TYPE_MISMATCH_ERR);
     V8Parameter<> strArg = args[0];
-    TestObj* objArg =
+    if (args.Length() <= 1)
+      return throwError(TYPE_MISMATCH_ERR);
+    EXCEPTION_BLOCK(
+        TestObj*, objArg,
         V8TestObj::HasInstance(args[1])
             ? V8TestObj::toNative(v8::Handle<v8::Object>::Cast(args[1]))
-            : 0;
+            : 0);
     RefPtr<TestObj> result =
         imp->methodThatRequiresAllArgsAndThrows(strArg, objArg, ec);
     if (UNLIKELY(ec))
@@ -720,6 +752,8 @@ static v8::Handle<v8::Value> serializedValueCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.serializedValue");
   TestObj* imp = V8TestObj::toNative(args.Holder());
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
   bool serializedArgDidThrow = false;
   RefPtr<SerializedScriptValue> serializedArg =
       SerializedScriptValue::create(args[0], serializedArgDidThrow);
@@ -732,7 +766,9 @@ static v8::Handle<v8::Value> serializedValueCallback(
 static v8::Handle<v8::Value> idbKeyCallback(const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.idbKey");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  RefPtr<IDBKey> key = createIDBKeyFromValue(args[0]);
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(RefPtr<IDBKey>, key, createIDBKeyFromValue(args[0]));
   imp->idbKey(key);
   return v8::Handle<v8::Value>();
 }
@@ -762,9 +798,12 @@ static v8::Handle<v8::Value> customArgsAndExceptionCallback(
     OwnPtr<ScriptCallStack> callStack(ScriptCallStack::create(args, 1));
     if (!callStack)
       return v8::Undefined();
-    log* intArg = V8log::HasInstance(args[0])
-                      ? V8log::toNative(v8::Handle<v8::Object>::Cast(args[0]))
-                      : 0;
+    if (args.Length() <= 0)
+      return throwError(TYPE_MISMATCH_ERR);
+    EXCEPTION_BLOCK(log*, intArg,
+                    V8log::HasInstance(args[0])
+                        ? V8log::toNative(v8::Handle<v8::Object>::Cast(args[0]))
+                        : 0);
     imp->customArgsAndException(intArg, callStack.get(), ec);
     if (UNLIKELY(ec))
       goto fail;
@@ -820,7 +859,9 @@ static v8::Handle<v8::Value> withDynamicFrameAndArgCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.withDynamicFrameAndArg");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  int intArg = toInt32(args[0]);
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(int, intArg, toInt32(args[0]));
   Frame* enteredFrame = V8Proxy::retrieveFrameForEnteredContext();
   if (!enteredFrame)
     return v8::Undefined();
@@ -832,7 +873,9 @@ static v8::Handle<v8::Value> withDynamicFrameAndOptionalArgCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.withDynamicFrameAndOptionalArg");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  int intArg = toInt32(args[0]);
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(int, intArg, toInt32(args[0]));
   if (args.Length() <= 1) {
     Frame* enteredFrame = V8Proxy::retrieveFrameForEnteredContext();
     if (!enteredFrame)
@@ -840,7 +883,7 @@ static v8::Handle<v8::Value> withDynamicFrameAndOptionalArgCallback(
     imp->withDynamicFrameAndOptionalArg(enteredFrame, intArg);
     return v8::Handle<v8::Value>();
   }
-  int optionalArg = toInt32(args[1]);
+  EXCEPTION_BLOCK(int, optionalArg, toInt32(args[1]));
   Frame* enteredFrame = V8Proxy::retrieveFrameForEnteredContext();
   if (!enteredFrame)
     return v8::Undefined();
@@ -852,7 +895,9 @@ static v8::Handle<v8::Value> withDynamicFrameAndUserGestureCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.withDynamicFrameAndUserGesture");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  int intArg = toInt32(args[0]);
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(int, intArg, toInt32(args[0]));
   Frame* enteredFrame = V8Proxy::retrieveFrameForEnteredContext();
   if (!enteredFrame)
     return v8::Undefined();
@@ -865,7 +910,9 @@ static v8::Handle<v8::Value> withDynamicFrameAndUserGestureASADCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.withDynamicFrameAndUserGestureASAD");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  int intArg = toInt32(args[0]);
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(int, intArg, toInt32(args[0]));
   if (args.Length() <= 1) {
     Frame* enteredFrame = V8Proxy::retrieveFrameForEnteredContext();
     if (!enteredFrame)
@@ -874,7 +921,7 @@ static v8::Handle<v8::Value> withDynamicFrameAndUserGestureASADCallback(
                                             processingUserGesture());
     return v8::Handle<v8::Value>();
   }
-  int optionalArg = toInt32(args[1]);
+  EXCEPTION_BLOCK(int, optionalArg, toInt32(args[1]));
   Frame* enteredFrame = V8Proxy::retrieveFrameForEnteredContext();
   if (!enteredFrame)
     return v8::Undefined();
@@ -962,7 +1009,7 @@ static v8::Handle<v8::Value> methodWithOptionalArgCallback(
     imp->methodWithOptionalArg();
     return v8::Handle<v8::Value>();
   }
-  int opt = toInt32(args[0]);
+  EXCEPTION_BLOCK(int, opt, toInt32(args[0]));
   imp->methodWithOptionalArg(opt);
   return v8::Handle<v8::Value>();
 }
@@ -971,12 +1018,14 @@ static v8::Handle<v8::Value> methodWithNonOptionalArgAndOptionalArgCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.methodWithNonOptionalArgAndOptionalArg");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  int nonOpt = toInt32(args[0]);
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(int, nonOpt, toInt32(args[0]));
   if (args.Length() <= 1) {
     imp->methodWithNonOptionalArgAndOptionalArg(nonOpt);
     return v8::Handle<v8::Value>();
   }
-  int opt = toInt32(args[1]);
+  EXCEPTION_BLOCK(int, opt, toInt32(args[1]));
   imp->methodWithNonOptionalArgAndOptionalArg(nonOpt, opt);
   return v8::Handle<v8::Value>();
 }
@@ -985,13 +1034,19 @@ static v8::Handle<v8::Value> methodWithNonOptionalArgAndTwoOptionalArgsCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.methodWithNonOptionalArgAndTwoOptionalArgs");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  int nonOpt = toInt32(args[0]);
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(int, nonOpt, toInt32(args[0]));
   if (args.Length() <= 1) {
     imp->methodWithNonOptionalArgAndTwoOptionalArgs(nonOpt);
     return v8::Handle<v8::Value>();
   }
-  int opt1 = toInt32(args[1]);
-  int opt2 = toInt32(args[2]);
+  EXCEPTION_BLOCK(int, opt1, toInt32(args[1]));
+  if (args.Length() <= 2) {
+    imp->methodWithNonOptionalArgAndTwoOptionalArgs(nonOpt, opt1);
+    return v8::Handle<v8::Value>();
+  }
+  EXCEPTION_BLOCK(int, opt2, toInt32(args[2]));
   imp->methodWithNonOptionalArgAndTwoOptionalArgs(nonOpt, opt1, opt2);
   return v8::Handle<v8::Value>();
 }
@@ -1000,7 +1055,9 @@ static v8::Handle<v8::Value> methodWithCallbackArgCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.methodWithCallbackArg");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  if (args.Length() <= 0 || !args[0]->IsObject())
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  if (!args[0]->IsObject())
     return throwError(TYPE_MISMATCH_ERR);
   RefPtr<TestCallback> callback =
       V8TestCallback::create(args[0], getScriptExecutionContext());
@@ -1012,8 +1069,12 @@ static v8::Handle<v8::Value> methodWithNonCallbackArgAndCallbackArgCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.methodWithNonCallbackArgAndCallbackArg");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  int nonCallback = toInt32(args[0]);
-  if (args.Length() <= 1 || !args[1]->IsObject())
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(int, nonCallback, toInt32(args[0]));
+  if (args.Length() <= 1)
+    return throwError(TYPE_MISMATCH_ERR);
+  if (!args[1]->IsObject())
     return throwError(TYPE_MISMATCH_ERR);
   RefPtr<TestCallback> callback =
       V8TestCallback::create(args[1], getScriptExecutionContext());
@@ -1025,14 +1086,9 @@ static v8::Handle<v8::Value> methodWithCallbackAndOptionalArgCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.methodWithCallbackAndOptionalArg");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  if (args.Length() <= 0) {
-    imp->methodWithCallbackAndOptionalArg();
-    return v8::Handle<v8::Value>();
-  }
-  if (args.Length() <= 0 || !args[0]->IsObject())
-    return throwError(TYPE_MISMATCH_ERR);
-  RefPtr<TestCallback> callback =
-      V8TestCallback::create(args[0], getScriptExecutionContext());
+  RefPtr<TestCallback> callback;
+  if (args.Length() > 0 && args[0]->IsObject())
+    callback = V8TestCallback::create(args[0], getScriptExecutionContext());
   imp->methodWithCallbackAndOptionalArg(callback);
   return v8::Handle<v8::Value>();
 }
@@ -1041,10 +1097,15 @@ static v8::Handle<v8::Value> overloadedMethod1Callback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.overloadedMethod1");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  TestObj* objArg =
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(
+      TestObj*, objArg,
       V8TestObj::HasInstance(args[0])
           ? V8TestObj::toNative(v8::Handle<v8::Object>::Cast(args[0]))
-          : 0;
+          : 0);
+  if (args.Length() <= 1)
+    return throwError(TYPE_MISMATCH_ERR);
   V8Parameter<> strArg = args[1];
   imp->overloadedMethod(objArg, strArg);
   return v8::Handle<v8::Value>();
@@ -1054,15 +1115,18 @@ static v8::Handle<v8::Value> overloadedMethod2Callback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.overloadedMethod2");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  TestObj* objArg =
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(
+      TestObj*, objArg,
       V8TestObj::HasInstance(args[0])
           ? V8TestObj::toNative(v8::Handle<v8::Object>::Cast(args[0]))
-          : 0;
+          : 0);
   if (args.Length() <= 1) {
     imp->overloadedMethod(objArg);
     return v8::Handle<v8::Value>();
   }
-  int intArg = toInt32(args[1]);
+  EXCEPTION_BLOCK(int, intArg, toInt32(args[1]));
   imp->overloadedMethod(objArg, intArg);
   return v8::Handle<v8::Value>();
 }
@@ -1071,6 +1135,8 @@ static v8::Handle<v8::Value> overloadedMethod3Callback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.overloadedMethod3");
   TestObj* imp = V8TestObj::toNative(args.Holder());
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
   V8Parameter<> strArg = args[0];
   imp->overloadedMethod(strArg);
   return v8::Handle<v8::Value>();
@@ -1080,7 +1146,9 @@ static v8::Handle<v8::Value> overloadedMethod4Callback(
     const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.overloadedMethod4");
   TestObj* imp = V8TestObj::toNative(args.Holder());
-  int intArg = toInt32(args[0]);
+  if (args.Length() <= 0)
+    return throwError(TYPE_MISMATCH_ERR);
+  EXCEPTION_BLOCK(int, intArg, toInt32(args[0]));
   imp->overloadedMethod(intArg);
   return v8::Handle<v8::Value>();
 }
@@ -1317,6 +1385,9 @@ static const BatchedCallback TestObjCallbacks[] = {
      TestObjInternal::methodWithNonOptionalArgAndOptionalArgCallback},
     {"methodWithNonOptionalArgAndTwoOptionalArgs",
      TestObjInternal::methodWithNonOptionalArgAndTwoOptionalArgsCallback},
+    {"methodWithCallbackArg", TestObjInternal::methodWithCallbackArgCallback},
+    {"methodWithNonCallbackArgAndCallbackArg",
+     TestObjInternal::methodWithNonCallbackArgAndCallbackArgCallback},
     {"methodWithCallbackAndOptionalArg",
      TestObjInternal::methodWithCallbackAndOptionalArgCallback},
     {"overloadedMethod", TestObjInternal::overloadedMethodCallback},
@@ -1446,33 +1517,6 @@ static v8::Persistent<v8::FunctionTemplate> ConfigureV8TestObjTemplate(
              v8::FunctionTemplate::New(
                  TestObjInternal::customArgsAndExceptionCallback,
                  v8::Handle<v8::Value>(), customArgsAndExceptionSignature));
-
-  // Custom Signature 'methodWithCallbackArg'
-  const int methodWithCallbackArgArgc = 1;
-  v8::Handle<v8::FunctionTemplate>
-      methodWithCallbackArgArgv[methodWithCallbackArgArgc] = {
-          V8TestCallback::GetRawTemplate()};
-  v8::Handle<v8::Signature> methodWithCallbackArgSignature = v8::Signature::New(
-      desc, methodWithCallbackArgArgc, methodWithCallbackArgArgv);
-  proto->Set(v8::String::New("methodWithCallbackArg"),
-             v8::FunctionTemplate::New(
-                 TestObjInternal::methodWithCallbackArgCallback,
-                 v8::Handle<v8::Value>(), methodWithCallbackArgSignature));
-
-  // Custom Signature 'methodWithNonCallbackArgAndCallbackArg'
-  const int methodWithNonCallbackArgAndCallbackArgArgc = 2;
-  v8::Handle<v8::FunctionTemplate> methodWithNonCallbackArgAndCallbackArgArgv
-      [methodWithNonCallbackArgAndCallbackArgArgc] = {
-          v8::Handle<v8::FunctionTemplate>(), V8TestCallback::GetRawTemplate()};
-  v8::Handle<v8::Signature> methodWithNonCallbackArgAndCallbackArgSignature =
-      v8::Signature::New(desc, methodWithNonCallbackArgAndCallbackArgArgc,
-                         methodWithNonCallbackArgAndCallbackArgArgv);
-  proto->Set(
-      v8::String::New("methodWithNonCallbackArgAndCallbackArg"),
-      v8::FunctionTemplate::New(
-          TestObjInternal::methodWithNonCallbackArgAndCallbackArgCallback,
-          v8::Handle<v8::Value>(),
-          methodWithNonCallbackArgAndCallbackArgSignature));
   batchConfigureConstants(desc, proto, TestObjConsts,
                           sizeof(TestObjConsts) / sizeof(*TestObjConsts));
 

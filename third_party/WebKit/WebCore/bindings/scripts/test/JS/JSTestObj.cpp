@@ -1148,9 +1148,30 @@ jsTestObjPrototypeFunctionVoidMethodWithArgs(ExecState* exec) {
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   int intArg = exec->argument(0).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 1) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   const String& strArg = ustringToString(exec->argument(1).toString(exec));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 2) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   TestObj* objArg = toTestObj(exec->argument(2));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->voidMethodWithArgs(intArg, strArg, objArg);
   return JSValue::encode(jsUndefined());
@@ -1175,9 +1196,30 @@ jsTestObjPrototypeFunctionIntMethodWithArgs(ExecState* exec) {
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   int intArg = exec->argument(0).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 1) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   const String& strArg = ustringToString(exec->argument(1).toString(exec));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 2) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   TestObj* objArg = toTestObj(exec->argument(2));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   JSC::JSValue result =
       jsNumber(exec, imp->intMethodWithArgs(intArg, strArg, objArg));
@@ -1204,9 +1246,30 @@ jsTestObjPrototypeFunctionObjMethodWithArgs(ExecState* exec) {
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   int intArg = exec->argument(0).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 1) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   const String& strArg = ustringToString(exec->argument(1).toString(exec));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 2) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   TestObj* objArg = toTestObj(exec->argument(2));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   JSC::JSValue result =
       toJS(exec, castedThis->globalObject(),
@@ -1223,8 +1286,22 @@ jsTestObjPrototypeFunctionMethodThatRequiresAllArgs(ExecState* exec) {
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   if (exec->argumentCount() < 2)
     return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   const String& strArg = ustringToString(exec->argument(0).toString(exec));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 1) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   TestObj* objArg = toTestObj(exec->argument(1));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   JSC::JSValue result =
       toJS(exec, castedThis->globalObject(),
@@ -1242,8 +1319,22 @@ jsTestObjPrototypeFunctionMethodThatRequiresAllArgsAndThrows(ExecState* exec) {
   if (exec->argumentCount() < 2)
     return throwVMError(exec, createSyntaxError(exec, "Not enough arguments"));
   ExceptionCode ec = 0;
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   const String& strArg = ustringToString(exec->argument(0).toString(exec));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 1) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   TestObj* objArg = toTestObj(exec->argument(1));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   JSC::JSValue result = toJS(
       exec, castedThis->globalObject(),
@@ -1259,8 +1350,15 @@ jsTestObjPrototypeFunctionSerializedValue(ExecState* exec) {
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   RefPtr<SerializedScriptValue> serializedArg =
       SerializedScriptValue::create(exec, exec->argument(0));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->serializedValue(serializedArg);
   return JSValue::encode(jsUndefined());
@@ -1272,7 +1370,14 @@ EncodedJSValue JSC_HOST_CALL jsTestObjPrototypeFunctionIdbKey(ExecState* exec) {
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   RefPtr<IDBKey> key = createIDBKeyFromValue(exec, exec->argument(0));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->idbKey(key);
   return JSValue::encode(jsUndefined());
@@ -1319,7 +1424,14 @@ jsTestObjPrototypeFunctionCustomArgsAndException(ExecState* exec) {
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   ExceptionCode ec = 0;
   ScriptCallStack callStack(exec, 1);
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   log* intArg = tolog(exec->argument(0));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->customArgsAndException(intArg, &callStack, ec);
   setDOMException(exec, ec);
@@ -1387,7 +1499,14 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndArg(ExecState* exec) {
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   int intArg = exec->argument(0).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->withDynamicFrameAndArg(dynamicFrame, intArg);
   return JSValue::encode(jsUndefined());
@@ -1403,15 +1522,23 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndOptionalArg(ExecState* exec) {
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   int intArg = exec->argument(0).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   int argsCount = exec->argumentCount();
-  if (argsCount < 2) {
+  if (argsCount <= 1) {
     imp->withDynamicFrameAndOptionalArg(dynamicFrame, intArg);
     return JSValue::encode(jsUndefined());
   }
-
   int optionalArg = exec->argument(1).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->withDynamicFrameAndOptionalArg(dynamicFrame, intArg, optionalArg);
   return JSValue::encode(jsUndefined());
@@ -1427,7 +1554,14 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndUserGesture(ExecState* exec) {
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   int intArg = exec->argument(0).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->withDynamicFrameAndUserGesture(dynamicFrame, intArg,
                                       processingUserGesture(exec));
@@ -1444,15 +1578,23 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndUserGestureASAD(ExecState* exec) {
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   int intArg = exec->argument(0).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   int argsCount = exec->argumentCount();
-  if (argsCount < 2) {
+  if (argsCount <= 1) {
     imp->withDynamicFrameAndUserGestureASAD(dynamicFrame, intArg);
     return JSValue::encode(jsUndefined());
   }
-
   int optionalArg = exec->argument(1).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->withDynamicFrameAndUserGestureASAD(dynamicFrame, intArg, optionalArg,
                                           processingUserGesture(exec));
@@ -1544,12 +1686,13 @@ jsTestObjPrototypeFunctionMethodWithOptionalArg(ExecState* exec) {
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
 
   int argsCount = exec->argumentCount();
-  if (argsCount < 1) {
+  if (argsCount <= 0) {
     imp->methodWithOptionalArg();
     return JSValue::encode(jsUndefined());
   }
-
   int opt = exec->argument(0).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->methodWithOptionalArg(opt);
   return JSValue::encode(jsUndefined());
@@ -1563,15 +1706,23 @@ jsTestObjPrototypeFunctionMethodWithNonOptionalArgAndOptionalArg(
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   int nonOpt = exec->argument(0).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   int argsCount = exec->argumentCount();
-  if (argsCount < 2) {
+  if (argsCount <= 1) {
     imp->methodWithNonOptionalArgAndOptionalArg(nonOpt);
     return JSValue::encode(jsUndefined());
   }
-
   int opt = exec->argument(1).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->methodWithNonOptionalArgAndOptionalArg(nonOpt, opt);
   return JSValue::encode(jsUndefined());
@@ -1585,16 +1736,31 @@ jsTestObjPrototypeFunctionMethodWithNonOptionalArgAndTwoOptionalArgs(
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   int nonOpt = exec->argument(0).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   int argsCount = exec->argumentCount();
-  if (argsCount < 2) {
+  if (argsCount <= 1) {
     imp->methodWithNonOptionalArgAndTwoOptionalArgs(nonOpt);
     return JSValue::encode(jsUndefined());
   }
-
   int opt1 = exec->argument(1).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
+
+  if (argsCount <= 2) {
+    imp->methodWithNonOptionalArgAndTwoOptionalArgs(nonOpt, opt1);
+    return JSValue::encode(jsUndefined());
+  }
   int opt2 = exec->argument(2).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->methodWithNonOptionalArgAndTwoOptionalArgs(nonOpt, opt1, opt2);
   return JSValue::encode(jsUndefined());
@@ -1607,12 +1773,17 @@ jsTestObjPrototypeFunctionMethodWithCallbackArg(ExecState* exec) {
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
-  if (exec->argumentCount() <= 0 || !exec->argument(0).isObject()) {
+
+  if (exec->argumentCount() <= 0) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
-    return jsUndefined();
+    return JSValue::encode(jsUndefined());
+  }
+  if (!exec->argument(0).isObject() || !exec->argument(0).getObject()) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
   }
   RefPtr<TestCallback> callback = JSTestCallback::create(
-      asObject(exec->argument(0)), castedThis->globalObject());
+      exec->argument(0).getObject(), castedThis->globalObject());
 
   imp->methodWithCallbackArg(callback);
   return JSValue::encode(jsUndefined());
@@ -1626,13 +1797,25 @@ jsTestObjPrototypeFunctionMethodWithNonCallbackArgAndCallbackArg(
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
-  int nonCallback = exec->argument(0).toInt32(exec);
-  if (exec->argumentCount() <= 1 || !exec->argument(1).isObject()) {
+
+  if (exec->argumentCount() <= 0) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
-    return jsUndefined();
+    return JSValue::encode(jsUndefined());
+  }
+  int nonCallback = exec->argument(0).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 1) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
+  if (!exec->argument(1).isObject() || !exec->argument(1).getObject()) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
   }
   RefPtr<TestCallback> callback = JSTestCallback::create(
-      asObject(exec->argument(1)), castedThis->globalObject());
+      exec->argument(1).getObject(), castedThis->globalObject());
 
   imp->methodWithNonCallbackArgAndCallbackArg(nonCallback, callback);
   return JSValue::encode(jsUndefined());
@@ -1646,18 +1829,15 @@ jsTestObjPrototypeFunctionMethodWithCallbackAndOptionalArg(ExecState* exec) {
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
 
-  int argsCount = exec->argumentCount();
-  if (argsCount < 1) {
-    imp->methodWithCallbackAndOptionalArg();
-    return JSValue::encode(jsUndefined());
+  RefPtr<TestCallback> callback;
+  if (exec->argumentCount() > 0 && exec->argument(0).isObject()) {
+    JSObject* object = exec->argument(0).getObject();
+    if (!object) {
+      setDOMException(exec, TYPE_MISMATCH_ERR);
+      return JSValue::encode(jsUndefined());
+    }
+    callback = JSTestCallback::create(object, castedThis->globalObject());
   }
-
-  if (exec->argumentCount() <= 0 || !exec->argument(0).isObject()) {
-    setDOMException(exec, TYPE_MISMATCH_ERR);
-    return jsUndefined();
-  }
-  RefPtr<TestCallback> callback = JSTestCallback::create(
-      asObject(exec->argument(0)), castedThis->globalObject());
 
   imp->methodWithCallbackAndOptionalArg(callback);
   return JSValue::encode(jsUndefined());
@@ -1670,8 +1850,22 @@ jsTestObjPrototypeFunctionOverloadedMethod1(ExecState* exec) {
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   TestObj* objArg = toTestObj(exec->argument(0));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
+
+  if (exec->argumentCount() <= 1) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   const String& strArg = ustringToString(exec->argument(1).toString(exec));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->overloadedMethod(objArg, strArg);
   return JSValue::encode(jsUndefined());
@@ -1684,15 +1878,23 @@ jsTestObjPrototypeFunctionOverloadedMethod2(ExecState* exec) {
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   TestObj* objArg = toTestObj(exec->argument(0));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   int argsCount = exec->argumentCount();
-  if (argsCount < 2) {
+  if (argsCount <= 1) {
     imp->overloadedMethod(objArg);
     return JSValue::encode(jsUndefined());
   }
-
   int intArg = exec->argument(1).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->overloadedMethod(objArg, intArg);
   return JSValue::encode(jsUndefined());
@@ -1705,7 +1907,14 @@ jsTestObjPrototypeFunctionOverloadedMethod3(ExecState* exec) {
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   const String& strArg = ustringToString(exec->argument(0).toString(exec));
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->overloadedMethod(strArg);
   return JSValue::encode(jsUndefined());
@@ -1718,7 +1927,14 @@ jsTestObjPrototypeFunctionOverloadedMethod4(ExecState* exec) {
     return throwVMTypeError(exec);
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+
+  if (exec->argumentCount() <= 0) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
   int intArg = exec->argument(0).toInt32(exec);
+  if (exec->hadException())
+    return JSValue::encode(jsUndefined());
 
   imp->overloadedMethod(intArg);
   return JSValue::encode(jsUndefined());
