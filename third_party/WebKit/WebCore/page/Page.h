@@ -45,6 +45,8 @@ class Chrome;
 class ChromeClient;
 class ContextMenuClient;
 class ContextMenuController;
+class DeviceMotionClient;
+class DeviceMotionController;
 class DeviceOrientationClient;
 class DeviceOrientationController;
 class Document;
@@ -103,6 +105,7 @@ class Page : public Noncopyable {
           inspectorClient(0),
           pluginHalterClient(0),
           geolocationControllerClient(0),
+          deviceMotionClient(0),
           deviceOrientationClient(0),
           backForwardControllerClient(0),
           speechInputClient(0) {}
@@ -114,6 +117,7 @@ class Page : public Noncopyable {
     InspectorClient* inspectorClient;
     PluginHalterClient* pluginHalterClient;
     GeolocationControllerClient* geolocationControllerClient;
+    DeviceMotionClient* deviceMotionClient;
     DeviceOrientationClient* deviceOrientationClient;
     BackForwardControllerClient* backForwardControllerClient;
     SpeechInputClient* speechInputClient;
@@ -201,6 +205,9 @@ class Page : public Noncopyable {
   }
 #endif
 #if ENABLE(DEVICE_ORIENTATION)
+  DeviceMotionController* deviceMotionController() const {
+    return m_deviceMotionController.get();
+  }
   DeviceOrientationController* deviceOrientationController() const {
     return m_deviceOrientationController.get();
   }
@@ -362,6 +369,7 @@ class Page : public Noncopyable {
   OwnPtr<GeolocationController> m_geolocationController;
 #endif
 #if ENABLE(DEVICE_ORIENTATION)
+  OwnPtr<DeviceMotionController> m_deviceMotionController;
   OwnPtr<DeviceOrientationController> m_deviceOrientationController;
 #endif
 #if ENABLE(INPUT_SPEECH)

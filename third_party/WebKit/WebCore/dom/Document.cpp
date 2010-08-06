@@ -46,6 +46,7 @@
 #include "CustomEvent.h"
 #include "DOMImplementation.h"
 #include "DOMWindow.h"
+#include "DeviceMotionEvent.h"
 #include "DeviceOrientationEvent.h"
 #include "DocLoader.h"
 #include "DocumentFragment.h"
@@ -3414,6 +3415,8 @@ PassRefPtr<Event> Document::createEvent(const String& eventType,
     event = TouchEvent::create();
 #endif
 #if ENABLE(DEVICE_ORIENTATION)
+  else if (eventType == "DeviceMotionEvent")
+    event = DeviceMotionEvent::create();
   else if (eventType == "DeviceOrientationEvent")
     event = DeviceOrientationEvent::create();
 #endif

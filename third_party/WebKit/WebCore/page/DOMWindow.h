@@ -379,6 +379,7 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
 #endif
 
 #if ENABLE(DEVICE_ORIENTATION)
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(devicemotion);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(deviceorientation);
 #endif
 

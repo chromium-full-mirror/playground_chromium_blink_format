@@ -130,6 +130,13 @@ class RuntimeEnabledFeatures {
   static bool ontouchcancelEnabled() { return isTouchEnabled; }
 #endif
 
+  static void setDeviceMotionEnabled(bool isEnabled) {
+    isDeviceMotionEnabled = isEnabled;
+  }
+  static bool deviceMotionEnabled() { return isDeviceMotionEnabled; }
+  static bool deviceMotionEventEnabled() { return isDeviceMotionEnabled; }
+  static bool ondevicemotionEnabled() { return isDeviceMotionEnabled; }
+
   static void setDeviceOrientationEnabled(bool isEnabled) {
     isDeviceOrientationEnabled = isEnabled;
   }
@@ -160,6 +167,7 @@ class RuntimeEnabledFeatures {
   static bool isWebGLEnabled;
   static bool isPushStateEnabled;
   static bool isTouchEnabled;
+  static bool isDeviceMotionEnabled;
   static bool isDeviceOrientationEnabled;
   static bool isSpeechInputEnabled;
 };

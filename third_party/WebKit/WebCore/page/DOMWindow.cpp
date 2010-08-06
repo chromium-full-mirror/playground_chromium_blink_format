@@ -42,6 +42,7 @@
 #include "DOMTimer.h"
 #include "Database.h"
 #include "DatabaseCallback.h"
+#include "DeviceMotionController.h"
 #include "DeviceOrientationController.h"
 #include "PageTransitionEvent.h"
 #include "Document.h"
@@ -1407,6 +1408,9 @@ bool DOMWindow::addEventListener(const AtomicString& eventType,
            allowsBeforeUnloadListeners(this))
     addBeforeUnloadEventListener(this);
 #if ENABLE(DEVICE_ORIENTATION)
+  else if (eventType == eventNames().devicemotionEvent && frame() &&
+           frame()->page() && frame()->page()->deviceMotionController())
+    frame()->page()->deviceMotionController()->addListener(this);
   else if (eventType == eventNames().deviceorientationEvent && frame() &&
            frame()->page() && frame()->page()->deviceOrientationController())
     frame()->page()->deviceOrientationController()->addListener(this);
@@ -1427,6 +1431,9 @@ bool DOMWindow::removeEventListener(const AtomicString& eventType,
            allowsBeforeUnloadListeners(this))
     removeBeforeUnloadEventListener(this);
 #if ENABLE(DEVICE_ORIENTATION)
+  else if (eventType == eventNames().devicemotionEvent && frame() &&
+           frame()->page() && frame()->page()->deviceMotionController())
+    frame()->page()->deviceMotionController()->removeListener(this);
   else if (eventType == eventNames().deviceorientationEvent && frame() &&
            frame()->page() && frame()->page()->deviceOrientationController())
     frame()->page()->deviceOrientationController()->removeListener(this);
@@ -1513,6 +1520,8 @@ void DOMWindow::removeAllEventListeners() {
   EventTarget::removeAllEventListeners();
 
 #if ENABLE(DEVICE_ORIENTATION)
+  if (frame() && frame()->page() && frame()->page()->deviceMotionController())
+    frame()->page()->deviceMotionController()->removeAllListeners(this);
   if (frame() && frame()->page() &&
       frame()->page()->deviceOrientationController())
     frame()->page()->deviceOrientationController()->removeAllListeners(this);

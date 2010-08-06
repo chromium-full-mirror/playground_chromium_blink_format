@@ -21,6 +21,7 @@
 #include "config.h"
 #include "Page.h"
 
+#include "DeviceMotionController.h"
 #include "BackForwardController.h"
 #include "BackForwardList.h"
 #include "Base64.h"
@@ -156,6 +157,10 @@ Page::Page(const PageClients& pageClients)
 #endif
 #if ENABLE(DEVICE_ORIENTATION)
       ,
+      m_deviceMotionController(
+          RuntimeEnabledFeatures::deviceMotionEnabled()
+              ? new DeviceMotionController(pageClients.deviceMotionClient)
+              : 0),
       m_deviceOrientationController(
           RuntimeEnabledFeatures::deviceOrientationEnabled()
               ? new DeviceOrientationController(

@@ -33,8 +33,8 @@ namespace WebCore {
       beforeprocess) macro(beforeunload) macro(blur) macro(cached) macro(change) macro(checking)                                 \
       macro(click) macro(close) macro(complete) macro(compositionend) macro(compositionstart) macro(                             \
           compositionupdate) macro(connect) macro(contextmenu) macro(copy) macro(cut)                                            \
-          macro(dblclick) macro(deviceorientation) macro(display) macro(downloading) macro(                                      \
-              drag) macro(dragend) macro(dragenter) macro(dragleave) macro(dragover)                                             \
+          macro(dblclick) macro(devicemotion) macro(deviceorientation) macro(display) macro(                                     \
+              downloading) macro(drag) macro(dragend) macro(dragenter) macro(dragleave) macro(dragover)                          \
               macro(dragstart) macro(drop) macro(error) macro(focus) macro(focusin) macro(focusout) macro(                       \
                   hashchange) macro(input) macro(invalid) macro(keydown) macro(keypress)                                         \
                   macro(keyup) macro(load) macro(loadstart) macro(message) macro(                                                \

@@ -184,6 +184,10 @@ bool Event::isTouchEvent() const {
 #endif
 
 #if ENABLE(DEVICE_ORIENTATION)
+bool Event::isDeviceMotionEvent() const {
+  return false;
+}
+
 bool Event::isDeviceOrientationEvent() const {
   return false;
 }
