@@ -77,6 +77,7 @@ class Connection : public ThreadSafeShared<Connection> {
 
    public:
     virtual void didClose(Connection*) = 0;
+    virtual void didReceiveInvalidMessage(Connection*, MessageID) = 0;
   };
 
 #if PLATFORM(MAC)
@@ -130,7 +131,12 @@ class Connection : public ThreadSafeShared<Connection> {
     MessageID messageID() const { return m_messageID; }
     T* arguments() const { return m_arguments; }
 
-    void destroy() { delete m_arguments; }
+    PassOwnPtr<T> releaseArguments() {
+      T* arguments = m_arguments;
+      m_arguments = 0;
+
+      return arguments;
+    }
 
    private:
     MessageID m_messageID;

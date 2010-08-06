@@ -125,6 +125,7 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
                              CoreIPC::ArgumentDecoder*,
                              CoreIPC::ArgumentEncoder*);
   void didClose(CoreIPC::Connection*);
+  void didReceiveInvalidMessage(CoreIPC::Connection*, CoreIPC::MessageID);
 
   // ResponsivenessTimer::Client
   void didBecomeUnresponsive(ResponsivenessTimer*);
