@@ -54,7 +54,9 @@ class DrawingAreaProxy : public DrawingAreaBase {
   virtual void didReceiveSyncMessage(CoreIPC::Connection*,
                                      CoreIPC::MessageID,
                                      CoreIPC::ArgumentDecoder&,
-                                     CoreIPC::ArgumentEncoder&) = 0;
+                                     CoreIPC::ArgumentEncoder&) {
+    ASSERT_NOT_REACHED();
+  }
 
   virtual void paint(const WebCore::IntRect&, PlatformDrawingContext) = 0;
   virtual void setSize(const WebCore::IntSize&) = 0;
