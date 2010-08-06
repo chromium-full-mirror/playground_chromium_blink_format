@@ -216,6 +216,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
     inline qreal initialScaleFactor() const { return m_initialScaleFactor; };
     inline qreal minimumScaleFactor() const { return m_minimumScaleFactor; };
     inline qreal maximumScaleFactor() const { return m_maximumScaleFactor; };
+    inline int targetDensityDpi() const { return m_targetDensityDpi; };
     inline bool isUserScalable() const { return m_isUserScalable; };
     inline bool isValid() const { return m_isValid; };
     inline QSize size() const { return m_size; };
@@ -225,6 +226,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
     qreal m_initialScaleFactor;
     qreal m_minimumScaleFactor;
     qreal m_maximumScaleFactor;
+    int m_targetDensityDpi;
     bool m_isUserScalable;
     bool m_isValid;
     QSize m_size;
