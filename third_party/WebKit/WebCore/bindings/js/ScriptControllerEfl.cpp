@@ -39,13 +39,9 @@ namespace WebCore {
 
 PassRefPtr<JSC::Bindings::Instance>
 ScriptController::createScriptInstanceForWidget(Widget* widget) {
-  return 0;
+  if (!widget->isPluginView())
+    return 0;
 
-#if 0  // FIXME: disabled until we have Plugin system done.
-    if (!widget->isPluginView())
-        return 0;
-
-    return static_cast<PluginView*>(widget)->bindingInstance();
-#endif
+  return static_cast<PluginView*>(widget)->bindingInstance();
 }
 }
