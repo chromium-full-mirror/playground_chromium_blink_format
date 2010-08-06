@@ -37,11 +37,11 @@ SharedMemory::Handle::~Handle() {
   notImplemented();
 }
 
-void SharedMemory::Handle::encode(CoreIPC::ArgumentEncoder& encoder) const {
+void SharedMemory::Handle::encode(CoreIPC::ArgumentEncoder* encoder) const {
   notImplemented();
 }
 
-bool SharedMemory::Handle::decode(CoreIPC::ArgumentDecoder& decoder,
+bool SharedMemory::Handle::decode(CoreIPC::ArgumentDecoder* decoder,
                                   Handle& handle) {
   notImplemented();
   return false;
