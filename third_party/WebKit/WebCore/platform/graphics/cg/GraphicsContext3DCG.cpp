@@ -116,13 +116,15 @@ void GraphicsContext3D::paintToCanvas(const unsigned char* imagePixels,
       canvasHeight <= 0 || !context)
     return;
   int rowBytes = imageWidth * 4;
-  RetainPtr<CGDataProviderRef> dataProvider =
-      CGDataProviderCreateWithData(0, imagePixels, rowBytes * imageHeight, 0);
-  RetainPtr<CGColorSpaceRef> colorSpace = CGColorSpaceCreateDeviceRGB();
-  RetainPtr<CGImageRef> cgImage =
+  RetainPtr<CGDataProviderRef> dataProvider(
+      AdoptCF,
+      CGDataProviderCreateWithData(0, imagePixels, rowBytes * imageHeight, 0));
+  RetainPtr<CGColorSpaceRef> colorSpace(AdoptCF, CGColorSpaceCreateDeviceRGB());
+  RetainPtr<CGImageRef> cgImage(
+      AdoptCF,
       CGImageCreate(imageWidth, imageHeight, 8, 32, rowBytes, colorSpace.get(),
                     kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host,
-                    dataProvider.get(), 0, false, kCGRenderingIntentDefault);
+                    dataProvider.get(), 0, false, kCGRenderingIntentDefault));
   // CSS styling may cause the canvas's content to be resized on
   // the page. Go back to the Canvas to figure out the correct
   // width and height to draw.
