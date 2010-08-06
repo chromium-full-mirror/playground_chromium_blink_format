@@ -33,10 +33,7 @@
 #include "AccessibilityRenderObject.h"
 #include "Document.h"
 #include "HTMLNames.h"
-#include "IntRect.h"
-#include "RenderObject.h"
-
-using namespace std;
+#include "RenderBoxModelObject.h"
 
 namespace WebCore {
 

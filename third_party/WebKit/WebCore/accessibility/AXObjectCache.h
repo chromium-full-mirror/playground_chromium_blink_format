@@ -141,8 +141,6 @@ class AXObjectCache : public Noncopyable {
                         bool postToElement,
                         PostType = PostAsynchronously);
 
-  bool nodeHasRole(Node*, const AtomicString& role);
-
  protected:
   void postPlatformNotification(AccessibilityObject*, AXNotification);
 
@@ -163,6 +161,8 @@ class AXObjectCache : public Noncopyable {
 
   AXID getAXID(AccessibilityObject*);
 };
+
+bool nodeHasRole(Node*, const String& role);
 
 #if !HAVE(ACCESSIBILITY)
 inline void AXObjectCache::handleActiveDescendantChanged(RenderObject*) {}
