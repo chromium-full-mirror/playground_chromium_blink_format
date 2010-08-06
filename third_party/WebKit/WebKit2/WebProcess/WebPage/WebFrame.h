@@ -44,6 +44,8 @@ class HTMLFrameOwnerElement;
 
 namespace WebKit {
 
+class InjectedBundleNodeHandle;
+class InjectedBundleScriptWorld;
 class WebPage;
 
 class WebFrame : public APIObject {
@@ -77,6 +79,11 @@ class WebFrame : public APIObject {
   PassRefPtr<ImmutableArray> childFrames();
   JSValueRef computedStyleIncludingVisitedInfo(JSObjectRef element);
   JSGlobalContextRef jsContext();
+  JSGlobalContextRef jsContextForWorld(InjectedBundleScriptWorld*);
+
+  JSValueRef jsWrapperForWorld(InjectedBundleNodeHandle*,
+                               InjectedBundleScriptWorld*);
+
   static WebCore::String counterValue(JSObjectRef element);
   static WebCore::String markerText(JSObjectRef element);
 

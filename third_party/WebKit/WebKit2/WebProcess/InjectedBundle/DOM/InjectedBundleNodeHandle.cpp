@@ -25,6 +25,7 @@
 
 #include "InjectedBundleNodeHandle.h"
 
+#include "InjectedBundleScriptWorld.h"
 #include <WebCore/Node.h>
 #include <wtf/HashMap.h>
 
@@ -61,6 +62,10 @@ InjectedBundleNodeHandle::InjectedBundleNodeHandle(Node* node) : m_node(node) {}
 
 InjectedBundleNodeHandle::~InjectedBundleNodeHandle() {
   domHandleCache().remove(m_node.get());
+}
+
+Node* InjectedBundleNodeHandle::coreNode() const {
+  return m_node.get();
 }
 
 }  // namespace WebKit

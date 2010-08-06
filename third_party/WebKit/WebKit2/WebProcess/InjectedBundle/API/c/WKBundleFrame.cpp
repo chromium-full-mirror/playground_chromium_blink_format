@@ -67,6 +67,19 @@ JSGlobalContextRef WKBundleFrameGetJavaScriptContext(
   return toWK(frameRef)->jsContext();
 }
 
+JSGlobalContextRef WKBundleFrameGetJavaScriptContextForWorld(
+    WKBundleFrameRef frameRef,
+    WKBundleScriptWorldRef worldRef) {
+  return toWK(frameRef)->jsContextForWorld(toWK(worldRef));
+}
+
+JSValueRef WKBundleFrameGetJavaScriptWrapperForNodeForWorld(
+    WKBundleFrameRef frameRef,
+    WKBundleNodeHandleRef nodeHandleRef,
+    WKBundleScriptWorldRef worldRef) {
+  return toWK(frameRef)->jsWrapperForWorld(toWK(nodeHandleRef), toWK(worldRef));
+}
+
 WKStringRef WKBundleFrameCopyName(WKBundleFrameRef frameRef) {
   return toCopiedRef(toWK(frameRef)->name());
 }
