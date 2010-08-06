@@ -28,6 +28,8 @@
 
 #include "Connection.h"
 #include "DrawingArea.h"
+#include "SharedMemory.h"
+#include "VisitedLinkTable.h"
 #include <WebCore/LinkHash.h>
 #include <wtf/HashMap.h>
 
@@ -68,6 +70,9 @@ class WebProcess : CoreIPC::Connection::Client {
   }
 #endif
 
+  void addVisitedLink(WebCore::LinkHash);
+  bool isLinkVisited(WebCore::LinkHash) const;
+
  private:
   WebProcess();
   void shutdown();
@@ -79,7 +84,10 @@ class WebProcess : CoreIPC::Connection::Client {
 #endif
   void setApplicationCacheDirectory(const WebCore::String&);
   void registerURLSchemeAsEmptyDocument(const WebCore::String&);
-  void addVisitedLinkHash(WebCore::LinkHash);
+
+  void setVisitedLinkTable(const SharedMemory::Handle&);
+  void visitedLinkStateChanged(const Vector<WebCore::LinkHash>& linkHashes);
+  void allVisitedLinkStateChanged();
 
   // CoreIPC::Connection::Client
   void didReceiveMessage(CoreIPC::Connection*,
@@ -98,6 +106,9 @@ class WebProcess : CoreIPC::Connection::Client {
   bool m_inDidClose;
 
   RunLoop* m_runLoop;
+
+  // FIXME: The visited link table should not be per process.
+  VisitedLinkTable m_visitedLinkTable;
 
 #if USE(ACCELERATED_COMPOSITING) && PLATFORM(MAC)
   mach_port_t m_compositingRenderServerPort;

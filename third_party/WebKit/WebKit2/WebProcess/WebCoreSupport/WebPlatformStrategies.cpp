@@ -864,14 +864,12 @@ String WebPlatformStrategies::validationMessageStepMismatchText() {
 }
 
 // VisitedLinkStrategy
-bool WebPlatformStrategies::isLinkVisited(Page* page, LinkHash hash) {
-  // FIXME: Have WebKit2 manage its own visited links
-  return page->group().isLinkVisited(hash);
+bool WebPlatformStrategies::isLinkVisited(Page* page, LinkHash linkHash) {
+  return WebProcess::shared().isLinkVisited(linkHash);
 }
 
-void WebPlatformStrategies::addVisitedLink(Page* page, LinkHash hash) {
-  // FIXME: Have WebKit2 manage its own visited links
-  return page->group().addVisitedLinkHash(hash);
+void WebPlatformStrategies::addVisitedLink(Page* page, LinkHash linkHash) {
+  WebProcess::shared().addVisitedLink(linkHash);
 }
 
 }  // namespace WebKit

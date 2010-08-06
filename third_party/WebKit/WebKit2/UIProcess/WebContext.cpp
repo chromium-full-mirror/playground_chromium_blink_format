@@ -166,6 +166,7 @@ static WTF::RefCountedLeakCounter webContextCounter("WebContext");
 #endif
 
 WebContext* WebContext::sharedProcessContext() {
+  RunLoop::initializeMainRunLoop();
   static WebContext* context =
       adoptRef(new WebContext(ProcessModelSharedSecondaryProcess, String()))
           .leakRef();
@@ -173,15 +174,24 @@ WebContext* WebContext::sharedProcessContext() {
 }
 
 WebContext* WebContext::sharedThreadContext() {
+  RunLoop::initializeMainRunLoop();
   static WebContext* context =
       adoptRef(new WebContext(ProcessModelSharedSecondaryThread, String()))
           .leakRef();
   return context;
 }
 
+PassRefPtr<WebContext> WebContext::create(const String& injectedBundlePath) {
+  RunLoop::initializeMainRunLoop();
+  return adoptRef(
+      new WebContext(ProcessModelSecondaryProcess, injectedBundlePath));
+}
+
 WebContext::WebContext(ProcessModel processModel,
                        const WebCore::String& injectedBundlePath)
-    : m_processModel(processModel), m_injectedBundlePath(injectedBundlePath) {
+    : m_processModel(processModel),
+      m_injectedBundlePath(injectedBundlePath),
+      m_visitedLinkProvider(this) {
   RunLoop::initializeMainRunLoop();
 
   m_preferences = WebPreferences::shared();
@@ -231,6 +241,14 @@ void WebContext::ensureWebProcess() {
        it != end; ++it)
     m_process->send(WebProcessMessage::RegisterURLSchemeAsEmptyDocument, 0,
                     CoreIPC::In(*it));
+}
+
+void WebContext::processDidFinishLaunching(WebProcessProxy* process) {
+  // FIXME: Once we support multiple processes per context, this assertion won't
+  // hold.
+  ASSERT(process == m_process);
+
+  m_visitedLinkProvider.populateVisitedLinksIfNeeded();
 }
 
 WebPageProxy* WebContext::createWebPage(WebPageNamespace* pageNamespace) {
@@ -372,9 +390,13 @@ void WebContext::addVisitedLink(const String& visitedURL) {
   if (visitedURL.isEmpty())
     return;
 
-  WebCore::LinkHash hash =
+  LinkHash linkHash =
       visitedLinkHash(visitedURL.characters(), visitedURL.length());
-  m_process->send(WebProcessMessage::AddVisitedLink, 0, CoreIPC::In(hash));
+  addVisitedLink(linkHash);
+}
+
+void WebContext::addVisitedLink(LinkHash linkHash) {
+  m_visitedLinkProvider.addVisitedLink(linkHash);
 }
 
 void WebContext::didReceiveMessage(CoreIPC::Connection* connection,

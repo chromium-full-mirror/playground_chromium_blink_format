@@ -389,10 +389,7 @@ void WebChromeClient::dashboardRegionsChanged() {
 }
 #endif
 
-void WebChromeClient::populateVisitedLinks() {
-  WebProcess::shared().connection()->send(
-      WebProcessProxyMessage::PopulateVisitedLinks, 0, CoreIPC::In());
-}
+void WebChromeClient::populateVisitedLinks() {}
 
 FloatRect WebChromeClient::customHighlightRect(Node*,
                                                const AtomicString& type,

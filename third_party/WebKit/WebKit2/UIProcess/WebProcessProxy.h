@@ -33,6 +33,7 @@
 #include "ProcessModel.h"
 #include "ResponsivenessTimer.h"
 #include "WebPageProxy.h"
+#include <WebCore/LinkHash.h>
 #include <wtf/HashMap.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -113,6 +114,7 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
                                       const WebCore::String& originalURLString,
                                       const WebCore::String& urlString,
                                       const WebCore::String& title);
+  void addVisitedLink(WebCore::LinkHash);
 
   // CoreIPC::Connection::Client
   void didReceiveMessage(CoreIPC::Connection*,
