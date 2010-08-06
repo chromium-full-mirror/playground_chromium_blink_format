@@ -810,12 +810,14 @@ bool RenderLayerBacking::containsPaintedContent() const {
   if (isDirectlyCompositedImage())
     return false;
 
-  // FIXME: we could optimize cases where the image, video or canvas is known to
-  // fill the border box entirely,
-  // and set background color on the layer in that case, instead of allocating
-  // backing store and painting.
+// FIXME: we could optimize cases where the image, video or canvas is known to
+// fill the border box entirely,
+// and set background color on the layer in that case, instead of allocating
+// backing store and painting.
+#if ENABLE(VIDEO)
   if (renderer()->isVideo() && toRenderVideo(renderer())->shouldDisplayVideo())
     return hasBoxDecorationsOrBackground(renderer());
+#endif
 #if ENABLE(3D_CANVAS) || ENABLE(ACCELERATED_2D_CANVAS)
   if (isAcceleratedCanvas(renderer()))
     return hasBoxDecorationsOrBackground(renderer());
