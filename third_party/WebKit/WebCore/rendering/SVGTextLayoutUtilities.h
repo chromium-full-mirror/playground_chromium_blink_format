@@ -32,6 +32,7 @@ class Font;
 class InlineTextBox;
 class RenderObject;
 class RenderStyle;
+class SVGElement;
 class SVGRenderStyle;
 class TextRun;
 
@@ -71,7 +72,7 @@ TextRun svgTextRunForInlineTextBox(const UChar*,
                                    const RenderStyle*,
                                    const InlineTextBox*);
 
-float calculateCSSKerning(const RenderStyle*);
+float calculateCSSKerning(SVGElement* context, const RenderStyle*);
 bool applySVGKerning(SVGCharacterLayoutInfo&,
                      const RenderStyle*,
                      SVGLastGlyphInfo&,

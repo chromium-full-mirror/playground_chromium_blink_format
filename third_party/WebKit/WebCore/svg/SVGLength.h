@@ -26,6 +26,8 @@
 
 namespace WebCore {
 
+class CSSPrimitiveValue;
+
 enum SVGLengthType {
   LengthTypeUnknown = 0,
   LengthTypeNumber = 1,
@@ -63,8 +65,12 @@ class SVGLength {
 
   SVGLength(SVGLengthMode mode = LengthModeOther,
             const String& valueAsString = String());
+  SVGLength(const SVGLength&);
 
   SVGLengthType unitType() const;
+
+  bool operator==(const SVGLength&) const;
+  bool operator!=(const SVGLength&) const;
 
   float value(const SVGElement* context) const;
   void setValue(float);
@@ -90,6 +96,9 @@ class SVGLength {
     return (type == LengthTypePercentage || type == LengthTypeEMS ||
             type == LengthTypeEXS);
   }
+
+  static SVGLength fromCSSPrimitiveValue(CSSPrimitiveValue*);
+  static PassRefPtr<CSSPrimitiveValue> toCSSPrimitiveValue(const SVGLength&);
 
  private:
   float m_valueInSpecifiedUnits;

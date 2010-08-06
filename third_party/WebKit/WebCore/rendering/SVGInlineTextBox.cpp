@@ -745,6 +745,12 @@ void SVGInlineTextBox::buildLayoutInformation(SVGCharacterLayoutInfo& info,
   RenderStyle* style = textRenderer->style();
   ASSERT(style);
 
+  RenderObject* parentRenderer = parent()->renderer();
+  ASSERT(parentRenderer);
+  ASSERT(parentRenderer->node());
+  ASSERT(parentRenderer->node()->isSVGElement());
+  SVGElement* lengthContext = static_cast<SVGElement*>(parentRenderer->node());
+
   const Font& font = style->font();
   const UChar* characters = textRenderer->characters();
 
@@ -819,7 +825,8 @@ void SVGInlineTextBox::buildLayoutInformation(SVGCharacterLayoutInfo& info,
     }
 
     // Take letter & word spacing and kerning into account
-    float spacing = font.letterSpacing() + calculateCSSKerning(style);
+    float spacing =
+        font.letterSpacing() + calculateCSSKerning(lengthContext, style);
 
     const UChar* currentCharacter =
         characters +

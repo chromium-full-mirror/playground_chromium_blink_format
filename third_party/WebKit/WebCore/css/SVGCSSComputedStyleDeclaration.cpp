@@ -46,6 +46,19 @@ static PassRefPtr<CSSPrimitiveValue> glyphOrientationToCSSPrimitiveValue(
   }
 }
 
+static PassRefPtr<CSSValue> strokeDashArrayToCSSValueList(
+    const Vector<SVGLength>& dashes) {
+  if (dashes.isEmpty())
+    return CSSPrimitiveValue::createIdentifier(CSSValueNone);
+
+  RefPtr<CSSValueList> list = CSSValueList::createCommaSeparated();
+  const Vector<SVGLength>::const_iterator end = dashes.end();
+  for (Vector<SVGLength>::const_iterator it = dashes.begin(); it != end; ++it)
+    list->append(SVGLength::toCSSPrimitiveValue(*it));
+
+  return list.release();
+}
+
 PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getSVGPropertyCSSValue(
     int propertyID,
     EUpdateLayout updateLayout) const {
@@ -132,7 +145,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getSVGPropertyCSSValue(
     case CSSPropertyFill:
       return svgStyle->fillPaint();
     case CSSPropertyKerning:
-      return svgStyle->kerning();
+      return SVGLength::toCSSPrimitiveValue(svgStyle->kerning());
     case CSSPropertyMarkerEnd:
       if (!svgStyle->markerEndResource().isEmpty())
         return CSSPrimitiveValue::create(svgStyle->markerEndResource(),
@@ -151,11 +164,11 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getSVGPropertyCSSValue(
     case CSSPropertyStroke:
       return svgStyle->strokePaint();
     case CSSPropertyStrokeDasharray:
-      return svgStyle->strokeDashArray();
+      return strokeDashArrayToCSSValueList(svgStyle->strokeDashArray());
     case CSSPropertyStrokeDashoffset:
-      return svgStyle->strokeDashOffset();
+      return SVGLength::toCSSPrimitiveValue(svgStyle->strokeDashOffset());
     case CSSPropertyStrokeWidth:
-      return svgStyle->strokeWidth();
+      return SVGLength::toCSSPrimitiveValue(svgStyle->strokeWidth());
     case CSSPropertyBaselineShift: {
       switch (svgStyle->baselineShift()) {
         case BS_BASELINE:
@@ -165,7 +178,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getSVGPropertyCSSValue(
         case BS_SUB:
           return CSSPrimitiveValue::createIdentifier(CSSValueSub);
         case BS_LENGTH:
-          return svgStyle->baselineShiftValue();
+          return SVGLength::toCSSPrimitiveValue(svgStyle->baselineShiftValue());
       }
     }
     case CSSPropertyGlyphOrientationHorizontal:
