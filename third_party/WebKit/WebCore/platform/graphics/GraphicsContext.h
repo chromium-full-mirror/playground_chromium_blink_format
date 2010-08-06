@@ -116,6 +116,7 @@ class AffineTransform;
 class Font;
 class Generator;
 class Gradient;
+class GraphicsContext3D;
 class GraphicsContextPlatformPrivate;
 class GraphicsContextPrivate;
 class ImageBuffer;
@@ -508,6 +509,11 @@ class GraphicsContext : public Noncopyable {
 
 #if PLATFORM(HAIKU)
   pattern getHaikuStrokeStyle();
+#endif
+
+#if PLATFORM(SKIA)
+  void setGraphicsContext3D(GraphicsContext3D*, const IntSize&);
+  void syncSoftwareCanvas();
 #endif
 
  private:

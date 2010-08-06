@@ -54,6 +54,8 @@ class CanvasRenderingContext : public Noncopyable {
   // For non accelerated canvases returns 0.
   virtual GraphicsContext3D* graphicsContext3D() const { return 0; }
 
+  virtual void paintRenderingResultsToCanvas() {}
+
  private:
   HTMLCanvasElement* m_canvas;
 };

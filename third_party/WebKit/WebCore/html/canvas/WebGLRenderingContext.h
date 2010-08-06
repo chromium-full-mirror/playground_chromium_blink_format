@@ -673,9 +673,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
 
   void reshape(int width, int height);
 
-  // Return value true indicates canvas is updated during the call,
-  // false indicates no updates.
-  bool paintRenderingResultsToCanvas();
+  virtual void paintRenderingResultsToCanvas();
 
   // Helpers for notification about paint events.
   void beginPaint();

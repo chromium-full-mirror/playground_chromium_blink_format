@@ -177,6 +177,13 @@ CanvasRenderingContext* HTMLCanvasElement::getContext(
 #endif
       m_context = new CanvasRenderingContext2D(this, document()->inCompatMode(),
                                                usesDashbardCompatibilityMode);
+#if ENABLE(ACCELERATED_2D_CANVAS) && USE(ACCELERATED_COMPOSITING)
+      if (m_context) {
+        // Need to make sure a RenderLayer and compositing layer get created for
+        // the Canvas
+        setNeedsStyleRecalc(SyntheticStyleChange);
+      }
+#endif
     }
     return m_context.get();
   }
@@ -306,13 +313,8 @@ bool HTMLCanvasElement::is3D() const {
 #endif
 
 void HTMLCanvasElement::makeRenderingResultsAvailable() {
-#if ENABLE(3D_CANVAS)
-  if (is3D()) {
-    WebGLRenderingContext* context3d =
-        reinterpret_cast<WebGLRenderingContext*>(renderingContext());
-    context3d->paintRenderingResultsToCanvas();
-  }
-#endif
+  if (m_context)
+    m_context->paintRenderingResultsToCanvas();
 }
 
 void HTMLCanvasElement::recalcStyle(StyleChange change) {
