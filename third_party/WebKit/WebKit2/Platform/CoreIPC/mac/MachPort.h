@@ -37,13 +37,13 @@ class MachPort {
   MachPort(mach_port_name_t port, mach_msg_type_name_t disposition)
       : m_port(port), m_disposition(disposition) {}
 
-  void encode(ArgumentEncoder& encoder) const {
-    encoder.encode(Attachment(m_port, m_disposition));
+  void encode(ArgumentEncoder* encoder) const {
+    encoder->encode(Attachment(m_port, m_disposition));
   }
 
-  static bool decode(ArgumentDecoder& decoder, MachPort& p) {
+  static bool decode(ArgumentDecoder* decoder, MachPort& p) {
     Attachment attachment;
-    if (!decoder.decode(attachment))
+    if (!decoder->decode(attachment))
       return false;
 
     p.m_port = attachment.port();

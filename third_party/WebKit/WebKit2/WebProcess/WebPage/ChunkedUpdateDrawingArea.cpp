@@ -182,9 +182,9 @@ void ChunkedUpdateDrawingArea::didUpdate() {
 void ChunkedUpdateDrawingArea::didReceiveMessage(
     CoreIPC::Connection*,
     CoreIPC::MessageID messageID,
-    CoreIPC::ArgumentDecoder& arguments) {
+    CoreIPC::ArgumentDecoder* arguments) {
   DrawingAreaID targetDrawingAreaID;
-  if (!arguments.decode(CoreIPC::Out(targetDrawingAreaID)))
+  if (!arguments->decode(CoreIPC::Out(targetDrawingAreaID)))
     return;
 
   // We can switch drawing areas on the fly, so if this message was targetted at
@@ -195,7 +195,7 @@ void ChunkedUpdateDrawingArea::didReceiveMessage(
   switch (messageID.get<DrawingAreaMessage::Kind>()) {
     case DrawingAreaMessage::SetSize: {
       IntSize size;
-      if (!arguments.decode(CoreIPC::Out(size)))
+      if (!arguments->decode(CoreIPC::Out(size)))
         return;
 
       setSize(size);
@@ -208,7 +208,7 @@ void ChunkedUpdateDrawingArea::didReceiveMessage(
 
     case DrawingAreaMessage::ResumePainting: {
       bool forceRepaint;
-      if (!arguments.decode(CoreIPC::Out(forceRepaint)))
+      if (!arguments->decode(CoreIPC::Out(forceRepaint)))
         return;
 
       resumePainting(forceRepaint);

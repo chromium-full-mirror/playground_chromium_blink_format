@@ -148,11 +148,11 @@ class WebPageProxy : public APIObject {
 
   void didReceiveMessage(CoreIPC::Connection*,
                          CoreIPC::MessageID,
-                         CoreIPC::ArgumentDecoder&);
+                         CoreIPC::ArgumentDecoder*);
   void didReceiveSyncMessage(CoreIPC::Connection*,
                              CoreIPC::MessageID,
-                             CoreIPC::ArgumentDecoder&,
-                             CoreIPC::ArgumentEncoder&);
+                             CoreIPC::ArgumentDecoder*,
+                             CoreIPC::ArgumentEncoder*);
 
   void processDidBecomeUnresponsive();
   void processDidBecomeResponsive();

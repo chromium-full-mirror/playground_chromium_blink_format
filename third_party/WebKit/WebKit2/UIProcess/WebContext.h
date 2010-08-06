@@ -116,7 +116,7 @@ class WebContext : public APIObject {
 
   void didReceiveMessage(CoreIPC::Connection*,
                          CoreIPC::MessageID,
-                         CoreIPC::ArgumentDecoder&);
+                         CoreIPC::ArgumentDecoder*);
 
  private:
   WebContext(ProcessModel, const WebCore::String& injectedBundlePath);

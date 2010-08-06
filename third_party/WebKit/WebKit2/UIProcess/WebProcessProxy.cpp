@@ -320,7 +320,7 @@ void WebProcessProxy::didReceiveMessage(CoreIPC::Connection* connection,
   }
 
   if (messageID.is<CoreIPC::MessageClassWebContext>()) {
-    m_context->didReceiveMessage(connection, messageID, *arguments);
+    m_context->didReceiveMessage(connection, messageID, arguments);
     return;
   }
 
@@ -332,7 +332,7 @@ void WebProcessProxy::didReceiveMessage(CoreIPC::Connection* connection,
   if (!pageProxy)
     return;
 
-  pageProxy->didReceiveMessage(connection, messageID, *arguments);
+  pageProxy->didReceiveMessage(connection, messageID, arguments);
 }
 
 void WebProcessProxy::didReceiveSyncMessage(CoreIPC::Connection* connection,
@@ -388,7 +388,7 @@ void WebProcessProxy::didReceiveSyncMessage(CoreIPC::Connection* connection,
   if (!pageProxy)
     return;
 
-  pageProxy->didReceiveSyncMessage(connection, messageID, *arguments, *reply);
+  pageProxy->didReceiveSyncMessage(connection, messageID, arguments, reply);
 }
 
 void WebProcessProxy::didClose(CoreIPC::Connection*) {

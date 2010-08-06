@@ -50,11 +50,11 @@ class DrawingAreaProxy : public DrawingAreaBase {
 
   virtual void didReceiveMessage(CoreIPC::Connection*,
                                  CoreIPC::MessageID,
-                                 CoreIPC::ArgumentDecoder&) = 0;
+                                 CoreIPC::ArgumentDecoder*) = 0;
   virtual void didReceiveSyncMessage(CoreIPC::Connection*,
                                      CoreIPC::MessageID,
-                                     CoreIPC::ArgumentDecoder&,
-                                     CoreIPC::ArgumentEncoder&) {
+                                     CoreIPC::ArgumentDecoder*,
+                                     CoreIPC::ArgumentEncoder*) {
     ASSERT_NOT_REACHED();
   }
 

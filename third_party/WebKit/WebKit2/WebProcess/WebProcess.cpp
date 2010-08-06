@@ -296,7 +296,7 @@ void WebProcess::didReceiveMessage(CoreIPC::Connection* connection,
   if (messageID.is<CoreIPC::MessageClassInjectedBundle>()) {
     if (!m_injectedBundle)
       return;
-    m_injectedBundle->didReceiveMessage(connection, messageID, *arguments);
+    m_injectedBundle->didReceiveMessage(connection, messageID, arguments);
     return;
   }
 
@@ -308,7 +308,7 @@ void WebProcess::didReceiveMessage(CoreIPC::Connection* connection,
   if (!page)
     return;
 
-  page->didReceiveMessage(connection, messageID, *arguments);
+  page->didReceiveMessage(connection, messageID, arguments);
 }
 
 void WebProcess::didClose(CoreIPC::Connection*) {

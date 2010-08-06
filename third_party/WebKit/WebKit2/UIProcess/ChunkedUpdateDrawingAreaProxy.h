@@ -62,7 +62,7 @@ class ChunkedUpdateDrawingAreaProxy : public DrawingAreaProxy {
 
   // The DrawingAreaProxy should never be decoded itself. Instead, the
   // DrawingArea should be decoded.
-  virtual void encode(CoreIPC::ArgumentEncoder& encoder) const {
+  virtual void encode(CoreIPC::ArgumentEncoder* encoder) const {
     DrawingAreaProxy::encode(encoder);
   }
 
@@ -72,7 +72,7 @@ class ChunkedUpdateDrawingAreaProxy : public DrawingAreaProxy {
   // DrawingAreaProxy
   virtual void didReceiveMessage(CoreIPC::Connection*,
                                  CoreIPC::MessageID,
-                                 CoreIPC::ArgumentDecoder&);
+                                 CoreIPC::ArgumentDecoder*);
   virtual void paint(const WebCore::IntRect&, PlatformDrawingContext);
   virtual void setSize(const WebCore::IntSize&);
   virtual void setPageIsVisible(bool isVisible);

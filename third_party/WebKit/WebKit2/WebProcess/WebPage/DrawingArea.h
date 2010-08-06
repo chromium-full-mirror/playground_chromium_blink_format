@@ -72,7 +72,7 @@ class DrawingArea : public DrawingAreaBase, public RefCounted<DrawingArea> {
 
   virtual void didReceiveMessage(CoreIPC::Connection*,
                                  CoreIPC::MessageID,
-                                 CoreIPC::ArgumentDecoder&) = 0;
+                                 CoreIPC::ArgumentDecoder*) = 0;
 
  protected:
   DrawingArea(Type, DrawingAreaID, WebPage*);

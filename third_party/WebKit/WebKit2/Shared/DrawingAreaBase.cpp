@@ -27,19 +27,19 @@
 
 namespace WebKit {
 
-void DrawingAreaBase::encode(CoreIPC::ArgumentEncoder& encoder) const {
+void DrawingAreaBase::encode(CoreIPC::ArgumentEncoder* encoder) const {
   DrawingAreaInfo info(type(), id());
-  encoder.encode(info);
+  encoder->encode(info);
 }
 
-bool DrawingAreaBase::decode(CoreIPC::ArgumentDecoder& decoder,
+bool DrawingAreaBase::decode(CoreIPC::ArgumentDecoder* decoder,
                              DrawingAreaInfo& info) {
   uint32_t drawingAreaType;
-  if (!decoder.decode(drawingAreaType))
+  if (!decoder->decode(drawingAreaType))
     return false;
 
   DrawingAreaID drawingAreaID;
-  if (!decoder.decode(drawingAreaID))
+  if (!decoder->decode(drawingAreaID))
     return false;
 
   info.type = static_cast<Type>(drawingAreaType);

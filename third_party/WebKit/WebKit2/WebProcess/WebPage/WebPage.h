@@ -99,7 +99,7 @@ class WebPage : public APIObject {
   // -- Called from WebProcess.
   void didReceiveMessage(CoreIPC::Connection*,
                          CoreIPC::MessageID,
-                         CoreIPC::ArgumentDecoder&);
+                         CoreIPC::ArgumentDecoder*);
 
   // -- InjectedBundle methods
   void initializeInjectedBundleEditorClient(WKBundlePageEditorClient*);

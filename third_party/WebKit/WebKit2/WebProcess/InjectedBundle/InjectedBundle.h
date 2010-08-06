@@ -80,7 +80,7 @@ class InjectedBundle : public APIObject {
 
   void didReceiveMessage(CoreIPC::Connection*,
                          CoreIPC::MessageID,
-                         CoreIPC::ArgumentDecoder&);
+                         CoreIPC::ArgumentDecoder*);
 
  private:
   InjectedBundle(const WebCore::String&);

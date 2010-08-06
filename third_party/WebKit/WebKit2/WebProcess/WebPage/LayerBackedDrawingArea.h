@@ -75,7 +75,7 @@ class LayerBackedDrawingArea : public DrawingArea,
 
   virtual void didReceiveMessage(CoreIPC::Connection*,
                                  CoreIPC::MessageID,
-                                 CoreIPC::ArgumentDecoder&);
+                                 CoreIPC::ArgumentDecoder*);
 
  private:
   // GraphicsLayerClient

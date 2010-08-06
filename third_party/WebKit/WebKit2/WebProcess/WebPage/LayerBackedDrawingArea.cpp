@@ -146,9 +146,9 @@ void LayerBackedDrawingArea::didUpdate() {
 void LayerBackedDrawingArea::didReceiveMessage(
     CoreIPC::Connection*,
     CoreIPC::MessageID messageID,
-    CoreIPC::ArgumentDecoder& arguments) {
+    CoreIPC::ArgumentDecoder* arguments) {
   DrawingAreaID targetDrawingAreaID;
-  if (!arguments.decode(CoreIPC::Out(targetDrawingAreaID)))
+  if (!arguments->decode(CoreIPC::Out(targetDrawingAreaID)))
     return;
 
   // We can switch drawing areas on the fly, so if this message was targetted at
@@ -159,7 +159,7 @@ void LayerBackedDrawingArea::didReceiveMessage(
   switch (messageID.get<DrawingAreaMessage::Kind>()) {
     case DrawingAreaMessage::SetSize: {
       IntSize size;
-      if (!arguments.decode(CoreIPC::Out(size)))
+      if (!arguments->decode(CoreIPC::Out(size)))
         return;
 
       setSize(size);

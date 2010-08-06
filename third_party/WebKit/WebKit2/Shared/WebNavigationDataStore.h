@@ -34,16 +34,16 @@
 namespace WebKit {
 
 struct WebNavigationDataStore {
-  void encode(CoreIPC::ArgumentEncoder& encoder) const {
-    encoder.encode(url);
-    encoder.encode(title);
+  void encode(CoreIPC::ArgumentEncoder* encoder) const {
+    encoder->encode(url);
+    encoder->encode(title);
   }
 
-  static bool decode(CoreIPC::ArgumentDecoder& decoder,
+  static bool decode(CoreIPC::ArgumentDecoder* decoder,
                      WebNavigationDataStore& store) {
-    if (!decoder.decode(store.url))
+    if (!decoder->decode(store.url))
       return false;
-    if (!decoder.decode(store.title))
+    if (!decoder->decode(store.title))
       return false;
     return true;
   }
