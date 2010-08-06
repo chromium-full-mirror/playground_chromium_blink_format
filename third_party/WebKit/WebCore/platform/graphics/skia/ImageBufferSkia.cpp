@@ -124,7 +124,7 @@ PassRefPtr<ImageData> getImageData(const IntRect& rect,
 
   if (bitmap.config() == SkBitmap::kNo_Config) {
     // This is an empty SkBitmap that could not be configured.
-    ASSERT(size.width() == 0 || size.height() == 0);
+    ASSERT(!size.width() || !size.height());
     return result;
   }
 
