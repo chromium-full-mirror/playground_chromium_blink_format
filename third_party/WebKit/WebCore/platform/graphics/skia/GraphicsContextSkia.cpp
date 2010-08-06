@@ -758,8 +758,6 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
   if (paintingDisabled())
     return;
 
-  platformContext()->save();
-
   SkRect r = rect;
   if (!isRectSkiaSafe(getCTM(), r)) {
     // See the other version of fillRect below.
@@ -774,6 +772,8 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
     return;
   }
 #endif
+
+  platformContext()->save();
 
   platformContext()->prepareForSoftwareDraw();
 

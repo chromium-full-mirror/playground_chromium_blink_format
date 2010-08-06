@@ -437,7 +437,6 @@ static void drawBitmapGLES2(GraphicsContext* ctxt,
                             CompositeOperator compositeOp) {
   ctxt->platformContext()->prepareForHardwareDraw();
   GLES2Canvas* gpuCanvas = ctxt->platformContext()->gpuCanvas();
-  gpuCanvas->gles2Context()->makeCurrent();
   GLES2Texture* texture = gpuCanvas->getTexture(bitmap);
   if (!texture) {
     ASSERT(bitmap->config() == SkBitmap::kARGB_8888_Config);

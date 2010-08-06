@@ -46,15 +46,15 @@
 
 namespace WebCore {
 
-class FloatRect;
 class Color;
-class GLES2Context;
+class FloatRect;
+class GraphicsContext3D;
 
 typedef HashMap<NativeImagePtr, RefPtr<GLES2Texture>> TextureHashMap;
 
 class GLES2Canvas : public Noncopyable {
  public:
-  GLES2Canvas(GLES2Context*, const IntSize&);
+  GLES2Canvas(GraphicsContext3D*, const IntSize&);
   ~GLES2Canvas();
 
   void fillRect(const FloatRect&, const Color&, ColorSpace);
@@ -86,7 +86,7 @@ class GLES2Canvas : public Noncopyable {
                         const FloatRect& dstRect,
                         ColorSpace,
                         CompositeOperator);
-  GLES2Context* gles2Context() { return m_gles2Context; }
+  GraphicsContext3D* context() { return m_context; }
   GLES2Texture* createTexture(NativeImagePtr,
                               GLES2Texture::Format,
                               int width,
@@ -101,7 +101,7 @@ class GLES2Canvas : public Noncopyable {
   unsigned getSimpleProgram();
   unsigned getTexProgram();
 
-  GLES2Context* m_gles2Context;
+  GraphicsContext3D* m_context;
   struct State;
   WTF::Vector<State> m_stateStack;
   State* m_state;
