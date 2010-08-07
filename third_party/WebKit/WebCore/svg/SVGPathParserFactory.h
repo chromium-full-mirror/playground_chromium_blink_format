@@ -25,6 +25,8 @@
 #include "PlatformString.h"
 #include "SVGPathConsumer.h"
 #include "SVGPathSegList.h"
+#include "SVGPathByteStream.h"
+#include <OwnPtr.h>
 
 namespace WebCore {
 
@@ -33,10 +35,17 @@ class SVGPathParserFactory {
   static SVGPathParserFactory* self();
 
   bool buildPathFromString(const String&, Path&);
+  bool buildPathFromByteStream(SVGPathByteStream*, Path& result);
 
   bool buildSVGPathSegListFromString(const String&,
                                      SVGPathSegList*,
                                      PathParsingMode);
+  bool buildSVGPathSegListFromByteStream(SVGPathByteStream*,
+                                         SVGPathSegList*,
+                                         PathParsingMode);
+
+  PassOwnPtr<SVGPathByteStream>
+  createSVGPathByteStreamFromString(const String&, PathParsingMode, bool& ok);
 
  private:
   SVGPathParserFactory();
