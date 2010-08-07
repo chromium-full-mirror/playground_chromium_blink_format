@@ -25,6 +25,8 @@
 
 #include "WebPreferencesStore.h"
 
+#include "FontSmoothingLevel.h"
+
 namespace WebKit {
 
 WebPreferencesStore::WebPreferencesStore()
@@ -33,6 +35,7 @@ WebPreferencesStore::WebPreferencesStore()
       pluginsEnabled(true),
       offlineWebApplicationCacheEnabled(false),
       localStorageEnabled(true),
+      fontSmoothingLevel(FontSmoothingLevelMedium),
       minimumFontSize(1),
       minimumLogicalFontSize(9),
       defaultFontSize(16),
@@ -50,6 +53,7 @@ WebPreferencesStore::WebPreferencesStore(const WebPreferencesStore& other) {
   pluginsEnabled = other.pluginsEnabled;
   offlineWebApplicationCacheEnabled = other.offlineWebApplicationCacheEnabled;
   localStorageEnabled = other.localStorageEnabled;
+  fontSmoothingLevel = other.fontSmoothingLevel;
   minimumFontSize = other.minimumFontSize;
   minimumLogicalFontSize = other.minimumLogicalFontSize;
   defaultFontSize = other.defaultFontSize;
@@ -76,6 +80,7 @@ void WebPreferencesStore::swap(WebPreferencesStore& other) {
   std::swap(offlineWebApplicationCacheEnabled,
             other.offlineWebApplicationCacheEnabled);
   std::swap(localStorageEnabled, other.localStorageEnabled);
+  std::swap(fontSmoothingLevel, other.fontSmoothingLevel);
   std::swap(minimumFontSize, other.minimumFontSize);
   std::swap(minimumLogicalFontSize, other.minimumLogicalFontSize);
   std::swap(defaultFontSize, other.defaultFontSize);

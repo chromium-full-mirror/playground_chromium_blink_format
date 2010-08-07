@@ -27,6 +27,7 @@
 #define WebPreferences_h
 
 #include "APIObject.h"
+#include "FontSmoothingLevel.h"
 #include "WebPreferencesStore.h"
 #include <wtf/HashSet.h>
 #include <wtf/PassRefPtr.h>
@@ -66,6 +67,9 @@ class WebPreferences : public APIObject {
 
   void setLocalStorageEnabled(bool);
   bool localStorageEnabled() const;
+
+  void setFontSmoothingLevel(FontSmoothingLevel);
+  FontSmoothingLevel fontSmoothingLevel() const;
 
  private:
   WebPreferences();
