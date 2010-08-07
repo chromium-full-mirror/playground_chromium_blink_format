@@ -32,6 +32,7 @@
 #include <WebKit2/WKBundleFrame.h>
 #include <WebKit2/WKBundleFramePrivate.h>
 #include <WebKit2/WKBundlePagePrivate.h>
+#include <WebKit2/WKBundlePrivate.h>
 #include <WebKit2/WKRetainPtr.h>
 #include <WebKit2/WebKit2.h>
 
@@ -41,18 +42,6 @@ namespace WTR {
 // through the failures
 // Eventually it should be changed to match.
 static const CFTimeInterval waitToDumpWatchdogInterval = 6.0;
-
-static void setProperty(JSContextRef context,
-                        JSObjectRef object,
-                        const char* propertyName,
-                        JSWrappable* value,
-                        JSPropertyAttributes attributes,
-                        JSValueRef* exception) {
-  JSRetainPtr<JSStringRef> propertyNameString(
-      Adopt, JSStringCreateWithUTF8CString(propertyName));
-  JSObjectSetProperty(context, object, propertyNameString.get(),
-                      JSWrapper::wrap(context, value), attributes, exception);
-}
 
 static JSValueRef propertyValue(JSContextRef context,
                                 JSObjectRef object,
@@ -182,7 +171,7 @@ bool LayoutTestController::pauseAnimationAtTimeOnElementWithId(
 }
 
 void LayoutTestController::keepWebHistory() {
-  InjectedBundle::shared().setShouldTrackVisitedLinks();
+  WKBundleSetShouldTrackVisitedLinks(InjectedBundle::shared().bundle(), true);
 }
 
 JSValueRef LayoutTestController::computedStyleIncludingVisitedInfo(

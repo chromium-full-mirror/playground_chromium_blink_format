@@ -73,6 +73,12 @@ class InjectedBundle : public APIObject {
   void removeAllVisitedLinks();
   void activateMacFontAscentHack();
 
+  // Garbage collection API
+  void garbageCollectJavaScriptObjects();
+  void garbageCollectJavaScriptObjectsOnAlternateThreadForDebugging(
+      bool waitUntilDone);
+  size_t javaScriptObjectsCount();
+
   // Callback hooks
   void didCreatePage(WebPage*);
   void willDestroyPage(WebPage*);

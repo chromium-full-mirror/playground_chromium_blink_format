@@ -26,6 +26,7 @@
 #ifndef InjectedBundle_h
 #define InjectedBundle_h
 
+#include "GCController.h"
 #include "LayoutTestController.h"
 #include <WebKit2/WKBase.h>
 #include <WebKit2/WKBundleBase.h>
@@ -46,18 +47,19 @@ class InjectedBundle {
   // Initialize the InjectedBundle.
   void initialize(WKBundleRef);
 
-  void done();
+  WKBundleRef bundle() const { return m_bundle; }
 
   LayoutTestController* layoutTestController() {
     return m_layoutTestController.get();
   }
+  GCController* gcController() { return m_gcController.get(); }
+
   InjectedBundlePage* page() { return m_mainPage.get(); }
   size_t pageCount() { return !!m_mainPage + m_otherPages.size(); }
   void closeOtherPages();
 
+  void done();
   std::ostringstream& os() { return m_outputStream; }
-
-  void setShouldTrackVisitedLinks();
 
  private:
   InjectedBundle();
@@ -85,6 +87,7 @@ class InjectedBundle {
   OwnPtr<InjectedBundlePage> m_mainPage;
 
   RefPtr<LayoutTestController> m_layoutTestController;
+  RefPtr<GCController> m_gcController;
 
   std::ostringstream m_outputStream;
 };
