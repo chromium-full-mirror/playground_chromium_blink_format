@@ -31,10 +31,11 @@
 
 namespace WebCore {
 
-class SVGPathBuilder : private SVGPathConsumer {
+class SVGPathBuilder : public SVGPathConsumer {
  public:
-  SVGPathBuilder(Path&);
-  bool build(const String&);
+  SVGPathBuilder();
+
+  void setCurrentPath(Path* path) { m_path = path; }
 
  private:
   // Used in UnalteredParisng/NormalizedParsing modes.
@@ -67,17 +68,17 @@ class SVGPathBuilder : private SVGPathConsumer {
   virtual void curveToQuadraticSmooth(const FloatPoint&, PathCoordinateMode) {
     ASSERT_NOT_REACHED();
   }
-  virtual void arcTo(const FloatPoint&,
-                     float,
+  virtual void arcTo(float,
                      float,
                      float,
                      bool,
                      bool,
+                     const FloatPoint&,
                      PathCoordinateMode) {
     ASSERT_NOT_REACHED();
   }
 
-  Path& m_path;
+  Path* m_path;
   FloatPoint m_current;
 };
 

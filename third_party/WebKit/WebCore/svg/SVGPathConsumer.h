@@ -26,6 +26,7 @@
 
 #if ENABLE(SVG)
 #include "FloatPoint.h"
+#include <wtf/Noncopyable.h>
 
 namespace WebCore {
 
@@ -33,7 +34,7 @@ enum PathCoordinateMode { AbsoluteCoordinates, RelativeCoordinates };
 
 enum PathParsingMode { NormalizedParsing, UnalteredParsing };
 
-class SVGPathConsumer {
+class SVGPathConsumer : public Noncopyable {
  public:
   // Used in UnalteredParisng/NormalizedParsing modes.
   virtual void moveTo(const FloatPoint&, bool closed, PathCoordinateMode) = 0;
@@ -56,12 +57,12 @@ class SVGPathConsumer {
                                 PathCoordinateMode) = 0;
   virtual void curveToQuadraticSmooth(const FloatPoint&,
                                       PathCoordinateMode) = 0;
-  virtual void arcTo(const FloatPoint&,
-                     float,
+  virtual void arcTo(float,
                      float,
                      float,
                      bool largeArcFlag,
                      bool sweepFlag,
+                     const FloatPoint&,
                      PathCoordinateMode) = 0;
 
  protected:

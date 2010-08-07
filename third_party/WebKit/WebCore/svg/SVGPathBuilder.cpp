@@ -26,47 +26,47 @@
 #if ENABLE(SVG)
 #include "SVGPathBuilder.h"
 
-#include "SVGPathParser.h"
-
 namespace WebCore {
 
-SVGPathBuilder::SVGPathBuilder(Path& path) : m_path(path) {}
+SVGPathBuilder::SVGPathBuilder() : m_path(0) {}
 
-bool SVGPathBuilder::build(const String& d) {
-  SVGPathParser parser(this);
-  return parser.parsePathDataString(d, true);
-}
-
-void SVGPathBuilder::moveTo(const FloatPoint& point,
+void SVGPathBuilder::moveTo(const FloatPoint& targetPoint,
                             bool closed,
                             PathCoordinateMode mode) {
-  m_current = mode == AbsoluteCoordinates ? point : m_current + point;
+  ASSERT(m_path);
+  m_current =
+      mode == AbsoluteCoordinates ? targetPoint : m_current + targetPoint;
   if (closed)
-    m_path.closeSubpath();
-  m_path.moveTo(m_current);
+    m_path->closeSubpath();
+  m_path->moveTo(m_current);
 }
 
-void SVGPathBuilder::lineTo(const FloatPoint& point, PathCoordinateMode mode) {
-  m_current = mode == AbsoluteCoordinates ? point : m_current + point;
-  m_path.addLineTo(m_current);
+void SVGPathBuilder::lineTo(const FloatPoint& targetPoint,
+                            PathCoordinateMode mode) {
+  ASSERT(m_path);
+  m_current =
+      mode == AbsoluteCoordinates ? targetPoint : m_current + targetPoint;
+  m_path->addLineTo(m_current);
 }
 
 void SVGPathBuilder::curveToCubic(const FloatPoint& point1,
                                   const FloatPoint& point2,
-                                  const FloatPoint& point,
+                                  const FloatPoint& targetPoint,
                                   PathCoordinateMode mode) {
+  ASSERT(m_path);
   if (mode == RelativeCoordinates) {
-    m_path.addBezierCurveTo(m_current + point1, m_current + point2,
-                            m_current + point);
-    m_current += point;
+    m_path->addBezierCurveTo(m_current + point1, m_current + point2,
+                             m_current + targetPoint);
+    m_current += targetPoint;
   } else {
-    m_current = point;
-    m_path.addBezierCurveTo(point1, point2, m_current);
+    m_current = targetPoint;
+    m_path->addBezierCurveTo(point1, point2, m_current);
   }
 }
 
 void SVGPathBuilder::closePath() {
-  m_path.closeSubpath();
+  ASSERT(m_path);
+  m_path->closeSubpath();
 }
 }
 
