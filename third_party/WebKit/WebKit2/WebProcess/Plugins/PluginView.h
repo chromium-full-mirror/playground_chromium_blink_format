@@ -94,8 +94,10 @@ class PluginView : public WebCore::PluginViewBase,
   void removeStream(Stream*);
   void cancelAllStreams();
 
-  // WebCore::PluginViewBase
+// WebCore::PluginViewBase
+#if PLATFORM(MAC)
   virtual PlatformLayer* platformLayer() const;
+#endif
   virtual JSC::JSObject* scriptObject(JSC::JSGlobalObject*);
 
   // WebCore::Widget

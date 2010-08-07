@@ -354,13 +354,11 @@ void PluginView::initializePlugin() {
 #endif
 }
 
-PlatformLayer* PluginView::platformLayer() const {
 #if PLATFORM(MAC)
+PlatformLayer* PluginView::platformLayer() const {
   return m_plugin->pluginLayer();
-#endif
-
-  return 0;
 }
+#endif
 
 JSObject* PluginView::scriptObject(JSGlobalObject* globalObject) {
   // The plug-in can be null here if it failed to initialize.
