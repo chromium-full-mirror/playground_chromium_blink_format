@@ -31,7 +31,9 @@ SVGFontData::SVGFontData(SVGFontFaceElement* fontFaceElement)
       m_horizontalAdvanceX(fontFaceElement->horizontalAdvanceX()),
       m_verticalOriginX(fontFaceElement->verticalOriginX()),
       m_verticalOriginY(fontFaceElement->verticalOriginY()),
-      m_verticalAdvanceY(fontFaceElement->verticalAdvanceY()) {}
+      m_verticalAdvanceY(fontFaceElement->verticalAdvanceY()) {
+  ASSERT_ARG(fontFaceElement, fontFaceElement);
+}
 
 SVGFontData::~SVGFontData() {}
 

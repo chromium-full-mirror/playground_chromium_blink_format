@@ -1,7 +1,7 @@
 /*
  * This file is part of the internal font implementation.
  *
- * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2008, 2010 Apple Inc. All rights reserved.
  * Copyright (C) 2007-2008 Torch Mobile, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -32,14 +32,10 @@
 #include "TypesettingFeatures.h"
 #include <wtf/OwnPtr.h>
 #include <wtf/PassOwnPtr.h>
+#include <wtf/RetainPtr.h>
 
 #if USE(ATSUI)
 typedef struct OpaqueATSUStyle* ATSUStyle;
-#endif
-
-#if USE(CORE_TEXT)
-#include <ApplicationServices/ApplicationServices.h>
-#include <wtf/RetainPtr.h>
 #endif
 
 #if (PLATFORM(WIN) && !OS(WINCE)) || (OS(WINDOWS) && PLATFORM(WX))
@@ -61,7 +57,6 @@ typedef struct OpaqueATSUStyle* ATSUStyle;
 namespace WebCore {
 
 class FontDescription;
-class FontPlatformData;
 class SharedBuffer;
 class SVGFontData;
 
@@ -70,12 +65,16 @@ enum Pitch { UnknownPitch, FixedPitch, VariablePitch };
 class SimpleFontData : public FontData {
  public:
   SimpleFontData(const FontPlatformData&,
-                 bool customFont = false,
-                 bool loading = false,
-                 SVGFontData* data = 0);
+                 bool isCustomFont = false,
+                 bool isLoading = false);
+#if ENABLE(SVG_FONTS)
+  SimpleFontData(PassOwnPtr<SVGFontData>,
+                 int size,
+                 bool syntheticBold,
+                 bool syntheticItalic);
+#endif
   virtual ~SimpleFontData();
 
- public:
   const FontPlatformData& platformData() const { return m_platformData; }
   SimpleFontData* smallCapsFontData(
       const FontDescription& fontDescription) const;
@@ -136,7 +135,6 @@ class SimpleFontData : public FontData {
 #endif
 
 #if USE(CORE_TEXT)
-  CTFontRef getCTFont() const;
   CFDictionaryRef getCFStringAttributes(TypesettingFeatures) const;
 #endif
 
@@ -241,7 +239,6 @@ class SimpleFontData : public FontData {
 #endif
 
 #if USE(CORE_TEXT)
-  mutable RetainPtr<CTFontRef> m_CTFont;
   mutable HashMap<unsigned, RetainPtr<CFDictionaryRef>> m_CFStringAttributes;
 #endif
 

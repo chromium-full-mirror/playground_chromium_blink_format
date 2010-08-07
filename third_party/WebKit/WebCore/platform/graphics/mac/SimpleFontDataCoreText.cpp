@@ -41,15 +41,6 @@ using namespace std;
 
 namespace WebCore {
 
-CTFontRef SimpleFontData::getCTFont() const {
-  if (getNSFont())
-    return toCTFontRef(getNSFont());
-  if (!m_CTFont)
-    m_CTFont.adoptCF(CTFontCreateWithGraphicsFont(m_platformData.cgFont(),
-                                                  m_platformData.size(), 0, 0));
-  return m_CTFont.get();
-}
-
 CFDictionaryRef SimpleFontData::getCFStringAttributes(
     TypesettingFeatures typesettingFeatures) const {
   unsigned key = typesettingFeatures + 1;
@@ -77,7 +68,7 @@ CFDictionaryRef SimpleFontData::getCFStringAttributes(
     static const void* keysWithKerningDisabled[] = {
         kCTFontAttributeName, kCTKernAttributeName, kCTLigatureAttributeName};
     const void* valuesWithKerningDisabled[] = {
-        getCTFont(), kerningAdjustment,
+        platformData().ctFont(), kerningAdjustment,
         allowLigatures ? ligaturesAllowed : ligaturesNotAllowed};
     attributesDictionary.adoptCF(CFDictionaryCreate(
         0, keysWithKerningDisabled, valuesWithKerningDisabled,
@@ -90,7 +81,8 @@ CFDictionaryRef SimpleFontData::getCFStringAttributes(
     static const void* keysWithKerningEnabled[] = {kCTFontAttributeName,
                                                    kCTLigatureAttributeName};
     const void* valuesWithKerningEnabled[] = {
-        getCTFont(), allowLigatures ? ligaturesAllowed : ligaturesNotAllowed};
+        platformData().ctFont(),
+        allowLigatures ? ligaturesAllowed : ligaturesNotAllowed};
     attributesDictionary.adoptCF(CFDictionaryCreate(
         0, keysWithKerningEnabled, valuesWithKerningEnabled,
         sizeof(keysWithKerningEnabled) / sizeof(*keysWithKerningEnabled),
