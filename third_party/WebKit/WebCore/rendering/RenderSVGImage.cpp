@@ -189,6 +189,9 @@ void RenderSVGImage::imageChanged(WrappedImagePtr image, const IntRect* rect) {
           SVGResourcesCache::cachedResourcesForRenderObject(this))
     resources->invalidateClient(this);
 
+  // Eventually notify parent resources, that we've changed.
+  RenderSVGResource::markForLayoutAndParentResourceInvalidation(this, false);
+
   repaint();
 }
 
