@@ -1042,8 +1042,15 @@ bool HTMLElement::rendererIsNeeded(RenderStyle* style) {
     Frame* frame = document()->frame();
     if (frame && frame->script()->canExecuteScripts(NotAboutToExecuteScript))
       return false;
-  }
+  } else
 #endif
+      if (hasLocalName(noembedTag)) {
+    Frame* frame = document()->frame();
+    if (frame &&
+        frame->loader()->subframeLoader()->allowPlugins(
+            NotAboutToInstantiatePlugin))
+      return false;
+  }
   return StyledElement::rendererIsNeeded(style);
 }
 
