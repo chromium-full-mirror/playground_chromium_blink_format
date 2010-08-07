@@ -191,7 +191,13 @@ void WebFrameLoaderClient::dispatchDidLoadResourceByXMLHttpRequest(
 }
 
 void WebFrameLoaderClient::dispatchDidHandleOnloadEvents() {
-  notImplemented();
+  WebPage* webPage = m_frame->page();
+  if (!webPage)
+    return;
+
+  // Notify the bundle client.
+  webPage->injectedBundleLoaderClient().didHandleOnloadEventsForFrame(webPage,
+                                                                      m_frame);
 }
 
 void WebFrameLoaderClient::
@@ -211,17 +217,35 @@ void WebFrameLoaderClient::
 }
 
 void WebFrameLoaderClient::dispatchDidCancelClientRedirect() {
-  notImplemented();
+  WebPage* webPage = m_frame->page();
+  if (!webPage)
+    return;
+
+  // Notify the bundle client.
+  webPage->injectedBundleLoaderClient().didChangeLocationWithinPageForFrame(
+      webPage, m_frame);
 }
 
-void WebFrameLoaderClient::dispatchWillPerformClientRedirect(const KURL&,
+void WebFrameLoaderClient::dispatchWillPerformClientRedirect(const KURL& url,
                                                              double interval,
                                                              double fireDate) {
-  notImplemented();
+  WebPage* webPage = m_frame->page();
+  if (!webPage)
+    return;
+
+  // Notify the bundle client.
+  webPage->injectedBundleLoaderClient().willPerformClientRedirectForFrame(
+      webPage, m_frame, url.string(), interval, fireDate);
 }
 
 void WebFrameLoaderClient::dispatchDidChangeLocationWithinPage() {
-  notImplemented();
+  WebPage* webPage = m_frame->page();
+  if (!webPage)
+    return;
+
+  // Notify the bundle client.
+  webPage->injectedBundleLoaderClient().didChangeLocationWithinPageForFrame(
+      webPage, m_frame);
 }
 
 void WebFrameLoaderClient::dispatchDidPushStateWithinPage() {
@@ -336,7 +360,13 @@ void WebFrameLoaderClient::dispatchDidFailLoad(const ResourceError& error) {
 }
 
 void WebFrameLoaderClient::dispatchDidFinishDocumentLoad() {
-  notImplemented();
+  WebPage* webPage = m_frame->page();
+  if (!webPage)
+    return;
+
+  // Notify the bundle client.
+  webPage->injectedBundleLoaderClient().didFinishDocumentLoadForFrame(webPage,
+                                                                      m_frame);
 }
 
 void WebFrameLoaderClient::dispatchDidFinishLoad() {
@@ -657,11 +687,23 @@ void WebFrameLoaderClient::dispatchDidChangeBackForwardIndex() const {
 }
 
 void WebFrameLoaderClient::didDisplayInsecureContent() {
-  notImplemented();
+  WebPage* webPage = m_frame->page();
+  if (!webPage)
+    return;
+
+  // Notify the bundle client.
+  webPage->injectedBundleLoaderClient().didDisplayInsecureContentForFrame(
+      webPage, m_frame);
 }
 
 void WebFrameLoaderClient::didRunInsecureContent(SecurityOrigin*) {
-  notImplemented();
+  WebPage* webPage = m_frame->page();
+  if (!webPage)
+    return;
+
+  // Notify the bundle client.
+  webPage->injectedBundleLoaderClient().didRunInsecureContentForFrame(webPage,
+                                                                      m_frame);
 }
 
 ResourceError WebFrameLoaderClient::cancelledError(
