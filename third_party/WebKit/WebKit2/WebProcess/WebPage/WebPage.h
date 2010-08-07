@@ -145,7 +145,7 @@ class WebPage : public APIObject {
 
   void platformInitialize();
   static const char* interpretKeyEvent(const WebCore::KeyboardEvent*);
-  void performDefaultBehaviorForKeyEvent(const WebKeyboardEvent&);
+  bool performDefaultBehaviorForKeyEvent(const WebKeyboardEvent&);
 
   // Actions
   void tryClose();
