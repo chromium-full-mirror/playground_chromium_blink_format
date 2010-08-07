@@ -30,10 +30,10 @@
 
 #include "CachedResourceHandle.h"
 #include "CheckedRadioButtons.h"
-#include "ContainerNode.h"
 #include "CollectionCache.h"
 #include "CollectionType.h"
 #include "Color.h"
+#include "ContainerNode.h"
 #include "Document.h"
 #include "DocumentMarker.h"
 #include "QualifiedName.h"
@@ -982,8 +982,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   XBLBindingManager* bindingManager() const { return m_bindingManager.get(); }
 #endif
 
-  void incDOMTreeVersion() { ++m_domtree_version; }
-  unsigned domTreeVersion() const { return m_domtree_version; }
+  void incDOMTreeVersion() { ++m_domTreeVersion; }
+  unsigned domTreeVersion() const { return m_domTreeVersion; }
 
   void setDocType(PassRefPtr<DocumentType>);
 
@@ -1288,7 +1288,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   RefPtr<Node> m_activeNode;
   mutable RefPtr<Element> m_documentElement;
 
-  unsigned m_domtree_version;
+  unsigned m_domTreeVersion;
 
   HashSet<NodeIterator*> m_nodeIterators;
   HashSet<Range*> m_ranges;

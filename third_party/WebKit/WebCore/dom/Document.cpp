@@ -81,10 +81,8 @@
 #include "HTMLMapElement.h"
 #include "HTMLNameCollection.h"
 #include "HTMLNames.h"
-#include "LegacyHTMLTreeBuilder.h"
 #include "HTMLStyleElement.h"
 #include "HTMLTitleElement.h"
-#include "LegacyHTMLDocumentParser.h"
 #include "HTTPParsers.h"
 #include "HistoryItem.h"
 #include "HitTestRequest.h"
@@ -93,6 +91,8 @@
 #include "InspectorController.h"
 #include "InspectorTimelineAgent.h"
 #include "KeyboardEvent.h"
+#include "LegacyHTMLDocumentParser.h"
+#include "LegacyHTMLTreeBuilder.h"
 #include "Logging.h"
 #include "MessageEvent.h"
 #include "MouseEvent.h"
@@ -138,10 +138,10 @@
 #include "WebKitAnimationEvent.h"
 #include "WebKitTransitionEvent.h"
 #include "WheelEvent.h"
+#include "XMLDocumentParser.h"
 #include "XMLHttpRequest.h"
 #include "XMLNSNames.h"
 #include "XMLNames.h"
-#include "XMLDocumentParser.h"
 #include "htmlediting.h"
 #include <wtf/CurrentTime.h>
 #include <wtf/HashFunctions.h>
@@ -176,8 +176,8 @@
 #include "SVGDocumentExtensions.h"
 #include "SVGElementFactory.h"
 #include "SVGNames.h"
-#include "SVGZoomEvent.h"
 #include "SVGStyleElement.h"
+#include "SVGZoomEvent.h"
 #endif
 
 #if ENABLE(TOUCH_EVENTS)
@@ -370,7 +370,7 @@ class DocumentWeakReference : public ThreadSafeShared<DocumentWeakReference> {
 
 Document::Document(Frame* frame, const KURL& url, bool isXHTML, bool isHTML)
     : ContainerNode(0),
-      m_domtree_version(0),
+      m_domTreeVersion(0),
       m_styleSheets(StyleSheetList::create(this)),
       m_styleRecalcTimer(this, &Document::styleRecalcTimerFired),
       m_frameElementsShouldIgnoreScrolling(false),
@@ -960,7 +960,7 @@ Element* Document::getElementById(const AtomicString& elementId) const {
   if (m_duplicateIds.contains(elementId.impl())) {
     // We know there's at least one node with this id, but we don't know what
     // the first one is.
-    for (Node* n = traverseNextNode(); n != 0; n = n->traverseNextNode()) {
+    for (Node* n = traverseNextNode(); n; n = n->traverseNextNode()) {
       if (n->isElementNode()) {
         element = static_cast<Element*>(n);
         if (element->hasID() && element->getIdAttribute() == elementId) {
@@ -2378,7 +2378,7 @@ Node* Document::nextFocusableNode(Node* start, KeyboardEvent* event) {
                                                  start->tabIndex(), event))
       return winner;
 
-    if (start->tabIndex() == 0)
+    if (!start->tabIndex())
       // We've reached the last node in the document with a tabindex of 0. This
       // is the end of the tabbing order.
       return 0;
@@ -2399,8 +2399,8 @@ Node* Document::nextFocusableNode(Node* start, KeyboardEvent* event) {
 
 Node* Document::previousFocusableNode(Node* start, KeyboardEvent* event) {
   Node* last;
-  for (last = this; last->lastChild(); last = last->lastChild())
-    ;  // Empty loop.
+  for (last = this; last->lastChild(); last = last->lastChild()) {
+  }
 
   // First try to find the last node in the document that comes before start and
   // has the same tabindex as start.
@@ -2448,9 +2448,8 @@ int Document::nodeAbsIndex(Node* node) {
 
 Node* Document::nodeWithAbsIndex(int absIndex) {
   Node* n = this;
-  for (int i = 0; n && (i < absIndex); i++) {
+  for (int i = 0; n && (i < absIndex); i++)
     n = n->traverseNextNode();
-  }
   return n;
 }
 
@@ -2904,11 +2903,11 @@ void Document::recalcStyleSelector() {
       bool enabledViaScript = false;
       if (e->hasLocalName(linkTag)) {
         // <LINK> element
-        HTMLLinkElement* l = static_cast<HTMLLinkElement*>(n);
-        if (l->isDisabled())
+        HTMLLinkElement* linkElement = static_cast<HTMLLinkElement*>(n);
+        if (linkElement->isDisabled())
           continue;
-        enabledViaScript = l->isEnabledViaScript();
-        if (l->isLoading()) {
+        enabledViaScript = linkElement->isEnabledViaScript();
+        if (linkElement->isLoading()) {
           // it is loading but we should still decide which style sheet set to
           // use
           if (!enabledViaScript && !title.isEmpty() &&
@@ -2921,7 +2920,7 @@ void Document::recalcStyleSelector() {
           }
           continue;
         }
-        if (!l->sheet())
+        if (!linkElement->sheet())
           title = nullAtom;
       }
 
@@ -3637,7 +3636,7 @@ bool Document::parseQualifiedName(const String& qualifiedName,
                                   ExceptionCode& ec) {
   unsigned length = qualifiedName.length();
 
-  if (length == 0) {
+  if (!length) {
     ec = INVALID_CHARACTER_ERR;
     return false;
   }
@@ -3755,13 +3754,13 @@ void Document::setInPageCache(bool flag) {
 
   m_inPageCache = flag;
   if (flag) {
-    ASSERT(m_savedRenderer == 0);
+    ASSERT(!m_savedRenderer);
     m_savedRenderer = renderer();
     if (FrameView* v = view())
       v->resetScrollbars();
     unscheduleStyleRecalc();
   } else {
-    ASSERT(renderer() == 0 || renderer() == m_savedRenderer);
+    ASSERT(!renderer() || renderer() == m_savedRenderer);
     ASSERT(m_renderArena);
     setRenderer(m_savedRenderer);
     m_savedRenderer = 0;
@@ -4739,7 +4738,7 @@ unsigned FormElementKeyHash::hash(const FormElementKey& k) {
   // this avoids ever returning a hash code of 0, since that is used to
   // signal "hash not computed yet", using a value that is likely to be
   // effectively the same as 0 when the low bits are masked
-  if (hash == 0)
+  if (!hash)
     hash = 0x80000000;
 
   return hash;
