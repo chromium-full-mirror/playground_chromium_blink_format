@@ -95,6 +95,7 @@ class PluginView : public WebCore::PluginViewBase,
   void cancelAllStreams();
 
   // WebCore::PluginViewBase
+  virtual PlatformLayer* platformLayer() const;
   virtual JSC::JSObject* scriptObject(JSC::JSGlobalObject*);
 
   // WebCore::Widget
@@ -128,6 +129,7 @@ class PluginView : public WebCore::PluginViewBase,
                         NPVariant* result,
                         bool allowPopups);
   virtual void setStatusbarText(const WebCore::String&);
+  virtual bool isAcceleratedCompositingEnabled();
 
   // WebFrame::LoadListener
   virtual void didFinishLoad(WebFrame*);

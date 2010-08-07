@@ -26,6 +26,7 @@
 #ifndef Plugin_h
 #define Plugin_h
 
+#include <WebCore/GraphicsLayer.h>
 #include <WebCore/KURL.h>
 #include <wtf/RefCounted.h>
 #include <wtf/Vector.h>
@@ -67,6 +68,12 @@ class Plugin : public RefCounted<Plugin> {
   // passed in dirty rect is in window coordinates.
   virtual void paint(WebCore::GraphicsContext*,
                      const WebCore::IntRect& dirtyRect) = 0;
+
+#if PLATFORM(MAC)
+  // If a plug-in is using the Core Animation drawing model, this returns its
+  // plug-in layer.
+  virtual PlatformLayer* pluginLayer() = 0;
+#endif
 
   // Tells the plug-in that either the plug-ins frame rect or its clip rect has
   // changed. Both rects are in window coordinates.

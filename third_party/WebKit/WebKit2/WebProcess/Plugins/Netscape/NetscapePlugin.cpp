@@ -198,6 +198,10 @@ void NetscapePlugin::removePluginStream(NetscapePluginStream* pluginStream) {
   m_streams.remove(pluginStream->streamID());
 }
 
+bool NetscapePlugin::isAcceleratedCompositingEnabled() {
+  return m_pluginController->isAcceleratedCompositingEnabled();
+}
+
 NPError NetscapePlugin::NPP_New(NPMIMEType pluginType,
                                 uint16_t mode,
                                 int16_t argc,
