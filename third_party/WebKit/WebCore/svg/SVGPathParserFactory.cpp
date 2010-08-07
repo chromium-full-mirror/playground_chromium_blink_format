@@ -148,6 +148,8 @@ bool SVGPathParserFactory::buildSVGPathSegListFromByteStream(
     PathParsingMode parsingMode) {
   ASSERT(stream);
   ASSERT(result);
+  if (stream->isEmpty())
+    return false;
 
   SVGPathSegListBuilder* builder = globalSVGPathSegListBuilder();
   builder->setCurrentSVGPathSegList(result);
@@ -171,8 +173,10 @@ SVGPathParserFactory::createSVGPathByteStreamFromString(
     const String& d,
     PathParsingMode parsingMode,
     bool& ok) {
-  if (d.isEmpty())
-    return false;
+  if (d.isEmpty()) {
+    ok = false;
+    return PassOwnPtr<SVGPathByteStream>();
+  }
 
   SVGPathByteStreamBuilder* builder = globalSVGPathByteStreamBuilder();
   OwnPtr<SVGPathByteStream> stream = SVGPathByteStream::create();

@@ -37,7 +37,7 @@ class SVGPathByteStreamSource : public SVGPathSource {
   virtual ~SVGPathByteStreamSource();
 
   virtual bool hasMoreData() const;
-  virtual bool moveToNextToken();
+  virtual bool moveToNextToken() { return true; }
   virtual bool parseFloat(float& result);
   virtual bool parseFlag(bool& result);
   virtual bool parseSVGSegmentType(SVGPathSegType&);
@@ -46,6 +46,9 @@ class SVGPathByteStreamSource : public SVGPathSource {
  private:
   SVGPathByteStreamSource(SVGPathByteStream*);
 
+#if COMPILER(MSVC)
+#pragma warning(disable : 4701)
+#endif
   template <typename DataType, typename ByteType>
   DataType readType() {
     ByteType data;

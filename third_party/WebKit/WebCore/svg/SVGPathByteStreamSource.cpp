@@ -22,21 +22,19 @@
 #if ENABLE(SVG)
 #include "SVGPathByteStreamSource.h"
 
-#include "PlatformString.h"
-
 namespace WebCore {
 
 SVGPathByteStreamSource::SVGPathByteStreamSource(SVGPathByteStream* stream)
-    : m_stream(stream),
-      m_streamCurrent(stream->begin()),
-      m_streamEnd(stream->end()) {
+    : m_stream(stream) {
   ASSERT(stream);
+  m_streamCurrent = stream->begin();
+  m_streamEnd = stream->end();
 }
 
 SVGPathByteStreamSource::~SVGPathByteStreamSource() {}
 
 bool SVGPathByteStreamSource::hasMoreData() const {
-  return (m_streamCurrent < m_streamEnd);
+  return m_streamCurrent < m_streamEnd;
 }
 
 bool SVGPathByteStreamSource::parseFloat(float& result) {
