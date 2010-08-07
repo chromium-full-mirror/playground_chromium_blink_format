@@ -1574,10 +1574,10 @@ static void tryHyphenating(RenderText* text,
   if (!prefixLength)
     return;
 
-  prefixLength = 1 + lastHyphenLocation(text->characters() + lastSpace + 1,
-                                        pos - lastSpace - 1, prefixLength,
-                                        localeIdentifier);
-  if (prefixLength <= 1)
+  prefixLength =
+      lastHyphenLocation(text->characters() + lastSpace, pos - lastSpace,
+                         prefixLength + 1, localeIdentifier);
+  if (!prefixLength)
     return;
 
 #if !ASSERT_DISABLED
