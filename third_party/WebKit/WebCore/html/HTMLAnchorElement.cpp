@@ -250,7 +250,7 @@ void HTMLAnchorElement::setActive(bool down, bool pause) {
       // editable block as
       // this link
       case EditableLinkLiveWhenNotFocused:
-        if (down && document()->frame() && document()->frame()->selection() &&
+        if (down && document()->frame() &&
             document()->frame()->selection()->rootEditableElement() ==
                 rootEditableElement())
           return;
