@@ -33,6 +33,8 @@
 
 namespace WebCore {
 
+enum ConcatMode { ConcatUnaltered, ConcatAddingSpacesBetweenIndividualStrings };
+
 class StringBuilder {
  public:
   StringBuilder() : m_totalLength(UINT_MAX) {}
@@ -49,7 +51,7 @@ class StringBuilder {
   void clear();
   unsigned length() const;
 
-  String toString() const;
+  String toString(ConcatMode mode = ConcatUnaltered) const;
 
  private:
   bool isNull() const { return m_totalLength == UINT_MAX; }

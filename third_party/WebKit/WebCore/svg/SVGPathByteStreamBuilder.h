@@ -36,6 +36,7 @@ class SVGPathByteStreamBuilder : public SVGPathConsumer {
   void setCurrentByteStream(SVGPathByteStream* byteStream) {
     m_byteStream = byteStream;
   }
+  virtual void cleanup() { m_byteStream = 0; }
 
  private:
   // Used in UnalteredParsing/NormalizedParsing modes.

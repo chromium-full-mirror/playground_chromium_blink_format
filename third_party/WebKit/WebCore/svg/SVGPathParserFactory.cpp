@@ -22,44 +22,62 @@
 #if ENABLE(SVG)
 #include "SVGPathParserFactory.h"
 
+#include "StringBuilder.h"
 #include "SVGPathBuilder.h"
 #include "SVGPathByteStreamBuilder.h"
 #include "SVGPathByteStreamSource.h"
+#include "SVGPathStringBuilder.h"
 #include "SVGPathParser.h"
 #include "SVGPathSegListBuilder.h"
 #include "SVGPathStringSource.h"
 
 namespace WebCore {
 
-static SVGPathBuilder* globalSVGPathBuilder() {
+static SVGPathBuilder* globalSVGPathBuilder(Path& result) {
   static SVGPathBuilder* s_builder = 0;
   if (!s_builder)
     s_builder = new SVGPathBuilder;
 
+  s_builder->setCurrentPath(&result);
   return s_builder;
 }
 
-static SVGPathSegListBuilder* globalSVGPathSegListBuilder() {
+static SVGPathSegListBuilder* globalSVGPathSegListBuilder(
+    SVGPathSegList* result) {
   static SVGPathSegListBuilder* s_builder = 0;
   if (!s_builder)
     s_builder = new SVGPathSegListBuilder;
 
+  s_builder->setCurrentSVGPathSegList(result);
   return s_builder;
 }
 
-static SVGPathByteStreamBuilder* globalSVGPathByteStreamBuilder() {
+static SVGPathByteStreamBuilder* globalSVGPathByteStreamBuilder(
+    SVGPathByteStream* result) {
   static SVGPathByteStreamBuilder* s_builder = 0;
   if (!s_builder)
     s_builder = new SVGPathByteStreamBuilder;
 
+  s_builder->setCurrentByteStream(result);
   return s_builder;
 }
 
-static SVGPathParser* globalSVGPathParser() {
+static SVGPathStringBuilder* globalSVGPathStringBuilder() {
+  static SVGPathStringBuilder* s_builder = 0;
+  if (!s_builder)
+    s_builder = new SVGPathStringBuilder;
+
+  return s_builder;
+}
+
+static SVGPathParser* globalSVGPathParser(SVGPathSource* source,
+                                          SVGPathConsumer* consumer) {
   static SVGPathParser* s_parser = 0;
   if (!s_parser)
     s_parser = new SVGPathParser;
 
+  s_parser->setCurrentSource(source);
+  s_parser->setCurrentConsumer(consumer);
   return s_parser;
 }
 
@@ -79,19 +97,12 @@ bool SVGPathParserFactory::buildPathFromString(const String& d, Path& result) {
   if (d.isEmpty())
     return false;
 
-  SVGPathBuilder* builder = globalSVGPathBuilder();
-  builder->setCurrentPath(&result);
-
-  SVGPathParser* parser = globalSVGPathParser();
-  parser->setCurrentConsumer(builder);
+  SVGPathBuilder* builder = globalSVGPathBuilder(result);
 
   OwnPtr<SVGPathStringSource> source = SVGPathStringSource::create(d);
-  parser->setCurrentSource(source.get());
-
+  SVGPathParser* parser = globalSVGPathParser(source.get(), builder);
   bool ok = parser->parsePathDataFromSource(NormalizedParsing);
-  parser->setCurrentConsumer(0);
-  parser->setCurrentSource(0);
-  builder->setCurrentPath(0);
+  parser->cleanup();
   return ok;
 }
 
@@ -101,20 +112,13 @@ bool SVGPathParserFactory::buildPathFromByteStream(SVGPathByteStream* stream,
   if (stream->isEmpty())
     return false;
 
-  SVGPathBuilder* builder = globalSVGPathBuilder();
-  builder->setCurrentPath(&result);
-
-  SVGPathParser* parser = globalSVGPathParser();
-  parser->setCurrentConsumer(builder);
+  SVGPathBuilder* builder = globalSVGPathBuilder(result);
 
   OwnPtr<SVGPathByteStreamSource> source =
       SVGPathByteStreamSource::create(stream);
-  parser->setCurrentSource(source.get());
-
+  SVGPathParser* parser = globalSVGPathParser(source.get(), builder);
   bool ok = parser->parsePathDataFromSource(NormalizedParsing);
-  parser->setCurrentConsumer(0);
-  parser->setCurrentSource(0);
-  builder->setCurrentPath(0);
+  parser->cleanup();
   return ok;
 }
 
@@ -126,19 +130,12 @@ bool SVGPathParserFactory::buildSVGPathSegListFromString(
   if (d.isEmpty())
     return false;
 
-  SVGPathSegListBuilder* builder = globalSVGPathSegListBuilder();
-  builder->setCurrentSVGPathSegList(result);
-
-  SVGPathParser* parser = globalSVGPathParser();
-  parser->setCurrentConsumer(builder);
+  SVGPathSegListBuilder* builder = globalSVGPathSegListBuilder(result);
 
   OwnPtr<SVGPathStringSource> source = SVGPathStringSource::create(d);
-  parser->setCurrentSource(source.get());
-
+  SVGPathParser* parser = globalSVGPathParser(source.get(), builder);
   bool ok = parser->parsePathDataFromSource(parsingMode);
-  parser->setCurrentConsumer(0);
-  parser->setCurrentSource(0);
-  builder->setCurrentSVGPathSegList(0);
+  parser->cleanup();
   return ok;
 }
 
@@ -151,48 +148,52 @@ bool SVGPathParserFactory::buildSVGPathSegListFromByteStream(
   if (stream->isEmpty())
     return false;
 
-  SVGPathSegListBuilder* builder = globalSVGPathSegListBuilder();
-  builder->setCurrentSVGPathSegList(result);
-
-  SVGPathParser* parser = globalSVGPathParser();
-  parser->setCurrentConsumer(builder);
+  SVGPathSegListBuilder* builder = globalSVGPathSegListBuilder(result);
 
   OwnPtr<SVGPathByteStreamSource> source =
       SVGPathByteStreamSource::create(stream);
-  parser->setCurrentSource(source.get());
-
+  SVGPathParser* parser = globalSVGPathParser(source.get(), builder);
   bool ok = parser->parsePathDataFromSource(parsingMode);
-  parser->setCurrentConsumer(0);
-  parser->setCurrentSource(0);
-  builder->setCurrentSVGPathSegList(0);
+  parser->cleanup();
   return ok;
 }
 
-PassOwnPtr<SVGPathByteStream>
-SVGPathParserFactory::createSVGPathByteStreamFromString(
+bool SVGPathParserFactory::buildStringFromByteStream(
+    SVGPathByteStream* stream,
+    String& result,
+    PathParsingMode parsingMode) {
+  ASSERT(stream);
+  if (stream->isEmpty())
+    return false;
+
+  SVGPathStringBuilder* builder = globalSVGPathStringBuilder();
+
+  OwnPtr<SVGPathByteStreamSource> source =
+      SVGPathByteStreamSource::create(stream);
+  SVGPathParser* parser = globalSVGPathParser(source.get(), builder);
+  bool ok = parser->parsePathDataFromSource(parsingMode);
+  parser->cleanup();
+  result = builder->result();
+  return ok;
+}
+
+bool SVGPathParserFactory::buildSVGPathByteStreamFromString(
     const String& d,
-    PathParsingMode parsingMode,
-    bool& ok) {
-  if (d.isEmpty()) {
-    ok = false;
-    return PassOwnPtr<SVGPathByteStream>();
-  }
+    OwnPtr<SVGPathByteStream>& result,
+    PathParsingMode parsingMode) {
+  if (d.isEmpty())
+    return false;
 
-  SVGPathByteStreamBuilder* builder = globalSVGPathByteStreamBuilder();
   OwnPtr<SVGPathByteStream> stream = SVGPathByteStream::create();
-  builder->setCurrentByteStream(stream.get());
-
-  SVGPathParser* parser = globalSVGPathParser();
-  parser->setCurrentConsumer(builder);
+  SVGPathByteStreamBuilder* builder =
+      globalSVGPathByteStreamBuilder(stream.get());
 
   OwnPtr<SVGPathStringSource> source = SVGPathStringSource::create(d);
-  parser->setCurrentSource(source.get());
-
-  ok = parser->parsePathDataFromSource(parsingMode);
-  parser->setCurrentConsumer(0);
-  parser->setCurrentSource(0);
-  builder->setCurrentByteStream(0);
-  return stream.release();
+  SVGPathParser* parser = globalSVGPathParser(source.get(), builder);
+  bool ok = parser->parsePathDataFromSource(parsingMode);
+  result = stream.release();
+  parser->cleanup();
+  return ok;
 }
 }
 
