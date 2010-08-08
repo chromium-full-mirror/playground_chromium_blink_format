@@ -236,6 +236,7 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   void takeMemoryCacheLoadsForClientNotification(Vector<String>& loads);
 
   DocumentLoadTiming* timing() { return &m_documentLoadTiming; }
+  void resetTiming() { m_documentLoadTiming = DocumentLoadTiming(); }
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   ApplicationCacheHost* applicationCacheHost() const {
