@@ -318,7 +318,6 @@ class ChromiumBridge {
 
   // Widget -------------------------------------------------------------
   static void widgetSetCursor(Widget*, const Cursor&);
-  static void widgetSetFocus(Widget*);
 };
 
 }  // namespace WebCore
