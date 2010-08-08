@@ -2010,7 +2010,7 @@ bool HTMLInputElement::storesValueSeparateFromAttribute() const {
   return false;
 }
 
-struct EventHandlingState {
+struct EventHandlingState : FastAllocBase {
   RefPtr<HTMLInputElement> m_currRadio;
   bool m_indeterminate;
   bool m_checked;
