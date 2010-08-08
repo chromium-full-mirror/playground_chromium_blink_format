@@ -27,7 +27,7 @@
 #include "BackForwardList.h"
 #include "Frame.h"
 #include "Page.h"
-#include "DocumentParser.h"
+#include "ScriptableDocumentParser.h"
 #include "WMLCardElement.h"
 #include "WMLErrorHandling.h"
 #include "WMLPageState.h"
@@ -43,7 +43,7 @@ WMLDocument::WMLDocument(Frame* frame)
 WMLDocument::~WMLDocument() {}
 
 void WMLDocument::finishedParsing() {
-  if (DocumentParser* parser = this->parser()) {
+  if (ScriptableDocumentParser* parser = this->scriptableDocumentParser()) {
     if (!parser->wellFormed()) {
       Document::finishedParsing();
       return;
