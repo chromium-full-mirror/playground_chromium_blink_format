@@ -92,6 +92,8 @@ class WebFrame : public APIObject {
                                      const WebCore::String& elementID,
                                      double time);
 
+  unsigned pendingUnloadCount();
+
   // Simple listener class used by plug-ins to know when frames finish or fail
   // loading.
   class LoadListener {

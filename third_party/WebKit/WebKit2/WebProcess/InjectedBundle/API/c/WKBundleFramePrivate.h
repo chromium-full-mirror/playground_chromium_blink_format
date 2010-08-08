@@ -53,6 +53,7 @@ WK_EXPORT bool WKBundleFramePauseAnimationOnElementWithId(
     WKStringRef name,
     WKStringRef elementID,
     double time);
+WK_EXPORT unsigned WKBundleFrameGetPendingUnloadCount(WKBundleFrameRef frame);
 
 #ifdef __cplusplus
 }

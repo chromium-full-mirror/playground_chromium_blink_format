@@ -250,6 +250,13 @@ bool WebFrame::pauseAnimationOnElementWithId(const String& animationName,
                                           time);
 }
 
+unsigned WebFrame::pendingUnloadCount() {
+  if (!m_coreFrame)
+    return 0;
+
+  return m_coreFrame->domWindow()->pendingUnloadEventListeners();
+}
+
 JSGlobalContextRef WebFrame::jsContext() {
   return toGlobalRef(m_coreFrame->script()
                          ->globalObject(mainThreadNormalWorld())
