@@ -1064,11 +1064,17 @@ class X86Assembler {
 
 #else
   void movl_rm(RegisterID src, void* addr) {
-    m_formatter.oneByteOp(OP_MOV_EvGv, src, addr);
+    if (src == X86Registers::eax)
+      movl_EAXm(addr);
+    else
+      m_formatter.oneByteOp(OP_MOV_EvGv, src, addr);
   }
 
   void movl_mr(void* addr, RegisterID dst) {
-    m_formatter.oneByteOp(OP_MOV_GvEv, dst, addr);
+    if (dst == X86Registers::eax)
+      movl_mEAX(addr);
+    else
+      m_formatter.oneByteOp(OP_MOV_GvEv, dst, addr);
   }
 
   void movl_i32m(int imm, void* addr) {
@@ -1395,20 +1401,6 @@ class X86Assembler {
     ASSERT(where.m_offset != -1);
 
     setPointer(reinterpret_cast<char*>(code) + where.m_offset, value);
-  }
-
-  static int32_t int32AtLocation(void* where) {
-    return static_cast<int32_t*>(where)[-1];
-  }
-
-  static void* pointerAtLocation(void* where) {
-    return static_cast<void**>(where)[-1];
-  }
-
-  static void* jumpTarget(void* jump) {
-    intptr_t src = reinterpret_cast<intptr_t>(jump);
-    int32_t offset = static_cast<int32_t*>(jump)[-1];
-    return reinterpret_cast<void*>(src + offset);
   }
 
   static void relinkJump(void* from, void* to) { setRel32(from, to); }

@@ -162,10 +162,6 @@ class MacroAssembler : public MacroAssemblerBase {
 
   void xorPtr(Imm32 imm, RegisterID srcDest) { xor32(imm, srcDest); }
 
-  void loadPtrWithPatch(void* address, RegisterID dest) {
-    load32WithPatch(address, dest);
-  }
-
   void loadPtr(ImplicitAddress address, RegisterID dest) {
     load32(address, dest);
   }
