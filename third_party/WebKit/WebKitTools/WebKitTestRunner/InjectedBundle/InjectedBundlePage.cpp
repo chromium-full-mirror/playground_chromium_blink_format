@@ -422,7 +422,14 @@ void InjectedBundlePage::didFailLoadWithErrorForFrame(WKBundleFrameRef frame) {
 }
 
 void InjectedBundlePage::didReceiveTitleForFrame(WKStringRef title,
-                                                 WKBundleFrameRef frame) {}
+                                                 WKBundleFrameRef frame) {
+  if (!InjectedBundle::shared()
+           .layoutTestController()
+           ->shouldDumpTitleChanges())
+    return;
+
+  InjectedBundle::shared().os() << "TITLE CHANGED: " << title << "\n";
+}
 
 void InjectedBundlePage::didClearWindowForFrame(WKBundleFrameRef frame,
                                                 JSGlobalContextRef context,

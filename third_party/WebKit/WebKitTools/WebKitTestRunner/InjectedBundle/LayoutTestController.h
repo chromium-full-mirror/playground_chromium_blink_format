@@ -60,6 +60,7 @@ class LayoutTestController : public JSWrappable {
   void dumpSelectionRect() {
   }  // Will need to do something when we support pixel tests.
   void dumpStatusCallbacks() { m_dumpStatusCallbacks = true; }
+  void dumpTitleChanges() { m_dumpTitleChanges = true; }
 
   // Special options.
   void keepWebHistory();
@@ -100,6 +101,7 @@ class LayoutTestController : public JSWrappable {
   }
 
   bool shouldDumpStatusCallbacks() const { return m_dumpStatusCallbacks; }
+  bool shouldDumpTitleChanges() const { return m_dumpTitleChanges; }
 
   bool waitToDump() const { return m_waitToDump; }
   void waitToDumpWatchdogTimerFired();
@@ -122,6 +124,7 @@ class LayoutTestController : public JSWrappable {
 
   bool m_dumpEditingCallbacks;
   bool m_dumpStatusCallbacks;
+  bool m_dumpTitleChanges;
   bool m_waitToDump;  // True if waitUntilDone() has been called, but
                       // notifyDone() has not yet been called.
   bool m_testRepaint;
