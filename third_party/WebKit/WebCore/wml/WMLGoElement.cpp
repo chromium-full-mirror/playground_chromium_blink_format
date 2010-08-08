@@ -26,6 +26,7 @@
 
 #include "Attribute.h"
 #include "FormData.h"
+#include "FormDataBuilder.h"
 #include "FormSubmission.h"
 #include "Frame.h"
 #include "FrameLoader.h"
