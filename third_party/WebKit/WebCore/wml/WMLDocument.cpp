@@ -35,8 +35,8 @@
 
 namespace WebCore {
 
-WMLDocument::WMLDocument(Frame* frame)
-    : Document(frame, false, false), m_activeCard(0) {
+WMLDocument::WMLDocument(Frame* frame, const KURL& url)
+    : Document(frame, url, false, false), m_activeCard(0) {
   clearXMLVersion();
 }
 

@@ -33,8 +33,8 @@ class WMLCardElement;
 
 class WMLDocument : public Document {
  public:
-  static PassRefPtr<WMLDocument> create(Frame* frame) {
-    return adoptRef(new WMLDocument(frame));
+  static PassRefPtr<WMLDocument> create(Frame* frame, const KURL& url) {
+    return adoptRef(new WMLDocument(frame, url));
   }
 
   virtual ~WMLDocument();
@@ -47,7 +47,7 @@ class WMLDocument : public Document {
   WMLCardElement* activeCard() const { return m_activeCard; }
 
  private:
-  WMLDocument(Frame*);
+  WMLDocument(Frame*, const KURL&);
   WMLCardElement* m_activeCard;
 };
 
