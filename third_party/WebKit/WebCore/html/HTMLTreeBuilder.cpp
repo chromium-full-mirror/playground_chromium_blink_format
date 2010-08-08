@@ -1593,7 +1593,7 @@ void HTMLTreeBuilder::callTheAdoptionAgency(AtomicHTMLToken& token) {
       // Use appendChild instead of parserAddChild to handle possible
       // reparenting.
       ExceptionCode ec;
-      node->element()->appendChild(lastNode->element(), ec);
+      node->element()->appendChild(lastNode->element(), ec, true);
       ASSERT(!ec);
       // 6.7
       lastNode = node;
@@ -1607,7 +1607,7 @@ void HTMLTreeBuilder::callTheAdoptionAgency(AtomicHTMLToken& token) {
       m_tree.fosterParent(lastNode->element());
     else {
       ExceptionCode ec;
-      commonAncestor->appendChild(lastNode->element(), ec);
+      commonAncestor->appendChild(lastNode->element(), ec, true);
       ASSERT(!ec);
     }
     // 8
