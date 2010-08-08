@@ -39,8 +39,9 @@ OriginUsageRecord::OriginUsageRecord() : m_cachedDiskUsageIsValid(false) {}
 void OriginUsageRecord::addDatabase(const String& identifier,
                                     const String& fullPath) {
   ASSERT(!m_databaseMap.contains(identifier));
-  ASSERT_ARG(identifier, identifier.impl()->hasOneRef());
-  ASSERT_ARG(fullPath, fullPath.impl()->hasOneRef());
+  ASSERT_ARG(identifier,
+             identifier.impl()->hasOneRef() || identifier.isEmpty());
+  ASSERT_ARG(fullPath, fullPath.impl()->hasOneRef() || fullPath.isEmpty());
 
   m_databaseMap.set(identifier, DatabaseEntry(fullPath));
   m_unknownSet.add(identifier);
@@ -58,7 +59,8 @@ void OriginUsageRecord::removeDatabase(const String& identifier) {
 
 void OriginUsageRecord::markDatabase(const String& identifier) {
   ASSERT(m_databaseMap.contains(identifier));
-  ASSERT_ARG(identifier, identifier.impl()->hasOneRef());
+  ASSERT_ARG(identifier,
+             identifier.impl()->hasOneRef() || identifier.isEmpty());
 
   m_unknownSet.add(identifier);
   m_cachedDiskUsageIsValid = false;
