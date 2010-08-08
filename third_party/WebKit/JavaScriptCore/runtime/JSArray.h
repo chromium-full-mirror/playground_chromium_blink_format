@@ -95,7 +95,7 @@ class JSArray : public JSObject {
 
   static JS_EXPORTDATA const ClassInfo info;
 
-  unsigned length() const { return arrayStorage()->m_length; }
+  unsigned length() const { return m_storage->m_length; }
   void setLength(unsigned);  // OK to use on new arrays, but not if it might be
                              // a RegExpMatchArray.
 
@@ -112,19 +112,21 @@ class JSArray : public JSObject {
   void shiftCount(ExecState*, int count);
   void unshiftCount(ExecState*, int count);
 
-  bool canGetIndex(unsigned i) { return i < m_vectorLength && m_vector[i]; }
+  bool canGetIndex(unsigned i) {
+    return i < m_vectorLength && m_storage->m_vector[i];
+  }
   JSValue getIndex(unsigned i) {
     ASSERT(canGetIndex(i));
-    return m_vector[i];
+    return m_storage->m_vector[i];
   }
 
   bool canSetIndex(unsigned i) { return i < m_vectorLength; }
   void setIndex(unsigned i, JSValue v) {
     ASSERT(canSetIndex(i));
 
-    JSValue& x = m_vector[i];
+    JSValue& x = m_storage->m_vector[i];
     if (!x) {
-      ArrayStorage* storage = arrayStorage();
+      ArrayStorage* storage = m_storage;
       ++storage->m_numValuesInVector;
       if (i >= storage->m_length)
         storage->m_length = i + 1;
@@ -134,7 +136,7 @@ class JSArray : public JSObject {
 
   void uncheckedSetIndex(unsigned i, JSValue v) {
     ASSERT(canSetIndex(i));
-    ArrayStorage* storage = arrayStorage();
+    ArrayStorage* storage = m_storage;
 #if CHECK_ARRAY_CONSISTENCY
     ASSERT(storage->m_inCompactInitialization);
 #endif
@@ -170,16 +172,6 @@ class JSArray : public JSObject {
   void* subclassData() const;
   void setSubclassData(void*);
 
-  inline ArrayStorage* arrayStorage() const {
-    return reinterpret_cast<ArrayStorage*>(
-        reinterpret_cast<char*>(m_vector) -
-        (sizeof(ArrayStorage) - sizeof(JSValue)));
-  }
-
-  inline void setArrayStorage(ArrayStorage* storage) {
-    m_vector = &storage->m_vector[0];
-  }
-
  private:
   virtual const ClassInfo* classInfo() const { return &info; }
 
@@ -202,9 +194,8 @@ class JSArray : public JSObject {
   void checkConsistency(ConsistencyCheckType = NormalConsistencyCheck);
 
   unsigned m_vectorLength;  // The valid length of m_vector
-  int m_indexBias;    // The number of JSValue sized blocks before ArrayStorage.
-  JSValue* m_vector;  // Copy of ArrayStorage.m_vector.  Used for quick vector
-                      // access and to materialize ArrayStorage ptr.
+  int m_indexBias;  // The number of JSValue sized blocks before ArrayStorage.
+  ArrayStorage* m_storage;
 };
 
 JSArray* asArray(JSValue);
@@ -228,7 +219,7 @@ inline bool isJSArray(JSGlobalData* globalData, JSCell* cell) {
 inline void JSArray::markChildrenDirect(MarkStack& markStack) {
   JSObject::markChildrenDirect(markStack);
 
-  ArrayStorage* storage = arrayStorage();
+  ArrayStorage* storage = m_storage;
 
   unsigned usedVectorLength = std::min(storage->m_length, m_vectorLength);
   markStack.appendValues(storage->m_vector, usedVectorLength,
