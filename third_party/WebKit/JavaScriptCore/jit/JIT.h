@@ -309,6 +309,28 @@ class JIT : private JSInterfaceJIT {
                                    JSObject*,
                                    ReturnAddressPtr);
 
+#if ENABLE(MOVABLE_GC_OBJECTS)
+  static void patchPrototypeStructureAddress(CodeLocationDataLabelPtr,
+                                             MarkStack&,
+                                             RepatchBuffer&);
+  static void patchGetDirectOffset(CodeLocationLabel,
+                                   MarkStack&,
+                                   RepatchBuffer&,
+                                   PropertySlot::CachedPropertyType);
+  static void markGetByIdChainInternal(CodeLocationLabel,
+                                       MarkStack&,
+                                       RepatchBuffer&,
+                                       PropertySlot::CachedPropertyType);
+
+  static void markGetByIdProto(MarkStack&, CodeBlock*, StructureStubInfo*);
+  static void markGetByIdChain(MarkStack&, CodeBlock*, StructureStubInfo*);
+  static void markGetByIdProtoList(MarkStack&, CodeBlock*, StructureStubInfo*);
+  static void markPutByIdTransition(MarkStack&, CodeBlock*, StructureStubInfo*);
+  static void markGlobalObjectReference(MarkStack&,
+                                        CodeBlock*,
+                                        CodeLocationDataLabelPtr);
+#endif
+
   static bool compilePatchGetArrayLength(JSGlobalData* globalData,
                                          CodeBlock* codeBlock,
                                          StructureStubInfo* stubInfo,
@@ -428,7 +450,7 @@ class JIT : private JSInterfaceJIT {
   void emitLoadDouble(unsigned index, FPRegisterID value);
   void emitLoadInt32ToDouble(unsigned index, FPRegisterID value);
 
-  void testPrototype(JSValue, JumpList& failureCases);
+  unsigned testPrototype(JSValue, JumpList& failureCases);
 
 #if USE(JSVALUE32_64)
   bool getOperandConstantImmediateInt(unsigned op1,
@@ -560,6 +582,13 @@ class JIT : private JSInterfaceJIT {
   static const int patchOffsetMethodCheckProtoObj = 11;
   static const int patchOffsetMethodCheckProtoStruct = 18;
   static const int patchOffsetMethodCheckPutFunction = 29;
+
+  static const int patchOffsetGetByIdProtoStruct = 19;
+  static const int patchOffsetPutByIdProtoStruct = 12;
+  static const int patchLengthTestPrototype = 16;
+  static const int patchLengthBranchPtr = 10;
+  static const int patchLengthMove = 6;
+  static const int patchLengthStore = 10;
 #elif CPU(ARM_TRADITIONAL)
   // These architecture specific value are used to enable patching - see comment
   // on op_put_by_id.
@@ -779,6 +808,13 @@ class JIT : private JSInterfaceJIT {
   static const int patchOffsetMethodCheckProtoObj = 20;
   static const int patchOffsetMethodCheckProtoStruct = 30;
   static const int patchOffsetMethodCheckPutFunction = 50;
+
+  static const int patchOffsetGetByIdProtoStruct = 40;
+  static const int patchOffsetPutByIdProtoStruct = 20;
+  static const int patchLengthTestPrototype = 29;
+  static const int patchLengthBranchPtr = 9;
+  static const int patchLengthMove = 10;
+  static const int patchLengthStore = 13;
 #elif CPU(X86)
   // These architecture specific value are used to enable patching - see comment
   // on op_put_by_id.

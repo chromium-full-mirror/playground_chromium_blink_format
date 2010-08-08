@@ -30,6 +30,7 @@
 
 #include "Instruction.h"
 #include "MacroAssembler.h"
+#include "PropertySlot.h"
 #include "Opcode.h"
 #include "Structure.h"
 
@@ -62,9 +63,17 @@ struct StructureStubInfo {
     baseObjectStructure->ref();
   }
 
+#if ENABLE(MOVABLE_GC_OBJECTS)
   void initGetByIdProto(Structure* baseObjectStructure,
                         Structure* prototypeStructure,
-                        CodeLocationLabel routine) {
+                        CodeLocationLabel routine,
+                        PropertySlot::CachedPropertyType propertyType)
+#else
+  void initGetByIdProto(Structure* baseObjectStructure,
+                        Structure* prototypeStructure,
+                        CodeLocationLabel routine)
+#endif
+  {
     accessType = access_get_by_id_proto;
 
     u.getByIdProto.baseObjectStructure = baseObjectStructure;
@@ -74,11 +83,24 @@ struct StructureStubInfo {
     prototypeStructure->ref();
 
     stubRoutine = routine;
+
+#if ENABLE(MOVABLE_GC_OBJECTS)
+    u.getByIdProto.propertyType = propertyType;
+#endif
   }
 
+#if ENABLE(MOVABLE_GC_OBJECTS)
   void initGetByIdChain(Structure* baseObjectStructure,
                         StructureChain* chain,
-                        CodeLocationLabel routine) {
+                        CodeLocationLabel routine,
+                        int count,
+                        PropertySlot::CachedPropertyType propertyType)
+#else
+  void initGetByIdChain(Structure* baseObjectStructure,
+                        StructureChain* chain,
+                        CodeLocationLabel routine)
+#endif
+  {
     accessType = access_get_by_id_chain;
 
     u.getByIdChain.baseObjectStructure = baseObjectStructure;
@@ -88,6 +110,11 @@ struct StructureStubInfo {
     chain->ref();
 
     stubRoutine = routine;
+
+#if ENABLE(MOVABLE_GC_OBJECTS)
+    u.getByIdChain.count = count;
+    u.getByIdChain.propertyType = propertyType;
+#endif
   }
 
   void initGetByIdSelfList(PolymorphicAccessStructureList* structureList) {
@@ -136,6 +163,9 @@ struct StructureStubInfo {
   }
 
   void deref();
+#if ENABLE(MOVABLE_GC_OBJECTS)
+  void markAggregate(MarkStack&, CodeBlock*);
+#endif
 
   bool seenOnce() { return seen; }
 
@@ -151,10 +181,24 @@ struct StructureStubInfo {
     struct {
       Structure* baseObjectStructure;
       Structure* prototypeStructure;
+#if ENABLE(MOVABLE_GC_OBJECTS)
+      // The propertyType is required to properly determine the
+      // structure of the underlying code so that we may patch it
+      // correctly.  Different code is generated for different
+      // property types, and therefore, the offsets that we need to
+      // patch at will change.
+      PropertySlot::CachedPropertyType propertyType;
+#endif
     } getByIdProto;
     struct {
       Structure* baseObjectStructure;
       StructureChain* chain;
+#if ENABLE(MOVABLE_GC_OBJECTS)
+      // We need the count so that we can iterate over the prototype
+      // chain, marking all of the references to objects.
+      int count;
+      PropertySlot::CachedPropertyType propertyType;
+#endif
     } getByIdChain;
     struct {
       PolymorphicAccessStructureList* structureList;
