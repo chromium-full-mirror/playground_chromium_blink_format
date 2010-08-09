@@ -1443,10 +1443,10 @@ bool ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclaration* style,
       removed = true;
       if (mode == RemoveNone)
         return true;
-      removeCSSProperty(decl, propertyID);
+      removeCSSProperty(elem, propertyID);
       if (propertyID == CSSPropertyUnicodeBidi &&
           !decl->getPropertyValue(CSSPropertyDirection).isEmpty())
-        removeCSSProperty(decl, CSSPropertyDirection);
+        removeCSSProperty(elem, CSSPropertyDirection);
     }
   }
 
@@ -1508,7 +1508,7 @@ ApplyStyleCommand::extractTextDecorationStyle(Node* node) {
   RefPtr<CSSValue> property =
       style->getPropertyCSSValue(CSSPropertyTextDecoration);
   if (property && !equalIgnoringCase(property->cssText(), "none"))
-    removeCSSProperty(style.get(), CSSPropertyTextDecoration);
+    removeCSSProperty(element, CSSPropertyTextDecoration);
 
   return textDecorationStyle.release();
 }

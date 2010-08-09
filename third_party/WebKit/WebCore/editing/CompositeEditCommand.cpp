@@ -393,11 +393,10 @@ void CompositeEditCommand::deleteSelection(const VisibleSelection& selection,
         expandForSpecialElements));
 }
 
-void CompositeEditCommand::removeCSSProperty(
-    PassRefPtr<CSSMutableStyleDeclaration> style,
-    CSSPropertyID property) {
+void CompositeEditCommand::removeCSSProperty(PassRefPtr<StyledElement> element,
+                                             CSSPropertyID property) {
   applyCommandToComposite(
-      RemoveCSSPropertyCommand::create(document(), style, property));
+      RemoveCSSPropertyCommand::create(document(), element, property));
 }
 
 void CompositeEditCommand::removeNodeAttribute(PassRefPtr<Element> element,

@@ -29,6 +29,7 @@
 #include "EditCommand.h"
 #include "CSSMutableStyleDeclaration.h"
 #include "CSSPropertyNames.h"
+#include "StyledElement.h"
 
 namespace WebCore {
 
@@ -36,20 +37,20 @@ class RemoveCSSPropertyCommand : public SimpleEditCommand {
  public:
   static PassRefPtr<RemoveCSSPropertyCommand> create(
       Document* document,
-      PassRefPtr<CSSMutableStyleDeclaration> style,
+      PassRefPtr<StyledElement> element,
       CSSPropertyID property) {
-    return adoptRef(new RemoveCSSPropertyCommand(document, style, property));
+    return adoptRef(new RemoveCSSPropertyCommand(document, element, property));
   }
 
  private:
   RemoveCSSPropertyCommand(Document*,
-                           PassRefPtr<CSSMutableStyleDeclaration>,
+                           PassRefPtr<StyledElement>,
                            CSSPropertyID property);
 
   virtual void doApply();
   virtual void doUnapply();
 
-  RefPtr<CSSMutableStyleDeclaration> m_style;
+  RefPtr<StyledElement> m_element;
   CSSPropertyID m_property;
   String m_oldValue;
   bool m_important;
