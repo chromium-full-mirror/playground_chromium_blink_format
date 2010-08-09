@@ -49,7 +49,6 @@ class InspectorFrontend : public Noncopyable {
   ~InspectorFrontend();
 
   void close();
-  void showPanel(int panel);
   ScriptState* scriptState() const { return m_webInspector.scriptState(); }
 
  private:
