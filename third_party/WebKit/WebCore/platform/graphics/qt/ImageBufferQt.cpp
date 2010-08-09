@@ -174,7 +174,7 @@ PassRefPtr<ImageData> getImageData(const IntRect& rect,
   ASSERT(!image.isNull());
 
   const int bytesPerLine = image.bytesPerLine();
-#if QT_VERSION >= 0x040700
+#if QT_VERSION >= QT_VERSION_CHECK(4, 7, 0)
   const uchar* bits = image.constBits();
 #else
   const uchar* bits = image.bits();

@@ -54,7 +54,7 @@ class PageClientQWidget : public QWebPageClient {
   virtual void update(const QRect& dirtyRect);
   virtual void setInputMethodEnabled(bool enable);
   virtual bool inputMethodEnabled() const;
-#if QT_VERSION >= 0x040600
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   virtual void setInputMethodHints(Qt::InputMethodHints hints);
 #endif
 
@@ -140,7 +140,7 @@ class PageClientQGraphicsWidget : public QWebPageClient {
   virtual void update(const QRect& dirtyRect);
   virtual void setInputMethodEnabled(bool enable);
   virtual bool inputMethodEnabled() const;
-#if QT_VERSION >= 0x040600
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   virtual void setInputMethodHints(Qt::InputMethodHints hints);
 #endif
 

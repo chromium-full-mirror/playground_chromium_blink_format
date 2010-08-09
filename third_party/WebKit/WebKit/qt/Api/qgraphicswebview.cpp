@@ -245,7 +245,7 @@ void QGraphicsWebViewPrivate::_q_scaleChanged() {
 */
 QGraphicsWebView::QGraphicsWebView(QGraphicsItem* parent)
     : QGraphicsWidget(parent), d(new QGraphicsWebViewPrivate(this)) {
-#if QT_VERSION >= 0x040600
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   setFlag(QGraphicsItem::ItemUsesExtendedStyleOption, true);
 #endif
   setAcceptDrops(true);
@@ -431,7 +431,7 @@ void QGraphicsWebViewPrivate::detachCurrentPage() {
   if (!page)
     return;
 
-#if QT_VERSION >= 0x040600
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   page->d->view.clear();
 #else
   page->d->view = 0;
