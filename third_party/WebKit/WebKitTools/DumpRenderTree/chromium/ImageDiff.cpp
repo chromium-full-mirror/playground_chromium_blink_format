@@ -314,12 +314,13 @@ static bool writeFile(const char* outFile,
                       size_t dataSize) {
   FILE* file = fopen(outFile, "wb");
   if (!file) {
-    fprintf(stderr, "ImageDiff: Unable to create file \"%s\"\n", file);
+    fprintf(stderr, "ImageDiff: Unable to create file \"%s\"\n", outFile);
     return false;
   }
   if (dataSize != fwrite(data, 1, dataSize, file)) {
     fclose(file);
-    fprintf(stderr, "ImageDiff: Unable to write data to file \"%s\"\n", file);
+    fprintf(stderr, "ImageDiff: Unable to write data to file \"%s\"\n",
+            outFile);
     return false;
   }
   fclose(file);
