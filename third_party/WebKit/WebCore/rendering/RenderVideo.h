@@ -40,7 +40,6 @@ class RenderVideo : public RenderMedia {
   RenderVideo(HTMLVideoElement*);
   virtual ~RenderVideo();
 
-  void videoSizeChanged();
   IntRect videoBox() const;
 
   static IntSize defaultSize();
@@ -57,6 +56,9 @@ class RenderVideo : public RenderMedia {
   inline HTMLVideoElement* videoElement() const;
 
   virtual void intrinsicSizeChanged();
+  IntSize calculateIntrinsicSize();
+  void updateIntrinsicSize();
+
   virtual void imageChanged(WrappedImagePtr, const IntRect*);
 
   virtual const char* renderName() const { return "RenderVideo"; }
