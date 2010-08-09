@@ -56,11 +56,20 @@ class CanvasLayerChromium : public LayerChromium {
     m_shaderProgramId = shaderProgramId;
   }
 
+  class PrepareTextureCallback : public Noncopyable {
+   public:
+    virtual void willPrepareTexture() = 0;
+  };
+  void setPrepareTextureCallback(PassOwnPtr<PrepareTextureCallback> callback) {
+    m_prepareTextureCallback = callback;
+  }
+
  private:
   explicit CanvasLayerChromium(GraphicsLayerChromium* owner);
   GraphicsContext3D* m_context;
   unsigned m_textureId;
   bool m_textureChanged;
+  OwnPtr<PrepareTextureCallback> m_prepareTextureCallback;
 
   static unsigned m_shaderProgramId;
 };
