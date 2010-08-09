@@ -64,7 +64,6 @@ void InspectorApplicationCacheAgent::updateNetworkState(bool isNowOnline) {
 }
 
 void InspectorApplicationCacheAgent::getApplicationCaches(
-    long,
     RefPtr<InspectorValue>* applicationCaches) {
   DocumentLoader* documentLoader = m_inspectorController->inspectedPage()
                                        ->mainFrame()

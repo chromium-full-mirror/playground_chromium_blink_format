@@ -79,8 +79,7 @@ void InspectorDebuggerAgent::deactivateBreakpoints() {
   ScriptDebugServer::shared().deactivateBreakpoints();
 }
 
-void InspectorDebuggerAgent::setBreakpoint(long,
-                                           const String& sourceID,
+void InspectorDebuggerAgent::setBreakpoint(const String& sourceID,
                                            unsigned lineNumber,
                                            bool enabled,
                                            const String& condition,
@@ -134,7 +133,6 @@ void InspectorDebuggerAgent::removeBreakpoint(const String& sourceID,
 }
 
 void InspectorDebuggerAgent::editScriptSource(
-    long,
     const String& sourceID,
     const String& newContent,
     bool* success,
@@ -145,8 +143,7 @@ void InspectorDebuggerAgent::editScriptSource(
     *newCallFrames = currentCallFrames();
 }
 
-void InspectorDebuggerAgent::getScriptSource(long,
-                                             const String& sourceID,
+void InspectorDebuggerAgent::getScriptSource(const String& sourceID,
                                              String* scriptSource) {
   *scriptSource = m_scriptIDToContent.get(sourceID);
 }

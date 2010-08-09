@@ -199,8 +199,7 @@ class InspectorController : public Noncopyable {
   void stopTimelineProfiler();
   InspectorTimelineAgent* timelineAgent() { return m_timelineAgent.get(); }
 
-  void getCookies(long callId,
-                  RefPtr<InspectorArray>* cookies,
+  void getCookies(RefPtr<InspectorArray>* cookies,
                   WebCore::String* cookiesString);
   void deleteCookie(const String& cookieName, const String& domain);
 
@@ -236,18 +235,12 @@ class InspectorController : public Noncopyable {
                         bool isLocalStorage,
                         Frame* frame);
   void selectDOMStorage(Storage* storage);
-  void getDOMStorageEntries(long callId,
-                            long storageId,
-                            RefPtr<InspectorArray>* entries);
-  void setDOMStorageItem(long callId,
-                         long storageId,
+  void getDOMStorageEntries(long storageId, RefPtr<InspectorArray>* entries);
+  void setDOMStorageItem(long storageId,
                          const String& key,
                          const String& value,
                          bool* success);
-  void removeDOMStorageItem(long callId,
-                            long storageId,
-                            const String& key,
-                            bool* success);
+  void removeDOMStorageItem(long storageId, const String& key, bool* success);
 #endif
 
   const ResourcesMap& resources() const { return m_resources; }
@@ -309,7 +302,7 @@ class InspectorController : public Noncopyable {
   void resume();
 #endif
 
-  void evaluateForTestInFrontend(long callId, const String& script);
+  void evaluateForTestInFrontend(long testCallId, const String& script);
 
   InjectedScript injectedScriptForNodeId(long id);
   void addScriptToEvaluateOnLoad(const String& source);
@@ -346,10 +339,8 @@ class InspectorController : public Noncopyable {
   void startUserInitiatedProfilingSoon();
   void toggleRecordButton(bool);
   void enableDebuggerFromFrontend(bool always);
-  void getProfileHeaders(long callId, RefPtr<InspectorArray>* headers);
-  void getProfile(long callId,
-                  unsigned uid,
-                  RefPtr<InspectorObject>* profileObject);
+  void getProfileHeaders(RefPtr<InspectorArray>* headers);
+  void getProfile(unsigned uid, RefPtr<InspectorObject>* profileObject);
   PassRefPtr<InspectorObject> createProfileHeader(const ScriptProfile& profile);
 #endif
 #if ENABLE(DATABASE)
@@ -370,9 +361,7 @@ class InspectorController : public Noncopyable {
   void addResource(InspectorResource*);
   void removeResource(InspectorResource*);
   InspectorResource* getTrackedResource(unsigned long identifier);
-  void getResourceContent(long callId,
-                          unsigned long identifier,
-                          String* content);
+  void getResourceContent(unsigned long identifier, String* content);
 
   void pruneResources(ResourcesMap*, DocumentLoader* loaderToKeep = 0);
   void removeAllResources(ResourcesMap* map) { pruneResources(map); }

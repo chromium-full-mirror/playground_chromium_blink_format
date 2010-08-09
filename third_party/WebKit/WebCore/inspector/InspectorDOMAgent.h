@@ -101,32 +101,18 @@ class InspectorDOMAgent : public EventListener {
   virtual bool operator==(const EventListener& other);
 
   // Methods called from the frontend for DOM nodes inspection.
-  void getChildNodes(long callId, long nodeId);
-  void setAttribute(long callId,
-                    long elementId,
+  void getChildNodes(long nodeId);
+  void setAttribute(long elementId,
                     const String& name,
                     const String& value,
                     bool* success);
-  void removeAttribute(long callId,
-                       long elementId,
-                       const String& name,
-                       bool* success);
-  void removeNode(long callId, long nodeId, long* outNodeId);
-  void changeTagName(long callId,
-                     long nodeId,
-                     const String& tagName,
-                     long* newId);
-  void getOuterHTML(long callId, long nodeId, WebCore::String* outerHTML);
-  void setOuterHTML(long callId,
-                    long nodeId,
-                    const String& outerHTML,
-                    long* newId);
-  void setTextNodeValue(long callId,
-                        long nodeId,
-                        const String& value,
-                        bool* success);
-  void getEventListenersForNode(long callId,
-                                long nodeId,
+  void removeAttribute(long elementId, const String& name, bool* success);
+  void removeNode(long nodeId, long* outNodeId);
+  void changeTagName(long nodeId, const String& tagName, long* newId);
+  void getOuterHTML(long nodeId, WebCore::String* outerHTML);
+  void setOuterHTML(long nodeId, const String& outerHTML, long* newId);
+  void setTextNodeValue(long nodeId, const String& value, bool* success);
+  void getEventListenersForNode(long nodeId,
                                 long* outNodeId,
                                 RefPtr<InspectorArray>* listenersArray);
   void addInspectedNode(long nodeId);
@@ -135,50 +121,34 @@ class InspectorDOMAgent : public EventListener {
   void searchCanceled();
 
   // Methods called from the frontend for CSS styles inspection.
-  void getStyles(long callId,
-                 long nodeId,
-                 bool authorOnly,
-                 RefPtr<InspectorValue>* styles);
-  void getAllStyles(long callId, RefPtr<InspectorArray>* styles);
-  void getInlineStyle(long callId, long nodeId, RefPtr<InspectorValue>* styles);
-  void getComputedStyle(long callId,
-                        long nodeId,
-                        RefPtr<InspectorValue>* styles);
-  void getStyleSheet(long callId,
-                     long styleSheetId,
+  void getStyles(long nodeId, bool authorOnly, RefPtr<InspectorValue>* styles);
+  void getAllStyles(RefPtr<InspectorArray>* styles);
+  void getInlineStyle(long nodeId, RefPtr<InspectorValue>* styles);
+  void getComputedStyle(long nodeId, RefPtr<InspectorValue>* styles);
+  void getStyleSheet(long styleSheetId,
                      RefPtr<InspectorObject>* styleSheetObject);
-  void getRuleRanges(long callId,
-                     long styleSheetId,
-                     RefPtr<InspectorValue>* ruleRange);
-  void applyStyleText(long callId,
-                      long styleId,
+  void getRuleRanges(long styleSheetId, RefPtr<InspectorValue>* ruleRange);
+  void applyStyleText(long styleId,
                       const String& styleText,
                       const String& propertyName,
                       bool* success,
                       RefPtr<InspectorValue>* styleObject,
                       RefPtr<InspectorArray>* changedProperties);
-  void setStyleText(long callId,
-                    long styleId,
-                    const String& cssText,
-                    bool* success);
-  void setStyleProperty(long callId,
-                        long styleId,
+  void setStyleText(long styleId, const String& cssText, bool* success);
+  void setStyleProperty(long styleId,
                         const String& name,
                         const String& value,
                         bool* success);
-  void toggleStyleEnabled(long callId,
-                          long styleId,
+  void toggleStyleEnabled(long styleId,
                           const String& propertyName,
                           bool disabled,
                           RefPtr<InspectorValue>* styleObject);
-  void setRuleSelector(long callId,
-                       long ruleId,
+  void setRuleSelector(long ruleId,
                        const String& selector,
                        long selectedNodeId,
                        RefPtr<InspectorValue>* ruleObject,
                        bool* selectorAffectsNode);
-  void addRule(long callId,
-               const String& selector,
+  void addRule(const String& selector,
                long selectedNodeId,
                RefPtr<InspectorValue>* ruleObject,
                bool* selectorAffectsNode);
@@ -194,7 +164,7 @@ class InspectorDOMAgent : public EventListener {
   Node* nodeForId(long nodeId);
   long pushNodePathToFrontend(Node* node);
   void pushChildNodesToFrontend(long nodeId);
-  void pushNodeByPathToFrontend(long callId, const String& path, long* nodeId);
+  void pushNodeByPathToFrontend(const String& path, long* nodeId);
   long inspectedNode(unsigned long num);
   void copyNode(long nodeId);
 

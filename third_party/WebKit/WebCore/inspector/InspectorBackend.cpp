@@ -65,8 +65,7 @@ void InspectorBackend::takeHeapSnapshot() {
   ScriptProfiler::takeHeapSnapshot();
 }
 
-void InspectorBackend::getProfilerLogLines(long,
-                                           long position,
+void InspectorBackend::getProfilerLogLines(long position,
                                            long* outPosition,
                                            String* data) {
   // FIXME: we should make inspector dispatcher pluggable, so that embedders
@@ -114,7 +113,7 @@ void InspectorBackend::dispatchOnInjectedScript(long callId,
                                                 *hadException);
 }
 
-void InspectorBackend::clearConsoleMessages(long) {
+void InspectorBackend::clearConsoleMessages() {
   m_inspectorController->clearConsoleMessages();
 }
 
@@ -125,8 +124,7 @@ void InspectorBackend::releaseWrapperObjectGroup(long injectedScriptId,
 }
 
 #if ENABLE(DATABASE)
-void InspectorBackend::getDatabaseTableNames(long,
-                                             long databaseId,
+void InspectorBackend::getDatabaseTableNames(long databaseId,
                                              RefPtr<InspectorArray>* names) {
   Database* database = m_inspectorController->databaseForId(databaseId);
   if (database) {
