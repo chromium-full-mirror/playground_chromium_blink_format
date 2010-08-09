@@ -49,6 +49,7 @@ class KillRing;
 class Pasteboard;
 class SimpleFontData;
 class Text;
+class TextEvent;
 
 struct CompositionUnderline {
   CompositionUnderline() : startOffset(0), endOffset(0), thick(false) {}
@@ -86,6 +87,7 @@ class Editor {
 
   void handleKeyboardEvent(KeyboardEvent*);
   void handleInputMethodKeydown(KeyboardEvent*);
+  bool handleTextEvent(TextEvent*);
 
   bool canEdit() const;
   bool canEditRichly() const;
@@ -343,6 +345,11 @@ class Editor {
 
   void addToKillRing(Range*, bool prepend);
 
+  void pasteAsFragment(PassRefPtr<DocumentFragment>,
+                       bool smartReplace,
+                       bool matchStyle);
+  void pasteAsPlainText(const String&, bool smartReplace);
+
  private:
   Frame* m_frame;
   OwnPtr<DeleteButtonController> m_deleteButtonController;
@@ -383,6 +390,7 @@ class Editor {
   void changeSelectionAfterCommand(const VisibleSelection& newSelection,
                                    bool closeTyping,
                                    bool clearTypingStyle);
+  Node* findEventTargetFromSelection() const;
 };
 
 inline void Editor::setStartNewKillRingSequence(bool flag) {

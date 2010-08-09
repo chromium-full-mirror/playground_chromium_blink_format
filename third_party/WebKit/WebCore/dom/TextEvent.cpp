@@ -31,13 +31,52 @@
 
 namespace WebCore {
 
-TextEvent::TextEvent() : m_isLineBreak(false), m_isBackTab(false) {}
+PassRefPtr<TextEvent> TextEvent::create() {
+  return adoptRef(new TextEvent);
+}
 
-TextEvent::TextEvent(PassRefPtr<AbstractView> view, const String& data)
+PassRefPtr<TextEvent> TextEvent::create(PassRefPtr<AbstractView> view,
+                                        const String& data) {
+  return adoptRef(new TextEvent(view, data));
+}
+
+PassRefPtr<TextEvent> TextEvent::createForPlainTextPaste(
+    PassRefPtr<AbstractView> view,
+    const String& data,
+    bool shouldSmartReplace) {
+  return adoptRef(new TextEvent(view, data, 0, true, shouldSmartReplace));
+}
+
+PassRefPtr<TextEvent> TextEvent::createForFragmentPaste(
+    PassRefPtr<AbstractView> view,
+    PassRefPtr<DocumentFragment> data,
+    bool shouldSmartReplace,
+    bool shouldMatchStyle) {
+  return adoptRef(new TextEvent(view, "", data, true, shouldSmartReplace,
+                                shouldMatchStyle));
+}
+
+TextEvent::TextEvent()
+    : m_isLineBreak(false),
+      m_isBackTab(false),
+      m_isPaste(false),
+      m_shouldSmartReplace(false),
+      m_shouldMatchStyle(false) {}
+
+TextEvent::TextEvent(PassRefPtr<AbstractView> view,
+                     const String& data,
+                     PassRefPtr<DocumentFragment> pastingFragment,
+                     bool isPaste,
+                     bool shouldSmartReplace,
+                     bool shouldMatchStyle)
     : UIEvent(eventNames().textInputEvent, true, true, view, 0),
       m_data(data),
       m_isLineBreak(false),
-      m_isBackTab(false) {}
+      m_isBackTab(false),
+      m_pastingFragment(pastingFragment),
+      m_isPaste(isPaste),
+      m_shouldSmartReplace(shouldSmartReplace),
+      m_shouldMatchStyle(shouldMatchStyle) {}
 
 TextEvent::~TextEvent() {}
 
