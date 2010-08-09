@@ -32,6 +32,7 @@
 
 #include "MathMLNames.h"
 #include "RenderMathMLBlock.h"
+#include "RenderMathMLFenced.h"
 #include "RenderMathMLFraction.h"
 #include "RenderMathMLRoot.h"
 #include "RenderMathMLRow.h"
@@ -76,6 +77,8 @@ RenderObject* MathMLInlineContainerElement::createRenderer(RenderArena* arena,
     return new (arena) RenderMathMLSquareRoot(this);
   else if (hasLocalName(MathMLNames::mrootTag))
     return new (arena) RenderMathMLRoot(this);
+  else if (hasLocalName(MathMLNames::mfencedTag))
+    return new (arena) RenderMathMLFenced(this);
   else
     return new (arena) RenderMathMLBlock(this);
 }

@@ -78,13 +78,18 @@ static struct StretchyCharacter {
   UChar extensionGlyph;
   UChar bottomGlyph;
   UChar middleGlyph;
-} stretchyCharacters[9] = {
+} stretchyCharacters[13] = {
     {0x28, 0x239b, 0x239c, 0x239d, 0x0},     // left parenthesis
     {0x29, 0x239e, 0x239f, 0x23a0, 0x0},     // right parenthesis
     {0x5b, 0x23a1, 0x23a2, 0x23a3, 0x0},     // left square bracket
+    {0x2308, 0x23a1, 0x23a2, 0x23a2, 0x0},   // left ceiling
+    {0x230a, 0x23a2, 0x23a2, 0x23a3, 0x0},   // left floor
     {0x5d, 0x23a4, 0x23a5, 0x23a6, 0x0},     // right square bracket
+    {0x2309, 0x23a4, 0x23a5, 0x23a5, 0x0},   // right ceiling
+    {0x230b, 0x23a5, 0x23a5, 0x23a6, 0x0},   // right floor
     {0x7b, 0x23a7, 0x23aa, 0x23a9, 0x23a8},  // left curly bracket
     {0x7c, 0x23d0, 0x23d0, 0x23d0, 0x0},     // vertical bar
+    {0x2016, 0x2016, 0x2016, 0x2016, 0x0},   // double vertical line
     {0x7d, 0x23ab, 0x23aa, 0x23ad, 0x23ac},  // right curly bracket
     {0x222b, 0x2320, 0x23ae, 0x2321, 0x0}    // integral sign
 };
@@ -98,12 +103,14 @@ static struct StretchyCharacter {
 //
 // All of these settings are represented in the constants below.
 
+// FIXME: use fractions of style()->fontSize() for proper zooming/resizing.
 static const int gGlyphFontSize = 14;
-static const int gGlyphLineHeight = 12;
+static const int gGlyphLineHeight = 11;
 static const int gMinimumStretchHeight = 24;
 static const int gGlyphHeight = 10;
-static const int gMiddleGlyphTopAdjust = -2;
-static const int gBottomGlyphTopAdjust = -4;
+static const int gTopGlyphTopAdjust = 1;
+static const int gMiddleGlyphTopAdjust = -1;
+static const int gBottomGlyphTopAdjust = -3;
 static const float gMinimumRatioForStretch = 0.10f;
 
 void RenderMathMLOperator::updateFromElement() {
@@ -230,14 +237,16 @@ void RenderMathMLOperator::updateFromElement() {
       int half = (m_stretchHeight - gGlyphHeight) / 2;
       if (half <= gGlyphHeight) {
         // We only have enough space for a single middle glyph.
-        createGlyph(stretchyCharacters[index].topGlyph, half);
+        createGlyph(stretchyCharacters[index].topGlyph, half,
+                    gTopGlyphTopAdjust);
         createGlyph(stretchyCharacters[index].middleGlyph, gGlyphHeight,
                     gMiddleGlyphTopAdjust);
         createGlyph(stretchyCharacters[index].bottomGlyph, 0,
                     gBottomGlyphTopAdjust);
       } else {
         // We have to extend both the top and bottom to the middle.
-        createGlyph(stretchyCharacters[index].topGlyph, gGlyphHeight);
+        createGlyph(stretchyCharacters[index].topGlyph, gGlyphHeight,
+                    gTopGlyphTopAdjust);
         int remaining = half - gGlyphHeight;
         while (remaining > 0) {
           if (remaining < gGlyphHeight) {
@@ -279,7 +288,8 @@ void RenderMathMLOperator::updateFromElement() {
       // We do not have a middle glyph and so we just extend from the top to the
       // bottom glyph.
       int remaining = m_stretchHeight - 2 * gGlyphHeight;
-      createGlyph(stretchyCharacters[index].topGlyph, gGlyphHeight);
+      createGlyph(stretchyCharacters[index].topGlyph, gGlyphHeight,
+                  gTopGlyphTopAdjust);
       while (remaining > 0) {
         if (remaining < gGlyphHeight) {
           createGlyph(stretchyCharacters[index].extensionGlyph, remaining);
