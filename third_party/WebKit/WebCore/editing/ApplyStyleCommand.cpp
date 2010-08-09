@@ -150,8 +150,7 @@ void StyleChange::reconcileTextDecorationProperties(
     style->removeProperty(CSSPropertyTextDecoration);
 }
 
-static int getIdentifierValue(CSSMutableStyleDeclaration* style,
-                              int propertyID) {
+static int getIdentifierValue(CSSStyleDeclaration* style, int propertyID) {
   if (!style)
     return 0;
 
@@ -880,7 +879,7 @@ void ApplyStyleCommand::cleanupUnstyledAppleStyleSpans(
 HTMLElement* ApplyStyleCommand::splitAncestorsWithUnicodeBidi(
     Node* node,
     bool before,
-    RefPtr<CSSPrimitiveValue> allowedDirection) {
+    int allowedDirection) {
   // We are allowed to leave the highest ancestor with unicode-bidi unsplit if
   // it is unicode-bidi: embed and direction: allowedDirection.
   // In that case, we return the unsplit ancestor. Otherwise, we return 0.
@@ -890,19 +889,14 @@ HTMLElement* ApplyStyleCommand::splitAncestorsWithUnicodeBidi(
 
   Node* highestAncestorWithUnicodeBidi = 0;
   Node* nextHighestAncestorWithUnicodeBidi = 0;
-  RefPtr<CSSPrimitiveValue> highestAncestorUnicodeBidi;
+  int highestAncestorUnicodeBidi = 0;
   for (Node* n = node->parent(); n != block; n = n->parent()) {
-    RefPtr<CSSValue> unicodeBidi =
-        computedStyle(n)->getPropertyCSSValue(CSSPropertyUnicodeBidi);
-    if (unicodeBidi) {
-      ASSERT(unicodeBidi->isPrimitiveValue());
-      if (static_cast<CSSPrimitiveValue*>(unicodeBidi.get())->getIdent() !=
-          CSSValueNormal) {
-        highestAncestorUnicodeBidi =
-            static_cast<CSSPrimitiveValue*>(unicodeBidi.get());
-        nextHighestAncestorWithUnicodeBidi = highestAncestorWithUnicodeBidi;
-        highestAncestorWithUnicodeBidi = n;
-      }
+    int unicodeBidi =
+        getIdentifierValue(computedStyle(n).get(), CSSPropertyUnicodeBidi);
+    if (unicodeBidi && unicodeBidi != CSSValueNormal) {
+      highestAncestorUnicodeBidi = unicodeBidi;
+      nextHighestAncestorWithUnicodeBidi = highestAncestorWithUnicodeBidi;
+      highestAncestorWithUnicodeBidi = n;
     }
   }
 
@@ -911,22 +905,15 @@ HTMLElement* ApplyStyleCommand::splitAncestorsWithUnicodeBidi(
 
   HTMLElement* unsplitAncestor = 0;
 
-  if (allowedDirection &&
-      highestAncestorUnicodeBidi->getIdent() != CSSValueBidiOverride) {
-    RefPtr<CSSValue> highestAncestorDirection =
-        computedStyle(highestAncestorWithUnicodeBidi)
-            ->getPropertyCSSValue(CSSPropertyDirection);
-    ASSERT(highestAncestorDirection->isPrimitiveValue());
-    if (static_cast<CSSPrimitiveValue*>(highestAncestorDirection.get())
-                ->getIdent() == allowedDirection->getIdent() &&
-        highestAncestorWithUnicodeBidi->isHTMLElement()) {
-      if (!nextHighestAncestorWithUnicodeBidi)
-        return static_cast<HTMLElement*>(highestAncestorWithUnicodeBidi);
+  if (allowedDirection && highestAncestorUnicodeBidi != CSSValueBidiOverride &&
+      getIdentifierValue(computedStyle(highestAncestorWithUnicodeBidi).get(),
+                         CSSPropertyDirection) == allowedDirection &&
+      highestAncestorWithUnicodeBidi->isHTMLElement()) {
+    if (!nextHighestAncestorWithUnicodeBidi)
+      return static_cast<HTMLElement*>(highestAncestorWithUnicodeBidi);
 
-      unsplitAncestor =
-          static_cast<HTMLElement*>(highestAncestorWithUnicodeBidi);
-      highestAncestorWithUnicodeBidi = nextHighestAncestorWithUnicodeBidi;
-    }
+    unsplitAncestor = static_cast<HTMLElement*>(highestAncestorWithUnicodeBidi);
+    highestAncestorWithUnicodeBidi = nextHighestAncestorWithUnicodeBidi;
   }
 
   // Split every ancestor through highest ancestor with embedding.
@@ -949,47 +936,42 @@ void ApplyStyleCommand::removeEmbeddingUpToEnclosingBlock(
   if (!block)
     return;
 
-  Node* n = node->parent();
-  while (n != block && n != unsplitAncestor) {
-    Node* parent = n->parent();
-    if (!n->isStyledElement()) {
-      n = parent;
+  Node* parent = 0;
+  for (Node* n = node->parent(); n != block && n != unsplitAncestor;
+       n = parent) {
+    parent = n->parent();
+    if (!n->isStyledElement())
       continue;
-    }
 
     StyledElement* element = static_cast<StyledElement*>(n);
-    RefPtr<CSSValue> unicodeBidi =
-        computedStyle(element)->getPropertyCSSValue(CSSPropertyUnicodeBidi);
-    if (unicodeBidi) {
-      ASSERT(unicodeBidi->isPrimitiveValue());
-      if (static_cast<CSSPrimitiveValue*>(unicodeBidi.get())->getIdent() !=
-          CSSValueNormal) {
-        // FIXME: This code should really consider the mapped attribute 'dir',
-        // the inline style declaration,
-        // and all matching style rules in order to determine how to best set
-        // the unicode-bidi property to 'normal'.
-        // For now, it assumes that if the 'dir' attribute is present, then
-        // removing it will suffice, and
-        // otherwise it sets the property in the inline style declaration.
-        if (element->hasAttribute(dirAttr)) {
-          // FIXME: If this is a BDO element, we should probably just remove it
-          // if it has no
-          // other attributes, like we (should) do with B and I elements.
-          removeNodeAttribute(element, dirAttr);
-        } else {
-          RefPtr<CSSMutableStyleDeclaration> inlineStyle =
-              element->getInlineStyleDecl()->copy();
-          inlineStyle->setProperty(CSSPropertyUnicodeBidi, CSSValueNormal);
-          inlineStyle->removeProperty(CSSPropertyDirection);
-          setNodeAttribute(element, styleAttr, inlineStyle->cssText());
-          // FIXME: should this be isSpanWithoutAttributesOrUnstyleStyleSpan?
-          // Need a test.
-          if (isUnstyledStyleSpan(element))
-            removeNodePreservingChildren(element);
-        }
-      }
+    int unicodeBidi = getIdentifierValue(computedStyle(element).get(),
+                                         CSSPropertyUnicodeBidi);
+    if (!unicodeBidi || unicodeBidi == CSSValueNormal)
+      continue;
+
+    // FIXME: This code should really consider the mapped attribute 'dir', the
+    // inline style declaration,
+    // and all matching style rules in order to determine how to best set the
+    // unicode-bidi property to 'normal'.
+    // For now, it assumes that if the 'dir' attribute is present, then removing
+    // it will suffice, and
+    // otherwise it sets the property in the inline style declaration.
+    if (element->hasAttribute(dirAttr)) {
+      // FIXME: If this is a BDO element, we should probably just remove it if
+      // it has no
+      // other attributes, like we (should) do with B and I elements.
+      removeNodeAttribute(element, dirAttr);
+    } else {
+      RefPtr<CSSMutableStyleDeclaration> inlineStyle =
+          element->getInlineStyleDecl()->copy();
+      inlineStyle->setProperty(CSSPropertyUnicodeBidi, CSSValueNormal);
+      inlineStyle->removeProperty(CSSPropertyDirection);
+      setNodeAttribute(element, styleAttr, inlineStyle->cssText());
+      // FIXME: should this be isSpanWithoutAttributesOrUnstyleStyleSpan?  Need
+      // a test.
+      if (isUnstyledStyleSpan(element))
+        removeNodePreservingChildren(element);
     }
-    n = parent;
   }
 }
 
@@ -1037,26 +1019,19 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
     endDummySpanAncestor = dummySpanAncestorForNode(end.node());
   }
 
-  RefPtr<CSSValue> unicodeBidi =
-      style->getPropertyCSSValue(CSSPropertyUnicodeBidi);
-  RefPtr<CSSValue> direction;
+  int unicodeBidi = getIdentifierValue(style, CSSPropertyUnicodeBidi);
+  int direction = 0;
   HTMLElement* startUnsplitAncestor = 0;
   HTMLElement* endUnsplitAncestor = 0;
   if (unicodeBidi) {
-    RefPtr<CSSPrimitiveValue> allowedDirection;
-    ASSERT(unicodeBidi->isPrimitiveValue());
-    if (static_cast<CSSPrimitiveValue*>(unicodeBidi.get())->getIdent() ==
-        CSSValueEmbed) {
-      // Leave alone an ancestor that provides the desired single level
-      // embedding, if there is one.
-      direction = style->getPropertyCSSValue(CSSPropertyDirection);
-      ASSERT(direction->isPrimitiveValue());
-      allowedDirection = static_cast<CSSPrimitiveValue*>(direction.get());
-    }
+    // Leave alone an ancestor that provides the desired single level embedding,
+    // if there is one.
+    if (unicodeBidi == CSSValueEmbed)
+      direction = getIdentifierValue(style, CSSPropertyDirection);
     startUnsplitAncestor =
-        splitAncestorsWithUnicodeBidi(start.node(), true, allowedDirection);
+        splitAncestorsWithUnicodeBidi(start.node(), true, direction);
     endUnsplitAncestor =
-        splitAncestorsWithUnicodeBidi(end.node(), false, allowedDirection);
+        splitAncestorsWithUnicodeBidi(end.node(), false, direction);
     removeEmbeddingUpToEnclosingBlock(start.node(), startUnsplitAncestor);
     removeEmbeddingUpToEnclosingBlock(end.node(), endUnsplitAncestor);
   }
@@ -1086,9 +1061,7 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
     RefPtr<CSSMutableStyleDeclaration> embeddingStyle =
         CSSMutableStyleDeclaration::create();
     embeddingStyle->setProperty(CSSPropertyUnicodeBidi, CSSValueEmbed);
-    embeddingStyle->setProperty(
-        CSSPropertyDirection,
-        static_cast<CSSPrimitiveValue*>(direction.get())->getIdent());
+    embeddingStyle->setProperty(CSSPropertyDirection, direction);
     if (comparePositions(embeddingRemoveStart, embeddingRemoveEnd) <= 0)
       removeInlineStyle(embeddingStyle, embeddingRemoveStart,
                         embeddingRemoveEnd);
@@ -1129,33 +1102,21 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
     // ancestors that already have them.
     Node* startEnclosingBlock = enclosingBlock(start.node());
     for (Node* n = start.node(); n != startEnclosingBlock; n = n->parent()) {
-      if (n->isHTMLElement()) {
-        RefPtr<CSSValue> ancestorUnicodeBidi =
-            computedStyle(n)->getPropertyCSSValue(CSSPropertyUnicodeBidi);
-        if (ancestorUnicodeBidi) {
-          ASSERT(ancestorUnicodeBidi->isPrimitiveValue());
-          if (static_cast<CSSPrimitiveValue*>(ancestorUnicodeBidi.get())
-                  ->getIdent() == CSSValueEmbed) {
-            embeddingApplyStart = positionInParentAfterNode(n);
-            break;
-          }
-        }
+      if (n->isHTMLElement() &&
+          getIdentifierValue(computedStyle(n).get(), CSSPropertyUnicodeBidi) ==
+              CSSValueEmbed) {
+        embeddingApplyStart = positionInParentAfterNode(n);
+        break;
       }
     }
 
     Node* endEnclosingBlock = enclosingBlock(end.node());
     for (Node* n = end.node(); n != endEnclosingBlock; n = n->parent()) {
-      if (n->isHTMLElement()) {
-        RefPtr<CSSValue> ancestorUnicodeBidi =
-            computedStyle(n)->getPropertyCSSValue(CSSPropertyUnicodeBidi);
-        if (ancestorUnicodeBidi) {
-          ASSERT(ancestorUnicodeBidi->isPrimitiveValue());
-          if (static_cast<CSSPrimitiveValue*>(ancestorUnicodeBidi.get())
-                  ->getIdent() == CSSValueEmbed) {
-            embeddingApplyEnd = positionInParentBeforeNode(n);
-            break;
-          }
-        }
+      if (n->isHTMLElement() &&
+          getIdentifierValue(computedStyle(n).get(), CSSPropertyUnicodeBidi) ==
+              CSSValueEmbed) {
+        embeddingApplyEnd = positionInParentBeforeNode(n);
+        break;
       }
     }
   }
@@ -1165,9 +1126,7 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
       RefPtr<CSSMutableStyleDeclaration> embeddingStyle =
           CSSMutableStyleDeclaration::create();
       embeddingStyle->setProperty(CSSPropertyUnicodeBidi, CSSValueEmbed);
-      embeddingStyle->setProperty(
-          CSSPropertyDirection,
-          static_cast<CSSPrimitiveValue*>(direction.get())->getIdent());
+      embeddingStyle->setProperty(CSSPropertyDirection, direction);
       applyInlineStyleToRange(embeddingStyle.get(), embeddingApplyStart,
                               embeddingApplyEnd);
     }

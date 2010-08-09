@@ -155,10 +155,9 @@ class ApplyStyleCommand : public CompositeEditCommand {
   float computedFontSize(const Node*);
   void joinChildTextNodes(Node*, const Position& start, const Position& end);
 
-  HTMLElement* splitAncestorsWithUnicodeBidi(
-      Node*,
-      bool before,
-      RefPtr<CSSPrimitiveValue> allowedDirection);
+  HTMLElement* splitAncestorsWithUnicodeBidi(Node*,
+                                             bool before,
+                                             int allowedDirection);
   void removeEmbeddingUpToEnclosingBlock(Node* node, Node* unsplitAncestor);
 
   void updateStartEnd(const Position& newStart, const Position& newEnd);
