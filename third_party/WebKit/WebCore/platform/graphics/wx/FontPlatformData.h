@@ -156,6 +156,7 @@ class FontPlatformData {
   ATSUFontID m_atsuFontID;
   CGFontRef cgFont() const;
   NSFont* nsFont() const { return m_nsFont; }
+  CTFontRef ctFont() const { return reinterpret_cast<CTFontRef>(m_nsFont); }
   void cacheNSFont();
 #endif
 
