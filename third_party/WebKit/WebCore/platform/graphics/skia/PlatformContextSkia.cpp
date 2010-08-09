@@ -33,7 +33,6 @@
 #include "PlatformContextSkia.h"
 
 #include "AffineTransform.h"
-#include "CanvasLayerChromium.h"
 #include "GraphicsContext.h"
 #include "ImageBuffer.h"
 #include "NativeImageSkia.h"
@@ -220,15 +219,7 @@ PlatformContextSkia::PlatformContextSkia(skia::PlatformCanvas* canvas)
   m_state = &m_stateStack.last();
 }
 
-PlatformContextSkia::~PlatformContextSkia() {
-#if USE(GLES2_RENDERING)
-  if (m_gpuCanvas) {
-    CanvasLayerChromium* layer = static_cast<CanvasLayerChromium*>(
-        m_gpuCanvas->context()->platformLayer());
-    layer->setPrepareTextureCallback(0);
-  }
-#endif
-}
+PlatformContextSkia::~PlatformContextSkia() {}
 
 void PlatformContextSkia::setCanvas(skia::PlatformCanvas* canvas) {
   m_canvas = canvas;
@@ -665,28 +656,10 @@ void PlatformContextSkia::applyAntiAliasedClipPaths(
 
 #if USE(GLES2_RENDERING)
 
-class PrepareTextureCallbackImpl
-    : public CanvasLayerChromium::PrepareTextureCallback {
- public:
-  static PassOwnPtr<PrepareTextureCallbackImpl> create(
-      PlatformContextSkia* pcs) {
-    return new PrepareTextureCallbackImpl(pcs);
-  }
-
-  virtual void willPrepareTexture() { m_pcs->prepareForHardwareDraw(); }
-
- private:
-  explicit PrepareTextureCallbackImpl(PlatformContextSkia* pcs) : m_pcs(pcs) {}
-  PlatformContextSkia* m_pcs;
-};
-
 void PlatformContextSkia::setGraphicsContext3D(GraphicsContext3D* context,
                                                const WebCore::IntSize& size) {
   m_useGPU = true;
   m_gpuCanvas = new GLES2Canvas(context, size);
-  CanvasLayerChromium* layer =
-      static_cast<CanvasLayerChromium*>(context->platformLayer());
-  layer->setPrepareTextureCallback(PrepareTextureCallbackImpl::create(this));
 }
 
 void PlatformContextSkia::prepareForSoftwareDraw() const {
