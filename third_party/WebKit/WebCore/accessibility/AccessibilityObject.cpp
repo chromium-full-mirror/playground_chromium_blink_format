@@ -1010,6 +1010,14 @@ AccessibilityRole AccessibilityObject::ariaRoleToWebCoreRole(
   return roleMap->get(value);
 }
 
+const AtomicString& AccessibilityObject::placeholderValue() const {
+  const AtomicString& placeholder = getAttribute(placeholderAttr);
+  if (!placeholder.isEmpty())
+    return placeholder;
+
+  return nullAtom;
+}
+
 bool AccessibilityObject::isInsideARIALiveRegion() const {
   if (supportsARIALiveRegion())
     return true;

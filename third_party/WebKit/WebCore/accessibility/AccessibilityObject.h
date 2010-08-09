@@ -424,6 +424,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual FrameView* documentFrameView() const;
   String language() const;
   virtual unsigned hierarchicalLevel() const { return 0; }
+  const AtomicString& placeholderValue() const;
 
   virtual void setFocused(bool) {}
   virtual void setSelectedText(const String&) {}
