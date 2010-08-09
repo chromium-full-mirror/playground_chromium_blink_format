@@ -388,6 +388,7 @@ class GraphicsContext3DInternal {
 
  private:
   OwnPtr<WebKit::WebGraphicsContext3D> m_impl;
+  WebKit::WebViewImpl* m_webViewImpl;
 #if USE(ACCELERATED_COMPOSITING)
   RefPtr<CanvasLayerChromium> m_compositingLayer;
 #endif
@@ -406,9 +407,11 @@ class GraphicsContext3DInternal {
 };
 
 GraphicsContext3DInternal::GraphicsContext3DInternal()
+    : m_webViewImpl(0)
 #if PLATFORM(SKIA)
 #elif PLATFORM(CG)
-    : m_renderOutput(0)
+      ,
+      m_renderOutput(0)
 #else
 #error Must port to your platform
 #endif
@@ -439,11 +442,11 @@ bool GraphicsContext3DInternal::initialize(GraphicsContext3D::Attributes attrs,
   WebKit::ChromeClientImpl* chromeClientImpl =
       static_cast<WebKit::ChromeClientImpl*>(chrome->client());
 
-  WebKit::WebViewImpl* webView = chromeClientImpl->webView();
+  m_webViewImpl = chromeClientImpl->webView();
 
-  if (!webView)
+  if (!m_webViewImpl)
     return false;
-  if (!webContext->initialize(webAttributes, webView)) {
+  if (!webContext->initialize(webAttributes, m_webViewImpl)) {
     delete webContext;
     return false;
   }
@@ -536,6 +539,11 @@ void GraphicsContext3DInternal::paintRenderingResultsToCanvas(
 }
 
 void GraphicsContext3DInternal::beginPaint(CanvasRenderingContext* context) {
+  // If the gpu compositor is on then skip the readback and software rendering
+  // path.
+  if (m_webViewImpl->isAcceleratedCompositingActive())
+    return;
+
   paintRenderingResultsToCanvas(context);
 }
 
