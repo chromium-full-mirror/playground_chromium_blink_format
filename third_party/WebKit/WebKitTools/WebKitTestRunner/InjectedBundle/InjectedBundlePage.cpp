@@ -439,6 +439,8 @@ void InjectedBundlePage::didClearWindowForFrame(WKBundleFrameRef frame,
       context, window, &exception);
   InjectedBundle::shared().gcController()->makeWindowObject(context, window,
                                                             &exception);
+  InjectedBundle::shared().eventSendingController()->makeWindowObject(
+      context, window, &exception);
 }
 
 void InjectedBundlePage::didCancelClientRedirectForFrame(
