@@ -50,6 +50,8 @@ class V8Binding {
  public:
   typedef v8::Handle<v8::Value> Value;
   typedef V8BindingDOMWindow DOMWindow;
+
+  static Value emptyScriptValue() { return v8::Local<v8::Value>(); }
 };
 typedef BindingSecurity<V8Binding> V8BindingSecurity;
 

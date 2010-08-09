@@ -36,6 +36,8 @@
 
 namespace WebCore {
 
+class Frame;
+
 // Singleton implementation of State<V8Binding>.  Uses V8's global data
 // structures to return information about relevant execution state.
 template <>
@@ -44,11 +46,19 @@ class State<V8Binding> : public State<GenericBinding> {
   // Singleton
   static State* Only();
 
+  // Reports an error message (without delay) if the security check fails.
+  static void immediatelyReportUnsafeAccessTo(Frame*);
+
   // The DOMWindow corresponding to the 'calling context' of execution.
   DOMWindow* getActiveWindow();
 
-  // Reports an error message (without delay) if the security check fails.
-  static void immediatelyReportUnsafeAccessTo(Frame*);
+  // The frame corresponding to the 'calling context' of execution.
+  Frame* getActiveFrame();
+
+  // The first frame in which execution entered user script.
+  Frame* getFirstFrame();
+
+  bool processingUserGesture();
 
  private:
   explicit State() {}
