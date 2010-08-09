@@ -221,7 +221,7 @@ PlatformContextSkia::PlatformContextSkia(skia::PlatformCanvas* canvas)
 }
 
 PlatformContextSkia::~PlatformContextSkia() {
-#if USE(GLES2_RENDERING)
+#if USE(GLES2_RENDERING) && USE(ACCELERATED_COMPOSITING)
   if (m_gpuCanvas) {
     CanvasLayerChromium* layer = static_cast<CanvasLayerChromium*>(
         m_gpuCanvas->context()->platformLayer());
@@ -664,7 +664,7 @@ void PlatformContextSkia::applyAntiAliasedClipPaths(
 }
 
 #if USE(GLES2_RENDERING)
-
+#if USE(ACCELERATED_COMPOSITING)
 class PrepareTextureCallbackImpl
     : public CanvasLayerChromium::PrepareTextureCallback {
  public:
@@ -679,14 +679,17 @@ class PrepareTextureCallbackImpl
   explicit PrepareTextureCallbackImpl(PlatformContextSkia* pcs) : m_pcs(pcs) {}
   PlatformContextSkia* m_pcs;
 };
+#endif
 
 void PlatformContextSkia::setGraphicsContext3D(GraphicsContext3D* context,
                                                const WebCore::IntSize& size) {
   m_useGPU = true;
   m_gpuCanvas = new GLES2Canvas(context, size);
+#if USE(ACCELERATED_COMPOSITING)
   CanvasLayerChromium* layer =
       static_cast<CanvasLayerChromium*>(context->platformLayer());
   layer->setPrepareTextureCallback(PrepareTextureCallbackImpl::create(this));
+#endif
 }
 
 void PlatformContextSkia::prepareForSoftwareDraw() const {
