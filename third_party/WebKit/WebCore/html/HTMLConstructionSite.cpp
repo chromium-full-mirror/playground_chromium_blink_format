@@ -132,6 +132,12 @@ HTMLConstructionSite::HTMLConstructionSite(
 
 HTMLConstructionSite::~HTMLConstructionSite() {}
 
+void HTMLConstructionSite::setForm(HTMLFormElement* form) {
+  // This method should only be needed for HTMLTreeBuilder in the fragment case.
+  ASSERT(!m_form);
+  m_form = form;
+}
+
 PassRefPtr<HTMLFormElement> HTMLConstructionSite::takeForm() {
   return m_form.release();
 }
@@ -173,7 +179,6 @@ void HTMLConstructionSite::insertHTMLHtmlStartTagInBody(
 void HTMLConstructionSite::insertHTMLBodyStartTagInBody(
     AtomicHTMLToken& token) {
   // FIXME: parse error
-  notImplemented();  // fragment case
   mergeAttributesFromTokenIntoElement(token, m_openElements.bodyElement());
 }
 

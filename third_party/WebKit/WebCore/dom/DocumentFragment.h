@@ -34,9 +34,10 @@ class DocumentFragment : public ContainerNode {
   static PassRefPtr<DocumentFragment> create(Document*);
 
   void parseHTML(const String&,
+                 Element* contextElement,
                  FragmentScriptingPermission = FragmentScriptingAllowed);
   bool parseXML(const String&,
-                Element* parent,
+                Element* contextElement,
                 FragmentScriptingPermission = FragmentScriptingAllowed);
 
  private:

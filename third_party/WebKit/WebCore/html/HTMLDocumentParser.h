@@ -57,7 +57,9 @@ class HTMLDocumentParser : public ScriptableDocumentParser,
   // FIXME: These constructors should be made private and replaced by create()
   // methods.
   HTMLDocumentParser(HTMLDocument*, bool reportErrors);
-  HTMLDocumentParser(DocumentFragment*, FragmentScriptingPermission);
+  HTMLDocumentParser(DocumentFragment*,
+                     Element* contextElement,
+                     FragmentScriptingPermission);
   virtual ~HTMLDocumentParser();
 
   // Exposed for HTMLParserScheduler
@@ -66,6 +68,7 @@ class HTMLDocumentParser : public ScriptableDocumentParser,
   static void parseDocumentFragment(
       const String&,
       DocumentFragment*,
+      Element* contextElement,
       FragmentScriptingPermission = FragmentScriptingAllowed);
 
  private:

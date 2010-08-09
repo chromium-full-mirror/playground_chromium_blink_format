@@ -123,6 +123,9 @@ class HTMLElementStack : public Noncopyable {
   bool hasOnlyHTMLElementsInScope() const;
   bool hasNumberedHeaderElementInScope() const;
 
+  bool hasOnlyOneElement() const;
+  bool secondElementIsHTMLBodyElement() const;
+
   Element* htmlElement() const;
   Element* headElement() const;
   Element* bodyElement() const;

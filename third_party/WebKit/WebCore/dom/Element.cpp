@@ -93,7 +93,7 @@ PassRefPtr<DocumentFragment> Element::createContextualFragment(
   RefPtr<DocumentFragment> fragment = document()->createDocumentFragment();
 
   if (document()->isHTMLDocument())
-    fragment->parseHTML(markup, scriptingPermission);
+    fragment->parseHTML(markup, this, scriptingPermission);
   else {
     if (!fragment->parseXML(markup, this, scriptingPermission))
       // FIXME: We should propagate a syntax error exception out here.
