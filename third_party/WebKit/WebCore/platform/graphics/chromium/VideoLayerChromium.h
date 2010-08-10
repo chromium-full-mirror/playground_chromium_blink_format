@@ -55,8 +55,10 @@ class VideoLayerChromium : public LayerChromium {
 
   unsigned m_allocatedTextureId;
   IntSize m_allocatedTextureSize;
+#if PLATFORM(SKIA)
   OwnPtr<skia::PlatformCanvas> m_canvas;
   OwnPtr<PlatformContextSkia> m_skiaContext;
+#endif
   OwnPtr<GraphicsContext> m_graphicsContext;
 };
 }

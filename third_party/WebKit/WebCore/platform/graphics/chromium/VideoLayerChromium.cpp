@@ -55,10 +55,15 @@ PassRefPtr<VideoLayerChromium> VideoLayerChromium::create(
 
 VideoLayerChromium::VideoLayerChromium(GraphicsLayerChromium* owner)
     : LayerChromium(owner),
-      m_allocatedTextureId(0),
+      m_allocatedTextureId(0)
+#if PLATFORM(SKIA)
+      ,
       m_canvas(0),
-      m_skiaContext(0),
-      m_graphicsContext(0) {}
+      m_skiaContext(0)
+#endif
+      ,
+      m_graphicsContext(0) {
+}
 
 void VideoLayerChromium::updateTextureContents(unsigned textureId) {
   RenderLayerBacking* backing =
@@ -115,7 +120,8 @@ void VideoLayerChromium::updateTextureContents(unsigned textureId) {
   else
     updateTextureRect(dirtyRect, textureId);
 #else
-#error "Need to implement for your platform."
+  // FIXME: Implement non-skia path
+  notImplemented();
 #endif
 }
 
@@ -124,12 +130,13 @@ void VideoLayerChromium::createTextureRect(const IntSize& requiredTextureSize,
                                            unsigned textureId) {
   // Paint into graphics context and get bitmap.
   m_owner->paintGraphicsLayerContents(*m_graphicsContext, updateRect);
+  void* pixels = 0;
+  IntSize bitmapSize = IntSize();
+#if PLATFORM(SKIA)
   const SkBitmap& bitmap = m_canvas->getDevice()->accessBitmap(false);
   const SkBitmap* skiaBitmap = &bitmap;
   ASSERT(skiaBitmap);
 
-  void* pixels = 0;
-  IntSize bitmapSize;
   SkAutoLockPixels lock(*skiaBitmap);
   SkBitmap::Config skiaConfig = skiaBitmap->config();
   // FIXME: Do we need to support more image configurations?
@@ -137,7 +144,10 @@ void VideoLayerChromium::createTextureRect(const IntSize& requiredTextureSize,
     pixels = skiaBitmap->getPixels();
     bitmapSize = IntSize(skiaBitmap->width(), skiaBitmap->height());
   }
-
+#else
+  // FIXME: Implement non-skia path
+  notImplemented();
+#endif
   if (!pixels)
     return;
 
@@ -155,6 +165,7 @@ void VideoLayerChromium::createTextureRect(const IntSize& requiredTextureSize,
 
 void VideoLayerChromium::updateTextureRect(const IntRect& updateRect,
                                            unsigned textureId) {
+#if PLATFORM(SKIA)
   const SkBitmap& bitmap = m_canvas->getDevice()->accessBitmap(true);
   SkBitmap* skiaBitmap = const_cast<SkBitmap*>(&bitmap);
   ASSERT(skiaBitmap);
@@ -173,6 +184,10 @@ void VideoLayerChromium::updateTextureRect(const IntRect& updateRect,
   }
 
   updateCompleted();
+#else
+  // FIXME: Implement non-skia path
+  notImplemented();
+#endif
 }
 
 void VideoLayerChromium::updateCompleted() {
