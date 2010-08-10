@@ -116,6 +116,7 @@ ALWAYS_INLINE JIT::Call JIT::emitNakedCall(CodePtr function) {
 
 ALWAYS_INLINE void JIT::beginUninterruptedSequence(int insnSpace,
                                                    int constSpace) {
+  JSInterfaceJIT::beginUninterruptedSequence();
 #if CPU(ARM_TRADITIONAL)
 #ifndef NDEBUG
   // Ensure the label after the sequence can also fit
@@ -143,6 +144,7 @@ ALWAYS_INLINE void JIT::endUninterruptedSequence(int insnSpace,
   ASSERT(sizeOfConstantPool() - m_uninterruptedConstantSequenceBegin ==
          constSpace);
 #endif
+  JSInterfaceJIT::endUninterruptedSequence();
 }
 
 #endif
