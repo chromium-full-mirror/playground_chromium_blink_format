@@ -920,13 +920,11 @@ class JIT : private JSInterfaceJIT {
 #if (defined(ASSEMBLER_HAS_CONSTANT_POOL) && ASSEMBLER_HAS_CONSTANT_POOL)
 #define BEGIN_UNINTERRUPTED_SEQUENCE(name)                                   \
   do {                                                                       \
-    beginUninterruptedSequence();                                            \
     beginUninterruptedSequence(name##InstructionSpace, name##ConstantSpace); \
   } while (false)
 #define END_UNINTERRUPTED_SEQUENCE(name)                                   \
   do {                                                                     \
     endUninterruptedSequence(name##InstructionSpace, name##ConstantSpace); \
-    endUninterruptedSequence();                                            \
   } while (false)
 
   void beginUninterruptedSequence(int, int);
