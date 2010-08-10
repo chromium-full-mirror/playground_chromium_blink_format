@@ -47,6 +47,10 @@ class SegmentedSubstring {
 
   void setExcludeLineNumbers() { m_doNotExcludeLineNumbers = false; }
 
+  int numberOfCharactersConsumed() const {
+    return m_string.length() - m_length;
+  }
+
   void appendTo(String& str) const {
     if (m_string.characters() == m_current) {
       if (str.isEmpty())
@@ -73,15 +77,19 @@ class SegmentedString {
       : m_pushedChar1(0),
         m_pushedChar2(0),
         m_currentChar(0),
+        m_numberOfCharactersConsumedPriorToCurrentString(0),
         m_composite(false),
         m_closed(false) {}
+
   SegmentedString(const String& str)
       : m_pushedChar1(0),
         m_pushedChar2(0),
         m_currentString(str),
         m_currentChar(m_currentString.m_current),
+        m_numberOfCharactersConsumedPriorToCurrentString(0),
         m_composite(false),
         m_closed(false) {}
+
   SegmentedString(const SegmentedString&);
 
   const SegmentedString& operator=(const SegmentedString&);
@@ -185,6 +193,13 @@ class SegmentedString {
 
   bool escaped() const { return m_pushedChar1; }
 
+  int numberOfCharactersConsumed() {
+    // We don't currently handle the case when there are pushed character.
+    ASSERT(!m_pushedChar1);
+    return m_numberOfCharactersConsumedPriorToCurrentString +
+           m_currentString.numberOfCharactersConsumed();
+  }
+
   String toString() const;
 
   const UChar& operator*() const { return *current(); }
@@ -242,6 +257,7 @@ class SegmentedString {
   UChar m_pushedChar2;
   SegmentedSubstring m_currentString;
   const UChar* m_currentChar;
+  int m_numberOfCharactersConsumedPriorToCurrentString;
   Deque<SegmentedSubstring> m_substrings;
   bool m_composite;
   bool m_closed;
