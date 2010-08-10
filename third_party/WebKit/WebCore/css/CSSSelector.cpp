@@ -797,8 +797,11 @@ String CSSSelector::selectorText() const {
       localName != starAtom) {
     if (prefix.isNull())
       str = localName;
-    else
-      str = prefix + "|" + localName;
+    else {
+      str = prefix.string();
+      str.append("|");
+      str.append(localName);
+    }
   }
 
   const CSSSelector* cs = this;
