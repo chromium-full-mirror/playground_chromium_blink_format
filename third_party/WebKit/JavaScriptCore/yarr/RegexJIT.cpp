@@ -1599,7 +1599,7 @@ class RegexGenerator : private MacroAssembler {
       return;
     }
 
-    LinkBuffer patchBuffer(this, executablePool.release());
+    LinkBuffer patchBuffer(this, executablePool.release(), 0);
     if (!patchBuffer.allocationSuccessful()) {
       m_shouldFallBack = true;
       return;

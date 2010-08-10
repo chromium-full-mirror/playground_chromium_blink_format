@@ -123,6 +123,8 @@ class ExecutablePool : public RefCounted<ExecutablePool> {
     return poolAllocate(n);
   }
 
+  void returnLastBytes(size_t count) { m_freePtr -= count; }
+
   ~ExecutablePool() {
     AllocationList::iterator end = m_pools.end();
     for (AllocationList::iterator ptr = m_pools.begin(); ptr != end; ++ptr)

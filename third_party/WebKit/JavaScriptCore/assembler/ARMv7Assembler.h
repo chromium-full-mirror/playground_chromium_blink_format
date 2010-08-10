@@ -413,8 +413,8 @@ class VFPImmediate {
 
     u.d = d;
 
-    int sign = (u.i >> 63);
-    int exponent = (u.i >> 52) & 0x7ff;
+    int sign = static_cast<int>(u.i >> 63);
+    int exponent = static_cast<int>(u.i >> 52) & 0x7ff;
     uint64_t mantissa = u.i & 0x000fffffffffffffull;
 
     if ((exponent >= 0x3fc) && (exponent <= 0x403) &&
@@ -502,22 +502,71 @@ class ARMv7Assembler {
     ConditionCC = ConditionLO,
   } Condition;
 
+  enum JumpType { JumpNoCondition, JumpCondition, JumpFullSize };
+  enum JumpLinkType {
+    LinkInvalid,
+    LinkShortJump,
+    LinkConditionalShortJump,
+    LinkLongJump,
+    JumpTypeCount
+  };
+  static const int JumpSizes[JumpTypeCount];
+  enum { JumpPaddingSize = 5 * sizeof(uint16_t) };
+  class LinkRecord {
+   public:
+    LinkRecord(intptr_t from, intptr_t to, JumpType type, Condition condition)
+        : m_from(from),
+          m_to(to),
+          m_type(type),
+          m_linkType(LinkInvalid),
+          m_condition(condition) {}
+    intptr_t from() const { return m_from; }
+    void setFrom(intptr_t from) { m_from = from; }
+    intptr_t to() const { return m_to; }
+    JumpType type() const { return m_type; }
+    JumpLinkType linkType() const { return m_linkType; }
+    void setLinkType(JumpLinkType linkType) {
+      ASSERT(m_linkType == LinkInvalid);
+      m_linkType = linkType;
+    }
+    Condition condition() const { return m_condition; }
+
+   private:
+    intptr_t m_from : 31;
+    intptr_t m_to : 31;
+    JumpType m_type : 2;
+    JumpLinkType m_linkType : 3;
+    Condition m_condition : 16;
+  };
+
   class JmpSrc {
     friend class ARMv7Assembler;
     friend class ARMInstructionFormatter;
+    friend class LinkBuffer;
 
    public:
     JmpSrc() : m_offset(-1) {}
 
    private:
-    JmpSrc(int offset) : m_offset(offset) {}
+    JmpSrc(int offset, JumpType type)
+        : m_offset(offset), m_condition(0xffff), m_type(type) {
+      ASSERT(m_type != JumpCondition);
+    }
+
+    JmpSrc(int offset, JumpType type, Condition condition)
+        : m_offset(offset), m_condition(condition), m_type(type) {
+      ASSERT(m_type == JumpCondition || m_type == JumpFullSize);
+    }
 
     int m_offset;
+    Condition m_condition : 16;
+    JumpType m_type : 16;
   };
 
   class JmpDst {
     friend class ARMv7Assembler;
     friend class ARMInstructionFormatter;
+    friend class LinkBuffer;
 
    public:
     JmpDst() : m_offset(-1), m_used(false) {}
@@ -535,13 +584,6 @@ class ARMv7Assembler {
   };
 
  private:
-  struct LinkRecord {
-    LinkRecord(intptr_t from, intptr_t to) : from(from), to(to) {}
-
-    intptr_t from;
-    intptr_t to;
-  };
-
   // ARMv7, Appx-A.6.3
   bool BadReg(RegisterID reg) {
     return (reg == ARMRegisters::sp) || (reg == ARMRegisters::pc);
@@ -886,22 +928,27 @@ class ARMv7Assembler {
   }
 
   // Only allowed in IT (if then) block if last instruction.
-  JmpSrc b() {
+  JmpSrc b(JumpType type) {
     m_formatter.twoWordOp16Op16(OP_B_T4a, OP_B_T4b);
-    return JmpSrc(m_formatter.size());
+    return JmpSrc(m_formatter.size(), type);
   }
 
   // Only allowed in IT (if then) block if last instruction.
-  JmpSrc blx(RegisterID rm) {
+  JmpSrc blx(RegisterID rm, JumpType type) {
     ASSERT(rm != ARMRegisters::pc);
     m_formatter.oneWordOp8RegReg143(OP_BLX, rm, (RegisterID)8);
-    return JmpSrc(m_formatter.size());
+    return JmpSrc(m_formatter.size(), type);
   }
 
   // Only allowed in IT (if then) block if last instruction.
-  JmpSrc bx(RegisterID rm) {
+  JmpSrc bx(RegisterID rm, JumpType type, Condition condition) {
     m_formatter.oneWordOp8RegReg143(OP_BX, rm, (RegisterID)0);
-    return JmpSrc(m_formatter.size());
+    return JmpSrc(m_formatter.size(), type, condition);
+  }
+
+  JmpSrc bx(RegisterID rm, JumpType type) {
+    m_formatter.oneWordOp8RegReg143(OP_BX, rm, (RegisterID)0);
+    return JmpSrc(m_formatter.size(), type);
   }
 
   void bkpt(uint8_t imm = 0) { m_formatter.oneWordOp8Imm8(OP_BKPT, imm); }
@@ -1614,27 +1661,83 @@ class ARMv7Assembler {
     return dst.m_offset - src.m_offset;
   }
 
+  int executableOffsetFor(int location) {
+    if (!location)
+      return 0;
+    return static_cast<int32_t*>(
+        m_formatter.data())[location / sizeof(int32_t) - 1];
+  }
+
+  int jumpSizeDelta(JumpLinkType jumpLinkType) {
+    return JumpPaddingSize - JumpSizes[jumpLinkType];
+  }
+
   // Assembler admin methods:
 
   size_t size() const { return m_formatter.size(); }
 
-  void* executableCopy(ExecutablePool* allocator) {
-    void* copy = m_formatter.executableCopy(allocator);
-    if (!copy)
-      return 0;
-
-    unsigned jumpCount = m_jumpsToLink.size();
-    for (unsigned i = 0; i < jumpCount; ++i) {
-      uint16_t* location = reinterpret_cast<uint16_t*>(
-          reinterpret_cast<intptr_t>(copy) + m_jumpsToLink[i].from);
-      uint16_t* target = reinterpret_cast<uint16_t*>(
-          reinterpret_cast<intptr_t>(copy) + m_jumpsToLink[i].to);
-      linkJumpAbsolute(location, target);
-    }
-    m_jumpsToLink.clear();
-
-    return copy;
+  static bool linkRecordSourceComparator(const LinkRecord& a,
+                                         const LinkRecord& b) {
+    return a.from() < b.from();
   }
+
+  JumpLinkType computeJumpType(LinkRecord& record,
+                               const uint8_t* from,
+                               const uint8_t* to) {
+    if (record.type() >= JumpFullSize) {
+      record.setLinkType(LinkLongJump);
+      return LinkLongJump;
+    }
+    bool mayTriggerErrata = false;
+    const uint16_t* shortJumpLocation = reinterpret_cast<const uint16_t*>(
+        from - (JumpPaddingSize - JumpSizes[LinkShortJump]));
+    if (!canBeShortJump(shortJumpLocation, to, mayTriggerErrata)) {
+      record.setLinkType(LinkLongJump);
+      return LinkLongJump;
+    }
+    if (mayTriggerErrata) {
+      record.setLinkType(LinkLongJump);
+      return LinkLongJump;
+    }
+    if (record.type() == JumpCondition) {
+      record.setLinkType(LinkConditionalShortJump);
+      return LinkConditionalShortJump;
+    }
+    record.setLinkType(LinkShortJump);
+    return LinkShortJump;
+  }
+
+  void recordLinkOffsets(int32_t regionStart,
+                         int32_t regionEnd,
+                         int32_t offset) {
+    int32_t ptr = regionStart / sizeof(int32_t);
+    const int32_t end = regionEnd / sizeof(int32_t);
+    int32_t* offsets = static_cast<int32_t*>(m_formatter.data());
+    while (ptr < end)
+      offsets[ptr++] = offset;
+  }
+
+  Vector<LinkRecord>& jumpsToLink() {
+    std::sort(m_jumpsToLink.begin(), m_jumpsToLink.end(),
+              linkRecordSourceComparator);
+    return m_jumpsToLink;
+  }
+
+  void link(LinkRecord& record, uint8_t* from, uint8_t* to) {
+    uint16_t* itttLocation;
+    if (record.linkType() == LinkConditionalShortJump) {
+      itttLocation = reinterpret_cast<uint16_t*>(
+          from - JumpSizes[LinkConditionalShortJump] - 2);
+      itttLocation[0] = ifThenElse(record.condition()) | OP_IT;
+    }
+    ASSERT(record.linkType() != LinkInvalid);
+    if (record.linkType() != LinkLongJump)
+      linkShortJump(reinterpret_cast<uint16_t*>(from), to);
+    else
+      linkLongJump(reinterpret_cast<uint16_t*>(from), to);
+  }
+
+  void* unlinkedCode() { return m_formatter.data(); }
 
   static unsigned getCallReturnOffset(JmpSrc call) {
     ASSERT(call.m_offset >= 0);
@@ -1654,7 +1757,8 @@ class ARMv7Assembler {
   void linkJump(JmpSrc from, JmpDst to) {
     ASSERT(to.m_offset != -1);
     ASSERT(from.m_offset != -1);
-    m_jumpsToLink.append(LinkRecord(from.m_offset, to.m_offset));
+    m_jumpsToLink.append(
+        LinkRecord(from.m_offset, to.m_offset, from.m_type, from.m_condition));
   }
 
   static void linkJump(void* code, JmpSrc from, void* to) {
@@ -1848,21 +1952,14 @@ class ARMv7Assembler {
     return (instruction[0] == OP_NOP_T2a) && (instruction[1] == OP_NOP_T2b);
   }
 
-  static void linkJumpAbsolute(uint16_t* instruction, void* target) {
-    // FIMXE: this should be up in the MacroAssembler layer. :-(
-    const uint16_t JUMP_TEMPORARY_REGISTER = ARMRegisters::ip;
-
+  static bool canBeShortJump(const uint16_t* instruction,
+                             const void* target,
+                             bool& mayTriggerErrata) {
     ASSERT(!(reinterpret_cast<intptr_t>(instruction) & 1));
     ASSERT(!(reinterpret_cast<intptr_t>(target) & 1));
 
-    ASSERT((isMOV_imm_T3(instruction - 5) && isMOVT(instruction - 3) &&
-            isBX(instruction - 1)) ||
-           (isNOP_T1(instruction - 5) && isNOP_T2(instruction - 4) &&
-            isB(instruction - 2)));
-
     intptr_t relative = reinterpret_cast<intptr_t>(target) -
                         (reinterpret_cast<intptr_t>(instruction));
-
     // From Cortex-A8 errata:
     // If the 32-bit Thumb-2 branch instruction spans two 4KiB regions and
     // the target of the branch falls within the first region it is
@@ -1873,12 +1970,54 @@ class ARMv7Assembler {
     // 0x002
     bool spansTwo4K =
         ((reinterpret_cast<intptr_t>(instruction) & 0xfff) == 0x002);
+    mayTriggerErrata = spansTwo4K;
     // The target is in the first page if the jump branch back by [3..0x1002]
     // bytes
     bool targetInFirstPage = (relative >= -0x1002) && (relative < -2);
     bool wouldTriggerA8Errata = spansTwo4K && targetInFirstPage;
+    return ((relative << 7) >> 7) == relative && !wouldTriggerA8Errata;
+  }
 
-    if (((relative << 7) >> 7) == relative && !wouldTriggerA8Errata) {
+  static void linkLongJump(uint16_t* instruction, void* target) {
+    linkJumpAbsolute(instruction, target);
+  }
+
+  static void linkShortJump(uint16_t* instruction, void* target) {
+    // FIMXE: this should be up in the MacroAssembler layer. :-(
+    ASSERT(!(reinterpret_cast<intptr_t>(instruction) & 1));
+    ASSERT(!(reinterpret_cast<intptr_t>(target) & 1));
+
+    intptr_t relative = reinterpret_cast<intptr_t>(target) -
+                        (reinterpret_cast<intptr_t>(instruction));
+    bool scratch;
+    UNUSED_PARAM(scratch);
+    ASSERT(canBeShortJump(instruction, target, scratch));
+    // ARM encoding for the top two bits below the sign bit is 'peculiar'.
+    if (relative >= 0)
+      relative ^= 0xC00000;
+
+    // All branch offsets should be an even distance.
+    ASSERT(!(relative & 1));
+    instruction[-2] = OP_B_T4a | ((relative & 0x1000000) >> 14) |
+                      ((relative & 0x3ff000) >> 12);
+    instruction[-1] = OP_B_T4b | ((relative & 0x800000) >> 10) |
+                      ((relative & 0x400000) >> 11) | ((relative & 0xffe) >> 1);
+  }
+
+  static void linkJumpAbsolute(uint16_t* instruction, void* target) {
+    // FIMXE: this should be up in the MacroAssembler layer. :-(
+    ASSERT(!(reinterpret_cast<intptr_t>(instruction) & 1));
+    ASSERT(!(reinterpret_cast<intptr_t>(target) & 1));
+
+    ASSERT((isMOV_imm_T3(instruction - 5) && isMOVT(instruction - 3) &&
+            isBX(instruction - 1)) ||
+           (isNOP_T1(instruction - 5) && isNOP_T2(instruction - 4) &&
+            isB(instruction - 2)));
+
+    intptr_t relative = reinterpret_cast<intptr_t>(target) -
+                        (reinterpret_cast<intptr_t>(instruction));
+    bool scratch;
+    if (canBeShortJump(instruction, target, scratch)) {
       // ARM encoding for the top two bits below the sign bit is 'peculiar'.
       if (relative >= 0)
         relative ^= 0xC00000;
@@ -1903,6 +2042,7 @@ class ARMv7Assembler {
                         ((relative & 0x400000) >> 11) |
                         ((relative & 0xffe) >> 1);
     } else {
+      const uint16_t JUMP_TEMPORARY_REGISTER = ARMRegisters::ip;
       ARMThumbImmediate lo16 = ARMThumbImmediate::makeUInt16(
           static_cast<uint16_t>(reinterpret_cast<uint32_t>(target) + 1));
       ARMThumbImmediate hi16 = ARMThumbImmediate::makeUInt16(
@@ -1922,6 +2062,7 @@ class ARMv7Assembler {
                                                       ARMThumbImmediate imm) {
     return op | (imm.m_value.i << 10) | imm.m_value.imm4;
   }
+
   static uint16_t twoWordOp5i6Imm4Reg4EncodedImmSecond(uint16_t rd,
                                                        ARMThumbImmediate imm) {
     return (imm.m_value.imm3 << 12) | (rd << 8) | imm.m_value.imm8;
@@ -2055,6 +2196,7 @@ class ARMv7Assembler {
   } m_formatter;
 
   Vector<LinkRecord> m_jumpsToLink;
+  Vector<int32_t> m_offsets;
 };
 
 }  // namespace JSC

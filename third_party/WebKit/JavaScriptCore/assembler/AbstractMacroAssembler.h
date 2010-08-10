@@ -362,12 +362,6 @@ class AbstractMacroAssembler {
   };
 
   // Section 3: Misc admin methods
-
-  static CodePtr trampolineAt(CodeRef ref, Label label) {
-    return CodePtr(AssemblerType::getRelocatedAddress(ref.m_code.dataLocation(),
-                                                      label.m_label));
-  }
-
   size_t size() { return m_assembler.size(); }
 
   Label label() { return Label(this); }
@@ -408,6 +402,9 @@ class AbstractMacroAssembler {
   ptrdiff_t differenceBetween(DataLabelPtr from, Call to) {
     return AssemblerType::getDifferenceBetweenLabels(from.m_label, to.m_jmp);
   }
+
+  void beginUninterruptedSequence() {}
+  void endUninterruptedSequence() {}
 
  protected:
   AssemblerType m_assembler;

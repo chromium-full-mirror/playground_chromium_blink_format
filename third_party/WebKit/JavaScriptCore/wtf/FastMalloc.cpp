@@ -4597,13 +4597,13 @@ malloc_introspection_t jscore_fastmalloc_introspection = {
   &FastMallocZone::forceUnlock,
   &FastMallocZone::statistics
 
-#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD) && !OS(IOS)
+#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD)
   ,
   0  // zone_locked will not be called on the zone unless it advertises itself
      // as version five or higher.
 #endif
 #if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD) && \
-    !defined(BUILDING_ON_SNOW_LEOPARD) && !OS(IOS)
+    !defined(BUILDING_ON_SNOW_LEOPARD)
   ,
   0,
   0,

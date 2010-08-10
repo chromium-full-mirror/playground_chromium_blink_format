@@ -48,6 +48,32 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
   }
 
  public:
+  typedef ARMv7Assembler::LinkRecord LinkRecord;
+  typedef ARMv7Assembler::JumpLinkType JumpLinkType;
+
+  MacroAssemblerARMv7() : m_inUninterruptedSequence(false) {}
+
+  void beginUninterruptedSequence() { m_inUninterruptedSequence = true; }
+  void endUninterruptedSequence() { m_inUninterruptedSequence = false; }
+  Vector<LinkRecord>& jumpsToLink() { return m_assembler.jumpsToLink(); }
+  void* unlinkedCode() { return m_assembler.unlinkedCode(); }
+  JumpLinkType computeJumpType(LinkRecord& record,
+                               const uint8_t* from,
+                               const uint8_t* to) {
+    return m_assembler.computeJumpType(record, from, to);
+  }
+  void recordLinkOffsets(int32_t regionStart,
+                         int32_t regionEnd,
+                         int32_t offset) {
+    return m_assembler.recordLinkOffsets(regionStart, regionEnd, offset);
+  }
+  int jumpSizeDelta(JumpLinkType jumpLinkType) {
+    return m_assembler.jumpSizeDelta(jumpLinkType);
+  }
+  void link(LinkRecord& record, uint8_t* from, uint8_t* to) {
+    return m_assembler.link(record, from, to);
+  }
+
   struct ArmAddress {
     enum AddressType {
       HasOffset,
@@ -898,12 +924,18 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
 
   Jump jump() { return Jump(makeJump()); }
 
-  void jump(RegisterID target) { m_assembler.bx(target); }
+  void jump(RegisterID target) {
+    m_assembler.bx(target, inUninterruptedSequence()
+                               ? ARMv7Assembler::JumpFullSize
+                               : ARMv7Assembler::JumpNoCondition);
+  }
 
   // Address is a memory location containing the address to jump to
   void jump(Address address) {
     load32(address, dataTempRegister);
-    m_assembler.bx(dataTempRegister);
+    m_assembler.bx(dataTempRegister, inUninterruptedSequence()
+                                         ? ARMv7Assembler::JumpFullSize
+                                         : ARMv7Assembler::JumpNoCondition);
   }
 
   // Arithmetic control flow operations:
@@ -937,14 +969,14 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
   }
 
   Jump branchMul32(Condition cond, RegisterID src, RegisterID dest) {
-    ASSERT(cond == Overflow);
+    ASSERT_UNUSED(cond, cond == Overflow);
     m_assembler.smull(dest, dataTempRegister, dest, src);
     m_assembler.asr(addressTempRegister, dest, 31);
     return branch32(NotEqual, addressTempRegister, dataTempRegister);
   }
 
   Jump branchMul32(Condition cond, Imm32 imm, RegisterID src, RegisterID dest) {
-    ASSERT(cond == Overflow);
+    ASSERT_UNUSED(cond, cond == Overflow);
     move(imm, dataTempRegister);
     m_assembler.smull(dest, dataTempRegister, src, dataTempRegister);
     m_assembler.asr(addressTempRegister, dest, 31);
@@ -979,28 +1011,32 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
 
   // Miscellaneous operations:
 
-  void breakpoint() { m_assembler.bkpt(); }
+  void breakpoint() { m_assembler.bkpt(0); }
 
   Call nearCall() {
     moveFixedWidthEncoding(Imm32(0), dataTempRegister);
-    return Call(m_assembler.blx(dataTempRegister), Call::LinkableNear);
+    return Call(m_assembler.blx(dataTempRegister, ARMv7Assembler::JumpFullSize),
+                Call::LinkableNear);
   }
 
   Call call() {
     moveFixedWidthEncoding(Imm32(0), dataTempRegister);
-    return Call(m_assembler.blx(dataTempRegister), Call::Linkable);
+    return Call(m_assembler.blx(dataTempRegister, ARMv7Assembler::JumpFullSize),
+                Call::Linkable);
   }
 
   Call call(RegisterID target) {
-    return Call(m_assembler.blx(target), Call::None);
+    return Call(m_assembler.blx(target, ARMv7Assembler::JumpFullSize),
+                Call::None);
   }
 
   Call call(Address address) {
     load32(address, dataTempRegister);
-    return Call(m_assembler.blx(dataTempRegister), Call::None);
+    return Call(m_assembler.blx(dataTempRegister, ARMv7Assembler::JumpFullSize),
+                Call::None);
   }
 
-  void ret() { m_assembler.bx(linkRegister); }
+  void ret() { m_assembler.bx(linkRegister, ARMv7Assembler::JumpFullSize); }
 
   void set32(Condition cond,
              RegisterID left,
@@ -1098,7 +1134,8 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
   Call tailRecursiveCall() {
     // Like a normal call, but don't link.
     moveFixedWidthEncoding(Imm32(0), dataTempRegister);
-    return Call(m_assembler.bx(dataTempRegister), Call::Linkable);
+    return Call(m_assembler.bx(dataTempRegister, ARMv7Assembler::JumpFullSize),
+                Call::Linkable);
   }
 
   Call makeTailRecursiveCall(Jump oldJump) {
@@ -1106,16 +1143,28 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
     return tailRecursiveCall();
   }
 
+  int executableOffsetFor(int location) {
+    return m_assembler.executableOffsetFor(location);
+  }
+
  protected:
+  bool inUninterruptedSequence() { return m_inUninterruptedSequence; }
+
   ARMv7Assembler::JmpSrc makeJump() {
     moveFixedWidthEncoding(Imm32(0), dataTempRegister);
-    return m_assembler.bx(dataTempRegister);
+    return m_assembler.bx(dataTempRegister,
+                          inUninterruptedSequence()
+                              ? ARMv7Assembler::JumpFullSize
+                              : ARMv7Assembler::JumpNoCondition);
   }
 
   ARMv7Assembler::JmpSrc makeBranch(ARMv7Assembler::Condition cond) {
     m_assembler.it(cond, true, true);
     moveFixedWidthEncoding(Imm32(0), dataTempRegister);
-    return m_assembler.bx(dataTempRegister);
+    return m_assembler.bx(dataTempRegister, inUninterruptedSequence()
+                                                ? ARMv7Assembler::JumpFullSize
+                                                : ARMv7Assembler::JumpCondition,
+                          cond);
   }
   ARMv7Assembler::JmpSrc makeBranch(Condition cond) {
     return makeBranch(armV7Condition(cond));
@@ -1204,6 +1253,8 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
     ARMv7Assembler::relinkCall(call.dataLocation(),
                                destination.executableAddress());
   }
+
+  bool m_inUninterruptedSequence;
 };
 
 }  // namespace JSC

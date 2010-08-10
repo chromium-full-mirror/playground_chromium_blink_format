@@ -81,7 +81,7 @@ JIT::CodePtr JIT::stringGetByValStubGenerator(JSGlobalData* globalData,
   jit.move(Imm32(0), regT0);
   jit.ret();
 
-  LinkBuffer patchBuffer(&jit, pool);
+  LinkBuffer patchBuffer(&jit, pool, 0);
   // We can't run without the JIT trampolines!
   if (!patchBuffer.allocationSuccessful())
     CRASH();
@@ -782,7 +782,7 @@ bool JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
   restoreArgumentReferenceForTrampoline();
   Call failureCall = tailRecursiveCall();
 
-  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool(), 0);
   if (!patchBuffer.allocationSuccessful())
     return false;
 
@@ -920,7 +920,7 @@ bool JIT::privateCompilePatchGetArrayLength(StructureStubInfo* stubInfo,
   emitFastArithIntToImmNoCheck(regT2, regT0);
   Jump success = jump();
 
-  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool(), 0);
   if (!patchBuffer.allocationSuccessful())
     return false;
 
@@ -1008,7 +1008,7 @@ bool JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
   } else
     compileGetDirectOffset(protoObject, regT1, regT0, cachedOffset);
   Jump success = jump();
-  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool(), 0);
   if (!patchBuffer.allocationSuccessful())
     return false;
 
@@ -1087,7 +1087,7 @@ bool JIT::privateCompileGetByIdSelfList(StructureStubInfo* stubInfo,
     compileGetDirectOffset(regT0, regT0, structure, cachedOffset);
   Jump success = jump();
 
-  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool(), 0);
   if (!patchBuffer.allocationSuccessful())
     return false;
 
@@ -1187,7 +1187,7 @@ bool JIT::privateCompileGetByIdProtoList(StructureStubInfo* stubInfo,
 
   Jump success = jump();
 
-  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool(), 0);
   if (!patchBuffer.allocationSuccessful())
     return false;
 
@@ -1281,7 +1281,7 @@ bool JIT::privateCompileGetByIdChainList(StructureStubInfo* stubInfo,
     compileGetDirectOffset(protoObject, regT1, regT0, cachedOffset);
   Jump success = jump();
 
-  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool(), 0);
   if (!patchBuffer.allocationSuccessful())
     return false;
 
@@ -1372,7 +1372,7 @@ bool JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
     compileGetDirectOffset(protoObject, regT1, regT0, cachedOffset);
   Jump success = jump();
 
-  LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
+  LinkBuffer patchBuffer(this, m_codeBlock->executablePool(), 0);
   if (!patchBuffer.allocationSuccessful())
     return false;
 

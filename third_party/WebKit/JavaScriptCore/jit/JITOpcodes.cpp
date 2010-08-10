@@ -192,7 +192,7 @@ void JIT::privateCompileCTIMachineTrampolines(
   // We can't run without the JIT trampolines!
   if (!*executablePool)
     CRASH();
-  LinkBuffer patchBuffer(this, *executablePool);
+  LinkBuffer patchBuffer(this, *executablePool, 0);
   // We can't run without the JIT trampolines!
   if (!patchBuffer.allocationSuccessful())
     CRASH();
@@ -217,21 +217,21 @@ void JIT::privateCompileCTIMachineTrampolines(
   CodeRef finalCode = patchBuffer.finalizeCode();
 
   trampolines->ctiVirtualCallLink =
-      trampolineAt(finalCode, virtualCallLinkBegin);
+      patchBuffer.trampolineAt(virtualCallLinkBegin);
   trampolines->ctiVirtualConstructLink =
-      trampolineAt(finalCode, virtualConstructLinkBegin);
-  trampolines->ctiVirtualCall = trampolineAt(finalCode, virtualCallBegin);
+      patchBuffer.trampolineAt(virtualConstructLinkBegin);
+  trampolines->ctiVirtualCall = patchBuffer.trampolineAt(virtualCallBegin);
   trampolines->ctiVirtualConstruct =
-      trampolineAt(finalCode, virtualConstructBegin);
-  trampolines->ctiNativeCall = trampolineAt(finalCode, nativeCallThunk);
+      patchBuffer.trampolineAt(virtualConstructBegin);
+  trampolines->ctiNativeCall = patchBuffer.trampolineAt(nativeCallThunk);
   trampolines->ctiNativeConstruct =
-      trampolineAt(finalCode, nativeConstructThunk);
+      patchBuffer.trampolineAt(nativeConstructThunk);
 #if ENABLE(JIT_USE_SOFT_MODULO)
-  trampolines->ctiSoftModulo = trampolineAt(finalCode, softModBegin);
+  trampolines->ctiSoftModulo = patchBuffer.trampolineAt(softModBegin);
 #endif
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
   trampolines->ctiStringLengthTrampoline =
-      trampolineAt(finalCode, stringLengthBegin);
+      patchBuffer.trampolineAt(stringLengthBegin);
 #endif
 }
 
