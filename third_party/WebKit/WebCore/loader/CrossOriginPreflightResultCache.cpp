@@ -146,7 +146,7 @@ bool CrossOriginPreflightResultCacheItem::allowsCrossOriginHeaders(
        ++it) {
     if (!m_headers.contains(it->first) &&
         !isOnAccessControlSimpleRequestHeaderWhitelist(it->first, it->second)) {
-      errorDescription = "Request header field " + it->first +
+      errorDescription = "Request header field " + String(it->first) +
                          " is not allowed by Access-Control-Allow-Headers.";
       return false;
     }
