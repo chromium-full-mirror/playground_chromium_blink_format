@@ -63,7 +63,6 @@ class InspectorCSSStore;
 class InspectorDOMStorageResource;
 class InspectorDatabaseResource;
 class InspectorDebuggerAgent;
-class InspectorFrontend;
 class InspectorFrontendClient;
 class InspectorResource;
 class InspectorTimelineAgent;
@@ -77,7 +76,6 @@ class ResourceRequest;
 class ResourceResponse;
 class ResourceError;
 class ScriptCallStack;
-class ScriptObject;
 class ScriptString;
 class SharedBuffer;
 class Storage;
@@ -138,7 +136,7 @@ class InspectorController : public Noncopyable {
   // transport via InspectorClient. After migration, webInspector parameter
   // should
   // be removed.
-  void connectFrontend(const ScriptObject& webInspector);
+  void connectFrontend();
   void disconnectFrontend();
 
   void addMessageToConsole(MessageSource,
@@ -244,7 +242,6 @@ class InspectorController : public Noncopyable {
 
   const ResourcesMap& resources() const { return m_resources; }
   InspectorResource* resourceForURL(const String& url);
-  InspectorFrontend* inspectorFrontend() { return m_frontend.get(); }
   RemoteInspectorFrontend* remoteInspectorFrontend() {
     return m_remoteFrontend.get();
   }
@@ -380,7 +377,6 @@ class InspectorController : public Noncopyable {
   InspectorClient* m_client;
   OwnPtr<InspectorFrontendClient> m_inspectorFrontendClient;
   bool m_openingFrontend;
-  OwnPtr<InspectorFrontend> m_frontend;
   OwnPtr<RemoteInspectorFrontend> m_remoteFrontend;
   RefPtr<InspectorDOMAgent> m_domAgent;
   OwnPtr<InspectorCSSStore> m_cssStore;

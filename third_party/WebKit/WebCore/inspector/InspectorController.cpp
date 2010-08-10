@@ -62,7 +62,6 @@
 #include "InspectorDOMStorageResource.h"
 #include "InspectorDatabaseResource.h"
 #include "InspectorDebuggerAgent.h"
-#include "InspectorFrontend.h"
 #include "InspectorResource.h"
 #include "InspectorValues.h"
 #include "InspectorWorkerResource.h"
@@ -130,7 +129,7 @@ const char* const InspectorController::ProfilesPanel = "profiles";
 
 static const char* const monitoringXHRSettingName = "xhrMonitor";
 
-int connectedFrontendCount = 0;
+static int connectedFrontendCount = 0;
 
 const String& InspectorController::frontendSettingsSettingName() {
   DEFINE_STATIC_LOCAL(String, settingName, ("frontendSettings"));
@@ -481,10 +480,9 @@ void InspectorController::setMonitoringXHR(bool enabled) {
   }
 }
 
-void InspectorController::connectFrontend(const ScriptObject& webInspector) {
+void InspectorController::connectFrontend() {
   m_openingFrontend = false;
   releaseFrontendLifetimeAgents();
-  m_frontend = new InspectorFrontend(webInspector, m_client);
   m_remoteFrontend = new RemoteInspectorFrontend(m_client);
   m_domAgent =
       InspectorDOMAgent::create(m_cssStore.get(), m_remoteFrontend.get());
@@ -565,13 +563,12 @@ void InspectorController::showPanel(const String& panel) {
 void InspectorController::close() {
   if (!m_remoteFrontend)
     return;
-  m_frontend->close();
+  m_remoteFrontend->close();
 }
 
 void InspectorController::disconnectFrontend() {
   if (!m_remoteFrontend)
     return;
-  m_frontend.clear();
   m_remoteFrontend.clear();
 
   connectedFrontendCount--;
