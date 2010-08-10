@@ -549,6 +549,9 @@ void WebGLRenderingContext::copyTexImage2D(unsigned long target,
                                  border, internalformat,
                                  GraphicsContext3D::UNSIGNED_BYTE))
     return;
+  WebGLTexture* tex = validateTextureBinding(target, true);
+  if (!tex)
+    return;
   if (!isGLES2Compliant()) {
     if (m_framebufferBinding && m_framebufferBinding->object() &&
         !isTexInternalFormatColorBufferCombinationValid(
@@ -565,13 +568,10 @@ void WebGLRenderingContext::copyTexImage2D(unsigned long target,
                             border);
   // FIXME: if the framebuffer is not complete, none of the below should be
   // executed.
-  WebGLTexture* tex = getTextureBinding(target);
-  if (!isGLES2Compliant()) {
-    if (tex)
-      tex->setLevelInfo(target, level, internalformat, width, height,
-                        GraphicsContext3D::UNSIGNED_BYTE);
-  }
-  if (m_framebufferBinding && tex)
+  if (!isGLES2Compliant())
+    tex->setLevelInfo(target, level, internalformat, width, height,
+                      GraphicsContext3D::UNSIGNED_BYTE);
+  if (m_framebufferBinding)
     m_framebufferBinding->onAttachedObjectChange(tex);
   cleanupAfterGraphicsCall(false);
 }
@@ -584,9 +584,11 @@ void WebGLRenderingContext::copyTexSubImage2D(unsigned long target,
                                               long y,
                                               unsigned long width,
                                               unsigned long height) {
+  WebGLTexture* tex = validateTextureBinding(target, true);
+  if (!tex)
+    return;
   if (!isGLES2Compliant()) {
-    WebGLTexture* tex = getTextureBinding(target);
-    if (m_framebufferBinding && m_framebufferBinding->object() && tex &&
+    if (m_framebufferBinding && m_framebufferBinding->object() &&
         !isTexInternalFormatColorBufferCombinationValid(
             tex->getInternalFormat(),
             m_framebufferBinding->getColorBufferFormat())) {
@@ -1168,22 +1170,18 @@ void WebGLRenderingContext::frontFace(unsigned long mode) {
 }
 
 void WebGLRenderingContext::generateMipmap(unsigned long target) {
-  RefPtr<WebGLTexture> tex;
+  WebGLTexture* tex = validateTextureBinding(target, false);
+  if (!tex)
+    return;
   if (!isGLES2Compliant()) {
-    if (target == GraphicsContext3D::TEXTURE_2D)
-      tex = m_textureUnits[m_activeTextureUnit].m_texture2DBinding;
-    else if (target == GraphicsContext3D::TEXTURE_CUBE_MAP)
-      tex = m_textureUnits[m_activeTextureUnit].m_textureCubeMapBinding;
-    if (tex && !tex->canGenerateMipmaps()) {
+    if (!tex->canGenerateMipmaps()) {
       m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
       return;
     }
   }
   m_context->generateMipmap(target);
-  if (!isGLES2Compliant()) {
-    if (tex)
-      tex->generateMipmapLevelInfo();
-  }
+  if (!isGLES2Compliant())
+    tex->generateMipmapLevelInfo();
   cleanupAfterGraphicsCall(false);
 }
 
@@ -1658,11 +1656,9 @@ WebGLGetInfo WebGLRenderingContext::getTexParameter(unsigned long target,
                                                     unsigned long pname,
                                                     ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (target != GraphicsContext3D::TEXTURE_2D &&
-      target != GraphicsContext3D::TEXTURE_CUBE_MAP) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
+  WebGLTexture* tex = validateTextureBinding(target, false);
+  if (!tex)
     return WebGLGetInfo();
-  }
   WebGLStateRestorer(this, false);
   int value = 0;
   switch (pname) {
@@ -2217,6 +2213,9 @@ void WebGLRenderingContext::texImage2DBase(unsigned target,
   if (!validateTexFuncParameters(target, level, internalformat, width, height,
                                  border, format, type))
     return;
+  WebGLTexture* tex = validateTextureBinding(target, true);
+  if (!tex)
+    return;
   if (!isGLES2Compliant()) {
     if (level && WebGLTexture::isNPOT(width, height)) {
       m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
@@ -2225,12 +2224,9 @@ void WebGLRenderingContext::texImage2DBase(unsigned target,
   }
   m_context->texImage2D(target, level, internalformat, width, height, border,
                         format, type, pixels);
-  WebGLTexture* tex = getTextureBinding(target);
-  if (!isGLES2Compliant()) {
-    if (tex)
-      tex->setLevelInfo(target, level, internalformat, width, height, type);
-  }
-  if (m_framebufferBinding && tex)
+  if (!isGLES2Compliant())
+    tex->setLevelInfo(target, level, internalformat, width, height, type);
+  if (m_framebufferBinding)
     m_framebufferBinding->onAttachedObjectChange(tex);
   cleanupAfterGraphicsCall(false);
 }
@@ -2530,19 +2526,10 @@ void WebGLRenderingContext::texParameter(unsigned long target,
                                          float paramf,
                                          int parami,
                                          bool isFloat) {
+  WebGLTexture* tex = validateTextureBinding(target, false);
+  if (!tex)
+    return;
   if (!isGLES2Compliant()) {
-    RefPtr<WebGLTexture> tex = 0;
-    switch (target) {
-      case GraphicsContext3D::TEXTURE_2D:
-        tex = m_textureUnits[m_activeTextureUnit].m_texture2DBinding;
-        break;
-      case GraphicsContext3D::TEXTURE_CUBE_MAP:
-        tex = m_textureUnits[m_activeTextureUnit].m_textureCubeMapBinding;
-        break;
-      default:
-        m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
-        return;
-    }
     switch (pname) {
       case GraphicsContext3D::TEXTURE_MIN_FILTER:
       case GraphicsContext3D::TEXTURE_MAG_FILTER:
@@ -2563,12 +2550,10 @@ void WebGLRenderingContext::texParameter(unsigned long target,
         m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
         return;
     }
-    if (tex) {
-      if (isFloat)
-        tex->setParameterf(pname, paramf);
-      else
-        tex->setParameteri(pname, parami);
-    }
+    if (isFloat)
+      tex->setParameterf(pname, paramf);
+    else
+      tex->setParameteri(pname, parami);
   }
   if (isFloat)
     m_context->texParameterf(target, pname, paramf);
@@ -2603,7 +2588,8 @@ void WebGLRenderingContext::texSubImage2DBase(unsigned target,
   ec = 0;
   if (!validateTexFuncFormatAndType(format, type))
     return;
-
+  if (!validateTextureBinding(target, true))
+    return;
   m_context->texSubImage2D(target, level, xoffset, yoffset, width, height,
                            format, type, pixels);
   cleanupAfterGraphicsCall(false);
@@ -3731,11 +3717,13 @@ bool WebGLRenderingContext::isTexInternalFormatColorBufferCombinationValid(
   return false;
 }
 
-WebGLTexture* WebGLRenderingContext::getTextureBinding(unsigned long target) {
-  RefPtr<WebGLTexture> tex = 0;
+WebGLTexture* WebGLRenderingContext::validateTextureBinding(
+    unsigned long target,
+    bool useSixEnumsForCubeMap) {
+  WebGLTexture* tex = 0;
   switch (target) {
     case GraphicsContext3D::TEXTURE_2D:
-      tex = m_textureUnits[m_activeTextureUnit].m_texture2DBinding;
+      tex = m_textureUnits[m_activeTextureUnit].m_texture2DBinding.get();
       break;
     case GraphicsContext3D::TEXTURE_CUBE_MAP_POSITIVE_X:
     case GraphicsContext3D::TEXTURE_CUBE_MAP_NEGATIVE_X:
@@ -3743,12 +3731,26 @@ WebGLTexture* WebGLRenderingContext::getTextureBinding(unsigned long target) {
     case GraphicsContext3D::TEXTURE_CUBE_MAP_NEGATIVE_Y:
     case GraphicsContext3D::TEXTURE_CUBE_MAP_POSITIVE_Z:
     case GraphicsContext3D::TEXTURE_CUBE_MAP_NEGATIVE_Z:
-      tex = m_textureUnits[m_activeTextureUnit].m_textureCubeMapBinding;
+      if (!useSixEnumsForCubeMap) {
+        m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
+        return 0;
+      }
+      tex = m_textureUnits[m_activeTextureUnit].m_textureCubeMapBinding.get();
       break;
+    case GraphicsContext3D::TEXTURE_CUBE_MAP:
+      if (useSixEnumsForCubeMap) {
+        m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
+        return 0;
+      }
+      tex = m_textureUnits[m_activeTextureUnit].m_textureCubeMapBinding.get();
+      break;
+    default:
+      m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
+      return 0;
   }
-  if (tex && tex->object())
-    return tex.get();
-  return 0;
+  if (!tex)
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  return tex;
 }
 
 bool WebGLRenderingContext::validateTexFuncFormatAndType(unsigned long format,
