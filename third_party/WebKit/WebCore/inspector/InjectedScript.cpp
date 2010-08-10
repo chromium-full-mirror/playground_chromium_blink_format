@@ -42,10 +42,8 @@ namespace WebCore {
 InjectedScript::InjectedScript(ScriptObject injectedScriptObject)
     : m_injectedScriptObject(injectedScriptObject) {}
 
-void InjectedScript::dispatch(long callId,
-                              const String& methodName,
+void InjectedScript::dispatch(const String& methodName,
                               const String& arguments,
-                              bool async,
                               RefPtr<InspectorValue>* result,
                               bool* hadException) {
   ASSERT(!hasNoValue());
@@ -57,8 +55,6 @@ void InjectedScript::dispatch(long callId,
   ScriptFunctionCall function(m_injectedScriptObject, "dispatch");
   function.appendArgument(methodName);
   function.appendArgument(arguments);
-  if (async)
-    function.appendArgument(callId);
   *hadException = false;
   ScriptValue resultValue = function.call(*hadException);
   if (!*hadException)

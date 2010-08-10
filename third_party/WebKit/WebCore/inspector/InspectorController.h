@@ -65,6 +65,7 @@ class InspectorDatabaseResource;
 class InspectorDebuggerAgent;
 class InspectorFrontendClient;
 class InspectorResource;
+class InspectorStorageAgent;
 class InspectorTimelineAgent;
 class InspectorValue;
 class InspectorWorkerResource;
@@ -377,6 +378,7 @@ class InspectorController : public Noncopyable {
   bool m_openingFrontend;
   OwnPtr<RemoteInspectorFrontend> m_remoteFrontend;
   RefPtr<InspectorDOMAgent> m_domAgent;
+  RefPtr<InspectorStorageAgent> m_storageAgent;
   OwnPtr<InspectorCSSStore> m_cssStore;
   OwnPtr<InspectorTimelineAgent> m_timelineAgent;
 

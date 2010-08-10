@@ -40,6 +40,7 @@
 #include "InjectedScriptHost.h"
 #include "InspectorController.h"
 #include "InspectorDOMAgent.h"
+#include "InspectorStorageAgent.h"
 #include "RemoteInspectorFrontend.h"
 #include "ScriptBreakpoint.h"
 #include "ScriptProfiler.h"
@@ -79,11 +80,9 @@ void InspectorBackend::setInjectedScriptSource(const String& source) {
   m_inspectorController->injectedScriptHost()->setInjectedScriptSource(source);
 }
 
-void InspectorBackend::dispatchOnInjectedScript(long callId,
-                                                long injectedScriptId,
+void InspectorBackend::dispatchOnInjectedScript(long injectedScriptId,
                                                 const String& methodName,
                                                 const String& arguments,
-                                                bool async,
                                                 RefPtr<InspectorValue>* result,
                                                 bool* hadException) {
   if (!remoteFrontend())
@@ -104,13 +103,7 @@ void InspectorBackend::dispatchOnInjectedScript(long callId,
   if (injectedScript.hasNoValue())
     return;
 
-  injectedScript.dispatch(callId, methodName, arguments, async, result,
-                          hadException);
-  if (async)
-    return;  // InjectedScript will return result asynchronously by means of
-             // ::reportDidDispatchOnInjectedScript.
-  remoteFrontend()->didDispatchOnInjectedScript(callId, (*result).get(),
-                                                *hadException);
+  injectedScript.dispatch(methodName, arguments, result, hadException);
 }
 
 void InspectorBackend::clearConsoleMessages() {
@@ -134,6 +127,22 @@ void InspectorBackend::getDatabaseTableNames(long databaseId,
       (*names)->pushString(tableNames[i]);
   }
 }
+
+void InspectorBackend::executeSQL(long databaseId,
+                                  const String& query,
+                                  bool* success,
+                                  long* transactionId) {
+  Database* database = m_inspectorController->databaseForId(databaseId);
+  if (!m_inspectorController->m_storageAgent || !database) {
+    *success = false;
+    return;
+  }
+
+  *transactionId =
+      m_inspectorController->m_storageAgent->executeSQL(database, query);
+  *success = true;
+}
+
 #endif
 
 RemoteInspectorFrontend* InspectorBackend::remoteFrontend() {

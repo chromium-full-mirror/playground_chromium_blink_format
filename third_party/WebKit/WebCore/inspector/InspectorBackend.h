@@ -69,11 +69,9 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 #endif
 
   void setInjectedScriptSource(const String& source);
-  void dispatchOnInjectedScript(long callId,
-                                long injectedScriptId,
+  void dispatchOnInjectedScript(long injectedScriptId,
                                 const String& methodName,
                                 const String& arguments,
-                                bool async,
                                 RefPtr<InspectorValue>* result,
                                 bool* hadException);
   void clearConsoleMessages();
@@ -84,6 +82,10 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
 #if ENABLE(DATABASE)
   void getDatabaseTableNames(long databaseId, RefPtr<InspectorArray>* names);
+  void executeSQL(long databaseId,
+                  const String& query,
+                  bool* success,
+                  long* transactionId);
 #endif
 
  private:

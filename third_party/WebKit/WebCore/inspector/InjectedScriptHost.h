@@ -83,9 +83,6 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
   void didCreateWorker(long id, const String& url, bool isSharedWorker);
   void didDestroyWorker(long id);
 #endif
-  void reportDidDispatchOnInjectedScript(long callId,
-                                         PassRefPtr<InspectorValue> result,
-                                         bool isException);
 
   pair<long, ScriptObject> injectScript(const String& source, ScriptState*);
   InjectedScript injectedScriptFor(ScriptState*);
