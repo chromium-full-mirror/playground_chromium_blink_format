@@ -523,7 +523,7 @@
 #define WTF_PLATFORM_CAIRO 1
 #endif
 
-#if OS(WINCE) && PLATFORM(QT)
+#if OS(WINCE)
 #include <ce_time.h>
 #endif
 
