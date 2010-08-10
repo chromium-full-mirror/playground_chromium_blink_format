@@ -107,13 +107,6 @@ class WebDevToolsAgentImpl : public WebDevToolsAgentPrivate,
   int hostId() { return m_hostId; }
 
  private:
-  static v8::Handle<v8::Value> jsDispatchOnClient(const v8::Arguments& args);
-
-  void disposeUtilityContext();
-
-  void compileUtilityScripts();
-  void initDevToolsAgentHost();
-  void createInspectorFrontendProxy();
   void setApuAgentEnabled(bool enabled);
 
   WebCore::InspectorController* inspectorController();
@@ -125,9 +118,6 @@ class WebDevToolsAgentImpl : public WebDevToolsAgentPrivate,
   bool m_apuAgentEnabled;
   bool m_resourceTrackingWasEnabled;
   bool m_attached;
-  // TODO(pfeldman): This should not be needed once GC styles issue is fixed
-  // for matching rules.
-  v8::Persistent<v8::Context> m_utilityContext;
 };
 
 }  // namespace WebKit
