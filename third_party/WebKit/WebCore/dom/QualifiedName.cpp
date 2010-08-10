@@ -98,7 +98,7 @@ void QualifiedName::deref() {
 String QualifiedName::toString() const {
   String local = localName();
   if (hasPrefix()) {
-    String result(prefix());
+    String result = prefix().string();
     result.append(":");
     result.append(local);
     return result;
