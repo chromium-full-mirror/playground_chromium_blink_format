@@ -51,11 +51,11 @@ class SmallStringsStorage : public Noncopyable {
 
 SmallStringsStorage::SmallStringsStorage() {
   UChar* characterBuffer = 0;
-  RefPtr<UStringImpl> baseString =
-      UStringImpl::createUninitialized(numCharactersToStore, characterBuffer);
+  RefPtr<StringImpl> baseString =
+      StringImpl::createUninitialized(numCharactersToStore, characterBuffer);
   for (unsigned i = 0; i < numCharactersToStore; ++i) {
     characterBuffer[i] = i;
-    m_reps[i] = UStringImpl::create(baseString, i, 1);
+    m_reps[i] = StringImpl::create(baseString, i, 1);
   }
 }
 

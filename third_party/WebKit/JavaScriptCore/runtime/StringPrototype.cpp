@@ -271,8 +271,8 @@ jsSpliceSubstringsWithSeparators(ExecState* exec,
     if (position <= 0 && length >= sourceSize)
       return sourceVal;
     // We could call UString::substr, but this would result in redundant checks
-    return jsString(exec, UStringImpl::create(source.rep(), max(0, position),
-                                              min(sourceSize, length)));
+    return jsString(exec, StringImpl::create(source.rep(), max(0, position),
+                                             min(sourceSize, length)));
   }
 
   int totalLength = 0;
@@ -285,8 +285,8 @@ jsSpliceSubstringsWithSeparators(ExecState* exec,
     return jsString(exec, "");
 
   UChar* buffer;
-  PassRefPtr<UStringImpl> impl =
-      UStringImpl::tryCreateUninitialized(totalLength, buffer);
+  PassRefPtr<StringImpl> impl =
+      StringImpl::tryCreateUninitialized(totalLength, buffer);
   if (!impl)
     return throwOutOfMemoryError(exec);
 
@@ -294,14 +294,14 @@ jsSpliceSubstringsWithSeparators(ExecState* exec,
   int bufferPos = 0;
   for (int i = 0; i < maxCount; i++) {
     if (i < rangeCount) {
-      UStringImpl::copyChars(buffer + bufferPos,
-                             source.data() + substringRanges[i].position,
-                             substringRanges[i].length);
+      StringImpl::copyChars(buffer + bufferPos,
+                            source.data() + substringRanges[i].position,
+                            substringRanges[i].length);
       bufferPos += substringRanges[i].length;
     }
     if (i < separatorCount) {
-      UStringImpl::copyChars(buffer + bufferPos, separators[i].data(),
-                             separators[i].size());
+      StringImpl::copyChars(buffer + bufferPos, separators[i].data(),
+                            separators[i].size());
       bufferPos += separators[i].size();
     }
   }
@@ -1013,8 +1013,8 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncFontsize(ExecState* exec) {
     unsigned stringSize = s.size();
     unsigned bufferSize = 22 + stringSize;
     UChar* buffer;
-    PassRefPtr<UStringImpl> impl =
-        UStringImpl::tryCreateUninitialized(bufferSize, buffer);
+    PassRefPtr<StringImpl> impl =
+        StringImpl::tryCreateUninitialized(bufferSize, buffer);
     if (!impl)
       return JSValue::encode(jsUndefined());
     buffer[0] = '<';
@@ -1065,8 +1065,8 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncLink(ExecState* exec) {
   unsigned stringSize = s.size();
   unsigned bufferSize = 15 + linkTextSize + stringSize;
   UChar* buffer;
-  PassRefPtr<UStringImpl> impl =
-      UStringImpl::tryCreateUninitialized(bufferSize, buffer);
+  PassRefPtr<StringImpl> impl =
+      StringImpl::tryCreateUninitialized(bufferSize, buffer);
   if (!impl)
     return JSValue::encode(jsUndefined());
   buffer[0] = '<';

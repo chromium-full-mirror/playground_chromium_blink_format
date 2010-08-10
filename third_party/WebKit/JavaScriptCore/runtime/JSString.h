@@ -139,11 +139,11 @@ class JS_EXPORTCLASS JSString : public JSCell {
       return *this;
     }
 
-    UStringImpl* operator*() {
+    StringImpl* operator*() {
       WorkItem& item = m_workQueue.last();
       RopeImpl::Fiber fiber = item.fibers[item.i];
       ASSERT(!RopeImpl::isRope(fiber));
-      return static_cast<UStringImpl*>(fiber);
+      return static_cast<StringImpl*>(fiber);
     }
 
     bool operator!=(const RopeIterator& other) const {
@@ -202,7 +202,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
     ASSERT(!m_value.isNull());
   }
   JSString(JSGlobalData* globalData,
-           PassRefPtr<UStringImpl> value,
+           PassRefPtr<StringImpl> value,
            HasOtherOwnerType)
       : JSCell(globalData->stringStructure.get()),
         m_length(value->length()),
@@ -366,7 +366,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
   void resolveRope(ExecState*) const;
 
   void appendStringInConstruct(unsigned& index, const UString& string) {
-    UStringImpl* impl = string.rep();
+    StringImpl* impl = string.rep();
     impl->ref();
     m_other.m_fibers[index++] = impl;
   }
@@ -393,7 +393,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
       m_length += s->length();
     } else {
       UString u(v.toString(exec));
-      UStringImpl* impl = u.rep();
+      StringImpl* impl = u.rep();
       impl->ref();
       m_other.m_fibers[index++] = impl;
       m_length += u.size();
@@ -504,7 +504,7 @@ inline JSString* jsSingleCharacterSubstring(ExecState* exec,
   return fixupVPtr(
       globalData,
       new (globalData) JSString(
-          globalData, UString(UStringImpl::create(s.rep(), offset, 1))));
+          globalData, UString(StringImpl::create(s.rep(), offset, 1))));
 }
 
 inline JSString* jsNontrivialString(JSGlobalData* globalData, const char* s) {
@@ -567,7 +567,7 @@ inline JSString* jsSubstring(JSGlobalData* globalData,
   return fixupVPtr(
       globalData,
       new (globalData) JSString(
-          globalData, UString(UStringImpl::create(s.rep(), offset, length)),
+          globalData, UString(StringImpl::create(s.rep(), offset, length)),
           JSString::HasOtherOwner));
 }
 

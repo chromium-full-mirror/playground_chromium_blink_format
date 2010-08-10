@@ -40,7 +40,7 @@ namespace JSC {
 // (since appending to the string is likely more common) - and as such resolving
 // in this fashion should minimize work queue size.  (If we built the queue
 // forwards
-// we would likely have to place all of the constituent UStringImpls into the
+// we would likely have to place all of the constituent StringImpls into the
 // Vector before performing any concatenation, but by working backwards we
 // likely
 // only fill the queue with the number of substrings at any given level in a
@@ -51,8 +51,8 @@ void JSString::resolveRope(ExecState* exec) const {
   // Allocate the buffer to hold the final string, position initially points to
   // the end.
   UChar* buffer;
-  if (PassRefPtr<UStringImpl> newImpl =
-          UStringImpl::tryCreateUninitialized(m_length, buffer))
+  if (PassRefPtr<StringImpl> newImpl =
+          StringImpl::tryCreateUninitialized(m_length, buffer))
     m_value = newImpl;
   else {
     for (unsigned i = 0; i < m_fiberCount; ++i) {
@@ -85,10 +85,10 @@ void JSString::resolveRope(ExecState* exec) const {
         workQueue.append(rope->fibers()[i]);
       currentFiber = rope->fibers()[fiberCountMinusOne];
     } else {
-      UStringImpl* string = static_cast<UStringImpl*>(currentFiber);
+      StringImpl* string = static_cast<StringImpl*>(currentFiber);
       unsigned length = string->length();
       position -= length;
-      UStringImpl::copyChars(position, string->characters(), length);
+      StringImpl::copyChars(position, string->characters(), length);
 
       // Was this the last item in the work queue?
       if (workQueue.isEmpty()) {
@@ -126,7 +126,7 @@ JSValue JSString::replaceCharacter(ExecState* exec,
 
   // Count total fibers and find matching string.
   size_t fiberCount = 0;
-  UStringImpl* matchString = 0;
+  StringImpl* matchString = 0;
   int matchPosition = -1;
   for (RopeIterator it(m_other.m_fibers.data(), m_fiberCount); it != end;
        ++it) {
@@ -134,7 +134,7 @@ JSValue JSString::replaceCharacter(ExecState* exec,
     if (matchString)
       continue;
 
-    UStringImpl* string = *it;
+    StringImpl* string = *it;
     matchPosition = string->find(character);
     if (matchPosition == -1)
       continue;
@@ -150,7 +150,7 @@ JSValue JSString::replaceCharacter(ExecState* exec,
 
   for (RopeIterator it(m_other.m_fibers.data(), m_fiberCount); it != end;
        ++it) {
-    UStringImpl* string = *it;
+    StringImpl* string = *it;
     if (string != matchString) {
       builder.append(UString(string));
       continue;
