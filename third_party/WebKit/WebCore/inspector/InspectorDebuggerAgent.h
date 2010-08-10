@@ -47,7 +47,8 @@ class RemoteInspectorFrontend;
 
 class InspectorDebuggerAgent : public ScriptDebugListener, public Noncopyable {
  public:
-  static PassOwnPtr<InspectorDebuggerAgent> create(InspectorController*);
+  static PassOwnPtr<InspectorDebuggerAgent> create(InspectorController*,
+                                                   RemoteInspectorFrontend*);
   virtual ~InspectorDebuggerAgent();
 
   static bool isDebuggerAlwaysEnabled();
@@ -82,7 +83,7 @@ class InspectorDebuggerAgent : public ScriptDebugListener, public Noncopyable {
   static String md5Base16(const String& string);
 
  private:
-  InspectorDebuggerAgent(InspectorController*);
+  InspectorDebuggerAgent(InspectorController*, RemoteInspectorFrontend*);
 
   PassRefPtr<InspectorValue> currentCallFrames();
 
@@ -102,9 +103,8 @@ class InspectorDebuggerAgent : public ScriptDebugListener, public Noncopyable {
   virtual void didPause(ScriptState*);
   virtual void didContinue();
 
-  RemoteInspectorFrontend* remoteFrontend() const;
-
   InspectorController* m_inspectorController;
+  RemoteInspectorFrontend* m_remoteFrontend;
   ScriptState* m_pausedScriptState;
   HashMap<String, String> m_sourceIDToURL;
   HashMap<String, String> m_scriptIDToContent;
