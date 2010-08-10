@@ -38,6 +38,7 @@
 #include "RenderTableCell.h"
 #include "RenderTableRow.h"
 #include "RenderTextControl.h"
+#include "RenderTextFragment.h"
 #include "VisiblePosition.h"
 #include "visible_units.h"
 
@@ -253,10 +254,13 @@ TextIterator::TextIterator()
       m_positionNode(0),
       m_textCharacters(0),
       m_textLength(0),
+      m_remainingTextBox(0),
+      m_firstLetterText(0),
       m_lastCharacter(0),
       m_emitsCharactersBetweenAllVisiblePositions(false),
       m_entersTextControls(false),
-      m_emitsTextWithoutTranscoding(false) {}
+      m_emitsTextWithoutTranscoding(false),
+      m_handledFirstLetter(false) {}
 
 TextIterator::TextIterator(const Range* r, TextIteratorBehavior behavior)
     : m_startContainer(0),
@@ -266,11 +270,14 @@ TextIterator::TextIterator(const Range* r, TextIteratorBehavior behavior)
       m_positionNode(0),
       m_textCharacters(0),
       m_textLength(0),
+      m_remainingTextBox(0),
+      m_firstLetterText(0),
       m_emitsCharactersBetweenAllVisiblePositions(
           behavior & TextIteratorEmitsCharactersBetweenAllVisiblePositions),
       m_entersTextControls(behavior & TextIteratorEntersTextControls),
       m_emitsTextWithoutTranscoding(behavior &
-                                    TextIteratorEmitsTextsWithoutTranscoding) {
+                                    TextIteratorEmitsTextsWithoutTranscoding),
+      m_handledFirstLetter(false) {
   // FIXME: should support TextIteratorEndsAtEditingBoundary
   // http://webkit.org/b/43609
   ASSERT(behavior != TextIteratorEndsAtEditingBoundary);
@@ -349,6 +356,12 @@ void TextIterator::advance() {
     return;
   }
 
+  if (!m_textBox && m_remainingTextBox) {
+    m_textBox = m_remainingTextBox;
+    m_remainingTextBox = 0;
+    m_firstLetterText = 0;
+    m_offset = 0;
+  }
   // handle remembered text box
   if (m_textBox) {
     handleTextBox();
@@ -427,6 +440,8 @@ void TextIterator::advance() {
       pushFullyClippedState(m_fullyClippedStack, m_node);
     m_handledNode = false;
     m_handledChildren = false;
+    m_handledFirstLetter = false;
+    m_firstLetterText = 0;
 
     // how would this ever be?
     if (m_positionNode)
@@ -444,8 +459,6 @@ bool TextIterator::handleTextNode() {
     return false;
 
   RenderText* renderer = toRenderText(m_node->renderer());
-  if (renderer->style()->visibility() != VISIBLE)
-    return false;
 
   m_lastTextNode = m_node;
   String str = renderer->text();
@@ -453,10 +466,22 @@ bool TextIterator::handleTextNode() {
   // handle pre-formatted text
   if (!renderer->style()->collapseWhiteSpace()) {
     int runStart = m_offset;
-    if (m_lastTextNodeEndedWithCollapsedSpace) {
+    if (m_lastTextNodeEndedWithCollapsedSpace && hasVisibleTextNode(renderer)) {
       emitCharacter(' ', m_node, 0, runStart, runStart);
       return false;
     }
+    if (!m_handledFirstLetter && renderer->isTextFragment()) {
+      handleTextNodeFirstLetter(static_cast<RenderTextFragment*>(renderer));
+      if (m_firstLetterText) {
+        String firstLetter = m_firstLetterText->text();
+        emitText(m_node, m_firstLetterText, m_offset, firstLetter.length());
+        m_firstLetterText = 0;
+        m_textBox = 0;
+        return false;
+      }
+    }
+    if (renderer->style()->visibility() != VISIBLE)
+      return false;
     int strLength = str.length();
     int end = (m_node == m_endContainer) ? m_endOffset : INT_MAX;
     int runEnd = min(strLength, end);
@@ -469,6 +494,15 @@ bool TextIterator::handleTextNode() {
   }
 
   if (!renderer->firstTextBox() && str.length() > 0) {
+    if (!m_handledFirstLetter && renderer->isTextFragment()) {
+      handleTextNodeFirstLetter(static_cast<RenderTextFragment*>(renderer));
+      if (m_firstLetterText) {
+        handleTextBox();
+        return false;
+      }
+    }
+    if (renderer->style()->visibility() != VISIBLE)
+      return false;
     m_lastTextNodeEndedWithCollapsedSpace =
         true;  // entire block is collapsed space
     return true;
@@ -489,12 +523,19 @@ bool TextIterator::handleTextNode() {
   m_textBox = renderer->containsReversedText()
                   ? (m_sortedTextBoxes.isEmpty() ? 0 : m_sortedTextBoxes[0])
                   : renderer->firstTextBox();
+  if (!m_handledFirstLetter && renderer->isTextFragment() && !m_offset)
+    handleTextNodeFirstLetter(static_cast<RenderTextFragment*>(renderer));
   handleTextBox();
   return true;
 }
 
 void TextIterator::handleTextBox() {
-  RenderText* renderer = toRenderText(m_node->renderer());
+  RenderText* renderer =
+      m_firstLetterText ? m_firstLetterText : toRenderText(m_node->renderer());
+  if (renderer->style()->visibility() != VISIBLE) {
+    m_textBox = 0;
+    return;
+  }
   String str = renderer->text();
   int start = m_offset;
   int end = (m_node == m_endContainer) ? m_endOffset : INT_MAX;
@@ -546,7 +587,7 @@ void TextIterator::handleTextBox() {
           subrunEnd = runEnd;
 
         m_offset = subrunEnd;
-        emitText(m_node, runStart, subrunEnd);
+        emitText(m_node, renderer, runStart, subrunEnd);
       }
 
       // If we are doing a subrun that doesn't go to the end of the text box,
@@ -570,6 +611,33 @@ void TextIterator::handleTextBox() {
     if (renderer->containsReversedText())
       ++m_sortedTextBoxesPosition;
   }
+  if (!m_textBox && m_remainingTextBox) {
+    m_textBox = m_remainingTextBox;
+    m_remainingTextBox = 0;
+    m_firstLetterText = 0;
+    m_offset = 0;
+    handleTextBox();
+  }
+}
+
+void TextIterator::handleTextNodeFirstLetter(RenderTextFragment* renderer) {
+  if (renderer->firstLetter()) {
+    RenderObject* r = renderer->firstLetter();
+    if (r->style()->visibility() != VISIBLE)
+      return;
+    for (RenderObject* currChild = r->firstChild(); currChild;
+         currChild->nextSibling()) {
+      if (currChild->isText()) {
+        RenderText* firstLetter = toRenderText(currChild);
+        m_handledFirstLetter = true;
+        m_remainingTextBox = m_textBox;
+        m_textBox = firstLetter->firstTextBox();
+        m_firstLetterText = firstLetter;
+        return;
+      }
+    }
+  }
+  m_handledFirstLetter = true;
 }
 
 bool TextIterator::handleReplacedElement() {
@@ -616,6 +684,18 @@ bool TextIterator::handleReplacedElement() {
   m_lastCharacter = 0;
 
   return true;
+}
+
+bool TextIterator::hasVisibleTextNode(RenderText* renderer) {
+  if (renderer->style()->visibility() == VISIBLE)
+    return true;
+  if (renderer->isTextFragment()) {
+    RenderTextFragment* fragment = static_cast<RenderTextFragment*>(renderer);
+    if (fragment->firstLetter() &&
+        fragment->firstLetter()->style()->visibility() == VISIBLE)
+      return true;
+  }
+  return false;
 }
 
 static bool shouldEmitTabBeforeNode(Node* node) {
@@ -924,9 +1004,10 @@ void TextIterator::emitCharacter(UChar c,
 }
 
 void TextIterator::emitText(Node* textNode,
+                            RenderObject* renderObject,
                             int textStartOffset,
                             int textEndOffset) {
-  RenderText* renderer = toRenderText(m_node->renderer());
+  RenderText* renderer = toRenderText(renderObject);
   m_text = m_emitsTextWithoutTranscoding ? renderer->textWithoutTranscoding()
                                          : renderer->text();
   ASSERT(m_text.characters());
@@ -941,6 +1022,12 @@ void TextIterator::emitText(Node* textNode,
 
   m_lastTextNodeEndedWithCollapsedSpace = false;
   m_hasEmitted = true;
+}
+
+void TextIterator::emitText(Node* textNode,
+                            int textStartOffset,
+                            int textEndOffset) {
+  emitText(textNode, m_node->renderer(), textStartOffset, textEndOffset);
 }
 
 PassRefPtr<Range> TextIterator::range() const {
