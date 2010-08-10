@@ -517,7 +517,7 @@ void RenderThemeGtk::adjustSearchFieldResultsButtonStyle(
 bool RenderThemeGtk::paintSearchFieldResultsButton(RenderObject* o,
                                                    const PaintInfo& i,
                                                    const IntRect& rect) {
-  return paintMozillaGtkWidget(this, MOZ_GTK_DROPDOWN_ARROW, o, i, rect);
+  return paintSearchFieldResultsDecoration(o, i, rect);
 }
 
 void RenderThemeGtk::adjustSearchFieldResultsDecorationStyle(
@@ -536,7 +536,13 @@ void RenderThemeGtk::adjustSearchFieldResultsDecorationStyle(
 bool RenderThemeGtk::paintSearchFieldResultsDecoration(RenderObject* o,
                                                        const PaintInfo& i,
                                                        const IntRect& rect) {
-  return paintMozillaGtkWidget(this, MOZ_GTK_CHECKMENUITEM, o, i, rect);
+  GraphicsContext* context = i.context;
+
+  static Image* searchImage =
+      Image::loadPlatformThemeIcon(GTK_STOCK_FIND, rect.width()).releaseRef();
+  context->drawImage(searchImage, DeviceColorSpace, rect);
+
+  return false;
 }
 
 void RenderThemeGtk::adjustSearchFieldCancelButtonStyle(
@@ -555,7 +561,14 @@ void RenderThemeGtk::adjustSearchFieldCancelButtonStyle(
 bool RenderThemeGtk::paintSearchFieldCancelButton(RenderObject* o,
                                                   const PaintInfo& i,
                                                   const IntRect& rect) {
-  return paintMozillaGtkWidget(this, MOZ_GTK_CHECKMENUITEM, o, i, rect);
+  GraphicsContext* context = i.context;
+
+  // TODO: Brightening up the image on hover is desirable here, I believe.
+  static Image* cancelImage =
+      Image::loadPlatformThemeIcon(GTK_STOCK_CLEAR, rect.width()).releaseRef();
+  context->drawImage(cancelImage, DeviceColorSpace, rect);
+
+  return false;
 }
 
 void RenderThemeGtk::adjustSearchFieldStyle(CSSStyleSelector* selector,
