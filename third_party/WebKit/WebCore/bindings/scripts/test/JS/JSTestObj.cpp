@@ -1471,7 +1471,7 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndUserGesture(ExecState* exec) {
     return JSValue::encode(jsUndefined());
 
   imp->withDynamicFrameAndUserGesture(dynamicFrame, intArg,
-                                      processingUserGesture(exec));
+                                      processingUserGesture());
   return JSValue::encode(jsUndefined());
 }
 
@@ -1500,7 +1500,7 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndUserGestureASAD(ExecState* exec) {
     return JSValue::encode(jsUndefined());
 
   imp->withDynamicFrameAndUserGestureASAD(dynamicFrame, intArg, optionalArg,
-                                          processingUserGesture(exec));
+                                          processingUserGesture());
   return JSValue::encode(jsUndefined());
 }
 

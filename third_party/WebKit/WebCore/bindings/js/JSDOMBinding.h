@@ -398,7 +398,7 @@ JSC::JSValue objectToStringFunctionGetter(JSC::ExecState*,
 
 Frame* toLexicalFrame(JSC::ExecState*);
 Frame* toDynamicFrame(JSC::ExecState*);
-bool processingUserGesture(JSC::ExecState*);
+bool processingUserGesture();
 KURL completeURL(JSC::ExecState*, const String& relativeURL);
 
 inline JSC::JSValue jsString(JSC::ExecState* exec, const String& s) {

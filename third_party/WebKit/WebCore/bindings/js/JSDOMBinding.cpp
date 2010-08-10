@@ -720,9 +720,8 @@ Frame* toDynamicFrame(ExecState* exec) {
   return asJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
 }
 
-bool processingUserGesture(ExecState* exec) {
-  Frame* frame = toDynamicFrame(exec);
-  return frame && frame->script()->processingUserGesture(currentWorld(exec));
+bool processingUserGesture() {
+  return ScriptController::processingUserGesture();
 }
 
 KURL completeURL(ExecState* exec, const String& relativeURL) {

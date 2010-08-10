@@ -592,7 +592,7 @@ void JSDOMWindow::setLocation(ExecState* exec, JSValue value) {
     frame->redirectScheduler()->scheduleLocationChange(
         url, lexicalFrame->loader()->outgoingReferrer(),
         !lexicalFrame->script()->anyPageIsProcessingUserGesture(), false,
-        processingUserGesture(exec));
+        processingUserGesture());
   }
 }
 
@@ -810,7 +810,7 @@ static Frame* createWindow(ExecState* exec,
   if (!protocolIsJavaScript(url) || newWindow->allowsAccessFrom(exec)) {
     KURL completedURL =
         url.isEmpty() ? KURL(ParsedURLString, "") : completeURL(exec, url);
-    bool userGesture = processingUserGesture(exec);
+    bool userGesture = processingUserGesture();
 
     if (created)
       newFrame->loader()->changeLocation(completedURL, referrer, false, false,
@@ -825,9 +825,9 @@ static Frame* createWindow(ExecState* exec,
   return newFrame;
 }
 
-static bool domWindowAllowPopUp(Frame* activeFrame, ExecState* exec) {
+static bool domWindowAllowPopUp(Frame* activeFrame) {
   ASSERT(activeFrame);
-  if (activeFrame->script()->processingUserGesture(currentWorld(exec)))
+  if (ScriptController::processingUserGesture())
     return true;
   return DOMWindow::allowPopUp(activeFrame);
 }
@@ -858,7 +858,7 @@ JSValue JSDOMWindow::open(ExecState* exec) {
   // empty framenames.
   // Otherwise, illegitimate window.open() calls with no name will pass right
   // through the popup blocker.
-  if (!domWindowAllowPopUp(dynamicFrame, exec) &&
+  if (!domWindowAllowPopUp(dynamicFrame) &&
       (frameName.isEmpty() || !frame->tree()->find(frameName)))
     return jsUndefined();
 
@@ -886,7 +886,7 @@ JSValue JSDOMWindow::open(ExecState* exec) {
     if (!completedURL.isEmpty() &&
         (!protocolIsJavaScript(completedURL) ||
          (targetedWindow && targetedWindow->allowsAccessFrom(exec)))) {
-      bool userGesture = processingUserGesture(exec);
+      bool userGesture = processingUserGesture();
 
       // For whatever reason, Firefox uses the dynamicGlobalObject to
       // determine the outgoingReferrer.  We replicate that behavior
@@ -942,7 +942,7 @@ JSValue JSDOMWindow::showModalDialog(ExecState* exec) {
     return jsUndefined();
 
   if (!DOMWindow::canShowModalDialogNow(frame) ||
-      !domWindowAllowPopUp(dynamicFrame, exec))
+      !domWindowAllowPopUp(dynamicFrame))
     return jsUndefined();
 
   HashMap<String, String> features;

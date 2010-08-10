@@ -238,7 +238,7 @@ static void navigateIfAllowed(ExecState* exec,
   if (!protocolIsJavaScript(url) || allowsAccessFromFrame(exec, frame))
     frame->redirectScheduler()->scheduleLocationChange(
         url.string(), lexicalFrame->loader()->outgoingReferrer(), lockHistory,
-        lockBackForwardList, processingUserGesture(exec));
+        lockBackForwardList, processingUserGesture());
 }
 
 void JSLocation::setHref(ExecState* exec, JSValue value) {
@@ -372,7 +372,7 @@ JSValue JSLocation::reload(ExecState* exec) {
     return jsUndefined();
 
   if (!protocolIsJavaScript(frame->loader()->url()))
-    frame->redirectScheduler()->scheduleRefresh(processingUserGesture(exec));
+    frame->redirectScheduler()->scheduleRefresh(processingUserGesture());
   return jsUndefined();
 }
 
