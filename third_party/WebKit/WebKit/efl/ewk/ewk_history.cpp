@@ -404,8 +404,8 @@ Eina_Bool ewk_history_limit_set(const Ewk_History* history, int limit) {
  *         free this item with ewk_history_item_free().
  */
 Ewk_History_Item* ewk_history_item_new(const char* uri, const char* title) {
-  WebCore::String u = WebCore::String::fromUTF8(uri);
-  WebCore::String t = WebCore::String::fromUTF8(title);
+  WTF::String u = WTF::String::fromUTF8(uri);
+  WTF::String t = WTF::String::fromUTF8(title);
   WTF::RefPtr<WebCore::HistoryItem> core =
       WebCore::HistoryItem::create(u, t, 0);
   Ewk_History_Item* item = _ewk_history_item_new(core.release().releaseRef());
@@ -493,7 +493,7 @@ void ewk_history_item_title_alternate_set(Ewk_History_Item* item,
   EWK_HISTORY_ITEM_CORE_GET_OR_RETURN(item, core);
   if (!eina_stringshare_replace(&item->alternate_title, title))
     return;
-  core->setAlternateTitle(WebCore::String::fromUTF8(title));
+  core->setAlternateTitle(WTF::String::fromUTF8(title));
 }
 
 /**

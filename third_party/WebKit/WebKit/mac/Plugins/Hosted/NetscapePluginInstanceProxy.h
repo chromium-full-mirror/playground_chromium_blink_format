@@ -32,15 +32,12 @@
 #include <WebCore/Timer.h>
 #include <WebKit/npapi.h>
 #include <wtf/Deque.h>
+#include <wtf/Forward.h>
 #include <wtf/HashMap.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RetainPtr.h>
 #include "WebKitPluginHostTypes.h"
-
-namespace WebCore {
-class String;
-}
 
 namespace JSC {
 namespace Bindings {
@@ -134,7 +131,7 @@ class NetscapePluginInstanceProxy
                                                   // calls aren't balanced).
 
   bool evaluate(uint32_t objectID,
-                const WebCore::String& script,
+                const WTF::String& script,
                 data_t& resultData,
                 mach_msg_type_number_t& resultLength,
                 bool allowPopups);
@@ -256,7 +253,7 @@ class NetscapePluginInstanceProxy
   void didDraw();
   void privateBrowsingModeDidChange(bool isPrivateBrowsingEnabled);
 
-  static void setGlobalException(const WebCore::String&);
+  static void setGlobalException(const WTF::String&);
   static void moveGlobalExceptionToExecState(JSC::ExecState*);
 
   // Reply structs

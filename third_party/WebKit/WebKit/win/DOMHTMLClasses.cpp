@@ -443,7 +443,7 @@ HRESULT STDMETHODCALLTYPE DOMHTMLElement::setInnerHTML(
 HRESULT STDMETHODCALLTYPE DOMHTMLElement::innerText(
     /* [retval][out] */ BSTR* result) {
   ASSERT(m_element && m_element->isHTMLElement());
-  WebCore::String innerTextString =
+  WTF::String innerTextString =
       static_cast<HTMLElement*>(m_element)->innerText();
   *result =
       BString(innerTextString.characters(), innerTextString.length()).release();
@@ -454,7 +454,7 @@ HRESULT STDMETHODCALLTYPE DOMHTMLElement::setInnerText(
     /* [in] */ BSTR text) {
   ASSERT(m_element && m_element->isHTMLElement());
   HTMLElement* htmlEle = static_cast<HTMLElement*>(m_element);
-  WebCore::String textString(text, SysStringLen(text));
+  WTF::String textString(text, SysStringLen(text));
   WebCore::ExceptionCode ec = 0;
   htmlEle->setInnerText(textString, ec);
   return S_OK;
@@ -515,8 +515,7 @@ HRESULT STDMETHODCALLTYPE DOMHTMLFormElement::setAcceptCharset(
 HRESULT STDMETHODCALLTYPE DOMHTMLFormElement::action(
     /* [retval][out] */ BSTR* result) {
   ASSERT(m_element && m_element->hasTagName(formTag));
-  WebCore::String actionString =
-      static_cast<HTMLFormElement*>(m_element)->action();
+  WTF::String actionString = static_cast<HTMLFormElement*>(m_element)->action();
   *result = BString(actionString.characters(), actionString.length()).release();
   return S_OK;
 }
@@ -542,8 +541,7 @@ HRESULT STDMETHODCALLTYPE DOMHTMLFormElement::setEnctype(
 HRESULT STDMETHODCALLTYPE DOMHTMLFormElement::method(
     /* [retval][out] */ BSTR* result) {
   ASSERT(m_element && m_element->hasTagName(formTag));
-  WebCore::String methodString =
-      static_cast<HTMLFormElement*>(m_element)->method();
+  WTF::String methodString = static_cast<HTMLFormElement*>(m_element)->method();
   *result = BString(methodString.characters(), methodString.length()).release();
   return S_OK;
 }
@@ -1072,7 +1070,7 @@ HRESULT STDMETHODCALLTYPE DOMHTMLInputElement::setType(
     /* [in] */ BSTR type) {
   ASSERT(m_element && m_element->hasTagName(inputTag));
   HTMLInputElement* inputElement = static_cast<HTMLInputElement*>(m_element);
-  WebCore::String typeString(type, SysStringLen(type));
+  WTF::String typeString(type, SysStringLen(type));
   inputElement->setType(typeString);
   return S_OK;
 }
@@ -1093,7 +1091,7 @@ HRESULT STDMETHODCALLTYPE DOMHTMLInputElement::value(
     /* [retval][out] */ BSTR* result) {
   ASSERT(m_element && m_element->hasTagName(inputTag));
   HTMLInputElement* inputElement = static_cast<HTMLInputElement*>(m_element);
-  WebCore::String valueString = inputElement->value();
+  WTF::String valueString = inputElement->value();
   *result = BString(valueString.characters(), valueString.length()).release();
   if (valueString.length() && !*result)
     return E_OUTOFMEMORY;
@@ -1405,7 +1403,7 @@ HRESULT STDMETHODCALLTYPE DOMHTMLTextAreaElement::value(
   ASSERT(m_element && m_element->hasTagName(textareaTag));
   HTMLTextAreaElement* textareaElement =
       static_cast<HTMLTextAreaElement*>(m_element);
-  WebCore::String valueString = textareaElement->value();
+  WTF::String valueString = textareaElement->value();
   *result = BString(valueString.characters(), valueString.length()).release();
   if (valueString.length() && !*result)
     return E_OUTOFMEMORY;

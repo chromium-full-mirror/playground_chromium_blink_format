@@ -65,7 +65,7 @@ v8::Handle<v8::Value> SetTimeoutOrInterval(const v8::Arguments& args,
 
   v8::Handle<v8::Context> v8Context = proxy->context();
   if (function->IsString()) {
-    WebCore::String stringFunction = toWebCoreString(function);
+    WTF::String stringFunction = toWebCoreString(function);
     timerId = DOMTimer::install(
         workerContext,
         new ScheduledAction(v8Context, stringFunction, workerContext->url()),

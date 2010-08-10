@@ -34,12 +34,12 @@
 #include "OwnHandle.h"
 #include "ScriptSourceCode.h"
 #include "V8GCController.h"
+#include <wtf/Forward.h>
 
 #include <v8.h>
 
 namespace WebCore {
 
-class String;
 class ScriptExecutionContext;
 class V8Proxy;
 class WorkerContext;
@@ -51,7 +51,7 @@ class ScheduledAction {
                   int argc,
                   v8::Handle<v8::Value> argv[]);
   explicit ScheduledAction(v8::Handle<v8::Context> context,
-                           const WebCore::String& code,
+                           const WTF::String& code,
                            const KURL& url = KURL())
       : m_context(context), m_argc(0), m_argv(0), m_code(code, url) {}
 

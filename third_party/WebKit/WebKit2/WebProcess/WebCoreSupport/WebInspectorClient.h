@@ -43,9 +43,9 @@ class WebInspectorClient : public WebCore::InspectorClient {
 
   virtual WebCore::Page* createPage();
 
-  virtual WebCore::String localizedStringsURL();
+  virtual WTF::String localizedStringsURL();
 
-  virtual WebCore::String hiddenPanels();
+  virtual WTF::String hiddenPanels();
 
   virtual void showWindow();
   virtual void closeWindow();
@@ -58,14 +58,12 @@ class WebInspectorClient : public WebCore::InspectorClient {
   virtual void highlight(WebCore::Node*);
   virtual void hideHighlight();
 
-  virtual void inspectedURLChanged(const WebCore::String& newURL);
+  virtual void inspectedURLChanged(const WTF::String& newURL);
 
-  virtual void populateSetting(const WebCore::String& key,
-                               WebCore::String* value);
-  virtual void storeSetting(const WebCore::String& key,
-                            const WebCore::String& value);
+  virtual void populateSetting(const WTF::String& key, WTF::String* value);
+  virtual void storeSetting(const WTF::String& key, const WTF::String& value);
 
-  virtual bool sendMessageToFrontend(const WebCore::String&);
+  virtual bool sendMessageToFrontend(const WTF::String&);
 
   virtual void inspectorWindowObjectCleared();
 

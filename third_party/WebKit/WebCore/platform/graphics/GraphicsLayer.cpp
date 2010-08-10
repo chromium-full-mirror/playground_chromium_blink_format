@@ -538,7 +538,7 @@ void showGraphicsLayerTree(const WebCore::GraphicsLayer* layer) {
   if (!layer)
     return;
 
-  WebCore::String output = layer->layerTreeAsText(LayerTreeAsTextDebug);
+  WTF::String output = layer->layerTreeAsText(LayerTreeAsTextDebug);
   fprintf(stderr, "%s\n", output.utf8().data());
 }
 #endif

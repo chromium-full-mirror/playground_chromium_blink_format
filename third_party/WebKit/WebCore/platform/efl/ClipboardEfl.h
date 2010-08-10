@@ -56,7 +56,7 @@ class ClipboardEfl : public Clipboard {
 
   virtual bool hasData();
 
-  virtual void writePlainText(const WebCore::String&);
+  virtual void writePlainText(const WTF::String&);
 };
 }
 

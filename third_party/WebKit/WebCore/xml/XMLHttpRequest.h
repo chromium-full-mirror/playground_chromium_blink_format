@@ -185,7 +185,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   RefPtr<TextResourceDecoder> m_decoder;
 
   // Unlike most strings in the DOM, we keep this as a ScriptString, not a
-  // WebCore::String.
+  // WTF::String.
   // That's because these strings can easily get huge (they are filled from the
   // network with
   // no parsing) and because JS can easily observe many intermediate states, so

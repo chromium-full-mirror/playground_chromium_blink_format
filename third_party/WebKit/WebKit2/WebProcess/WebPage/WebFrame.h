@@ -33,13 +33,13 @@
 #include <WebCore/FrameLoaderClient.h>
 #include <WebCore/FrameLoaderTypes.h>
 #include <WebCore/PolicyChecker.h>
+#include <wtf/Forward.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
 class Frame;
 class HTMLFrameOwnerElement;
-class String;
 }
 
 namespace WebKit {
@@ -54,7 +54,7 @@ class WebFrame : public APIObject {
 
   static PassRefPtr<WebFrame> createMainFrame(WebPage*);
   static PassRefPtr<WebFrame> createSubframe(WebPage*,
-                                             const WebCore::String& frameName,
+                                             const WTF::String& frameName,
                                              WebCore::HTMLFrameOwnerElement*);
   ~WebFrame();
 
@@ -73,9 +73,9 @@ class WebFrame : public APIObject {
 
   // WKBundleFrame API and SPI functions
   bool isMainFrame() const;
-  WebCore::String name() const;
-  WebCore::String url() const;
-  WebCore::String innerText() const;
+  WTF::String name() const;
+  WTF::String url() const;
+  WTF::String innerText() const;
   PassRefPtr<ImmutableArray> childFrames();
   JSValueRef computedStyleIncludingVisitedInfo(JSObjectRef element);
   JSGlobalContextRef jsContext();
@@ -84,12 +84,12 @@ class WebFrame : public APIObject {
   JSValueRef jsWrapperForWorld(InjectedBundleNodeHandle*,
                                InjectedBundleScriptWorld*);
 
-  static WebCore::String counterValue(JSObjectRef element);
-  static WebCore::String markerText(JSObjectRef element);
+  static WTF::String counterValue(JSObjectRef element);
+  static WTF::String markerText(JSObjectRef element);
 
   unsigned numberOfActiveAnimations();
-  bool pauseAnimationOnElementWithId(const WebCore::String& animationName,
-                                     const WebCore::String& elementID,
+  bool pauseAnimationOnElementWithId(const WTF::String& animationName,
+                                     const WTF::String& elementID,
                                      double time);
 
   unsigned pendingUnloadCount();
@@ -110,10 +110,10 @@ class WebFrame : public APIObject {
 
  private:
   static PassRefPtr<WebFrame> create(WebPage*,
-                                     const WebCore::String& frameName,
+                                     const WTF::String& frameName,
                                      WebCore::HTMLFrameOwnerElement*);
   WebFrame(WebPage*,
-           const WebCore::String& frameName,
+           const WTF::String& frameName,
            WebCore::HTMLFrameOwnerElement*);
 
   virtual Type type() const { return APIType; }

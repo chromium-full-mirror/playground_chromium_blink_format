@@ -159,7 +159,7 @@ void DebuggerAgentManager::debugDetach(DebuggerAgentImpl* debuggerAgent) {
     }
   } else {
     // Remove all breakpoints set by the agent.
-    WebCore::String clearBreakpointGroupCmd = WebCore::String::format(
+    WTF::String clearBreakpointGroupCmd = WTF::String::format(
         "{\"seq\":1,\"type\":\"request\",\"command\":\"clearbreakpointgroup\","
         "\"arguments\":{\"groupId\":%d}}",
         hostId);
@@ -177,7 +177,7 @@ void DebuggerAgentManager::debugDetach(DebuggerAgentImpl* debuggerAgent) {
 void DebuggerAgentManager::onV8DebugMessage(const v8::Debug::Message& message) {
   v8::HandleScope scope;
   v8::String::Value value(message.GetJSON());
-  WebCore::String out(reinterpret_cast<const UChar*>(*value), value.length());
+  WTF::String out(reinterpret_cast<const UChar*>(*value), value.length());
 
   // If callerData is not 0 the message is a response to a debugger command.
   if (v8::Debug::ClientData* callerData = message.GetClientData()) {
@@ -250,9 +250,8 @@ void DebuggerAgentManager::pauseScript() {
     v8::Debug::DebugBreak();
 }
 
-void DebuggerAgentManager::executeDebuggerCommand(
-    const WebCore::String& command,
-    int callerId) {
+void DebuggerAgentManager::executeDebuggerCommand(const WTF::String& command,
+                                                  int callerId) {
   sendCommandToV8(command, new CallerIdWrapper(callerId));
 }
 
@@ -285,14 +284,14 @@ void DebuggerAgentManager::onNavigate() {
     DebuggerAgentManager::sendContinueCommandToV8();
 }
 
-void DebuggerAgentManager::sendCommandToV8(const WebCore::String& cmd,
+void DebuggerAgentManager::sendCommandToV8(const WTF::String& cmd,
                                            v8::Debug::ClientData* data) {
   v8::Debug::SendCommand(reinterpret_cast<const uint16_t*>(cmd.characters()),
                          cmd.length(), data);
 }
 
 void DebuggerAgentManager::sendContinueCommandToV8() {
-  WebCore::String continueCmd(
+  WTF::String continueCmd(
       "{\"seq\":1,\"type\":\"request\",\"command\":\"continue\"}");
   sendCommandToV8(continueCmd, new CallerIdWrapper());
 }

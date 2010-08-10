@@ -26,14 +26,13 @@
 #ifndef CanvasNumberArray_h
 #define CanvasNumberArray_h
 
+#include <wtf/Forward.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/Vector.h>
 #include <limits>
 
 namespace WebCore {
-
-class String;
 
 class CanvasNumberArray : public RefCounted<CanvasNumberArray> {
  public:

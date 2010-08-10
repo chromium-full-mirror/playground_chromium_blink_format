@@ -60,7 +60,7 @@ void WebSpeechInputControllerMockImpl::didCompleteRecognition() {
 }
 
 void WebSpeechInputControllerMockImpl::setRecognitionResult(
-    const WebCore::String& result) {
+    const WTF::String& result) {
   m_listener->setRecognitionResult(result);
 }
 

@@ -26,9 +26,6 @@
 #include <WebCore/ContextMenuClient.h>
 #include <wtf/Forward.h>
 
-namespace WebCore {
-class String;
-}
 class WebView;
 
 class WebContextMenuClient : public WebCore::ContextMenuClient {
@@ -44,7 +41,7 @@ class WebContextMenuClient : public WebCore::ContextMenuClient {
   virtual void downloadURL(const WebCore::KURL&);
   virtual void searchWithGoogle(const WebCore::Frame*);
   virtual void lookUpInDictionary(WebCore::Frame*);
-  virtual void speak(const WebCore::String&);
+  virtual void speak(const WTF::String&);
   virtual void stopSpeaking();
   virtual bool isSpeaking();
 

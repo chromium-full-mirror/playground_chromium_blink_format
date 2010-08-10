@@ -131,7 +131,7 @@ class FileReader : public RefCounted<FileReader>,
   TextEncoding m_encoding;
 
   // Like XMLHttpRequest.m_responseText, we keep this as a ScriptString, not a
-  // WebCore::String.
+  // WTF::String.
   // That's because these strings can easily get huge (they are filled from the
   // file) and
   // because JS can easily observe many intermediate states, so it's very useful

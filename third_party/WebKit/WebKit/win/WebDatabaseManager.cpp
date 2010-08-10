@@ -392,7 +392,7 @@ void WebKitInitializeWebDatabasesIfNecessary() {
   if (initialized)
     return;
 
-  WebCore::String databasesDirectory = WebCore::pathByAppendingComponent(
+  WTF::String databasesDirectory = WebCore::pathByAppendingComponent(
       WebCore::localUserSpecificStorageDirectory(), "Databases");
   WebCore::DatabaseTracker::initializeTracker(databasesDirectory);
 

@@ -186,7 +186,7 @@ void WebProcessProxy::getPlugins(bool refresh, Vector<PluginInfo>& plugins) {
 
 void WebProcessProxy::getPluginHostConnection(const String& mimeType,
                                               const KURL& url,
-                                              WebCore::String& pluginPath) {
+                                              WTF::String& pluginPath) {
   String newMimeType = mimeType.lower();
 
   PluginInfoStore::Plugin plugin =

@@ -36,9 +36,8 @@ class WebDatabaseTrackerClient : public WebCore::DatabaseTrackerClient {
 
   virtual ~WebDatabaseTrackerClient();
   virtual void dispatchDidModifyOrigin(WebCore::SecurityOrigin*);
-  virtual void dispatchDidModifyDatabase(
-      WebCore::SecurityOrigin*,
-      const WebCore::String& databaseIdentifier);
+  virtual void dispatchDidModifyDatabase(WebCore::SecurityOrigin*,
+                                         const WTF::String& databaseIdentifier);
 
  private:
   WebDatabaseTrackerClient();

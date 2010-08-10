@@ -26,7 +26,7 @@
 // FIXME: Remove this redundant name!
 #include <wtf/text/StringImpl.h>
 namespace JSC {
-typedef WebCore::StringImpl UStringImpl;
+typedef StringImpl UStringImpl;
 }
 
 #endif

@@ -31,6 +31,7 @@
 #include "c_utility.h"
 
 #include "CRuntimeObject.h"
+#include "JSDOMBinding.h"
 #include "JSDOMWindow.h"
 #include "NP_jsobject.h"
 #include "c_instance.h"
@@ -42,8 +43,6 @@
 #include "runtime_object.h"
 #include "runtime_root.h"
 #include <wtf/Assertions.h>
-
-using WebCore::String;
 
 namespace JSC {
 namespace Bindings {
@@ -130,7 +129,8 @@ JSValue convertNPVariantToValue(ExecState* exec,
   if (type == NPVariantType_Double)
     return jsNumber(exec, NPVARIANT_TO_DOUBLE(*variant));
   if (type == NPVariantType_String)
-    return jsString(exec, convertNPStringToUTF16(&variant->value.stringValue));
+    return WebCore::jsString(
+        exec, convertNPStringToUTF16(&variant->value.stringValue));
   if (type == NPVariantType_Object) {
     NPObject* obj = variant->value.objectValue;
 
@@ -151,8 +151,8 @@ String convertNPStringToUTF16(const NPString* string) {
 }
 
 Identifier identifierFromNPIdentifier(ExecState* exec, const NPUTF8* name) {
-  return Identifier(
-      exec, stringToUString(convertUTF8ToUTF16WithLatin1Fallback(name, -1)));
+  return Identifier(exec, WebCore::stringToUString(
+                              convertUTF8ToUTF16WithLatin1Fallback(name, -1)));
 }
 }
 }

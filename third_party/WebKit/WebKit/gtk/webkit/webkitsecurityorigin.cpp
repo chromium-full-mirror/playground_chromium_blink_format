@@ -237,7 +237,7 @@ G_CONST_RETURN gchar* webkit_security_origin_get_protocol(
   g_return_val_if_fail(WEBKIT_IS_SECURITY_ORIGIN(securityOrigin), NULL);
 
   WebKitSecurityOriginPrivate* priv = securityOrigin->priv;
-  WebCore::String protocol = priv->coreOrigin->protocol();
+  WTF::String protocol = priv->coreOrigin->protocol();
 
   if (!priv->protocol)
     priv->protocol = g_strdup(protocol.utf8().data());
@@ -260,7 +260,7 @@ G_CONST_RETURN gchar* webkit_security_origin_get_host(
   g_return_val_if_fail(WEBKIT_IS_SECURITY_ORIGIN(securityOrigin), NULL);
 
   WebKitSecurityOriginPrivate* priv = securityOrigin->priv;
-  WebCore::String host = priv->coreOrigin->host();
+  WTF::String host = priv->coreOrigin->host();
 
   if (!priv->host)
     priv->host = g_strdup(host.utf8().data());
@@ -368,7 +368,7 @@ GList* webkit_security_origin_get_all_web_databases(
 
 #if ENABLE(DATABASE)
   WebCore::SecurityOrigin* coreOrigin = core(securityOrigin);
-  Vector<WebCore::String> databaseNames;
+  Vector<WTF::String> databaseNames;
 
   if (!WebCore::DatabaseTracker::tracker().databaseNamesForOrigin(
           coreOrigin, databaseNames))

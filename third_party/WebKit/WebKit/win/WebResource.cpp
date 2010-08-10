@@ -41,9 +41,9 @@ using namespace WebCore;
 
 WebResource::WebResource(IStream* data,
                          const WebCore::KURL& url,
-                         const WebCore::String& mimeType,
-                         const WebCore::String& textEncodingName,
-                         const WebCore::String& frameName)
+                         const WTF::String& mimeType,
+                         const WTF::String& textEncodingName,
+                         const WTF::String& frameName)
     : m_refCount(0),
       m_data(data),
       m_url(url),

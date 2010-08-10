@@ -42,14 +42,14 @@ class CommandLine {
 #elif PLATFORM(WIN)
   bool parse(LPTSTR commandLineString);
 #endif
-  WebCore::String operator[](const WebCore::String& key) const {
+  WTF::String operator[](const WTF::String& key) const {
     return m_args.get(key);
   }
 
  private:
   bool m_parsedSuccessfully;
 
-  HashMap<WebCore::String, WebCore::String> m_args;
+  HashMap<WTF::String, WTF::String> m_args;
 };
 }
 

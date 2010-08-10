@@ -33,7 +33,7 @@
 #include "StaticConstructors.h"
 #include "StringImpl.h"
 
-namespace WebCore {
+namespace WTF {
 
 StringImpl* StringImpl::empty() {
   // FIXME: This works around a bug in our port of PCRE, that a regular

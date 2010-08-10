@@ -27,10 +27,7 @@
 #define WebHistoryClient_h
 
 #include "WKContext.h"
-
-namespace WebCore {
-class String;
-}
+#include <wtf/Forward.h>
 
 namespace WebKit {
 
@@ -50,18 +47,18 @@ class WebHistoryClient {
                                      WebFrameProxy*);
   void didPerformClientRedirect(WebContext*,
                                 WebPageProxy*,
-                                const WebCore::String& sourceURL,
-                                const WebCore::String& destinationURL,
+                                const WTF::String& sourceURL,
+                                const WTF::String& destinationURL,
                                 WebFrameProxy*);
   void didPerformServerRedirect(WebContext*,
                                 WebPageProxy*,
-                                const WebCore::String& sourceURL,
-                                const WebCore::String& destinationURL,
+                                const WTF::String& sourceURL,
+                                const WTF::String& destinationURL,
                                 WebFrameProxy*);
   void didUpdateHistoryTitle(WebContext*,
                              WebPageProxy*,
-                             const WebCore::String& title,
-                             const WebCore::String& url,
+                             const WTF::String& title,
+                             const WTF::String& url,
                              WebFrameProxy*);
   void populateVisitedLinks(WebContext*);
 

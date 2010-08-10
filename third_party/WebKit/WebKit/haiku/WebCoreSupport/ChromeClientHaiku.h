@@ -113,7 +113,7 @@ class ChromeClientHaiku : public ChromeClient {
                            String& result);
   bool shouldInterruptJavaScript();
 
-  void setStatusbarText(const WebCore::String&);
+  void setStatusbarText(const WTF::String&);
   bool tabsToLinks() const;
   IntRect windowResizerRect() const;
 

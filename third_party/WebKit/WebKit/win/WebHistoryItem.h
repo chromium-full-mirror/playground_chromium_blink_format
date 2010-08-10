@@ -120,7 +120,7 @@ class WebHistoryItem : public IWebHistoryItem, IWebHistoryItemPrivate {
   ULONG m_refCount;
 
   RefPtr<WebCore::HistoryItem> m_historyItem;
-  WebCore::String m_alternateTitle;
+  WTF::String m_alternateTitle;
 };
 
 #endif

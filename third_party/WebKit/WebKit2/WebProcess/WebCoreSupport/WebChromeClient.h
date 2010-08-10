@@ -85,23 +85,23 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void addMessageToConsole(WebCore::MessageSource,
                                    WebCore::MessageType,
                                    WebCore::MessageLevel,
-                                   const WebCore::String& message,
+                                   const WTF::String& message,
                                    unsigned int lineNumber,
-                                   const WebCore::String& sourceID);
+                                   const WTF::String& sourceID);
 
   virtual bool canRunBeforeUnloadConfirmPanel();
-  virtual bool runBeforeUnloadConfirmPanel(const WebCore::String& message,
+  virtual bool runBeforeUnloadConfirmPanel(const WTF::String& message,
                                            WebCore::Frame* frame);
 
   virtual void closeWindowSoon();
 
-  virtual void runJavaScriptAlert(WebCore::Frame*, const WebCore::String&);
-  virtual bool runJavaScriptConfirm(WebCore::Frame*, const WebCore::String&);
+  virtual void runJavaScriptAlert(WebCore::Frame*, const WTF::String&);
+  virtual bool runJavaScriptConfirm(WebCore::Frame*, const WTF::String&);
   virtual bool runJavaScriptPrompt(WebCore::Frame*,
-                                   const WebCore::String& message,
-                                   const WebCore::String& defaultValue,
-                                   WebCore::String& result);
-  virtual void setStatusbarText(const WebCore::String&);
+                                   const WTF::String& message,
+                                   const WTF::String& defaultValue,
+                                   WTF::String& result);
+  virtual void setStatusbarText(const WTF::String&);
   virtual bool shouldInterruptJavaScript();
   virtual bool tabsToLinks() const;
 
@@ -128,13 +128,13 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void mouseDidMoveOverElement(const WebCore::HitTestResult&,
                                        unsigned modifierFlags);
 
-  virtual void setToolTip(const WebCore::String&, WebCore::TextDirection);
+  virtual void setToolTip(const WTF::String&, WebCore::TextDirection);
 
   virtual void print(WebCore::Frame*);
 
 #if ENABLE(DATABASE)
   virtual void exceededDatabaseQuota(WebCore::Frame*,
-                                     const WebCore::String& databaseName);
+                                     const WTF::String& databaseName);
 #endif
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
@@ -150,19 +150,19 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual WebCore::FloatRect customHighlightRect(
       WebCore::Node*,
-      const WebCore::AtomicString& type,
+      const WTF::AtomicString& type,
       const WebCore::FloatRect& lineRect);
   virtual void paintCustomHighlight(WebCore::Node*,
-                                    const WebCore::AtomicString& type,
+                                    const WTF::AtomicString& type,
                                     const WebCore::FloatRect& boxRect,
                                     const WebCore::FloatRect& lineRect,
                                     bool behindText,
                                     bool entireLine);
 
   virtual bool shouldReplaceWithGeneratedFileForUpload(
-      const WebCore::String& path,
-      WebCore::String& generatedFilename);
-  virtual WebCore::String generateReplacementFile(const WebCore::String& path);
+      const WTF::String& path,
+      WTF::String& generatedFilename);
+  virtual WTF::String generateReplacementFile(const WTF::String& path);
 
   virtual bool paintCustomScrollbar(WebCore::GraphicsContext*,
                                     const WebCore::FloatRect&,
@@ -187,7 +187,7 @@ class WebChromeClient : public WebCore::ChromeClient {
       WebCore::Geolocation*);
 
   virtual void runOpenPanel(WebCore::Frame*, PassRefPtr<WebCore::FileChooser>);
-  virtual void chooseIconForFiles(const Vector<WebCore::String>&,
+  virtual void chooseIconForFiles(const Vector<WTF::String>&,
                                   WebCore::FileChooser*);
 
   virtual void setCursor(const WebCore::Cursor&);
@@ -226,7 +226,7 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void setLastSetCursorToCurrentCursor();
 #endif
 
-  WebCore::String m_cachedToolTip;
+  WTF::String m_cachedToolTip;
   WebPage* m_page;
 };
 

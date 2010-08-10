@@ -28,10 +28,7 @@
 
 #include "WKBundlePage.h"
 #include <JavaScriptCore/JSBase.h>
-
-namespace WebCore {
-class String;
-}
+#include <wtf/Forward.h>
 
 namespace WebKit {
 
@@ -49,7 +46,7 @@ class InjectedBundlePageLoaderClient {
   void didCommitLoadForFrame(WebPage*, WebFrame*);
   void didFinishLoadForFrame(WebPage*, WebFrame*);
   void didFailLoadWithErrorForFrame(WebPage*, WebFrame*);
-  void didReceiveTitleForFrame(WebPage*, const WebCore::String&, WebFrame*);
+  void didReceiveTitleForFrame(WebPage*, const WTF::String&, WebFrame*);
   void didClearWindowObjectForFrame(WebPage*,
                                     WebFrame*,
                                     JSGlobalContextRef,
@@ -57,7 +54,7 @@ class InjectedBundlePageLoaderClient {
   void didCancelClientRedirectForFrame(WebPage*, WebFrame*);
   void willPerformClientRedirectForFrame(WebPage*,
                                          WebFrame*,
-                                         const WebCore::String& url,
+                                         const WTF::String& url,
                                          double delay,
                                          double date);
   void didChangeLocationWithinPageForFrame(WebPage*, WebFrame*);

@@ -69,7 +69,7 @@ WebDOMString WebDOMTestObj::readOnlyStringAttr() const {
   if (!impl())
     return WebDOMString();
 
-  return static_cast<const WebCore::String&>(impl()->readOnlyStringAttr());
+  return static_cast<const WTF::String&>(impl()->readOnlyStringAttr());
 }
 
 WebDOMTestObj WebDOMTestObj::readOnlyTestObjAttr() const {
@@ -126,7 +126,7 @@ WebDOMString WebDOMTestObj::stringAttr() const {
   if (!impl())
     return WebDOMString();
 
-  return static_cast<const WebCore::String&>(impl()->stringAttr());
+  return static_cast<const WTF::String&>(impl()->stringAttr());
 }
 
 void WebDOMTestObj::setStringAttr(const WebDOMString& newStringAttr) {
@@ -182,7 +182,7 @@ WebDOMString WebDOMTestObj::reflectedStringAttr() const {
   if (!impl())
     return WebDOMString();
 
-  return static_cast<const WebCore::String&>(
+  return static_cast<const WTF::String&>(
       impl()->getAttribute(WebCore::HTMLNames::reflectedstringattrAttr));
 }
 
@@ -230,7 +230,7 @@ WebDOMString WebDOMTestObj::reflectedURLAttr() const {
   if (!impl())
     return WebDOMString();
 
-  return static_cast<const WebCore::String&>(
+  return static_cast<const WTF::String&>(
       impl()->getURLAttribute(WebCore::HTMLNames::reflectedurlattrAttr));
 }
 
@@ -247,7 +247,7 @@ WebDOMString WebDOMTestObj::reflectedNonEmptyURLAttr() const {
   if (!impl())
     return WebDOMString();
 
-  return static_cast<const WebCore::String&>(impl()->getNonEmptyURLAttribute(
+  return static_cast<const WTF::String&>(impl()->getNonEmptyURLAttribute(
       WebCore::HTMLNames::reflectednonemptyurlattrAttr));
 }
 
@@ -264,7 +264,7 @@ WebDOMString WebDOMTestObj::reflectedStringAttr() const {
   if (!impl())
     return WebDOMString();
 
-  return static_cast<const WebCore::String&>(
+  return static_cast<const WTF::String&>(
       impl()->getAttribute(WebCore::HTMLNames::customContentStringAttrAttr));
 }
 
@@ -315,7 +315,7 @@ WebDOMString WebDOMTestObj::reflectedCustomURLAttr() const {
   if (!impl())
     return WebDOMString();
 
-  return static_cast<const WebCore::String&>(
+  return static_cast<const WTF::String&>(
       impl()->getURLAttribute(WebCore::HTMLNames::customContentURLAttrAttr));
 }
 
@@ -332,7 +332,7 @@ WebDOMString WebDOMTestObj::reflectedCustomNonEmptyURLAttr() const {
   if (!impl())
     return WebDOMString();
 
-  return static_cast<const WebCore::String&>(impl()->getNonEmptyURLAttribute(
+  return static_cast<const WTF::String&>(impl()->getNonEmptyURLAttribute(
       WebCore::HTMLNames::customContentNonEmptyURLAttrAttr));
 }
 
@@ -387,7 +387,7 @@ WebDOMString WebDOMTestObj::stringAttrWithGetterException() const {
   WebCore::ExceptionCode ec = 0;
   WebDOMString result = impl()->stringAttrWithGetterException(ec);
   webDOMRaiseError(static_cast<WebDOMExceptionCode>(ec));
-  return static_cast<const WebCore::String&>(result);
+  return static_cast<const WTF::String&>(result);
 }
 
 void WebDOMTestObj::setStringAttrWithGetterException(
@@ -405,7 +405,7 @@ WebDOMString WebDOMTestObj::stringAttrWithSetterException() const {
   if (!impl())
     return WebDOMString();
 
-  return static_cast<const WebCore::String&>(
+  return static_cast<const WTF::String&>(
       impl()->stringAttrWithSetterException());
 }
 
@@ -424,7 +424,7 @@ WebDOMString WebDOMTestObj::scriptStringAttr() const {
   if (!impl())
     return WebDOMString();
 
-  return static_cast<const WebCore::String&>(impl()->scriptStringAttr());
+  return static_cast<const WTF::String&>(impl()->scriptStringAttr());
 }
 
 #if ENABLE(Condition1)
@@ -500,7 +500,7 @@ WebDOMString WebDOMTestObj::hash() const {
   if (!impl())
     return WebDOMString();
 
-  return static_cast<const WebCore::String&>(impl()->hash());
+  return static_cast<const WTF::String&>(impl()->hash());
 }
 
 void WebDOMTestObj::voidMethod() {
@@ -581,7 +581,7 @@ void WebDOMTestObj::serializedValue(const WebDOMString& serializedArg) {
     return;
 
   impl()->serializedValue(
-      WebCore::SerializedScriptValue::create(WebCore::String(serializedArg)));
+      WebCore::SerializedScriptValue::create(WTF::String(serializedArg)));
 }
 
 void WebDOMTestObj::idbKey(const WebDOMIDBKey& key) {

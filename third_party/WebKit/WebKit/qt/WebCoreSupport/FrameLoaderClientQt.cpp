@@ -1050,7 +1050,7 @@ WebCore::Frame* FrameLoaderClientQt::dispatchCreatePage() {
 
 void FrameLoaderClientQt::dispatchDecidePolicyForMIMEType(
     FramePolicyFunction function,
-    const WebCore::String& MIMEType,
+    const WTF::String& MIMEType,
     const WebCore::ResourceRequest&) {
   // we need to call directly here
   const ResourceResponse& response =
@@ -1069,7 +1069,7 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNewWindowAction(
     const WebCore::NavigationAction& action,
     const WebCore::ResourceRequest& request,
     PassRefPtr<WebCore::FormState>,
-    const WebCore::String&) {
+    const WTF::String&) {
   Q_ASSERT(m_webFrame);
   QNetworkRequest r(request.toNetworkRequest(m_webFrame));
   QWebPage* page = m_webFrame->page();

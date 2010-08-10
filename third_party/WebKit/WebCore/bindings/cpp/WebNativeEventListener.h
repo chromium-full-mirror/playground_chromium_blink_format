@@ -45,8 +45,8 @@ class WebNativeEventListener : public WebCore::EventListener {
  private:
   virtual void handleEvent(WebCore::ScriptExecutionContext*, WebCore::Event*);
   virtual bool reportError(WebCore::ScriptExecutionContext*,
-                           const WebCore::String& message,
-                           const WebCore::String& url,
+                           const WTF::String& message,
+                           const WTF::String& url,
                            int lineNumber);
 
  protected:

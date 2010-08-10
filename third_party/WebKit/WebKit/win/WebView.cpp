@@ -3211,9 +3211,7 @@ HRESULT STDMETHODCALLTYPE WebView::stringByEvaluatingJavaScriptFromString(
     return E_FAIL;
 
   JSC::JSValue scriptExecutionResult =
-      coreFrame->script()
-          ->executeScript(WebCore::String(script), true)
-          .jsValue();
+      coreFrame->script()->executeScript(WTF::String(script), true).jsValue();
   if (!scriptExecutionResult)
     return E_FAIL;
   else if (scriptExecutionResult.isString()) {
@@ -5905,7 +5903,7 @@ HRESULT STDMETHODCALLTYPE WebView::registerEmbeddedViewMIMEType(BSTR mimeType) {
   return S_OK;
 }
 
-bool WebView::shouldUseEmbeddedView(const WebCore::String& mimeType) const {
+bool WebView::shouldUseEmbeddedView(const WTF::String& mimeType) const {
   if (!m_embeddedViewMIMETypes)
     return false;
 

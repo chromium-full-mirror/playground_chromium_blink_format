@@ -49,7 +49,7 @@ class WebDragClient : public WebCore::DragClient {
                          WebCore::Frame*,
                          bool);
   virtual WebCore::DragImageRef createDragImageForLink(WebCore::KURL&,
-                                                       const WebCore::String&,
+                                                       const WTF::String&,
                                                        WebCore::Frame*);
 
  private:

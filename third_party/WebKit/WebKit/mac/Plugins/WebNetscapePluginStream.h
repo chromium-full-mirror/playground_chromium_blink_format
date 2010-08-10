@@ -100,7 +100,7 @@ class WebNetscapePluginStream
   void startStream(NSURL*,
                    long long expectedContentLength,
                    NSDate* lastModifiedDate,
-                   const WebCore::String& mimeType,
+                   const WTF::String& mimeType,
                    NSData* headers);
 
   NSError* pluginCancelledConnectionError() const;

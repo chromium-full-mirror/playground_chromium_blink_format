@@ -29,6 +29,7 @@
 #include "RunLoop.h"
 #include <WebCore/FileSystem.h>
 #include <WebCore/npruntime_internal.h>
+#include <wtf/Forward.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
@@ -36,7 +37,6 @@
 
 namespace WebCore {
 class KURL;
-class String;
 }
 
 namespace WebKit {
@@ -61,14 +61,14 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
   void didReceiveResponse(const WebCore::KURL& responseURL,
                           uint32_t streamLength,
                           uint32_t lastModifiedTime,
-                          const WebCore::String& mimeType,
-                          const WebCore::String& headers);
+                          const WTF::String& mimeType,
+                          const WTF::String& headers);
   void didReceiveData(const char* bytes, int length);
   void didFinishLoading();
   void didFail(bool wasCancelled);
 
-  void sendJavaScriptStream(const WebCore::String& requestURLString,
-                            const WebCore::String& result);
+  void sendJavaScriptStream(const WTF::String& requestURLString,
+                            const WTF::String& result);
 
   void stop(NPReason);
   NPError destroy(NPReason);
@@ -79,11 +79,11 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
                        bool sendNotification,
                        void* notificationData);
 
-  bool start(const WebCore::String& responseURLString,
+  bool start(const WTF::String& responseURLString,
              uint32_t streamLength,
              uint32_t lastModifiedTime,
-             const WebCore::String& mimeType,
-             const WebCore::String& headers);
+             const WTF::String& mimeType,
+             const WTF::String& headers);
 
   void cancel();
   void notifyAndDestroyStream(NPReason);

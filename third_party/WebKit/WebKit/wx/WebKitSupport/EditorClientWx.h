@@ -115,8 +115,7 @@ class EditorClientWx : public EditorClient {
   virtual void showSpellingUI(bool show);
   virtual bool spellingUIIsShowing();
   virtual void getGuessesForWord(const String&, Vector<String>& guesses);
-  virtual String getAutoCorrectSuggestionForMisspelledWord(
-      const WebCore::String&);
+  virtual String getAutoCorrectSuggestionForMisspelledWord(const WTF::String&);
 
   virtual void willSetInputMethodState();
   virtual void setInputMethodState(bool enabled);

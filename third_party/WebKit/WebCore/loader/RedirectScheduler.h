@@ -34,6 +34,7 @@
 
 #include "Event.h"
 #include "Timer.h"
+#include <wtf/Forward.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/PassOwnPtr.h>
 #include <wtf/PassRefPtr.h>
@@ -43,7 +44,6 @@ namespace WebCore {
 class FormState;
 class FormSubmission;
 class Frame;
-class String;
 
 struct FrameLoadRequest;
 class ScheduledNavigation;

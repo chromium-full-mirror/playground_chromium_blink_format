@@ -137,10 +137,10 @@ WebCore::Page* ewk_view_core_page_get(const Evas_Object* o);
 WTF::PassRefPtr<WebCore::Frame> ewk_view_frame_create(
     Evas_Object* o,
     Evas_Object* frame,
-    const WebCore::String& name,
+    const WTF::String& name,
     WebCore::HTMLFrameOwnerElement* ownerElement,
     const WebCore::KURL& url,
-    const WebCore::String& referrer);
+    const WTF::String& referrer);
 
 WTF::PassRefPtr<WebCore::Widget> ewk_view_plugin_create(
     Evas_Object* o,
@@ -148,9 +148,9 @@ WTF::PassRefPtr<WebCore::Widget> ewk_view_plugin_create(
     const WebCore::IntSize& pluginSize,
     WebCore::HTMLPlugInElement* element,
     const WebCore::KURL& url,
-    const WTF::Vector<WebCore::String>& paramNames,
-    const WTF::Vector<WebCore::String>& paramValues,
-    const WebCore::String& mimeType,
+    const WTF::Vector<WTF::String>& paramNames,
+    const WTF::Vector<WTF::String>& paramValues,
+    const WTF::String& mimeType,
     bool loadManually);
 
 void ewk_view_popup_new(Evas_Object* o,
@@ -188,9 +188,9 @@ Eina_Bool ewk_frame_init(Evas_Object* o,
                          WebCore::Frame* frame);
 Evas_Object* ewk_frame_child_add(Evas_Object* o,
                                  WTF::PassRefPtr<WebCore::Frame> child,
-                                 const WebCore::String& name,
+                                 const WTF::String& name,
                                  const WebCore::KURL& url,
-                                 const WebCore::String& referrer);
+                                 const WTF::String& referrer);
 
 WebCore::Frame* ewk_frame_core_get(const Evas_Object* o);
 void ewk_frame_core_gone(Evas_Object* o);
@@ -237,9 +237,9 @@ WTF::PassRefPtr<WebCore::Widget> ewk_frame_plugin_create(
     const WebCore::IntSize& pluginSize,
     WebCore::HTMLPlugInElement* element,
     const WebCore::KURL& url,
-    const WTF::Vector<WebCore::String>& paramNames,
-    const WTF::Vector<WebCore::String>& paramValues,
-    const WebCore::String& mimeType,
+    const WTF::Vector<WTF::String>& paramNames,
+    const WTF::Vector<WTF::String>& paramValues,
+    const WTF::String& mimeType,
     bool loadManually);
 
 #ifdef __cplusplus

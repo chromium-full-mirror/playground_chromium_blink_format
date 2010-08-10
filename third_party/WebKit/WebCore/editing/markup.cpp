@@ -840,7 +840,7 @@ class MarkupAccumulatorWrapper {
                         ("<span class=\"" AppleStyleSpanClass "\" style=\""));
     DEFINE_STATIC_LOCAL(const String, styleSpanClose, ("</span>"));
     Vector<UChar> openTag;
-    WebCore::append(openTag, isBlock ? divStyle : styleSpanOpen);
+    WTF::append(openTag, isBlock ? divStyle : styleSpanOpen);
     appendAttributeValue(openTag, style->cssText(), document->isHTMLDocument());
     openTag.append('\"');
     openTag.append('>');
@@ -867,10 +867,10 @@ class MarkupAccumulatorWrapper {
     result.reserveInitialCapacity(length);
 
     for (size_t i = preCount; i > 0; --i)
-      WebCore::append(result, preMarkups[i - 1]);
+      WTF::append(result, preMarkups[i - 1]);
 
     for (size_t i = 0; i < postCount; ++i)
-      WebCore::append(result, postMarkups[i]);
+      WTF::append(result, postMarkups[i]);
 
     return String::adopt(result);
   }

@@ -45,9 +45,9 @@ class WebResource : public IWebResource {
  protected:
   WebResource(IStream* data,
               const WebCore::KURL& url,
-              const WebCore::String& mimeType,
-              const WebCore::String& textEncodingName,
-              const WebCore::String& frameName);
+              const WTF::String& mimeType,
+              const WTF::String& textEncodingName,
+              const WTF::String& frameName);
   ~WebResource();
 
  public:
@@ -84,9 +84,9 @@ class WebResource : public IWebResource {
   ULONG m_refCount;
   COMPtr<IStream> m_data;
   WebCore::KURL m_url;
-  WebCore::String m_mimeType;
-  WebCore::String m_textEncodingName;
-  WebCore::String m_frameName;
+  WTF::String m_mimeType;
+  WTF::String m_textEncodingName;
+  WTF::String m_frameName;
 };
 
 #endif

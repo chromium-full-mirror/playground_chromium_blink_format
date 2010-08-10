@@ -34,20 +34,20 @@
 class WebNavigationData : public IWebNavigationData {
  public:
   static WebNavigationData* createInstance(
-      const WebCore::String& url,
-      const WebCore::String& title,
+      const WTF::String& url,
+      const WTF::String& title,
       IWebURLRequest*,
       IWebURLResponse*,
       bool hasSubstituteData,
-      const WebCore::String& clientRedirectSource);
+      const WTF::String& clientRedirectSource);
 
  private:
-  WebNavigationData(const WebCore::String& url,
-                    const WebCore::String& title,
+  WebNavigationData(const WTF::String& url,
+                    const WTF::String& title,
                     IWebURLRequest*,
                     IWebURLResponse*,
                     bool hasSubstituteData,
-                    const WebCore::String& clientRedirectSource);
+                    const WTF::String& clientRedirectSource);
   ~WebNavigationData();
 
  public:

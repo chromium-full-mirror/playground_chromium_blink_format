@@ -53,7 +53,7 @@ class WebEditorClient : public WebCore::EditorClient {
 
   virtual bool shouldBeginEditing(WebCore::Range*);
   virtual bool shouldEndEditing(WebCore::Range*);
-  virtual bool shouldInsertText(const WebCore::String&,
+  virtual bool shouldInsertText(const WTF::String&,
                                 WebCore::Range*,
                                 WebCore::EditorInsertAction);
 
@@ -107,27 +107,27 @@ class WebEditorClient : public WebCore::EditorClient {
   void handleKeyboardEvent(WebCore::KeyboardEvent*);
   void handleInputMethodKeydown(WebCore::KeyboardEvent*);
 
-  virtual void ignoreWordInSpellDocument(const WebCore::String&);
-  virtual void learnWord(const WebCore::String&);
+  virtual void ignoreWordInSpellDocument(const WTF::String&);
+  virtual void learnWord(const WTF::String&);
   virtual void checkSpellingOfString(const UChar*,
                                      int length,
                                      int* misspellingLocation,
                                      int* misspellingLength);
-  virtual WebCore::String getAutoCorrectSuggestionForMisspelledWord(
-      const WebCore::String&);
+  virtual WTF::String getAutoCorrectSuggestionForMisspelledWord(
+      const WTF::String&);
   virtual void checkGrammarOfString(const UChar*,
                                     int length,
                                     Vector<WebCore::GrammarDetail>&,
                                     int* badGrammarLocation,
                                     int* badGrammarLength);
   virtual void updateSpellingUIWithGrammarString(
-      const WebCore::String&,
+      const WTF::String&,
       const WebCore::GrammarDetail& detail);
-  virtual void updateSpellingUIWithMisspelledWord(const WebCore::String&);
+  virtual void updateSpellingUIWithMisspelledWord(const WTF::String&);
   virtual void showSpellingUI(bool show);
   virtual bool spellingUIIsShowing();
-  virtual void getGuessesForWord(const WebCore::String&,
-                                 Vector<WebCore::String>& guesses);
+  virtual void getGuessesForWord(const WTF::String&,
+                                 Vector<WTF::String>& guesses);
 
   virtual void willSetInputMethodState();
   virtual void setInputMethodState(bool);

@@ -121,7 +121,7 @@ void InjectedBundlePageLoaderClient::didCancelClientRedirectForFrame(
 void InjectedBundlePageLoaderClient::willPerformClientRedirectForFrame(
     WebPage* page,
     WebFrame* frame,
-    const WebCore::String& url,
+    const WTF::String& url,
     double delay,
     double date) {
   if (m_client.willPerformClientRedirectForFrame)

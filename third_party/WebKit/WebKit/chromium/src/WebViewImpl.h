@@ -471,7 +471,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   // Inspector settings.
   WebString m_inspectorSettings;
 
-  typedef HashMap<WebCore::String, WebCore::String> SettingsMap;
+  typedef HashMap<WTF::String, WTF::String> SettingsMap;
   OwnPtr<SettingsMap> m_inspectorSettingsMap;
   OwnPtr<DragScrollTimer> m_dragScrollTimer;
 

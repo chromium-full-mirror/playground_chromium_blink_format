@@ -55,9 +55,9 @@ void wxWebEditCommand::SetNodeAttribute(WebDOMElement* element,
   if (m_impl)
     m_impl->setElementAttribute(
         element->impl(),
-        WebCore::QualifiedName(WebCore::nullAtom, WebCore::String(name),
+        WebCore::QualifiedName(WebCore::nullAtom, WTF::String(name),
                                WebCore::nullAtom),
-        WebCore::String(value));
+        WTF::String(value));
 }
 
 void wxWebEditCommand::Apply() {

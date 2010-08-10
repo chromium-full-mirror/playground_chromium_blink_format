@@ -28,10 +28,7 @@
 
 #include "WKPage.h"
 #include <WebCore/FrameLoaderTypes.h>
-
-namespace WebCore {
-class String;
-}
+#include <wtf/Forward.h>
 
 namespace WebKit {
 
@@ -46,17 +43,17 @@ class WebPolicyClient {
 
   bool decidePolicyForNavigationAction(WebPageProxy*,
                                        WebCore::NavigationType,
-                                       const WebCore::String& url,
+                                       const WTF::String& url,
                                        WebFrameProxy*,
                                        WebFramePolicyListenerProxy*);
   bool decidePolicyForNewWindowAction(WebPageProxy*,
                                       WebCore::NavigationType,
-                                      const WebCore::String& url,
+                                      const WTF::String& url,
                                       WebFrameProxy*,
                                       WebFramePolicyListenerProxy*);
   bool decidePolicyForMIMEType(WebPageProxy*,
-                               const WebCore::String&,
-                               const WebCore::String& url,
+                               const WTF::String&,
+                               const WTF::String& url,
                                WebFrameProxy*,
                                WebFramePolicyListenerProxy*);
 

@@ -88,20 +88,20 @@ class ChromeClientImpl : public WebCore::ChromeClientChromium {
   virtual void addMessageToConsole(WebCore::MessageSource,
                                    WebCore::MessageType,
                                    WebCore::MessageLevel,
-                                   const WebCore::String& message,
+                                   const WTF::String& message,
                                    unsigned lineNumber,
-                                   const WebCore::String& sourceID);
+                                   const WTF::String& sourceID);
   virtual bool canRunBeforeUnloadConfirmPanel();
-  virtual bool runBeforeUnloadConfirmPanel(const WebCore::String& message,
+  virtual bool runBeforeUnloadConfirmPanel(const WTF::String& message,
                                            WebCore::Frame*);
   virtual void closeWindowSoon();
-  virtual void runJavaScriptAlert(WebCore::Frame*, const WebCore::String&);
-  virtual bool runJavaScriptConfirm(WebCore::Frame*, const WebCore::String&);
+  virtual void runJavaScriptAlert(WebCore::Frame*, const WTF::String&);
+  virtual bool runJavaScriptConfirm(WebCore::Frame*, const WTF::String&);
   virtual bool runJavaScriptPrompt(WebCore::Frame*,
-                                   const WebCore::String& message,
-                                   const WebCore::String& defaultValue,
-                                   WebCore::String& result);
-  virtual void setStatusbarText(const WebCore::String& message);
+                                   const WTF::String& message,
+                                   const WTF::String& defaultValue,
+                                   WTF::String& result);
+  virtual void setStatusbarText(const WTF::String& message);
   virtual bool shouldInterruptJavaScript();
   virtual bool tabsToLinks() const;
   virtual WebCore::IntRect windowResizerRect() const;
@@ -121,11 +121,11 @@ class ChromeClientImpl : public WebCore::ChromeClientChromium {
   virtual void scrollbarsModeDidChange() const;
   virtual void mouseDidMoveOverElement(const WebCore::HitTestResult& result,
                                        unsigned modifierFlags);
-  virtual void setToolTip(const WebCore::String& tooltipText,
+  virtual void setToolTip(const WTF::String& tooltipText,
                           WebCore::TextDirection);
   virtual void print(WebCore::Frame*);
   virtual void exceededDatabaseQuota(WebCore::Frame*,
-                                     const WebCore::String& databaseName);
+                                     const WTF::String& databaseName);
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   virtual void reachedMaxAppCacheSize(int64_t spaceNeeded);
   virtual void reachedApplicationCacheOriginQuota(WebCore::SecurityOrigin*);
@@ -139,7 +139,7 @@ class ChromeClientImpl : public WebCore::ChromeClientChromium {
       WebCore::Frame*,
       WebCore::Geolocation*);
   virtual void runOpenPanel(WebCore::Frame*, PassRefPtr<WebCore::FileChooser>);
-  virtual void chooseIconForFiles(const Vector<WebCore::String>&,
+  virtual void chooseIconForFiles(const Vector<WTF::String>&,
                                   WebCore::FileChooser*);
   virtual void setCursor(const WebCore::Cursor&) {}
   virtual void formStateDidChange(const WebCore::Node*);

@@ -38,8 +38,8 @@ void WebNativeEventListener::handleEvent(WebCore::ScriptExecutionContext*,
 }
 
 bool WebNativeEventListener::reportError(WebCore::ScriptExecutionContext*,
-                                         const WebCore::String&,
-                                         const WebCore::String&,
+                                         const WTF::String&,
+                                         const WTF::String&,
                                          int) {
   // FIXME: Implement error handling
   return false;

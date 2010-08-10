@@ -505,7 +505,7 @@ void InspectorDOMAgent::changeTagName(long nodeId,
     pushChildNodesToFrontend(*newId);
 }
 
-void InspectorDOMAgent::getOuterHTML(long nodeId, WebCore::String* outerHTML) {
+void InspectorDOMAgent::getOuterHTML(long nodeId, WTF::String* outerHTML) {
   Node* node = nodeForId(nodeId);
   if (!node || !node->isHTMLElement())
     return;

@@ -31,10 +31,10 @@ class WebSearchPopupMenu : public WebCore::SearchPopupMenu {
   WebSearchPopupMenu(WebCore::PopupMenuClient*);
 
   virtual WebCore::PopupMenu* popupMenu();
-  virtual void saveRecentSearches(const WebCore::AtomicString& name,
-                                  const Vector<WebCore::String>& searchItems);
-  virtual void loadRecentSearches(const WebCore::AtomicString& name,
-                                  Vector<WebCore::String>& searchItems);
+  virtual void saveRecentSearches(const WTF::AtomicString& name,
+                                  const Vector<WTF::String>& searchItems);
+  virtual void loadRecentSearches(const WTF::AtomicString& name,
+                                  Vector<WTF::String>& searchItems);
   virtual bool enabled();
 
  private:

@@ -45,10 +45,9 @@ class WebDragClient : public WebCore::DragClient {
                          WebCore::Clipboard*,
                          WebCore::Frame*,
                          bool linkDrag);
-  virtual WebCore::DragImageRef createDragImageForLink(
-      WebCore::KURL& url,
-      const WebCore::String& label,
-      WebCore::Frame*);
+  virtual WebCore::DragImageRef createDragImageForLink(WebCore::KURL& url,
+                                                       const WTF::String& label,
+                                                       WebCore::Frame*);
   virtual void declareAndWriteDragImage(NSPasteboard*,
                                         DOMElement*,
                                         NSURL*,

@@ -45,9 +45,9 @@ class NetscapePluginHostManager {
   static NetscapePluginHostManager& shared();
 
   PassRefPtr<NetscapePluginInstanceProxy> instantiatePlugin(
-      const WebCore::String& pluginPath,
+      const WTF::String& pluginPath,
       cpu_type_t pluginArchitecture,
-      const WebCore::String& bundleIdentifier,
+      const WTF::String& bundleIdentifier,
       WebHostedNetscapePluginView*,
       NSString* mimeType,
       NSArray* attributeKeys,
@@ -60,22 +60,21 @@ class NetscapePluginHostManager {
 
   void pluginHostDied(NetscapePluginHostProxy*);
 
-  static void createPropertyListFile(const WebCore::String& pluginPath,
+  static void createPropertyListFile(const WTF::String& pluginPath,
                                      cpu_type_t pluginArchitecture);
 
   void didCreateWindow();
 
  private:
-  NetscapePluginHostProxy* hostForPlugin(
-      const WebCore::String& pluginPath,
-      cpu_type_t pluginArchitecture,
-      const WebCore::String& bundleIdentifier,
-      bool useProxiedOpenPanel);
+  NetscapePluginHostProxy* hostForPlugin(const WTF::String& pluginPath,
+                                         cpu_type_t pluginArchitecture,
+                                         const WTF::String& bundleIdentifier,
+                                         bool useProxiedOpenPanel);
 
   NetscapePluginHostManager();
   ~NetscapePluginHostManager();
 
-  bool spawnPluginHost(const WebCore::String& pluginPath,
+  bool spawnPluginHost(const WTF::String& pluginPath,
                        cpu_type_t pluginArchitecture,
                        mach_port_t clientPort,
                        mach_port_t& pluginHostPort,
@@ -88,7 +87,7 @@ class NetscapePluginHostManager {
 
   // FIXME: This should really be a HashMap of RetainPtrs, but that doesn't work
   // right now.
-  typedef HashMap<WebCore::String, NetscapePluginHostProxy*> PluginHostMap;
+  typedef HashMap<WTF::String, NetscapePluginHostProxy*> PluginHostMap;
   PluginHostMap m_pluginHosts;
 };
 

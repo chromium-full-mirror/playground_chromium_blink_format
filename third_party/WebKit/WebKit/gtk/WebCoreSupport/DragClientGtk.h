@@ -56,10 +56,9 @@ class DragClient : public WebCore::DragClient {
                          WebCore::Clipboard*,
                          WebCore::Frame*,
                          bool linkDrag = false);
-  virtual WebCore::DragImageRef createDragImageForLink(
-      WebCore::KURL&,
-      const WebCore::String& label,
-      WebCore::Frame*);
+  virtual WebCore::DragImageRef createDragImageForLink(WebCore::KURL&,
+                                                       const WTF::String& label,
+                                                       WebCore::Frame*);
 
   virtual void dragControllerDestroyed();
 

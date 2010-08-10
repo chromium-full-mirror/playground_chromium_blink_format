@@ -75,7 +75,6 @@ class ScriptString;
 class SecurityOrigin;
 class SharedBuffer;
 class SubstituteData;
-class String;
 class Widget;
 
 typedef void (PolicyChecker::*FramePolicyFunction)(PolicyAction);

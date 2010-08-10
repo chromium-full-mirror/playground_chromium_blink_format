@@ -27,10 +27,10 @@
 #define WebPluginHalterClient_h
 
 #include <WebCore/PluginHalterClient.h>
+#include <wtf/Forward.h>
 
 namespace WebCore {
 class Node;
-class String;
 }
 
 class WebView;
@@ -41,7 +41,7 @@ class WebPluginHalterClient : public WebCore::PluginHalterClient {
 
   virtual bool shouldHaltPlugin(WebCore::Node* n,
                                 bool isWindowed,
-                                const WebCore::String& pluginName) const;
+                                const WTF::String& pluginName) const;
   virtual bool enabled() const;
 
  private:

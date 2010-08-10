@@ -424,7 +424,7 @@ void WebPage::show() {
                                           m_pageID, CoreIPC::In());
 }
 
-void WebPage::runJavaScriptInMainFrame(const WebCore::String& script,
+void WebPage::runJavaScriptInMainFrame(const WTF::String& script,
                                        uint64_t callbackID) {
   // NOTE: We need to be careful when running scripts that the objects we depend
   // on don't

@@ -48,8 +48,7 @@ namespace WebCore {
 // can access the responseText attribute of the XMLHttpRequest object.
 // JavaScript
 // may also query the responseXML attribute of the XMLHttpRequest object which
-// results in the responseText attribute being coerced into a WebCore::String
-// and
+// results in the responseText attribute being coerced into a WTF::String and
 // then parsed as an XML document.
 // This implementation optimizes for the common case where the responseText is
 // built up with many calls to operator+= before the actual text is queried.

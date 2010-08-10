@@ -72,7 +72,7 @@ class WebWorkerImpl : public WebWorkerBase, public WebWorker {
   static void postMessageToWorkerContextTask(
       WebCore::ScriptExecutionContext* context,
       WebWorkerImpl* thisPtr,
-      const WebCore::String& message,
+      const WTF::String& message,
       PassOwnPtr<WebCore::MessagePortChannelArray> channels);
 
   WebWorkerClient* m_client;

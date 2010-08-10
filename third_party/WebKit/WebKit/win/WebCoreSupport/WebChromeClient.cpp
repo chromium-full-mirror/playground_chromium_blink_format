@@ -809,9 +809,8 @@ void WebChromeClient::runOpenPanel(Frame*,
   // buffer is too small.  For now, this will fail silently.
 }
 
-void WebChromeClient::chooseIconForFiles(
-    const Vector<WebCore::String>& filenames,
-    WebCore::FileChooser* chooser) {
+void WebChromeClient::chooseIconForFiles(const Vector<WTF::String>& filenames,
+                                         WebCore::FileChooser* chooser) {
   chooser->iconLoaded(Icon::createIconForFiles(filenames));
 }
 

@@ -31,11 +31,11 @@
 #include "SharedMemory.h"
 #include "VisitedLinkTable.h"
 #include <WebCore/LinkHash.h>
+#include <wtf/Forward.h>
 #include <wtf/HashMap.h>
 
 namespace WebCore {
 class IntSize;
-class String;
 }
 
 namespace WebKit {
@@ -78,12 +78,12 @@ class WebProcess : CoreIPC::Connection::Client {
   void shutdown();
 
 #if ENABLE(WEB_PROCESS_SANDBOX)
-  void loadInjectedBundle(const WebCore::String&, const WebCore::String&);
+  void loadInjectedBundle(const WTF::String&, const WTF::String&);
 #else
-  void loadInjectedBundle(const WebCore::String&);
+  void loadInjectedBundle(const WTF::String&);
 #endif
-  void setApplicationCacheDirectory(const WebCore::String&);
-  void registerURLSchemeAsEmptyDocument(const WebCore::String&);
+  void setApplicationCacheDirectory(const WTF::String&);
+  void registerURLSchemeAsEmptyDocument(const WTF::String&);
 
   void setVisitedLinkTable(const SharedMemory::Handle&);
   void visitedLinkStateChanged(const Vector<WebCore::LinkHash>& linkHashes);

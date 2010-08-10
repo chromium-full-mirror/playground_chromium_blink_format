@@ -154,7 +154,7 @@ static bool isSupportedTransferMode(uint16_t transferMode) {
   return false;
 }
 
-bool NetscapePluginStream::start(const WebCore::String& responseURLString,
+bool NetscapePluginStream::start(const WTF::String& responseURLString,
                                  uint32_t streamLength,
                                  uint32_t lastModifiedTime,
                                  const String& mimeType,

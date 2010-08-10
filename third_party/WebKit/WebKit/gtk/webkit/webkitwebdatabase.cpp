@@ -339,7 +339,7 @@ G_CONST_RETURN gchar* webkit_web_database_get_display_name(
   WebCore::DatabaseDetails details =
       WebCore::DatabaseTracker::tracker().detailsForNameAndOrigin(
           priv->name, core(priv->origin));
-  WebCore::String displayName = details.displayName();
+  WTF::String displayName = details.displayName();
 
   if (displayName.isEmpty())
     return "";
@@ -420,8 +420,8 @@ G_CONST_RETURN gchar* webkit_web_database_get_filename(
 
 #if ENABLE(DATABASE)
   WebKitWebDatabasePrivate* priv = webDatabase->priv;
-  WebCore::String coreName = WebCore::String::fromUTF8(priv->name);
-  WebCore::String corePath =
+  WTF::String coreName = WTF::String::fromUTF8(priv->name);
+  WTF::String corePath =
       WebCore::DatabaseTracker::tracker().fullPathForDatabase(
           core(priv->origin), coreName);
 
@@ -482,7 +482,7 @@ void webkit_remove_all_web_databases() {
  **/
 G_CONST_RETURN gchar* webkit_get_web_database_directory_path() {
 #if ENABLE(DATABASE)
-  WebCore::String path =
+  WTF::String path =
       WebCore::DatabaseTracker::tracker().databaseDirectoryPath();
 
   if (path.isEmpty())
@@ -507,7 +507,7 @@ G_CONST_RETURN gchar* webkit_get_web_database_directory_path() {
  **/
 void webkit_set_web_database_directory_path(const gchar* path) {
 #if ENABLE(DATABASE)
-  WebCore::String corePath = WebCore::String::fromUTF8(path);
+  WTF::String corePath = WTF::String::fromUTF8(path);
   WebCore::DatabaseTracker::tracker().setDatabaseDirectoryPath(corePath);
 
   g_free(webkit_database_directory_path);

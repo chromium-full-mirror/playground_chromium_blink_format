@@ -53,5 +53,4 @@ WTFThreadData::~WTFThreadData() {
   delete m_defaultIdentifierTable;
 #endif
 }
-
-}  // namespace WebCore
+}

@@ -115,7 +115,7 @@ static bool booleanValueForPreferencesValue(CFPropertyListRef value) {
 
 static CFDictionaryRef defaultSettings;
 
-static HashMap<WebCore::String, COMPtr<WebPreferences>> webPreferencesInstances;
+static HashMap<WTF::String, COMPtr<WebPreferences>> webPreferencesInstances;
 
 WebPreferences* WebPreferences::sharedStandardPreferences() {
   static WebPreferences* standardPreferences;
@@ -162,14 +162,14 @@ WebPreferences* WebPreferences::getInstanceForIdentifier(BSTR identifier) {
   if (!identifier)
     return sharedStandardPreferences();
 
-  WebCore::String identifierString(identifier, SysStringLen(identifier));
+  WTF::String identifierString(identifier, SysStringLen(identifier));
   return webPreferencesInstances.get(identifierString).get();
 }
 
 void WebPreferences::setInstance(WebPreferences* instance, BSTR identifier) {
   if (!identifier || !instance)
     return;
-  WebCore::String identifierString(identifier, SysStringLen(identifier));
+  WTF::String identifierString(identifier, SysStringLen(identifier));
   webPreferencesInstances.add(identifierString, instance);
 }
 
@@ -177,7 +177,7 @@ void WebPreferences::removeReferenceForIdentifier(BSTR identifier) {
   if (!identifier || webPreferencesInstances.isEmpty())
     return;
 
-  WebCore::String identifierString(identifier, SysStringLen(identifier));
+  WTF::String identifierString(identifier, SysStringLen(identifier));
   WebPreferences* webPreference =
       webPreferencesInstances.get(identifierString).get();
   if (webPreference && webPreference->m_refCount == 1)
@@ -211,7 +211,7 @@ void WebPreferences::initializeDefaultSettings() {
                        CFSTR("16"));
   CFDictionaryAddValue(defaults, CFSTR(WebKitDefaultFixedFontSizePreferenceKey),
                        CFSTR("13"));
-  WebCore::String defaultDefaultEncoding(LPCTSTR_UI_STRING(
+  WTF::String defaultDefaultEncoding(LPCTSTR_UI_STRING(
       "ISO-8859-1", "The default, default character encoding"));
   CFDictionaryAddValue(defaults,
                        CFSTR(WebKitDefaultTextEncodingNamePreferenceKey),

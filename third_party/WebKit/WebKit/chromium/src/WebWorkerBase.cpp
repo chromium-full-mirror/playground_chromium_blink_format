@@ -66,11 +66,11 @@ class AllowDatabaseMainThreadBridge
  public:
   static PassRefPtr<AllowDatabaseMainThreadBridge> create(
       WebWorkerBase* worker,
-      const WebCore::String& mode,
+      const WTF::String& mode,
       WebCommonWorkerClient* commonClient,
       WebFrame* frame,
-      const WebCore::String& name,
-      const WebCore::String& displayName,
+      const WTF::String& name,
+      const WTF::String& displayName,
       unsigned long estimatedSize) {
     return adoptRef(new AllowDatabaseMainThreadBridge(
         worker, mode, commonClient, frame, name, displayName, estimatedSize));
@@ -94,11 +94,11 @@ class AllowDatabaseMainThreadBridge
 
  private:
   AllowDatabaseMainThreadBridge(WebWorkerBase* worker,
-                                const WebCore::String& mode,
+                                const WTF::String& mode,
                                 WebCommonWorkerClient* commonClient,
                                 WebFrame* frame,
-                                const WebCore::String& name,
-                                const WebCore::String& displayName,
+                                const WTF::String& name,
+                                const WTF::String& displayName,
                                 unsigned long estimatedSize)
       : m_worker(worker), m_mode(mode) {
     worker->dispatchTaskToMainThread(createCallbackTask(
@@ -110,8 +110,8 @@ class AllowDatabaseMainThreadBridge
       WebCore::ScriptExecutionContext* context,
       WebCommonWorkerClient* commonClient,
       WebFrame* frame,
-      const WebCore::String name,
-      const WebCore::String displayName,
+      const WTF::String name,
+      const WTF::String displayName,
       unsigned long estimatedSize,
       PassRefPtr<AllowDatabaseMainThreadBridge> bridge) {
     if (!commonClient)
@@ -130,7 +130,7 @@ class AllowDatabaseMainThreadBridge
   bool m_result;
   Mutex m_mutex;
   WebWorkerBase* m_worker;
-  WebCore::String m_mode;
+  WTF::String m_mode;
 };
 }
 

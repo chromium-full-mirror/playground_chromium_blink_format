@@ -44,7 +44,7 @@ class WebContextMenuClient : public WebCore::ContextMenuClient {
   virtual void searchWithGoogle(const WebCore::Frame*);
   virtual void lookUpInDictionary(WebCore::Frame*);
   virtual bool isSpeaking();
-  virtual void speak(const WebCore::String&);
+  virtual void speak(const WTF::String&);
   virtual void stopSpeaking();
   virtual void searchWithSpotlight();
 

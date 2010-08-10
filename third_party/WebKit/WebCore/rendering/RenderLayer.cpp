@@ -4316,7 +4316,7 @@ void showLayerTree(const WebCore::RenderLayer* layer) {
     return;
 
   if (WebCore::Frame* frame = layer->renderer()->frame()) {
-    WebCore::String output = externalRepresentation(
+    WTF::String output = externalRepresentation(
         frame, WebCore::RenderAsTextShowAllLayers |
                    WebCore::RenderAsTextShowLayerNesting |
                    WebCore::RenderAsTextShowCompositedLayers |

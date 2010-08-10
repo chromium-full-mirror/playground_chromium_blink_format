@@ -27,10 +27,7 @@
 #define WebContextInjectedBundleClient_h
 
 #include "WKContext.h"
-
-namespace WebCore {
-class String;
-}
+#include <wtf/Forward.h>
 
 namespace WebKit {
 
@@ -43,7 +40,7 @@ class WebContextInjectedBundleClient {
   void initialize(const WKContextInjectedBundleClient*);
 
   void didReceiveMessageFromInjectedBundle(WebContext*,
-                                           const WebCore::String&,
+                                           const WTF::String&,
                                            APIObject*);
 
  private:

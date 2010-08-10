@@ -81,7 +81,7 @@ class WebDatabaseManager : public IWebDatabaseManager,
   // DatabaseTrackerClient
   virtual void dispatchDidModifyOrigin(WebCore::SecurityOrigin*);
   virtual void dispatchDidModifyDatabase(WebCore::SecurityOrigin*,
-                                         const WebCore::String& databaseName);
+                                         const WTF::String& databaseName);
 
  private:
   WebDatabaseManager();

@@ -32,7 +32,7 @@
 #include <objc/objc-auto.h>
 #endif
 
-namespace WebCore {
+namespace WTF {
 
 namespace StringWrapperCFAllocator {
 
@@ -47,7 +47,7 @@ static void release(const void*) {
 }
 
 static CFStringRef copyDescription(const void*) {
-  return CFSTR("WebCore::String-based allocator");
+  return CFSTR("WTF::String-based allocator");
 }
 
 static void* allocate(CFIndex size, CFOptionFlags, void*) {

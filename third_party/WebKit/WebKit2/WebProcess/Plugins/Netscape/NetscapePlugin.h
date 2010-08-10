@@ -57,19 +57,17 @@ class NetscapePlugin : public Plugin {
 
   void invalidate(const NPRect*);
   const char* userAgent();
-  void loadURL(const WebCore::String& method,
-               const WebCore::String& urlString,
-               const WebCore::String& target,
+  void loadURL(const WTF::String& method,
+               const WTF::String& urlString,
+               const WTF::String& target,
                const WebCore::HTTPHeaderMap& headerFields,
                const Vector<char>& httpBody,
                bool sendNotification,
                void* notificationData);
   NPError destroyStream(NPStream*, NPReason);
-  void setStatusbarText(const WebCore::String&);
-  static void setException(const WebCore::String&);
-  bool evaluate(NPObject*,
-                const WebCore::String& scriptString,
-                NPVariant* result);
+  void setStatusbarText(const WTF::String&);
+  static void setException(const WTF::String&);
+  bool evaluate(NPObject*, const WTF::String& scriptString, NPVariant* result);
 
   // These return retained objects.
   NPObject* windowScriptNPObject();
@@ -133,14 +131,14 @@ class NetscapePlugin : public Plugin {
   virtual void frameDidFinishLoading(uint64_t requestID);
   virtual void frameDidFail(uint64_t requestID, bool wasCancelled);
   virtual void didEvaluateJavaScript(uint64_t requestID,
-                                     const WebCore::String& requestURLString,
-                                     const WebCore::String& result);
+                                     const WTF::String& requestURLString,
+                                     const WTF::String& result);
   virtual void streamDidReceiveResponse(uint64_t streamID,
                                         const WebCore::KURL& responseURL,
                                         uint32_t streamLength,
                                         uint32_t lastModifiedTime,
-                                        const WebCore::String& mimeType,
-                                        const WebCore::String& headers);
+                                        const WTF::String& mimeType,
+                                        const WTF::String& headers);
   virtual void streamDidReceiveData(uint64_t streamID,
                                     const char* bytes,
                                     int length);
@@ -149,8 +147,8 @@ class NetscapePlugin : public Plugin {
   virtual void manualStreamDidReceiveResponse(const WebCore::KURL& responseURL,
                                               uint32_t streamLength,
                                               uint32_t lastModifiedTime,
-                                              const WebCore::String& mimeType,
-                                              const WebCore::String& headers);
+                                              const WTF::String& mimeType,
+                                              const WTF::String& headers);
   virtual void manualStreamDidReceiveData(const char* bytes, int length);
   virtual void manualStreamDidFinishLoading();
   virtual void manualStreamDidFail(bool wasCancelled);
@@ -167,8 +165,7 @@ class NetscapePlugin : public Plugin {
   PluginController* m_pluginController;
   uint64_t m_nextRequestID;
 
-  typedef HashMap<uint64_t, std::pair<WebCore::String, void*>>
-      PendingURLNotifyMap;
+  typedef HashMap<uint64_t, std::pair<WTF::String, void*>> PendingURLNotifyMap;
   PendingURLNotifyMap m_pendingURLNotifications;
 
   typedef HashMap<uint64_t, RefPtr<NetscapePluginStream>> StreamsMap;

@@ -27,10 +27,7 @@
 #define InjectedBundlePageUIClient_h
 
 #include "WKBundlePage.h"
-
-namespace WebCore {
-class String;
-}
+#include <wtf/Forward.h>
 
 namespace WebKit {
 
@@ -43,14 +40,14 @@ class InjectedBundlePageUIClient {
   void initialize(WKBundlePageUIClient*);
 
   void willAddMessageToConsole(WebPage*,
-                               const WebCore::String& message,
+                               const WTF::String& message,
                                int32_t lineNumber);
-  void willSetStatusbarText(WebPage*, const WebCore::String&);
-  void willRunJavaScriptAlert(WebPage*, const WebCore::String&, WebFrame*);
-  void willRunJavaScriptConfirm(WebPage*, const WebCore::String&, WebFrame*);
+  void willSetStatusbarText(WebPage*, const WTF::String&);
+  void willRunJavaScriptAlert(WebPage*, const WTF::String&, WebFrame*);
+  void willRunJavaScriptConfirm(WebPage*, const WTF::String&, WebFrame*);
   void willRunJavaScriptPrompt(WebPage*,
-                               const WebCore::String&,
-                               const WebCore::String&,
+                               const WTF::String&,
+                               const WTF::String&,
                                WebFrame*);
 
  private:

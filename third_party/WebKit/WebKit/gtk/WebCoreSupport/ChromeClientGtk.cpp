@@ -262,7 +262,7 @@ bool ChromeClient::canRunBeforeUnloadConfirmPanel() {
   return true;
 }
 
-bool ChromeClient::runBeforeUnloadConfirmPanel(const WebCore::String& message,
+bool ChromeClient::runBeforeUnloadConfirmPanel(const WTF::String& message,
                                                WebCore::Frame* frame) {
   return runJavaScriptConfirm(frame, message);
 }
@@ -270,9 +270,9 @@ bool ChromeClient::runBeforeUnloadConfirmPanel(const WebCore::String& message,
 void ChromeClient::addMessageToConsole(WebCore::MessageSource source,
                                        WebCore::MessageType type,
                                        WebCore::MessageLevel level,
-                                       const WebCore::String& message,
+                                       const WTF::String& message,
                                        unsigned int lineNumber,
-                                       const WebCore::String& sourceId) {
+                                       const WTF::String& sourceId) {
   gboolean retval;
   g_signal_emit_by_name(m_webView, "console-message", message.utf8().data(),
                         lineNumber, sourceId.utf8().data(), &retval);
@@ -585,7 +585,7 @@ void ChromeClient::runOpenPanel(Frame*,
   gtk_widget_destroy(dialog);
 }
 
-void ChromeClient::chooseIconForFiles(const Vector<WebCore::String>& filenames,
+void ChromeClient::chooseIconForFiles(const Vector<WTF::String>& filenames,
                                       WebCore::FileChooser* chooser) {
   chooser->iconLoaded(Icon::createIconForFiles(filenames));
 }

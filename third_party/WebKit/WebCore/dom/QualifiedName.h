@@ -215,8 +215,7 @@ struct HashTraits<WebCore::QualifiedName>
     : GenericHashTraits<WebCore::QualifiedName> {
   static const bool emptyValueIsZero = false;
   static WebCore::QualifiedName emptyValue() {
-    return WebCore::QualifiedName(WebCore::nullAtom, WebCore::nullAtom,
-                                  WebCore::nullAtom);
+    return WebCore::QualifiedName(nullAtom, nullAtom, nullAtom);
   }
   static void constructDeletedValue(WebCore::QualifiedName& slot) {
     new (&slot) WebCore::QualifiedName(WTF::HashTableDeletedValue);

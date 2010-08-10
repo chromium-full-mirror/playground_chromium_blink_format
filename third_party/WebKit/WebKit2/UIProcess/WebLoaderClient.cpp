@@ -86,7 +86,7 @@ void WebLoaderClient::didFailLoadWithErrorForFrame(WebPageProxy* page,
 }
 
 void WebLoaderClient::didReceiveTitleForFrame(WebPageProxy* page,
-                                              WebCore::StringImpl* title,
+                                              WTF::StringImpl* title,
                                               WebFrameProxy* frame) {
   if (m_pageLoaderClient.didReceiveTitleForFrame)
     m_pageLoaderClient.didReceiveTitleForFrame(

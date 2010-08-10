@@ -129,8 +129,8 @@ class DECLSPEC_UUID("3dbd565b-db22-4d88-8e0e-778bde54524a") AccessibleBase
   AccessibleBase(WebCore::AccessibilityObject*);
   virtual ~AccessibleBase();
 
-  virtual WebCore::String name() const;
-  virtual WebCore::String value() const;
+  virtual WTF::String name() const;
+  virtual WTF::String value() const;
   virtual long role() const;
 
   HRESULT getAccessibilityObjectForChild(VARIANT vChild,

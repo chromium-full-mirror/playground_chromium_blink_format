@@ -70,7 +70,7 @@ void WebFrameProxy::didFinishLoad() {
   m_loadState = LoadStateFinished;
 }
 
-void WebFrameProxy::didReceiveTitle(const WebCore::String&) {}
+void WebFrameProxy::didReceiveTitle(const WTF::String&) {}
 
 void WebFrameProxy::receivedPolicyDecision(WebCore::PolicyAction action,
                                            uint64_t listenerID) {
