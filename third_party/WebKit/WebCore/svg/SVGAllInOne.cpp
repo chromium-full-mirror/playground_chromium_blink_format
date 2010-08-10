@@ -126,6 +126,7 @@
 #include "SVGPathSegLinetoVertical.cpp"
 #include "SVGPathSegList.cpp"
 #include "SVGPathSegListBuilder.cpp"
+#include "SVGPathSegListSource.cpp"
 #include "SVGPathSegMoveto.cpp"
 #include "SVGPathStringBuilder.cpp"
 #include "SVGPathStringSource.cpp"
