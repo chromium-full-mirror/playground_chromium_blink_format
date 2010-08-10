@@ -35,7 +35,8 @@ class SVGPathParserFactory {
   static SVGPathParserFactory* self();
 
   bool buildPathFromString(const String&, Path&);
-  bool buildPathFromByteStream(SVGPathByteStream*, Path& result);
+  bool buildPathFromByteStream(SVGPathByteStream*, Path&);
+  bool buildPathFromSVGPathSegList(SVGPathSegList*, Path&);
 
   bool buildSVGPathSegListFromString(const String&,
                                      SVGPathSegList*,
@@ -45,6 +46,7 @@ class SVGPathParserFactory {
                                          PathParsingMode);
 
   bool buildStringFromByteStream(SVGPathByteStream*, String&, PathParsingMode);
+  bool buildStringFromSVGPathSegList(SVGPathSegList*, String&, PathParsingMode);
 
   bool buildSVGPathByteStreamFromString(const String&,
                                         OwnPtr<SVGPathByteStream>&,

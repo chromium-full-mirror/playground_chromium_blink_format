@@ -25,12 +25,6 @@
 
 namespace WebCore {
 
-String SVGPathSegArc::toString() const {
-  return pathSegTypeAsLetter() +
-         String::format(" %.6lg %.6lg %.6lg %d %d %.6lg %.6lg", m_r1, m_r2,
-                        m_angle, m_largeArcFlag, m_sweepFlag, m_x, m_y);
-}
-
 SVGPathSegArcAbs::SVGPathSegArcAbs(float x,
                                    float y,
                                    float r1,

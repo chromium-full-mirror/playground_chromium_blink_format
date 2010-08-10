@@ -37,7 +37,6 @@ class SVGPathSegClosePath : public SVGPathSeg {
 
   virtual unsigned short pathSegType() const { return PATHSEG_CLOSEPATH; }
   virtual String pathSegTypeAsLetter() const { return "Z"; }
-  virtual String toString() const { return "Z"; }
 
  private:
   SVGPathSegClosePath();

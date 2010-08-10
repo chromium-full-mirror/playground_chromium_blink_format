@@ -45,8 +45,6 @@ class SVGPathSegArc : public SVGPathSeg {
         m_largeArcFlag(largeArcFlag),
         m_sweepFlag(sweepFlag) {}
 
-  virtual String toString() const;
-
   void setX(float x) { m_x = x; }
   float x() const { return m_x; }
 

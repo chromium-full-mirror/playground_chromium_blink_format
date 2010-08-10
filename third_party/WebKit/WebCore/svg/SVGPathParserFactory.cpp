@@ -26,9 +26,10 @@
 #include "SVGPathBuilder.h"
 #include "SVGPathByteStreamBuilder.h"
 #include "SVGPathByteStreamSource.h"
-#include "SVGPathStringBuilder.h"
 #include "SVGPathParser.h"
 #include "SVGPathSegListBuilder.h"
+#include "SVGPathSegListSource.h"
+#include "SVGPathStringBuilder.h"
 #include "SVGPathStringSource.h"
 
 namespace WebCore {
@@ -122,6 +123,23 @@ bool SVGPathParserFactory::buildPathFromByteStream(SVGPathByteStream* stream,
   return ok;
 }
 
+bool SVGPathParserFactory::buildPathFromSVGPathSegList(
+    SVGPathSegList* pathSegList,
+    Path& result) {
+  ASSERT(pathSegList);
+  if (!pathSegList->numberOfItems())
+    return false;
+
+  SVGPathBuilder* builder = globalSVGPathBuilder(result);
+
+  OwnPtr<SVGPathSegListSource> source =
+      SVGPathSegListSource::create(pathSegList);
+  SVGPathParser* parser = globalSVGPathParser(source.get(), builder);
+  bool ok = parser->parsePathDataFromSource(NormalizedParsing);
+  parser->cleanup();
+  return ok;
+}
+
 bool SVGPathParserFactory::buildSVGPathSegListFromString(
     const String& d,
     SVGPathSegList* result,
@@ -172,8 +190,27 @@ bool SVGPathParserFactory::buildStringFromByteStream(
       SVGPathByteStreamSource::create(stream);
   SVGPathParser* parser = globalSVGPathParser(source.get(), builder);
   bool ok = parser->parsePathDataFromSource(parsingMode);
-  parser->cleanup();
   result = builder->result();
+  parser->cleanup();
+  return ok;
+}
+
+bool SVGPathParserFactory::buildStringFromSVGPathSegList(
+    SVGPathSegList* pathSegList,
+    String& result,
+    PathParsingMode parsingMode) {
+  ASSERT(pathSegList);
+  if (!pathSegList->numberOfItems())
+    return false;
+
+  SVGPathStringBuilder* builder = globalSVGPathStringBuilder();
+
+  OwnPtr<SVGPathSegListSource> source =
+      SVGPathSegListSource::create(pathSegList);
+  SVGPathParser* parser = globalSVGPathParser(source.get(), builder);
+  bool ok = parser->parsePathDataFromSource(parsingMode);
+  result = builder->result();
+  parser->cleanup();
   return ok;
 }
 

@@ -84,7 +84,6 @@ class SVGPathSeg : public RefCounted<SVGPathSeg> {
 
   virtual unsigned short pathSegType() const;
   virtual String pathSegTypeAsLetter() const;
-  virtual String toString() const;
 
   const QualifiedName& associatedAttributeName() const;
 
@@ -101,8 +100,6 @@ class SVGPathSegSingleCoord : public SVGPathSeg {
 
   void setY(float y) { m_y = y; }
   float y() const { return m_y; }
-
-  virtual String toString() const;
 
  private:
   float m_x;

@@ -32,10 +32,6 @@ class SVGPathSegLinetoVertical : public SVGPathSeg {
  public:
   SVGPathSegLinetoVertical(float y) : SVGPathSeg(), m_y(y) {}
 
-  virtual String toString() const {
-    return pathSegTypeAsLetter() + String::format(" %.6lg", m_y);
-  }
-
   void setY(float y) { m_y = y; }
   float y() const { return m_y; }
 

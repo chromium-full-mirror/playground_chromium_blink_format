@@ -38,12 +38,6 @@ class SVGPathSegCurvetoCubic : public SVGPathSeg {
                          float y2)
       : SVGPathSeg(), m_x(x), m_y(y), m_x1(x1), m_y1(y1), m_x2(x2), m_y2(y2) {}
 
-  virtual String toString() const {
-    return pathSegTypeAsLetter() +
-           String::format(" %.6lg %.6lg %.6lg %.6lg %.6lg %.6lg", m_x1, m_y1,
-                          m_x2, m_y2, m_x, m_y);
-  }
-
   void setX(float x) { m_x = x; }
   float x() const { return m_x; }
 
