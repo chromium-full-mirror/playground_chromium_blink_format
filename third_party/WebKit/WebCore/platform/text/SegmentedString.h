@@ -37,11 +37,6 @@ class SegmentedSubstring {
         m_string(str),
         m_doNotExcludeLineNumbers(true) {}
 
-  SegmentedSubstring(const UChar* str, int length)
-      : m_length(length),
-        m_current(length == 0 ? 0 : str),
-        m_doNotExcludeLineNumbers(true) {}
-
   void clear() {
     m_length = 0;
     m_current = 0;
@@ -78,13 +73,6 @@ class SegmentedString {
       : m_pushedChar1(0),
         m_pushedChar2(0),
         m_currentChar(0),
-        m_composite(false),
-        m_closed(false) {}
-  SegmentedString(const UChar* str, int length)
-      : m_pushedChar1(0),
-        m_pushedChar2(0),
-        m_currentString(str, length),
-        m_currentChar(m_currentString.m_current),
         m_composite(false),
         m_closed(false) {}
   SegmentedString(const String& str)
