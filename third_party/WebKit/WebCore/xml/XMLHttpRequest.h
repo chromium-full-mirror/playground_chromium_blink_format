@@ -22,7 +22,6 @@
 #define XMLHttpRequest_h
 
 #include "ActiveDOMObject.h"
-#include "AtomicStringHash.h"
 #include "EventListener.h"
 #include "EventNames.h"
 #include "EventTarget.h"
@@ -32,6 +31,7 @@
 #include "ThreadableLoaderClient.h"
 #include "XMLHttpRequestProgressEventThrottle.h"
 #include <wtf/OwnPtr.h>
+#include <wtf/text/AtomicStringHash.h>
 
 namespace WebCore {
 

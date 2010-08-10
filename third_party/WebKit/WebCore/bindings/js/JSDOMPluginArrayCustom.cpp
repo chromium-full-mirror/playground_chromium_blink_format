@@ -21,9 +21,9 @@
 #include "config.h"
 #include "JSDOMPluginArray.h"
 
-#include "AtomicString.h"
 #include "DOMPluginArray.h"
 #include "JSDOMPlugin.h"
+#include <wtf/text/AtomicString.h>
 
 namespace WebCore {
 

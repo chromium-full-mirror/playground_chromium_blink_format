@@ -30,10 +30,10 @@
 #include "FontPlatformData.h"
 #include "Font.h"
 #include "PlatformString.h"
-#include "StringHash.h"
 #include <utility>
 #include <wtf/ListHashSet.h>
 #include <wtf/StdLibExtras.h>
+#include <wtf/text/StringHash.h>
 
 #include <QFont>
 

@@ -25,9 +25,9 @@
 #ifndef Event_h
 #define Event_h
 
-#include "AtomicString.h"
 #include "EventTarget.h"
 #include <wtf/RefCounted.h>
+#include <wtf/text/AtomicString.h>
 
 namespace WebCore {
 

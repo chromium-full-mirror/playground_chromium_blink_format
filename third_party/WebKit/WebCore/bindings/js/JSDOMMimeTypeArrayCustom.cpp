@@ -21,9 +21,9 @@
 #include "config.h"
 #include "JSDOMMimeTypeArray.h"
 
-#include "AtomicString.h"
 #include "DOMMimeTypeArray.h"
 #include "JSDOMMimeType.h"
+#include <wtf/text/AtomicString.h>
 
 namespace WebCore {
 

@@ -20,9 +20,9 @@
 #include "config.h"
 #include "JSDOMPlugin.h"
 
-#include "AtomicString.h"
 #include "DOMPlugin.h"
 #include "JSDOMMimeType.h"
+#include <wtf/text/AtomicString.h>
 
 namespace WebCore {
 
