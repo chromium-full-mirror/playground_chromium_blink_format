@@ -539,7 +539,11 @@ void GraphicsContext::clipConvexPolygon(size_t numPoints,
   if (numPoints <= 1)
     return;
 
-  // FIXME: IMPLEMENT!!
+  QPainterPath path(points[0]);
+  for (size_t i = 1; i < numPoints; ++i)
+    path.lineTo(points[i]);
+  path.setFillRule(Qt::WindingFill);
+  m_data->p()->setClipPath(path, Qt::IntersectClip);
 }
 
 QPen GraphicsContext::pen() {
