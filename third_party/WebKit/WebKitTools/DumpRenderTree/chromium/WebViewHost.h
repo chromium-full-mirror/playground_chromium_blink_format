@@ -92,12 +92,8 @@ class WebViewHost : public WebKit::WebViewClient,
     return m_navigationController.get();
   }
 
-  void addClearHeader(const WebCore::String& header) {
-    m_clearHeaders.add(header);
-  }
-  const HashSet<WebCore::String>& clearHeaders() const {
-    return m_clearHeaders;
-  }
+  void addClearHeader(const WTF::String& header) { m_clearHeaders.add(header); }
+  const HashSet<WTF::String>& clearHeaders() const { return m_clearHeaders; }
 
   // NavigationHost
   virtual bool navigate(const TestNavigationEntry&, bool reload);
@@ -327,7 +323,7 @@ class WebViewHost : public WebKit::WebViewClient,
   bool m_selectTrailingWhitespaceEnabled;
 
   // Set of headers to clear in willSendRequest.
-  HashSet<WebCore::String> m_clearHeaders;
+  HashSet<WTF::String> m_clearHeaders;
 
   // true if we should block any redirects
   bool m_blocksRedirects;
