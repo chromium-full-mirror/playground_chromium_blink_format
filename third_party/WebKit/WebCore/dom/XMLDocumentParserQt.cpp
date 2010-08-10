@@ -331,9 +331,10 @@ static inline void handleElementNamespaces(
   for (int i = 0; i < ns.count(); ++i) {
     const QXmlStreamNamespaceDeclaration& decl = ns[i];
     String namespaceURI = decl.namespaceUri();
-    String namespaceQName = decl.prefix().isEmpty()
-                                ? String("xmlns")
-                                : String("xmlns:") + String(decl.prefix());
+    String namespaceQName =
+        decl.prefix().isEmpty()
+            ? String("xmlns")
+            : String("xmlns:") namespaceQName.append(decl.prefix());
     newElement->setAttributeNS("http://www.w3.org/2000/xmlns/", namespaceQName,
                                namespaceURI, ec, scriptingPermission);
     if (ec)  // exception setting attributes
