@@ -36,6 +36,8 @@
 
 namespace WebCore {
 
+using WTF::operator+;
+
 using namespace HTMLNames;
 
 class CSSSelectorBag : public Noncopyable {
