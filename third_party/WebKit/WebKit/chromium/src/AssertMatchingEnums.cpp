@@ -70,6 +70,13 @@
   COMPILE_ASSERT(int(WebKit::webkit_name) == int(WebCore::webcore_name), \
                  mismatching_enums)
 
+// These constants are in WTF, bring them into WebCore so the ASSERT still works
+// for them!
+namespace WebCore {
+using WTF::TextCaseSensitive;
+using WTF::TextCaseInsensitive;
+};
+
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleUnknown, UnknownRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleButton, ButtonRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleRadioButton, RadioButtonRole);
