@@ -44,6 +44,7 @@
 namespace WebKit {
 
 class WebAccessibilityObject;
+class WebDeviceOrientationClient;
 class WebDragData;
 class WebElement;
 class WebFileChooserCompletion;
@@ -364,6 +365,11 @@ class WebViewClient : virtual public WebWidgetClient {
       WebSpeechInputListener*) {
     return 0;
   }
+
+  // Device Orientation --------------------------------------------------
+
+  // Access the embedder API for device orientation services.
+  virtual WebDeviceOrientationClient* deviceOrientationClient() { return 0; }
 
  protected:
   ~WebViewClient() {}
