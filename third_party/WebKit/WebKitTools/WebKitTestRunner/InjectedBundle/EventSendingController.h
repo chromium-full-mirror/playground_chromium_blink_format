@@ -68,22 +68,11 @@ class EventSendingController : public JSWrappable {
                    const JSValueRef arguments[],
                    JSValueRef* exception);
 
-  void textZoomIn(JSContextRef context,
-                  size_t argumentCount,
-                  const JSValueRef arguments[],
-                  JSValueRef* exception);
-  void textZoomOut(JSContextRef context,
-                   size_t argumentCount,
-                   const JSValueRef arguments[],
-                   JSValueRef* exception);
-  void zoomPageIn(JSContextRef context,
-                  size_t argumentCount,
-                  const JSValueRef arguments[],
-                  JSValueRef* exception);
-  void zoomPageOut(JSContextRef context,
-                   size_t argumentCount,
-                   const JSValueRef arguments[],
-                   JSValueRef* exception);
+  // Zoom functions.
+  void textZoomIn();
+  void textZoomOut();
+  void zoomPageIn();
+  void zoomPageOut();
 
  private:
   EventSendingController();

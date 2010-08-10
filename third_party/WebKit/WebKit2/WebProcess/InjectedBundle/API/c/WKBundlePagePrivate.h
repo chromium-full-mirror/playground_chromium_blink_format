@@ -33,6 +33,12 @@
 extern "C" {
 #endif
 
+enum WKBundlePageZoomMode {
+  kWKBundlePageZoomModePage = 0,
+  kWKBundlePageZoomModeTextOnly = 1
+};
+typedef enum WKBundlePageZoomMode WKBundlePageZoomMode;
+
 WK_EXPORT bool WKBundlePageIsEditingCommandEnabled(WKBundlePageRef page,
                                                    WKStringRef commandName);
 WK_EXPORT void WKBundlePageClearMainFrameName(WKBundlePageRef page);
@@ -42,6 +48,12 @@ WKBundlePageCopyRenderTreeExternalRepresentation(WKBundlePageRef page);
 WK_EXPORT void WKBundlePageExecuteEditingCommand(WKBundlePageRef page,
                                                  WKStringRef commandName,
                                                  WKStringRef argument);
+
+WK_EXPORT float WKBundlePageGetZoomFactor(WKBundlePageRef page);
+WK_EXPORT void WKBundlePageSetZoomFactor(WKBundlePageRef page,
+                                         float zoomFactor);
+WK_EXPORT void WKBundlePageSetZoomMode(WKBundlePageRef page,
+                                       WKBundlePageZoomMode zoomMode);
 
 #ifdef __cplusplus
 }

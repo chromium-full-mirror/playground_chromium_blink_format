@@ -89,3 +89,16 @@ void WKBundlePageClearMainFrameName(WKBundlePageRef pageRef) {
 void WKBundlePageClose(WKBundlePageRef pageRef) {
   toWK(pageRef)->sendClose();
 }
+
+float WKBundlePageGetZoomFactor(WKBundlePageRef pageRef) {
+  return toWK(pageRef)->zoomFactor();
+}
+
+void WKBundlePageSetZoomFactor(WKBundlePageRef pageRef, float zoomFactor) {
+  toWK(pageRef)->setZoomFactor(zoomFactor);
+}
+
+void WKBundlePageSetZoomMode(WKBundlePageRef pageRef,
+                             WKBundlePageZoomMode zoomMode) {
+  toWK(pageRef)->setZoomMode(toZoomMode(zoomMode));
+}

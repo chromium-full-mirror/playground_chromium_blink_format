@@ -34,6 +34,7 @@
 #include "InjectedBundlePageUIClient.h"
 #include <WebCore/FrameLoaderTypes.h>
 #include <WebCore/IntRect.h>
+#include <WebCore/ZoomMode.h>
 #include <wtf/Forward.h>
 #include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
@@ -126,6 +127,10 @@ class WebPage : public APIObject {
   bool isEditingCommandEnabled(const WTF::String& commandName);
   void clearMainFrameName();
   void sendClose();
+
+  float zoomFactor() const;
+  void setZoomFactor(float);
+  void setZoomMode(WebCore::ZoomMode);
 
 #if USE(ACCELERATED_COMPOSITING)
   void changeAcceleratedCompositingMode(WebCore::GraphicsLayer*);
