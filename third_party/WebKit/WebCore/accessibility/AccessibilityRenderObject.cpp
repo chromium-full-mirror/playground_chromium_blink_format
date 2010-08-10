@@ -363,11 +363,11 @@ AccessibilityObject* AccessibilityRenderObject::nextSibling() const {
     RenderObject* continuation =
         toRenderInline(m_renderer->parent())->continuation();
 
-    // Case 4a: continuation is a block - in this case the block itself is the
+    // Case 5a: continuation is a block - in this case the block itself is the
     // next sibling.
     if (continuation->isRenderBlock())
       nextSibling = continuation;
-    // Case 4b: continuation is an inline - in this case the inline's first
+    // Case 5b: continuation is an inline - in this case the inline's first
     // child is the next sibling
     else
       nextSibling = firstChildConsideringContinuation(continuation);
@@ -379,6 +379,12 @@ AccessibilityObject* AccessibilityRenderObject::nextSibling() const {
   return axObjectCache()->getOrCreate(nextSibling);
 }
 
+static RenderBoxModelObject* nextContinuation(RenderObject* renderer) {
+  if (renderer->isInline() && !renderer->isReplaced())
+    return toRenderInline(renderer)->continuation();
+  return toRenderBlock(renderer)->inlineElementContinuation();
+}
+
 RenderObject* AccessibilityRenderObject::renderParentObject() const {
   if (!m_renderer)
     return 0;
@@ -387,7 +393,8 @@ RenderObject* AccessibilityRenderObject::renderParentObject() const {
 
   // Case 1: node is a block and is an inline's continuation. Parent
   // is the start of the continuation chain.
-  RenderInline* startOfConts = 0;
+  RenderObject* startOfConts = 0;
+  RenderObject* firstChild = 0;
   if (m_renderer->isRenderBlock() &&
       (startOfConts = startOfContinuations(m_renderer)))
     parent = startOfConts;
@@ -398,6 +405,24 @@ RenderObject* AccessibilityRenderObject::renderParentObject() const {
   else if (parent && parent->isRenderInline() &&
            (startOfConts = startOfContinuations(parent)))
     parent = startOfConts;
+
+  // Case 3: The first sibling is the beginning of a continuation chain. Find
+  // the origin of that continuation.
+  else if (parent && (firstChild = parent->firstChild()) &&
+           firstChild->node()) {
+    // Get the node's renderer and follow that continuation chain until the
+    // first child is found
+    RenderObject* nodeRenderFirstChild = firstChild->node()->renderer();
+    if (nodeRenderFirstChild != firstChild) {
+      for (RenderObject* contsTest = nodeRenderFirstChild; contsTest;
+           contsTest = nextContinuation(contsTest)) {
+        if (contsTest == firstChild) {
+          parent = nodeRenderFirstChild->parent();
+          break;
+        }
+      }
+    }
+  }
 
   return parent;
 }
@@ -3352,8 +3377,10 @@ void AccessibilityRenderObject::addChildren() {
       unsigned length = children.size();
       for (unsigned i = 0; i < length; ++i)
         m_children.append(children[i]);
-    } else
+    } else {
+      ASSERT(obj->parentObject() == this);
       m_children.append(obj);
+    }
   }
 
   // for a RenderImage, add the <area> elements as individual accessibility
