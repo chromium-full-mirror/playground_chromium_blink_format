@@ -60,14 +60,24 @@ class CSSSelectorBag : public Noncopyable {
   Vector<CSSSelector*, 16> m_stack;
 };
 
-unsigned int CSSSelector::specificity() {
-  if (m_isForPage)
-    return specificityForPage();
+unsigned CSSSelector::specificity() const {
+  // make sure the result doesn't overflow
+  static const unsigned maxValueMask = 0xffffff;
+  unsigned total = 0;
+  for (const CSSSelector* selector = this; selector;
+       selector = selector->tagHistory()) {
+    if (selector->m_isForPage)
+      return (total + selector->specificityForPage()) & maxValueMask;
+    total = (total + selector->specificityForOneSelector()) & maxValueMask;
+  }
+  return total;
+}
 
+inline unsigned CSSSelector::specificityForOneSelector() const {
   // FIXME: Pseudo-elements and pseudo-classes do not have the same specificity.
   // This function
   // isn't quite correct.
-  int s = (m_tag.localName() == starAtom ? 0 : 1);
+  unsigned s = (m_tag.localName() == starAtom ? 0 : 1);
   switch (m_match) {
     case Id:
       s += 0x10000;
@@ -86,16 +96,10 @@ unsigned int CSSSelector::specificity() {
     case None:
       break;
   }
-
-  // FIXME: Avoid recursive calls to prevent possible stack overflow.
-  if (CSSSelector* tagHistory = this->tagHistory())
-    s += tagHistory->specificity();
-
-  // make sure it doesn't overflow
-  return s & 0xffffff;
+  return s;
 }
 
-unsigned CSSSelector::specificityForPage() {
+unsigned CSSSelector::specificityForPage() const {
   // See http://dev.w3.org/csswg/css3-page/#cascading-and-page-context
   unsigned s = (m_tag.localName() == starAtom ? 0 : 4);
 
