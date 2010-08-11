@@ -92,8 +92,8 @@ class WebSocketChannel : public RefCounted<WebSocketChannel>,
                    const KURL&,
                    const String& protocol);
 
-  bool appendToBuffer(const char* data, int len);
-  void skipBuffer(int len);
+  bool appendToBuffer(const char* data, size_t len);
+  void skipBuffer(size_t len);
   bool processBuffer();
   void resumeTimerFired(Timer<WebSocketChannel>* timer);
 
@@ -102,7 +102,7 @@ class WebSocketChannel : public RefCounted<WebSocketChannel>,
   WebSocketHandshake m_handshake;
   RefPtr<SocketStreamHandle> m_handle;
   char* m_buffer;
-  int m_bufferSize;
+  size_t m_bufferSize;
 
   Timer<WebSocketChannel> m_resumeTimer;
   bool m_suspended;
