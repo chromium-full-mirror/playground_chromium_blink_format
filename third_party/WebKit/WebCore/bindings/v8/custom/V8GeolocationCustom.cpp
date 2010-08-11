@@ -26,6 +26,8 @@
 #include "config.h"
 #include "V8Geolocation.h"
 
+#if ENABLE(GEOLOCATION)
+
 #include "Frame.h"
 #include "Geolocation.h"
 #include "V8Binding.h"
@@ -233,3 +235,5 @@ v8::Handle<v8::Value> V8Geolocation::watchPositionCallback(
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(GEOLOCATION)
