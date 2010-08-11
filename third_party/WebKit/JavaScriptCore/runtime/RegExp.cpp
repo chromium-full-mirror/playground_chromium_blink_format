@@ -188,8 +188,8 @@ void RegExp::compile(JSGlobalData*) {
   JSRegExpMultilineOption multilineOption =
       multiline() ? JSRegExpMultiline : JSRegExpSingleLine;
   m_regExp =
-      jsRegExpCompile(reinterpret_cast<const UChar*>(m_pattern.data()),
-                      m_pattern.size(), ignoreCaseOption, multilineOption,
+      jsRegExpCompile(reinterpret_cast<const UChar*>(m_pattern.characters()),
+                      m_pattern.length(), ignoreCaseOption, multilineOption,
                       &m_numSubpatterns, &m_constructionError);
 }
 
@@ -199,7 +199,7 @@ int RegExp::match(const UString& s, int startOffset, Vector<int, 32>* ovector) {
   if (ovector)
     ovector->clear();
 
-  if (static_cast<unsigned>(startOffset) > s.size() || s.isNull())
+  if (static_cast<unsigned>(startOffset) > s.length() || s.isNull())
     return -1;
 
   if (m_regExp) {
@@ -217,9 +217,9 @@ int RegExp::match(const UString& s, int startOffset, Vector<int, 32>* ovector) {
       offsetVector = ovector->data();
     }
 
-    int numMatches =
-        jsRegExpExecute(m_regExp, reinterpret_cast<const UChar*>(s.data()),
-                        s.size(), startOffset, offsetVector, offsetVectorSize);
+    int numMatches = jsRegExpExecute(
+        m_regExp, reinterpret_cast<const UChar*>(s.characters()), s.length(),
+        startOffset, offsetVector, offsetVectorSize);
 
     if (numMatches < 0) {
 #ifndef NDEBUG
