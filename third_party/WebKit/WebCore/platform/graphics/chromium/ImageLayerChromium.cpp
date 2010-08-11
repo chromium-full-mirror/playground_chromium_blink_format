@@ -110,8 +110,7 @@ void ImageLayerChromium::updateTextureContents(unsigned textureId) {
     case kCGColorSpaceModelDeviceN:
       break;
     default:
-      colorSpace.adoptCF(
-          CGColorSpaceCreateWithName(kCGColorSpaceGenericRGBLinear));
+      colorSpace.adoptCF(CGColorSpaceCreateDeviceRGB());
       break;
   }
   RetainPtr<CGContextRef> tempContext(
