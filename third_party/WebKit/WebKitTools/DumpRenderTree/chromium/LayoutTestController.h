@@ -413,7 +413,7 @@ class LayoutTestController : public CppBoundClass {
   bool elementDoesAutoCompleteForElementWithId(const WebKit::WebString&);
   int numberOfActiveAnimations();
   void suspendAnimations();
-  void suspendAnimations();
+  void resumeAnimations();
 
   // Used for test timeouts.
   ScopedRunnableMethodFactory<LayoutTestController> m_timeoutFactory;
