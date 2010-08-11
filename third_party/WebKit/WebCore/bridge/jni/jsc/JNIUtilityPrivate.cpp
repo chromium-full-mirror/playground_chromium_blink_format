@@ -63,9 +63,9 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
           JSValue item = jsArray->get(exec, i);
           UString stringValue = item.toString(exec);
           env->SetObjectArrayElement(
-              jarray, i,
-              env->functions->NewString(env, (const jchar*)stringValue.data(),
-                                        stringValue.size()));
+              jarray, i, env->functions->NewString(
+                             env, (const jchar*)stringValue.characters(),
+                             stringValue.length()));
         }
       }
       break;
@@ -98,8 +98,8 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
         JSValue item = jsArray->get(exec, i);
         UString stringValue = item.toString(exec);
         jchar value = 0;
-        if (stringValue.size() > 0)
-          value = ((const jchar*)stringValue.data())[0];
+        if (stringValue.length() > 0)
+          value = ((const jchar*)stringValue.characters())[0];
         env->SetCharArrayRegion((jcharArray)jarray, (jsize)i, (jsize)1, &value);
       }
       break;
@@ -227,7 +227,8 @@ jvalue convertValueToJValue(ExecState* exec,
           UString stringValue = asString(value)->value(exec);
           JNIEnv* env = getJNIEnv();
           jobject javaString = env->functions->NewString(
-              env, (const jchar*)stringValue.data(), stringValue.size());
+              env, (const jchar*)stringValue.characters(),
+              stringValue.length());
           result.l = javaString;
         } else if (value.isNumber()) {
           double doubleValue = value.uncheckedGetNumber();
@@ -249,7 +250,8 @@ jvalue convertValueToJValue(ExecState* exec,
           UString stringValue = "undefined";
           JNIEnv* env = getJNIEnv();
           jobject javaString = env->functions->NewString(
-              env, (const jchar*)stringValue.data(), stringValue.size());
+              env, (const jchar*)stringValue.characters(),
+              stringValue.length());
           result.l = javaString;
         }
       }
@@ -262,7 +264,8 @@ jvalue convertValueToJValue(ExecState* exec,
           UString stringValue = value.toString(exec);
           JNIEnv* env = getJNIEnv();
           jobject javaString = env->functions->NewString(
-              env, (const jchar*)stringValue.data(), stringValue.size());
+              env, (const jchar*)stringValue.characters(),
+              stringValue.length());
           result.l = javaString;
         }
       }

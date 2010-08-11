@@ -44,7 +44,9 @@ class StringBuilder {
 
   void append(const UChar* str, size_t len) { buffer.append(str, len); }
 
-  void append(const UString& str) { buffer.append(str.data(), str.size()); }
+  void append(const UString& str) {
+    buffer.append(str.characters(), str.length());
+  }
 
   bool isEmpty() { return buffer.isEmpty(); }
   void reserveCapacity(size_t newCapacity) {

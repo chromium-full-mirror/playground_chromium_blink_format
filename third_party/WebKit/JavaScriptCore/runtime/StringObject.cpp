@@ -100,7 +100,7 @@ void StringObject::getOwnPropertyNames(ExecState* exec,
                                        EnumerationMode mode) {
   int size = internalValue()->length();
   for (int i = 0; i < size; ++i)
-    propertyNames.add(Identifier(exec, UString::from(i)));
+    propertyNames.add(Identifier(exec, UString::number(i)));
   if (mode == IncludeDontEnumProperties)
     propertyNames.add(exec->propertyNames().length);
   return JSObject::getOwnPropertyNames(exec, propertyNames, mode);

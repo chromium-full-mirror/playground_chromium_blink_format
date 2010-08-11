@@ -60,7 +60,7 @@ ALWAYS_INLINE const Identifier& IdentifierArena::makeIdentifier(
 inline const Identifier& IdentifierArena::makeNumericIdentifier(
     JSGlobalData* globalData,
     double number) {
-  m_identifiers.append(Identifier(globalData, UString::from(number)));
+  m_identifiers.append(Identifier(globalData, UString::number(number)));
   return m_identifiers.last();
 }
 

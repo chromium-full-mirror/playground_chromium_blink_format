@@ -270,7 +270,7 @@ class ASTBuilder {
                               int start) {
     RegExpNode* node =
         new (m_globalData) RegExpNode(m_globalData, pattern, flags);
-    int size = pattern.size() + 2;  // + 2 for the two /'s
+    int size = pattern.length() + 2;  // + 2 for the two /'s
     setExceptionLocation(node, start, start + size, start + size);
     return node;
   }

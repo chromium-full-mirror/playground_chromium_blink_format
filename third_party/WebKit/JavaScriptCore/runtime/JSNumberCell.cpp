@@ -51,7 +51,7 @@ double JSNumberCell::toNumber(ExecState*) const {
 }
 
 UString JSNumberCell::toString(ExecState*) const {
-  return UString::from(m_value);
+  return UString::number(m_value);
 }
 
 JSObject* JSNumberCell::toObject(ExecState* exec) const {

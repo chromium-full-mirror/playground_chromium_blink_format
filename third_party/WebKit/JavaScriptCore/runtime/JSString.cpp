@@ -144,7 +144,7 @@ JSValue JSString::replaceCharacter(ExecState* exec,
   if (!matchString)
     return this;
 
-  RopeBuilder builder(replacement.size() ? fiberCount + 2 : fiberCount + 1);
+  RopeBuilder builder(replacement.length() ? fiberCount + 2 : fiberCount + 1);
   if (UNLIKELY(builder.isOutOfMemory()))
     return throwOutOfMemoryError(exec);
 
@@ -157,7 +157,7 @@ JSValue JSString::replaceCharacter(ExecState* exec,
     }
 
     builder.append(UString(string).substr(0, matchPosition));
-    if (replacement.size())
+    if (replacement.length())
       builder.append(replacement);
     builder.append(UString(string).substr(matchPosition + 1));
     matchString = 0;
@@ -175,7 +175,7 @@ JSString* JSString::getIndexSlowCase(ExecState* exec, unsigned i) {
   if (exec->exception())
     return jsString(exec, "");
   ASSERT(!isRope());
-  ASSERT(i < m_value.size());
+  ASSERT(i < m_value.length());
   return jsSingleCharacterSubstring(exec, m_value, i);
 }
 

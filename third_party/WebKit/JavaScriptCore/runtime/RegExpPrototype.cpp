@@ -152,7 +152,7 @@ EncodedJSValue JSC_HOST_CALL regExpProtoFuncToString(ExecState* exec) {
                        .toString(exec);
   // If source is empty, use "/(?:)/" to avoid colliding with comment syntax
   return JSValue::encode(jsMakeNontrivialString(
-      exec, "/", source.size() ? source : UString("(?:)"), postfix));
+      exec, "/", source.length() ? source : UString("(?:)"), postfix));
 }
 
 }  // namespace JSC

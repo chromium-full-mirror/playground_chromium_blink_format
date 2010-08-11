@@ -300,7 +300,7 @@ void JSLocation::setPort(ExecState* exec, JSValue value) {
   // FIXME: Could make this a little less ugly if String provided a
   // toUnsignedShort function.
   const UString& portString = value.toString(exec);
-  int port = charactersToInt(portString.data(), portString.size());
+  int port = charactersToInt(portString.characters(), portString.length());
   if (port < 0 || port > 0xFFFF)
     url.removePort();
   else

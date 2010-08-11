@@ -186,7 +186,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
 
   ALWAYS_INLINE JSString(JSGlobalData* globalData, const UString& value)
       : JSCell(globalData->stringStructure.get()),
-        m_length(value.size()),
+        m_length(value.length()),
         m_value(value),
         m_fiberCount(0) {
     ASSERT(!m_value.isNull());
@@ -196,7 +196,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
   enum HasOtherOwnerType { HasOtherOwner };
   JSString(JSGlobalData* globalData, const UString& value, HasOtherOwnerType)
       : JSCell(globalData->stringStructure.get()),
-        m_length(value.size()),
+        m_length(value.length()),
         m_value(value),
         m_fiberCount(0) {
     ASSERT(!m_value.isNull());
@@ -238,7 +238,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
            JSString* s1,
            const UString& u2)
       : JSCell(globalData->stringStructure.get()),
-        m_length(s1->length() + u2.size()),
+        m_length(s1->length() + u2.length()),
         m_fiberCount(fiberCount) {
     ASSERT(fiberCount <= s_maxInternalRopeLength);
     unsigned index = 0;
@@ -253,7 +253,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
            const UString& u1,
            JSString* s2)
       : JSCell(globalData->stringStructure.get()),
-        m_length(u1.size() + s2->length()),
+        m_length(u1.length() + s2->length()),
         m_fiberCount(fiberCount) {
     ASSERT(fiberCount <= s_maxInternalRopeLength);
     unsigned index = 0;
@@ -279,7 +279,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
   // This constructor constructs a new string by concatenating u1 & u2.
   JSString(JSGlobalData* globalData, const UString& u1, const UString& u2)
       : JSCell(globalData->stringStructure.get()),
-        m_length(u1.size() + u2.size()),
+        m_length(u1.length() + u2.length()),
         m_fiberCount(2) {
     unsigned index = 0;
     appendStringInConstruct(index, u1);
@@ -293,7 +293,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
            const UString& u2,
            const UString& u3)
       : JSCell(globalData->stringStructure.get()),
-        m_length(u1.size() + u2.size() + u3.size()),
+        m_length(u1.length() + u2.length() + u3.length()),
         m_fiberCount(s_maxInternalRopeLength) {
     unsigned index = 0;
     appendStringInConstruct(index, u1);
@@ -307,7 +307,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
            JSStringFinalizerCallback finalizer,
            void* context)
       : JSCell(globalData->stringStructure.get()),
-        m_length(value.size()),
+        m_length(value.length()),
         m_value(value),
         m_fiberCount(0) {
     ASSERT(!m_value.isNull());
@@ -388,7 +388,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
     if (v.isString()) {
       ASSERT(asCell(v)->isString());
       JSString* s = static_cast<JSString*>(asCell(v));
-      ASSERT(s->size() == 1);
+      ASSERT(s->fiberCount() == 1);
       appendStringInConstruct(index, s);
       m_length += s->length();
     } else {
@@ -396,7 +396,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
       StringImpl* impl = u.impl();
       impl->ref();
       m_other.m_fibers[index++] = impl;
-      m_length += u.size();
+      m_length += u.length();
     }
   }
 
@@ -443,7 +443,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
     ASSERT(!isRope());
     return m_value;
   }
-  unsigned size() { return m_fiberCount ? m_fiberCount : 1; }
+  unsigned fiberCount() { return m_fiberCount ? m_fiberCount : 1; }
 
   friend JSValue jsString(ExecState* exec, JSString* s1, JSString* s2);
   friend JSValue jsString(ExecState* exec, const UString& u1, JSString* s2);
@@ -497,8 +497,8 @@ inline JSString* jsSingleCharacterSubstring(ExecState* exec,
                                             const UString& s,
                                             unsigned offset) {
   JSGlobalData* globalData = &exec->globalData();
-  ASSERT(offset < static_cast<unsigned>(s.size()));
-  UChar c = s.data()[offset];
+  ASSERT(offset < static_cast<unsigned>(s.length()));
+  UChar c = s.characters()[offset];
   if (c <= 0xFF)
     return globalData->smallStrings.singleCharacterString(globalData, c);
   return fixupVPtr(
@@ -516,7 +516,7 @@ inline JSString* jsNontrivialString(JSGlobalData* globalData, const char* s) {
 
 inline JSString* jsNontrivialString(JSGlobalData* globalData,
                                     const UString& s) {
-  ASSERT(s.size() > 1);
+  ASSERT(s.length() > 1);
   return fixupVPtr(globalData, new (globalData) JSString(globalData, s));
 }
 
@@ -524,16 +524,16 @@ inline JSString* JSString::getIndex(ExecState* exec, unsigned i) {
   ASSERT(canGetIndex(i));
   if (isRope())
     return getIndexSlowCase(exec, i);
-  ASSERT(i < m_value.size());
+  ASSERT(i < m_value.length());
   return jsSingleCharacterSubstring(exec, m_value, i);
 }
 
 inline JSString* jsString(JSGlobalData* globalData, const UString& s) {
-  int size = s.size();
+  int size = s.length();
   if (!size)
     return globalData->smallStrings.emptyString(globalData);
   if (size == 1) {
-    UChar c = s.data()[0];
+    UChar c = s.characters()[0];
     if (c <= 0xFF)
       return globalData->smallStrings.singleCharacterString(globalData, c);
   }
@@ -544,7 +544,7 @@ inline JSString* jsStringWithFinalizer(ExecState* exec,
                                        const UString& s,
                                        JSStringFinalizerCallback callback,
                                        void* context) {
-  ASSERT(s.size() && (s.size() > 1 || s.data()[0] > 0xFF));
+  ASSERT(s.length() && (s.length() > 1 || s.characters()[0] > 0xFF));
   JSGlobalData* globalData = &exec->globalData();
   return fixupVPtr(globalData,
                    new (globalData) JSString(globalData, s, callback, context));
@@ -554,13 +554,13 @@ inline JSString* jsSubstring(JSGlobalData* globalData,
                              const UString& s,
                              unsigned offset,
                              unsigned length) {
-  ASSERT(offset <= static_cast<unsigned>(s.size()));
-  ASSERT(length <= static_cast<unsigned>(s.size()));
-  ASSERT(offset + length <= static_cast<unsigned>(s.size()));
+  ASSERT(offset <= static_cast<unsigned>(s.length()));
+  ASSERT(length <= static_cast<unsigned>(s.length()));
+  ASSERT(offset + length <= static_cast<unsigned>(s.length()));
   if (!length)
     return globalData->smallStrings.emptyString(globalData);
   if (length == 1) {
-    UChar c = s.data()[offset];
+    UChar c = s.characters()[offset];
     if (c <= 0xFF)
       return globalData->smallStrings.singleCharacterString(globalData, c);
   }
@@ -572,11 +572,11 @@ inline JSString* jsSubstring(JSGlobalData* globalData,
 }
 
 inline JSString* jsOwnedString(JSGlobalData* globalData, const UString& s) {
-  int size = s.size();
+  int size = s.length();
   if (!size)
     return globalData->smallStrings.emptyString(globalData);
   if (size == 1) {
-    UChar c = s.data()[0];
+    UChar c = s.characters()[0];
     if (c <= 0xFF)
       return globalData->smallStrings.singleCharacterString(globalData, c);
   }

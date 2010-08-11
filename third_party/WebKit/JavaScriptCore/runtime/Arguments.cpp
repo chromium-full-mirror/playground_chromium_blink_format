@@ -157,8 +157,8 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  return JSObject::getOwnPropertySlot(exec, Identifier(exec, UString::from(i)),
-                                      slot);
+  return JSObject::getOwnPropertySlot(
+      exec, Identifier(exec, UString::number(i)), slot);
 }
 
 bool Arguments::getOwnPropertySlot(ExecState* exec,
@@ -227,7 +227,7 @@ void Arguments::getOwnPropertyNames(ExecState* exec,
   if (mode == IncludeDontEnumProperties) {
     for (unsigned i = 0; i < d->numArguments; ++i) {
       if (!d->deletedArguments || !d->deletedArguments[i])
-        propertyNames.add(Identifier(exec, UString::from(i)));
+        propertyNames.add(Identifier(exec, UString::number(i)));
     }
     propertyNames.add(exec->propertyNames().callee);
     propertyNames.add(exec->propertyNames().length);
@@ -248,7 +248,7 @@ void Arguments::put(ExecState* exec,
     return;
   }
 
-  JSObject::put(exec, Identifier(exec, UString::from(i)), value, slot);
+  JSObject::put(exec, Identifier(exec, UString::number(i)), value, slot);
 }
 
 void Arguments::put(ExecState* exec,
@@ -293,7 +293,7 @@ bool Arguments::deleteProperty(ExecState* exec, unsigned i) {
     }
   }
 
-  return JSObject::deleteProperty(exec, Identifier(exec, UString::from(i)));
+  return JSObject::deleteProperty(exec, Identifier(exec, UString::number(i)));
 }
 
 bool Arguments::deleteProperty(ExecState* exec,

@@ -72,8 +72,8 @@ UString CFStringToUString(CFStringRef inCFString) {
 //--------------------------------------------------------------------------
 // Caller is responsible for releasing the returned CFStringRef
 CFStringRef UStringToCFString(const UString& inUString) {
-  return CFStringCreateWithCharacters(0, (const UniChar*)inUString.data(),
-                                      inUString.size());
+  return CFStringCreateWithCharacters(0, (const UniChar*)inUString.characters(),
+                                      inUString.length());
 }
 
 //--------------------------------------------------------------------------
@@ -255,8 +255,8 @@ CFTypeRef KJSValueToCFTypeInternal(JSValue inValue,
           while (iter != end && isArray) {
             Identifier propName = *iter;
             UString ustr = propName.ustring();
-            const UniChar* uniChars = (const UniChar*)ustr.data();
-            int size = ustr.size();
+            const UniChar* uniChars = (const UniChar*)ustr.characters();
+            int size = ustr.length();
             while (size--) {
               if (uniChars[size] < '0' || uniChars[size] > '9') {
                 isArray = false;

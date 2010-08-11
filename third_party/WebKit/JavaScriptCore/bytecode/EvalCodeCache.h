@@ -49,7 +49,7 @@ class EvalCodeCache {
                                  JSValue& exceptionValue) {
     RefPtr<EvalExecutable> evalExecutable;
 
-    if (evalSource.size() < maxCacheableSourceLength &&
+    if (evalSource.length() < maxCacheableSourceLength &&
         (*scopeChain->begin())->isVariableObject())
       evalExecutable = m_cacheMap.get(evalSource.impl());
 
@@ -59,7 +59,7 @@ class EvalCodeCache {
       if (exceptionValue)
         return 0;
 
-      if (evalSource.size() < maxCacheableSourceLength &&
+      if (evalSource.length() < maxCacheableSourceLength &&
           (*scopeChain->begin())->isVariableObject() &&
           m_cacheMap.size() < maxCacheEntries)
         m_cacheMap.set(evalSource.impl(), evalExecutable);
