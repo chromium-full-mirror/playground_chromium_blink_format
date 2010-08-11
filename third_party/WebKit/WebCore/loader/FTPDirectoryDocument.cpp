@@ -27,9 +27,9 @@
 #include "FTPDirectoryDocument.h"
 
 #include "CharacterNames.h"
+#include "HTMLDocumentParser.h"
 #include "HTMLNames.h"
 #include "HTMLTableElement.h"
-#include "LegacyHTMLDocumentParser.h"
 #include "LocalizedStrings.h"
 #include "Logging.h"
 #include "FTPDirectoryParser.h"
@@ -48,7 +48,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-class FTPDirectoryDocumentParser : public LegacyHTMLDocumentParser {
+class FTPDirectoryDocumentParser : public HTMLDocumentParser {
  public:
   FTPDirectoryDocumentParser(HTMLDocument*);
 
@@ -99,7 +99,7 @@ class FTPDirectoryDocumentParser : public LegacyHTMLDocumentParser {
 };
 
 FTPDirectoryDocumentParser::FTPDirectoryDocumentParser(HTMLDocument* document)
-    : LegacyHTMLDocumentParser(document, false),
+    : HTMLDocumentParser(document, false),
       m_skipLF(false),
       m_parsedTemplate(false),
       m_size(254),
@@ -323,7 +323,7 @@ bool FTPDirectoryDocumentParser::loadDocumentTemplate() {
     return false;
   }
 
-  LegacyHTMLDocumentParser::insert(
+  HTMLDocumentParser::insert(
       String(templateDocumentData->data(), templateDocumentData->size()));
 
   RefPtr<Element> tableElement =
@@ -449,7 +449,7 @@ void FTPDirectoryDocumentParser::finish() {
   m_tableElement = 0;
   fastFree(m_buffer);
 
-  LegacyHTMLDocumentParser::finish();
+  HTMLDocumentParser::finish();
 }
 
 FTPDirectoryDocument::FTPDirectoryDocument(Frame* frame, const KURL& url)

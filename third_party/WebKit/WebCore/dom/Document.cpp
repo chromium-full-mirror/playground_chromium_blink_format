@@ -91,7 +91,6 @@
 #include "InspectorController.h"
 #include "InspectorTimelineAgent.h"
 #include "KeyboardEvent.h"
-#include "LegacyHTMLDocumentParser.h"
 #include "LegacyHTMLTreeBuilder.h"
 #include "Logging.h"
 #include "MessageEvent.h"

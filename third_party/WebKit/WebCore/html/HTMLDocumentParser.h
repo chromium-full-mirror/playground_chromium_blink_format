@@ -71,12 +71,14 @@ class HTMLDocumentParser : public ScriptableDocumentParser,
       Element* contextElement,
       FragmentScriptingPermission = FragmentScriptingAllowed);
 
+ protected:
+  virtual void insert(const SegmentedString&);
+  virtual void finish();
+
  private:
   // DocumentParser
   virtual bool hasInsertionPoint();
-  virtual void insert(const SegmentedString&);
   virtual void append(const SegmentedString&);
-  virtual void finish();
   virtual bool finishWasCalled();
   virtual bool processingData() const;
   virtual void stopParsing();

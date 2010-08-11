@@ -69,7 +69,6 @@
 #include "HTMLBodyElement.h"
 #include "HTMLElementFactory.h"
 #include "HTMLNames.h"
-#include "LegacyHTMLDocumentParser.h"
 #include "InspectorController.h"
 #include "KURL.h"
 #include "Page.h"
@@ -274,11 +273,7 @@ DocumentParser* HTMLDocument::createParser() {
   if (Page* page = this->page())
     reportErrors = page->inspectorController()->windowVisible();
 #endif
-
-  if (settings() && settings()->html5ParserEnabled())
-    return new HTMLDocumentParser(this, reportErrors);
-
-  return new LegacyHTMLDocumentParser(this, reportErrors);
+  return new HTMLDocumentParser(this, reportErrors);
 }
 
 // --------------------------------------------------------------------------
