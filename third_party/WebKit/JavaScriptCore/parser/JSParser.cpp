@@ -1316,12 +1316,12 @@ TreeExpression JSParser::parseStrictObjectLiteral(TreeBuilder& context) {
   TreeProperty property = parseProperty<true>(context);
   failIfFalse(property);
 
-  typedef HashMap<RefPtr<UString::Rep>, unsigned, IdentifierRepHash>
+  typedef HashMap<RefPtr<StringImpl>, unsigned, IdentifierRepHash>
       ObjectValidationMap;
   ObjectValidationMap objectValidator;
   // Add the first property
   if (!m_syntaxAlreadyValidated)
-    objectValidator.add(context.getName(property).ustring().rep(),
+    objectValidator.add(context.getName(property).impl(),
                         context.getType(property));
 
   TreePropertyList propertyList = context.createPropertyList(property);
@@ -1335,7 +1335,7 @@ TreeExpression JSParser::parseStrictObjectLiteral(TreeBuilder& context) {
     failIfFalse(property);
     if (!m_syntaxAlreadyValidated) {
       std::pair<ObjectValidationMap::iterator, bool> propertyEntryIter =
-          objectValidator.add(context.getName(property).ustring().rep(),
+          objectValidator.add(context.getName(property).impl(),
                               context.getType(property));
       if (!propertyEntryIter.second) {
         if ((context.getType(property) & propertyEntryIter.first->second) !=

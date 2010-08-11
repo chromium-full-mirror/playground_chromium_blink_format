@@ -528,7 +528,7 @@ JSValue jsStringOrFalse(ExecState* exec, const KURL& url) {
 AtomicStringImpl* findAtomicString(const Identifier& identifier) {
   if (identifier.isNull())
     return 0;
-  StringImpl* impl = identifier.ustring().rep();
+  StringImpl* impl = identifier.impl();
   ASSERT(impl->existingHash());
   return AtomicString::find(impl->characters(), impl->length(),
                             impl->existingHash());

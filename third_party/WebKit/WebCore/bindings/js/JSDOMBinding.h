@@ -421,7 +421,7 @@ inline DOMObjectWrapperMap& domObjectWrapperMapFor(JSC::ExecState* exec) {
 }
 
 inline String ustringToString(const JSC::UString& u) {
-  return u.rep();
+  return u.impl();
 }
 
 inline JSC::UString stringToUString(const String& s) {
@@ -429,16 +429,16 @@ inline JSC::UString stringToUString(const String& s) {
 }
 
 inline String identifierToString(const JSC::Identifier& i) {
-  return i.ustring().rep();
+  return i.impl();
 }
 
 inline AtomicString ustringToAtomicString(const JSC::UString& u) {
-  return AtomicString(u.rep());
+  return AtomicString(u.impl());
 }
 
 inline AtomicString identifierToAtomicString(
     const JSC::Identifier& identifier) {
-  return AtomicString(identifier.ustring().rep());
+  return AtomicString(identifier.impl());
 }
 
 }  // namespace WebCore

@@ -3577,7 +3577,7 @@ DEFINE_STUB_FUNCTION(void*, op_switch_char) {
                      .ctiDefault.executableAddress();
 
   if (scrutinee.isString()) {
-    UString::Rep* value = asString(scrutinee)->value(callFrame).rep();
+    StringImpl* value = asString(scrutinee)->value(callFrame).impl();
     if (value->length() == 1)
       result = codeBlock->characterSwitchJumpTable(tableIndex)
                    .ctiForValue(value->characters()[0])
@@ -3600,7 +3600,7 @@ DEFINE_STUB_FUNCTION(void*, op_switch_string) {
                      .ctiDefault.executableAddress();
 
   if (scrutinee.isString()) {
-    UString::Rep* value = asString(scrutinee)->value(callFrame).rep();
+    StringImpl* value = asString(scrutinee)->value(callFrame).impl();
     result = codeBlock->stringSwitchJumpTable(tableIndex)
                  .ctiForValue(value)
                  .executableAddress();

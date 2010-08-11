@@ -38,12 +38,12 @@ class JavaStringImpl {
  public:
   ~JavaStringImpl() {
     JSLock lock(SilenceAssertionsOnly);
-    m_rep = 0;
+    m_impl = 0;
   }
 
   void init() {
     JSLock lock(SilenceAssertionsOnly);
-    m_rep = UString().rep();
+    m_impl = UString().impl();
   }
 
   void init(JNIEnv* e, jstring s) {
@@ -51,7 +51,7 @@ class JavaStringImpl {
     const jchar* uc = getUCharactersFromJStringInEnv(e, s);
     {
       JSLock lock(SilenceAssertionsOnly);
-      m_rep = UString(reinterpret_cast<const UChar*>(uc), size).rep();
+      m_impl = UString(reinterpret_cast<const UChar*>(uc), size).impl();
     }
     releaseUCharactersForJStringInEnv(e, s, uc);
   }
@@ -59,16 +59,16 @@ class JavaStringImpl {
   const char* UTF8String() const {
     if (!m_utf8String.data()) {
       JSLock lock(SilenceAssertionsOnly);
-      m_utf8String = UString(m_rep).UTF8String();
+      m_utf8String = UString(m_impl).UTF8String();
     }
     return m_utf8String.data();
   }
-  const jchar* uchars() const { return (const jchar*)m_rep->characters(); }
-  int length() const { return m_rep->length(); }
-  UString uString() const { return UString(m_rep); }
+  const jchar* uchars() const { return (const jchar*)m_impl->characters(); }
+  int length() const { return m_impl->length(); }
+  UString uString() const { return UString(m_impl); }
 
  private:
-  RefPtr<UString::Rep> m_rep;
+  RefPtr<StringImpl> m_impl;
   mutable CString m_utf8String;
 };
 

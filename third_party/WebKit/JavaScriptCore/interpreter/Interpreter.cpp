@@ -3957,7 +3957,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       if (!scrutinee.isString())
         vPC += defaultOffset;
       else {
-        UString::Rep* value = asString(scrutinee)->value(callFrame).rep();
+        StringImpl* value = asString(scrutinee)->value(callFrame).impl();
         if (value->length() != 1)
           vPC += defaultOffset;
         else
@@ -3982,7 +3982,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         vPC += defaultOffset;
       else
         vPC += codeBlock->stringSwitchJumpTable(tableIndex)
-                   .offsetForValue(asString(scrutinee)->value(callFrame).rep(),
+                   .offsetForValue(asString(scrutinee)->value(callFrame).impl(),
                                    defaultOffset);
       NEXT_INSTRUCTION();
     }

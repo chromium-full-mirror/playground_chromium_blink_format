@@ -34,7 +34,7 @@ void HashTable::createTable(JSGlobalData* globalData) const {
   for (int i = 0; i < compactSize; ++i)
     entries[i].setKey(0);
   for (int i = 0; values[i].key; ++i) {
-    UString::Rep* identifier =
+    StringImpl* identifier =
         Identifier::add(globalData, values[i].key).releaseRef();
     int hashIndex = identifier->existingHash() & compactHashSizeMask;
     HashEntry* entry = &entries[hashIndex];
@@ -63,7 +63,7 @@ void HashTable::deleteTable() const {
   if (table) {
     int max = compactSize;
     for (int i = 0; i != max; ++i) {
-      if (UString::Rep* key = table[i].key())
+      if (StringImpl* key = table[i].key())
         key->deref();
     }
     delete[] table;

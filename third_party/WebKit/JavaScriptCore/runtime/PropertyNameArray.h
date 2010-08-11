@@ -64,9 +64,9 @@ class PropertyNameArray {
 
   JSGlobalData* globalData() { return m_globalData; }
 
-  void add(const Identifier& identifier) { add(identifier.ustring().rep()); }
-  void add(UString::Rep*);
-  void addKnownUnique(UString::Rep* identifier) {
+  void add(const Identifier& identifier) { add(identifier.impl()); }
+  void add(StringImpl*);
+  void addKnownUnique(StringImpl* identifier) {
     m_data->propertyNameVector().append(Identifier(m_globalData, identifier));
   }
 
@@ -87,7 +87,7 @@ class PropertyNameArray {
   const_iterator end() const { return m_data->propertyNameVector().end(); }
 
  private:
-  typedef HashSet<UString::Rep*, PtrHash<UString::Rep*>> IdentifierSet;
+  typedef HashSet<StringImpl*, PtrHash<StringImpl*>> IdentifierSet;
 
   RefPtr<PropertyNameArrayData> m_data;
   IdentifierSet m_set;

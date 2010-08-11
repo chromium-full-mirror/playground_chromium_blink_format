@@ -36,7 +36,7 @@ namespace JSC {
 
 bool JSVariableObject::deleteProperty(ExecState* exec,
                                       const Identifier& propertyName) {
-  if (symbolTable().contains(propertyName.ustring().rep()))
+  if (symbolTable().contains(propertyName.impl()))
     return false;
 
   return JSObject::deleteProperty(exec, propertyName);
@@ -62,8 +62,7 @@ bool JSVariableObject::isVariableObject() const {
 
 bool JSVariableObject::symbolTableGet(const Identifier& propertyName,
                                       PropertyDescriptor& descriptor) {
-  SymbolTableEntry entry =
-      symbolTable().inlineGet(propertyName.ustring().rep());
+  SymbolTableEntry entry = symbolTable().inlineGet(propertyName.impl());
   if (!entry.isNull()) {
     descriptor.setDescriptor(registerAt(entry.getIndex()).jsValue(),
                              entry.getAttributes() | DontDelete);

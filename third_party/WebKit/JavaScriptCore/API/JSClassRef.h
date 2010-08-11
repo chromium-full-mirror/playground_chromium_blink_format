@@ -56,9 +56,9 @@ struct StaticFunctionEntry : FastAllocBase {
   JSPropertyAttributes attributes;
 };
 
-typedef HashMap<RefPtr<JSC::UString::Rep>, StaticValueEntry*>
+typedef HashMap<RefPtr<StringImpl>, StaticValueEntry*>
     OpaqueJSClassStaticValuesTable;
-typedef HashMap<RefPtr<JSC::UString::Rep>, StaticFunctionEntry*>
+typedef HashMap<RefPtr<StringImpl>, StaticFunctionEntry*>
     OpaqueJSClassStaticFunctionsTable;
 
 struct OpaqueJSClass;

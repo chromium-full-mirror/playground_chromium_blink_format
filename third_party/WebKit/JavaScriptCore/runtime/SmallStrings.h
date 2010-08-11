@@ -54,7 +54,7 @@ class SmallStrings : public Noncopyable {
     return m_singleCharacterStrings[character];
   }
 
-  UString::Rep* singleCharacterStringRep(unsigned char character);
+  StringImpl* singleCharacterStringRep(unsigned char character);
 
   void markChildren(MarkStack&);
   void clear();

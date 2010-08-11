@@ -271,7 +271,7 @@ jsSpliceSubstringsWithSeparators(ExecState* exec,
     if (position <= 0 && length >= sourceSize)
       return sourceVal;
     // We could call UString::substr, but this would result in redundant checks
-    return jsString(exec, StringImpl::create(source.rep(), max(0, position),
+    return jsString(exec, StringImpl::create(source.impl(), max(0, position),
                                              min(sourceSize, length)));
   }
 
@@ -629,7 +629,7 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncMatch(ExecState* exec) {
      *  replaced with the result of the expression new RegExp(regexp).
      */
     reg = exec->globalData().regExpCache()->lookupOrCreate(a0.toString(exec),
-                                                           UString::null());
+                                                           UString());
   }
   RegExpConstructor* regExpConstructor =
       exec->lexicalGlobalObject()->regExpConstructor();
@@ -683,7 +683,7 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncSearch(ExecState* exec) {
      *  replaced with the result of the expression new RegExp(regexp).
      */
     reg = exec->globalData().regExpCache()->lookupOrCreate(a0.toString(exec),
-                                                           UString::null());
+                                                           UString());
   }
   RegExpConstructor* regExpConstructor =
       exec->lexicalGlobalObject()->regExpConstructor();

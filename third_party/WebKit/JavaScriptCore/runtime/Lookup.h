@@ -56,7 +56,7 @@ typedef void (*PutFunction)(ExecState*, JSObject* baseObject, JSValue value);
 
 class HashEntry : public FastAllocBase {
  public:
-  void initialize(UString::Rep* key,
+  void initialize(StringImpl* key,
                   unsigned char attributes,
                   intptr_t v1,
                   intptr_t v2
@@ -75,8 +75,8 @@ class HashEntry : public FastAllocBase {
     m_next = 0;
   }
 
-  void setKey(UString::Rep* key) { m_key = key; }
-  UString::Rep* key() const { return m_key; }
+  void setKey(StringImpl* key) { m_key = key; }
+  StringImpl* key() const { return m_key; }
 
   unsigned char attributes() const { return m_attributes; }
 
@@ -113,7 +113,7 @@ class HashEntry : public FastAllocBase {
   HashEntry* next() const { return m_next; }
 
  private:
-  UString::Rep* m_key;
+  StringImpl* m_key;
   unsigned char m_attributes;  // JSObject attributes
 
   union {
@@ -177,14 +177,14 @@ struct HashTable {
   ALWAYS_INLINE const HashEntry* entry(const Identifier& identifier) const {
     ASSERT(table);
 
-    const HashEntry* entry = &table[identifier.ustring().rep()->existingHash() &
-                                    compactHashSizeMask];
+    const HashEntry* entry =
+        &table[identifier.impl()->existingHash() & compactHashSizeMask];
 
     if (!entry->key())
       return 0;
 
     do {
-      if (entry->key() == identifier.ustring().rep())
+      if (entry->key() == identifier.impl())
         return entry;
       entry = entry->next();
     } while (entry);

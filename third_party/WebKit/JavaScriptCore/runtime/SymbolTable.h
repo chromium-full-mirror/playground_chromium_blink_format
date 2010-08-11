@@ -103,10 +103,10 @@ struct SymbolTableIndexHashTraits {
   static const bool needsDestruction = false;
 };
 
-typedef HashMap<RefPtr<UString::Rep>,
+typedef HashMap<RefPtr<StringImpl>,
                 SymbolTableEntry,
                 IdentifierRepHash,
-                HashTraits<RefPtr<UString::Rep>>,
+                HashTraits<RefPtr<StringImpl>>,
                 SymbolTableIndexHashTraits>
     SymbolTable;
 

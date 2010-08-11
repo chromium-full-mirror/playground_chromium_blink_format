@@ -98,7 +98,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
     }
     void append(const UString& string) {
       ASSERT(m_rope);
-      m_rope->initializeFiber(m_index, string.rep());
+      m_rope->initializeFiber(m_index, string.impl());
     }
     void append(JSString* jsString) {
       if (jsString->isRope()) {
@@ -366,7 +366,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
   void resolveRope(ExecState*) const;
 
   void appendStringInConstruct(unsigned& index, const UString& string) {
-    StringImpl* impl = string.rep();
+    StringImpl* impl = string.impl();
     impl->ref();
     m_other.m_fibers[index++] = impl;
   }
@@ -393,7 +393,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
       m_length += s->length();
     } else {
       UString u(v.toString(exec));
-      StringImpl* impl = u.rep();
+      StringImpl* impl = u.impl();
       impl->ref();
       m_other.m_fibers[index++] = impl;
       m_length += u.size();
@@ -504,7 +504,7 @@ inline JSString* jsSingleCharacterSubstring(ExecState* exec,
   return fixupVPtr(
       globalData,
       new (globalData) JSString(
-          globalData, UString(StringImpl::create(s.rep(), offset, 1))));
+          globalData, UString(StringImpl::create(s.impl(), offset, 1))));
 }
 
 inline JSString* jsNontrivialString(JSGlobalData* globalData, const char* s) {
@@ -567,7 +567,7 @@ inline JSString* jsSubstring(JSGlobalData* globalData,
   return fixupVPtr(
       globalData,
       new (globalData) JSString(
-          globalData, UString(StringImpl::create(s.rep(), offset, length)),
+          globalData, UString(StringImpl::create(s.impl(), offset, length)),
           JSString::HasOtherOwner));
 }
 

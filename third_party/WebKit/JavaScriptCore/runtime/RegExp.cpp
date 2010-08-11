@@ -110,7 +110,7 @@ int RegExp::match(const UString& s, int startOffset, Vector<int, 32>* ovector) {
   // invocation
   // and if it is return the prior result.
   if ((startOffset == m_lastMatchStart) &&
-      (s.rep() == m_lastMatchString.rep())) {
+      (s.impl() == m_lastMatchString.impl())) {
     if (ovector)
       *ovector = m_lastOVector;
 

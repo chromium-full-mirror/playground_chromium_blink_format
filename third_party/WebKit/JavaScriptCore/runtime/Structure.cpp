@@ -300,7 +300,7 @@ Structure::~Structure() {
     unsigned entryCount =
         m_propertyTable->keyCount + m_propertyTable->deletedSentinelCount;
     for (unsigned i = 1; i <= entryCount; i++) {
-      if (UString::Rep* key = m_propertyTable->entries()[i].key)
+      if (StringImpl* key = m_propertyTable->entries()[i].key)
         key->deref();
     }
 
@@ -423,7 +423,7 @@ void Structure::growPropertyStorageCapacity() {
 }
 
 void Structure::despecifyDictionaryFunction(const Identifier& propertyName) {
-  const UString::Rep* rep = propertyName._ustring.rep();
+  const StringImpl* rep = propertyName.impl();
 
   materializePropertyMapIfNecessary();
 
@@ -478,7 +478,7 @@ PassRefPtr<Structure> Structure::addPropertyTransitionToExistingStructure(
   ASSERT(structure->typeInfo().type() == ObjectType);
 
   if (Structure* existingTransition = structure->transitionTableGet(
-          make_pair(propertyName.ustring().rep(), attributes), specificValue)) {
+          make_pair(propertyName.impl(), attributes), specificValue)) {
     ASSERT(existingTransition->m_offset != noOffset);
     offset =
         existingTransition->m_offset + existingTransition->m_anonymousSlotCount;
@@ -524,7 +524,7 @@ PassRefPtr<Structure> Structure::addPropertyTransition(
 
   transition->m_cachedPrototypeChain = structure->m_cachedPrototypeChain;
   transition->m_previous = structure;
-  transition->m_nameInPrevious = propertyName.ustring().rep();
+  transition->m_nameInPrevious = propertyName.impl();
   transition->m_attributesInPrevious = attributes;
   transition->m_specificValueInPrevious = specificValue;
   transition->m_propertyStorageCapacity = structure->m_propertyStorageCapacity;
@@ -557,9 +557,8 @@ PassRefPtr<Structure> Structure::addPropertyTransition(
 
   transition->m_offset = offset - structure->m_anonymousSlotCount;
   ASSERT(structure->anonymousSlotCount() == transition->anonymousSlotCount());
-  structure->transitionTableAdd(
-      make_pair(propertyName.ustring().rep(), attributes), transition.get(),
-      specificValue);
+  structure->transitionTableAdd(make_pair(propertyName.impl(), attributes),
+                                transition.get(), specificValue);
   return transition.release();
 }
 
@@ -813,7 +812,7 @@ PropertyMapHashTable* Structure::copyPropertyTable() {
   unsigned entryCount =
       m_propertyTable->keyCount + m_propertyTable->deletedSentinelCount;
   for (unsigned i = 1; i <= entryCount; ++i) {
-    if (UString::Rep* key = newTable->entries()[i].key)
+    if (StringImpl* key = newTable->entries()[i].key)
       key->ref();
   }
 
@@ -825,7 +824,7 @@ PropertyMapHashTable* Structure::copyPropertyTable() {
   return newTable;
 }
 
-size_t Structure::get(const UString::Rep* rep,
+size_t Structure::get(const StringImpl* rep,
                       unsigned& attributes,
                       JSCell*& specificValue) {
   materializePropertyMapIfNecessary();
@@ -885,7 +884,7 @@ bool Structure::despecifyFunction(const Identifier& propertyName) {
   if (!m_propertyTable)
     return false;
 
-  UString::Rep* rep = propertyName._ustring.rep();
+  StringImpl* rep = propertyName.impl();
 
   unsigned i = rep->existingHash();
 
@@ -951,7 +950,7 @@ size_t Structure::put(const Identifier& propertyName,
   if (attributes & DontEnum)
     m_hasNonEnumerableProperties = true;
 
-  UString::Rep* rep = propertyName._ustring.rep();
+  StringImpl* rep = propertyName.impl();
 
   if (!m_propertyTable)
     createPropertyMapHashTable();
@@ -1042,7 +1041,7 @@ size_t Structure::put(const Identifier& propertyName,
   return newOffset;
 }
 
-bool Structure::hasTransition(UString::Rep* rep, unsigned attributes) {
+bool Structure::hasTransition(StringImpl* rep, unsigned attributes) {
   return transitionTableHasTransition(make_pair(rep, attributes));
 }
 
@@ -1051,7 +1050,7 @@ size_t Structure::remove(const Identifier& propertyName) {
 
   checkConsistency();
 
-  UString::Rep* rep = propertyName._ustring.rep();
+  StringImpl* rep = propertyName.impl();
 
   if (!m_propertyTable)
     return notFound;
@@ -1065,7 +1064,7 @@ size_t Structure::remove(const Identifier& propertyName) {
   unsigned i = rep->existingHash();
   unsigned k = 0;
   unsigned entryIndex;
-  UString::Rep* key = 0;
+  StringImpl* key = 0;
   while (1) {
     entryIndex = m_propertyTable->entryIndices[i & m_propertyTable->sizeMask];
     if (entryIndex == emptyEntryIndex)
@@ -1337,7 +1336,7 @@ void Structure::checkConsistency() {
        ++c) {
     ASSERT(m_hasNonEnumerableProperties ||
            !(m_propertyTable->entries()[c].attributes & DontEnum));
-    UString::Rep* rep = m_propertyTable->entries()[c].key;
+    StringImpl* rep = m_propertyTable->entries()[c].key;
     ASSERT(m_propertyTable->entries()[c].offset >= m_anonymousSlotCount);
     if (!rep)
       continue;

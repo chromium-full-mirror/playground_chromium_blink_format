@@ -76,7 +76,7 @@ IdentifierRep* IdentifierRep::get(int intID) {
   return result.first->second;
 }
 
-typedef HashMap<RefPtr<JSC::UString::Rep>, IdentifierRep*> StringIdentifierMap;
+typedef HashMap<RefPtr<StringImpl>, IdentifierRep*> StringIdentifierMap;
 
 static StringIdentifierMap& stringIdentifierMap() {
   DEFINE_STATIC_LOCAL(StringIdentifierMap, stringIdentifierMap, ());
@@ -91,7 +91,7 @@ IdentifierRep* IdentifierRep::get(const char* name) {
   UString string =
       stringToUString(String::fromUTF8WithLatin1Fallback(name, strlen(name)));
   pair<StringIdentifierMap::iterator, bool> result =
-      stringIdentifierMap().add(string.rep(), 0);
+      stringIdentifierMap().add(string.impl(), 0);
   if (result.second) {
     ASSERT(!result.first->second);
     result.first->second = new IdentifierRep(name);

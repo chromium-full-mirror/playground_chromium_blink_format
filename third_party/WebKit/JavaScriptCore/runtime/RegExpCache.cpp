@@ -66,7 +66,7 @@ PassRefPtr<RegExp> RegExpCache::create(const UString& patternString,
                                 patternKeyArray[m_nextKeyToEvict].pattern));
 
   patternKeyArray[m_nextKeyToEvict].flagsValue = key.flagsValue;
-  patternKeyArray[m_nextKeyToEvict].pattern = patternString.rep();
+  patternKeyArray[m_nextKeyToEvict].pattern = patternString.impl();
   return regExp;
 }
 

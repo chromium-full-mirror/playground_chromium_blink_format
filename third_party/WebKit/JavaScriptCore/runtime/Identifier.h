@@ -36,32 +36,33 @@ class Identifier {
   Identifier() {}
 
   Identifier(ExecState* exec, const char* s)
-      : _ustring(add(exec, s)) {}  // Only to be used with string literals.
+      : m_string(add(exec, s)) {}  // Only to be used with string literals.
   Identifier(ExecState* exec, const UChar* s, int length)
-      : _ustring(add(exec, s, length)) {}
-  Identifier(ExecState* exec, UString::Rep* rep) : _ustring(add(exec, rep)) {}
+      : m_string(add(exec, s, length)) {}
+  Identifier(ExecState* exec, StringImpl* rep) : m_string(add(exec, rep)) {}
   Identifier(ExecState* exec, const UString& s)
-      : _ustring(add(exec, s.rep())) {}
+      : m_string(add(exec, s.impl())) {}
 
   Identifier(JSGlobalData* globalData, const char* s)
-      : _ustring(add(globalData, s)) {
+      : m_string(add(globalData, s)) {
   }  // Only to be used with string literals.
   Identifier(JSGlobalData* globalData, const UChar* s, int length)
-      : _ustring(add(globalData, s, length)) {}
-  Identifier(JSGlobalData* globalData, UString::Rep* rep)
-      : _ustring(add(globalData, rep)) {}
+      : m_string(add(globalData, s, length)) {}
+  Identifier(JSGlobalData* globalData, StringImpl* rep)
+      : m_string(add(globalData, rep)) {}
   Identifier(JSGlobalData* globalData, const UString& s)
-      : _ustring(add(globalData, s.rep())) {}
+      : m_string(add(globalData, s.impl())) {}
 
   // Special constructor for cases where we overwrite an object in place.
-  Identifier(PlacementNewAdoptType) : _ustring(PlacementNewAdopt) {}
+  Identifier(PlacementNewAdoptType) : m_string(PlacementNewAdopt) {}
 
-  const UString& ustring() const { return _ustring; }
+  const UString& ustring() const { return m_string; }
+  StringImpl* impl() const { return m_string.impl(); }
 
-  const UChar* data() const { return _ustring.data(); }
-  int size() const { return _ustring.size(); }
+  const UChar* data() const { return m_string.data(); }
+  int size() const { return m_string.size(); }
 
-  const char* ascii() const { return _ustring.ascii(); }
+  const char* ascii() const { return m_string.ascii(); }
 
   static Identifier from(ExecState* exec, unsigned y);
   static Identifier from(ExecState* exec, int y);
@@ -70,18 +71,18 @@ class Identifier {
   static Identifier from(JSGlobalData*, int y);
   static Identifier from(JSGlobalData*, double y);
 
-  bool isNull() const { return _ustring.isNull(); }
-  bool isEmpty() const { return _ustring.isEmpty(); }
+  bool isNull() const { return m_string.isNull(); }
+  bool isEmpty() const { return m_string.isEmpty(); }
 
-  uint32_t toUInt32(bool* ok) const { return _ustring.toUInt32(ok); }
+  uint32_t toUInt32(bool* ok) const { return m_string.toUInt32(ok); }
   uint32_t toUInt32(bool* ok, bool tolerateEmptyString) const {
-    return _ustring.toUInt32(ok, tolerateEmptyString);
+    return m_string.toUInt32(ok, tolerateEmptyString);
   };
   uint32_t toStrictUInt32(bool* ok) const {
-    return _ustring.toStrictUInt32(ok);
+    return m_string.toStrictUInt32(ok);
   }
-  unsigned toArrayIndex(bool* ok) const { return _ustring.toArrayIndex(ok); }
-  double toDouble() const { return _ustring.toDouble(); }
+  unsigned toArrayIndex(bool* ok) const { return m_string.toArrayIndex(ok); }
+  double toDouble() const { return m_string.toDouble(); }
 
   friend bool operator==(const Identifier&, const Identifier&);
   friend bool operator!=(const Identifier&, const Identifier&);
@@ -89,33 +90,33 @@ class Identifier {
   friend bool operator==(const Identifier&, const char*);
   friend bool operator!=(const Identifier&, const char*);
 
-  static bool equal(const UString::Rep*, const char*);
-  static bool equal(const UString::Rep*, const UChar*, unsigned length);
-  static bool equal(const UString::Rep* a, const UString::Rep* b) {
+  static bool equal(const StringImpl*, const char*);
+  static bool equal(const StringImpl*, const UChar*, unsigned length);
+  static bool equal(const StringImpl* a, const StringImpl* b) {
     return ::equal(a, b);
   }
 
-  static PassRefPtr<UString::Rep> add(
+  static PassRefPtr<StringImpl> add(
       ExecState*,
       const char*);  // Only to be used with string literals.
-  static PassRefPtr<UString::Rep> add(
+  static PassRefPtr<StringImpl> add(
       JSGlobalData*,
       const char*);  // Only to be used with string literals.
 
  private:
-  UString _ustring;
+  UString m_string;
 
   static bool equal(const Identifier& a, const Identifier& b) {
-    return a._ustring.rep() == b._ustring.rep();
+    return a.m_string.impl() == b.m_string.impl();
   }
   static bool equal(const Identifier& a, const char* b) {
-    return equal(a._ustring.rep(), b);
+    return equal(a.m_string.impl(), b);
   }
 
-  static PassRefPtr<UString::Rep> add(ExecState*, const UChar*, int length);
-  static PassRefPtr<UString::Rep> add(JSGlobalData*, const UChar*, int length);
+  static PassRefPtr<StringImpl> add(ExecState*, const UChar*, int length);
+  static PassRefPtr<StringImpl> add(JSGlobalData*, const UChar*, int length);
 
-  static PassRefPtr<UString::Rep> add(ExecState* exec, UString::Rep* r) {
+  static PassRefPtr<StringImpl> add(ExecState* exec, StringImpl* r) {
 #ifndef NDEBUG
     checkCurrentIdentifierTable(exec);
 #endif
@@ -123,8 +124,7 @@ class Identifier {
       return r;
     return addSlowCase(exec, r);
   }
-  static PassRefPtr<UString::Rep> add(JSGlobalData* globalData,
-                                      UString::Rep* r) {
+  static PassRefPtr<StringImpl> add(JSGlobalData* globalData, StringImpl* r) {
 #ifndef NDEBUG
     checkCurrentIdentifierTable(globalData);
 #endif
@@ -133,8 +133,8 @@ class Identifier {
     return addSlowCase(globalData, r);
   }
 
-  static PassRefPtr<UString::Rep> addSlowCase(ExecState*, UString::Rep* r);
-  static PassRefPtr<UString::Rep> addSlowCase(JSGlobalData*, UString::Rep* r);
+  static PassRefPtr<StringImpl> addSlowCase(ExecState*, StringImpl* r);
+  static PassRefPtr<StringImpl> addSlowCase(JSGlobalData*, StringImpl* r);
 
   static void checkCurrentIdentifierTable(ExecState*);
   static void checkCurrentIdentifierTable(JSGlobalData*);

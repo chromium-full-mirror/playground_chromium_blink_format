@@ -89,7 +89,7 @@ class SerializedScriptValueData {
   explicit SerializedScriptValueData(const String& string)
       : m_type(StringType),
         m_string(string.crossThreadString())  // FIXME: Should be able to just
-                                              // share the Rep
+                                              // share the StringImpl
   {}
 
   explicit SerializedScriptValueData(const Blob*);

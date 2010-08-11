@@ -51,7 +51,7 @@ class EvalCodeCache {
 
     if (evalSource.size() < maxCacheableSourceLength &&
         (*scopeChain->begin())->isVariableObject())
-      evalExecutable = m_cacheMap.get(evalSource.rep());
+      evalExecutable = m_cacheMap.get(evalSource.impl());
 
     if (!evalExecutable) {
       evalExecutable = EvalExecutable::create(exec, makeSource(evalSource));
@@ -62,7 +62,7 @@ class EvalCodeCache {
       if (evalSource.size() < maxCacheableSourceLength &&
           (*scopeChain->begin())->isVariableObject() &&
           m_cacheMap.size() < maxCacheEntries)
-        m_cacheMap.set(evalSource.rep(), evalExecutable);
+        m_cacheMap.set(evalSource.impl(), evalExecutable);
     }
 
     return evalExecutable.release();
@@ -74,7 +74,7 @@ class EvalCodeCache {
   static const unsigned maxCacheableSourceLength = 256;
   static const int maxCacheEntries = 64;
 
-  typedef HashMap<RefPtr<UString::Rep>, RefPtr<EvalExecutable>> EvalCacheMap;
+  typedef HashMap<RefPtr<StringImpl>, RefPtr<EvalExecutable>> EvalCacheMap;
   EvalCacheMap m_cacheMap;
 };
 

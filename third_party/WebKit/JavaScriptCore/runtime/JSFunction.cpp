@@ -155,7 +155,7 @@ const UString JSFunction::displayName(ExecState* exec) {
   if (displayName && isJSString(&exec->globalData(), displayName))
     return asString(displayName)->tryGetValue();
 
-  return UString::null();
+  return UString();
 }
 
 const UString JSFunction::calculatedDisplayName(ExecState* exec) {

@@ -43,10 +43,10 @@ class SmallStringsStorage : public Noncopyable {
  public:
   SmallStringsStorage();
 
-  UString::Rep* rep(unsigned char character) { return m_reps[character].get(); }
+  StringImpl* rep(unsigned char character) { return m_reps[character].get(); }
 
  private:
-  RefPtr<UString::Rep> m_reps[numCharactersToStore];
+  RefPtr<StringImpl> m_reps[numCharactersToStore];
 };
 
 SmallStringsStorage::SmallStringsStorage() {
@@ -129,7 +129,7 @@ void SmallStrings::createSingleCharacterString(JSGlobalData* globalData,
       JSString(globalData, m_storage->rep(character), JSString::HasOtherOwner);
 }
 
-UString::Rep* SmallStrings::singleCharacterStringRep(unsigned char character) {
+StringImpl* SmallStrings::singleCharacterStringRep(unsigned char character) {
   if (!m_storage)
     m_storage = adoptPtr(new SmallStringsStorage);
   return m_storage->rep(character);
