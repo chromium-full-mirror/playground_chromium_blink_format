@@ -485,7 +485,9 @@ class ARMv7Assembler {
     ConditionEQ,
     ConditionNE,
     ConditionHS,
+    ConditionCS = ConditionHS,
     ConditionLO,
+    ConditionCC = ConditionLO,
     ConditionMI,
     ConditionPL,
     ConditionVS,
@@ -497,9 +499,7 @@ class ARMv7Assembler {
     ConditionGT,
     ConditionLE,
     ConditionAL,
-
-    ConditionCS = ConditionHS,
-    ConditionCC = ConditionLO,
+    ConditionInvalid
   } Condition;
 
   enum JumpType { JumpNoCondition, JumpCondition, JumpFullSize };
@@ -549,7 +549,7 @@ class ARMv7Assembler {
 
    private:
     JmpSrc(int offset, JumpType type)
-        : m_offset(offset), m_condition(0xffff), m_type(type) {
+        : m_offset(offset), m_condition(ConditionInvalid), m_type(type) {
       ASSERT(m_type != JumpCondition);
     }
 
