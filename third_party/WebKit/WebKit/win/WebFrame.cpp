@@ -1270,26 +1270,26 @@ HRESULT WebFrame::numberOfActiveAnimations(UINT* number) {
 HRESULT WebFrame::suspendAnimations() {
   Frame* frame = core(this);
   if (!frame)
-    return;
+    return E_FAIL;
 
   AnimationController* controller = frame->animation();
   if (!controller)
-    return;
+    return E_FAIL;
 
-  controller->suspendAnimations();
+  controller->suspendAnimations(frame->document());
   return S_OK;
 }
 
 HRESULT WebFrame::resumeAnimations() {
   Frame* frame = core(this);
   if (!frame)
-    return;
+    return E_FAIL;
 
   AnimationController* controller = frame->animation();
   if (!controller)
-    return;
+    return E_FAIL;
 
-  controller->resumeAnimations();
+  controller->resumeAnimations(frame->document());
   return S_OK;
 }
 
