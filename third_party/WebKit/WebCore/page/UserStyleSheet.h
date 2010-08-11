@@ -37,27 +37,22 @@ namespace WebCore {
 
 class UserStyleSheet : public Noncopyable {
  public:
-  enum Level { UserLevel, AuthorLevel };
-
   UserStyleSheet(const String& source,
                  const KURL& url,
                  PassOwnPtr<Vector<String>> whitelist,
                  PassOwnPtr<Vector<String>> blacklist,
-                 UserContentInjectedFrames injectedFrames,
-                 Level level)
+                 UserContentInjectedFrames injectedFrames)
       : m_source(source),
         m_url(url),
         m_whitelist(whitelist),
         m_blacklist(blacklist),
-        m_injectedFrames(injectedFrames),
-        m_level(level) {}
+        m_injectedFrames(injectedFrames) {}
 
   const String& source() const { return m_source; }
   const KURL& url() const { return m_url; }
   const Vector<String>* whitelist() const { return m_whitelist.get(); }
   const Vector<String>* blacklist() const { return m_blacklist.get(); }
   UserContentInjectedFrames injectedFrames() const { return m_injectedFrames; }
-  Level level() const { return m_level; }
 
  private:
   String m_source;
@@ -65,7 +60,6 @@ class UserStyleSheet : public Noncopyable {
   OwnPtr<Vector<String>> m_whitelist;
   OwnPtr<Vector<String>> m_blacklist;
   UserContentInjectedFrames m_injectedFrames;
-  Level m_level;
 };
 
 }  // namespace WebCore
