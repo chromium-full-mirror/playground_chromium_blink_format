@@ -34,9 +34,9 @@
 #include "WebDOMClass3.h"
 #include "WebDOMString.h"
 #include "WebExceptionHandler.h"
+#include "wtf/text/AtomicString.h"
 #include <wtf/GetPtr.h>
 #include <wtf/RefPtr.h>
-#include <wtf/text/AtomicString.h>
 
 struct WebDOMTestCallback::WebDOMTestCallbackPrivate {
   WebDOMTestCallbackPrivate(WebCore::TestCallback* object = 0) : impl(object) {}
@@ -75,7 +75,7 @@ bool WebDOMTestCallback::callbackWithClass1Param(
   if (!impl())
     return false;
 
-  return impl()->callbackWithClass1Param(0, toWebCore(class1Param));
+  return impl()->callbackWithClass1Param(toWebCore(class1Param));
 }
 
 bool WebDOMTestCallback::callbackWithClass2Param(
@@ -84,7 +84,7 @@ bool WebDOMTestCallback::callbackWithClass2Param(
   if (!impl())
     return false;
 
-  return impl()->callbackWithClass2Param(0, toWebCore(class2Param), strArg);
+  return impl()->callbackWithClass2Param(toWebCore(class2Param), strArg);
 }
 
 int WebDOMTestCallback::callbackWithNonBoolReturnType(
@@ -92,7 +92,7 @@ int WebDOMTestCallback::callbackWithNonBoolReturnType(
   if (!impl())
     return 0;
 
-  return impl()->callbackWithNonBoolReturnType(0, toWebCore(class3Param));
+  return impl()->callbackWithNonBoolReturnType(toWebCore(class3Param));
 }
 
 WebCore::TestCallback* toWebCore(const WebDOMTestCallback& wrapper) {
