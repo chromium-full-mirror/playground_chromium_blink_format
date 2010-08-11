@@ -929,7 +929,7 @@ void LayoutTestController::suspendAnimations() {
   if (!controller)
     return;
 
-  controller->suspendAnimations(webFrame->document());
+  controller->suspendAnimations();
 }
 
 void LayoutTestController::resumeAnimations() {
@@ -941,7 +941,7 @@ void LayoutTestController::resumeAnimations() {
   if (!controller)
     return;
 
-  controller->resumeAnimations(webFrame->document());
+  controller->resumeAnimations();
 }
 
 void LayoutTestController::pauseAnimationAtTimeOnElementWithId(
