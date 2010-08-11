@@ -171,6 +171,8 @@ class LauncherWindow : public MainWindow {
 #endif
 
   void changeViewportUpdateMode(int mode);
+  void animatedFlip();
+  void animatedYFlip();
   void selectElements();
   void showFPS(bool enable);
   void showUserAgentDialog();
