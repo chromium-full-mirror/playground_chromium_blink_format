@@ -269,7 +269,7 @@ inline void MarkStack::drain() {
 
       JSCell* cell;
       if (!value || !value.isCell() ||
-          Heap::isCellMarked(cell = value.asCell())) {
+          Heap::checkMarkCell(cell = value.asCell())) {
         if (current.m_values == end) {
           m_markSets.removeLast();
           continue;
@@ -277,7 +277,6 @@ inline void MarkStack::drain() {
         goto findNextUnmarkedNullValue;
       }
 
-      Heap::markCell(cell);
       if (cell->structure()->typeInfo().type() < CompoundType) {
         if (current.m_values == end) {
           m_markSets.removeLast();

@@ -324,9 +324,8 @@ inline JSObject* JSValue::toThisObject(ExecState* exec) const {
 ALWAYS_INLINE void MarkStack::append(JSCell* cell) {
   ASSERT(!m_isCheckingForDefaultMarkViolation);
   ASSERT(cell);
-  if (Heap::isCellMarked(cell))
+  if (Heap::checkMarkCell(cell))
     return;
-  Heap::markCell(cell);
   if (cell->structure()->typeInfo().type() >= CompoundType)
     m_values.append(cell);
 }
