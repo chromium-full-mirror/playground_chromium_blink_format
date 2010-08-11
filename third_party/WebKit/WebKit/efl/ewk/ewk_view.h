@@ -21,6 +21,7 @@
 #ifndef ewk_view_h
 #define ewk_view_h
 
+#include "ewk_frame.h"
 #include "ewk_history.h"
 #include "ewk_window_features.h"
 
@@ -181,6 +182,9 @@ struct _Ewk_View_Smart_Class {
                               Eina_Bool allows_multiple_files,
                               const Eina_List* suggested_filenames,
                               Eina_List** selected_filenames);
+
+  Eina_Bool (*navigation_policy_decision)(Ewk_View_Smart_Data* sd,
+                                          Ewk_Frame_Resource_Request* request);
 };
 
 #define EWK_VIEW_SMART_CLASS_VERSION                                \

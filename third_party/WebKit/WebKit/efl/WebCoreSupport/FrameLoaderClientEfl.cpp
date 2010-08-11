@@ -362,9 +362,23 @@ void FrameLoaderClientEfl::dispatchDecidePolicyForNavigationAction(
   ASSERT(m_frame);
   // if not acceptNavigationRequest - look at Qt -> PolicyIgnore;
   // FIXME: do proper check and only reset forms when on PolicyIgnore
-  Frame* f = ewk_frame_core_get(m_frame);
-  f->loader()->resetMultipleFormSubmissionProtection();
-  callPolicyFunction(function, PolicyUse);
+  char* url = strdup(resourceRequest.url().prettyURL().utf8().data());
+  Ewk_Frame_Resource_Request request = {url, 0};
+  Eina_Bool ret = ewk_view_navigation_policy_decision(m_view, &request);
+  free(url);
+
+  PolicyAction policy;
+  if (!ret)
+    policy = PolicyIgnore;
+  else {
+    if (action.type() == NavigationTypeFormSubmitted ||
+        action.type() == NavigationTypeFormResubmitted) {
+      Frame* f = ewk_frame_core_get(m_frame);
+      f->loader()->resetMultipleFormSubmissionProtection();
+    }
+    policy = PolicyUse;
+  }
+  callPolicyFunction(function, policy);
 }
 
 PassRefPtr<Widget> FrameLoaderClientEfl::createPlugin(

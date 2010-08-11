@@ -242,6 +242,10 @@ WTF::PassRefPtr<WebCore::Widget> ewk_frame_plugin_create(
     const WTF::String& mimeType,
     bool loadManually);
 
+Eina_Bool ewk_view_navigation_policy_decision(
+    Evas_Object* o,
+    Ewk_Frame_Resource_Request* request);
+
 #ifdef __cplusplus
 }
 #endif
