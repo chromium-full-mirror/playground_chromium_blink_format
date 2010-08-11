@@ -85,7 +85,7 @@ PassRefPtr<ChildType> HTMLConstructionSite::attach(
   // doesn't.  It feels like we're missing a concept somehow.
   if (shouldFosterParent()) {
     fosterParent(child.get());
-    ASSERT(child->attached());
+    ASSERT(child->attached() || !child->parent()->attached());
     return child.release();
   }
 
