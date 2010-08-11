@@ -137,14 +137,6 @@ class FrameLoader : public Noncopyable {
 
   static void reportLocalLoadFailed(Frame*, const String& url);
 
-  // Called by createWindow in JSDOMWindowBase.cpp, e.g. to fulfill a modal
-  // dialog creation
-  // FIXME: Move this method outside of the FrameLoader class.
-  Frame* createWindow(FrameLoader* frameLoaderForFrameLookup,
-                      const FrameLoadRequest&,
-                      const WindowFeatures&,
-                      bool& created);
-
   unsigned long loadResourceSynchronously(const ResourceRequest&,
                                           StoredCredentials,
                                           ResourceError&,
@@ -611,6 +603,23 @@ class FrameLoader : public Noncopyable {
   bool m_didDispatchDidCommitLoad;
 #endif
 };
+
+// This function is called by createWindow() in JSDOMWindowBase.cpp, for
+// example, for
+// modal dialog creation.  The lookupFrame is for looking up the frame name in
+// case
+// the frame name references a frame different from the openerFrame, e.g. when
+// it is
+// "_self" or "_parent".
+//
+// FIXME: Consider making this function part of an appropriate class (not
+// FrameLoader)
+// and moving it to a more appropriate location.
+Frame* createWindow(Frame* openerFrame,
+                    Frame* lookupFrame,
+                    const FrameLoadRequest&,
+                    const WindowFeatures&,
+                    bool& created);
 
 }  // namespace WebCore
 
