@@ -1933,7 +1933,7 @@ WTF::PassRefPtr<WebCore::Widget> ewk_frame_plugin_create(
     const WebCore::KURL& url,
     const WTF::Vector<WTF::String>& paramNames,
     const WTF::Vector<WTF::String>& paramValues,
-    const WTF::StringWTF::String& mimeType,
+    const WTF::String& mimeType,
     bool loadManually) {
   return 0;
 }
