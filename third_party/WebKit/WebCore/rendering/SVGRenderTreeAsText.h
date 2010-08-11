@@ -44,6 +44,7 @@ class RenderImage;
 class RenderObject;
 class RenderPath;
 class RenderSVGGradientStop;
+class RenderSVGImage;
 class RenderSVGRoot;
 class RenderText;
 class AffineTransform;
@@ -57,7 +58,7 @@ void writeSVGGradientStop(TextStream&,
                           int indent);
 void writeSVGResourceContainer(TextStream&, const RenderObject&, int indent);
 void writeSVGContainer(TextStream&, const RenderObject&, int indent);
-void writeSVGImage(TextStream&, const RenderImage&, int indent);
+void writeSVGImage(TextStream&, const RenderSVGImage&, int indent);
 void writeSVGInlineText(TextStream&, const RenderText&, int indent);
 void writeSVGText(TextStream&, const RenderBlock&, int indent);
 void writeResources(TextStream&, const RenderObject&, int indent);

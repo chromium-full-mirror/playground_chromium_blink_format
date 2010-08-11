@@ -466,7 +466,7 @@ void write(TextStream& ts,
     return;
   }
   if (o.isSVGImage()) {
-    writeSVGImage(ts, *toRenderImage(&o), indent);
+    writeSVGImage(ts, *toRenderSVGImage(&o), indent);
     return;
   }
 #endif
