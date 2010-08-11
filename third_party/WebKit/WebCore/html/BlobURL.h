@@ -31,8 +31,6 @@
 #ifndef BlobURL_h
 #define BlobURL_h
 
-#if ENABLE(BLOB)
-
 #include "KURL.h"
 
 namespace WebCore {
@@ -45,7 +43,5 @@ class BlobURL {
   static KURL getOrigin(const KURL&);
 };
 }
-
-#endif  // ENABLE(BLOB)
 
 #endif  // BlobURL_h

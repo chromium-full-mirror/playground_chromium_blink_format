@@ -30,8 +30,6 @@
 
 #include "config.h"
 
-#if ENABLE(BLOB)
-
 #include "BlobURL.h"
 
 #include "KURL.h"
@@ -67,5 +65,3 @@ KURL BlobURL::getOrigin(const KURL& url) {
 }
 
 }  // namespace WebCore
-
-#endif  // ENABLE(BLOB)

@@ -31,8 +31,6 @@
 #ifndef BlobRegistryImpl_h
 #define BlobRegistryImpl_h
 
-#if ENABLE(BLOB)
-
 #include "BlobData.h"
 #include "BlobRegistry.h"
 #include "BlobStorageData.h"
@@ -81,7 +79,5 @@ class BlobRegistryImpl : public BlobRegistry {
 };
 
 }  // namespace WebCore
-
-#endif  // ENABLE(BLOB)
 
 #endif  // BlobRegistryImpl_h
