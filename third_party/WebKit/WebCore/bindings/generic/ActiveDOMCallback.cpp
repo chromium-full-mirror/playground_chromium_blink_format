@@ -109,9 +109,7 @@ static void destroyOnContextThread(
 }
 
 ActiveDOMCallback::ActiveDOMCallback(ScriptExecutionContext* context)
-    : m_impl(new ActiveDOMObjectCallbackImpl(context)) {
-  ASSERT(context->isContextThread());
-}
+    : m_impl(new ActiveDOMObjectCallbackImpl(context)) {}
 
 ActiveDOMCallback::~ActiveDOMCallback() {
   destroyOnContextThread(m_impl.release());

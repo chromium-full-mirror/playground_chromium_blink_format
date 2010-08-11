@@ -35,7 +35,14 @@
 
 namespace WebCore {
 
-DatabaseTaskSynchronizer::DatabaseTaskSynchronizer() : m_taskCompleted(false) {}
+DatabaseTaskSynchronizer::DatabaseTaskSynchronizer()
+    : m_taskCompleted(false)
+#ifndef NDEBUG
+      ,
+      m_hasCheckedForTermination(false)
+#endif
+{
+}
 
 void DatabaseTaskSynchronizer::waitForTaskCompletion() {
   m_synchronousMutex.lock();
@@ -62,7 +69,9 @@ DatabaseTask::DatabaseTask(Database* database,
 {
 }
 
-DatabaseTask::~DatabaseTask() {}
+DatabaseTask::~DatabaseTask() {
+  ASSERT(m_complete || !m_synchronizer);
+}
 
 void DatabaseTask::performTask() {
   // Database tasks are meant to be used only once, so make sure this one hasn't
@@ -76,6 +85,10 @@ void DatabaseTask::performTask() {
 
   if (m_synchronizer)
     m_synchronizer->taskCompleted();
+
+#ifndef NDEBUG
+  m_complete = true;
+#endif
 }
 
 // *** DatabaseOpenTask ***

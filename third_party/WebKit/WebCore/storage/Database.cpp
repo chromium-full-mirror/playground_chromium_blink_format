@@ -206,14 +206,15 @@ String Database::version() const {
 
 bool Database::openAndVerifyVersion(bool setVersionInNewDatabase,
                                     ExceptionCode& e) {
-  if (!m_scriptExecutionContext->databaseThread())
+  DatabaseTaskSynchronizer synchronizer;
+  if (!m_scriptExecutionContext->databaseThread() ||
+      m_scriptExecutionContext->databaseThread()->terminationRequested(
+          &synchronizer))
     return false;
 
   bool success = false;
-  DatabaseTaskSynchronizer synchronizer;
   OwnPtr<DatabaseOpenTask> task = DatabaseOpenTask::create(
       this, setVersionInNewDatabase, &synchronizer, e, success);
-
   m_scriptExecutionContext->databaseThread()->scheduleImmediateTask(
       task.release());
   synchronizer.waitForTaskCompletion();
@@ -229,7 +230,9 @@ void Database::markAsDeletedAndClose() {
       stringIdentifier().ascii().data(), this);
   m_deleted = true;
 
-  if (m_scriptExecutionContext->databaseThread()->terminationRequested()) {
+  DatabaseTaskSynchronizer synchronizer;
+  if (m_scriptExecutionContext->databaseThread()->terminationRequested(
+          &synchronizer)) {
     LOG(StorageAPI,
         "Database handle %p is on a terminated DatabaseThread, cannot be "
         "marked for normal closure\n",
@@ -237,10 +240,8 @@ void Database::markAsDeletedAndClose() {
     return;
   }
 
-  DatabaseTaskSynchronizer synchronizer;
   OwnPtr<DatabaseCloseTask> task =
       DatabaseCloseTask::create(this, &synchronizer);
-
   m_scriptExecutionContext->databaseThread()->scheduleImmediateTask(
       task.release());
   synchronizer.waitForTaskCompletion();
@@ -439,13 +440,14 @@ Vector<String> Database::tableNames() {
   // in dealing with them. However, if the code changes, this may not be true
   // anymore.
   Vector<String> result;
-  if (!m_scriptExecutionContext->databaseThread())
+  DatabaseTaskSynchronizer synchronizer;
+  if (!m_scriptExecutionContext->databaseThread() ||
+      m_scriptExecutionContext->databaseThread()->terminationRequested(
+          &synchronizer))
     return result;
 
-  DatabaseTaskSynchronizer synchronizer;
   OwnPtr<DatabaseTableNamesTask> task =
       DatabaseTableNamesTask::create(this, &synchronizer, result);
-
   m_scriptExecutionContext->databaseThread()->scheduleImmediateTask(
       task.release());
   synchronizer.waitForTaskCompletion();

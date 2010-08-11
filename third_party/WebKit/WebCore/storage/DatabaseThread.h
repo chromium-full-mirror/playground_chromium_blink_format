@@ -57,7 +57,8 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
 
   bool start();
   void requestTermination(DatabaseTaskSynchronizer* cleanupSync);
-  bool terminationRequested() const;
+  bool terminationRequested(
+      DatabaseTaskSynchronizer* taskSynchronizer = 0) const;
 
   void scheduleTask(PassOwnPtr<DatabaseTask>);
   void scheduleImmediateTask(PassOwnPtr<DatabaseTask>);  // This just adds the
