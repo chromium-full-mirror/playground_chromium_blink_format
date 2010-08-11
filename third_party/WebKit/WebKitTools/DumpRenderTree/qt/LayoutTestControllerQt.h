@@ -178,6 +178,8 @@ class LayoutTestController : public QObject {
   bool elementDoesAutoCompleteForElementWithId(const QString& elementId);
 
   unsigned numberOfActiveAnimations() const;
+  void suspendAnimations() const;
+  void resumeAnimations() const;
 
   void addOriginAccessWhitelistEntry(const QString& sourceOrigin,
                                      const QString& destinationProtocol,

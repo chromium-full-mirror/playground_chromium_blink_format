@@ -62,6 +62,8 @@ bool webkit_web_frame_pause_svg_animation(WebKitWebFrame* frame,
                                           const gchar* element);
 unsigned int webkit_web_frame_number_of_active_animations(
     WebKitWebFrame* frame);
+void webkit_web_frame_suspend_animations(WebKitWebFrame* frame);
+void webkit_web_frame_resume_animations(WebKitWebFrame* frame);
 void webkit_application_cache_set_maximum_size(unsigned long long size);
 unsigned int webkit_worker_thread_count(void);
 void webkit_white_list_access_from_origin(const gchar* sourceOrigin,
@@ -641,6 +643,14 @@ bool LayoutTestController::sampleSVGAnimationForElementAtTime(
 
 unsigned LayoutTestController::numberOfActiveAnimations() const {
   return webkit_web_frame_number_of_active_animations(mainFrame);
+}
+
+void LayoutTestController::suspendAnimations() const {
+  return webkit_web_frame_suspend_animations(mainFrame);
+}
+
+void LayoutTestController::resumeAnimations() const {
+  return webkit_web_frame_resume_animations(mainFrame);
 }
 
 void LayoutTestController::overridePreference(JSStringRef key,

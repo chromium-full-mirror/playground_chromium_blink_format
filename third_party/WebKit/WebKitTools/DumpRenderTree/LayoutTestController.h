@@ -370,6 +370,8 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
                                           double time,
                                           JSStringRef elementId);
   unsigned numberOfActiveAnimations() const;
+  void suspendAnimations() const;
+  void resumeAnimations() const;
 
   void addOriginAccessWhitelistEntry(JSStringRef sourceOrigin,
                                      JSStringRef destinationProtocol,

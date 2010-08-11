@@ -273,6 +273,8 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
                     double secondsFromNow,
                     BOOL* animationWasRunning);
   virtual HRESULT STDMETHODCALLTYPE numberOfActiveAnimations(UINT*);
+  virtual HRESULT STDMETHODCALLTYPE suspendAnimations();
+  virtual HRESULT STDMETHODCALLTYPE resumeAnimations();
 
   virtual HRESULT STDMETHODCALLTYPE isDisplayingStandaloneImage(BOOL*);
 

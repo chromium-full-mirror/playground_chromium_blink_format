@@ -129,6 +129,11 @@ typedef enum {
 // transitions and CSS animations).
 - (unsigned)_numberOfActiveAnimations;
 
+// Suspend and resume animations (includes both CSS transitions and CSS
+// animations).
+- (void)_suspendAnimations;
+- (void)_resumeAnimations;
+
 - (void)_replaceSelectionWithFragment:(DOMDocumentFragment*)fragment
                     selectReplacement:(BOOL)selectReplacement
                          smartReplace:(BOOL)smartReplace

@@ -2285,6 +2285,30 @@ static JSValueRef numberOfActiveAnimationsCallback(JSContextRef context,
   return JSValueMakeNumber(context, controller->numberOfActiveAnimations());
 }
 
+static JSValueRef suspendAnimationsCallback(JSContextRef context,
+                                            JSObjectRef function,
+                                            JSObjectRef thisObject,
+                                            size_t argumentCount,
+                                            const JSValueRef arguments[],
+                                            JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->suspendAnimations();
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef resumeAnimationsCallback(JSContextRef context,
+                                           JSObjectRef function,
+                                           JSObjectRef thisObject,
+                                           size_t argumentCount,
+                                           const JSValueRef arguments[],
+                                           JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->resumeAnimations();
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef waitForPolicyDelegateCallback(JSContextRef context,
                                                 JSObjectRef,
                                                 JSObjectRef thisObject,
@@ -2766,6 +2790,10 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"notifyDone", notifyDoneCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"numberOfActiveAnimations", numberOfActiveAnimationsCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"suspendAnimations", suspendAnimationsCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"resumeAnimations", resumeAnimationsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"overridePreference", overridePreferenceCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

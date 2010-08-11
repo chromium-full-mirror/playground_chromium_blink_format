@@ -95,6 +95,8 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
   static void clearFrameName(QWebFrame* frame);
   static void overwritePluginDirectories();
   static int numberOfActiveAnimations(QWebFrame*);
+  static void suspendAnimations(QWebFrame*);
+  static void resumeAnimations(QWebFrame*);
   static int numberOfPages(QWebFrame* frame, float width, float height);
   static int pageNumberForElementById(QWebFrame* frame,
                                       const QString& id,
