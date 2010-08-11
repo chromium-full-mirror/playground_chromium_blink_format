@@ -171,22 +171,31 @@ class Writer : Noncopyable {
     doWriteNumber(number);
   }
 
-  void writeBlob(const String& path) {
+  void writeBlob(const String& url,
+                 const String& type,
+                 unsigned long long size) {
     append(BlobTag);
-    doWriteWebCoreString(path);
+    doWriteWebCoreString(url);
+    doWriteWebCoreString(type);
+    doWriteUint64(size);
   }
 
-  void writeFile(const String& path) {
+  void writeFile(const String& path, const String& url, const String& type) {
     append(FileTag);
     doWriteWebCoreString(path);
+    doWriteWebCoreString(url);
+    doWriteWebCoreString(type);
   }
 
   void writeFileList(const FileList& fileList) {
     append(FileListTag);
     uint32_t length = fileList.length();
     doWriteUint32(length);
-    for (unsigned i = 0; i < length; ++i)
+    for (unsigned i = 0; i < length; ++i) {
       doWriteWebCoreString(fileList.item(i)->path());
+      doWriteWebCoreString(fileList.item(i)->url().string());
+      doWriteWebCoreString(fileList.item(i)->type());
+    }
   }
 
   void writeImageData(uint32_t width,
@@ -232,7 +241,8 @@ class Writer : Noncopyable {
     doWriteString(buffer->data(), buffer->size());
   }
 
-  void doWriteUint32(uint32_t value) {
+  template <class T>
+  void doWriteUintHelper(T value) {
     while (true) {
       uint8_t b = (value & varIntMask);
       value >>= varIntShift;
@@ -243,6 +253,10 @@ class Writer : Noncopyable {
       append(b | (1 << varIntShift));
     }
   }
+
+  void doWriteUint32(uint32_t value) { doWriteUintHelper(value); }
+
+  void doWriteUint64(uint64_t value) { doWriteUintHelper(value); }
 
   void doWriteNumber(double number) {
     append(reinterpret_cast<uint8_t*>(&number), sizeof(number));
@@ -516,14 +530,14 @@ class Serializer {
     Blob* blob = V8Blob::toNative(value.As<v8::Object>());
     if (!blob)
       return;
-    m_writer.writeBlob(blob->path());
+    m_writer.writeBlob(blob->url().string(), blob->type(), blob->size());
   }
 
   void writeFile(v8::Handle<v8::Value> value) {
     File* file = V8File::toNative(value.As<v8::Object>());
     if (!file)
       return;
-    m_writer.writeFile(file->path());
+    m_writer.writeFile(file->path(), file->url().string(), file->type());
   }
 
   void writeFileList(v8::Handle<v8::Value> value) {
@@ -798,19 +812,33 @@ class Reader {
   }
 
   bool readBlob(v8::Handle<v8::Value>* value) {
-    String path;
-    if (!readWebCoreString(&path))
+    String url;
+    String type;
+    unsigned long long size;
+    if (!readWebCoreString(&url))
       return false;
-    PassRefPtr<Blob> blob = Blob::create(getScriptExecutionContext(), path);
+    if (!readWebCoreString(&type))
+      return false;
+    if (!doReadUint64(&size))
+      return false;
+    RefPtr<Blob> blob = Blob::create(getScriptExecutionContext(),
+                                     KURL(ParsedURLString, url), type, size);
     *value = toV8(blob);
     return true;
   }
 
   bool readFile(v8::Handle<v8::Value>* value) {
     String path;
+    String url;
+    String type;
     if (!readWebCoreString(&path))
       return false;
-    PassRefPtr<File> file = File::create(getScriptExecutionContext(), path);
+    if (!readWebCoreString(&url))
+      return false;
+    if (!readWebCoreString(&type))
+      return false;
+    RefPtr<File> file = File::create(getScriptExecutionContext(), path,
+                                     KURL(ParsedURLString, url), type);
     *value = toV8(file);
     return true;
   }
@@ -822,15 +850,23 @@ class Reader {
     PassRefPtr<FileList> fileList = FileList::create();
     for (unsigned i = 0; i < length; ++i) {
       String path;
+      String urlString;
+      String type;
       if (!readWebCoreString(&path))
         return false;
-      fileList->append(File::create(getScriptExecutionContext(), path));
+      if (!readWebCoreString(&urlString))
+        return false;
+      if (!readWebCoreString(&type))
+        return false;
+      fileList->append(File::create(getScriptExecutionContext(), path,
+                                    KURL(ParsedURLString, urlString), type));
     }
     *value = toV8(fileList);
     return true;
   }
 
-  bool doReadUint32(uint32_t* value) {
+  template <class T>
+  bool doReadUintHelper(T* value) {
     *value = 0;
     uint8_t currentByte;
     int shift = 0;
@@ -843,6 +879,10 @@ class Reader {
     } while (currentByte & (1 << varIntShift));
     return true;
   }
+
+  bool doReadUint32(uint32_t* value) { return doReadUintHelper(value); }
+
+  bool doReadUint64(uint64_t* value) { return doReadUintHelper(value); }
 
   bool doReadNumber(double* number) {
     if (m_position + sizeof(double) > m_length)
