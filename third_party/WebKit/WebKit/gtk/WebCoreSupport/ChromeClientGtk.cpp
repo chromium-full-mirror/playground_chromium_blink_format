@@ -600,14 +600,14 @@ void ChromeClient::requestGeolocationPermissionForFrame(
   WebKitWebFrame* webFrame = kit(frame);
   WebKitWebView* webView = getViewFromFrame(webFrame);
 
-  WebKitGeolocationPolicyDecision* policyDecision =
-      webkit_geolocation_policy_decision_new(webFrame, geolocation);
+  GRefPtr<WebKitGeolocationPolicyDecision> policyDecision(
+      adoptGRef(webkit_geolocation_policy_decision_new(webFrame, geolocation)));
 
   gboolean isHandled = FALSE;
   g_signal_emit_by_name(webView, "geolocation-policy-decision-requested",
-                        webFrame, policyDecision, &isHandled);
+                        webFrame, policyDecision.get(), &isHandled);
   if (!isHandled)
-    webkit_geolocation_policy_deny(policyDecision);
+    webkit_geolocation_policy_deny(policyDecision.get());
 }
 
 void ChromeClient::cancelGeolocationPermissionRequestForFrame(
