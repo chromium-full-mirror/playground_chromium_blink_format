@@ -38,6 +38,7 @@ class WebDOMTestInterface : public WebDOMObject {
   WebDOMTestInterface();
   explicit WebDOMTestInterface(WebCore::TestInterface*);
   WebDOMTestInterface(const WebDOMTestInterface&);
+  WebDOMTestInterface& operator=(const WebDOMTestInterface&);
   ~WebDOMTestInterface();
 
   WebCore::TestInterface* impl() const;
