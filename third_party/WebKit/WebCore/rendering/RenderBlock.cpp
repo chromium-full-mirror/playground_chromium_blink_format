@@ -2391,7 +2391,7 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
   PaintInfo info(paintInfo);
   info.phase = newPhase;
   info.updatePaintingRootForChildren(this);
-  bool checkPageBreaks = document()->printing() &&
+  bool checkPageBreaks = document()->paginated() &&
                          !document()->settings()->paginateDuringLayoutEnabled();
   bool checkColumnBreaks =
       !checkPageBreaks && !view()->printRect().isEmpty() &&
@@ -4693,7 +4693,7 @@ void RenderBlock::calcColumnWidth() {
 
   // For now, we don't support multi-column layouts when printing, since we have
   // to do a lot of work for proper pagination.
-  if (document()->printing() ||
+  if (document()->paginated() ||
       (style()->hasAutoColumnCount() && style()->hasAutoColumnWidth())) {
     setDesiredColumnCountAndWidth(desiredColumnCount, desiredColumnWidth);
     return;

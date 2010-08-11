@@ -431,6 +431,7 @@ Document::Document(Frame* frame, const KURL& url, bool isXHTML, bool isHTML)
   m_pageGroupUserSheetCacheValid = false;
 
   m_printing = false;
+  m_paginatedForScreen = false;
 
   m_ignoreAutofocus = false;
 
