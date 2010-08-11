@@ -67,7 +67,8 @@ JSValue QtClass::fallbackObject(ExecState* exec,
 
   const UString& ustring = identifier.ustring();
   const QByteArray name =
-      QString(reinterpret_cast<const QChar*>(ustring.data()), ustring.size())
+      QString(reinterpret_cast<const QChar*>(ustring.characters()),
+              ustring.length())
           .toAscii();
 
   // First see if we have a cache hit
@@ -131,8 +132,8 @@ Field* QtClass::fieldNamed(const Identifier& identifier,
 
   QObject* obj = qtinst->getObject();
   const UString& ustring = identifier.ustring();
-  const QString name(reinterpret_cast<const QChar*>(ustring.data()),
-                     ustring.size());
+  const QString name(reinterpret_cast<const QChar*>(ustring.characters()),
+                     ustring.length());
   const QByteArray ascii = name.toAscii();
 
   // First check for a cached field
