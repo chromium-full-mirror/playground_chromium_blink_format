@@ -53,8 +53,8 @@ PassRefPtr<HTMLSourceElement> HTMLSourceElement::create(
   return adoptRef(new HTMLSourceElement(tagName, document));
 }
 
-void HTMLSourceElement::insertedIntoDocument() {
-  HTMLElement::insertedIntoDocument();
+void HTMLSourceElement::insertedIntoTree(bool deep) {
+  HTMLElement::insertedIntoTree(deep);
   if (parentNode() && (parentNode()->hasTagName(audioTag) ||
                        parentNode()->hasTagName(videoTag))) {
     HTMLMediaElement* media = static_cast<HTMLMediaElement*>(parentNode());
