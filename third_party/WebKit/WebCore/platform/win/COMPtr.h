@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -78,11 +78,9 @@ class COMPtr {
   }
 
   T* get() const { return m_ptr; }
-  T* releaseRef() {
-    T* tmp = m_ptr;
-    m_ptr = 0;
-    return tmp;
-  }
+
+  void clear();
+  T* leakRef();
 
   T& operator*() const { return *m_ptr; }
   T* operator->() const { return m_ptr; }
@@ -116,6 +114,10 @@ class COMPtr {
   HRESULT copyRefTo(U**);
   void adoptRef(T*);
 
+  // FIXME: Remove releaseRef once we change all callers to call leakRef
+  // instead.
+  T* releaseRef() { return leakRef(); }
+
  private:
   static T* copyQueryInterfaceRef(IUnknown*);
   static T* createInstance(const IID& clsid);
@@ -123,6 +125,21 @@ class COMPtr {
 
   T* m_ptr;
 };
+
+template <typename T>
+inline void COMPtr<T>::clear() {
+  if (T* ptr = m_ptr) {
+    m_ptr = 0;
+    ptr->Release();
+  }
+}
+
+template <typename T>
+inline T* COMPtr<T>::leakRef() {
+  T* ptr = m_ptr;
+  m_ptr = 0;
+  return ptr;
+}
 
 template <typename T>
 inline T* COMPtr<T>::createInstance(const IID& clsid) {
@@ -233,11 +250,10 @@ template <typename P>
 struct HashTraits<COMPtr<P>> : GenericHashTraits<COMPtr<P>> {
   static const bool emptyValueIsZero = true;
   static void constructDeletedValue(COMPtr<P>& slot) {
-    slot.releaseRef();
-    *&slot = reinterpret_cast<P*>(-1);
+    new (&slot) COMPtr<P>(HashTableDeletedValueType);
   }
   static bool isDeletedValue(const COMPtr<P>& value) {
-    return value == reinterpret_cast<P*>(-1);
+    return value.isHashTableDeletedValue();
   }
 };
 

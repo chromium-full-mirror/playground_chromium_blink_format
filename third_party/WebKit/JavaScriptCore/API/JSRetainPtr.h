@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2005, 2006, 2007, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -49,32 +49,16 @@ class JSRetainPtr {
     if (ptr)
       JSRetain(ptr);
   }
-
   JSRetainPtr(AdoptTag, T ptr) : m_ptr(ptr) {}
-
-  JSRetainPtr(const JSRetainPtr& o) : m_ptr(o.m_ptr) {
-    if (T ptr = m_ptr)
-      JSRetain(ptr);
-  }
-
-  ~JSRetainPtr() {
-    if (T ptr = m_ptr)
-      JSRelease(ptr);
-  }
-
+  JSRetainPtr(const JSRetainPtr&);
   template <typename U>
-  JSRetainPtr(const JSRetainPtr<U>& o) : m_ptr(o.get()) {
-    if (T ptr = m_ptr)
-      JSRetain(ptr);
-  }
+  JSRetainPtr(const JSRetainPtr<U>&);
+  ~JSRetainPtr();
 
   T get() const { return m_ptr; }
 
-  T releaseRef() {
-    T tmp = m_ptr;
-    m_ptr = 0;
-    return tmp;
-  }
+  void clear();
+  T leakRef();
 
   T operator->() const { return m_ptr; }
 
@@ -98,9 +82,47 @@ class JSRetainPtr {
 
   void swap(JSRetainPtr&);
 
+  // FIXME: Remove releaseRef once we change all callers to call leakRef
+  // instead.
+  T releaseRef() { return leakRef(); }
+
  private:
   T m_ptr;
 };
+
+template <typename T>
+inline JSRetainPtr<T>::JSRetainPtr(const JSRetainPtr& o) : m_ptr(o.m_ptr) {
+  if (m_ptr)
+    JSRetain(m_ptr);
+}
+
+template <typename T>
+template <typename U>
+inline JSRetainPtr<T>::JSRetainPtr(const JSRetainPtr<U>& o) : m_ptr(o.get()) {
+  if (m_ptr)
+    JSRetain(m_ptr);
+}
+
+template <typename T>
+inline JSRetainPtr<T>::~JSRetainPtr() {
+  if (m_ptr)
+    JSRelease(m_ptr);
+}
+
+template <typename T>
+inline void JSRetainPtr<T>::clear() {
+  if (T ptr = m_ptr) {
+    m_ptr = 0;
+    JSRelease(ptr);
+  }
+}
+
+template <typename T>
+inline T JSRetainPtr<T>::leakRef() {
+  T ptr = m_ptr;
+  m_ptr = 0;
+  return ptr;
+}
 
 template <typename T>
 inline JSRetainPtr<T>& JSRetainPtr<T>::operator=(const JSRetainPtr<T>& o) {
@@ -158,12 +180,12 @@ inline JSRetainPtr<T>& JSRetainPtr<T>::operator=(U* optr) {
   return *this;
 }
 
-template <class T>
+template <typename T>
 inline void JSRetainPtr<T>::swap(JSRetainPtr<T>& o) {
   std::swap(m_ptr, o.m_ptr);
 }
 
-template <class T>
+template <typename T>
 inline void swap(JSRetainPtr<T>& a, JSRetainPtr<T>& b) {
   a.swap(b);
 }

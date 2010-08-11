@@ -70,6 +70,7 @@ class WKRetainPtr {
     if (ptr)
       WKRelease(ptr);
   }
+
   PtrType leakRef() {
     PtrType ptr = m_ptr;
     m_ptr = 0;
@@ -159,12 +160,12 @@ inline WKRetainPtr<T>& WKRetainPtr<T>::operator=(U* optr) {
   return *this;
 }
 
-template <class T>
+template <typename T>
 inline void WKRetainPtr<T>::swap(WKRetainPtr<T>& o) {
   std::swap(m_ptr, o.m_ptr);
 }
 
-template <class T>
+template <typename T>
 inline void swap(WKRetainPtr<T>& a, WKRetainPtr<T>& b) {
   a.swap(b);
 }

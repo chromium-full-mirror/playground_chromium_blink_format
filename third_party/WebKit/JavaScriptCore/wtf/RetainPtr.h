@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ *  Copyright (C) 2005, 2006, 2007, 2008, 2010 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -81,18 +81,12 @@ class RetainPtr {
   }
 
   template <typename U>
-  RetainPtr(const RetainPtr<U>& o) : m_ptr(o.get()) {
-    if (PtrType ptr = m_ptr)
-      CFRetain(ptr);
-  }
+  RetainPtr(const RetainPtr<U>&);
 
   PtrType get() const { return m_ptr; }
 
-  PtrType releaseRef() {
-    PtrType tmp = m_ptr;
-    m_ptr = 0;
-    return tmp;
-  }
+  void clear();
+  PtrType leakRef() WARN_UNUSED_RETURN;
 
   PtrType operator->() const { return m_ptr; }
 
@@ -115,11 +109,37 @@ class RetainPtr {
 
   void swap(RetainPtr&);
 
+  // FIXME: Remove releaseRef once we change all callers to call leakRef
+  // instead.
+  PtrType releaseRef() { return leakRef(); }
+
  private:
   static T* hashTableDeletedValue() { return reinterpret_cast<T*>(-1); }
 
   PtrType m_ptr;
 };
+
+template <typename T>
+template <typename U>
+inline RetainPtr<T>::RetainPtr(const RetainPtr<U>& o) : m_ptr(o.get()) {
+  if (PtrType ptr = m_ptr)
+    CFRetain(ptr);
+}
+
+template <typename T>
+inline void RetainPtr<T>::clear() {
+  if (PtrType ptr = m_ptr) {
+    m_ptr = 0;
+    CFRelease(ptr);
+  }
+}
+
+template <typename T>
+inline typename RetainPtr<T>::PtrType RetainPtr<T>::leakRef() {
+  PtrType ptr = m_ptr;
+  m_ptr = 0;
+  return ptr;
+}
 
 template <typename T>
 inline RetainPtr<T>& RetainPtr<T>::operator=(const RetainPtr<T>& o) {
@@ -187,12 +207,12 @@ inline RetainPtr<T>& RetainPtr<T>::operator=(U* optr) {
   return *this;
 }
 
-template <class T>
+template <typename T>
 inline void RetainPtr<T>::swap(RetainPtr<T>& o) {
   std::swap(m_ptr, o.m_ptr);
 }
 
-template <class T>
+template <typename T>
 inline void swap(RetainPtr<T>& a, RetainPtr<T>& b) {
   a.swap(b);
 }
