@@ -64,7 +64,7 @@ class FileReader : public RefCounted<FileReader>,
 
   virtual ~FileReader();
 
-  enum ReadyState { Empty = 0, Loading = 1, Done = 2 };
+  enum ReadyState { EMPTY = 0, LOADING = 1, DONE = 2 };
 
   void readAsBinaryString(Blob*);
   void readAsText(Blob*, const String& encoding = "");

@@ -90,14 +90,6 @@ enum StyleChangeType {
   SyntheticStyleChange = 3 << nodeStyleChangeShift
 };
 
-const unsigned short DOCUMENT_POSITION_EQUIVALENT = 0x00;
-const unsigned short DOCUMENT_POSITION_DISCONNECTED = 0x01;
-const unsigned short DOCUMENT_POSITION_PRECEDING = 0x02;
-const unsigned short DOCUMENT_POSITION_FOLLOWING = 0x04;
-const unsigned short DOCUMENT_POSITION_CONTAINS = 0x08;
-const unsigned short DOCUMENT_POSITION_CONTAINED_BY = 0x10;
-const unsigned short DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 0x20;
-
 // this class implements nodes, which can have a parent but no children:
 class Node : public EventTarget,
              public TreeShared<Node>,
@@ -119,6 +111,15 @@ class Node : public EventTarget,
     DOCUMENT_FRAGMENT_NODE = 11,
     NOTATION_NODE = 12,
     XPATH_NAMESPACE_NODE = 13
+  };
+  enum DocumentPosition {
+    DOCUMENT_POSITION_EQUIVALENT = 0x00,
+    DOCUMENT_POSITION_DISCONNECTED = 0x01,
+    DOCUMENT_POSITION_PRECEDING = 0x02,
+    DOCUMENT_POSITION_FOLLOWING = 0x04,
+    DOCUMENT_POSITION_CONTAINS = 0x08,
+    DOCUMENT_POSITION_CONTAINED_BY = 0x10,
+    DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 0x20,
   };
 
   static bool isSupported(const String& feature, const String& version);

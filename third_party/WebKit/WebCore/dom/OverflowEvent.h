@@ -32,7 +32,7 @@ namespace WebCore {
 
 class OverflowEvent : public Event {
  public:
-  enum orientType { VERTICAL = 0, HORIZONTAL = 1, BOTH = 2 };
+  enum orientType { HORIZONTAL = 0, VERTICAL = 1, BOTH = 2 };
 
   static PassRefPtr<OverflowEvent> create() {
     return adoptRef(new OverflowEvent);
