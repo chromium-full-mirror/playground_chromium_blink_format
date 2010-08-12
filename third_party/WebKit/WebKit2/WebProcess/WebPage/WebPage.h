@@ -132,6 +132,8 @@ class WebPage : public APIObject {
   void setZoomFactor(float);
   void setZoomMode(WebCore::ZoomMode);
 
+  void stopLoading();
+
 #if USE(ACCELERATED_COMPOSITING)
   void changeAcceleratedCompositingMode(WebCore::GraphicsLayer*);
   void enterAcceleratedCompositingMode(WebCore::GraphicsLayer*);
@@ -155,7 +157,6 @@ class WebPage : public APIObject {
   // Actions
   void tryClose();
   void loadURL(const WTF::String&);
-  void stopLoading();
   void reload(bool reloadFromOrigin);
   void goForward(uint64_t);
   void goBack(uint64_t);

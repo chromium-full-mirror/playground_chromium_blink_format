@@ -55,6 +55,8 @@ WK_EXPORT void WKBundlePageSetZoomFactor(WKBundlePageRef page,
 WK_EXPORT void WKBundlePageSetZoomMode(WKBundlePageRef page,
                                        WKBundlePageZoomMode zoomMode);
 
+WK_EXPORT void WKBundlePageStopLoading(WKBundlePageRef page);
+
 #ifdef __cplusplus
 }
 #endif

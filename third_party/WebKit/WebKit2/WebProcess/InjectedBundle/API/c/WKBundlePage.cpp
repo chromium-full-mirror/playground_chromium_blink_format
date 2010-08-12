@@ -102,3 +102,7 @@ void WKBundlePageSetZoomMode(WKBundlePageRef pageRef,
                              WKBundlePageZoomMode zoomMode) {
   toWK(pageRef)->setZoomMode(toZoomMode(zoomMode));
 }
+
+void WKBundlePageStopLoading(WKBundlePageRef pageRef) {
+  toWK(pageRef)->stopLoading();
+}
