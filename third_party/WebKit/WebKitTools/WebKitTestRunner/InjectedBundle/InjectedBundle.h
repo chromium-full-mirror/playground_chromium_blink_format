@@ -65,6 +65,8 @@ class InjectedBundle {
   void done();
   std::ostringstream& os() { return m_outputStream; }
 
+  bool isTestRunning() { return m_state == Testing; }
+
  private:
   InjectedBundle();
   ~InjectedBundle();
@@ -84,7 +86,7 @@ class InjectedBundle {
   void willDestroyPage(WKBundlePageRef page);
   void didReceiveMessage(WKStringRef messageName, WKTypeRef messageBody);
 
-  void reset();
+  void beginTesting();
 
   WKBundleRef m_bundle;
   HashMap<WKBundlePageRef, InjectedBundlePage*> m_otherPages;
@@ -95,6 +97,9 @@ class InjectedBundle {
   RefPtr<EventSendingController> m_eventSendingController;
 
   std::ostringstream m_outputStream;
+
+  enum State { Idle, Testing };
+  State m_state;
 };
 
 }  // namespace WTR

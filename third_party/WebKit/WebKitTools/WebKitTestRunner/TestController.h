@@ -53,6 +53,9 @@ class TestController {
   WKPageNamespaceRef pageNamespace() { return m_pageNamespace.get(); }
   WKContextRef context() { return m_context.get(); }
 
+  // Helper
+  static void runUntil(bool& done);
+
  private:
   void initialize(int argc, const char* argv[]);
   void run();
@@ -64,6 +67,8 @@ class TestController {
   void initializeInjectedBundlePath();
   void initializeTestPluginDirectory();
 
+  void resetStateToConsistentValues();
+
   // WKContextInjectedBundleClient
   static void didReceiveMessageFromInjectedBundle(WKContextRef context,
                                                   WKStringRef messageName,
@@ -71,6 +76,12 @@ class TestController {
                                                   const void*);
   void didReceiveMessageFromInjectedBundle(WKStringRef messageName,
                                            WKTypeRef messageBody);
+
+  // WKPageLoaderClient
+  static void didFinishLoadForFrame(WKPageRef page,
+                                    WKFrameRef frame,
+                                    const void*);
+  void didFinishLoadForFrame(WKPageRef page, WKFrameRef frame);
 
   OwnPtr<TestInvocation> m_currentInvocation;
 
@@ -85,6 +96,10 @@ class TestController {
   OwnPtr<PlatformWebView> m_mainWebView;
   WKRetainPtr<WKContextRef> m_context;
   WKRetainPtr<WKPageNamespaceRef> m_pageNamespace;
+
+  enum State { Initial, Resetting, RunningTest };
+  State m_state;
+  bool m_doneResetting;
 };
 
 }  // namespace WTR

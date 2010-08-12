@@ -38,6 +38,7 @@ class InjectedBundlePage {
   WKBundlePageRef page() const { return m_page; }
   void dump();
 
+  void stopLoading();
   bool isLoading() { return m_isLoading; }
 
   void reset();

@@ -133,4 +133,15 @@ void TestController::initializeTestPluginDirectory() {
       WKStringCreateWithCFString(testPluginDirectoryPath.get()));
 }
 
+void TestController::runUntil(bool& done) {
+  while (!done) {
+    MSG msg;
+    BOOL result = GetMessage(&msg, 0, 0, 0);
+    if (result == -1)
+      return;
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+  }
+}
+
 }  // namespace WTR

@@ -140,6 +140,11 @@ InjectedBundlePage::InjectedBundlePage(WKBundlePageRef page)
 
 InjectedBundlePage::~InjectedBundlePage() {}
 
+void InjectedBundlePage::stopLoading() {
+  WKBundlePageStopLoading(m_page);
+  m_isLoading = false;
+}
+
 void InjectedBundlePage::reset() {
   WKBundlePageClearMainFrameName(m_page);
 
@@ -269,6 +274,9 @@ void InjectedBundlePage::didRunInsecureContentForFrame(WKBundlePageRef page,
 
 void InjectedBundlePage::didStartProvisionalLoadForFrame(
     WKBundleFrameRef frame) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   if (frame == WKBundlePageGetMainFrame(m_page))
     m_isLoading = true;
 }
@@ -366,6 +374,8 @@ void InjectedBundlePage::dumpAllFramesText() {
 }
 
 void InjectedBundlePage::dump() {
+  ASSERT(InjectedBundle::shared().isTestRunning());
+
   InjectedBundle::shared()
       .layoutTestController()
       ->invalidateWaitToDumpWatchdog();
@@ -398,6 +408,9 @@ void InjectedBundlePage::dump() {
 }
 
 void InjectedBundlePage::didFinishLoadForFrame(WKBundleFrameRef frame) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   if (!WKBundleFrameIsMainFrame(frame))
     return;
 
@@ -413,6 +426,9 @@ void InjectedBundlePage::didFinishLoadForFrame(WKBundleFrameRef frame) {
 }
 
 void InjectedBundlePage::didFailLoadWithErrorForFrame(WKBundleFrameRef frame) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   if (!WKBundleFrameIsMainFrame(frame))
     return;
 
@@ -426,6 +442,9 @@ void InjectedBundlePage::didFailLoadWithErrorForFrame(WKBundleFrameRef frame) {
 
 void InjectedBundlePage::didReceiveTitleForFrame(WKStringRef title,
                                                  WKBundleFrameRef frame) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   if (!InjectedBundle::shared()
            .layoutTestController()
            ->shouldDumpTitleChanges())
@@ -437,6 +456,9 @@ void InjectedBundlePage::didReceiveTitleForFrame(WKStringRef title,
 void InjectedBundlePage::didClearWindowForFrame(WKBundleFrameRef frame,
                                                 JSGlobalContextRef context,
                                                 JSObjectRef window) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   JSValueRef exception = 0;
   InjectedBundle::shared().layoutTestController()->makeWindowObject(
       context, window, &exception);
@@ -459,6 +481,9 @@ void InjectedBundlePage::didChangeLocationWithinPageForFrame(
     WKBundleFrameRef frame) {}
 
 void InjectedBundlePage::didFinishDocumentLoadForFrame(WKBundleFrameRef frame) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   unsigned pendingFrameUnloadEvents = WKBundleFrameGetPendingUnloadCount(frame);
   if (pendingFrameUnloadEvents)
     InjectedBundle::shared().os() << frame << " - has "
@@ -519,12 +544,18 @@ void InjectedBundlePage::willRunJavaScriptPrompt(WKBundlePageRef page,
 
 void InjectedBundlePage::willAddMessageToConsole(WKStringRef message,
                                                  uint32_t lineNumber) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   // FIXME: Strip file: urls.
   InjectedBundle::shared().os() << "CONSOLE MESSAGE: line " << lineNumber
                                 << ": " << message << "\n";
 }
 
 void InjectedBundlePage::willSetStatusbarText(WKStringRef statusbarText) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   if (!InjectedBundle::shared()
            .layoutTestController()
            ->shouldDumpStatusCallbacks())
@@ -536,11 +567,17 @@ void InjectedBundlePage::willSetStatusbarText(WKStringRef statusbarText) {
 
 void InjectedBundlePage::willRunJavaScriptAlert(WKStringRef message,
                                                 WKBundleFrameRef) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   InjectedBundle::shared().os() << "ALERT: " << message << "\n";
 }
 
 void InjectedBundlePage::willRunJavaScriptConfirm(WKStringRef message,
                                                   WKBundleFrameRef) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   InjectedBundle::shared().os() << "CONFIRM: " << message << "\n";
 }
 
@@ -639,6 +676,9 @@ void InjectedBundlePage::didChangeSelection(WKBundlePageRef page,
 }
 
 bool InjectedBundlePage::shouldBeginEditing(WKBundleRangeRef range) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return true;
+
   if (InjectedBundle::shared()
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
@@ -648,6 +688,9 @@ bool InjectedBundlePage::shouldBeginEditing(WKBundleRangeRef range) {
 }
 
 bool InjectedBundlePage::shouldEndEditing(WKBundleRangeRef range) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return true;
+
   if (InjectedBundle::shared()
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
@@ -659,6 +702,9 @@ bool InjectedBundlePage::shouldEndEditing(WKBundleRangeRef range) {
 bool InjectedBundlePage::shouldInsertNode(WKBundleNodeRef node,
                                           WKBundleRangeRef rangeToReplace,
                                           WKInsertActionType action) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return true;
+
   static const char* insertactionstring[] = {
       "WebViewInsertActionTyped", "WebViewInsertActionPasted",
       "WebViewInsertActionDropped",
@@ -677,6 +723,9 @@ bool InjectedBundlePage::shouldInsertNode(WKBundleNodeRef node,
 bool InjectedBundlePage::shouldInsertText(WKStringRef text,
                                           WKBundleRangeRef rangeToReplace,
                                           WKInsertActionType action) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return true;
+
   static const char* insertactionstring[] = {
       "WebViewInsertActionTyped", "WebViewInsertActionPasted",
       "WebViewInsertActionDropped",
@@ -693,6 +742,9 @@ bool InjectedBundlePage::shouldInsertText(WKStringRef text,
 }
 
 bool InjectedBundlePage::shouldDeleteRange(WKBundleRangeRef range) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return true;
+
   if (InjectedBundle::shared()
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
@@ -705,6 +757,9 @@ bool InjectedBundlePage::shouldChangeSelectedRange(WKBundleRangeRef fromRange,
                                                    WKBundleRangeRef toRange,
                                                    WKAffinityType affinity,
                                                    bool stillSelecting) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return true;
+
   static const char* affinitystring[] = {"NSSelectionAffinityUpstream",
                                          "NSSelectionAffinityDownstream"};
   static const char* boolstring[] = {"FALSE", "TRUE"};
@@ -721,6 +776,9 @@ bool InjectedBundlePage::shouldChangeSelectedRange(WKBundleRangeRef fromRange,
 
 bool InjectedBundlePage::shouldApplyStyle(WKBundleCSSStyleDeclarationRef style,
                                           WKBundleRangeRef range) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return true;
+
   if (InjectedBundle::shared()
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
@@ -731,6 +789,9 @@ bool InjectedBundlePage::shouldApplyStyle(WKBundleCSSStyleDeclarationRef style,
 }
 
 void InjectedBundlePage::didBeginEditing(WKStringRef notificationName) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   if (InjectedBundle::shared()
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
@@ -740,6 +801,9 @@ void InjectedBundlePage::didBeginEditing(WKStringRef notificationName) {
 }
 
 void InjectedBundlePage::didEndEditing(WKStringRef notificationName) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   if (InjectedBundle::shared()
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
@@ -749,6 +813,9 @@ void InjectedBundlePage::didEndEditing(WKStringRef notificationName) {
 }
 
 void InjectedBundlePage::didChange(WKStringRef notificationName) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   if (InjectedBundle::shared()
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
@@ -757,6 +824,9 @@ void InjectedBundlePage::didChange(WKStringRef notificationName) {
 }
 
 void InjectedBundlePage::didChangeSelection(WKStringRef notificationName) {
+  if (!InjectedBundle::shared().isTestRunning())
+    return;
+
   if (InjectedBundle::shared()
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
