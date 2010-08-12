@@ -36,6 +36,7 @@
 namespace WebCore {
 
 class KURL;
+class GroupSettings;
 class IDBFactoryBackendInterface;
 class Page;
 class StorageNamespace;
@@ -102,6 +103,8 @@ class PageGroup : public Noncopyable {
     return m_userStyleSheets.get();
   }
 
+  GroupSettings* groupSettings() const { return m_groupSettings.get(); }
+
  private:
   void addVisitedLink(LinkHash stringHash);
   void resetUserStyleCacheInAllFrames();
@@ -123,6 +126,8 @@ class PageGroup : public Noncopyable {
 
   OwnPtr<UserScriptMap> m_userScripts;
   OwnPtr<UserStyleSheetMap> m_userStyleSheets;
+
+  OwnPtr<GroupSettings> m_groupSettings;
 };
 
 }  // namespace WebCore
