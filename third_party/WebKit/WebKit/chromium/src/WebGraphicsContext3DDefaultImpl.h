@@ -78,7 +78,6 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
   virtual void prepareTexture();
 
   virtual void synthesizeGLError(unsigned long error);
-  virtual bool supportsBGRA();
 
   virtual void activeTexture(unsigned long texture);
   virtual void attachShader(WebGLId program, WebGLId shader);
