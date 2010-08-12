@@ -61,6 +61,7 @@ class EditorClient : public WebCore::EditorClient {
   ~EditorClient();
   WebKitWebView* webView() { return m_webView; }
   bool treatContextCommitAsKeyEvent() { return m_treatContextCommitAsKeyEvent; }
+  bool preventNextCompositionCommit() { return m_preventNextCompositionCommit; }
   void clearPendingComposition() { m_pendingComposition.set(0); }
   bool hasPendingComposition() { return m_pendingComposition; }
   void addPendingEditorCommand(const char* command) {
@@ -121,6 +122,7 @@ class EditorClient : public WebCore::EditorClient {
 
   virtual void handleKeyboardEvent(WebCore::KeyboardEvent*);
   virtual void handleInputMethodKeydown(WebCore::KeyboardEvent*);
+  virtual void handleInputMethodMousePress();
 
   virtual void textFieldDidBeginEditing(WebCore::Element*);
   virtual void textFieldDidEndEditing(WebCore::Element*);
@@ -155,6 +157,7 @@ class EditorClient : public WebCore::EditorClient {
 
  private:
   WebKitWebView* m_webView;
+  bool m_preventNextCompositionCommit;
   bool m_treatContextCommitAsKeyEvent;
   GOwnPtr<gchar> m_pendingComposition;
   Vector<const char*> m_pendingEditorCommands;
