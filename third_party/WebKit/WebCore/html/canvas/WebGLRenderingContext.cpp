@@ -3232,7 +3232,8 @@ WebGLGetInfo WebGLRenderingContext::getUnsignedLongParameter(
     unsigned long pname) {
   int value;
   m_context->getIntegerv(pname, &value);
-  return WebGLGetInfo(static_cast<unsigned long>(value));
+  unsigned int uValue = static_cast<unsigned int>(value);
+  return WebGLGetInfo(static_cast<unsigned long>(uValue));
 }
 
 WebGLGetInfo WebGLRenderingContext::getWebGLFloatArrayParameter(
