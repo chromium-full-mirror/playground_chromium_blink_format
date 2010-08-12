@@ -127,10 +127,17 @@ class SpinButtonElement : public TextControlInnerElement {
 class InputFieldSpeechButtonElement : public TextControlInnerElement,
                                       public SpeechInputListener {
  public:
+  enum SpeechInputState {
+    Idle,
+    Recording,
+    Recognizing,
+  };
+
   static PassRefPtr<InputFieldSpeechButtonElement> create(Node*);
 
   virtual void detach();
   virtual void defaultEventHandler(Event*);
+  SpeechInputState state() const { return m_state; }
 
   // SpeechInputListener methods.
   void didCompleteRecording();
@@ -140,8 +147,10 @@ class InputFieldSpeechButtonElement : public TextControlInnerElement,
  private:
   InputFieldSpeechButtonElement(Node*);
   SpeechInput* speechInput();
+  void setState(SpeechInputState state);
 
   bool m_capturing;
+  SpeechInputState m_state;
 };
 
 #endif  // ENABLE(INPUT_SPEECH)
