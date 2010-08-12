@@ -54,6 +54,7 @@
 #include "RenderSVGViewportContainer.cpp"
 #include "SVGCharacterData.cpp"
 #include "SVGCharacterLayoutInfo.cpp"
+#include "SVGImageBufferTools.cpp"
 #include "SVGInlineFlowBox.cpp"
 #include "SVGInlineTextBox.cpp"
 #include "SVGMarkerLayoutInfo.cpp"
