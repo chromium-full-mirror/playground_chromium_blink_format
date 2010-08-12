@@ -238,8 +238,11 @@ void PluginView::handleMouseEvent(MouseEvent* event) {
 void PluginView::setParent(ScrollView* parent) {
   Widget::setParent(parent);
 
-  if (parent)
+  if (parent) {
     init();
+    if (m_status == PluginStatusLoadedSuccessfully)
+      updatePluginWidget();
+  }
 }
 
 void PluginView::setNPWindowRect(const IntRect&) {
