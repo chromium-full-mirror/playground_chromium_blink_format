@@ -43,7 +43,7 @@ bool SVGImageBufferTools::createImageBuffer(
     const FloatRect& absoluteTargetRect,
     OwnPtr<ImageBuffer>& imageBuffer,
     ImageColorSpace colorSpace) {
-  ASSERT(context);
+  ASSERT_UNUSED(context, context);
 
   IntRect imageRect = enclosingIntRect(absoluteTargetRect);
   if (imageRect.isEmpty())
