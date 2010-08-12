@@ -41,7 +41,6 @@ class Vector;
 
 class AtomicString;
 class AtomicStringImpl;
-class CString;
 class String;
 class StringBuffer;
 class StringImpl;
@@ -57,7 +56,6 @@ using WTF::Vector;
 
 using WTF::AtomicString;
 using WTF::AtomicStringImpl;
-using WTF::CString;
 using WTF::String;
 using WTF::StringBuffer;
 using WTF::StringImpl;
