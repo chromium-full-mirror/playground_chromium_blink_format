@@ -263,5 +263,3 @@ struct VectorTraits<JSC::UString> : SimpleClassVectorTraits {
 }  // namespace WTF
 
 #endif
-
-#include "StringConcatenate.h"
