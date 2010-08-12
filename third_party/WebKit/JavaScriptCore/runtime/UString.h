@@ -80,7 +80,7 @@ class UString {
    */
   CString UTF8String(bool strict = false) const;
 
-  ALWAYS_INLINE unsigned length() const {
+  unsigned length() const {
     if (!m_impl)
       return 0;
     return m_impl->length();
@@ -113,7 +113,7 @@ class UString {
   UString substr(unsigned pos = 0, unsigned len = 0xFFFFFFFF) const;
 
   bool isNull() const { return !m_impl; }
-  ALWAYS_INLINE bool isEmpty() const { return !m_impl || !m_impl->length(); }
+  bool isEmpty() const { return !m_impl || !m_impl->length(); }
 
   StringImpl* impl() const { return m_impl.get(); }
 
@@ -124,6 +124,8 @@ class UString {
       return 0;
     return m_impl->cost();
   }
+
+  ALWAYS_INLINE ~UString() {}
 
  private:
   RefPtr<StringImpl> m_impl;
@@ -261,3 +263,5 @@ struct VectorTraits<JSC::UString> : SimpleClassVectorTraits {
 }  // namespace WTF
 
 #endif
+
+#include "StringConcatenate.h"
