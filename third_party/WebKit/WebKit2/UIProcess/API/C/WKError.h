@@ -43,4 +43,4 @@ WK_EXPORT void WKErrorRelease(WKErrorRef error);
 
 WK_DECLARE_RETAIN_RELEASE_OVERLOADS(WKError)
 
-#endif // WKError_h
+#endif  // WKError_h

@@ -30,7 +30,6 @@
 
 using namespace WebKit;
 
-WKTypeID WKErrorGetTypeID()
-{
-    return toRef(WebError::APIType);
+WKTypeID WKErrorGetTypeID() {
+  return toRef(WebError::APIType);
 }

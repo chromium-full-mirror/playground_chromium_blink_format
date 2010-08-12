@@ -34,17 +34,26 @@ extern "C" {
 
 WK_EXPORT WKTypeID WKBackForwardListGetTypeID();
 
-WK_EXPORT WKBackForwardListItemRef WKBackForwardListGetCurrentItem(WKBackForwardListRef list);
-WK_EXPORT WKBackForwardListItemRef WKBackForwardListGetBackItem(WKBackForwardListRef list);
-WK_EXPORT WKBackForwardListItemRef WKBackForwardListGetForwardItem(WKBackForwardListRef list);
+WK_EXPORT WKBackForwardListItemRef
+WKBackForwardListGetCurrentItem(WKBackForwardListRef list);
+WK_EXPORT WKBackForwardListItemRef
+WKBackForwardListGetBackItem(WKBackForwardListRef list);
+WK_EXPORT WKBackForwardListItemRef
+WKBackForwardListGetForwardItem(WKBackForwardListRef list);
 
 WK_EXPORT unsigned WKBackForwardListGetBackListCount(WKBackForwardListRef list);
-WK_EXPORT unsigned WKBackForwardListGetForwardListCount(WKBackForwardListRef list);
+WK_EXPORT unsigned WKBackForwardListGetForwardListCount(
+    WKBackForwardListRef list);
 
-WK_EXPORT WKArrayRef WKBackForwardListCopyBackListWithLimit(WKBackForwardListRef list, unsigned limit);
-WK_EXPORT WKArrayRef WKBackForwardListCopyForwardListWithLimit(WKBackForwardListRef list, unsigned limit);
+WK_EXPORT WKArrayRef
+WKBackForwardListCopyBackListWithLimit(WKBackForwardListRef list,
+                                       unsigned limit);
+WK_EXPORT WKArrayRef
+WKBackForwardListCopyForwardListWithLimit(WKBackForwardListRef list,
+                                          unsigned limit);
 
-WK_EXPORT WKBackForwardListRef WKBackForwardListRetain(WKBackForwardListRef list);
+WK_EXPORT WKBackForwardListRef
+WKBackForwardListRetain(WKBackForwardListRef list);
 WK_EXPORT void WKBackForwardListRelease(WKBackForwardListRef list);
 
 #ifdef __cplusplus
@@ -53,4 +62,4 @@ WK_EXPORT void WKBackForwardListRelease(WKBackForwardListRef list);
 
 WK_DECLARE_RETAIN_RELEASE_OVERLOADS(WKBackForwardList)
 
-#endif // WKBackForwardList_h
+#endif  // WKBackForwardList_h

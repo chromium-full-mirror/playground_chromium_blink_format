@@ -115,6 +115,10 @@ class WebContext : public APIObject {
                          CoreIPC::MessageID,
                          CoreIPC::ArgumentDecoder*);
 
+#if PLATFORM(WIN)
+  void setShouldPaintNativeControls(bool);
+#endif
+
  private:
   WebContext(ProcessModel, const WTF::String& injectedBundlePath);
 
@@ -122,6 +126,7 @@ class WebContext : public APIObject {
 
   void ensureWebProcess();
   bool hasValidProcess() const { return m_process && m_process->isValid(); }
+  void platformSetUpWebProcess();
 
   ProcessModel m_processModel;
 
@@ -140,6 +145,10 @@ class WebContext : public APIObject {
   VisitedLinkProvider m_visitedLinkProvider;
 
   HashSet<WTF::String> m_schemesToRegisterAsEmptyDocument;
+
+#if PLATFORM(WIN)
+  bool m_shouldPaintNativeControls;
+#endif
 };
 
 }  // namespace WebKit

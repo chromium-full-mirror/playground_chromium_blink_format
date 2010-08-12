@@ -30,40 +30,36 @@
 
 using namespace WebKit;
 
-WKTypeID WKArrayGetTypeID()
-{
-    return toRef(ImmutableArray::APIType);
+WKTypeID WKArrayGetTypeID() {
+  return toRef(ImmutableArray::APIType);
 }
 
-WKArrayRef WKArrayCreate(WKTypeRef* values, size_t numberOfValues)
-{
-    RefPtr<ImmutableArray> array = ImmutableArray::create(reinterpret_cast<APIObject**>(values), numberOfValues);
-    return toRef(array.release().releaseRef());
+WKArrayRef WKArrayCreate(WKTypeRef* values, size_t numberOfValues) {
+  RefPtr<ImmutableArray> array = ImmutableArray::create(
+      reinterpret_cast<APIObject**>(values), numberOfValues);
+  return toRef(array.release().releaseRef());
 }
 
-WKArrayRef WKArrayCreateAdoptingValues(WKTypeRef* values, size_t numberOfValues)
-{
-    RefPtr<ImmutableArray> array = ImmutableArray::adopt(reinterpret_cast<APIObject**>(values), numberOfValues);
-    return toRef(array.release().releaseRef());
+WKArrayRef WKArrayCreateAdoptingValues(WKTypeRef* values,
+                                       size_t numberOfValues) {
+  RefPtr<ImmutableArray> array = ImmutableArray::adopt(
+      reinterpret_cast<APIObject**>(values), numberOfValues);
+  return toRef(array.release().releaseRef());
 }
 
-WKTypeRef WKArrayGetItemAtIndex(WKArrayRef arrayRef, size_t index)
-{
-    return toWK(arrayRef)->at(index);
+WKTypeRef WKArrayGetItemAtIndex(WKArrayRef arrayRef, size_t index) {
+  return toWK(arrayRef)->at(index);
 }
 
-size_t WKArrayGetSize(WKArrayRef arrayRef)
-{
-    return toWK(arrayRef)->size();
+size_t WKArrayGetSize(WKArrayRef arrayRef) {
+  return toWK(arrayRef)->size();
 }
 
-WKArrayRef WKArrayRetain(WKArrayRef arrayRef)
-{
-    toWK(arrayRef)->ref();
-    return arrayRef;
+WKArrayRef WKArrayRetain(WKArrayRef arrayRef) {
+  toWK(arrayRef)->ref();
+  return arrayRef;
 }
 
-void WKArrayRelease(WKArrayRef arrayRef)
-{
-    toWK(arrayRef)->deref();
+void WKArrayRelease(WKArrayRef arrayRef) {
+  toWK(arrayRef)->deref();
 }

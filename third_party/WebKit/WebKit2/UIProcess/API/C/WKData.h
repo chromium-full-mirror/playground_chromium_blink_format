@@ -48,4 +48,4 @@ WK_EXPORT void WKDataRelease(WKDataRef data);
 
 WK_DECLARE_RETAIN_RELEASE_OVERLOADS(WKData)
 
-#endif // WKData_h
+#endif  // WKData_h

@@ -31,33 +31,28 @@
 
 using namespace WebKit;
 
-WKTypeID WKFramePolicyListenerGetTypeID()
-{
-    return toRef(WebFramePolicyListenerProxy::APIType);
+WKTypeID WKFramePolicyListenerGetTypeID() {
+  return toRef(WebFramePolicyListenerProxy::APIType);
 }
 
-void WKFramePolicyListenerUse(WKFramePolicyListenerRef policyListenerRef)
-{
-    toWK(policyListenerRef)->use();
+void WKFramePolicyListenerUse(WKFramePolicyListenerRef policyListenerRef) {
+  toWK(policyListenerRef)->use();
 }
 
-void WKFramePolicyListenerDownload(WKFramePolicyListenerRef policyListenerRef)
-{
-    toWK(policyListenerRef)->download();
+void WKFramePolicyListenerDownload(WKFramePolicyListenerRef policyListenerRef) {
+  toWK(policyListenerRef)->download();
 }
 
-void WKFramePolicyListenerIgnore(WKFramePolicyListenerRef policyListenerRef)
-{
-    toWK(policyListenerRef)->ignore();
+void WKFramePolicyListenerIgnore(WKFramePolicyListenerRef policyListenerRef) {
+  toWK(policyListenerRef)->ignore();
 }
 
-WKFramePolicyListenerRef WKFramePolicyListenerRetain(WKFramePolicyListenerRef policyListenerRef)
-{
-    toWK(policyListenerRef)->ref();
-    return policyListenerRef;
+WKFramePolicyListenerRef WKFramePolicyListenerRetain(
+    WKFramePolicyListenerRef policyListenerRef) {
+  toWK(policyListenerRef)->ref();
+  return policyListenerRef;
 }
 
-void WKFramePolicyListenerRelease(WKFramePolicyListenerRef policyListenerRef)
-{
-    toWK(policyListenerRef)->deref();
+void WKFramePolicyListenerRelease(WKFramePolicyListenerRef policyListenerRef) {
+  toWK(policyListenerRef)->deref();
 }

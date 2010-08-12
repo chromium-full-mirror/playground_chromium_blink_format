@@ -37,14 +37,14 @@ extern "C" {
 #endif
 
 enum WKFrameLoadState {
-    kWKFrameLoadStateProvisional = 0,
-    kWKFrameLoadStateCommitted = 1,
-    kWKFrameLoadStateFinished = 2
+  kWKFrameLoadStateProvisional = 0,
+  kWKFrameLoadStateCommitted = 1,
+  kWKFrameLoadStateFinished = 2
 };
 typedef enum WKFrameLoadState WKFrameLoadState;
 
 WK_EXPORT WKTypeID WKFrameGetTypeID();
- 
+
 WK_EXPORT bool WKFrameIsMainFrame(WKFrameRef frame);
 WK_EXPORT WKFrameLoadState WKFrameGetFrameLoadState(WKFrameRef frame);
 WK_EXPORT WKURLRef WKFrameCopyProvisionalURL(WKFrameRef frame);

@@ -52,130 +52,214 @@ class WebPageProxy;
 class WebPreferences;
 class WebString;
 
-template<typename APIType> struct APITypeInfo { };
-template<> struct APITypeInfo<WKTypeRef>                        { typedef APIObject* ImplType; };
-template<> struct APITypeInfo<WKArrayRef>                       { typedef ImmutableArray* ImplType; };
-template<> struct APITypeInfo<WKBackForwardListItemRef>         { typedef WebBackForwardListItem* ImplType; };
-template<> struct APITypeInfo<WKBackForwardListRef>             { typedef WebBackForwardList* ImplType; };
-template<> struct APITypeInfo<WKContextRef>                     { typedef WebContext* ImplType; };
-template<> struct APITypeInfo<WKDataRef>                        { typedef WebData* ImplType; };
-template<> struct APITypeInfo<WKFramePolicyListenerRef>         { typedef WebFramePolicyListenerProxy* ImplType; };
-template<> struct APITypeInfo<WKFrameRef>                       { typedef WebFrameProxy* ImplType; };
-template<> struct APITypeInfo<WKNavigationDataRef>              { typedef WebNavigationData* ImplType; };
-template<> struct APITypeInfo<WKPageNamespaceRef>               { typedef WebPageNamespace* ImplType; };
-template<> struct APITypeInfo<WKPageRef>                        { typedef WebPageProxy* ImplType; };
-template<> struct APITypeInfo<WKPreferencesRef>                 { typedef WebPreferences* ImplType; };
-template<> struct APITypeInfo<WKStringRef>                      { typedef WebString* ImplType; };
-template<> struct APITypeInfo<WKURLRef>                         { typedef WebURL* ImplType; };
-
-
-template<typename ImplType> struct ImplTypeInfo { };
-template<> struct ImplTypeInfo<APIObject*>                      { typedef WKTypeRef APIType; };
-template<> struct ImplTypeInfo<ImmutableArray*>                 { typedef WKArrayRef APIType; };
-template<> struct ImplTypeInfo<WebBackForwardList*>             { typedef WKBackForwardListRef APIType; };
-template<> struct ImplTypeInfo<WebBackForwardListItem*>         { typedef WKBackForwardListItemRef APIType; };
-template<> struct ImplTypeInfo<WebContext*>                     { typedef WKContextRef APIType; };
-template<> struct ImplTypeInfo<WebData*>                        { typedef WKDataRef APIType; };
-template<> struct ImplTypeInfo<WebError*>                       { typedef WKErrorRef APIType; };
-template<> struct ImplTypeInfo<WebFramePolicyListenerProxy*>    { typedef WKFramePolicyListenerRef APIType; };
-template<> struct ImplTypeInfo<WebFrameProxy*>                  { typedef WKFrameRef APIType; };
-template<> struct ImplTypeInfo<WebNavigationData*>              { typedef WKNavigationDataRef APIType; };
-template<> struct ImplTypeInfo<WebPageNamespace*>               { typedef WKPageNamespaceRef APIType; };
-template<> struct ImplTypeInfo<WebPageProxy*>                   { typedef WKPageRef APIType; };
-template<> struct ImplTypeInfo<WebPreferences*>                 { typedef WKPreferencesRef APIType; };
-template<> struct ImplTypeInfo<WebString*>                      { typedef WKStringRef APIType; };
-template<> struct ImplTypeInfo<WebURL*>                         { typedef WKURLRef APIType; };
-
-
-template<typename ImplType, typename APIType = typename ImplTypeInfo<ImplType*>::APIType>
-class ProxyingRefPtr {
-public:
-    ProxyingRefPtr(PassRefPtr<ImplType> impl)
-        : m_impl(impl)
-    {
-    }
-
-    operator APIType() { return toRef(m_impl.get()); }
-
-private:
-    RefPtr<ImplType> m_impl;
+template <typename APIType>
+struct APITypeInfo {};
+template <>
+struct APITypeInfo<WKTypeRef> {
+  typedef APIObject* ImplType;
+};
+template <>
+struct APITypeInfo<WKArrayRef> {
+  typedef ImmutableArray* ImplType;
+};
+template <>
+struct APITypeInfo<WKBackForwardListItemRef> {
+  typedef WebBackForwardListItem* ImplType;
+};
+template <>
+struct APITypeInfo<WKBackForwardListRef> {
+  typedef WebBackForwardList* ImplType;
+};
+template <>
+struct APITypeInfo<WKContextRef> {
+  typedef WebContext* ImplType;
+};
+template <>
+struct APITypeInfo<WKDataRef> {
+  typedef WebData* ImplType;
+};
+template <>
+struct APITypeInfo<WKFramePolicyListenerRef> {
+  typedef WebFramePolicyListenerProxy* ImplType;
+};
+template <>
+struct APITypeInfo<WKFrameRef> {
+  typedef WebFrameProxy* ImplType;
+};
+template <>
+struct APITypeInfo<WKNavigationDataRef> {
+  typedef WebNavigationData* ImplType;
+};
+template <>
+struct APITypeInfo<WKPageNamespaceRef> {
+  typedef WebPageNamespace* ImplType;
+};
+template <>
+struct APITypeInfo<WKPageRef> {
+  typedef WebPageProxy* ImplType;
+};
+template <>
+struct APITypeInfo<WKPreferencesRef> {
+  typedef WebPreferences* ImplType;
+};
+template <>
+struct APITypeInfo<WKStringRef> {
+  typedef WebString* ImplType;
+};
+template <>
+struct APITypeInfo<WKURLRef> {
+  typedef WebURL* ImplType;
 };
 
-} // namespace WebKit
+template <typename ImplType>
+struct ImplTypeInfo {};
+template <>
+struct ImplTypeInfo<APIObject*> {
+  typedef WKTypeRef APIType;
+};
+template <>
+struct ImplTypeInfo<ImmutableArray*> {
+  typedef WKArrayRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebBackForwardList*> {
+  typedef WKBackForwardListRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebBackForwardListItem*> {
+  typedef WKBackForwardListItemRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebContext*> {
+  typedef WKContextRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebData*> {
+  typedef WKDataRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebError*> {
+  typedef WKErrorRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebFramePolicyListenerProxy*> {
+  typedef WKFramePolicyListenerRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebFrameProxy*> {
+  typedef WKFrameRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebNavigationData*> {
+  typedef WKNavigationDataRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebPageNamespace*> {
+  typedef WKPageNamespaceRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebPageProxy*> {
+  typedef WKPageRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebPreferences*> {
+  typedef WKPreferencesRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebString*> {
+  typedef WKStringRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebURL*> {
+  typedef WKURLRef APIType;
+};
+
+template <typename ImplType,
+          typename APIType = typename ImplTypeInfo<ImplType*>::APIType>
+class ProxyingRefPtr {
+ public:
+  ProxyingRefPtr(PassRefPtr<ImplType> impl) : m_impl(impl) {}
+
+  operator APIType() { return toRef(m_impl.get()); }
+
+ private:
+  RefPtr<ImplType> m_impl;
+};
+
+}  // namespace WebKit
 
 /* Opaque typing convenience methods */
 
-template<typename T>
-inline typename WebKit::APITypeInfo<T>::ImplType toWK(T t)
-{
-    return reinterpret_cast<typename WebKit::APITypeInfo<T>::ImplType>(t);
+template <typename T>
+inline typename WebKit::APITypeInfo<T>::ImplType toWK(T t) {
+  return reinterpret_cast<typename WebKit::APITypeInfo<T>::ImplType>(t);
 }
 
-template<typename T>
-inline typename WebKit::ImplTypeInfo<T>::APIType toRef(T t)
-{
-    return reinterpret_cast<typename WebKit::ImplTypeInfo<T>::APIType>(t);
+template <typename T>
+inline typename WebKit::ImplTypeInfo<T>::APIType toRef(T t) {
+  return reinterpret_cast<typename WebKit::ImplTypeInfo<T>::APIType>(t);
 }
 
 /* Special cases. */
 
-inline WebKit::ProxyingRefPtr<WebKit::WebString> toRef(WTF::StringImpl* string)
-{
-    WTF::StringImpl* impl = string ? string : WTF::StringImpl::empty();
-    return WebKit::ProxyingRefPtr<WebKit::WebString>(WebKit::WebString::create(WTF::String(impl)));
+inline WebKit::ProxyingRefPtr<WebKit::WebString> toRef(
+    WTF::StringImpl* string) {
+  WTF::StringImpl* impl = string ? string : WTF::StringImpl::empty();
+  return WebKit::ProxyingRefPtr<WebKit::WebString>(
+      WebKit::WebString::create(WTF::String(impl)));
 }
 
-inline WebKit::ProxyingRefPtr<WebKit::WebURL> toURLRef(WTF::StringImpl* string)
-{
-    WTF::StringImpl* impl = string ? string : WTF::StringImpl::empty();
-    return WebKit::ProxyingRefPtr<WebKit::WebURL>(WebKit::WebURL::create(WTF::String(impl)));
+inline WebKit::ProxyingRefPtr<WebKit::WebURL> toURLRef(
+    WTF::StringImpl* string) {
+  WTF::StringImpl* impl = string ? string : WTF::StringImpl::empty();
+  return WebKit::ProxyingRefPtr<WebKit::WebURL>(
+      WebKit::WebURL::create(WTF::String(impl)));
 }
 
-inline WKStringRef toCopiedRef(const WTF::String& string)
-{
-    WTF::StringImpl* impl = string.impl() ? string.impl() : WTF::StringImpl::empty();
-    RefPtr<WebKit::WebString> webString = WebKit::WebString::create(WTF::String(impl));
-    return toRef(webString.release().releaseRef());
+inline WKStringRef toCopiedRef(const WTF::String& string) {
+  WTF::StringImpl* impl =
+      string.impl() ? string.impl() : WTF::StringImpl::empty();
+  RefPtr<WebKit::WebString> webString =
+      WebKit::WebString::create(WTF::String(impl));
+  return toRef(webString.release().releaseRef());
 }
 
-inline WKURLRef toCopiedURLRef(const WTF::String& string)
-{
-    WTF::StringImpl* impl = string.impl() ? string.impl() : WTF::StringImpl::empty();
-    RefPtr<WebKit::WebURL> webURL = WebKit::WebURL::create(WTF::String(impl));
-    return toRef(webURL.release().releaseRef());
+inline WKURLRef toCopiedURLRef(const WTF::String& string) {
+  WTF::StringImpl* impl =
+      string.impl() ? string.impl() : WTF::StringImpl::empty();
+  RefPtr<WebKit::WebURL> webURL = WebKit::WebURL::create(WTF::String(impl));
+  return toRef(webURL.release().releaseRef());
 }
 
-inline WKTypeID toRef(WebKit::APIObject::Type type)
-{
-    return static_cast<WKTypeID>(type);
+inline WKTypeID toRef(WebKit::APIObject::Type type) {
+  return static_cast<WKTypeID>(type);
 }
 
-inline WKFrameNavigationType toWK(WebCore::NavigationType type)
-{
-    WKFrameNavigationType wkType = kWKFrameNavigationTypeOther;
+inline WKFrameNavigationType toWK(WebCore::NavigationType type) {
+  WKFrameNavigationType wkType = kWKFrameNavigationTypeOther;
 
-    switch (type) {
+  switch (type) {
     case WebCore::NavigationTypeLinkClicked:
-        wkType = kWKFrameNavigationTypeLinkClicked;
-        break;
+      wkType = kWKFrameNavigationTypeLinkClicked;
+      break;
     case WebCore::NavigationTypeFormSubmitted:
-        wkType = kWKFrameNavigationTypeFormSubmitted;
-        break;
+      wkType = kWKFrameNavigationTypeFormSubmitted;
+      break;
     case WebCore::NavigationTypeBackForward:
-        wkType = kWKFrameNavigationTypeBackForward;
-        break;
+      wkType = kWKFrameNavigationTypeBackForward;
+      break;
     case WebCore::NavigationTypeReload:
-        wkType = kWKFrameNavigationTypeReload;
-        break;
+      wkType = kWKFrameNavigationTypeReload;
+      break;
     case WebCore::NavigationTypeFormResubmitted:
-        wkType = kWKFrameNavigationTypeFormResubmitted;
-        break;
+      wkType = kWKFrameNavigationTypeFormResubmitted;
+      break;
     case WebCore::NavigationTypeOther:
-        wkType = kWKFrameNavigationTypeOther;
-        break;
-    }
-    
-    return wkType;
+      wkType = kWKFrameNavigationTypeOther;
+      break;
+  }
+
+  return wkType;
 }
 
-#endif // WKAPICast_h
+#endif  // WKAPICast_h

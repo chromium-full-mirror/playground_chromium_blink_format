@@ -32,54 +32,53 @@
 
 using namespace WebKit;
 
-void WKPreferencesSetFontSmoothingLevel(WKPreferencesRef preferencesRef, WKFontSmoothingLevel wkLevel)
-{
-    FontSmoothingLevel level;
-    switch (wkLevel) {
-        case kWKFontSmoothingLevelNoSubpixelAntiAliasing:
-            level = FontSmoothingLevelNoSubpixelAntiAliasing;
-            break;
-        case kWKFontSmoothingLevelLight:
-            level = FontSmoothingLevelLight;
-            break;
-        case kWKFontSmoothingLevelMedium:
-            level = FontSmoothingLevelMedium;
-            break;
-        case kWKFontSmoothingLevelStrong:
-            level = FontSmoothingLevelStrong;
-            break;
+void WKPreferencesSetFontSmoothingLevel(WKPreferencesRef preferencesRef,
+                                        WKFontSmoothingLevel wkLevel) {
+  FontSmoothingLevel level;
+  switch (wkLevel) {
+    case kWKFontSmoothingLevelNoSubpixelAntiAliasing:
+      level = FontSmoothingLevelNoSubpixelAntiAliasing;
+      break;
+    case kWKFontSmoothingLevelLight:
+      level = FontSmoothingLevelLight;
+      break;
+    case kWKFontSmoothingLevelMedium:
+      level = FontSmoothingLevelMedium;
+      break;
+    case kWKFontSmoothingLevelStrong:
+      level = FontSmoothingLevelStrong;
+      break;
 #if PLATFORM(WIN)
-        case kWKFontSmoothingLevelWindows:
-            level = FontSmoothingLevelWindows;
-            break;
+    case kWKFontSmoothingLevelWindows:
+      level = FontSmoothingLevelWindows;
+      break;
 #endif
-        default:
-            ASSERT_NOT_REACHED();
-            level = FontSmoothingLevelMedium;
-            break;
-    }
-    toWK(preferencesRef)->setFontSmoothingLevel(level);
+    default:
+      ASSERT_NOT_REACHED();
+      level = FontSmoothingLevelMedium;
+      break;
+  }
+  toWK(preferencesRef)->setFontSmoothingLevel(level);
 }
 
-WKFontSmoothingLevel WKPreferencesGetFontSmoothingLevel(WKPreferencesRef preferencesRef)
-{
-    FontSmoothingLevel level = toWK(preferencesRef)->fontSmoothingLevel();
-    switch (level) {
-        case FontSmoothingLevelNoSubpixelAntiAliasing:
-            return kWKFontSmoothingLevelNoSubpixelAntiAliasing;
-        case FontSmoothingLevelLight:
-            return kWKFontSmoothingLevelLight;
-        case FontSmoothingLevelMedium:
-            return kWKFontSmoothingLevelMedium;
-        case FontSmoothingLevelStrong:
-            return kWKFontSmoothingLevelStrong;
+WKFontSmoothingLevel WKPreferencesGetFontSmoothingLevel(
+    WKPreferencesRef preferencesRef) {
+  FontSmoothingLevel level = toWK(preferencesRef)->fontSmoothingLevel();
+  switch (level) {
+    case FontSmoothingLevelNoSubpixelAntiAliasing:
+      return kWKFontSmoothingLevelNoSubpixelAntiAliasing;
+    case FontSmoothingLevelLight:
+      return kWKFontSmoothingLevelLight;
+    case FontSmoothingLevelMedium:
+      return kWKFontSmoothingLevelMedium;
+    case FontSmoothingLevelStrong:
+      return kWKFontSmoothingLevelStrong;
 #if PLATFORM(WIN)
-        case FontSmoothingLevelWindows:
-            return kWKFontSmoothingLevelWindows;
+    case FontSmoothingLevelWindows:
+      return kWKFontSmoothingLevelWindows;
 #endif
-    }
+  }
 
-    ASSERT_NOT_REACHED();
-    return kWKFontSmoothingLevelMedium;
+  ASSERT_NOT_REACHED();
+  return kWKFontSmoothingLevelMedium;
 }
-

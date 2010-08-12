@@ -191,7 +191,12 @@ WebContext::WebContext(ProcessModel processModel,
                        const WTF::String& injectedBundlePath)
     : m_processModel(processModel),
       m_injectedBundlePath(injectedBundlePath),
-      m_visitedLinkProvider(this) {
+      m_visitedLinkProvider(this)
+#if PLATFORM(WIN)
+      ,
+      m_shouldPaintNativeControls(true)
+#endif
+{
   RunLoop::initializeMainRunLoop();
 
   m_preferences = WebPreferences::shared();
@@ -241,6 +246,8 @@ void WebContext::ensureWebProcess() {
        it != end; ++it)
     m_process->send(WebProcessMessage::RegisterURLSchemeAsEmptyDocument, 0,
                     CoreIPC::In(*it));
+
+  platformSetUpWebProcess();
 }
 
 void WebContext::processDidFinishLaunching(WebProcessProxy* process) {

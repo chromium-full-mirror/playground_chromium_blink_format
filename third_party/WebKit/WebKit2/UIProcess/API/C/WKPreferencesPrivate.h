@@ -33,23 +33,24 @@ extern "C" {
 #endif
 
 enum WKFontSmoothingLevel {
-    kWKFontSmoothingLevelNoSubpixelAntiAliasing = 0,
-    kWKFontSmoothingLevelLight = 1,
-    kWKFontSmoothingLevelMedium = 2,
-    kWKFontSmoothingLevelStrong = 3,
+  kWKFontSmoothingLevelNoSubpixelAntiAliasing = 0,
+  kWKFontSmoothingLevelLight = 1,
+  kWKFontSmoothingLevelMedium = 2,
+  kWKFontSmoothingLevelStrong = 3,
 #if PLATFORM(WIN)
-    kWKFontSmoothingLevelWindows = 4,
+  kWKFontSmoothingLevelWindows = 4,
 #endif
 };
 typedef enum WKFontSmoothingLevel WKFontSmoothingLevel;
 
 // Defaults to kWKFontSmoothingLevelMedium.
-WK_EXPORT void WKPreferencesSetFontSmoothingLevel(WKPreferencesRef, WKFontSmoothingLevel);
-WK_EXPORT WKFontSmoothingLevel WKPreferencesGetFontSmoothingLevel(WKPreferencesRef);
+WK_EXPORT void WKPreferencesSetFontSmoothingLevel(WKPreferencesRef,
+                                                  WKFontSmoothingLevel);
+WK_EXPORT WKFontSmoothingLevel
+    WKPreferencesGetFontSmoothingLevel(WKPreferencesRef);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* WKPreferencesPrivate_h */
-

@@ -29,18 +29,15 @@
 
 using namespace WebKit;
 
-WKTypeID WKURLGetTypeID()
-{
-    return toRef(WebURL::APIType);
+WKTypeID WKURLGetTypeID() {
+  return toRef(WebURL::APIType);
 }
 
-WKURLRef WKURLRetain(WKURLRef URLRef)
-{
-    toWK(URLRef)->ref();
-    return URLRef;
+WKURLRef WKURLRetain(WKURLRef URLRef) {
+  toWK(URLRef)->ref();
+  return URLRef;
 }
 
-void WKURLRelease(WKURLRef URLRef)
-{
-    toWK(URLRef)->deref();
+void WKURLRelease(WKURLRef URLRef) {
+  toWK(URLRef)->deref();
 }

@@ -34,12 +34,17 @@ extern "C" {
 
 WK_EXPORT WKTypeID WKFramePolicyListenerGetTypeID();
 
-WK_EXPORT void WKFramePolicyListenerUse(WKFramePolicyListenerRef policyListener);
-WK_EXPORT void WKFramePolicyListenerDownload(WKFramePolicyListenerRef policyListener);
-WK_EXPORT void WKFramePolicyListenerIgnore(WKFramePolicyListenerRef policyListener);
+WK_EXPORT void WKFramePolicyListenerUse(
+    WKFramePolicyListenerRef policyListener);
+WK_EXPORT void WKFramePolicyListenerDownload(
+    WKFramePolicyListenerRef policyListener);
+WK_EXPORT void WKFramePolicyListenerIgnore(
+    WKFramePolicyListenerRef policyListener);
 
-WK_EXPORT WKFramePolicyListenerRef WKFramePolicyListenerRetain(WKFramePolicyListenerRef policyListener);
-WK_EXPORT void WKFramePolicyListenerRelease(WKFramePolicyListenerRef policyListener);
+WK_EXPORT WKFramePolicyListenerRef
+WKFramePolicyListenerRetain(WKFramePolicyListenerRef policyListener);
+WK_EXPORT void WKFramePolicyListenerRelease(
+    WKFramePolicyListenerRef policyListener);
 
 #ifdef __cplusplus
 }

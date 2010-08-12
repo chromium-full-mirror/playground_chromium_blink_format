@@ -64,6 +64,7 @@ class TestController {
   void runTest(const char* pathOrURL);
 
   void platformInitialize();
+  void platformInitializeContext();
   void initializeInjectedBundlePath();
   void initializeTestPluginDirectory();
 

@@ -30,33 +30,29 @@
 
 using namespace WebKit;
 
-WKTypeID WKBackForwardListItemGetTypeID()
-{
-    return toRef(WebBackForwardListItem::APIType);
+WKTypeID WKBackForwardListItemGetTypeID() {
+  return toRef(WebBackForwardListItem::APIType);
 }
 
-WKURLRef WKBackForwardListItemCopyOriginalURL(WKBackForwardListItemRef itemRef)
-{
-    return toCopiedURLRef(toWK(itemRef)->originalURL());
+WKURLRef WKBackForwardListItemCopyOriginalURL(
+    WKBackForwardListItemRef itemRef) {
+  return toCopiedURLRef(toWK(itemRef)->originalURL());
 }
 
-WKURLRef WKBackForwardListItemCopyURL(WKBackForwardListItemRef itemRef)
-{
-    return toCopiedURLRef(toWK(itemRef)->url());
+WKURLRef WKBackForwardListItemCopyURL(WKBackForwardListItemRef itemRef) {
+  return toCopiedURLRef(toWK(itemRef)->url());
 }
 
-WKStringRef WKBackForwardListItemCopyTitle(WKBackForwardListItemRef itemRef)
-{
-    return toCopiedRef(toWK(itemRef)->title());
+WKStringRef WKBackForwardListItemCopyTitle(WKBackForwardListItemRef itemRef) {
+  return toCopiedRef(toWK(itemRef)->title());
 }
 
-WKBackForwardListItemRef WKBackForwardListItemRetain(WKBackForwardListItemRef itemRef)
-{
-    toWK(itemRef)->ref();
-    return itemRef;
+WKBackForwardListItemRef WKBackForwardListItemRetain(
+    WKBackForwardListItemRef itemRef) {
+  toWK(itemRef)->ref();
+  return itemRef;
 }
 
-void WKBackForwardListItemRelease(WKBackForwardListItemRef itemRef)
-{
-    toWK(itemRef)->deref();
+void WKBackForwardListItemRelease(WKBackForwardListItemRef itemRef) {
+  toWK(itemRef)->deref();
 }

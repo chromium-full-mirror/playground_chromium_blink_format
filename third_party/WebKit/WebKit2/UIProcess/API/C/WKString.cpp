@@ -29,23 +29,19 @@
 
 using namespace WebKit;
 
-WKTypeID WKStringGetTypeID()
-{
-    return toRef(WebString::APIType);
+WKTypeID WKStringGetTypeID() {
+  return toRef(WebString::APIType);
 }
 
-WKStringRef WKStringRetain(WKStringRef stringRef)
-{
-    toWK(stringRef)->ref();
-    return stringRef;
+WKStringRef WKStringRetain(WKStringRef stringRef) {
+  toWK(stringRef)->ref();
+  return stringRef;
 }
 
-void WKStringRelease(WKStringRef stringRef)
-{
-    toWK(stringRef)->deref();
+void WKStringRelease(WKStringRef stringRef) {
+  toWK(stringRef)->deref();
 }
 
-bool WKStringIsEmpty(WKStringRef stringRef)
-{
-    return toWK(stringRef)->isEmpty();
+bool WKStringIsEmpty(WKStringRef stringRef) {
+  return toWK(stringRef)->isEmpty();
 }

@@ -33,12 +33,20 @@
 extern "C" {
 #endif
 
-typedef void (*WKPageRenderTreeExternalRepresentationFunction)(WKStringRef, WKErrorRef, void*);
-WK_EXPORT void WKPageRenderTreeExternalRepresentation(WKPageRef page, void *context, WKPageRenderTreeExternalRepresentationFunction function);
+typedef void (*WKPageRenderTreeExternalRepresentationFunction)(WKStringRef,
+                                                               WKErrorRef,
+                                                               void*);
+WK_EXPORT void WKPageRenderTreeExternalRepresentation(
+    WKPageRef page,
+    void* context,
+    WKPageRenderTreeExternalRepresentationFunction function);
 
 #ifdef __BLOCKS__
-typedef void (^WKPageRenderTreeExternalRepresentationBlock)(WKStringRef, WKErrorRef);
-WK_EXPORT void WKPageRenderTreeExternalRepresentation_b(WKPageRef page, WKPageRenderTreeExternalRepresentationBlock block);
+typedef void (^WKPageRenderTreeExternalRepresentationBlock)(WKStringRef,
+                                                            WKErrorRef);
+WK_EXPORT void WKPageRenderTreeExternalRepresentation_b(
+    WKPageRef page,
+    WKPageRenderTreeExternalRepresentationBlock block);
 #endif
 
 #ifdef __cplusplus

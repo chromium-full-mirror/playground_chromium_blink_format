@@ -35,7 +35,8 @@ extern "C" {
 WK_EXPORT WKTypeID WKArrayGetTypeID();
 
 WK_EXPORT WKArrayRef WKArrayCreate(WKTypeRef* values, size_t numberOfValues);
-WK_EXPORT WKArrayRef WKArrayCreateAdoptingValues(WKTypeRef* values, size_t numberOfValues);
+WK_EXPORT WKArrayRef WKArrayCreateAdoptingValues(WKTypeRef* values,
+                                                 size_t numberOfValues);
 
 WK_EXPORT WKTypeRef WKArrayGetItemAtIndex(WKArrayRef array, size_t index);
 WK_EXPORT size_t WKArrayGetSize(WKArrayRef array);
@@ -49,4 +50,4 @@ WK_EXPORT void WKArrayRelease(WKArrayRef array);
 
 WK_DECLARE_RETAIN_RELEASE_OVERLOADS(WKArray)
 
-#endif // WKArray_h
+#endif  // WKArray_h

@@ -32,28 +32,23 @@
 
 using namespace WebKit;
 
-WKTypeID WKPageNamespaceGetTypeID()
-{
-    return toRef(WebPageNamespace::APIType);
+WKTypeID WKPageNamespaceGetTypeID() {
+  return toRef(WebPageNamespace::APIType);
 }
 
-WKPageNamespaceRef WKPageNamespaceCreate(WKContextRef ownerContextRef)
-{
-    return toRef(toWK(ownerContextRef)->createPageNamespace());
+WKPageNamespaceRef WKPageNamespaceCreate(WKContextRef ownerContextRef) {
+  return toRef(toWK(ownerContextRef)->createPageNamespace());
 }
 
-WKContextRef WKPageNamespaceGetContext(WKPageNamespaceRef pageNamespaceRef)
-{
-    return toRef(toWK(pageNamespaceRef)->context());
+WKContextRef WKPageNamespaceGetContext(WKPageNamespaceRef pageNamespaceRef) {
+  return toRef(toWK(pageNamespaceRef)->context());
 }
 
-WKPageNamespaceRef WKPageNamespaceRetain(WKPageNamespaceRef pageNamespaceRef)
-{
-    toWK(pageNamespaceRef)->ref();
-    return pageNamespaceRef;
+WKPageNamespaceRef WKPageNamespaceRetain(WKPageNamespaceRef pageNamespaceRef) {
+  toWK(pageNamespaceRef)->ref();
+  return pageNamespaceRef;
 }
 
-void WKPageNamespaceRelease(WKPageNamespaceRef pageNamespaceRef)
-{
-    toWK(pageNamespaceRef)->deref();
+void WKPageNamespaceRelease(WKPageNamespaceRef pageNamespaceRef) {
+  toWK(pageNamespaceRef)->deref();
 }

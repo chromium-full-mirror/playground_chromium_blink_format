@@ -30,54 +30,46 @@
 
 using namespace WebKit;
 
-WKTypeID WKFrameGetTypeID()
-{
-    return toRef(WebFrameProxy::APIType);
+WKTypeID WKFrameGetTypeID() {
+  return toRef(WebFrameProxy::APIType);
 }
 
-bool WKFrameIsMainFrame(WKFrameRef frameRef)
-{
-    return toWK(frameRef)->isMainFrame();
+bool WKFrameIsMainFrame(WKFrameRef frameRef) {
+  return toWK(frameRef)->isMainFrame();
 }
 
-WKFrameLoadState WKFrameGetFrameLoadState(WKFrameRef frameRef)
-{
-    WebFrameProxy* frame = toWK(frameRef);
-    switch (frame->loadState()) {
-        case WebFrameProxy::LoadStateProvisional:
-            return kWKFrameLoadStateProvisional;
-        case WebFrameProxy::LoadStateCommitted:
-            return kWKFrameLoadStateCommitted;
-        case WebFrameProxy::LoadStateFinished:
-            return kWKFrameLoadStateFinished;
-    }
-    
-    ASSERT_NOT_REACHED();
-    return kWKFrameLoadStateFinished;
+WKFrameLoadState WKFrameGetFrameLoadState(WKFrameRef frameRef) {
+  WebFrameProxy* frame = toWK(frameRef);
+  switch (frame->loadState()) {
+    case WebFrameProxy::LoadStateProvisional:
+      return kWKFrameLoadStateProvisional;
+    case WebFrameProxy::LoadStateCommitted:
+      return kWKFrameLoadStateCommitted;
+    case WebFrameProxy::LoadStateFinished:
+      return kWKFrameLoadStateFinished;
+  }
+
+  ASSERT_NOT_REACHED();
+  return kWKFrameLoadStateFinished;
 }
 
-WKURLRef WKFrameCopyProvisionalURL(WKFrameRef frameRef)
-{
-    return toCopiedURLRef(toWK(frameRef)->provisionalURL());
+WKURLRef WKFrameCopyProvisionalURL(WKFrameRef frameRef) {
+  return toCopiedURLRef(toWK(frameRef)->provisionalURL());
 }
 
-WKURLRef WKFrameCopyURL(WKFrameRef frameRef)
-{
-    return toCopiedURLRef(toWK(frameRef)->url());
+WKURLRef WKFrameCopyURL(WKFrameRef frameRef) {
+  return toCopiedURLRef(toWK(frameRef)->url());
 }
 
-WKPageRef WKFrameGetPage(WKFrameRef frameRef)
-{
-    return toRef(toWK(frameRef)->page());
+WKPageRef WKFrameGetPage(WKFrameRef frameRef) {
+  return toRef(toWK(frameRef)->page());
 }
 
-WKFrameRef WKFrameRetain(WKFrameRef frameRef)
-{
-    toWK(frameRef)->ref();
-    return frameRef;
+WKFrameRef WKFrameRetain(WKFrameRef frameRef) {
+  toWK(frameRef)->ref();
+  return frameRef;
 }
 
-void WKFrameRelease(WKFrameRef frameRef)
-{
-    toWK(frameRef)->deref();
+void WKFrameRelease(WKFrameRef frameRef) {
+  toWK(frameRef)->deref();
 }

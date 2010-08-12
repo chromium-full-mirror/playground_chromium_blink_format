@@ -30,34 +30,28 @@
 
 using namespace WebKit;
 
-WKTypeID WKDataGetTypeID()
-{
-    return toRef(WebData::APIType);
+WKTypeID WKDataGetTypeID() {
+  return toRef(WebData::APIType);
 }
 
-WKDataRef WKDataCreate(const unsigned char* bytes, size_t size)
-{
-    RefPtr<WebData> data = WebData::create(bytes, size);
-    return toRef(data.release().releaseRef());
+WKDataRef WKDataCreate(const unsigned char* bytes, size_t size) {
+  RefPtr<WebData> data = WebData::create(bytes, size);
+  return toRef(data.release().releaseRef());
 }
 
-const unsigned char* WKDataGetBytes(WKDataRef dataRef)
-{
-    return toWK(dataRef)->bytes();
+const unsigned char* WKDataGetBytes(WKDataRef dataRef) {
+  return toWK(dataRef)->bytes();
 }
 
-size_t WKDataGetSize(WKDataRef dataRef)
-{
-    return toWK(dataRef)->size();
+size_t WKDataGetSize(WKDataRef dataRef) {
+  return toWK(dataRef)->size();
 }
 
-WKDataRef WKDataRetain(WKDataRef dataRef)
-{
-    toWK(dataRef)->ref();
-    return dataRef;
+WKDataRef WKDataRetain(WKDataRef dataRef) {
+  toWK(dataRef)->ref();
+  return dataRef;
 }
 
-void WKDataRelease(WKDataRef dataRef)
-{
-    toWK(dataRef)->deref();
+void WKDataRelease(WKDataRef dataRef) {
+  toWK(dataRef)->deref();
 }

@@ -32,70 +32,65 @@
 
 using namespace WebKit;
 
-WKTypeID WKPreferencesGetTypeID()
-{
-    return toRef(WebPreferences::APIType);
+WKTypeID WKPreferencesGetTypeID() {
+  return toRef(WebPreferences::APIType);
 }
 
-WKPreferencesRef WKPreferencesCreate()
-{
-    RefPtr<WebPreferences> preferences = WebPreferences::create();
-    return toRef(preferences.release().releaseRef());
+WKPreferencesRef WKPreferencesCreate() {
+  RefPtr<WebPreferences> preferences = WebPreferences::create();
+  return toRef(preferences.release().releaseRef());
 }
 
-WKPreferencesRef WKPreferencesCreateCopy(WKPreferencesRef preferencesRef)
-{
-    RefPtr<WebPreferences> preferences = WebPreferences::copy(toWK(preferencesRef));
-    return toRef(preferences.release().releaseRef());
+WKPreferencesRef WKPreferencesCreateCopy(WKPreferencesRef preferencesRef) {
+  RefPtr<WebPreferences> preferences =
+      WebPreferences::copy(toWK(preferencesRef));
+  return toRef(preferences.release().releaseRef());
 }
 
-void WKPreferencesSetJavaScriptEnabled(WKPreferencesRef preferencesRef, bool javaScriptEnabled)
-{
-    toWK(preferencesRef)->setJavaScriptEnabled(javaScriptEnabled);
+void WKPreferencesSetJavaScriptEnabled(WKPreferencesRef preferencesRef,
+                                       bool javaScriptEnabled) {
+  toWK(preferencesRef)->setJavaScriptEnabled(javaScriptEnabled);
 }
 
-bool WKPreferencesGetJavaScriptEnabled(WKPreferencesRef preferencesRef)
-{
-    return toWK(preferencesRef)->javaScriptEnabled();
+bool WKPreferencesGetJavaScriptEnabled(WKPreferencesRef preferencesRef) {
+  return toWK(preferencesRef)->javaScriptEnabled();
 }
 
-void WKPreferencesSetLoadsImagesAutomatically(WKPreferencesRef preferencesRef, bool loadsImagesAutomatically)
-{
-    toWK(preferencesRef)->setLoadsImagesAutomatically(loadsImagesAutomatically);
+void WKPreferencesSetLoadsImagesAutomatically(WKPreferencesRef preferencesRef,
+                                              bool loadsImagesAutomatically) {
+  toWK(preferencesRef)->setLoadsImagesAutomatically(loadsImagesAutomatically);
 }
 
-bool WKPreferencesGetLoadsImagesAutomatically(WKPreferencesRef preferencesRef)
-{
-    return toWK(preferencesRef)->loadsImagesAutomatically();
+bool WKPreferencesGetLoadsImagesAutomatically(WKPreferencesRef preferencesRef) {
+  return toWK(preferencesRef)->loadsImagesAutomatically();
 }
 
-void WKPreferencesSetOfflineWebApplicationCacheEnabled(WKPreferencesRef preferencesRef, bool offlineWebApplicationCacheEnabled)
-{
-    toWK(preferencesRef)->setOfflineWebApplicationCacheEnabled(offlineWebApplicationCacheEnabled);
+void WKPreferencesSetOfflineWebApplicationCacheEnabled(
+    WKPreferencesRef preferencesRef,
+    bool offlineWebApplicationCacheEnabled) {
+  toWK(preferencesRef)
+      ->setOfflineWebApplicationCacheEnabled(offlineWebApplicationCacheEnabled);
 }
 
-bool WKPreferencesGetOfflineWebApplicationCacheEnabled(WKPreferencesRef preferencesRef)
-{
-    return toWK(preferencesRef)->offlineWebApplicationCacheEnabled();
+bool WKPreferencesGetOfflineWebApplicationCacheEnabled(
+    WKPreferencesRef preferencesRef) {
+  return toWK(preferencesRef)->offlineWebApplicationCacheEnabled();
 }
 
-void WKPreferencesSetLocalStorageEnabled(WKPreferencesRef preferencesRef, bool localStorageEnabled)
-{
-    toWK(preferencesRef)->setLocalStorageEnabled(localStorageEnabled);
+void WKPreferencesSetLocalStorageEnabled(WKPreferencesRef preferencesRef,
+                                         bool localStorageEnabled) {
+  toWK(preferencesRef)->setLocalStorageEnabled(localStorageEnabled);
 }
 
-bool WKPreferencesGetLocalStorageEnabled(WKPreferencesRef preferencesRef)
-{
-    return toWK(preferencesRef)->localStorageEnabled();
+bool WKPreferencesGetLocalStorageEnabled(WKPreferencesRef preferencesRef) {
+  return toWK(preferencesRef)->localStorageEnabled();
 }
 
-WKPreferencesRef WKPreferencesRetain(WKPreferencesRef preferencesRef)
-{
-    toWK(preferencesRef)->ref();
-    return preferencesRef;
+WKPreferencesRef WKPreferencesRetain(WKPreferencesRef preferencesRef) {
+  toWK(preferencesRef)->ref();
+  return preferencesRef;
 }
 
-void WKPreferencesRelease(WKPreferencesRef preferencesRef)
-{
-    toWK(preferencesRef)->deref();
+void WKPreferencesRelease(WKPreferencesRef preferencesRef) {
+  toWK(preferencesRef)->deref();
 }
