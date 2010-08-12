@@ -265,7 +265,11 @@ class String {
   static String number(unsigned long long);
   static String number(double);
 
+#if !PLATFORM(QT)
   static String format(const char*, ...) WTF_ATTRIBUTE_PRINTF(1, 2);
+#else
+  static String format(const char*, ...);
+#endif
 
   // Returns an uninitialized string. The characters needs to be written
   // into the buffer returned in data before the returned string is used.
