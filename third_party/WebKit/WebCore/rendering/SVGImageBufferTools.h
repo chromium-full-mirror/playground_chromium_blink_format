@@ -33,8 +33,7 @@ class RenderObject;
 
 class SVGImageBufferTools : public Noncopyable {
  public:
-  static bool createImageBuffer(GraphicsContext*,
-                                const AffineTransform& absoluteTransform,
+  static bool createImageBuffer(const AffineTransform& absoluteTransform,
                                 const FloatRect& absoluteTargetRect,
                                 OwnPtr<ImageBuffer>&,
                                 ImageColorSpace);

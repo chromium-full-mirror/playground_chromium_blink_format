@@ -38,13 +38,10 @@ AffineTransform SVGImageBufferTools::absoluteTransformFromContext(
 }
 
 bool SVGImageBufferTools::createImageBuffer(
-    GraphicsContext* context,
     const AffineTransform& absoluteTransform,
     const FloatRect& absoluteTargetRect,
     OwnPtr<ImageBuffer>& imageBuffer,
     ImageColorSpace colorSpace) {
-  ASSERT_UNUSED(context, context);
-
   IntRect imageRect = enclosingIntRect(absoluteTargetRect);
   if (imageRect.isEmpty())
     return false;
