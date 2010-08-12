@@ -50,12 +50,20 @@ class RenderThemeChromiumMac : public RenderThemeMac {
   virtual bool shouldRenderMediaControlPart(ControlPart, Element*);
   virtual String extraMediaControlsStyleSheet();
 
+  virtual bool paintMediaSliderThumb(RenderObject*,
+                                     const PaintInfo&,
+                                     const IntRect&);
+  virtual bool paintMediaVolumeSliderContainer(RenderObject*,
+                                               const PaintInfo&,
+                                               const IntRect&);
   virtual bool paintMediaVolumeSliderTrack(RenderObject*,
                                            const PaintInfo&,
                                            const IntRect&);
   virtual bool paintMediaVolumeSliderThumb(RenderObject*,
                                            const PaintInfo&,
                                            const IntRect&);
+  virtual IntPoint volumeSliderOffsetFromMuteButton(Node*,
+                                                    const IntSize&) const;
 
 #endif
 
