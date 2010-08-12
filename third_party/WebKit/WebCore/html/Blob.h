@@ -63,6 +63,8 @@ class Blob : public RefCounted<Blob> {
 
   virtual ~Blob();
 
+  void contextDestroyed();
+
   const KURL& url() const { return m_url; }
   unsigned long long size() const;
   const String& type() const { return m_type; }
@@ -79,8 +81,6 @@ class Blob : public RefCounted<Blob> {
                          long long start,
                          long long length,
                          const String& contentType = String()) const;
-
-  KURL createPublicURL(ScriptExecutionContext*) const;
 #endif
 
  protected:
@@ -106,6 +106,7 @@ class Blob : public RefCounted<Blob> {
   // blob URL resource.
   KURL m_url;
 
+  ScriptExecutionContext* m_scriptExecutionContext;
   String m_type;
   long long m_size;
 };

@@ -40,6 +40,7 @@
 #include "ResourceLoader.h"
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
+#include <wtf/MainThread.h>
 #include <wtf/StdLibExtras.h>
 
 namespace WebCore {
@@ -75,6 +76,7 @@ bool BlobRegistryImpl::loadResourceSynchronously(const ResourceRequest& request,
 }
 
 BlobRegistry& BlobRegistry::instance() {
+  ASSERT(isMainThread());
   DEFINE_STATIC_LOCAL(BlobRegistryImpl, instance, ());
   return instance;
 }
@@ -126,6 +128,8 @@ void BlobRegistryImpl::appendStorageItems(BlobStorageData* blobStorageData,
 
 void BlobRegistryImpl::registerBlobURL(const KURL& url,
                                        PassOwnPtr<BlobData> blobData) {
+  ASSERT(isMainThread());
+
   RefPtr<BlobStorageData> blobStorageData = BlobStorageData::create();
   blobStorageData->setContentType(blobData->contentType());
   blobStorageData->setContentDisposition(blobData->contentDisposition());
@@ -153,6 +157,8 @@ void BlobRegistryImpl::registerBlobURL(const KURL& url,
 }
 
 void BlobRegistryImpl::registerBlobURL(const KURL& url, const KURL& srcURL) {
+  ASSERT(isMainThread());
+
   RefPtr<BlobStorageData> src = m_blobs.get(srcURL.string());
   ASSERT(src);
   if (!src)
@@ -167,11 +173,13 @@ void BlobRegistryImpl::registerBlobURL(const KURL& url, const KURL& srcURL) {
 }
 
 void BlobRegistryImpl::unregisterBlobURL(const KURL& url) {
+  ASSERT(isMainThread());
   m_blobs.remove(url.string());
 }
 
 PassRefPtr<BlobStorageData> BlobRegistryImpl::getBlobDataFromURL(
     const KURL& url) const {
+  ASSERT(isMainThread());
   return m_blobs.get(url.string());
 }
 

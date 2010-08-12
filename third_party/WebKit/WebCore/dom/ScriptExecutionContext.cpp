@@ -28,13 +28,15 @@
 #include "ScriptExecutionContext.h"
 
 #include "ActiveDOMObject.h"
-#include "BlobRegistry.h"
+#include "Blob.h"
+#include "BlobURL.h"
 #include "Database.h"
 #include "DatabaseTask.h"
 #include "DatabaseThread.h"
 #include "FileThread.h"
 #include "MessagePort.h"
 #include "SecurityOrigin.h"
+#include "ThreadableBlobRegistry.h"
 #include "WorkerContext.h"
 #include "WorkerThread.h"
 #include <wtf/MainThread.h>
@@ -92,11 +94,18 @@ ScriptExecutionContext::~ScriptExecutionContext() {
     m_fileThread = 0;
   }
 #endif
-  HashSet<String>::iterator blobURLsEnd = m_blobURLs.end();
-  for (HashSet<String>::iterator iter = m_blobURLs.begin(); iter != blobURLsEnd;
+
+  HashSet<Blob*>::iterator blobsEnd = m_blobs.end();
+  for (HashSet<Blob*>::iterator iter = m_blobs.begin(); iter != blobsEnd;
        ++iter)
-    // FIXME: implement thread-safe proxy to make it work with workers.
-    BlobRegistry::instance().unregisterBlobURL(KURL(ParsedURLString, *iter));
+    (*iter)->contextDestroyed();
+#if ENABLE(BLOB)
+  HashSet<String>::iterator publicBlobURLsEnd = m_publicBlobURLs.end();
+  for (HashSet<String>::iterator iter = m_publicBlobURLs.begin();
+       iter != publicBlobURLsEnd; ++iter)
+    ThreadableBlobRegistry::unregisterBlobURL(this,
+                                              KURL(ParsedURLString, *iter));
+#endif
 }
 
 #if ENABLE(DATABASE)
@@ -170,6 +179,16 @@ void ScriptExecutionContext::destroyedMessagePort(MessagePort* port) {
 #endif
 
   m_messagePorts.remove(port);
+}
+
+void ScriptExecutionContext::addBlob(Blob* blob) {
+  ASSERT(blob);
+  m_blobs.add(blob);
+}
+
+void ScriptExecutionContext::removeBlob(Blob* blob) {
+  ASSERT(blob);
+  m_blobs.remove(blob);
 }
 
 bool ScriptExecutionContext::canSuspendActiveDOMObjects() {
@@ -256,17 +275,21 @@ DOMTimer* ScriptExecutionContext::findTimeout(int timeoutId) {
   return m_timeouts.get(timeoutId);
 }
 
-void ScriptExecutionContext::trackBlobURL(const String& url) {
-  m_blobURLs.add(url);
+#if ENABLE(BLOB)
+KURL ScriptExecutionContext::createPublicBlobURL(Blob* blob) {
+  KURL publicURL = BlobURL::createURL(this);
+  ThreadableBlobRegistry::registerBlobURL(this, publicURL, blob->url());
+  m_publicBlobURLs.add(publicURL.string());
+  return publicURL;
 }
 
-void ScriptExecutionContext::revokeBlobURL(const String& url) {
-  if (m_blobURLs.contains(url)) {
-    // FIXME: implement thread-safe proxy to make it work with workers.
-    BlobRegistry::instance().unregisterBlobURL(KURL(ParsedURLString, url));
-    m_blobURLs.remove(url);
+void ScriptExecutionContext::revokePublicBlobURL(const KURL& url) {
+  if (m_publicBlobURLs.contains(url.string())) {
+    ThreadableBlobRegistry::unregisterBlobURL(this, url);
+    m_publicBlobURLs.remove(url.string());
   }
 }
+#endif
 
 #if ENABLE(BLOB) || ENABLE(FILE_WRITER)
 FileThread* ScriptExecutionContext::fileThread() {
