@@ -44,36 +44,43 @@ WebSpeechInputControllerMock* WebSpeechInputControllerMock::create(
 WebSpeechInputControllerMockImpl::WebSpeechInputControllerMockImpl(
     WebSpeechInputListener* listener)
     : m_webcoreMock(new WebCore::SpeechInputClientMock()),
-      m_listener(listener) {}
+      m_listener(listener) {
+  m_webcoreMock->setListener(this);
+}
+
+WebSpeechInputControllerMockImpl::~WebSpeechInputControllerMockImpl() {
+  m_webcoreMock->setListener(0);
+}
 
 void WebSpeechInputControllerMockImpl::setMockRecognitionResult(
     const WebString& result) {
   m_webcoreMock->setRecognitionResult(result);
 }
 
-void WebSpeechInputControllerMockImpl::didCompleteRecording() {
-  m_listener->didCompleteRecording();
+void WebSpeechInputControllerMockImpl::didCompleteRecording(int requestId) {
+  m_listener->didCompleteRecording(requestId);
 }
 
-void WebSpeechInputControllerMockImpl::didCompleteRecognition() {
-  m_listener->didCompleteRecognition();
+void WebSpeechInputControllerMockImpl::didCompleteRecognition(int requestId) {
+  m_listener->didCompleteRecognition(requestId);
 }
 
 void WebSpeechInputControllerMockImpl::setRecognitionResult(
+    int requestId,
     const WTF::String& result) {
-  m_listener->setRecognitionResult(result);
+  m_listener->setRecognitionResult(requestId, result);
 }
 
-bool WebSpeechInputControllerMockImpl::startRecognition() {
-  return m_webcoreMock->startRecognition(this);
+bool WebSpeechInputControllerMockImpl::startRecognition(int requestId) {
+  return m_webcoreMock->startRecognition(requestId);
 }
 
-void WebSpeechInputControllerMockImpl::cancelRecognition() {
-  m_webcoreMock->cancelRecognition();
+void WebSpeechInputControllerMockImpl::cancelRecognition(int requestId) {
+  m_webcoreMock->cancelRecognition(requestId);
 }
 
-void WebSpeechInputControllerMockImpl::stopRecording() {
-  m_webcoreMock->stopRecording();
+void WebSpeechInputControllerMockImpl::stopRecording(int requestId) {
+  m_webcoreMock->stopRecording(requestId);
 }
 
 }  // namespace WebKit

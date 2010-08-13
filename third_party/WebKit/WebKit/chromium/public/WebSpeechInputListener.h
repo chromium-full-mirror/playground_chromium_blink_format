@@ -50,7 +50,9 @@ class WebSpeechInputListener {
   // Typically after this call the listener would update the UI to reflect that
   // recognition is
   // in progress.
-  virtual void didCompleteRecording() = 0;
+  virtual void didCompleteRecording(int) = 0;
+  // FIXME: Remove this once chromium has picked up this change.
+  virtual void didCompleteRecording() { didCompleteRecording(1); }
 
   // Gives results from speech recognition, either partial or the final results.
   // This method can potentially get called multiple times if there are partial
@@ -59,7 +61,11 @@ class WebSpeechInputListener {
   // properly
   // or if there was any other errors in the process, this method may never be
   // called.
-  virtual void setRecognitionResult(const WebString&) = 0;
+  virtual void setRecognitionResult(int, const WebString&) = 0;
+  // FIXME: Remove this once chromium has picked up this change.
+  virtual void setRecognitionResult(const WebString& result) {
+    setRecognitionResult(1, result);
+  }
 
   // Informs that speech recognition has completed. This gets invoked
   // irrespective of whether
@@ -68,7 +74,9 @@ class WebSpeechInputListener {
   // handler typically frees up any temporary resources allocated and waits for
   // the next speech
   // recognition request.
-  virtual void didCompleteRecognition() = 0;
+  virtual void didCompleteRecognition(int) = 0;
+  // FIXME: Remove this once chromium has picked up this change.
+  virtual void didCompleteRecognition() { didCompleteRecognition(1); }
 
  protected:
   ~WebSpeechInputListener() {}

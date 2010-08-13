@@ -41,7 +41,7 @@ namespace WebCore {
 class SpeechInputListener {
  public:
   // Informs that audio recording has completed and recognition is underway.
-  virtual void didCompleteRecording() = 0;
+  virtual void didCompleteRecording(int requestId) = 0;
 
   // Informs that speech recognition has completed. This gets invoked
   // irrespective of whether
@@ -50,7 +50,7 @@ class SpeechInputListener {
   // handler typically frees up any temporary resources allocated and waits for
   // the next speech
   // recognition request.
-  virtual void didCompleteRecognition() = 0;
+  virtual void didCompleteRecognition(int requestId) = 0;
 
   // Gives results from speech recognition, either partial or the final results.
   // This method can potentially get called multiple times if there are partial
@@ -59,7 +59,7 @@ class SpeechInputListener {
   // properly
   // or if there was any other errors in the process, this method may never be
   // called.
-  virtual void setRecognitionResult(const String& result) = 0;
+  virtual void setRecognitionResult(int requestId, const String& result) = 0;
 
  protected:
   virtual ~SpeechInputListener() {}
