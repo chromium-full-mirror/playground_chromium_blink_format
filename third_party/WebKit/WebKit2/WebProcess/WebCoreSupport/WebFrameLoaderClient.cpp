@@ -513,7 +513,8 @@ void WebFrameLoaderClient::dispatchWillSubmitForm(
 
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::WillSubmitForm, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID(), sourceFrame->frameID(), listenerID));
+      CoreIPC::In(m_frame->frameID(), sourceFrame->frameID(),
+                  formState->textFieldValues(), listenerID));
 }
 
 void WebFrameLoaderClient::dispatchDidLoadMainResource(DocumentLoader*) {

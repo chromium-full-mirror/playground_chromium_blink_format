@@ -171,6 +171,7 @@ typedef void (*WKPageWillSubmitFormCallback)(
     WKPageRef page,
     WKFrameRef frame,
     WKFrameRef sourceFrame,
+    WKDictionaryRef values,
     WKFormSubmissionListenerRef listener,
     const void* clientInfo);
 
