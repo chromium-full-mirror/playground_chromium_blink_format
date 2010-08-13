@@ -62,7 +62,7 @@ class WebFrame : public APIObject {
   // being torn down.
   void invalidate();
 
-  WebPage* page() const { return m_page; }
+  WebPage* page() const;
   WebCore::Frame* coreFrame() const { return m_coreFrame; }
 
   uint64_t frameID() const { return m_frameID; }
@@ -118,7 +118,6 @@ class WebFrame : public APIObject {
 
   virtual Type type() const { return APIType; }
 
-  WebPage* m_page;
   WebCore::Frame* m_coreFrame;
 
   uint64_t m_policyListenerID;
