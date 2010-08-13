@@ -1796,19 +1796,19 @@ EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionOverloadedMethod(ExecState* exec) {
   if ((exec->argumentCount() == 2 &&
        (exec->argument(0).isNull() ||
-        exec->argument(0).isObject() &&
-            asObject(exec->argument(0))->inherits(&JSTestObj::s_info)) &&
+        (exec->argument(0).isObject() &&
+         asObject(exec->argument(0))->inherits(&JSTestObj::s_info))) &&
        (exec->argument(1).isNull() || exec->argument(1).isUndefined() ||
         exec->argument(1).isString() || exec->argument(1).isObject())))
     return jsTestObjPrototypeFunctionOverloadedMethod1(exec);
   if ((exec->argumentCount() == 1 &&
        (exec->argument(0).isNull() ||
-        exec->argument(0).isObject() &&
-            asObject(exec->argument(0))->inherits(&JSTestObj::s_info))) ||
+        (exec->argument(0).isObject() &&
+         asObject(exec->argument(0))->inherits(&JSTestObj::s_info)))) ||
       (exec->argumentCount() == 2 &&
        (exec->argument(0).isNull() ||
-        exec->argument(0).isObject() &&
-            asObject(exec->argument(0))->inherits(&JSTestObj::s_info))))
+        (exec->argument(0).isObject() &&
+         asObject(exec->argument(0))->inherits(&JSTestObj::s_info)))))
     return jsTestObjPrototypeFunctionOverloadedMethod2(exec);
   if ((exec->argumentCount() == 1 &&
        (exec->argument(0).isNull() || exec->argument(0).isUndefined() ||

@@ -60,7 +60,7 @@ void webkit_dom_test_obj_void_method(WebKitDOMTestObj* self) {
 
 void webkit_dom_test_obj_void_method_with_args(WebKitDOMTestObj* self,
                                                glong int_arg,
-                                               gchar* str_arg,
+                                               const gchar* str_arg,
                                                WebKitDOMTestObj* obj_arg) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
@@ -83,7 +83,7 @@ glong webkit_dom_test_obj_int_method(WebKitDOMTestObj* self) {
 
 glong webkit_dom_test_obj_int_method_with_args(WebKitDOMTestObj* self,
                                                glong int_arg,
-                                               gchar* str_arg,
+                                               const gchar* str_arg,
                                                WebKitDOMTestObj* obj_arg) {
   WebCore::JSMainThreadNullState state;
   g_return_val_if_fail(self, 0);
@@ -111,7 +111,7 @@ WebKitDOMTestObj* webkit_dom_test_obj_obj_method(WebKitDOMTestObj* self) {
 WebKitDOMTestObj* webkit_dom_test_obj_obj_method_with_args(
     WebKitDOMTestObj* self,
     glong int_arg,
-    gchar* str_arg,
+    const gchar* str_arg,
     WebKitDOMTestObj* obj_arg) {
   WebCore::JSMainThreadNullState state;
   g_return_val_if_fail(self, 0);
@@ -130,7 +130,7 @@ WebKitDOMTestObj* webkit_dom_test_obj_obj_method_with_args(
 
 WebKitDOMTestObj* webkit_dom_test_obj_method_that_requires_all_args(
     WebKitDOMTestObj* self,
-    gchar* str_arg,
+    const gchar* str_arg,
     WebKitDOMTestObj* obj_arg) {
   WebCore::JSMainThreadNullState state;
   g_return_val_if_fail(self, 0);
@@ -149,7 +149,7 @@ WebKitDOMTestObj* webkit_dom_test_obj_method_that_requires_all_args(
 
 WebKitDOMTestObj* webkit_dom_test_obj_method_that_requires_all_args_and_throws(
     WebKitDOMTestObj* self,
-    gchar* str_arg,
+    const gchar* str_arg,
     WebKitDOMTestObj* obj_arg,
     GError** error) {
   WebCore::JSMainThreadNullState state;
@@ -244,21 +244,23 @@ void webkit_dom_test_obj_with_dynamic_frame_and_optional_arg(
 
 void webkit_dom_test_obj_with_dynamic_frame_and_user_gesture(
     WebKitDOMTestObj* self,
-    glong int_arg) {
+    glong int_arg,
+    gboolean isUserGesture) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
-  item->withDynamicFrameAndUserGesture(int_arg);
+  item->withDynamicFrameAndUserGesture(int_arg, false);
 }
 
 void webkit_dom_test_obj_with_dynamic_frame_and_user_gesture_asad(
     WebKitDOMTestObj* self,
     glong int_arg,
-    glong optional_arg) {
+    glong optional_arg,
+    gboolean isUserGesture) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
-  item->withDynamicFrameAndUserGestureASAD(int_arg, optional_arg);
+  item->withDynamicFrameAndUserGestureASAD(int_arg, optional_arg, false);
 }
 
 void webkit_dom_test_obj_with_script_state_void(WebKitDOMTestObj* self) {
@@ -434,7 +436,8 @@ gchar* webkit_dom_test_obj_get_string_attr(WebKitDOMTestObj* self) {
   return res;
 }
 
-void webkit_dom_test_obj_set_string_attr(WebKitDOMTestObj* self, gchar* value) {
+void webkit_dom_test_obj_set_string_attr(WebKitDOMTestObj* self,
+                                         const gchar* value) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
@@ -511,7 +514,7 @@ gchar* webkit_dom_test_obj_get_reflected_string_attr(WebKitDOMTestObj* self) {
 }
 
 void webkit_dom_test_obj_set_reflected_string_attr(WebKitDOMTestObj* self,
-                                                   gchar* value) {
+                                                   const gchar* value) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
@@ -568,7 +571,7 @@ gchar* webkit_dom_test_obj_get_reflected_url_attr(WebKitDOMTestObj* self) {
 }
 
 void webkit_dom_test_obj_set_reflected_url_attr(WebKitDOMTestObj* self,
-                                                gchar* value) {
+                                                const gchar* value) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
@@ -589,7 +592,7 @@ gchar* webkit_dom_test_obj_get_reflected_non_empty_url_attr(
 
 void webkit_dom_test_obj_set_reflected_non_empty_url_attr(
     WebKitDOMTestObj* self,
-    gchar* value) {
+    const gchar* value) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
@@ -609,7 +612,7 @@ gchar* webkit_dom_test_obj_get_reflected_string_attr(WebKitDOMTestObj* self) {
 }
 
 void webkit_dom_test_obj_set_reflected_string_attr(WebKitDOMTestObj* self,
-                                                   gchar* value) {
+                                                   const gchar* value) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
@@ -670,7 +673,7 @@ gchar* webkit_dom_test_obj_get_reflected_custom_url_attr(
 }
 
 void webkit_dom_test_obj_set_reflected_custom_url_attr(WebKitDOMTestObj* self,
-                                                       gchar* value) {
+                                                       const gchar* value) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
@@ -692,7 +695,7 @@ gchar* webkit_dom_test_obj_get_reflected_custom_non_empty_url_attr(
 
 void webkit_dom_test_obj_set_reflected_custom_non_empty_url_attr(
     WebKitDOMTestObj* self,
-    gchar* value) {
+    const gchar* value) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
@@ -772,7 +775,7 @@ gchar* webkit_dom_test_obj_get_string_attr_with_getter_exception(
 
 void webkit_dom_test_obj_set_string_attr_with_getter_exception(
     WebKitDOMTestObj* self,
-    gchar* value,
+    const gchar* value,
     GError** error) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
@@ -800,7 +803,7 @@ gchar* webkit_dom_test_obj_get_string_attr_with_setter_exception(
 
 void webkit_dom_test_obj_set_string_attr_with_setter_exception(
     WebKitDOMTestObj* self,
-    gchar* value,
+    const gchar* value,
     GError** error) {
   WebCore::JSMainThreadNullState state;
   g_return_if_fail(self);
@@ -1323,18 +1326,18 @@ static void webkit_dom_test_obj_class_init(
       g_param_spec_string(
           "read-only-string-attr",          /* name */
           "test_obj_read-only-string-attr", /* short description */
-          "read-only  gchar*  TestObj.read-only-string-attr", /* longer - could
-                                                                 do with some
-                                                                 extra doc stuff
-                                                                 here */
-          "",                                                 /* default */
+          "read-only  gchar* TestObj.read-only-string-attr", /* longer - could
+                                                                do with some
+                                                                extra doc stuff
+                                                                here */
+          "",                                                /* default */
           WEBKIT_PARAM_READABLE));
   g_object_class_install_property(
       gobjectClass, PROP_READ_ONLY_TEST_OBJ_ATTR,
       g_param_spec_object("read-only-test-obj-attr",          /* name */
                           "test_obj_read-only-test-obj-attr", /* short
                                                                  description */
-                          "read-only  WebKitDOMTestObj*  "
+                          "read-only  WebKitDOMTestObj* "
                           "TestObj.read-only-test-obj-attr", /* longer - could
                                                                 do with some
                                                                 extra doc stuff
@@ -1382,32 +1385,19 @@ static void webkit_dom_test_obj_class_init(
   g_object_class_install_property(
       gobjectClass, PROP_STRING_ATTR,
       g_param_spec_string(
-          "string-attr",                             /* name */
-          "test_obj_string-attr",                    /* short description */
-          "read-write  gchar*  TestObj.string-attr", /* longer - could do with
-                                                        some extra doc stuff
-                                                        here */
-          "",                                        /* default */
+          "string-attr",                            /* name */
+          "test_obj_string-attr",                   /* short description */
+          "read-write  gchar* TestObj.string-attr", /* longer - could do with
+                                                       some extra doc stuff here
+                                                       */
+          "",                                       /* default */
           WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
       gobjectClass, PROP_TEST_OBJ_ATTR,
       g_param_spec_object(
           "test-obj-attr",          /* name */
           "test_obj_test-obj-attr", /* short description */
-          "read-write  WebKitDOMTestObj*  TestObj.test-obj-attr", /* longer -
-                                                                     could do
-                                                                     with some
-                                                                     extra doc
-                                                                     stuff here
-                                                                     */
-          WEBKIT_TYPE_DOM_TEST_OBJ, /* gobject type */
-          WEBKIT_PARAM_READWRITE));
-  g_object_class_install_property(
-      gobjectClass, PROP_XML_OBJ_ATTR,
-      g_param_spec_object(
-          "xml-obj-attr",          /* name */
-          "test_obj_xml-obj-attr", /* short description */
-          "read-write  WebKitDOMTestObj*  TestObj.xml-obj-attr", /* longer -
+          "read-write  WebKitDOMTestObj* TestObj.test-obj-attr", /* longer -
                                                                     could do
                                                                     with some
                                                                     extra doc
@@ -1415,6 +1405,17 @@ static void webkit_dom_test_obj_class_init(
                                                                     */
           WEBKIT_TYPE_DOM_TEST_OBJ, /* gobject type */
           WEBKIT_PARAM_READWRITE));
+  g_object_class_install_property(
+      gobjectClass,
+      PROP_XML_OBJ_ATTR, g_param_spec_object(
+                             "xml-obj-attr",          /* name */
+                             "test_obj_xml-obj-attr", /* short description */
+                             "read-write  WebKitDOMTestObj* "
+                             "TestObj.xml-obj-attr",   /* longer - could do with
+                                                          some extra doc stuff
+                                                          here */
+                             WEBKIT_TYPE_DOM_TEST_OBJ, /* gobject type */
+                             WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
       gobjectClass, PROP_CREATE,
       g_param_spec_boolean(
@@ -1429,11 +1430,11 @@ static void webkit_dom_test_obj_class_init(
       g_param_spec_string(
           "reflected-string-attr",          /* name */
           "test_obj_reflected-string-attr", /* short description */
-          "read-write  gchar*  TestObj.reflected-string-attr", /* longer - could
-                                                                  do with some
-                                                                  extra doc
-                                                                  stuff here */
-          "",                                                  /* default */
+          "read-write  gchar* TestObj.reflected-string-attr", /* longer - could
+                                                                 do with some
+                                                                 extra doc stuff
+                                                                 here */
+          "",                                                 /* default */
           WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
       gobjectClass, PROP_REFLECTED_INTEGRAL_ATTR,
@@ -1466,36 +1467,36 @@ static void webkit_dom_test_obj_class_init(
       g_param_spec_string(
           "reflected-url-attr",          /* name */
           "test_obj_reflected-url-attr", /* short description */
-          "read-write  gchar*  TestObj.reflected-url-attr", /* longer - could do
-                                                               with some extra
-                                                               doc stuff here */
-          "",                                               /* default */
+          "read-write  gchar* TestObj.reflected-url-attr", /* longer - could do
+                                                              with some extra
+                                                              doc stuff here */
+          "",                                              /* default */
           WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
       gobjectClass, PROP_REFLECTED_NON_EMPTY_URL_ATTR,
-      g_param_spec_string("reflected-non-empty-url-attr",          /* name */
-                          "test_obj_reflected-non-empty-url-attr", /* short
-                                                                      description
-                                                                      */
-                          "read-write  gchar*  "
-                          "TestObj.reflected-non-empty-url-attr", /* longer -
-                                                                     could do
-                                                                     with some
-                                                                     extra doc
-                                                                     stuff here
-                                                                     */
-                          "",                                     /* default */
-                          WEBKIT_PARAM_READWRITE));
+      g_param_spec_string(
+          "reflected-non-empty-url-attr",          /* name */
+          "test_obj_reflected-non-empty-url-attr", /* short description */
+          "read-write  gchar* TestObj.reflected-non-empty-url-attr", /* longer -
+                                                                        could do
+                                                                        with
+                                                                        some
+                                                                        extra
+                                                                        doc
+                                                                        stuff
+                                                                        here */
+          "", /* default */
+          WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
       gobjectClass, PROP_REFLECTED_STRING_ATTR,
       g_param_spec_string(
           "reflected-string-attr",          /* name */
           "test_obj_reflected-string-attr", /* short description */
-          "read-write  gchar*  TestObj.reflected-string-attr", /* longer - could
-                                                                  do with some
-                                                                  extra doc
-                                                                  stuff here */
-          "",                                                  /* default */
+          "read-write  gchar* TestObj.reflected-string-attr", /* longer - could
+                                                                 do with some
+                                                                 extra doc stuff
+                                                                 here */
+          "",                                                 /* default */
           WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
       gobjectClass, PROP_REFLECTED_CUSTOM_INTEGRAL_ATTR,
@@ -1531,17 +1532,17 @@ static void webkit_dom_test_obj_class_init(
                            WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
       gobjectClass, PROP_REFLECTED_CUSTOM_URL_ATTR,
-      g_param_spec_string("reflected-custom-url-attr",          /* name */
-                          "test_obj_reflected-custom-url-attr", /* short
-                                                                   description
-                                                                   */
-                          "read-write  gchar*  "
-                          "TestObj.reflected-custom-url-attr", /* longer - could
-                                                                  do with some
-                                                                  extra doc
-                                                                  stuff here */
-                          "",                                  /* default */
-                          WEBKIT_PARAM_READWRITE));
+      g_param_spec_string(
+          "reflected-custom-url-attr",          /* name */
+          "test_obj_reflected-custom-url-attr", /* short description */
+          "read-write  gchar* TestObj.reflected-custom-url-attr", /* longer -
+                                                                     could do
+                                                                     with some
+                                                                     extra doc
+                                                                     stuff here
+                                                                     */
+          "",                                                     /* default */
+          WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(gobjectClass,
                                   PROP_REFLECTED_CUSTOM_NON_EMPTY_URL_ATTR,
                                   g_param_spec_string("reflected-custom-non-"
@@ -1551,7 +1552,7 @@ static void webkit_dom_test_obj_class_init(
                                                       "custom-non-empty-url-"
                                                       "attr", /* short
                                                                  description */
-                                                      "read-write  gchar*  "
+                                                      "read-write  gchar* "
                                                       "TestObj.reflected-"
                                                       "custom-non-empty-url-"
                                                       "attr", /* longer - could
@@ -1597,7 +1598,7 @@ static void webkit_dom_test_obj_class_init(
                                                                               */
                                       "test_obj_string-attr-with-getter-"
                                       "exception", /* short description */
-                                      "read-write  gchar*  "
+                                      "read-write  gchar* "
                                       "TestObj.string-attr-with-getter-"
                                       "exception", /* longer - could do with
                                                       some extra doc stuff here
@@ -1611,7 +1612,7 @@ static void webkit_dom_test_obj_class_init(
                                                                               */
                                       "test_obj_string-attr-with-setter-"
                                       "exception", /* short description */
-                                      "read-write  gchar*  "
+                                      "read-write  gchar* "
                                       "TestObj.string-attr-with-setter-"
                                       "exception", /* longer - could do with
                                                       some extra doc stuff here
@@ -1623,10 +1624,10 @@ static void webkit_dom_test_obj_class_init(
       g_param_spec_string(
           "script-string-attr",          /* name */
           "test_obj_script-string-attr", /* short description */
-          "read-only  gchar*  TestObj.script-string-attr", /* longer - could do
-                                                              with some extra
-                                                              doc stuff here */
-          "",                                              /* default */
+          "read-only  gchar* TestObj.script-string-attr", /* longer - could do
+                                                             with some extra doc
+                                                             stuff here */
+          "",                                             /* default */
           WEBKIT_PARAM_READABLE));
 #if ENABLE(Condition1)
   g_object_class_install_property(
@@ -1694,13 +1695,13 @@ static void webkit_dom_test_obj_class_init(
                         WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
       gobjectClass, PROP_HASH,
-      g_param_spec_string(
-          "hash",                            /* name */
-          "test_obj_hash",                   /* short description */
-          "read-only  gchar*  TestObj.hash", /* longer - could do with some
-                                                extra doc stuff here */
-          "",                                /* default */
-          WEBKIT_PARAM_READABLE));
+      g_param_spec_string("hash",          /* name */
+                          "test_obj_hash", /* short description */
+                          "read-only  gchar* TestObj.hash", /* longer - could do
+                                                               with some extra
+                                                               doc stuff here */
+                          "",                               /* default */
+                          WEBKIT_PARAM_READABLE));
 }
 
 static void webkit_dom_test_obj_init(WebKitDOMTestObj* request) {}

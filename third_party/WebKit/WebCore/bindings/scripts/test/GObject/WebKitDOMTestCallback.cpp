@@ -70,7 +70,7 @@ gboolean webkit_dom_test_callback_callback_with_class1param(
 gboolean webkit_dom_test_callback_callback_with_class2param(
     WebKitDOMTestCallback* self,
     WebKitDOMClass2* class2param,
-    gchar* str_arg) {
+    const gchar* str_arg) {
   WebCore::JSMainThreadNullState state;
   g_return_val_if_fail(self, 0);
   WebCore::TestCallback* item = WebKit::core(self);

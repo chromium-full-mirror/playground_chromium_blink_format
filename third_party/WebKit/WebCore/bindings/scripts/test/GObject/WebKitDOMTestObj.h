@@ -55,7 +55,7 @@ WEBKIT_API void webkit_dom_test_obj_void_method(WebKitDOMTestObj* self);
 WEBKIT_API void webkit_dom_test_obj_void_method_with_args(
     WebKitDOMTestObj* self,
     glong int_arg,
-    gchar* str_arg,
+    const gchar* str_arg,
     WebKitDOMTestObj* obj_arg);
 
 WEBKIT_API glong webkit_dom_test_obj_int_method(WebKitDOMTestObj* self);
@@ -63,7 +63,7 @@ WEBKIT_API glong webkit_dom_test_obj_int_method(WebKitDOMTestObj* self);
 WEBKIT_API glong
 webkit_dom_test_obj_int_method_with_args(WebKitDOMTestObj* self,
                                          glong int_arg,
-                                         gchar* str_arg,
+                                         const gchar* str_arg,
                                          WebKitDOMTestObj* obj_arg);
 
 WEBKIT_API WebKitDOMTestObj* webkit_dom_test_obj_obj_method(
@@ -72,18 +72,18 @@ WEBKIT_API WebKitDOMTestObj* webkit_dom_test_obj_obj_method(
 WEBKIT_API WebKitDOMTestObj* webkit_dom_test_obj_obj_method_with_args(
     WebKitDOMTestObj* self,
     glong int_arg,
-    gchar* str_arg,
+    const gchar* str_arg,
     WebKitDOMTestObj* obj_arg);
 
 WEBKIT_API WebKitDOMTestObj* webkit_dom_test_obj_method_that_requires_all_args(
     WebKitDOMTestObj* self,
-    gchar* str_arg,
+    const gchar* str_arg,
     WebKitDOMTestObj* obj_arg);
 
 WEBKIT_API WebKitDOMTestObj*
 webkit_dom_test_obj_method_that_requires_all_args_and_throws(
     WebKitDOMTestObj* self,
-    gchar* str_arg,
+    const gchar* str_arg,
     WebKitDOMTestObj* obj_arg,
     GError** error);
 
@@ -115,12 +115,14 @@ WEBKIT_API void webkit_dom_test_obj_with_dynamic_frame_and_optional_arg(
 
 WEBKIT_API void webkit_dom_test_obj_with_dynamic_frame_and_user_gesture(
     WebKitDOMTestObj* self,
-    glong int_arg);
+    glong int_arg,
+    gboolean isUserGesture);
 
 WEBKIT_API void webkit_dom_test_obj_with_dynamic_frame_and_user_gesture_asad(
     WebKitDOMTestObj* self,
     glong int_arg,
-    glong optional_arg);
+    glong optional_arg,
+    gboolean isUserGesture);
 
 WEBKIT_API void webkit_dom_test_obj_with_script_state_void(
     WebKitDOMTestObj* self);
@@ -186,7 +188,7 @@ WEBKIT_API void webkit_dom_test_obj_set_unsigned_long_long_attr(
 WEBKIT_API gchar* webkit_dom_test_obj_get_string_attr(WebKitDOMTestObj* self);
 
 WEBKIT_API void webkit_dom_test_obj_set_string_attr(WebKitDOMTestObj* self,
-                                                    gchar* value);
+                                                    const gchar* value);
 
 WEBKIT_API WebKitDOMTestObj* webkit_dom_test_obj_get_test_obj_attr(
     WebKitDOMTestObj* self);
@@ -210,7 +212,7 @@ WEBKIT_API gchar* webkit_dom_test_obj_get_reflected_string_attr(
 
 WEBKIT_API void webkit_dom_test_obj_set_reflected_string_attr(
     WebKitDOMTestObj* self,
-    gchar* value);
+    const gchar* value);
 
 WEBKIT_API glong
 webkit_dom_test_obj_get_reflected_integral_attr(WebKitDOMTestObj* self);
@@ -231,21 +233,21 @@ WEBKIT_API gchar* webkit_dom_test_obj_get_reflected_url_attr(
 
 WEBKIT_API void webkit_dom_test_obj_set_reflected_url_attr(
     WebKitDOMTestObj* self,
-    gchar* value);
+    const gchar* value);
 
 WEBKIT_API gchar* webkit_dom_test_obj_get_reflected_non_empty_url_attr(
     WebKitDOMTestObj* self);
 
 WEBKIT_API void webkit_dom_test_obj_set_reflected_non_empty_url_attr(
     WebKitDOMTestObj* self,
-    gchar* value);
+    const gchar* value);
 
 WEBKIT_API gchar* webkit_dom_test_obj_get_reflected_string_attr(
     WebKitDOMTestObj* self);
 
 WEBKIT_API void webkit_dom_test_obj_set_reflected_string_attr(
     WebKitDOMTestObj* self,
-    gchar* value);
+    const gchar* value);
 
 WEBKIT_API glong
 webkit_dom_test_obj_get_reflected_custom_integral_attr(WebKitDOMTestObj* self);
@@ -266,14 +268,14 @@ WEBKIT_API gchar* webkit_dom_test_obj_get_reflected_custom_url_attr(
 
 WEBKIT_API void webkit_dom_test_obj_set_reflected_custom_url_attr(
     WebKitDOMTestObj* self,
-    gchar* value);
+    const gchar* value);
 
 WEBKIT_API gchar* webkit_dom_test_obj_get_reflected_custom_non_empty_url_attr(
     WebKitDOMTestObj* self);
 
 WEBKIT_API void webkit_dom_test_obj_set_reflected_custom_non_empty_url_attr(
     WebKitDOMTestObj* self,
-    gchar* value);
+    const gchar* value);
 
 WEBKIT_API glong
 webkit_dom_test_obj_get_attr_with_getter_exception(WebKitDOMTestObj* self,
@@ -298,7 +300,7 @@ WEBKIT_API gchar* webkit_dom_test_obj_get_string_attr_with_getter_exception(
 
 WEBKIT_API void webkit_dom_test_obj_set_string_attr_with_getter_exception(
     WebKitDOMTestObj* self,
-    gchar* value,
+    const gchar* value,
     GError** error);
 
 WEBKIT_API gchar* webkit_dom_test_obj_get_string_attr_with_setter_exception(
@@ -306,7 +308,7 @@ WEBKIT_API gchar* webkit_dom_test_obj_get_string_attr_with_setter_exception(
 
 WEBKIT_API void webkit_dom_test_obj_set_string_attr_with_setter_exception(
     WebKitDOMTestObj* self,
-    gchar* value,
+    const gchar* value,
     GError** error);
 
 WEBKIT_API gchar* webkit_dom_test_obj_get_script_string_attr(
