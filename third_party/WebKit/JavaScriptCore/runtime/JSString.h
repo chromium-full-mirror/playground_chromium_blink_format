@@ -190,7 +190,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
         m_value(value),
         m_fiberCount(0) {
     ASSERT(!m_value.isNull());
-    Heap::heap(this)->reportExtraMemoryCost(value.impl()->cost());
+    Heap::heap(this)->reportExtraMemoryCost(value.cost());
   }
 
   enum HasOtherOwnerType { HasOtherOwner };
@@ -314,7 +314,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
     // nasty hack because we can't union non-POD types
     m_other.m_finalizerCallback = finalizer;
     m_other.m_finalizerContext = context;
-    Heap::heap(this)->reportExtraMemoryCost(value.impl()->cost());
+    Heap::heap(this)->reportExtraMemoryCost(value.cost());
   }
 
   ~JSString() {

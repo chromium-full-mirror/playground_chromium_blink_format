@@ -119,10 +119,14 @@ class String {
   String(PassRefPtr<StringImpl> impl) : m_impl(impl) {}
   String(RefPtr<StringImpl> impl) : m_impl(impl) {}
 
-  // Inline the destructor.
-  ALWAYS_INLINE ~String() {}
-
   void swap(String& o) { m_impl.swap(o.m_impl); }
+
+  // Hash table deleted values, which are only constructed and never copied or
+  // destroyed.
+  String(WTF::HashTableDeletedValueType) : m_impl(WTF::HashTableDeletedValue) {}
+  bool isHashTableDeletedValue() const {
+    return m_impl.isHashTableDeletedValue();
+  }
 
   static String adopt(StringBuffer& buffer) {
     return StringImpl::adopt(buffer);
@@ -132,12 +136,7 @@ class String {
     return StringImpl::adopt(vector);
   }
 
-  bool isNull() const { return !m_impl; }
-  bool isEmpty() const { return !m_impl || !m_impl->length(); }
-
-  StringImpl* impl() const { return m_impl.get(); }
-
-  unsigned length() const {
+  ALWAYS_INLINE unsigned length() const {
     if (!m_impl)
       return 0;
     return m_impl->length();
@@ -149,27 +148,13 @@ class String {
     return m_impl->characters();
   }
 
-  CString latin1() const;
-  CString utf8(bool strict = false) const;
+  const UChar* charactersWithNullTermination();
 
   UChar operator[](unsigned index) const {
     if (!m_impl || index >= m_impl->length())
       return 0;
     return m_impl->characters()[index];
   }
-
-  static String number(short);
-  static String number(unsigned short);
-  static String number(int);
-  static String number(unsigned);
-  static String number(long);
-  static String number(unsigned long);
-  static String number(long long);
-  static String number(unsigned long long);
-  static String number(double);
-
-  const UChar* charactersWithNullTermination();
-
   UChar32 characterStartingAt(unsigned) const;  // Ditto.
 
   bool contains(UChar c) const { return find(c) != -1; }
@@ -269,6 +254,16 @@ class String {
   // Return the string with case folded for case insensitive comparison.
   String foldCase() const;
 
+  static String number(short);
+  static String number(unsigned short);
+  static String number(int);
+  static String number(unsigned);
+  static String number(long);
+  static String number(unsigned long);
+  static String number(long long);
+  static String number(unsigned long long);
+  static String number(double);
+
 #if !PLATFORM(QT)
   static String format(const char*, ...) WTF_ATTRIBUTE_PRINTF(1, 2);
 #else
@@ -317,6 +312,11 @@ class String {
   // to ever prefer copy() over plain old assignment.
   String threadsafeCopy() const;
 
+  bool isNull() const { return !m_impl; }
+  ALWAYS_INLINE bool isEmpty() const { return !m_impl || !m_impl->length(); }
+
+  StringImpl* impl() const { return m_impl.get(); }
+
 #if PLATFORM(CF)
   String(CFStringRef);
   CFStringRef createCFString() const;
@@ -352,6 +352,9 @@ class String {
 
   Vector<char> ascii() const;
 
+  CString latin1() const;
+  CString utf8() const;
+
   static String fromUTF8(const char*, size_t);
   static String fromUTF8(const char*);
 
@@ -368,13 +371,6 @@ class String {
 
   bool containsOnlyASCII() const {
     return charactersAreAllASCII(characters(), length());
-  }
-
-  // Hash table deleted values, which are only constructed and never copied or
-  // destroyed.
-  String(WTF::HashTableDeletedValueType) : m_impl(WTF::HashTableDeletedValue) {}
-  bool isHashTableDeletedValue() const {
-    return m_impl.isHashTableDeletedValue();
   }
 
  private:

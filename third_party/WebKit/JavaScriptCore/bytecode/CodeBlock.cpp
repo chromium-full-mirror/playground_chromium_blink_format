@@ -71,11 +71,12 @@ static UString valueToSourceString(ExecState* exec, JSValue val) {
 static CString constantName(ExecState* exec, int k, JSValue value) {
   return makeString(valueToSourceString(exec, value), "(@k",
                     UString::number(k - FirstConstantRegisterIndex), ")")
-      .utf8();
+      .UTF8String();
 }
 
 static CString idName(int id0, const Identifier& ident) {
-  return makeString(ident.ustring(), "(@id", UString::number(id0), ")").utf8();
+  return makeString(ident.ustring(), "(@id", UString::number(id0), ")")
+      .UTF8String();
 }
 
 CString CodeBlock::registerName(ExecState* exec, int r) const {
@@ -85,7 +86,7 @@ CString CodeBlock::registerName(ExecState* exec, int r) const {
   if (isConstantRegisterIndex(r))
     return constantName(exec, r, getConstant(r));
 
-  return makeString("r", UString::number(r)).utf8();
+  return makeString("r", UString::number(r)).UTF8String();
 }
 
 static UString regexpToSourceString(RegExp* regExp) {
@@ -104,7 +105,7 @@ static UString regexpToSourceString(RegExp* regExp) {
 static CString regexpName(int re, RegExp* regexp) {
   return makeString(regexpToSourceString(regexp), "(@re", UString::number(re),
                     ")")
-      .utf8();
+      .UTF8String();
 }
 
 static UString pointerToSourceString(void* p) {
@@ -239,7 +240,7 @@ static unsigned instructionOffsetForNth(ExecState* exec,
 static void printGlobalResolveInfo(const GlobalResolveInfo& resolveInfo,
                                    unsigned instructionOffset) {
   printf("  [%4d] %s: %s\n", instructionOffset, "resolve_global",
-         pointerToSourceString(resolveInfo.structure).utf8().data());
+         pointerToSourceString(resolveInfo.structure).UTF8String().data());
 }
 
 static void printStructureStubInfo(const StructureStubInfo& stubInfo,
@@ -248,31 +249,32 @@ static void printStructureStubInfo(const StructureStubInfo& stubInfo,
     case access_get_by_id_self:
       printf("  [%4d] %s: %s\n", instructionOffset, "get_by_id_self",
              pointerToSourceString(stubInfo.u.getByIdSelf.baseObjectStructure)
-                 .utf8()
+                 .UTF8String()
                  .data());
       return;
     case access_get_by_id_proto:
       printf("  [%4d] %s: %s, %s\n", instructionOffset, "get_by_id_proto",
              pointerToSourceString(stubInfo.u.getByIdProto.baseObjectStructure)
-                 .utf8()
+                 .UTF8String()
                  .data(),
              pointerToSourceString(stubInfo.u.getByIdProto.prototypeStructure)
-                 .utf8()
+                 .UTF8String()
                  .data());
       return;
     case access_get_by_id_chain:
-      printf(
-          "  [%4d] %s: %s, %s\n", instructionOffset, "get_by_id_chain",
-          pointerToSourceString(stubInfo.u.getByIdChain.baseObjectStructure)
-              .utf8()
-              .data(),
-          pointerToSourceString(stubInfo.u.getByIdChain.chain).utf8().data());
+      printf("  [%4d] %s: %s, %s\n", instructionOffset, "get_by_id_chain",
+             pointerToSourceString(stubInfo.u.getByIdChain.baseObjectStructure)
+                 .UTF8String()
+                 .data(),
+             pointerToSourceString(stubInfo.u.getByIdChain.chain)
+                 .UTF8String()
+                 .data());
       return;
     case access_get_by_id_self_list:
       printf("  [%4d] %s: %s (%d)\n", instructionOffset,
              "op_get_by_id_self_list",
              pointerToSourceString(stubInfo.u.getByIdSelfList.structureList)
-                 .utf8()
+                 .UTF8String()
                  .data(),
              stubInfo.u.getByIdSelfList.listSize);
       return;
@@ -280,7 +282,7 @@ static void printStructureStubInfo(const StructureStubInfo& stubInfo,
       printf("  [%4d] %s: %s (%d)\n", instructionOffset,
              "op_get_by_id_proto_list",
              pointerToSourceString(stubInfo.u.getByIdProtoList.structureList)
-                 .utf8()
+                 .UTF8String()
                  .data(),
              stubInfo.u.getByIdProtoList.listSize);
       return;
@@ -288,20 +290,20 @@ static void printStructureStubInfo(const StructureStubInfo& stubInfo,
       printf(
           "  [%4d] %s: %s, %s, %s\n", instructionOffset, "put_by_id_transition",
           pointerToSourceString(stubInfo.u.putByIdTransition.previousStructure)
-              .utf8()
+              .UTF8String()
               .data(),
           pointerToSourceString(stubInfo.u.putByIdTransition.structure)
-              .utf8()
+              .UTF8String()
               .data(),
           pointerToSourceString(stubInfo.u.putByIdTransition.chain)
-              .utf8()
+              .UTF8String()
               .data());
       return;
     case access_put_by_id_replace:
       printf(
           "  [%4d] %s: %s\n", instructionOffset, "put_by_id_replace",
           pointerToSourceString(stubInfo.u.putByIdReplace.baseObjectStructure)
-              .utf8()
+              .UTF8String()
               .data());
       return;
     case access_get_by_id:
@@ -333,7 +335,7 @@ void CodeBlock::printStructure(const char* name,
                                int operand) const {
   unsigned instructionOffset = vPC - m_instructions.begin();
   printf("  [%4d] %s: %s\n", instructionOffset, name,
-         pointerToSourceString(vPC[operand].u.structure).utf8().data());
+         pointerToSourceString(vPC[operand].u.structure).UTF8String().data());
 }
 
 void CodeBlock::printStructures(const Instruction* vPC) const {
@@ -350,22 +352,22 @@ void CodeBlock::printStructures(const Instruction* vPC) const {
   }
   if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_proto)) {
     printf("  [%4d] %s: %s, %s\n", instructionOffset, "get_by_id_proto",
-           pointerToSourceString(vPC[4].u.structure).utf8().data(),
-           pointerToSourceString(vPC[5].u.structure).utf8().data());
+           pointerToSourceString(vPC[4].u.structure).UTF8String().data(),
+           pointerToSourceString(vPC[5].u.structure).UTF8String().data());
     return;
   }
   if (vPC[0].u.opcode == interpreter->getOpcode(op_put_by_id_transition)) {
     printf("  [%4d] %s: %s, %s, %s\n", instructionOffset,
            "put_by_id_transition",
-           pointerToSourceString(vPC[4].u.structure).utf8().data(),
-           pointerToSourceString(vPC[5].u.structure).utf8().data(),
-           pointerToSourceString(vPC[6].u.structureChain).utf8().data());
+           pointerToSourceString(vPC[4].u.structure).UTF8String().data(),
+           pointerToSourceString(vPC[5].u.structure).UTF8String().data(),
+           pointerToSourceString(vPC[6].u.structureChain).UTF8String().data());
     return;
   }
   if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_chain)) {
     printf("  [%4d] %s: %s, %s\n", instructionOffset, "get_by_id_chain",
-           pointerToSourceString(vPC[4].u.structure).utf8().data(),
-           pointerToSourceString(vPC[5].u.structureChain).utf8().data());
+           pointerToSourceString(vPC[4].u.structure).UTF8String().data(),
+           pointerToSourceString(vPC[5].u.structureChain).UTF8String().data());
     return;
   }
   if (vPC[0].u.opcode == interpreter->getOpcode(op_put_by_id)) {

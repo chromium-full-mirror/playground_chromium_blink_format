@@ -163,7 +163,7 @@ void NPRuntimeObjectMap::convertJSValueToNPVariant(ExecState* exec,
   }
 
   if (value.isString()) {
-    CString utf8String = value.toString(exec).utf8();
+    CString utf8String = value.toString(exec).UTF8String();
 
     // This should use NPN_MemAlloc, but we know that it uses malloc under the
     // hood.

@@ -237,7 +237,7 @@ wxString wxWebFrame::RunScript(const wxString& javascript) {
                   .toString(m_impl->frame->script()
                                 ->globalObject(WebCore::mainThreadNormalWorld())
                                 ->globalExec())
-                  .utf8()
+                  .UTF8String()
                   .data(),
               wxConvUTF8);
       }

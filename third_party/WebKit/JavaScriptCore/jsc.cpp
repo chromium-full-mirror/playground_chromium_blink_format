@@ -205,7 +205,7 @@ EncodedJSValue JSC_HOST_CALL functionPrint(ExecState* exec) {
     if (i)
       putchar(' ');
 
-    printf("%s", exec->argument(i).toString(exec).utf8().data());
+    printf("%s", exec->argument(i).toString(exec).UTF8String().data());
   }
 
   putchar('\n');
@@ -214,7 +214,8 @@ EncodedJSValue JSC_HOST_CALL functionPrint(ExecState* exec) {
 }
 
 EncodedJSValue JSC_HOST_CALL functionDebug(ExecState* exec) {
-  fprintf(stderr, "--> %s\n", exec->argument(0).toString(exec).utf8().data());
+  fprintf(stderr, "--> %s\n",
+          exec->argument(0).toString(exec).UTF8String().data());
   return JSValue::encode(jsUndefined());
 }
 
@@ -483,7 +484,7 @@ static void runInteractive(GlobalObject* globalObject) {
     else
       printf("%s\n", completion.value()
                          .toString(globalObject->globalExec())
-                         .utf8()
+                         .UTF8String()
                          .data());
 
     globalObject->globalExec()->clearException();
@@ -579,9 +580,9 @@ int jscmain(int argc, char** argv, JSGlobalData* globalData) {
 
 static bool fillBufferWithContentsOfFile(const UString& fileName,
                                          Vector<char>& buffer) {
-  FILE* f = fopen(fileName.utf8().data(), "r");
+  FILE* f = fopen(fileName.UTF8String().data(), "r");
   if (!f) {
-    fprintf(stderr, "Could not open file: %s\n", fileName.utf8().data());
+    fprintf(stderr, "Could not open file: %s\n", fileName.UTF8String().data());
     return false;
   }
 
