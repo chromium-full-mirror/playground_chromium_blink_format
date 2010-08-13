@@ -711,7 +711,7 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
   }
 
   void addDouble(FPRegisterID src, FPRegisterID dest) {
-    m_assembler.faddd_r(dest, dest, src);
+    m_assembler.vadd_f64_r(dest, dest, src);
   }
 
   void addDouble(Address src, FPRegisterID dest) {
@@ -720,7 +720,7 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
   }
 
   void divDouble(FPRegisterID src, FPRegisterID dest) {
-    m_assembler.fdivd_r(dest, dest, src);
+    m_assembler.vdiv_f64_r(dest, dest, src);
   }
 
   void divDouble(Address src, FPRegisterID dest) {
@@ -730,7 +730,7 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
   }
 
   void subDouble(FPRegisterID src, FPRegisterID dest) {
-    m_assembler.fsubd_r(dest, dest, src);
+    m_assembler.vsub_f64_r(dest, dest, src);
   }
 
   void subDouble(Address src, FPRegisterID dest) {
@@ -739,7 +739,7 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
   }
 
   void mulDouble(FPRegisterID src, FPRegisterID dest) {
-    m_assembler.fmuld_r(dest, dest, src);
+    m_assembler.vmul_f64_r(dest, dest, src);
   }
 
   void mulDouble(Address src, FPRegisterID dest) {
@@ -748,12 +748,12 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
   }
 
   void sqrtDouble(FPRegisterID src, FPRegisterID dest) {
-    m_assembler.fsqrtd_r(dest, src);
+    m_assembler.vsqrt_f64_r(dest, src);
   }
 
   void convertInt32ToDouble(RegisterID src, FPRegisterID dest) {
-    m_assembler.fmsr_r(dest, src);
-    m_assembler.fsitod_r(dest, dest);
+    m_assembler.vmov_vfp_r(dest << 1, src);
+    m_assembler.vcvt_f64_s32_r(dest, dest << 1);
   }
 
   void convertInt32ToDouble(Address src, FPRegisterID dest) {
@@ -774,8 +774,8 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
   Jump branchDouble(DoubleCondition cond,
                     FPRegisterID left,
                     FPRegisterID right) {
-    m_assembler.fcmpd_r(left, right);
-    m_assembler.fmstat();
+    m_assembler.vcmp_f64_r(left, right);
+    m_assembler.vmrs_apsr();
     if (cond & DoubleConditionBitSpecial)
       m_assembler.cmp_r(ARMRegisters::S0, ARMRegisters::S0, ARMAssembler::VS);
     return Jump(m_assembler.jmp(
@@ -801,12 +801,12 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
                                   RegisterID dest,
                                   JumpList& failureCases,
                                   FPRegisterID fpTemp) {
-    m_assembler.ftosid_r(ARMRegisters::SD0, src);
-    m_assembler.fmrs_r(dest, ARMRegisters::SD0);
+    m_assembler.vcvt_s32_f64_r(ARMRegisters::SD0 << 1, src);
+    m_assembler.vmov_arm_r(dest, ARMRegisters::SD0 << 1);
 
     // Convert the integer result back to float & compare to the original value
     // - if not equal or unordered (NaN) then jump.
-    m_assembler.fsitod_r(ARMRegisters::SD0, ARMRegisters::SD0);
+    m_assembler.vcvt_f64_s32_r(ARMRegisters::SD0, ARMRegisters::SD0 << 1);
     failureCases.append(
         branchDouble(DoubleNotEqualOrUnordered, src, ARMRegisters::SD0));
 
