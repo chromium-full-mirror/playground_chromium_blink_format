@@ -2907,6 +2907,7 @@ bool EventHandler::handleTextInputEvent(const String& text,
   ASSERT(!underlyingEvent || !underlyingEvent->isKeyboardEvent() ||
          static_cast<KeyboardEvent*>(underlyingEvent)->type() ==
              eventNames().keypressEvent);
+  ASSERT(!(isLineBreak && isBackTab));
 
   if (!m_frame)
     return false;
@@ -2922,10 +2923,11 @@ bool EventHandler::handleTextInputEvent(const String& text,
   if (FrameView* view = m_frame->view())
     view->resetDeferredRepaintDelay();
 
-  RefPtr<TextEvent> event = TextEvent::create(m_frame->domWindow(), text);
+  RefPtr<TextEvent> event =
+      TextEvent::create(m_frame->domWindow(), text,
+                        TextEvent::selectInputType(isLineBreak, isBackTab));
   event->setUnderlyingEvent(underlyingEvent);
-  event->setIsLineBreak(isLineBreak);
-  event->setIsBackTab(isBackTab);
+
   ExceptionCode ec;
   target->dispatchEvent(event, ec);
   return event->defaultHandled();
