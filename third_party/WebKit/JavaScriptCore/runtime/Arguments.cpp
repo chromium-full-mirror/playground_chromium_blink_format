@@ -165,7 +165,7 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
                                    const Identifier& propertyName,
                                    PropertySlot& slot) {
   bool isArrayIndex;
-  unsigned i = propertyName.toArrayIndex(&isArrayIndex);
+  unsigned i = toArrayIndex(propertyName.ustring(), &isArrayIndex);
   if (isArrayIndex && i < d->numArguments &&
       (!d->deletedArguments || !d->deletedArguments[i])) {
     if (i < d->numParameters) {
@@ -194,7 +194,7 @@ bool Arguments::getOwnPropertyDescriptor(ExecState* exec,
                                          const Identifier& propertyName,
                                          PropertyDescriptor& descriptor) {
   bool isArrayIndex;
-  unsigned i = propertyName.toArrayIndex(&isArrayIndex);
+  unsigned i = toArrayIndex(propertyName.ustring(), &isArrayIndex);
   if (isArrayIndex && i < d->numArguments &&
       (!d->deletedArguments || !d->deletedArguments[i])) {
     if (i < d->numParameters) {
@@ -256,7 +256,7 @@ void Arguments::put(ExecState* exec,
                     JSValue value,
                     PutPropertySlot& slot) {
   bool isArrayIndex;
-  unsigned i = propertyName.toArrayIndex(&isArrayIndex);
+  unsigned i = toArrayIndex(propertyName.ustring(), &isArrayIndex);
   if (isArrayIndex && i < d->numArguments &&
       (!d->deletedArguments || !d->deletedArguments[i])) {
     if (i < d->numParameters)
@@ -299,7 +299,7 @@ bool Arguments::deleteProperty(ExecState* exec, unsigned i) {
 bool Arguments::deleteProperty(ExecState* exec,
                                const Identifier& propertyName) {
   bool isArrayIndex;
-  unsigned i = propertyName.toArrayIndex(&isArrayIndex);
+  unsigned i = toArrayIndex(propertyName.ustring(), &isArrayIndex);
   if (isArrayIndex && i < d->numArguments) {
     if (!d->deletedArguments) {
       d->deletedArguments.set(new bool[d->numArguments]);

@@ -283,10 +283,10 @@ void ProfileNode::debugPrintData(int indentLevel) const {
   printf(
       "Function Name %s %d SelfTime %.3fms/%.3f%% TotalTime %.3fms/%.3f%% "
       "VSelf %.3fms VTotal %.3fms Visible %s Next Sibling %s\n",
-      functionName().UTF8String().data(), m_numberOfCalls, m_actualSelfTime,
+      functionName().utf8().data(), m_numberOfCalls, m_actualSelfTime,
       selfPercent(), m_actualTotalTime, totalPercent(), m_visibleSelfTime,
       m_visibleTotalTime, (m_visible ? "True" : "False"),
-      m_nextSibling ? m_nextSibling->functionName().UTF8String().data() : "");
+      m_nextSibling ? m_nextSibling->functionName().utf8().data() : "");
 
   ++indentLevel;
 
@@ -303,7 +303,7 @@ double ProfileNode::debugPrintDataSampleStyle(
   printf("    ");
 
   // Print function names
-  const char* name = functionName().UTF8String().data();
+  const char* name = functionName().utf8().data();
   double sampleCount = m_actualTotalTime * 1000;
   if (indentLevel) {
     for (int i = 0; i < indentLevel; ++i)
@@ -333,7 +333,7 @@ double ProfileNode::debugPrintDataSampleStyle(
       printf("  ");
 
     printf("%.0f %s\n", sampleCount - sumOfChildrensCount,
-           functionName().UTF8String().data());
+           functionName().utf8().data());
   }
 
   return m_actualTotalTime;

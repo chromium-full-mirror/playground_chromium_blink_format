@@ -612,7 +612,7 @@ static inline void putUTF8Triple(char*& buffer, UChar ch) {
   *buffer++ = static_cast<char>((ch & 0x3F) | 0x80);
 }
 
-CString String::utf8() const {
+CString String::utf8(bool strict) const {
   unsigned length = this->length();
   const UChar* characters = this->characters();
 
@@ -631,19 +631,23 @@ CString String::utf8() const {
   char* buffer = bufferVector.data();
   ConversionResult result =
       convertUTF16ToUTF8(&characters, characters + length, &buffer,
-                         buffer + bufferVector.size(), false);
-  ASSERT(result != sourceIllegal);  // Only produced from strict conversion.
+                         buffer + bufferVector.size(), strict);
   ASSERT(
       result !=
       targetExhausted);  // (length * 3) should be sufficient for any conversion
 
-  // If a high surrogate is left unconverted, treat it the same was as an
-  // unpaired high surrogate
-  // would have been handled in the middle of a string with non-strict
-  // conversion - which is to say,
-  // simply encode it to UTF-8.
+  // Only produced from strict conversion.
+  if (result == sourceIllegal)
+    return CString();
+
+  // Check for an unconverted high surrogate.
   if (result == sourceExhausted) {
-    // This should be one unpaired high surrogate.
+    if (strict)
+      return CString();
+    // This should be one unpaired high surrogate. Treat it the same
+    // was as an unpaired high surrogate would have been handled in
+    // the middle of a string with non-strict conversion - which is
+    // to say, simply encode it to UTF-8.
     ASSERT((characters + 1) == (this->characters() + length));
     ASSERT((*characters >= 0xD800) && (*characters <= 0xDBFF));
     // There should be room left, since one UChar hasn't been converted.
