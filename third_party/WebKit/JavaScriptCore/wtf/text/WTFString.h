@@ -99,26 +99,25 @@ int reverseFind(const UChar*, size_t, UChar, int startPosition = -1);
 
 class String {
  public:
-  String() {}  // gives null string, distinguishable from an empty string
-  String(const UChar* str, unsigned len) {
-    if (!str)
-      return;
-    m_impl = StringImpl::create(str, len);
-  }
-  String(const char* str) {
-    if (!str)
-      return;
-    m_impl = StringImpl::create(str);
-  }
-  String(const char* str, unsigned length) {
-    if (!str)
-      return;
-    m_impl = StringImpl::create(str, length);
-  }
-  String(const UChar*);  // Specifically for null terminated UTF-16
-  String(StringImpl* i) : m_impl(i) {}
-  String(PassRefPtr<StringImpl> i) : m_impl(i) {}
-  String(RefPtr<StringImpl> i) : m_impl(i) {}
+  // Construct a null string, distinguishable from an empty string.
+  String() {}
+
+  // Construct a string with UTF-16 data.
+  String(const UChar* characters, unsigned length);
+
+  // Construct a string with UTF-16 data, from a null-terminated source.
+  String(const UChar*);
+
+  // Construct a string with latin1 data.
+  String(const char* characters, unsigned length);
+
+  // Construct a string with latin1 data, from a null-terminated source.
+  String(const char* characters);
+
+  // Construct a string referencing an existing StringImpl.
+  String(StringImpl* impl) : m_impl(impl) {}
+  String(PassRefPtr<StringImpl> impl) : m_impl(impl) {}
+  String(RefPtr<StringImpl> impl) : m_impl(impl) {}
 
   void swap(String& o) { m_impl.swap(o.m_impl); }
 
@@ -132,7 +131,8 @@ class String {
   static String adopt(StringBuffer& buffer) {
     return StringImpl::adopt(buffer);
   }
-  static String adopt(Vector<UChar>& vector) {
+  template <size_t inlineCapacity>
+  static String adopt(Vector<UChar, inlineCapacity>& vector) {
     return StringImpl::adopt(vector);
   }
 
@@ -150,11 +150,10 @@ class String {
 
   const UChar* charactersWithNullTermination();
 
-  UChar operator[](unsigned i) const  // if i >= length(), returns 0
-  {
-    if (!m_impl || i >= m_impl->length())
+  UChar operator[](unsigned index) const {
+    if (!m_impl || index >= m_impl->length())
       return 0;
-    return m_impl->characters()[i];
+    return m_impl->characters()[index];
   }
   UChar32 characterStartingAt(unsigned) const;  // Ditto.
 

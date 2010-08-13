@@ -126,7 +126,8 @@ void SmallStrings::createSingleCharacterString(JSGlobalData* globalData,
     m_storage = adoptPtr(new SmallStringsStorage);
   ASSERT(!m_singleCharacterStrings[character]);
   m_singleCharacterStrings[character] = new (globalData)
-      JSString(globalData, m_storage->rep(character), JSString::HasOtherOwner);
+      JSString(globalData, PassRefPtr<StringImpl>(m_storage->rep(character)),
+               JSString::HasOtherOwner);
 }
 
 StringImpl* SmallStrings::singleCharacterStringRep(unsigned char character) {
