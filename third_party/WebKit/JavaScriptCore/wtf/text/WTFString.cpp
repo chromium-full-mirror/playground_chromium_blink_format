@@ -612,7 +612,7 @@ static inline void putUTF8Triple(char*& buffer, UChar ch) {
   *buffer++ = static_cast<char>((ch & 0x3F) | 0x80);
 }
 
-CString String::utf8() const {
+CString String::utf8(bool strict) const {
   unsigned length = this->length();
   const UChar* characters = this->characters();
 
@@ -631,11 +631,13 @@ CString String::utf8() const {
   char* buffer = bufferVector.data();
   ConversionResult result =
       convertUTF16ToUTF8(&characters, characters + length, &buffer,
-                         buffer + bufferVector.size(), false);
-  ASSERT(result != sourceIllegal);  // Only produced from strict conversion.
+                         buffer + bufferVector.size(), strict);
   ASSERT(
       result !=
       targetExhausted);  // (length * 3) should be sufficient for any conversion
+
+  if (result == sourceIllegal)  // Only produced from strict conversion.
+    return CString();
 
   // If a high surrogate is left unconverted, treat it the same was as an
   // unpaired high surrogate

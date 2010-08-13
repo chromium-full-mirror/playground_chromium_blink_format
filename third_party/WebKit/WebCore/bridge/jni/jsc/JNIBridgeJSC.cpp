@@ -50,7 +50,7 @@ JavaField::JavaField(JNIEnv* env, jobject aField) {
     fieldTypeName = env->NewStringUTF("<Unknown>");
   m_type = JavaString(env, fieldTypeName);
 
-  m_JNIType = JNITypeFromClassName(m_type.UTF8String());
+  m_JNIType = JNITypeFromClassName(m_type.utf8());
 
   // Get field name
   jstring fieldName = static_cast<jstring>(
@@ -163,7 +163,7 @@ JSValue JavaField::valueFromInstance(ExecState* exec, const Instance* i) const {
   }
 
   LOG(LiveConnect, "JavaField::valueFromInstance getting %s = %s",
-      UString(name()).UTF8String().data(), jsresult.toString(exec).ascii());
+      UString(name()).utf8().data(), jsresult.toString(exec).ascii());
 
   return jsresult;
 }
@@ -207,7 +207,7 @@ void JavaField::setValueToInstance(ExecState* exec,
       convertValueToJValue(exec, i->rootObject(), aValue, m_JNIType, type());
 
   LOG(LiveConnect, "JavaField::setValueToInstance setting value %s to %s",
-      UString(name()).UTF8String().data(), aValue.toString(exec).ascii());
+      UString(name()).utf8().data(), aValue.toString(exec).ascii());
 
   switch (m_JNIType) {
     case array_type:

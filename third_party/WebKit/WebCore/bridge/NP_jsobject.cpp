@@ -497,8 +497,8 @@ bool _NPN_Enumerate(NPP,
         static_cast<NPIdentifier*>(malloc(sizeof(NPIdentifier) * size));
 
     for (unsigned i = 0; i < size; ++i)
-      identifiers[i] = _NPN_GetStringIdentifier(
-          propertyNames[i].ustring().UTF8String().data());
+      identifiers[i] =
+          _NPN_GetStringIdentifier(propertyNames[i].ustring().utf8().data());
 
     *identifier = identifiers;
     *count = size;
