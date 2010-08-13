@@ -46,7 +46,7 @@ RenderSVGResourceMarker::~RenderSVGResourceMarker() {}
 void RenderSVGResourceMarker::layout() {
   // Invalidate all resources if our layout changed.
   if (m_everHadLayout && selfNeedsLayout())
-    invalidateClients();
+    removeAllClientsFromCache();
 
   // RenderSVGHiddenContainer overwrites layout(). We need the
   // layouting of RenderSVGContainer for calculating  local
@@ -54,14 +54,19 @@ void RenderSVGResourceMarker::layout() {
   RenderSVGContainer::layout();
 }
 
-void RenderSVGResourceMarker::invalidateClients() {
-  markAllClientsForInvalidation(LayoutAndBoundariesInvalidation);
+void RenderSVGResourceMarker::removeAllClientsFromCache(
+    bool markForInvalidation) {
+  markAllClientsForInvalidation(markForInvalidation
+                                    ? LayoutAndBoundariesInvalidation
+                                    : ParentOnlyInvalidation);
 }
 
-void RenderSVGResourceMarker::invalidateClient(RenderObject* client) {
+void RenderSVGResourceMarker::removeClientFromCache(RenderObject* client,
+                                                    bool markForInvalidation) {
   ASSERT(client);
-  ASSERT(client->selfNeedsLayout());
-  markClientForInvalidation(client, BoundariesInvalidation);
+  markClientForInvalidation(client, markForInvalidation
+                                        ? BoundariesInvalidation
+                                        : ParentOnlyInvalidation);
 }
 
 void RenderSVGResourceMarker::applyViewportClip(PaintInfo& paintInfo) {

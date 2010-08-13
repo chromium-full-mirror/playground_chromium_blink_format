@@ -58,24 +58,29 @@ RenderSVGResourceMasker::~RenderSVGResourceMasker() {
   m_masker.clear();
 }
 
-void RenderSVGResourceMasker::invalidateClients() {
+void RenderSVGResourceMasker::removeAllClientsFromCache(
+    bool markForInvalidation) {
   m_maskContentBoundaries = FloatRect();
   if (!m_masker.isEmpty()) {
     deleteAllValues(m_masker);
     m_masker.clear();
   }
 
-  markAllClientsForInvalidation(LayoutAndBoundariesInvalidation);
+  markAllClientsForInvalidation(markForInvalidation
+                                    ? LayoutAndBoundariesInvalidation
+                                    : ParentOnlyInvalidation);
 }
 
-void RenderSVGResourceMasker::invalidateClient(RenderObject* client) {
+void RenderSVGResourceMasker::removeClientFromCache(RenderObject* client,
+                                                    bool markForInvalidation) {
   ASSERT(client);
-  ASSERT(client->selfNeedsLayout());
 
   if (m_masker.contains(client))
     delete m_masker.take(client);
 
-  markClientForInvalidation(client, BoundariesInvalidation);
+  markClientForInvalidation(client, markForInvalidation
+                                        ? BoundariesInvalidation
+                                        : ParentOnlyInvalidation);
 }
 
 bool RenderSVGResourceMasker::applyResource(RenderObject* object,

@@ -58,8 +58,9 @@ class RenderSVGResource {
   RenderSVGResource() {}
   virtual ~RenderSVGResource() {}
 
-  virtual void invalidateClients() = 0;
-  virtual void invalidateClient(RenderObject*) = 0;
+  virtual void removeAllClientsFromCache(bool markForInvalidation = true) = 0;
+  virtual void removeClientFromCache(RenderObject*,
+                                     bool markForInvalidation = true) = 0;
 
   virtual bool applyResource(RenderObject*,
                              RenderStyle*,

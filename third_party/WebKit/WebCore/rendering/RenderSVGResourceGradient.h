@@ -50,8 +50,9 @@ class RenderSVGResourceGradient : public RenderSVGResourceContainer {
   RenderSVGResourceGradient(SVGGradientElement*);
   virtual ~RenderSVGResourceGradient();
 
-  virtual void invalidateClients();
-  virtual void invalidateClient(RenderObject*);
+  virtual void removeAllClientsFromCache(bool markForInvalidation = true);
+  virtual void removeClientFromCache(RenderObject*,
+                                     bool markForInvalidation = true);
 
   virtual bool applyResource(RenderObject*,
                              RenderStyle*,
