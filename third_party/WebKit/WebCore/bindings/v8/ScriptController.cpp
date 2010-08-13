@@ -471,13 +471,9 @@ void ScriptController::updateDocument() {
 }
 
 void ScriptController::namedItemAdded(HTMLDocument* doc,
-                                      const AtomicString& name) {
-  m_proxy->windowShell()->namedItemAdded(doc, name);
-}
+                                      const AtomicString& name) {}
 
 void ScriptController::namedItemRemoved(HTMLDocument* doc,
-                                        const AtomicString& name) {
-  m_proxy->windowShell()->namedItemRemoved(doc, name);
-}
+                                        const AtomicString& name) {}
 
 }  // namespace WebCore
