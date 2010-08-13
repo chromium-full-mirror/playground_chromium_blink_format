@@ -247,6 +247,7 @@ class InspectorController : public Noncopyable {
   bool hasFrontend() const { return m_remoteFrontend; }
 
   void drawNodeHighlight(GraphicsContext&) const;
+  void openInInspectedWindow(const String& url);
 
   void count(const String& title, unsigned lineNumber, const String& sourceID);
 
@@ -301,6 +302,7 @@ class InspectorController : public Noncopyable {
   void evaluateForTestInFrontend(long testCallId, const String& script);
 
   InjectedScript injectedScriptForNodeId(long id);
+
   void addScriptToEvaluateOnLoad(const String& source);
   void removeAllScriptsToEvaluateOnLoad();
   void setInspectorExtensionAPI(const String& source);
