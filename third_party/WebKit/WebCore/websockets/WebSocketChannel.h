@@ -107,6 +107,7 @@ class WebSocketChannel : public RefCounted<WebSocketChannel>,
   Timer<WebSocketChannel> m_resumeTimer;
   bool m_suspended;
   bool m_closed;
+  bool m_shouldDiscardReceivedData;
   unsigned long m_unhandledBufferedAmount;
 };
 
