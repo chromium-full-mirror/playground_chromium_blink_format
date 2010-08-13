@@ -496,12 +496,24 @@ void WebFrameLoaderClient::dispatchUnableToImplementPolicy(
   notImplemented();
 }
 
-void WebFrameLoaderClient::dispatchWillSubmitForm(FramePolicyFunction function,
-                                                  PassRefPtr<FormState>) {
-  notImplemented();
+void WebFrameLoaderClient::dispatchWillSubmitForm(
+    FramePolicyFunction function,
+    PassRefPtr<FormState> formState) {
+  WebPage* webPage = m_frame->page();
+  if (!webPage)
+    return;
 
-  Frame* coreFrame = m_frame->coreFrame();
-  (coreFrame->loader()->policyChecker()->*function)(PolicyUse);
+  // FIXME: Pass more of the form state.
+
+  uint64_t listenerID = m_frame->setUpPolicyListener(function);
+
+  WebFrame* sourceFrame = static_cast<WebFrameLoaderClient*>(
+                              formState->sourceFrame()->loader()->client())
+                              ->webFrame();
+
+  WebProcess::shared().connection()->send(
+      WebPageProxyMessage::WillSubmitForm, webPage->pageID(),
+      CoreIPC::In(m_frame->frameID(), sourceFrame->frameID(), listenerID));
 }
 
 void WebFrameLoaderClient::dispatchDidLoadMainResource(DocumentLoader*) {

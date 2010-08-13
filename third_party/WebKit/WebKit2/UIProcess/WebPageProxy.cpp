@@ -34,6 +34,8 @@
 #include "WebCoreArgumentCoders.h"
 #include "WebData.h"
 #include "WebEvent.h"
+#include "WebFormSubmissionListenerProxy.h"
+#include "WebFramePolicyListenerProxy.h"
 #include "WebPageMessageKinds.h"
 #include "WebPageNamespace.h"
 #include "WebPageProxyMessageKinds.h"
@@ -110,6 +112,10 @@ void WebPageProxy::initializeLoaderClient(
 void WebPageProxy::initializePolicyClient(
     const WKPagePolicyClient* policyClient) {
   m_policyClient.initialize(policyClient);
+}
+
+void WebPageProxy::initializeFormClient(const WKPageFormClient* formClient) {
+  m_formClient.initialize(formClient);
 }
 
 void WebPageProxy::initializeUIClient(const WKPageUIClient* client) {
@@ -530,6 +536,16 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       decidePolicyForMIMEType(webFrame(frameID), MIMEType, url, listenerID);
       break;
     }
+    case WebPageProxyMessage::WillSubmitForm: {
+      uint64_t frameID;
+      uint64_t sourceFrameID;
+      uint64_t listenerID;
+      if (!arguments->decode(CoreIPC::Out(frameID, sourceFrameID, listenerID)))
+        return;
+      willSubmitForm(webFrame(frameID), webFrame(sourceFrameID), listenerID);
+      break;
+    }
+
     case WebPageProxyMessage::DidRunJavaScriptInMainFrame: {
       String resultString;
       uint64_t callbackID;
@@ -827,7 +843,19 @@ void WebPageProxy::decidePolicyForMIMEType(WebFrameProxy* frame,
     listener->use();
 }
 
+// FormClient
+
+void WebPageProxy::willSubmitForm(WebFrameProxy* frame,
+                                  WebFrameProxy* sourceFrame,
+                                  uint64_t listenerID) {
+  RefPtr<WebFormSubmissionListenerProxy> listener =
+      frame->setUpFormSubmissionListenerProxy(listenerID);
+  if (!m_formClient.willSubmitForm(this, frame, sourceFrame, listener.get()))
+    listener->continueSubmission();
+}
+
 // UIClient
+
 PassRefPtr<WebPageProxy> WebPageProxy::createNewPage() {
   return m_uiClient.createNewPage(this);
 }

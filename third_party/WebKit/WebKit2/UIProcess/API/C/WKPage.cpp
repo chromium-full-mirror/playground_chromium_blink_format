@@ -136,6 +136,12 @@ void WKPageSetPagePolicyClient(WKPageRef pageRef,
     toWK(pageRef)->initializePolicyClient(wkClient);
 }
 
+void WKPageSetPageFormClient(WKPageRef pageRef,
+                             const WKPageFormClient* wkClient) {
+  if (wkClient && !wkClient->version)
+    toWK(pageRef)->initializeFormClient(wkClient);
+}
+
 void WKPageSetPageUIClient(WKPageRef pageRef, const WKPageUIClient* wkClient) {
   if (wkClient && !wkClient->version)
     toWK(pageRef)->initializeUIClient(wkClient);
