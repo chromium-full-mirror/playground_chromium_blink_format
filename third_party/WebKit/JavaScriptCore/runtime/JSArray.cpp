@@ -482,8 +482,8 @@ NEVER_INLINE void JSArray::putSlowCase(ExecState* exec,
     return;
   }
 
-  m_storage = reinterpret_cast<ArrayStorage*>(static_cast<char*>(baseStorage) +
-                                              m_indexBias * sizeof(JSValue));
+  m_storage = reinterpret_cast_ptr<ArrayStorage*>(
+      static_cast<char*>(baseStorage) + m_indexBias * sizeof(JSValue));
   m_storage->m_allocBase = baseStorage;
   storage = m_storage;
 
@@ -637,7 +637,7 @@ bool JSArray::increaseVectorLength(unsigned newLength) {
            .getValue(baseStorage))
     return false;
 
-  storage = m_storage = reinterpret_cast<ArrayStorage*>(
+  storage = m_storage = reinterpret_cast_ptr<ArrayStorage*>(
       static_cast<char*>(baseStorage) + m_indexBias * sizeof(JSValue));
   m_storage->m_allocBase = baseStorage;
 
@@ -672,7 +672,7 @@ bool JSArray::increaseVectorPrefixLength(unsigned newLength) {
 
   m_indexBias += newVectorLength - newLength;
 
-  m_storage = reinterpret_cast<ArrayStorage*>(
+  m_storage = reinterpret_cast_ptr<ArrayStorage*>(
       static_cast<char*>(newBaseStorage) + m_indexBias * sizeof(JSValue));
 
   memcpy(m_storage, storage, storageSize(0));
@@ -852,7 +852,7 @@ void JSArray::shiftCount(ExecState* exec, int count) {
       char* newBaseStorage =
           reinterpret_cast<char*>(storage) + count * sizeof(JSValue);
       memmove(newBaseStorage, storage, storageSize(0));
-      m_storage = reinterpret_cast<ArrayStorage*>(newBaseStorage);
+      m_storage = reinterpret_cast_ptr<ArrayStorage*>(newBaseStorage);
 
       m_indexBias += count;
     }
@@ -891,7 +891,7 @@ void JSArray::unshiftCount(ExecState* exec, int count) {
     char* newBaseStorage =
         reinterpret_cast<char*>(storage) - count * sizeof(JSValue);
     memmove(newBaseStorage, storage, storageSize(0));
-    m_storage = reinterpret_cast<ArrayStorage*>(newBaseStorage);
+    m_storage = reinterpret_cast_ptr<ArrayStorage*>(newBaseStorage);
     m_vectorLength += count;
   } else if (!increaseVectorPrefixLength(m_vectorLength + count)) {
     throwOutOfMemoryError(exec);
