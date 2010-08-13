@@ -90,8 +90,8 @@ InspectorApplicationCacheAgent::buildObjectForApplicationCache(
                    applicationCacheInfo.m_manifest.lastPathComponent());
   value->setNumber("creationTime", applicationCacheInfo.m_creationTime);
   value->setNumber("updateTime", applicationCacheInfo.m_updateTime);
-  value->set("resources",
-             buildArrayForApplicationCacheResources(applicationCacheResources));
+  value->setArray("resources", buildArrayForApplicationCacheResources(
+                                   applicationCacheResources));
   return value;
 }
 
@@ -105,7 +105,7 @@ InspectorApplicationCacheAgent::buildArrayForApplicationCacheResources(
   ApplicationCacheHost::ResourceInfoList::const_iterator it =
       applicationCacheResources.begin();
   for (int i = 0; it != end; ++it, i++)
-    resources->push(buildObjectForApplicationCacheResource(*it));
+    resources->pushObject(buildObjectForApplicationCacheResource(*it));
 
   return resources;
 }

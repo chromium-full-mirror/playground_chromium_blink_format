@@ -249,7 +249,7 @@ void InspectorDebuggerAgent::saveBreakpoints() {
       continue;
     RefPtr<InspectorObject> breakpointsForURL =
         ScriptBreakpoint::inspectorObjectFromSourceBreakpoints(it->second);
-    breakpoints->set(it->first, breakpointsForURL);
+    breakpoints->setObject(it->first, breakpointsForURL);
   }
   m_inspectorController->saveBreakpoints(breakpoints);
 }

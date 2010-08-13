@@ -193,7 +193,7 @@ bool ScriptCallStack::stackTrace(int frameLimit,
                                                : toWebCoreString(functionName));
     frameObject->setNumber("lineNumber", frame->GetLineNumber());
     frameObject->setNumber("column", frame->GetColumn());
-    stackTrace->push(frameObject);
+    stackTrace->pushObject(frameObject);
   }
   return true;
 #else

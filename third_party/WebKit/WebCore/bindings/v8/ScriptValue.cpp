@@ -91,7 +91,7 @@ static PassRefPtr<InspectorValue> v8ToInspectorValue(
         ASSERT_NOT_REACHED();
         element = InspectorValue::null();
       }
-      inspectorArray->push(element);
+      inspectorArray->pushValue(element);
     }
     return inspectorArray;
   }
@@ -112,7 +112,8 @@ static PassRefPtr<InspectorValue> v8ToInspectorValue(
         ASSERT_NOT_REACHED();
         continue;
       }
-      inspectorObject->set(toWebCoreStringWithNullCheck(name), propertyValue);
+      inspectorObject->setValue(toWebCoreStringWithNullCheck(name),
+                                propertyValue);
     }
     return inspectorObject;
   }

@@ -1391,7 +1391,7 @@ PassRefPtr<InspectorArray> InspectorController::buildArrayForCookies(
   ListHashSet<Cookie>::iterator end = cookiesList.end();
   ListHashSet<Cookie>::iterator it = cookiesList.begin();
   for (int i = 0; it != end; ++it, i++)
-    cookies->push(buildObjectForCookie(*it));
+    cookies->pushObject(buildObjectForCookie(*it));
 
   return cookies;
 }
@@ -1483,7 +1483,7 @@ void InspectorController::getDOMStorageEntries(
       RefPtr<InspectorArray> entry = InspectorArray::create();
       entry->pushString(name);
       entry->pushString(value);
-      (*entries)->push(entry);
+      (*entries)->pushArray(entry);
     }
   }
 }
@@ -1583,7 +1583,7 @@ void InspectorController::clearProfiles() {
 void InspectorController::getProfileHeaders(RefPtr<InspectorArray>* headers) {
   ProfilesMap::iterator profilesEnd = m_profiles.end();
   for (ProfilesMap::iterator it = m_profiles.begin(); it != profilesEnd; ++it)
-    (*headers)->push(createProfileHeader(*it->second));
+    (*headers)->pushObject(createProfileHeader(*it->second));
 }
 
 void InspectorController::getProfile(unsigned uid,
@@ -1591,7 +1591,8 @@ void InspectorController::getProfile(unsigned uid,
   ProfilesMap::iterator it = m_profiles.find(uid);
   if (it != m_profiles.end()) {
     *profileObject = createProfileHeader(*it->second);
-    (*profileObject)->set("head", it->second->buildInspectorObjectForHead());
+    (*profileObject)
+        ->setObject("head", it->second->buildInspectorObjectForHead());
   }
 }
 

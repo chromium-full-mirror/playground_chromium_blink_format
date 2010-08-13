@@ -98,7 +98,7 @@ class StatementCallback : public SQLStatementCallback {
           values->pushNumber(value.number());
           break;
         case SQLValue::NullValue:
-          values->push(InspectorValue::null());
+          values->pushValue(InspectorValue::null());
           break;
       }
     }
