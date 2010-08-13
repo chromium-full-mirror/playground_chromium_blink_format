@@ -44,6 +44,19 @@
 
 namespace WebCore {
 
+namespace {
+
+class ClientDataImpl : public v8::Debug::ClientData {
+ public:
+  ClientDataImpl(PassOwnPtr<ScriptDebugServer::Task> task) : m_task(task) {}
+  virtual ~ClientDataImpl() {}
+  ScriptDebugServer::Task* task() const { return m_task.get(); }
+
+ private:
+  OwnPtr<ScriptDebugServer::Task> m_task;
+};
+}
+
 static Frame* retrieveFrame(v8::Handle<v8::Context> context) {
   if (context.IsEmpty())
     return 0;
@@ -219,6 +232,11 @@ void ScriptDebugServer::setPauseOnExceptionsState(
   setPauseOnExceptionsFunction->Call(m_debuggerScript.get(), 1, argv);
 }
 
+void ScriptDebugServer::pause() {
+  if (!m_pausedPage)
+    v8::Debug::DebugBreak();
+}
+
 void ScriptDebugServer::continueProgram() {
   if (m_pausedPage)
     m_clientMessageLoop->quitNow();
@@ -309,6 +327,14 @@ bool ScriptDebugServer::isDebuggerAlwaysEnabled() {
   return m_enabled;
 }
 
+void ScriptDebugServer::interruptAndRun(PassOwnPtr<Task> task) {
+  v8::Debug::DebugBreakForCommand(new ClientDataImpl(task));
+}
+
+void ScriptDebugServer::runPendingTasks() {
+  v8::Debug::ProcessDebugMessages();
+}
+
 void ScriptDebugServer::v8DebugEventCallback(
     const v8::Debug::EventDetails& eventDetails) {
   ScriptDebugServer::shared().handleV8DebugEvent(eventDetails);
@@ -317,6 +343,14 @@ void ScriptDebugServer::v8DebugEventCallback(
 void ScriptDebugServer::handleV8DebugEvent(
     const v8::Debug::EventDetails& eventDetails) {
   v8::DebugEvent event = eventDetails.GetEvent();
+
+  if (event == v8::BreakForCommand) {
+    ClientDataImpl* data =
+        static_cast<ClientDataImpl*>(eventDetails.GetClientData());
+    data->task()->run();
+    return;
+  }
+
   if (event != v8::Break && event != v8::Exception && event != v8::AfterCompile)
     return;
 

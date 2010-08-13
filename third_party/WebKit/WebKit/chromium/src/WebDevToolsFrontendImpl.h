@@ -69,8 +69,6 @@ class WebDevToolsFrontendImpl : public WebKit::WebDevToolsFrontend,
   void frontendLoaded();
 
  private:
-  static v8::Handle<v8::Value> jsDebuggerPauseScript(const v8::Arguments& args);
-
   WebKit::WebViewImpl* m_webViewImpl;
   WebKit::WebDevToolsFrontendClient* m_client;
   String m_applicationLocale;

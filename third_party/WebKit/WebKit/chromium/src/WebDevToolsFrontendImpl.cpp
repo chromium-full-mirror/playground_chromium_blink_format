@@ -98,17 +98,6 @@ WebDevToolsFrontendImpl::WebDevToolsFrontendImpl(
   // it's not
   // deferred along with the inspected page.
   m_webViewImpl->page()->setGroupName(String());
-
-  WebFrameImpl* frame = m_webViewImpl->mainFrameImpl();
-  v8::HandleScope scope;
-  v8::Handle<v8::Context> frameContext = V8Proxy::context(frame->frame());
-
-  // Debugger commands should be sent using special method.
-  BoundObject debuggerCommandExecutorObj(frameContext, this,
-                                         "RemoteDebuggerCommandExecutor");
-  debuggerCommandExecutorObj.addProtoFunction(
-      "DebuggerPauseScript", WebDevToolsFrontendImpl::jsDebuggerPauseScript);
-  debuggerCommandExecutorObj.build();
 }
 
 WebDevToolsFrontendImpl::~WebDevToolsFrontendImpl() {}
@@ -133,14 +122,6 @@ void WebDevToolsFrontendImpl::dispatchOnInspectorFrontend(
 
 void WebDevToolsFrontendImpl::frontendLoaded() {
   m_client->sendFrontendLoaded();
-}
-
-v8::Handle<v8::Value> WebDevToolsFrontendImpl::jsDebuggerPauseScript(
-    const v8::Arguments& args) {
-  WebDevToolsFrontendImpl* frontend = static_cast<WebDevToolsFrontendImpl*>(
-      v8::External::Cast(*args.Data())->Value());
-  frontend->m_client->sendDebuggerPauseScript();
-  return v8::Undefined();
 }
 
 }  // namespace WebKit
