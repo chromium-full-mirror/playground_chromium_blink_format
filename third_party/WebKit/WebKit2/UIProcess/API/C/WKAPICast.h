@@ -39,6 +39,7 @@
 namespace WebKit {
 
 class ImmutableArray;
+class ImmutableDictionary;
 class WebBackForwardList;
 class WebBackForwardListItem;
 class WebContext;
@@ -78,6 +79,10 @@ struct APITypeInfo<WKContextRef> {
 template <>
 struct APITypeInfo<WKDataRef> {
   typedef WebData* ImplType;
+};
+template <>
+struct APITypeInfo<WKDictionaryRef> {
+  typedef ImmutableDictionary* ImplType;
 };
 template <>
 struct APITypeInfo<WKFormSubmissionListenerRef> {
@@ -125,6 +130,10 @@ struct ImplTypeInfo<APIObject*> {
 template <>
 struct ImplTypeInfo<ImmutableArray*> {
   typedef WKArrayRef APIType;
+};
+template <>
+struct ImplTypeInfo<ImmutableDictionary*> {
+  typedef WKDictionaryRef APIType;
 };
 template <>
 struct ImplTypeInfo<WebBackForwardList*> {
