@@ -26,7 +26,6 @@
 
 namespace WebCore {
 
-class Path;
 class SVGElement;
 
 class SVGPathSegList : public SVGList<RefPtr<SVGPathSeg>> {
@@ -38,16 +37,9 @@ class SVGPathSegList : public SVGList<RefPtr<SVGPathSeg>> {
 
   unsigned getPathSegAtLength(double, ExceptionCode&);
 
-  static PassRefPtr<SVGPathSegList> createAnimated(
-      const SVGPathSegList* fromList,
-      const SVGPathSegList* toList,
-      float progress);
-
  private:
   SVGPathSegList(const QualifiedName&);
 };
-
-float adjustAnimatedValue(float from, float to, float progress);
 
 }  // namespace WebCore
 

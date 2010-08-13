@@ -52,6 +52,11 @@ class SVGPathParserFactory {
                                         OwnPtr<SVGPathByteStream>&,
                                         PathParsingMode);
 
+  bool buildAnimatedSVGPathByteStream(SVGPathByteStream*,
+                                      SVGPathByteStream*,
+                                      OwnPtr<SVGPathByteStream>&,
+                                      float);
+
  private:
   SVGPathParserFactory();
   ~SVGPathParserFactory();
