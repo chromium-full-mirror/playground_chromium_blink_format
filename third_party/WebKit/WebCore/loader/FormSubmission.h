@@ -88,6 +88,8 @@ class FormSubmission : public RefCounted<FormSubmission> {
 
   void populateFrameLoadRequest(FrameLoadRequest&);
 
+  KURL requestURL() const;
+
   Method method() const { return m_method; }
   const KURL& action() const { return m_action; }
   const String& target() const { return m_target; }
