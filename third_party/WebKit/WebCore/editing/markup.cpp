@@ -1182,8 +1182,9 @@ PassRefPtr<DocumentFragment> createFragmentFromMarkup(
     const String& markup,
     const String& baseURL,
     FragmentScriptingPermission scriptingPermission) {
+  // FIXME: This should not use deprecatedCreateContextualFragment
   RefPtr<DocumentFragment> fragment =
-      document->documentElement()->createContextualFragment(
+      document->documentElement()->deprecatedCreateContextualFragment(
           markup, scriptingPermission);
 
   if (fragment && !baseURL.isEmpty() && baseURL != blankURL() &&

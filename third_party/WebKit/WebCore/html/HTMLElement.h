@@ -47,7 +47,9 @@ class HTMLElement : public StyledElement {
 
   String innerHTML() const;
   String outerHTML() const;
-  PassRefPtr<DocumentFragment> createContextualFragment(
+  // deprecatedCreateContextualFragment logic should be moved into
+  // Range::createContextualFragment
+  PassRefPtr<DocumentFragment> deprecatedCreateContextualFragment(
       const String&,
       FragmentScriptingPermission = FragmentScriptingAllowed);
   void setInnerHTML(const String&, ExceptionCode&);

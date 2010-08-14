@@ -97,7 +97,7 @@ class Element : public ContainerNode {
   DEFINE_ATTRIBUTE_EVENT_LISTENER(touchcancel);
 #endif
 
-  virtual PassRefPtr<DocumentFragment> createContextualFragment(
+  virtual PassRefPtr<DocumentFragment> deprecatedCreateContextualFragment(
       const String&,
       FragmentScriptingPermission = FragmentScriptingAllowed);
 
