@@ -27,6 +27,7 @@
 // Windows release build.
 
 #include "HTMLElementFactory.cpp"
+#include "HTMLEntityTable.cpp"
 #include "JSAbstractWorker.cpp"
 #include "JSAttr.cpp"
 #include "JSBarInfo.cpp"
