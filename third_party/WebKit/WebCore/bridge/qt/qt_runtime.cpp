@@ -520,6 +520,7 @@ QVariant convertValueToQVariant(ExecState* exec,
           ret = QTime(gdt.hour, gdt.minute, gdt.second);
           dist = 10;
         }
+#ifndef QT_NO_DATESTRING
       } else if (type == String) {
         UString ustring = value.toString(exec);
         QString qstring = QString((const QChar*)ustring.impl()->characters(),
@@ -562,6 +563,7 @@ QVariant convertValueToQVariant(ExecState* exec,
             dist = 3;
           }
         }
+#endif  // QT_NO_DATESTRING
       }
       break;
 
