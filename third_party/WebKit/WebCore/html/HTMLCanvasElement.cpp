@@ -243,6 +243,7 @@ void HTMLCanvasElement::reset() {
     return;
 
   bool ok;
+  bool hadImageBuffer = hasCreatedImageBuffer();
   int w = getAttribute(widthAttr).toInt(&ok);
   if (!ok || w < 0)
     w = DefaultWidth;
@@ -259,7 +260,6 @@ void HTMLCanvasElement::reset() {
         ->reshape(width(), height());
 #endif
 
-  bool hadImageBuffer = hasCreatedImageBuffer();
   if (m_context && m_context->is2d())
     static_cast<CanvasRenderingContext2D*>(m_context.get())->reset();
 
