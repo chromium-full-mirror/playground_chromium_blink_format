@@ -79,7 +79,7 @@ MethodList CClass::methodsNamed(const Identifier& identifier,
     return methodList;
   }
 
-  NPIdentifier ident = _NPN_GetStringIdentifier(identifier.ascii());
+  NPIdentifier ident = _NPN_GetStringIdentifier(identifier.ascii().data());
   const CInstance* inst = static_cast<const CInstance*>(instance);
   NPObject* obj = inst->getObject();
   if (_isa->hasMethod && _isa->hasMethod(obj, ident)) {
@@ -100,7 +100,7 @@ Field* CClass::fieldNamed(const Identifier& identifier,
   if (aField)
     return aField;
 
-  NPIdentifier ident = _NPN_GetStringIdentifier(identifier.ascii());
+  NPIdentifier ident = _NPN_GetStringIdentifier(identifier.ascii().data());
   const CInstance* inst = static_cast<const CInstance*>(instance);
   NPObject* obj = inst->getObject();
   if (_isa->hasProperty && _isa->hasProperty(obj, ident)) {

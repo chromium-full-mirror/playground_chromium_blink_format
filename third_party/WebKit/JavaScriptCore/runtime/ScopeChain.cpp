@@ -44,7 +44,7 @@ void ScopeChainNode::print() const {
     for (PropertyNameArray::const_iterator propIter = propertyNames.begin();
          propIter != propEnd; propIter++) {
       Identifier name = *propIter;
-      fprintf(stderr, "%s, ", name.ascii());
+      fprintf(stderr, "%s, ", name.ustring().utf8().data());
     }
     fprintf(stderr, "\n");
   }

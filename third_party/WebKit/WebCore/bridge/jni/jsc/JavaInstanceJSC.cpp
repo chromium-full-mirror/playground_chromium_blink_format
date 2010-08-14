@@ -175,7 +175,7 @@ JSValue JavaInstance::invokeMethod(ExecState* exec,
         convertValueToJValue(exec, m_rootObject.get(), exec->argument(i),
                              aParameter->getJNIType(), aParameter->type());
     LOG(LiveConnect, "JavaInstance::invokeMethod arg[%d] = %s", i,
-        exec->argument(i).toString(exec).ascii());
+        exec->argument(i).toString(exec).ascii().data());
   }
 
   jvalue result;

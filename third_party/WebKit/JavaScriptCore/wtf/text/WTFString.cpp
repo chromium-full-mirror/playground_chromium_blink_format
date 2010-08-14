@@ -572,17 +572,22 @@ void String::split(UChar separator, Vector<String>& result) const {
   return split(String(&separator, 1), false, result);
 }
 
-Vector<char> String::ascii() const {
-  if (m_impl)
-    return m_impl->ascii();
+CString String::ascii() const {
+  // Basic Latin1 (ISO) encoding - Unicode characters 0..255 are
+  // preserved, characters outside of this range are converted to '?'.
 
-  const char* nullMsg = "(null impl)";
-  Vector<char, 2048> buffer;
-  for (int i = 0; nullMsg[i]; ++i)
-    buffer.append(nullMsg[i]);
+  unsigned length = this->length();
+  const UChar* characters = this->characters();
 
-  buffer.append('\0');
-  return buffer;
+  char* characterBuffer;
+  CString result = CString::newUninitialized(length, characterBuffer);
+
+  for (unsigned i = 0; i < length; ++i) {
+    UChar ch = characters[i];
+    characterBuffer[i] = ch && (ch < 0x20 || ch > 0x7f) ? '?' : ch;
+  }
+
+  return result;
 }
 
 CString String::latin1() const {
@@ -597,7 +602,7 @@ CString String::latin1() const {
 
   for (unsigned i = 0; i < length; ++i) {
     UChar ch = characters[i];
-    characterBuffer[i] = ch > 255 ? '?' : ch;
+    characterBuffer[i] = ch > 0xff ? '?' : ch;
   }
 
   return result;

@@ -149,6 +149,7 @@ class String {
     return m_impl->characters();
   }
 
+  CString ascii() const;
   CString latin1() const;
   CString utf8(bool strict = false) const;
 
@@ -349,8 +350,6 @@ class String {
   String(const BString&);
   operator BString() const;
 #endif
-
-  Vector<char> ascii() const;
 
   static String fromUTF8(const char*, size_t);
   static String fromUTF8(const char*);
