@@ -43,18 +43,18 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-class NestScript : public Noncopyable {
+// FIXME: Factor out to avoid duplication with HTMLDocumentParser.
+class NestingLevelIncrementer : public Noncopyable {
  public:
-  NestScript(unsigned& nestingLevel, HTMLInputStream& inputStream)
-      : m_nestingLevel(&nestingLevel), m_savedInsertionPoint(inputStream) {
+  explicit NestingLevelIncrementer(unsigned& nestingLevel)
+      : m_nestingLevel(&nestingLevel) {
     ++(*m_nestingLevel);
   }
 
-  ~NestScript() { --(*m_nestingLevel); }
+  ~NestingLevelIncrementer() { --(*m_nestingLevel); }
 
  private:
   unsigned* m_nestingLevel;
-  InsertionPointRecord m_savedInsertionPoint;
 };
 
 HTMLScriptRunner::HTMLScriptRunner(Document* document,
@@ -92,7 +92,7 @@ inline PassRefPtr<Event> createScriptErrorEvent() {
 
 ScriptSourceCode HTMLScriptRunner::sourceFromPendingScript(
     const PendingScript& script,
-    bool& errorOccurred) {
+    bool& errorOccurred) const {
   if (script.cachedScript()) {
     errorOccurred = script.cachedScript()->errorOccurred();
     ASSERT(script.cachedScript()->isLoaded());
@@ -113,13 +113,10 @@ bool HTMLScriptRunner::isPendingScriptReady(const PendingScript& script) {
   return true;
 }
 
-void HTMLScriptRunner::executePendingScript() {
+void HTMLScriptRunner::executeParsingBlockingScript() {
   ASSERT(!m_scriptNestingLevel);
   ASSERT(m_document->haveStylesheetsLoaded());
-  bool errorOccurred = false;
   ASSERT(isPendingScriptReady(m_parsingBlockingScript));
-  ScriptSourceCode sourceCode =
-      sourceFromPendingScript(m_parsingBlockingScript, errorOccurred);
 
   // Stop watching loads before executeScript to prevent recursion if the script
   // reloads itself.
@@ -127,11 +124,20 @@ void HTMLScriptRunner::executePendingScript() {
       m_parsingBlockingScript.watchingForLoad())
     stopWatchingForLoad(m_parsingBlockingScript);
 
+  InsertionPointRecord insertionPointRecord(m_host->inputStream());
+  executePendingScriptAndDispatchEvent(m_parsingBlockingScript);
+}
+
+void HTMLScriptRunner::executePendingScriptAndDispatchEvent(
+    PendingScript& pendingScript) {
+  bool errorOccurred = false;
+  ScriptSourceCode sourceCode =
+      sourceFromPendingScript(pendingScript, errorOccurred);
+
   // Clear the pending script before possible rentrancy from executeScript()
-  RefPtr<Element> scriptElement =
-      m_parsingBlockingScript.releaseElementAndClear();
+  RefPtr<Element> scriptElement = pendingScript.releaseElementAndClear();
   {
-    NestScript nestingLevel(m_scriptNestingLevel, m_host->inputStream());
+    NestingLevelIncrementer nestingLevelIncrementer(m_scriptNestingLevel);
     if (errorOccurred)
       scriptElement->dispatchEvent(createScriptErrorEvent());
     else {
@@ -143,12 +149,7 @@ void HTMLScriptRunner::executePendingScript() {
 }
 
 void HTMLScriptRunner::executeScript(Element* element,
-                                     const ScriptSourceCode& sourceCode) {
-  // FIXME: We do not block inline <script> tags on stylesheets for now.
-  // When we do,  || !element->hasAttribute(srcAttr) should be removed from
-  // the ASSERT below.  See https://bugs.webkit.org/show_bug.cgi?id=40047
-  ASSERT(m_document->haveStylesheetsLoaded() ||
-         !element->hasAttribute(srcAttr));
+                                     const ScriptSourceCode& sourceCode) const {
   ScriptElement* scriptElement = toScriptElement(element);
   ASSERT(scriptElement);
   if (!scriptElement->shouldExecuteAsJavaScript())
@@ -201,7 +202,7 @@ bool HTMLScriptRunner::executeParsingBlockingScripts() {
     // We only really need to check once.
     if (!isPendingScriptReady(m_parsingBlockingScript))
       return false;
-    executePendingScript();
+    executeParsingBlockingScript();
   }
   return true;
 }
@@ -225,25 +226,11 @@ bool HTMLScriptRunner::executeScriptsWaitingForStylesheets() {
   return executeParsingBlockingScripts();
 }
 
-void HTMLScriptRunner::requestScript(Element* script) {
-  ASSERT(!m_parsingBlockingScript.element());
-  AtomicString srcValue = script->getAttribute(srcAttr);
-  // Allow the host to disllow script loads (using the XSSAuditor, etc.)
-  if (!m_host->shouldLoadExternalScriptFromSrc(srcValue))
+void HTMLScriptRunner::requestParsingBlockingScript(Element* element) {
+  if (!requestPendingScript(m_parsingBlockingScript, element))
     return;
-  // FIXME: We need to resolve the url relative to the element.
-  if (!script->dispatchBeforeLoadEvent(srcValue))
-    return;
-  m_parsingBlockingScript.adoptElement(script);
-  // This should correctly return 0 for empty or invalid srcValues.
-  CachedScript* cachedScript = m_document->docLoader()->requestScript(
-      srcValue, toScriptElement(script)->scriptCharset());
-  if (!cachedScript) {
-    notImplemented();  // Dispatch error event.
-    return;
-  }
 
-  m_parsingBlockingScript.setCachedScript(cachedScript);
+  ASSERT(m_parsingBlockingScript.cachedScript());
 
   // We only care about a load callback if cachedScript is not already
   // in the cache.  Callers will attempt to run the m_parsingBlockingScript
@@ -252,12 +239,35 @@ void HTMLScriptRunner::requestScript(Element* script) {
     watchForLoad(m_parsingBlockingScript);
 }
 
+bool HTMLScriptRunner::requestPendingScript(PendingScript& pendingScript,
+                                            Element* script) const {
+  ASSERT(!pendingScript.element());
+  const AtomicString& srcValue = script->getAttribute(srcAttr);
+  // Allow the host to disllow script loads (using the XSSAuditor, etc.)
+  if (!m_host->shouldLoadExternalScriptFromSrc(srcValue))
+    return false;
+  // FIXME: We need to resolve the url relative to the element.
+  if (!script->dispatchBeforeLoadEvent(srcValue))
+    return false;
+  pendingScript.adoptElement(script);
+  // This should correctly return 0 for empty or invalid srcValues.
+  CachedScript* cachedScript = m_document->docLoader()->requestScript(
+      srcValue, toScriptElement(script)->scriptCharset());
+  if (!cachedScript) {
+    notImplemented();  // Dispatch error event.
+    return false;
+  }
+  pendingScript.setCachedScript(cachedScript);
+  return true;
+}
+
 // This method is meant to match the HTML5 definition of "running a script"
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1.html#running-a-script
 void HTMLScriptRunner::runScript(Element* script, int startingLineNumber) {
   ASSERT(!haveParsingBlockingScript());
   {
-    NestScript nestingLevel(m_scriptNestingLevel, m_host->inputStream());
+    InsertionPointRecord insertionPointRecord(m_host->inputStream());
+    NestingLevelIncrementer nestingLevelIncrementer(m_scriptNestingLevel);
 
     // Check script type and language, current code uses
     // ScriptElement::shouldExecuteAsJavaScript(), but that may not be HTML5
@@ -266,10 +276,13 @@ void HTMLScriptRunner::runScript(Element* script, int startingLineNumber) {
 
     if (script->hasAttribute(srcAttr)) {
       // FIXME: Handle defer and async
-      requestScript(script);
+      requestParsingBlockingScript(script);
     } else {
       // FIXME: We do not block inline <script> tags on stylesheets to match the
-      // old parser for now.  See https://bugs.webkit.org/show_bug.cgi?id=40047
+      // old parser for now.  When we do, the ASSERT below should be added.
+      // See https://bugs.webkit.org/show_bug.cgi?id=40047
+      // ASSERT(document()->haveStylesheetsLoaded());
+      ASSERT(isExecutingScript());
       ScriptSourceCode sourceCode(script->textContent(),
                                   documentURLForScriptExecution(m_document),
                                   startingLineNumber);
