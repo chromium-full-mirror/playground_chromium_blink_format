@@ -258,7 +258,7 @@ class HTMLTokenizer : public Noncopyable {
   inline void saveEndTagNameIfNeeded();
   inline bool isAppropriateEndTag();
 
-  inline bool shouldEmitBufferedCharacterToken(const SegmentedString&);
+  inline bool haveBufferedCharacterToken();
 
   State m_state;
 

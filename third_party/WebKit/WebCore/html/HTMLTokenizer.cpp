@@ -146,7 +146,7 @@ inline bool HTMLTokenizer::processEntity(SegmentedString& source) {
   do {                                                            \
     m_state = stateName;                                          \
     if (!m_inputStreamPreprocessor.advance(source, m_lineNumber)) \
-      return shouldEmitBufferedCharacterToken(source);            \
+      return haveBufferedCharacterToken();                        \
     cc = m_inputStreamPreprocessor.nextInputCharacter();          \
     goto stateName;                                               \
   } while (false)
@@ -160,7 +160,7 @@ inline bool HTMLTokenizer::processEntity(SegmentedString& source) {
     m_state = stateName;                                       \
     if (source.isEmpty() ||                                    \
         !m_inputStreamPreprocessor.peek(source, m_lineNumber)) \
-      return shouldEmitBufferedCharacterToken(source);         \
+      return haveBufferedCharacterToken();                     \
     cc = m_inputStreamPreprocessor.nextInputCharacter();       \
     goto stateName;                                            \
   } while (false)
@@ -192,7 +192,7 @@ bool HTMLTokenizer::emitAndReconsumeIn(SegmentedString&, State state) {
 // Used to emit the EndOfFile token.
 // Check if we have buffered characters to emit first before emitting the EOF.
 bool HTMLTokenizer::emitEndOfFile(SegmentedString& source) {
-  if (shouldEmitBufferedCharacterToken(source))
+  if (haveBufferedCharacterToken())
     return true;
   m_state = DataState;
   source.advance(m_lineNumber);
@@ -219,7 +219,7 @@ bool HTMLTokenizer::flushBufferedEndTag(SegmentedString& source) {
       return true;                                             \
     if (source.isEmpty() ||                                    \
         !m_inputStreamPreprocessor.peek(source, m_lineNumber)) \
-      return shouldEmitBufferedCharacterToken(source);         \
+      return haveBufferedCharacterToken();                     \
     cc = m_inputStreamPreprocessor.nextInputCharacter();       \
     goto stateName;                                            \
   } while (false)
@@ -249,7 +249,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
   }
 
   if (source.isEmpty() || !m_inputStreamPreprocessor.peek(source, m_lineNumber))
-    return shouldEmitBufferedCharacterToken(source);
+    return haveBufferedCharacterToken();
   UChar cc = m_inputStreamPreprocessor.nextInputCharacter();
 
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#parsing-main-inbody
@@ -297,7 +297,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
 
     BEGIN_STATE(CharacterReferenceInDataState) {
       if (!processEntity(source))
-        return shouldEmitBufferedCharacterToken(source);
+        return haveBufferedCharacterToken();
       SWITCH_TO(DataState);
     }
     END_STATE()
@@ -318,7 +318,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
 
     BEGIN_STATE(CharacterReferenceInRCDATAState) {
       if (!processEntity(source))
-        return shouldEmitBufferedCharacterToken(source);
+        return haveBufferedCharacterToken();
       SWITCH_TO(RCDATAState);
     }
     END_STATE()
@@ -1021,7 +1021,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
       unsigned value = consumeHTMLEntity(source, notEnoughCharacters,
                                          m_additionalAllowedCharacter);
       if (notEnoughCharacters)
-        return shouldEmitBufferedCharacterToken(source);
+        return haveBufferedCharacterToken();
       if (!value)
         m_token->appendToAttributeValue('&');
       else if (value < 0xFFFF)
@@ -1106,7 +1106,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
           m_token->beginComment();
           SWITCH_TO(CommentStartState);
         } else if (result == SegmentedString::NotEnoughCharacters)
-          return shouldEmitBufferedCharacterToken(source);
+          return haveBufferedCharacterToken();
       } else if (cc == 'D' || cc == 'd') {
         SegmentedString::LookAheadResult result =
             source.lookAheadIgnoringCase(doctypeString);
@@ -1114,7 +1114,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
           advanceStringAndASSERTIgnoringCase(source, "doctype");
           SWITCH_TO(DOCTYPEState);
         } else if (result == SegmentedString::NotEnoughCharacters)
-          return shouldEmitBufferedCharacterToken(source);
+          return haveBufferedCharacterToken();
       }
       notImplemented();
       // FIXME: We're still missing the bits about the insertion mode being in
@@ -1329,7 +1329,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
             advanceStringAndASSERTIgnoringCase(source, "public");
             SWITCH_TO(AfterDOCTYPEPublicKeywordState);
           } else if (result == SegmentedString::NotEnoughCharacters)
-            return shouldEmitBufferedCharacterToken(source);
+            return haveBufferedCharacterToken();
         } else if (cc == 'S' || cc == 's') {
           SegmentedString::LookAheadResult result =
               source.lookAheadIgnoringCase(systemString);
@@ -1337,7 +1337,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
             advanceStringAndASSERTIgnoringCase(source, "system");
             SWITCH_TO(AfterDOCTYPESystemKeywordState);
           } else if (result == SegmentedString::NotEnoughCharacters)
-            return shouldEmitBufferedCharacterToken(source);
+            return haveBufferedCharacterToken();
         }
         parseError();
         m_token->setForceQuirks();
@@ -1639,8 +1639,7 @@ inline void HTMLTokenizer::parseError() {
   notImplemented();
 }
 
-inline bool HTMLTokenizer::shouldEmitBufferedCharacterToken(
-    const SegmentedString& source) {
-  return source.isClosed() && m_token->type() == HTMLToken::Character;
+inline bool HTMLTokenizer::haveBufferedCharacterToken() {
+  return m_token->type() == HTMLToken::Character;
 }
 }
