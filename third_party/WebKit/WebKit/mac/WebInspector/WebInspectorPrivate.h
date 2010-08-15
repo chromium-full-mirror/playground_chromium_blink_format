@@ -30,8 +30,11 @@
 
 #import <WebKit/WebInspector.h>
 
+@class WebInspectorFrontend;
+
 @interface WebInspector (WebPrivate)
 - (void)evaluateInFrontend:(id)sender
                     callId:(long)callId
                     script:(NSString*)script;
+- (void)setFrontend:(WebInspectorFrontend*)frontend;
 @end
