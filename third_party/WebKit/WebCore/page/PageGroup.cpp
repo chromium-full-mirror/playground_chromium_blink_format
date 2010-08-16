@@ -187,8 +187,8 @@ StorageNamespace* PageGroup::localStorage() {
     // at this point we're stuck with it.
     Page* page = *m_pages.begin();
     const String& path = page->settings()->localStorageDatabasePath();
-        unsigned quota = m_groupSettings->localStorageQuotaBytes());
-        m_localStorage = StorageNamespace::localStorageNamespace(path, quota);
+    unsigned quota = m_groupSettings->localStorageQuotaBytes();
+    m_localStorage = StorageNamespace::localStorageNamespace(path, quota);
   }
 
   return m_localStorage.get();
