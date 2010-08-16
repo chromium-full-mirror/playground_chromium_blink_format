@@ -226,7 +226,6 @@ class WebPageProxy : public APIObject {
   WTF::String runJavaScriptPrompt(WebFrameProxy* frame,
                                   const WTF::String&,
                                   const WTF::String&);
-  void contentsSizeChanged(WebFrameProxy*, const WebCore::IntSize&);
 
   void addItemToBackForwardList(WebBackForwardListItem*);
   void goToItemInBackForwardList(WebBackForwardListItem*);

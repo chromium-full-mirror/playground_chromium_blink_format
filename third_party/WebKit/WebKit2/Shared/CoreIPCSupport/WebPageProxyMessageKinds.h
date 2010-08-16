@@ -40,7 +40,6 @@ enum Kind {
   RunJavaScriptPrompt,
 
   ClosePage,
-  ContentsSizeChanged,
   DecidePolicyForMIMEType,
   DecidePolicyForNavigationAction,
   DecidePolicyForNewWindowAction,
