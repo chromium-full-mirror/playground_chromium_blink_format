@@ -134,7 +134,7 @@ PassRefPtr<FilterEffect> SVGFEImageElement::build(SVGFilterBuilder*) {
   }
 
   return FEImage::create(
-      m_targetImage ? m_targetImage->image() : m_cachedImage->image(),
+      m_targetImage ? m_targetImage->copyImage() : m_cachedImage->image(),
       preserveAspectRatio());
 }
 

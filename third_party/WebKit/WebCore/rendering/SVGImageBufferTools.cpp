@@ -75,7 +75,7 @@ void SVGImageBufferTools::clipToImageBuffer(
   // So the actual masking process has to be done in the device coordinate space
   // as well.
   context->concatCTM(absoluteTransform.inverse());
-  context->clipToImageBuffer(absoluteTargetRect, imageBuffer);
+  context->clipToImageBuffer(imageBuffer, absoluteTargetRect);
   context->concatCTM(absoluteTransform);
 }
 }

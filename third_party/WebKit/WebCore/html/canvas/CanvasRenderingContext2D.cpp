@@ -1339,8 +1339,8 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* sourceCanvas,
 
   sourceCanvas->makeRenderingResultsAvailable();
 
-  c->drawImage(buffer->image(), DeviceColorSpace, destRect, sourceRect,
-               state().m_globalComposite);
+  c->drawImageBuffer(buffer, DeviceColorSpace, destRect, sourceRect,
+                     state().m_globalComposite);
   willDraw(destRect);  // This call comes after drawImage, since the buffer we
                        // draw into may be our own, and we need to make sure it
                        // is dirty.
@@ -1584,7 +1584,7 @@ PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
   CanvasPattern::parseRepetitionType(repetitionType, repeatX, repeatY, ec);
   if (ec)
     return 0;
-  return CanvasPattern::create(canvas->buffer()->image(), repeatX, repeatY,
+  return CanvasPattern::create(canvas->copiedImage(), repeatX, repeatY,
                                canvas->originClean());
 }
 
@@ -1968,7 +1968,7 @@ void CanvasRenderingContext2D::drawTextInternal(const String& text,
     maskImageContext->drawBidiText(font, textRun, location);
 
     c->save();
-    c->clipToImageBuffer(maskRect, maskImage.get());
+    c->clipToImageBuffer(maskImage.get(), maskRect);
     drawStyle->applyFillColor(c);
     c->fillRect(maskRect);
     c->restore();

@@ -557,7 +557,7 @@ void RenderBoxModelObject::paintFillLayerExtended(
 
     // The mask has been created.  Now we just need to clip to it.
     context->save();
-    context->clipToImageBuffer(maskRect, maskImage.get());
+    context->clipToImageBuffer(maskImage.get(), maskRect);
   }
 
   StyleImage* bg = bgLayer->image();

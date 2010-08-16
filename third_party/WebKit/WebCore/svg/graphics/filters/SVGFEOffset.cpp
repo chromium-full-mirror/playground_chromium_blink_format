@@ -83,8 +83,8 @@ void FEOffset::apply(Filter* filter) {
       m_dy + m_in->scaledSubRegion().y() - scaledSubRegion().y(),
       m_in->scaledSubRegion().width(), m_in->scaledSubRegion().height());
 
-  filterContext->drawImage(m_in->resultImage()->image(), DeviceColorSpace,
-                           dstRect);
+  filterContext->drawImageBuffer(m_in->resultImage(), DeviceColorSpace,
+                                 dstRect);
 }
 
 void FEOffset::dump() {}

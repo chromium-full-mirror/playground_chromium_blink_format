@@ -290,8 +290,8 @@ void RenderSVGResourceFilter::postApplyResource(RenderObject* object,
 #if !PLATFORM(CG)
       resultImage->transformColorSpace(LinearRGB, DeviceRGB);
 #endif
-      context->drawImage(resultImage->image(), object->style()->colorSpace(),
-                         lastEffect->subRegion());
+      context->drawImageBuffer(resultImage, object->style()->colorSpace(),
+                               lastEffect->subRegion());
     }
   }
 

@@ -44,7 +44,7 @@ class CanvasPattern : public RefCounted<CanvasPattern> {
                                   bool& repeatY,
                                   ExceptionCode&);
 
-  static PassRefPtr<CanvasPattern> create(Image* image,
+  static PassRefPtr<CanvasPattern> create(PassRefPtr<Image> image,
                                           bool repeatX,
                                           bool repeatY,
                                           bool originClean) {
@@ -56,7 +56,10 @@ class CanvasPattern : public RefCounted<CanvasPattern> {
   bool originClean() const { return m_originClean; }
 
  private:
-  CanvasPattern(Image*, bool repeatX, bool repeatY, bool originClean);
+  CanvasPattern(PassRefPtr<Image>,
+                bool repeatX,
+                bool repeatY,
+                bool originClean);
 
   RefPtr<Pattern> m_pattern;
   bool m_originClean;

@@ -272,6 +272,33 @@ class GraphicsContext : public Noncopyable {
                       CompositeOperator = CompositeSourceOver,
                       bool useLowQualityScale = false);
 
+  void drawImageBuffer(ImageBuffer*,
+                       ColorSpace styleColorSpace,
+                       const IntPoint&,
+                       CompositeOperator = CompositeSourceOver);
+  void drawImageBuffer(ImageBuffer*,
+                       ColorSpace styleColorSpace,
+                       const IntRect&,
+                       CompositeOperator = CompositeSourceOver,
+                       bool useLowQualityScale = false);
+  void drawImageBuffer(ImageBuffer*,
+                       ColorSpace styleColorSpace,
+                       const IntPoint& destPoint,
+                       const IntRect& srcRect,
+                       CompositeOperator = CompositeSourceOver);
+  void drawImageBuffer(ImageBuffer*,
+                       ColorSpace styleColorSpace,
+                       const IntRect& destRect,
+                       const IntRect& srcRect,
+                       CompositeOperator = CompositeSourceOver,
+                       bool useLowQualityScale = false);
+  void drawImageBuffer(ImageBuffer*,
+                       ColorSpace styleColorSpace,
+                       const FloatRect& destRect,
+                       const FloatRect& srcRect = FloatRect(0, 0, -1, -1),
+                       CompositeOperator = CompositeSourceOver,
+                       bool useLowQualityScale = false);
+
   void setImageInterpolationQuality(InterpolationQuality);
   InterpolationQuality imageInterpolationQuality() const;
 
@@ -290,10 +317,10 @@ class GraphicsContext : public Noncopyable {
                           const IntSize& bottomLeft,
                           const IntSize& bottomRight);
   void clipPath(WindRule);
-  void clipToImageBuffer(const FloatRect&, const ImageBuffer*);
   void clipConvexPolygon(size_t numPoints,
                          const FloatPoint*,
                          bool antialias = true);
+  void clipToImageBuffer(ImageBuffer*, const FloatRect&);
 
   int textDrawingMode();
   void setTextDrawingMode(int);

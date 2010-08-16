@@ -324,15 +324,16 @@ PassOwnPtr<ImageBuffer> RenderSVGResourcePattern::createTileImage(
 void RenderSVGResourcePattern::buildPattern(
     PatternData* patternData,
     PassOwnPtr<ImageBuffer> tileImage) const {
-  if (!tileImage->image()) {
+  RefPtr<Image> copiedImage = tileImage->copyImage();
+  if (!copiedImage) {
     patternData->pattern = 0;
     return;
   }
 
-  IntRect tileRect = tileImage->image()->rect();
+  IntRect tileRect = copiedImage->rect();
   if (tileRect.width() <= patternData->boundaries.width() &&
       tileRect.height() <= patternData->boundaries.height()) {
-    patternData->pattern = Pattern::create(tileImage->image(), true, true);
+    patternData->pattern = Pattern::create(copiedImage, true, true);
     return;
   }
 
@@ -361,14 +362,14 @@ void RenderSVGResourcePattern::buildPattern(
     newTileImageContext->translate(0, patternData->boundaries.height());
     for (int j = numX; j > 0; --j) {
       newTileImageContext->translate(patternData->boundaries.width(), 0);
-      newTileImageContext->drawImage(tileImage->image(), style()->colorSpace(),
+      newTileImageContext->drawImage(copiedImage.get(), style()->colorSpace(),
                                      tileRect, tileRect);
     }
     newTileImageContext->translate(-patternData->boundaries.width() * numX, 0);
   }
   newTileImageContext->restore();
 
-  patternData->pattern = Pattern::create(newTileImage->image(), true, true);
+  patternData->pattern = Pattern::create(newTileImage->copyImage(), true, true);
 }
 }
 
