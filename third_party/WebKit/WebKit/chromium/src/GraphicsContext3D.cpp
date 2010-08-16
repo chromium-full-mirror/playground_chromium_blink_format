@@ -102,8 +102,7 @@ class GraphicsContext3DInternal {
   void reshape(int width, int height);
 
   void paintRenderingResultsToCanvas(CanvasRenderingContext* context);
-  void beginPaint(CanvasRenderingContext* context);
-  void endPaint();
+  bool paintsIntoCanvasBuffer() const;
 
   void prepareTexture();
 
