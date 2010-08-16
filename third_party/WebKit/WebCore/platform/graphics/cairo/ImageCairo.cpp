@@ -206,7 +206,9 @@ void Image::drawPattern(GraphicsContext* context,
     cairo_set_source_surface(clippedImageContext, image, -tileRect.x(),
                              -tileRect.y());
     cairo_paint(clippedImageContext);
-    image = imageSurface->image()->nativeImageForCurrentFrame();
+    RefPtr<Image> copiedImage =
+        imageSurface->copyImage();  // FIXME: Copying here is wasteful.
+    image = copiedImage->nativeImageForCurrentFrame();
   }
 
   cairo_pattern_t* pattern = cairo_pattern_create_for_surface(image);
