@@ -644,7 +644,7 @@ void InspectorDOMAgent::performSearch(const String& whitespaceTrimmedQuery,
   // pushing next / previous result
   //    is sufficient.
 
-  int queryLength = whitespaceTrimmedQuery.length();
+  unsigned queryLength = whitespaceTrimmedQuery.length();
   bool startTagFound = !whitespaceTrimmedQuery.find('<');
   bool endTagFound = whitespaceTrimmedQuery.reverseFind('>') + 1 == queryLength;
 

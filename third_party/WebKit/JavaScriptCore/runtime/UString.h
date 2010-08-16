@@ -104,6 +104,25 @@ class UString {
   static UString number(long long);
   static UString number(double);
 
+  // Find a single character or string, also with match function & latin1 forms.
+  size_t find(UChar c, unsigned start = 0) const {
+    return m_impl ? m_impl->find(c, start) : notFound;
+  }
+  size_t find(const UString& str, unsigned start = 0) const {
+    return m_impl ? m_impl->find(str.impl(), start) : notFound;
+  }
+  size_t find(const char* str, unsigned start = 0) const {
+    return m_impl ? m_impl->find(str, start) : notFound;
+  }
+
+  // Find the last instance of a single character or string.
+  size_t reverseFind(UChar c, unsigned start = UINT_MAX) const {
+    return m_impl ? m_impl->reverseFind(c, start) : notFound;
+  }
+  size_t reverseFind(const UString& str, unsigned start = UINT_MAX) const {
+    return m_impl ? m_impl->reverseFind(str.impl(), start) : notFound;
+  }
+
   double toDouble(bool tolerateTrailingJunk, bool tolerateEmptyString) const;
   double toDouble(bool tolerateTrailingJunk) const;
   double toDouble() const;
@@ -112,13 +131,7 @@ class UString {
   uint32_t toUInt32(bool* ok, bool tolerateEmptyString) const;
   uint32_t toStrictUInt32(bool* ok = 0) const;
 
-  static const unsigned NotFound = 0xFFFFFFFFu;
-  unsigned find(const UString& f, unsigned pos = 0) const;
-  unsigned find(UChar, unsigned pos = 0) const;
-  unsigned rfind(const UString& f, unsigned pos) const;
-  unsigned rfind(UChar, unsigned pos) const;
-
-  UString substr(unsigned pos = 0, unsigned len = 0xFFFFFFFF) const;
+  UString substr(unsigned pos = 0, unsigned len = UINT_MAX) const;
 
  private:
   RefPtr<StringImpl> m_impl;

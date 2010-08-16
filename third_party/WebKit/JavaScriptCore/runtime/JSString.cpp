@@ -115,8 +115,8 @@ JSValue JSString::replaceCharacter(ExecState* exec,
                                    UChar character,
                                    const UString& replacement) {
   if (!isRope()) {
-    unsigned matchPosition = m_value.find(character);
-    if (matchPosition == UString::NotFound)
+    size_t matchPosition = m_value.find(character);
+    if (matchPosition == notFound)
       return JSValue(this);
     return jsString(exec, m_value.substr(0, matchPosition), replacement,
                     m_value.substr(matchPosition + 1));
@@ -127,7 +127,7 @@ JSValue JSString::replaceCharacter(ExecState* exec,
   // Count total fibers and find matching string.
   size_t fiberCount = 0;
   StringImpl* matchString = 0;
-  int matchPosition = -1;
+  size_t matchPosition = notFound;
   for (RopeIterator it(m_other.m_fibers.data(), m_fiberCount); it != end;
        ++it) {
     ++fiberCount;
@@ -136,7 +136,7 @@ JSValue JSString::replaceCharacter(ExecState* exec,
 
     StringImpl* string = *it;
     matchPosition = string->find(character);
-    if (matchPosition == -1)
+    if (matchPosition == notFound)
       continue;
     matchString = string;
   }

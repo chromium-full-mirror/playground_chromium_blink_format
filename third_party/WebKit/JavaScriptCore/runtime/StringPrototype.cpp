@@ -164,7 +164,7 @@ substituteBackreferencesSlow(const UString& replacement,
                              const UString& source,
                              const int* ovector,
                              RegExp* reg,
-                             unsigned i) {
+                             size_t i) {
   Vector<UChar> substitutedReplacement;
   int offset = 0;
   do {
@@ -223,7 +223,7 @@ substituteBackreferencesSlow(const UString& replacement,
     offset = i + 1;
     substitutedReplacement.append(source.characters() + backrefStart,
                                   backrefLength);
-  } while ((i = replacement.find('$', i + 1)) != UString::NotFound);
+  } while ((i = replacement.find('$', i + 1)) != notFound);
 
   if (replacement.length() - offset)
     substitutedReplacement.append(replacement.characters() + offset,
@@ -237,8 +237,8 @@ static inline UString substituteBackreferences(const UString& replacement,
                                                const UString& source,
                                                const int* ovector,
                                                RegExp* reg) {
-  unsigned i = replacement.find('$', 0);
-  if (UNLIKELY(i != UString::NotFound))
+  size_t i = replacement.find('$', 0);
+  if (UNLIKELY(i != notFound))
     return substituteBackreferencesSlow(replacement, source, ovector, reg, i);
   return replacement;
 }
@@ -464,9 +464,9 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncReplace(ExecState* exec) {
         sourceVal->replaceCharacter(exec, patternString[0], replacementString));
 
   const UString& source = sourceVal->value(exec);
-  unsigned matchPos = source.find(patternString);
+  size_t matchPos = source.find(patternString);
 
-  if (matchPos == UString::NotFound)
+  if (matchPos == notFound)
     return JSValue::encode(sourceVal);
 
   int matchLen = patternString.length();
@@ -578,8 +578,8 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncIndexOf(ExecState* exec) {
     pos = static_cast<int>(dpos);
   }
 
-  unsigned result = s.find(u2, pos);
-  if (result == UString::NotFound)
+  size_t result = s.find(u2, pos);
+  if (result == notFound)
     return JSValue::encode(jsNumber(exec, -1));
   return JSValue::encode(jsNumber(exec, result));
 }
@@ -606,8 +606,8 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncLastIndexOf(ExecState* exec) {
     dpos = len;
 #endif
 
-  unsigned result = s.rfind(u2, static_cast<unsigned>(dpos));
-  if (result == UString::NotFound)
+  size_t result = s.reverseFind(u2, static_cast<unsigned>(dpos));
+  if (result == notFound)
     return JSValue::encode(jsNumber(exec, -1));
   return JSValue::encode(jsNumber(exec, result));
 }
@@ -774,9 +774,8 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncSplit(ExecState* exec) {
       while (i != limit && p0 < s.length() - 1)
         result->put(exec, i++, jsSingleCharacterSubstring(exec, s, p0++));
     } else {
-      unsigned pos;
-
-      while (i != limit && (pos = s.find(u2, p0)) != UString::NotFound) {
+      size_t pos;
+      while (i != limit && (pos = s.find(u2, p0)) != notFound) {
         result->put(exec, i++, jsSubstring(exec, s, p0, pos - p0));
         p0 = pos + u2.length();
       }

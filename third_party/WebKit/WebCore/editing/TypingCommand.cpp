@@ -368,9 +368,9 @@ void TypingCommand::insertText(const String& text, bool selectInsertedText) {
   // both an old selection
   // that ends just before where we want to insert text and the newly inserted
   // text.
-  int offset = 0;
-  int newline;
-  while ((newline = text.find('\n', offset)) != -1) {
+  unsigned offset = 0;
+  size_t newline;
+  while ((newline = text.find('\n', offset)) != notFound) {
     if (newline != offset)
       insertTextRunWithoutNewlines(text.substring(offset, newline - offset),
                                    false);
@@ -380,7 +380,7 @@ void TypingCommand::insertText(const String& text, bool selectInsertedText) {
   if (!offset)
     insertTextRunWithoutNewlines(text, selectInsertedText);
   else {
-    int length = text.length();
+    unsigned length = text.length();
     if (length != offset)
       insertTextRunWithoutNewlines(text.substring(offset, length - offset),
                                    selectInsertedText);
