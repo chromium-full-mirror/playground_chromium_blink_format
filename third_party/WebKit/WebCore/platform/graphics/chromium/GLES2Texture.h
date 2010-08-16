@@ -35,6 +35,10 @@
 
 #include "RefCounted.h"
 #include "RefPtr.h"
+#include "TilingData.h"
+#include <wtf/OwnPtr.h>
+#include <wtf/PassOwnPtr.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 class GraphicsContext3D;
@@ -47,23 +51,22 @@ class GLES2Texture : public RefCounted<GLES2Texture> {
                                          Format,
                                          int width,
                                          int height);
-  void bind();
+  void bindTile(int tile);
   void load(void* pixels);
   Format format() const { return m_format; }
-  int width() const { return m_width; }
-  int height() const { return m_height; }
+  const TilingData& tiles() const { return m_tiles; }
 
  private:
   GLES2Texture(GraphicsContext3D*,
-               unsigned textureId,
-               Format,
+               PassOwnPtr<Vector<unsigned int>> tileTextureIds,
+               Format format,
                int width,
-               int height);
+               int height,
+               int maxTextureSize);
   GraphicsContext3D* m_context;
-  unsigned m_textureId;
   Format m_format;
-  int m_width;
-  int m_height;
+  TilingData m_tiles;
+  OwnPtr<Vector<unsigned int>> m_tileTextureIds;
 };
 }
 
