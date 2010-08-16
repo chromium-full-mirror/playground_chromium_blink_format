@@ -58,7 +58,9 @@ PageGroup::PageGroup(const String& name)
       m_groupSettings(GroupSettings::create()) {}
 
 PageGroup::PageGroup(Page* page)
-    : m_visitedLinksPopulated(false), m_identifier(getUniqueIdentifier()) {
+    : m_visitedLinksPopulated(false),
+      m_identifier(getUniqueIdentifier()),
+      m_groupSettings(GroupSettings::create()) {
   ASSERT(page);
   addPage(page);
 }
