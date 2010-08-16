@@ -81,21 +81,6 @@ class DebuggerAgentManager : public Noncopyable {
 
   static void onNavigate();
 
-  class UtilityContextScope : public Noncopyable {
-   public:
-    UtilityContextScope() {
-      ASSERT(!s_inUtilityContext);
-      s_inUtilityContext = true;
-    }
-    ~UtilityContextScope() {
-      if (s_debugBreakDelayed) {
-        v8::Debug::DebugBreak();
-        s_debugBreakDelayed = false;
-      }
-      s_inUtilityContext = false;
-    }
-  };
-
  private:
   DebuggerAgentManager();
   ~DebuggerAgentManager();
@@ -118,8 +103,6 @@ class DebuggerAgentManager : public Noncopyable {
   typedef HashMap<WebViewImpl*, WebCore::PageGroupLoadDeferrer*> DeferrersMap;
   static DeferrersMap s_pageDeferrers;
 
-  static bool s_inUtilityContext;
-  static bool s_debugBreakDelayed;
   static bool s_exposeV8DebuggerProtocol;
 };
 
