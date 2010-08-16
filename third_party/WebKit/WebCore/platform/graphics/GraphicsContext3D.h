@@ -827,6 +827,8 @@ class GraphicsContext3D : public Noncopyable {
 #if PLATFORM(QT)
   void paint(QPainter* painter, const QRect& rect) const;
   bool paintsIntoCanvasBuffer() const { return true; }
+#elseif PLATFORM(CHROMIUM)
+  bool paintsIntoCanvasBuffer() const;
 #else
   bool paintsIntoCanvasBuffer() const { return false; }
 #endif
