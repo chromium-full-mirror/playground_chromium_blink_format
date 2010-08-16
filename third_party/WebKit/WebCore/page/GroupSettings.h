@@ -39,10 +39,8 @@ class GroupSettings : public Noncopyable {
     return adoptPtr(new GroupSettings());
   }
 
-#if ENABLE(DOM_STORAGE)
   void setLocalStorageQuotaBytes(unsigned);
   unsigned localStorageQuotaBytes() const { return m_localStorageQuotaBytes; }
-#endif
 
   void setIndexedDBDatabasePath(const String&);
   const String& indexedDBDatabasePath() const {
@@ -52,9 +50,7 @@ class GroupSettings : public Noncopyable {
  private:
   GroupSettings();
 
-#if ENABLE(DOM_STORAGE)
   unsigned m_localStorageQuotaBytes;
-#endif
   String m_indexedDBDatabasePath;
 };
 

@@ -64,8 +64,12 @@ Settings::Settings(Page* page)
       m_minimumLogicalFontSize(0),
       m_defaultFontSize(0),
       m_defaultFixedFontSize(0),
-      m_maximumDecodedImageSize(numeric_limits<size_t>::max()),
-      m_sessionStorageQuota(StorageMap::noQuota),
+      m_maximumDecodedImageSize(numeric_limits<size_t>::max())
+#if ENABLE(DOM_STORAGE)
+      ,
+      m_sessionStorageQuota(StorageMap::noQuota)
+#endif
+      ,
       m_pluginAllowedRunTime(numeric_limits<unsigned>::max()),
       m_zoomMode(ZoomPage),
       m_isSpatialNavigationEnabled(false),
@@ -275,9 +279,11 @@ void Settings::setLocalStorageEnabled(bool localStorageEnabled) {
   m_localStorageEnabled = localStorageEnabled;
 }
 
+#if ENABLE(DOM_STORAGE)
 void Settings::setSessionStorageQuota(unsigned sessionStorageQuota) {
   m_sessionStorageQuota = sessionStorageQuota;
 }
+#endif
 
 void Settings::setPrivateBrowsingEnabled(bool privateBrowsingEnabled) {
   if (m_privateBrowsingEnabled == privateBrowsingEnabled)
