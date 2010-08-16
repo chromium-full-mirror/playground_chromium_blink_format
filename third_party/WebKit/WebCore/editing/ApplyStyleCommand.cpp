@@ -1668,17 +1668,21 @@ void ApplyStyleCommand::removeInlineStyle(
         style->getPropertyPriority(CSSPropertyWebkitTextDecorationsInEffect));
   }
 
-  RefPtr<Node> pushDownEnd = end.upstream().node();
-  pushDownInlineStyleAroundNode(style.get(), start.downstream().node());
-  pushDownInlineStyleAroundNode(style.get(), pushDownEnd.get());
+  Position pushDownStart = start.downstream();
+  Position pushDownEnd = end.upstream();
+  pushDownInlineStyleAroundNode(style.get(), pushDownStart.node());
+  pushDownInlineStyleAroundNode(style.get(), pushDownEnd.node());
 
   // The s and e variables store the positions used to set the ending selection
   // after style removal
   // takes place. This will help callers to recognize when either the start node
   // or the end node
   // are removed from the document during the work of this function.
-  Position s = start;
-  Position e = end;
+  // If pushDownInlineStyleAroundNode has pruned start.node() or end.node(),
+  // use pushDownStart or pushDownEnd instead, which
+  // pushDownInlineStyleAroundNode won't prune.
+  Position s = start.isNull() || start.isOrphan() ? pushDownStart : start;
+  Position e = end.isNull() || end.isOrphan() ? pushDownEnd : end;
 
   Node* node = start.node();
   while (node) {
