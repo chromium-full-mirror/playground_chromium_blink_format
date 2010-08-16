@@ -99,6 +99,7 @@ class DragController : public Noncopyable {
   static const float DragImageAlpha;
 
  private:
+  bool dispatchTextInputEventFor(Frame*, DragData*);
   bool canProcessDrag(DragData*);
   bool concludeEditDrag(DragData*);
   DragOperation dragEnteredOrUpdated(DragData*);

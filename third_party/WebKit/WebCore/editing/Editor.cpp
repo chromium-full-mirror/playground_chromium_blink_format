@@ -129,6 +129,11 @@ void Editor::handleInputMethodKeydown(KeyboardEvent* event) {
 }
 
 bool Editor::handleTextEvent(TextEvent* event) {
+  // Default event handling for Drag and Drop will be handled by DragController
+  // so we leave the event for it.
+  if (event->isDrop())
+    return false;
+
   if (event->isPaste()) {
     if (event->pastingFragment())
       replaceSelectionWithFragment(event->pastingFragment(), false,
@@ -814,13 +819,17 @@ bool Editor::dispatchCPPEvent(const AtomicString& eventType,
   return !noDefaultProcessing;
 }
 
-Node* Editor::findEventTargetFromSelection() const {
-  Node* target = m_frame->selection()->start().element();
+Node* Editor::findEventTargetFrom(const VisibleSelection& selection) const {
+  Node* target = selection.start().element();
   if (!target)
     target = m_frame->document()->body();
   if (!target)
     return 0;
   return target->shadowAncestorNode();
+}
+
+Node* Editor::findEventTargetFromSelection() const {
+  return findEventTargetFrom(m_frame->selection()->selection());
 }
 
 void Editor::applyStyle(CSSStyleDeclaration* style, EditAction editingAction) {

@@ -350,6 +350,8 @@ class Editor {
                        bool matchStyle);
   void pasteAsPlainText(const String&, bool smartReplace);
 
+  Node* findEventTargetFrom(const VisibleSelection& selection) const;
+
  private:
   Frame* m_frame;
   OwnPtr<DeleteButtonController> m_deleteButtonController;

@@ -39,7 +39,8 @@ class TextEvent : public UIEvent {
                          // only, not paragraph separators.
     InputTypeLineBreak,  // any tab characters in the text are backtabs.
     InputTypeBackTab,
-    InputTypePaste
+    InputTypePaste,
+    InputTypeDrop,
   };
 
   static InputType selectInputType(bool isLineBreak, bool isBackTab);
@@ -56,6 +57,8 @@ class TextEvent : public UIEvent {
       PassRefPtr<DocumentFragment> data,
       bool shouldSmartReplace,
       bool shouldMatchStyle);
+  static PassRefPtr<TextEvent> createForDrop(PassRefPtr<AbstractView> view,
+                                             const String& data);
 
   virtual ~TextEvent();
 
@@ -72,6 +75,7 @@ class TextEvent : public UIEvent {
   bool isLineBreak() const { return m_inputType == InputTypeLineBreak; }
   bool isBackTab() const { return m_inputType == InputTypeBackTab; }
   bool isPaste() const { return m_inputType == InputTypePaste; }
+  bool isDrop() const { return m_inputType == InputTypeDrop; }
 
   bool shouldSmartReplace() const { return m_shouldSmartReplace; }
   bool shouldMatchStyle() const { return m_shouldMatchStyle; }
@@ -79,6 +83,7 @@ class TextEvent : public UIEvent {
 
  private:
   TextEvent();
+
   TextEvent(PassRefPtr<AbstractView>,
             const String& data,
             InputType = InputTypeKeyboard);
@@ -87,6 +92,7 @@ class TextEvent : public UIEvent {
             PassRefPtr<DocumentFragment>,
             bool shouldSmartReplace,
             bool shouldMatchStyle);
+
   InputType m_inputType;
   String m_data;
 
