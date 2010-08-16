@@ -25,8 +25,6 @@
 
 #include "WebBackForwardListItem.h"
 
-using namespace WebCore;
-
 namespace WebKit {
 
 WebBackForwardListItem::WebBackForwardListItem(const String& originalURL,
