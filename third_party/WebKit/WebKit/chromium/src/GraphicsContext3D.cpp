@@ -1454,7 +1454,10 @@ DELEGATE_TO_INTERNAL_6(vertexAttribPointer,
 DELEGATE_TO_INTERNAL_4(viewport, long, long, unsigned long, unsigned long)
 
 DELEGATE_TO_INTERNAL_1(paintRenderingResultsToCanvas, CanvasRenderingContext*)
-DELEGATE_TO_INTERNAL(paintsIntoCanvasBuffer)
+
+bool GraphicsContext3D::paintsIntoCanvasBuffer() const {
+  return m_internal->paintsIntoCanvasBuffer();
+}
 
 DELEGATE_TO_INTERNAL_R(createBuffer, unsigned)
 DELEGATE_TO_INTERNAL_R(createFramebuffer, unsigned)
