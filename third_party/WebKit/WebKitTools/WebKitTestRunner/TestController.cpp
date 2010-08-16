@@ -140,6 +140,8 @@ void TestController::resetStateToConsistentValues() {
   WKPreferencesSetFontSmoothingLevel(
       preferences, kWKFontSmoothingLevelNoSubpixelAntiAliasing);
 
+  m_mainWebView->focus();
+
   // Reset main page back to about:blank
   m_doneResetting = false;
 
