@@ -852,7 +852,8 @@ PassRefPtr<Node> Document::adoptNode(PassRefPtr<Node> source,
     default:
       if (source->hasTagName(iframeTag))
         static_cast<HTMLIFrameElement*>(source.get())
-            ->setRemainsAliveOnRemovalFromTree(attached());
+            ->setRemainsAliveOnRemovalFromTree(attached() &&
+                                               source->attached());
 
       if (source->parentNode())
         source->parentNode()->removeChild(source.get(), ec);
