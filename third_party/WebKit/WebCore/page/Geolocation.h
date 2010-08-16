@@ -155,6 +155,9 @@ class Geolocation : public RefCounted<Geolocation>
   void stopTimersForWatchers();
   void stopTimers();
 
+  void cancelRequests(Vector<RefPtr<GeoNotifier>>&);
+  void cancelAllRequests();
+
   void positionChangedInternal();
   void makeSuccessCallbacks();
   void handleError(PositionError*);
