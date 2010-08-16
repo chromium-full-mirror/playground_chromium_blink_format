@@ -9,6 +9,7 @@
  * reserved.
  * Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies).
  * Copyright (C) 2008 Dirk Schulze <vbs85@gmx.de>
+ * Copyright (C) 2010 Sencha, Inc.
  *
  * All rights reserved.
  *
@@ -43,6 +44,7 @@
 
 #include "AffineTransform.h"
 #include "Color.h"
+#include "ContextShadow.h"
 #include "FloatConversion.h"
 #include "Font.h"
 #include "GraphicsContextPrivate.h"
@@ -239,12 +241,10 @@ class GraphicsContextPlatformPrivate : public Noncopyable {
   // Only used by SVG for now.
   QPainterPath currentPath;
 
-  ContextShadowParameter shadow;
-  QStack<ContextShadowParameter> shadowStack;
+  ContextShadow shadow;
+  QStack<ContextShadow> shadowStack;
 
-  bool hasShadow() const {
-    return shadow.type != ContextShadowParameter::NoShadow;
-  }
+  bool hasShadow() const { return shadow.type != ContextShadow::NoShadow; }
 
  private:
   QPainter* painter;
@@ -322,7 +322,7 @@ void GraphicsContext::restorePlatformState() {
   }
 
   if (m_data->shadowStack.isEmpty())
-    m_data->shadow = ContextShadowParameter();
+    m_data->shadow = ContextShadow();
   else
     m_data->shadow = m_data->shadowStack.pop();
 }
@@ -754,8 +754,7 @@ void GraphicsContext::fillRect(const FloatRect& rect,
   QPainter* p = m_data->p();
 
   if (m_data->hasShadow())
-    p->fillRect(QRectF(rect).translated(m_data->shadow.offset),
-                m_data->shadow.color);
+    m_data->shadow.drawShadowRect(p, rect);
 
   p->fillRect(rect, m_data->solidColor);
 }
@@ -938,11 +937,9 @@ void GraphicsContext::setPlatformShadow(const FloatSize& size,
     // CanvasRenderingContext
     // We flip the height since CG and HTML5 Canvas have opposite Y axis
     m_common->state.shadowSize = FloatSize(size.width(), -size.height());
-    m_data->shadow =
-        ContextShadowParameter(color, blur, size.width(), -size.height());
+    m_data->shadow = ContextShadow(color, blur, size.width(), -size.height());
   } else {
-    m_data->shadow =
-        ContextShadowParameter(color, blur, size.width(), size.height());
+    m_data->shadow = ContextShadow(color, blur, size.width(), size.height());
   }
 }
 
