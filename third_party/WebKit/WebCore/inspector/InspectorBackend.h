@@ -74,7 +74,6 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
                                 const String& arguments,
                                 RefPtr<InspectorValue>* result,
                                 bool* hadException);
-  void clearConsoleMessages();
 
   // Generic code called from custom implementations.
   void releaseWrapperObjectGroup(long injectedScriptId,

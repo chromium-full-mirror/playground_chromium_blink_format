@@ -366,6 +366,8 @@ void InspectorController::clearConsoleMessages() {
       0 /* release the group in all scripts */, "console");
   if (m_domAgent)
     m_domAgent->releaseDanglingNodes();
+  if (m_remoteFrontend)
+    m_remoteFrontend->consoleMessagesCleared();
 }
 
 void InspectorController::startGroup(MessageSource source,

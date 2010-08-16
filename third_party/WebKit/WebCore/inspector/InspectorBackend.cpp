@@ -106,10 +106,6 @@ void InspectorBackend::dispatchOnInjectedScript(long injectedScriptId,
   injectedScript.dispatch(methodName, arguments, result, hadException);
 }
 
-void InspectorBackend::clearConsoleMessages() {
-  m_inspectorController->clearConsoleMessages();
-}
-
 void InspectorBackend::releaseWrapperObjectGroup(long injectedScriptId,
                                                  const String& objectGroup) {
   m_inspectorController->injectedScriptHost()->releaseWrapperObjectGroup(
