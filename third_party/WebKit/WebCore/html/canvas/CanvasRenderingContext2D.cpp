@@ -129,7 +129,7 @@ CanvasRenderingContext2D::CanvasRenderingContext2D(
     return;
   if (FrameView* view = canvas->document()->view()) {
     if (ScrollView* rootView = view->root()) {
-      if (HostWindow* hostWindow = view->root()->hostWindow()) {
+      if (HostWindow* hostWindow = rootView->hostWindow()) {
         // Set up our context
         GraphicsContext3D::Attributes attr;
         attr.stencil = true;

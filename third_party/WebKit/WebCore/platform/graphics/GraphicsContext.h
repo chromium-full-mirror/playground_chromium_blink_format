@@ -547,10 +547,8 @@ class GraphicsContext : public Noncopyable {
   pattern getHaikuStrokeStyle();
 #endif
 
-#if PLATFORM(SKIA)
   void setGraphicsContext3D(GraphicsContext3D*, const IntSize&);
   void syncSoftwareCanvas();
-#endif
 
  private:
   void savePlatformState();
