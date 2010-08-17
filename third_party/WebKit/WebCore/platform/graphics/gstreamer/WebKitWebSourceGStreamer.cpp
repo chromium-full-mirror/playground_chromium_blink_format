@@ -788,6 +788,14 @@ void StreamingClient::didFail(ResourceHandle*, const ResourceError& error) {
   gst_app_src_end_of_stream(m_src->priv->appsrc);
 }
 
-void StreamingClient::wasBlocked(ResourceHandle*) {}
+void StreamingClient::wasBlocked(ResourceHandle*) {
+  GST_ERROR_OBJECT(m_src, "Request was blocked");
+  GST_ELEMENT_ERROR(m_src, RESOURCE, OPEN_READ,
+                    ("Access to \"%s\" was blocked", m_src->priv->uri), (0));
+}
 
-void StreamingClient::cannotShowURL(ResourceHandle*) {}
+void StreamingClient::cannotShowURL(ResourceHandle*) {
+  GST_ERROR_OBJECT(m_src, "Cannot show URL");
+  GST_ELEMENT_ERROR(m_src, RESOURCE, OPEN_READ,
+                    ("Can't show \"%s\"", m_src->priv->uri), (0));
+}
