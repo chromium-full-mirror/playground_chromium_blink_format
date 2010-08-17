@@ -225,6 +225,9 @@ InjectedScript InjectedScriptHost::injectedScriptFor(
     return InjectedScript(
         ScriptObject(inspectedScriptState, v8::Local<v8::Object>::Cast(val)));
 
+  if (!canAccessInspectedWindow(inspectedScriptState))
+    return InjectedScript();
+
   ASSERT(!m_injectedScriptSource.isEmpty());
   pair<long, ScriptObject> injectedScript =
       injectScript(m_injectedScriptSource, inspectedScriptState);

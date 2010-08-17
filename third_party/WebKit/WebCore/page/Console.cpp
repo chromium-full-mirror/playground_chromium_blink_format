@@ -195,7 +195,7 @@ void Console::addMessage(MessageType type,
 
 #if ENABLE(INSPECTOR)
   page->inspectorController()->addMessageToConsole(JSMessageSource, type, level,
-                                                   callStack);
+                                                   callStack, message);
 #endif
 
   if (!Console::shouldPrintExceptions())

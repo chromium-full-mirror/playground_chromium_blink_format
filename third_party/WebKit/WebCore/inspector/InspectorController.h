@@ -145,7 +145,7 @@ class InspectorController : public Noncopyable {
                            MessageType,
                            MessageLevel,
                            ScriptCallStack*,
-                           const String& message = String());
+                           const String& message);
   void addMessageToConsole(MessageSource,
                            MessageType,
                            MessageLevel,

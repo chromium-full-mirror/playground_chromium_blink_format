@@ -185,6 +185,9 @@ InjectedScript InjectedScriptHost::injectedScriptFor(ScriptState* scriptState) {
   if (injectedScript)
     return InjectedScript(ScriptObject(scriptState, injectedScript));
 
+  if (!canAccessInspectedWindow(scriptState))
+    return InjectedScript();
+
   ASSERT(!m_injectedScriptSource.isEmpty());
   pair<long, ScriptObject> injectedScriptObject =
       injectScript(m_injectedScriptSource, scriptState);
