@@ -37,10 +37,13 @@
 namespace WebCore {
 
 class DOMStringList;
+class IDBDatabaseBackendImpl;
 
 class IDBFactoryBackendImpl : public IDBFactoryBackendInterface {
  public:
-  static PassRefPtr<IDBFactoryBackendImpl> create();
+  static PassRefPtr<IDBFactoryBackendImpl> create() {
+    return adoptRef(new IDBFactoryBackendImpl());
+  }
   virtual ~IDBFactoryBackendImpl();
 
   virtual void open(const String& name,
@@ -52,8 +55,7 @@ class IDBFactoryBackendImpl : public IDBFactoryBackendInterface {
  private:
   IDBFactoryBackendImpl();
 
-  typedef HashMap<String, RefPtr<IDBDatabaseBackendInterface>>
-      IDBDatabaseBackendMap;
+  typedef HashMap<String, RefPtr<IDBDatabaseBackendImpl>> IDBDatabaseBackendMap;
   IDBDatabaseBackendMap m_databaseBackendMap;
 
   // We only create one instance of this class at a time.

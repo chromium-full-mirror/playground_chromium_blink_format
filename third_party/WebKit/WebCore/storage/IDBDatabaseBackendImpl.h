@@ -35,13 +35,19 @@
 
 namespace WebCore {
 
+class SQLiteDatabase;
+
 class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
  public:
-  static PassRefPtr<IDBDatabaseBackendInterface>
-  create(const String& name, const String& description, const String& version) {
-    return adoptRef(new IDBDatabaseBackendImpl(name, description, version));
+  static PassRefPtr<IDBDatabaseBackendImpl> create(
+      const String& name,
+      const String& description,
+      PassOwnPtr<SQLiteDatabase> database) {
+    return adoptRef(new IDBDatabaseBackendImpl(name, description, database));
   }
   virtual ~IDBDatabaseBackendImpl();
+
+  void setDescription(const String& description);
 
   // Implements IDBDatabase
   virtual String name() const { return m_name; }
@@ -65,7 +71,9 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
  private:
   IDBDatabaseBackendImpl(const String& name,
                          const String& description,
-                         const String& version);
+                         PassOwnPtr<SQLiteDatabase> database);
+
+  OwnPtr<SQLiteDatabase> m_sqliteDatabase;
 
   String m_name;
   String m_description;
