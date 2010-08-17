@@ -243,6 +243,10 @@ void ScriptExecutionContext::stopActiveDOMObjects() {
     ASSERT(iter->first->scriptExecutionContext() == this);
     iter->first->stop();
   }
+
+  // Also close MessagePorts. If they were ActiveDOMObjects (they could be) then
+  // they could be stopped instead.
+  closeMessagePorts();
 }
 
 void ScriptExecutionContext::createdActiveDOMObject(ActiveDOMObject* object,
@@ -255,6 +259,15 @@ void ScriptExecutionContext::createdActiveDOMObject(ActiveDOMObject* object,
 void ScriptExecutionContext::destroyedActiveDOMObject(ActiveDOMObject* object) {
   ASSERT(object);
   m_activeDOMObjects.remove(object);
+}
+
+void ScriptExecutionContext::closeMessagePorts() {
+  HashSet<MessagePort*>::iterator messagePortsEnd = m_messagePorts.end();
+  for (HashSet<MessagePort*>::iterator iter = m_messagePorts.begin();
+       iter != messagePortsEnd; ++iter) {
+    ASSERT((*iter)->scriptExecutionContext() == this);
+    (*iter)->close();
+  }
 }
 
 void ScriptExecutionContext::setSecurityOrigin(

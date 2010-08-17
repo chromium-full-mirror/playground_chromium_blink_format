@@ -170,6 +170,8 @@ class ScriptExecutionContext {
   virtual const KURL& virtualURL() const = 0;
   virtual KURL virtualCompleteURL(const String&) const = 0;
 
+  void closeMessagePorts();
+
   RefPtr<SecurityOrigin> m_securityOrigin;
 
   HashSet<MessagePort*> m_messagePorts;

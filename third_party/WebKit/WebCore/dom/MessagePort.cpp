@@ -73,7 +73,7 @@ void MessagePort::postMessage(PassRefPtr<SerializedScriptValue> message,
 void MessagePort::postMessage(PassRefPtr<SerializedScriptValue> message,
                               const MessagePortArray* ports,
                               ExceptionCode& ec) {
-  if (!m_entangledChannel)
+  if (!isEntangled())
     return;
   ASSERT(m_scriptExecutionContext);
 
@@ -120,8 +120,8 @@ void MessagePort::messageAvailable() {
 }
 
 void MessagePort::start() {
-  // Do nothing if we've been cloned
-  if (!m_entangledChannel)
+  // Do nothing if we've been cloned or closed.
+  if (!isEntangled())
     return;
 
   ASSERT(m_scriptExecutionContext);
@@ -134,7 +134,7 @@ void MessagePort::start() {
 
 void MessagePort::close() {
   m_closed = true;
-  if (!m_entangledChannel)
+  if (!isEntangled())
     return;
   m_entangledChannel->close();
 }
@@ -151,9 +151,10 @@ void MessagePort::entangle(PassOwnPtr<MessagePortChannel> remote) {
 
 void MessagePort::contextDestroyed() {
   ASSERT(m_scriptExecutionContext);
-  // Must close port before blowing away the cached context, to ensure that we
+  // Must be closed before blowing away the cached context, to ensure that we
   // get no more calls to messageAvailable().
-  close();
+  // ScriptExecutionContext::closeMessagePorts() takes care of that.
+  ASSERT(m_closed);
   m_scriptExecutionContext = 0;
 }
 
