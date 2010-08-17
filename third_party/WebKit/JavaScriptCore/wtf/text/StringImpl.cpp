@@ -524,17 +524,17 @@ size_t StringImpl::find(const char* matchString, unsigned index) {
     matchHash += matchCharacters[i];
   }
 
-  for (unsigned i = 0; i < delta; ++i) {
-    if (searchHash == matchHash &&
-        equal(searchCharacters + i, matchString, matchLength))
-      return index + i;
+  unsigned i = 0;
+  // keep looping until we match
+  while (searchHash != matchHash ||
+         !equal(searchCharacters + i, matchString, matchLength)) {
+    if (i == delta)
+      return notFound;
     searchHash += searchCharacters[i + matchLength];
     searchHash -= searchCharacters[i];
+    ++i;
   }
-  if (searchHash == matchHash &&
-      equal(searchCharacters + delta, matchString, matchLength))
-    return index + delta;
-  return notFound;
+  return index + i;
 }
 
 size_t StringImpl::findIgnoringCase(const char* matchString, unsigned index) {
@@ -557,11 +557,14 @@ size_t StringImpl::findIgnoringCase(const char* matchString, unsigned index) {
 
   const UChar* searchCharacters = characters() + index;
 
-  for (unsigned i = 0; i <= delta; ++i) {
-    if (equalIgnoringCase(searchCharacters + i, matchString, matchLength))
-      return index + i;
+  unsigned i = 0;
+  // keep looping until we match
+  while (!equalIgnoringCase(searchCharacters + i, matchString, matchLength)) {
+    if (i == delta)
+      return notFound;
+    ++i;
   }
-  return notFound;
+  return index + i;
 }
 
 size_t StringImpl::find(StringImpl* matchString, unsigned index) {
@@ -599,15 +602,18 @@ size_t StringImpl::find(StringImpl* matchString, unsigned index) {
     matchHash += matchCharacters[i];
   }
 
-  for (unsigned i = 0; i <= delta; ++i) {
-    if (searchHash == matchHash &&
-        memcmp(searchCharacters + i, matchCharacters,
-               matchLength * sizeof(UChar)) == 0)
-      return index + i;
+  unsigned i = 0;
+  // keep looping until we match
+  while (searchHash != matchHash ||
+         memcmp(searchCharacters + i, matchCharacters,
+                matchLength * sizeof(UChar))) {
+    if (i == delta)
+      return notFound;
     searchHash += searchCharacters[i + matchLength];
     searchHash -= searchCharacters[i];
+    ++i;
   }
-  return notFound;
+  return index + i;
 }
 
 size_t StringImpl::findIgnoringCase(StringImpl* matchString, unsigned index) {
@@ -631,11 +637,15 @@ size_t StringImpl::findIgnoringCase(StringImpl* matchString, unsigned index) {
   const UChar* searchCharacters = characters() + index;
   const UChar* matchCharacters = matchString->characters();
 
-  for (unsigned i = 0; i <= delta; ++i) {
-    if (equalIgnoringCase(searchCharacters + i, matchCharacters, matchLength))
-      return index + i;
+  unsigned i = 0;
+  // keep looping until we match
+  while (
+      !equalIgnoringCase(searchCharacters + i, matchCharacters, matchLength)) {
+    if (i == delta)
+      return notFound;
+    ++i;
   }
-  return notFound;
+  return index + i;
 }
 
 size_t StringImpl::reverseFind(UChar c, unsigned index) {
@@ -674,11 +684,13 @@ size_t StringImpl::reverseFind(StringImpl* matchString, unsigned index) {
     matchHash += matchCharacters[i];
   }
 
+  // keep looping until we match
   while (searchHash != matchHash ||
          memcmp(searchCharacters + delta, matchCharacters,
                 matchLength * sizeof(UChar))) {
-    if (!delta--)
+    if (!delta)
       return notFound;
+    delta--;
     searchHash -= searchCharacters[delta + matchLength];
     searchHash += searchCharacters[delta];
   }
@@ -704,10 +716,12 @@ size_t StringImpl::reverseFindIgnoringCase(StringImpl* matchString,
   const UChar* searchCharacters = characters();
   const UChar* matchCharacters = matchString->characters();
 
+  // keep looping until we match
   while (!equalIgnoringCase(searchCharacters + delta, matchCharacters,
                             matchLength)) {
-    if (!delta--)
+    if (!delta)
       return notFound;
+    delta--;
   }
   return delta;
 }
