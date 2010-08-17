@@ -105,6 +105,7 @@ class MediaPlayerPrivate : public QObject, public MediaPlayerPrivateInterface {
   void seekTimeout();
   void positionChanged(qint64);
   void durationChanged(qint64);
+  void bufferStatusChanged(int);
   void volumeChanged(int);
   void mutedChanged(bool);
   void repaint();
