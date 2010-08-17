@@ -111,6 +111,8 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   void setIsClientRedirect(bool isClientRedirect) {
     m_isClientRedirect = isClientRedirect;
   }
+  void handledOnloadEvents() { m_wasOnloadHandled = true; }
+  bool wasOnloadHandled() { return m_wasOnloadHandled; }
   bool isLoadingInAPISense() const;
   void setPrimaryLoadComplete(bool);
   void setTitle(const String&);
@@ -296,6 +298,7 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   bool m_gotFirstByte;
   bool m_primaryLoadComplete;
   bool m_isClientRedirect;
+  bool m_wasOnloadHandled;
 
   String m_pageTitle;
   String m_pageIconURL;

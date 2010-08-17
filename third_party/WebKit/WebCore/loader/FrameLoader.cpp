@@ -2779,10 +2779,12 @@ String FrameLoader::userAgent(const KURL& url) const {
 void FrameLoader::handledOnloadEvents() {
   m_client->dispatchDidHandleOnloadEvents();
 
+  if (documentLoader()) {
+    documentLoader()->handledOnloadEvents();
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
-  if (documentLoader())
     documentLoader()->applicationCacheHost()->stopDeferringEvents();
 #endif
+  }
 }
 
 void FrameLoader::frameDetached() {
