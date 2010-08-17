@@ -33,15 +33,15 @@
 
 #if ENABLE(FILE_SYSTEM)
 
-#include "Entry.h"
+#include "DirectoryEntry.h"
 
 namespace WebCore {
 
 DOMFileSystem::DOMFileSystem(const String& name, const String& rootPath)
     : m_rootPath(rootPath), m_name(name) {}
 
-PassRefPtr<Entry> DOMFileSystem::root() {
-  return Entry::create(this, "/");
+PassRefPtr<DirectoryEntry> DOMFileSystem::root() {
+  return DirectoryEntry::create(this, "/");
 }
 
 }  // namespace
