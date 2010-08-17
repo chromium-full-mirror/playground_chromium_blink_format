@@ -39,11 +39,11 @@
 
 namespace WebCore {
 
-template <typename R, typename T>
+template <typename T>
 class FileThreadTask0 : public FileThread::Task {
  public:
-  typedef R (T::*Method)();
-  typedef FileThreadTask0<R, T> FileThreadTaskImpl;
+  typedef void (T::*Method)();
+  typedef FileThreadTask0<T> FileThreadTaskImpl;
 
   static PassOwnPtr<FileThreadTaskImpl> create(T* instance, Method method) {
     return new FileThreadTaskImpl(instance, method);
@@ -59,11 +59,11 @@ class FileThreadTask0 : public FileThread::Task {
   Method m_method;
 };
 
-template <typename R, typename T, typename P1, typename MP1>
+template <typename T, typename P1, typename MP1>
 class FileThreadTask1 : public FileThread::Task {
  public:
-  typedef R (T::*Method)(MP1);
-  typedef FileThreadTask1<R, T, P1, MP1> FileThreadTaskImpl;
+  typedef void (T::*Method)(MP1);
+  typedef FileThreadTask1<T, P1, MP1> FileThreadTaskImpl;
   typedef typename CrossThreadTaskTraits<P1>::ParamType Param1;
 
   static PassOwnPtr<FileThreadTaskImpl> create(T* instance,
@@ -87,16 +87,11 @@ class FileThreadTask1 : public FileThread::Task {
   P1 m_parameter1;
 };
 
-template <typename R,
-          typename T,
-          typename P1,
-          typename MP1,
-          typename P2,
-          typename MP2>
+template <typename T, typename P1, typename MP1, typename P2, typename MP2>
 class FileThreadTask2 : public FileThread::Task {
  public:
-  typedef R (T::*Method)(MP1, MP2);
-  typedef FileThreadTask2<R, T, P1, MP1, P2, MP2> FileThreadTaskImpl;
+  typedef void (T::*Method)(MP1, MP2);
+  typedef FileThreadTask2<T, P1, MP1, P2, MP2> FileThreadTaskImpl;
   typedef typename CrossThreadTaskTraits<P1>::ParamType Param1;
   typedef typename CrossThreadTaskTraits<P2>::ParamType Param2;
 
@@ -127,8 +122,7 @@ class FileThreadTask2 : public FileThread::Task {
   P2 m_parameter2;
 };
 
-template <typename R,
-          typename T,
+template <typename T,
           typename P1,
           typename MP1,
           typename P2,
@@ -138,7 +132,7 @@ template <typename R,
 class FileThreadTask3 : public FileThread::Task {
  public:
   typedef void (T::*Method)(MP1, MP2, MP3);
-  typedef FileThreadTask3<R, T, P1, MP1, P2, MP2, P3, MP3> FileThreadTaskImpl;
+  typedef FileThreadTask3<T, P1, MP1, P2, MP2, P3, MP3> FileThreadTaskImpl;
   typedef typename CrossThreadTaskTraits<P1>::ParamType Param1;
   typedef typename CrossThreadTaskTraits<P2>::ParamType Param2;
   typedef typename CrossThreadTaskTraits<P3>::ParamType Param3;
@@ -176,44 +170,37 @@ class FileThreadTask3 : public FileThread::Task {
   P3 m_parameter3;
 };
 
-template <typename R, typename T>
+template <typename T>
 PassOwnPtr<FileThread::Task> createFileThreadTask(T* const callee,
-                                                  R (T::*method)());
+                                                  void (T::*method)());
 
-template <typename R, typename T>
+template <typename T>
 PassOwnPtr<FileThread::Task> createFileThreadTask(T* const callee,
-                                                  R (T::*method)()) {
-  return FileThreadTask0<R, T>::create(callee, method);
+                                                  void (T::*method)()) {
+  return FileThreadTask0<T>::create(callee, method);
 }
 
-template <typename R, typename T, typename P1, typename MP1>
+template <typename T, typename P1, typename MP1>
 PassOwnPtr<FileThread::Task> createFileThreadTask(T* const callee,
-                                                  R (T::*method)(MP1),
+                                                  void (T::*method)(MP1),
                                                   const P1& parameter1) {
-  return FileThreadTask1<R, T, typename CrossThreadCopier<P1>::Type,
-                         MP1>::create(callee, method,
-                                      CrossThreadCopier<P1>::copy(parameter1));
+  return FileThreadTask1<T, typename CrossThreadCopier<P1>::Type, MP1>::create(
+      callee, method, CrossThreadCopier<P1>::copy(parameter1));
 }
 
-template <typename R,
-          typename T,
-          typename P1,
-          typename MP1,
-          typename P2,
-          typename MP2>
+template <typename T, typename P1, typename MP1, typename P2, typename MP2>
 PassOwnPtr<FileThread::Task> createFileThreadTask(T* const callee,
-                                                  R (T::*method)(MP1, MP2),
+                                                  void (T::*method)(MP1, MP2),
                                                   const P1& parameter1,
                                                   const P2& parameter2) {
-  return FileThreadTask2<R, T, typename CrossThreadCopier<P1>::Type, MP1,
+  return FileThreadTask2<T, typename CrossThreadCopier<P1>::Type, MP1,
                          typename CrossThreadCopier<P2>::Type,
                          MP2>::create(callee, method,
                                       CrossThreadCopier<P1>::copy(parameter1),
                                       CrossThreadCopier<P2>::copy(parameter2));
 }
 
-template <typename R,
-          typename T,
+template <typename T,
           typename P1,
           typename MP1,
           typename P2,
@@ -221,11 +208,13 @@ template <typename R,
           typename P3,
           typename MP3>
 PassOwnPtr<FileThread::Task> createFileThreadTask(T* const callee,
-                                                  R (T::*method)(MP1, MP2, MP3),
+                                                  void (T::*method)(MP1,
+                                                                    MP2,
+                                                                    MP3),
                                                   const P1& parameter1,
                                                   const P2& parameter2,
                                                   const P3& parameter3) {
-  return FileThreadTask3<R, T, typename CrossThreadCopier<P1>::Type, MP1,
+  return FileThreadTask3<T, typename CrossThreadCopier<P1>::Type, MP1,
                          typename CrossThreadCopier<P2>::Type, MP2,
                          typename CrossThreadCopier<P3>::Type,
                          MP3>::create(callee, method,
