@@ -204,7 +204,7 @@ static void closeIconDatabaseOnExit() {
   iconDatabase()->close();
 }
 
-#if HAVE_GSETTINGS
+#ifdef HAVE_GSETTINGS
 static bool isSchemaAvailable(char* schemaID) {
   const char* const* availableSchemas = g_settings_list_schemas();
   char* const* iter = const_cast<char* const*>(availableSchemas);
@@ -267,7 +267,7 @@ void webkit_init() {
   // resources
   webkit_set_cache_model(WEBKIT_CACHE_MODEL_WEB_BROWSER);
 
-#if HAVE_GSETTINGS
+#ifdef HAVE_GSETTINGS
   // Initialize settings variables here to make sure this happens in
   // the main thread.
   inspectorGSettings();

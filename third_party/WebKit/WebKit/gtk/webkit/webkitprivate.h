@@ -120,7 +120,7 @@ typedef struct DroppingContext_ {
 extern "C" {
 void webkit_init();
 
-#if HAVE_GSETTINGS
+#ifdef HAVE_GSETTINGS
 GSettings* inspectorGSettings();
 #endif
 
