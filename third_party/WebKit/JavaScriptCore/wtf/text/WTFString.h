@@ -559,6 +559,11 @@ template <>
 struct DefaultHash<String> {
   typedef StringHash Hash;
 };
+
+template <>
+struct VectorTraits<String> : SimpleClassVectorTraits {
+  static const bool canInitializeWithMemset = true;
+};
 }
 
 using WTF::CString;
