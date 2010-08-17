@@ -536,18 +536,12 @@ void BitmapImageSingleFrameSkia::draw(GraphicsContext* ctxt,
                 WebCoreCompositeToSkiaComposite(compositeOp));
 }
 
-BitmapImageSingleFrameSkia::BitmapImageSingleFrameSkia(const SkBitmap& bitmap)
-    : m_nativeImage(bitmap) {}
-
 PassRefPtr<BitmapImageSingleFrameSkia> BitmapImageSingleFrameSkia::create(
-    const SkBitmap& bitmap,
-    bool copyPixels) {
-  if (copyPixels) {
-    SkBitmap temp;
-    bitmap.copyTo(&temp, bitmap.config());
-    return adoptRef(new BitmapImageSingleFrameSkia(temp));
-  }
-  return adoptRef(new BitmapImageSingleFrameSkia(bitmap));
+    const SkBitmap& bitmap) {
+  RefPtr<BitmapImageSingleFrameSkia> image(
+      adoptRef(new BitmapImageSingleFrameSkia()));
+  bitmap.copyTo(&image->m_nativeImage, bitmap.config());
+  return image.release();
 }
 
 }  // namespace WebCore
