@@ -49,10 +49,13 @@ class MediaPlayerPrivate : public QObject, public MediaPlayerPrivateInterface {
   bool hasAudio() const;
 
   void load(const String& url);
+  void commitLoad(const String& url);
+  void resumeLoad();
   void cancelLoad();
 
   void play();
   void pause();
+  void prepareToPlay();
 
   bool paused() const;
   bool seeking() const;
@@ -66,6 +69,8 @@ class MediaPlayerPrivate : public QObject, public MediaPlayerPrivateInterface {
 
   bool supportsMuting() const;
   void setMuted(bool);
+
+  void setPreload(MediaPlayer::Preload);
 
   MediaPlayer::NetworkState networkState() const;
   MediaPlayer::ReadyState readyState() const;
@@ -130,6 +135,9 @@ class MediaPlayerPrivate : public QObject, public MediaPlayerPrivateInterface {
   bool m_isSeeking;
   bool m_composited;
   qint64 m_queuedSeek;
+  MediaPlayer::Preload m_preload;
+  bool m_delayingLoad;
+  String m_mediaUrl;
 };
 }
 
