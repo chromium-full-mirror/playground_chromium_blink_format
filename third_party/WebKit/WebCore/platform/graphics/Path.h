@@ -167,6 +167,10 @@ class Path : public FastAllocBase {
 
  private:
   PlatformPathPtr m_path;
+
+#if PLATFORM(QT)
+  int m_lastMoveToIndex;
+#endif
 };
 }
 
