@@ -28,6 +28,8 @@
 
 #include <runtime/UString.h>
 #include "FastAllocBase.h"
+#include <wtf/text/CString.h>
+#include <wtf/text/StringHash.h>
 
 namespace JSC {
 
