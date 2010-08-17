@@ -20,8 +20,7 @@
 #include "config.h"
 #include "GOwnPtrGtk.h"
 
-#include <gdk/gdk.h>
-#include <glib.h>
+#include <gtk/gtk.h>
 
 namespace WTF {
 
@@ -29,5 +28,11 @@ template <>
 void freeOwnedGPtr<GdkEvent>(GdkEvent* ptr) {
   if (ptr)
     gdk_event_free(ptr);
+}
+
+template <>
+void freeOwnedGPtr<GtkIconInfo>(GtkIconInfo* info) {
+  if (info)
+    gtk_icon_info_free(info);
 }
 }

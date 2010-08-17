@@ -87,10 +87,10 @@ void InspectorClient::openInspectorFrontend(InspectorController* controller) {
                         currentDirectory.get()));
     inspectorURI.set(g_filename_to_uri(fullPath.get(), NULL, NULL));
   } else {
-    GOwnPtr<gchar> dataPath(
-        g_strdup_printf(DATA_DIR "/webkitgtk-%.1f/webinspector/inspector.html",
-                        WEBKITGTK_API_VERSION));
-    inspectorURI.set(g_filename_to_uri(dataPath.get(), NULL, NULL));
+    inspectorURI.set(
+        g_filename_to_uri(DATA_DIR "/webkitgtk-" WEBKITGTK_API_VERSION_STRING
+                                   "/webinspector/inspector.html",
+                          NULL, NULL));
   }
 
   webkit_web_view_load_uri(inspectorWebView, inspectorURI.get());
