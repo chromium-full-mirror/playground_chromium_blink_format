@@ -51,10 +51,6 @@ namespace WebCore {
 
 CanvasStyle::CanvasStyle(RGBA32 rgba) : m_type(RGBA), m_rgba(rgba) {}
 
-CanvasStyle::CanvasStyle(float grayLevel)
-    : m_type(RGBA),
-      m_rgba(makeRGBA32FromFloats(grayLevel, grayLevel, grayLevel, 1.0f)) {}
-
 CanvasStyle::CanvasStyle(float grayLevel, float alpha)
     : m_type(RGBA),
       m_rgba(makeRGBA32FromFloats(grayLevel, grayLevel, grayLevel, alpha)) {}
@@ -73,27 +69,30 @@ CanvasStyle::CanvasStyle(PassRefPtr<CanvasGradient> gradient)
 CanvasStyle::CanvasStyle(PassRefPtr<CanvasPattern> pattern)
     : m_type(ImagePattern), m_pattern(pattern) {}
 
-PassRefPtr<CanvasStyle> CanvasStyle::create(const String& color) {
+PassRefPtr<CanvasStyle> CanvasStyle::createFromString(const String& color) {
   RGBA32 rgba;
   if (!CSSParser::parseColor(rgba, color))
     return 0;
   return adoptRef(new CanvasStyle(rgba));
 }
 
-PassRefPtr<CanvasStyle> CanvasStyle::create(const String& color, float alpha) {
+PassRefPtr<CanvasStyle> CanvasStyle::createFromStringWithOverrideAlpha(
+    const String& color,
+    float alpha) {
   RGBA32 rgba;
   if (!CSSParser::parseColor(rgba, color))
     return 0;
   return adoptRef(new CanvasStyle(colorWithOverrideAlpha(rgba, alpha)));
 }
 
-PassRefPtr<CanvasStyle> CanvasStyle::create(
+PassRefPtr<CanvasStyle> CanvasStyle::createFromGradient(
     PassRefPtr<CanvasGradient> gradient) {
   if (!gradient)
     return 0;
   return adoptRef(new CanvasStyle(gradient));
 }
-PassRefPtr<CanvasStyle> CanvasStyle::create(PassRefPtr<CanvasPattern> pattern) {
+PassRefPtr<CanvasStyle> CanvasStyle::createFromPattern(
+    PassRefPtr<CanvasPattern> pattern) {
   if (!pattern)
     return 0;
   return adoptRef(new CanvasStyle(pattern));
@@ -119,14 +118,14 @@ bool CanvasStyle::isEquivalentColor(const CanvasStyle& other) const {
   return false;
 }
 
-bool CanvasStyle::isEquivalentColor(float r, float g, float b, float a) const {
+bool CanvasStyle::isEquivalentRGBA(float r, float g, float b, float a) const {
   if (m_type != RGBA)
     return false;
 
   return m_rgba == makeRGBA32FromFloats(r, g, b, a);
 }
 
-bool CanvasStyle::isEquivalentColor(float c,
+bool CanvasStyle::isEquivalentCMYKA(float c,
                                     float m,
                                     float y,
                                     float k,
