@@ -125,7 +125,11 @@ class FontDescription {
   void setGenericFamily(GenericFamilyType genericFamily) {
     m_genericFamily = genericFamily;
   }
+#if PLATFORM(CHROMIUM) && OS(DARWIN)
+  void setUsePrinterFont(bool) {}
+#else
   void setUsePrinterFont(bool p) { m_usePrinterFont = p; }
+#endif
   void setRenderingMode(FontRenderingMode mode) { m_renderingMode = mode; }
   void setKeywordSize(unsigned s) { m_keywordSize = s; }
   void setFontSmoothing(FontSmoothingMode smoothing) {
