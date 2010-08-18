@@ -126,9 +126,9 @@ void FileStreamProxy::getSizeOnFileThread(const String& path,
 
 static void didOpen(ScriptExecutionContext*,
                     FileStreamProxy* proxy,
-                    ExceptionCode ec) {
+                    bool success) {
   if (proxy->client())
-    proxy->client()->didOpen(ec);
+    proxy->client()->didOpen(success);
 }
 
 void FileStreamProxy::openForRead(const String& path,
@@ -141,8 +141,8 @@ void FileStreamProxy::openForRead(const String& path,
 void FileStreamProxy::openForReadOnFileThread(const String& path,
                                               long long offset,
                                               long long length) {
-  ExceptionCode ec = m_stream->openForRead(path, offset, length);
-  m_context->postTask(createCallbackTask(&didOpen, this, ec));
+  bool success = m_stream->openForRead(path, offset, length);
+  m_context->postTask(createCallbackTask(&didOpen, this, success));
 }
 
 void FileStreamProxy::openForWrite(const String& path) {
@@ -151,8 +151,8 @@ void FileStreamProxy::openForWrite(const String& path) {
 }
 
 void FileStreamProxy::openForWriteOnFileThread(const String& path) {
-  ExceptionCode ec = m_stream->openForWrite(path);
-  m_context->postTask(createCallbackTask(&didOpen, this, ec));
+  bool success = m_stream->openForWrite(path);
+  m_context->postTask(createCallbackTask(&didOpen, this, success));
 }
 
 void FileStreamProxy::close() {
@@ -188,23 +188,25 @@ static void didWrite(ScriptExecutionContext*,
     proxy->client()->didWrite(bytesWritten);
 }
 
-void FileStreamProxy::write(Blob* blob, long long position, int length) {
+void FileStreamProxy::write(const KURL& blobURL,
+                            long long position,
+                            int length) {
   fileThread()->postTask(createFileThreadTask(
-      this, &FileStreamProxy::writeOnFileThread, blob, position, length));
+      this, &FileStreamProxy::writeOnFileThread, blobURL, position, length));
 }
 
-void FileStreamProxy::writeOnFileThread(Blob* blob,
+void FileStreamProxy::writeOnFileThread(const KURL& blobURL,
                                         long long position,
                                         int length) {
-  int bytesWritten = m_stream->write(blob, position, length);
+  int bytesWritten = m_stream->write(blobURL, position, length);
   m_context->postTask(createCallbackTask(&didWrite, this, bytesWritten));
 }
 
 static void didTruncate(ScriptExecutionContext*,
                         FileStreamProxy* proxy,
-                        ExceptionCode ec) {
+                        bool success) {
   if (proxy->client())
-    proxy->client()->didTruncate(ec);
+    proxy->client()->didTruncate(success);
 }
 
 void FileStreamProxy::truncate(long long position) {
@@ -213,8 +215,8 @@ void FileStreamProxy::truncate(long long position) {
 }
 
 void FileStreamProxy::truncateOnFileThread(long long position) {
-  ExceptionCode ec = m_stream->truncate(position);
-  m_context->postTask(createCallbackTask(&didTruncate, this, ec));
+  bool success = m_stream->truncate(position);
+  m_context->postTask(createCallbackTask(&didTruncate, this, success));
 }
 
 }  // namespace WebCore

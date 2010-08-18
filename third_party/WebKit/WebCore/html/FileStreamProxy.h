@@ -41,10 +41,10 @@
 
 namespace WebCore {
 
-class Blob;
 class FileStream;
 class FileStreamClient;
 class FileThread;
+class KURL;
 class ScriptExecutionContext;
 
 // A proxy module that asynchronously calls corresponding FileStream methods on
@@ -61,7 +61,7 @@ class FileStreamProxy : public RefCounted<FileStreamProxy> {
   void openForWrite(const String& path);
   void close();
   void read(char* buffer, int length);
-  void write(Blob*, long long position, int length);
+  void write(const KURL& blobURL, long long position, int length);
   void truncate(long long position);
 
   // Stops the proxy and scedules it to be destructed.  All the pending tasks
@@ -87,7 +87,7 @@ class FileStreamProxy : public RefCounted<FileStreamProxy> {
   void openForWriteOnFileThread(const String& path);
   void closeOnFileThread();
   void readOnFileThread(char* buffer, int length);
-  void writeOnFileThread(Blob*, long long position, int length);
+  void writeOnFileThread(const KURL& blobURL, long long position, int length);
   void truncateOnFileThread(long long position);
 
   RefPtr<ScriptExecutionContext> m_context;

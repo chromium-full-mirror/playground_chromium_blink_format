@@ -33,7 +33,6 @@
 
 #if ENABLE(BLOB) || ENABLE(FILE_WRITER)
 
-#include "ExceptionCode.h"
 #include "FileSystem.h"
 #include <wtf/Forward.h>
 #include <wtf/PassRefPtr.h>
@@ -41,13 +40,13 @@
 
 namespace WebCore {
 
-class Blob;
+class KURL;
 
 // All methods are synchronous.
 class FileStream : public RefCounted<FileStream> {
  public:
   static PassRefPtr<FileStream> create() { return adoptRef(new FileStream()); }
-  virtual ~FileStream();
+  ~FileStream();
 
   // FIXME: To be removed when we switch to using BlobData.
   void start();
@@ -62,14 +61,12 @@ class FileStream : public RefCounted<FileStream> {
 
   // Opens a file for reading. The reading starts at the specified offset and
   // lasts till the specified length.
-  // Returns 0 on success. Exception code otherwise.
-  ExceptionCode openForRead(const String& path,
-                            long long offset,
-                            long long length);
+  // Returns true on success. False otherwise.
+  bool openForRead(const String& path, long long offset, long long length);
 
   // Opens a file for writing.
-  // Returns 0 on success. Exception code otherwise.
-  ExceptionCode openForWrite(const String& path);
+  // Returns true on success. False otherwise.
+  bool openForWrite(const String& path);
 
   // Closes the file.
   void close();
@@ -81,11 +78,11 @@ class FileStream : public RefCounted<FileStream> {
 
   // Writes a blob to the file.
   // Returns number of bytes being written on success. -1 otherwise.
-  int write(Blob*, long long position, int length);
+  int write(const KURL& blobURL, long long position, int length);
 
   // Truncates the file to the specified position.
-  // Returns 0 on success. Exception code otherwise.
-  ExceptionCode truncate(long long position);
+  // Returns true on success. False otherwise.
+  bool truncate(long long position);
 
  private:
   FileStream();
