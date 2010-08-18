@@ -57,6 +57,7 @@ class WebURLResponsePrivateImpl : public WebURLResponsePrivate {
   WebURLResponsePrivateImpl(const WebURLResponsePrivate* p)
       : m_resourceResponseAllocation(*p->m_resourceResponse) {
     m_resourceResponse = &m_resourceResponseAllocation;
+    m_downloadFilePath = p->m_downloadFilePath;
   }
 
   virtual void dispose() { delete this; }
