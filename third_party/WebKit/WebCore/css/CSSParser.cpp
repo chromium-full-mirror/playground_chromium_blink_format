@@ -4059,6 +4059,21 @@ static inline bool parseAlphaValue(const UChar*& string,
   return *foundTerminator == terminator;
 }
 
+static inline bool mightBeRGBA(const UChar* characters, unsigned length) {
+  if (length < 5)
+    return false;
+  return characters[4] == '(' && (characters[0] | 0x20) == 'r' &&
+         (characters[1] | 0x20) == 'g' && (characters[2] | 0x20) == 'b' &&
+         (characters[3] | 0x20) == 'a';
+}
+
+static inline bool mightBeRGB(const UChar* characters, unsigned length) {
+  if (length < 4)
+    return false;
+  return characters[3] == '(' && (characters[0] | 0x20) == 'r' &&
+         (characters[1] | 0x20) == 'g' && (characters[2] | 0x20) == 'b';
+}
+
 bool CSSParser::parseColor(const String& name, RGBA32& rgb, bool strict) {
   const UChar* characters = name.characters();
   unsigned length = name.length();
@@ -4074,7 +4089,7 @@ bool CSSParser::parseColor(const String& name, RGBA32& rgb, bool strict) {
   }
 
   // Try rgba() syntax.
-  if (name.startsWith("rgba(")) {
+  if (mightBeRGBA(characters, length)) {
     const UChar* current = characters + 5;
     const UChar* end = characters + length;
     int red;
@@ -4096,7 +4111,7 @@ bool CSSParser::parseColor(const String& name, RGBA32& rgb, bool strict) {
   }
 
   // Try rgb() syntax.
-  if (name.startsWith("rgb(")) {
+  if (mightBeRGB(characters, length)) {
     const UChar* current = characters + 4;
     const UChar* end = characters + length;
     int red;
