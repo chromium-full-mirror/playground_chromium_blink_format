@@ -69,9 +69,9 @@ class BlobRegistryImpl : public BlobRegistry {
 
  private:
   bool shouldLoadResource(const ResourceRequest& request) const;
-  void appendStorageItems(BlobStorageData*, const BlobStorageDataItemList&);
+  void appendStorageItems(BlobStorageData*, const BlobDataItemList&);
   void appendStorageItems(BlobStorageData*,
-                          const BlobStorageDataItemList&,
+                          const BlobDataItemList&,
                           long long offset,
                           long long length);
 
