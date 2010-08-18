@@ -42,22 +42,22 @@ WebEventListenerPrivate::WebEventListenerPrivate(
 
 WebEventListenerPrivate::~WebEventListenerPrivate() {}
 
-EventListenerWrapper* WebEventListenerPrivate::createEventListenerWrapper(
-    const WebString& eventType,
-    bool useCapture,
-    Node* node) {
-  EventListenerWrapper* listenerWrapper =
-      new EventListenerWrapper(m_webEventListener);
+DeprecatedEventListenerWrapper*
+WebEventListenerPrivate::createEventListenerWrapper(const WebString& eventType,
+                                                    bool useCapture,
+                                                    Node* node) {
+  DeprecatedEventListenerWrapper* listenerWrapper =
+      new DeprecatedEventListenerWrapper(m_webEventListener);
   WebEventListenerPrivate::ListenerInfo listenerInfo(eventType, useCapture,
                                                      listenerWrapper, node);
   m_listenerWrappers.append(listenerInfo);
   return listenerWrapper;
 }
 
-EventListenerWrapper* WebEventListenerPrivate::getEventListenerWrapper(
-    const WebString& eventType,
-    bool useCapture,
-    Node* node) {
+DeprecatedEventListenerWrapper*
+WebEventListenerPrivate::getEventListenerWrapper(const WebString& eventType,
+                                                 bool useCapture,
+                                                 Node* node) {
   Vector<WebEventListenerPrivate::ListenerInfo>::const_iterator iter;
   for (iter = m_listenerWrappers.begin(); iter != m_listenerWrappers.end();
        ++iter) {
@@ -78,7 +78,7 @@ void WebEventListenerPrivate::webEventListenerDeleted() {
 }
 
 void WebEventListenerPrivate::eventListenerDeleted(
-    EventListenerWrapper* eventListener) {
+    DeprecatedEventListenerWrapper* eventListener) {
   for (size_t i = 0; i < m_listenerWrappers.size(); ++i) {
     if (m_listenerWrappers[i].eventListenerWrapper == eventListener) {
       m_listenerWrappers.remove(i);

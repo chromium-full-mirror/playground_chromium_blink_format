@@ -44,18 +44,18 @@ WebEventListener::~WebEventListener() {
 }
 
 void WebEventListener::notifyEventListenerDeleted(
-    EventListenerWrapper* wrapper) {
+    DeprecatedEventListenerWrapper* wrapper) {
   m_private->eventListenerDeleted(wrapper);
 }
 
-EventListenerWrapper* WebEventListener::createEventListenerWrapper(
+DeprecatedEventListenerWrapper* WebEventListener::createEventListenerWrapper(
     const WebString& eventType,
     bool useCapture,
     Node* node) {
   return m_private->createEventListenerWrapper(eventType, useCapture, node);
 }
 
-EventListenerWrapper* WebEventListener::getEventListenerWrapper(
+DeprecatedEventListenerWrapper* WebEventListener::getEventListenerWrapper(
     const WebString& eventType,
     bool useCapture,
     Node* node) {

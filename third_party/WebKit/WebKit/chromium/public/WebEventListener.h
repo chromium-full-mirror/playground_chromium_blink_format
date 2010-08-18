@@ -41,7 +41,7 @@ class Node;
 
 namespace WebKit {
 
-class EventListenerWrapper;
+class DeprecatedEventListenerWrapper;
 class WebEvent;
 class WebEventListenerPrivate;
 class WebNode;
@@ -56,13 +56,15 @@ class WebEventListener {
   virtual void handleEvent(const WebEvent&) = 0;
 
 #if WEBKIT_IMPLEMENTATION
-  void notifyEventListenerDeleted(EventListenerWrapper*);
-  EventListenerWrapper* createEventListenerWrapper(const WebString& eventType,
-                                                   bool useCapture,
-                                                   WebCore::Node* node);
-  EventListenerWrapper* getEventListenerWrapper(const WebString& eventType,
-                                                bool useCapture,
-                                                WebCore::Node* node);
+  void notifyEventListenerDeleted(DeprecatedEventListenerWrapper*);
+  DeprecatedEventListenerWrapper* createEventListenerWrapper(
+      const WebString& eventType,
+      bool useCapture,
+      WebCore::Node* node);
+  DeprecatedEventListenerWrapper* getEventListenerWrapper(
+      const WebString& eventType,
+      bool useCapture,
+      WebCore::Node* node);
 #endif
 
  private:
