@@ -112,7 +112,7 @@ class UString {
     return m_impl ? m_impl->reverseFind(str.impl(), start) : notFound;
   }
 
-  UString substr(unsigned pos = 0, unsigned len = UINT_MAX) const;
+  UString substringSharingImpl(unsigned pos, unsigned len = UINT_MAX) const;
 
  private:
   RefPtr<StringImpl> m_impl;

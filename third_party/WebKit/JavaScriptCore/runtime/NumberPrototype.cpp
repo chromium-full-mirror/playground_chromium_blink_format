@@ -320,9 +320,11 @@ EncodedJSValue JSC_HOST_CALL numberProtoFuncToFixed(ExecState* exec) {
   int kMinusf = k - f;
 
   if (kMinusf < static_cast<int>(m.length()))
-    return JSValue::encode(jsString(
-        exec, makeString(s, m.substr(0, kMinusf), ".", m.substr(kMinusf))));
-  return JSValue::encode(jsString(exec, makeString(s, m.substr(0, kMinusf))));
+    return JSValue::encode(
+        jsString(exec, makeString(s, m.substringSharingImpl(0, kMinusf), ".",
+                                  m.substringSharingImpl(kMinusf))));
+  return JSValue::encode(
+      jsString(exec, makeString(s, m.substringSharingImpl(0, kMinusf))));
 }
 
 static void fractionalPartToString(char* buf,
@@ -489,7 +491,8 @@ EncodedJSValue JSC_HOST_CALL numberProtoFuncToPrecision(ExecState* exec) {
     m = integerPartNoExp(n);
     if (e < -6 || e >= precision) {
       if (m.length() > 1)
-        m = makeString(m.substr(0, 1), ".", m.substr(1));
+        m = makeString(m.substringSharingImpl(0, 1), ".",
+                       m.substringSharingImpl(1));
       if (e >= 0)
         return JSValue::encode(
             jsMakeNontrivialString(exec, s, m, "e+", UString::number(e)));
@@ -505,8 +508,9 @@ EncodedJSValue JSC_HOST_CALL numberProtoFuncToPrecision(ExecState* exec) {
     return JSValue::encode(jsString(exec, makeString(s, m)));
   if (e >= 0) {
     if (e + 1 < static_cast<int>(m.length()))
-      return JSValue::encode(jsString(
-          exec, makeString(s, m.substr(0, e + 1), ".", m.substr(e + 1))));
+      return JSValue::encode(
+          jsString(exec, makeString(s, m.substringSharingImpl(0, e + 1), ".",
+                                    m.substringSharingImpl(e + 1))));
     return JSValue::encode(jsString(exec, makeString(s, m)));
   }
   return JSValue::encode(

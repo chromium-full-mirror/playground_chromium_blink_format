@@ -281,6 +281,7 @@ class String {
   void remove(unsigned pos, int len = 1);
 
   String substring(unsigned pos, unsigned len = UINT_MAX) const;
+  String substringSharingImpl(unsigned pos, unsigned len = UINT_MAX) const;
   String left(unsigned len) const { return substring(0, len); }
   String right(unsigned len) const { return substring(length() - len, len); }
 

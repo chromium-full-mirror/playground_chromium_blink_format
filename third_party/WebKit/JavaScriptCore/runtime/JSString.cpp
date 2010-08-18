@@ -119,8 +119,9 @@ JSValue JSString::replaceCharacter(ExecState* exec,
     size_t matchPosition = m_value.find(character);
     if (matchPosition == notFound)
       return JSValue(this);
-    return jsString(exec, m_value.substr(0, matchPosition), replacement,
-                    m_value.substr(matchPosition + 1));
+    return jsString(exec, m_value.substringSharingImpl(0, matchPosition),
+                    replacement,
+                    m_value.substringSharingImpl(matchPosition + 1));
   }
 
   RopeIterator end;
@@ -157,10 +158,10 @@ JSValue JSString::replaceCharacter(ExecState* exec,
       continue;
     }
 
-    builder.append(UString(string).substr(0, matchPosition));
+    builder.append(UString(string).substringSharingImpl(0, matchPosition));
     if (replacement.length())
       builder.append(replacement);
-    builder.append(UString(string).substr(matchPosition + 1));
+    builder.append(UString(string).substringSharingImpl(matchPosition + 1));
     matchString = 0;
   }
 
