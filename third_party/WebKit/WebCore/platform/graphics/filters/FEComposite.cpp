@@ -141,7 +141,7 @@ void FEComposite::apply(Filter* filter) {
     case FECOMPOSITE_OPERATOR_IN:
       filterContext->save();
       filterContext->clipToImageBuffer(
-          m_in->resultImage(), calculateDrawingRect(m_in2->scaledSubRegion()));
+          m_in2->resultImage(), calculateDrawingRect(m_in2->scaledSubRegion()));
       filterContext->drawImageBuffer(
           m_in->resultImage(), DeviceColorSpace,
           calculateDrawingRect(m_in->scaledSubRegion()));
