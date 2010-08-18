@@ -156,7 +156,7 @@ struct JITStackFrame {
 #endif  // COMPILER(MSVC) || (OS(WINDOWS) && COMPILER(GCC))
 #elif CPU(ARM_THUMB2)
 struct JITStackFrame {
-  void* reserved;  // Unused
+  JITStubArg reserved;  // Unused
   JITStubArg args[6];
 #if USE(JSVALUE32_64)
   void* padding[2];  // Maintain 16-byte stack alignment.
