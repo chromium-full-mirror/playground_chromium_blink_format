@@ -330,6 +330,14 @@ void WebPageProxy::receivedPolicyDecision(WebCore::PolicyAction action,
                   CoreIPC::In(frame->frameID(), listenerID, (uint32_t)action));
 }
 
+void WebPageProxy::setCustomUserAgent(const String& userAgent) {
+  if (!isValid())
+    return;
+
+  process()->send(WebPageMessage::SetCustomUserAgent, m_pageID,
+                  CoreIPC::In(userAgent));
+}
+
 void WebPageProxy::terminateProcess() {
   if (!isValid())
     return;
