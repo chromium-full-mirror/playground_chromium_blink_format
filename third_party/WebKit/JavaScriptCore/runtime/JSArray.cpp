@@ -299,7 +299,7 @@ bool JSArray::getOwnPropertySlot(ExecState* exec,
   }
 
   bool isArrayIndex;
-  unsigned i = toArrayIndex(propertyName.ustring(), &isArrayIndex);
+  unsigned i = propertyName.toArrayIndex(isArrayIndex);
   if (isArrayIndex)
     return JSArray::getOwnPropertySlot(exec, i, slot);
 
@@ -317,7 +317,7 @@ bool JSArray::getOwnPropertyDescriptor(ExecState* exec,
   ArrayStorage* storage = m_storage;
 
   bool isArrayIndex;
-  unsigned i = toArrayIndex(propertyName.ustring(), &isArrayIndex);
+  unsigned i = propertyName.toArrayIndex(isArrayIndex);
   if (isArrayIndex) {
     if (i >= storage->m_length)
       return false;
@@ -346,7 +346,7 @@ void JSArray::put(ExecState* exec,
                   JSValue value,
                   PutPropertySlot& slot) {
   bool isArrayIndex;
-  unsigned i = toArrayIndex(propertyName.ustring(), &isArrayIndex);
+  unsigned i = propertyName.toArrayIndex(isArrayIndex);
   if (isArrayIndex) {
     put(exec, i, value);
     return;
@@ -519,7 +519,7 @@ NEVER_INLINE void JSArray::putSlowCase(ExecState* exec,
 
 bool JSArray::deleteProperty(ExecState* exec, const Identifier& propertyName) {
   bool isArrayIndex;
-  unsigned i = toArrayIndex(propertyName.ustring(), &isArrayIndex);
+  unsigned i = propertyName.toArrayIndex(isArrayIndex);
   if (isArrayIndex)
     return deleteProperty(exec, i);
 

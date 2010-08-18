@@ -57,6 +57,7 @@ static const double mantissaOverflowLowerBound = 9007199254740992.0;
 double parseIntOverflow(const char*, int length, int radix);
 double parseIntOverflow(const UChar*, int length, int radix);
 bool isStrWhiteSpace(UChar);
+double jsToNumber(const UString& s);
 
 }  // namespace JSC
 

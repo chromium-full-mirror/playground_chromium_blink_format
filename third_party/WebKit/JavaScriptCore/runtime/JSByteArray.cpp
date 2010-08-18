@@ -60,7 +60,7 @@ bool JSByteArray::getOwnPropertySlot(ExecState* exec,
                                      const Identifier& propertyName,
                                      PropertySlot& slot) {
   bool ok;
-  unsigned index = propertyName.toUInt32(&ok, false);
+  unsigned index = propertyName.toUInt32(ok);
   if (ok && canAccessIndex(index)) {
     slot.setValue(getIndex(exec, index));
     return true;
@@ -72,7 +72,7 @@ bool JSByteArray::getOwnPropertyDescriptor(ExecState* exec,
                                            const Identifier& propertyName,
                                            PropertyDescriptor& descriptor) {
   bool ok;
-  unsigned index = propertyName.toUInt32(&ok, false);
+  unsigned index = propertyName.toUInt32(ok);
   if (ok && canAccessIndex(index)) {
     descriptor.setDescriptor(getIndex(exec, index), DontDelete);
     return true;
@@ -96,7 +96,7 @@ void JSByteArray::put(ExecState* exec,
                       JSValue value,
                       PutPropertySlot& slot) {
   bool ok;
-  unsigned index = propertyName.toUInt32(&ok, false);
+  unsigned index = propertyName.toUInt32(ok);
   if (ok) {
     setIndex(exec, index, value);
     return;
