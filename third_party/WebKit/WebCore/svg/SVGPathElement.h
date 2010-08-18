@@ -62,7 +62,7 @@ class SVGPathElement : public SVGStyledTransformableElement,
   virtual bool isValid() const { return SVGTests::isValid(); }
   float getTotalLength();
   FloatPoint getPointAtLength(float distance);
-  unsigned long getPathSegAtLength(float distance, ExceptionCode&);
+  unsigned long getPathSegAtLength(float distance);
 
   static PassRefPtr<SVGPathSegClosePath> createSVGPathSegClosePath();
   static PassRefPtr<SVGPathSegMovetoAbs> createSVGPathSegMovetoAbs(float x,

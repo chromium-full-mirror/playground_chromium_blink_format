@@ -57,6 +57,10 @@ class SVGPathParserFactory {
                                       OwnPtr<SVGPathByteStream>&,
                                       float);
 
+  bool getSVGPathSegAtLengthFromSVGPathSegList(SVGPathSegList*,
+                                               float,
+                                               unsigned long&);
+
  private:
   SVGPathParserFactory();
   ~SVGPathParserFactory();

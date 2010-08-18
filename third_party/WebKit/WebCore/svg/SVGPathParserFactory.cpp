@@ -22,6 +22,7 @@
 #if ENABLE(SVG)
 #include "SVGPathParserFactory.h"
 
+#include "PathTraversalState.h"
 #include "SVGPathBlender.h"
 #include "SVGPathBuilder.h"
 #include "SVGPathByteStreamBuilder.h"
@@ -31,6 +32,7 @@
 #include "SVGPathSegListSource.h"
 #include "SVGPathStringBuilder.h"
 #include "SVGPathStringSource.h"
+#include "SVGPathTraversalStateBuilder.h"
 #include "StringBuilder.h"
 
 namespace WebCore {
@@ -69,6 +71,18 @@ static SVGPathStringBuilder* globalSVGPathStringBuilder() {
   if (!s_builder)
     s_builder = new SVGPathStringBuilder;
 
+  return s_builder;
+}
+
+static SVGPathTraversalStateBuilder* globalSVGPathTraversalStateBuilder(
+    PathTraversalState& traversalState,
+    float length) {
+  static SVGPathTraversalStateBuilder* s_builder = 0;
+  if (!s_builder)
+    s_builder = new SVGPathTraversalStateBuilder;
+
+  s_builder->setCurrentTraversalState(&traversalState);
+  s_builder->setDesiredLength(length);
   return s_builder;
 }
 
@@ -265,6 +279,28 @@ bool SVGPathParserFactory::buildAnimatedSVGPathByteStream(
                                        toSource.get(), builder);
   result = stream.release();
   blender->cleanup();
+  return ok;
+}
+
+bool SVGPathParserFactory::getSVGPathSegAtLengthFromSVGPathSegList(
+    SVGPathSegList* pathSegList,
+    float length,
+    unsigned long& pathSeg) {
+  ASSERT(pathSegList);
+  if (!pathSegList->numberOfItems())
+    return false;
+
+  PathTraversalState traversalState(
+      PathTraversalState::TraversalSegmentAtLength);
+  SVGPathTraversalStateBuilder* builder =
+      globalSVGPathTraversalStateBuilder(traversalState, length);
+
+  OwnPtr<SVGPathSegListSource> source =
+      SVGPathSegListSource::create(pathSegList);
+  SVGPathParser* parser = globalSVGPathParser(source.get(), builder);
+  bool ok = parser->parsePathDataFromSource(NormalizedParsing);
+  pathSeg = builder->pathSegmentIndex();
+  parser->cleanup();
   return ok;
 }
 }

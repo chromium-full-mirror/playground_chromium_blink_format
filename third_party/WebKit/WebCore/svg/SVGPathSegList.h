@@ -35,8 +35,6 @@ class SVGPathSegList : public SVGList<RefPtr<SVGPathSeg>> {
   }
   virtual ~SVGPathSegList();
 
-  unsigned getPathSegAtLength(double, ExceptionCode&);
-
  private:
   SVGPathSegList(const QualifiedName&);
 };

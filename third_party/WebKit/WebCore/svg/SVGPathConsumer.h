@@ -36,6 +36,8 @@ enum PathParsingMode { NormalizedParsing, UnalteredParsing };
 
 class SVGPathConsumer : public Noncopyable {
  public:
+  virtual void incrementPathSegmentCount() = 0;
+  virtual bool continueConsuming() = 0;
   virtual void cleanup() = 0;
 
  public:

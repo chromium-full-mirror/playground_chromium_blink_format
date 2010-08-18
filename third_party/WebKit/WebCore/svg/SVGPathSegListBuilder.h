@@ -38,6 +38,8 @@ class SVGPathSegListBuilder : public SVGPathConsumer {
   void setCurrentSVGPathSegList(SVGPathSegList* pathSegList) {
     m_pathSegList = pathSegList;
   }
+  virtual void incrementPathSegmentCount() {}
+  virtual bool continueConsuming() { return true; }
   virtual void cleanup() { m_pathSegList = 0; }
 
  private:
