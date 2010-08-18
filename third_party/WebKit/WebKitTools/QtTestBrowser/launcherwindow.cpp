@@ -64,7 +64,7 @@ void LauncherWindow::init() {
   QSplitter* splitter = new QSplitter(Qt::Vertical, this);
   setCentralWidget(splitter);
 
-#if defined(Q_WS_S60)
+#if defined(Q_OS_SYMBIAN)
   setWindowState(Qt::WindowMaximized);
 #else
   setWindowState(Qt::WindowNoState);
@@ -761,7 +761,7 @@ void LauncherWindow::toggleFullScreenMode(bool enable) {
   if (enable)
     setWindowState(Qt::WindowFullScreen);
   else {
-#if defined(Q_WS_S60)
+#if defined(Q_OS_SYMBIAN)
     setWindowState(Qt::WindowMaximized);
 #else
     setWindowState(Qt::WindowNoState);
@@ -815,7 +815,7 @@ void LauncherWindow::showFPS(bool enable) {
   view->setFrameRateMeasurementEnabled(enable);
 
   if (!enable) {
-#if defined(Q_WS_MAEMO_5) && defined(Q_WS_S60)
+#if defined(Q_WS_MAEMO_5) && defined(Q_OS_SYMBIAN)
     setWindowTitle("");
 #else
     statusBar()->clearMessage();
@@ -872,7 +872,7 @@ void LauncherWindow::showUserAgentDialog() {
 void LauncherWindow::updateFPS(int fps) {
   QString fpsStatusText = QString("Current FPS: %1").arg(fps);
 
-#if defined(Q_WS_MAEMO_5) && defined(Q_WS_S60)
+#if defined(Q_WS_MAEMO_5) && defined(Q_OS_SYMBIAN)
   setWindowTitle(fpsStatusText);
 #else
   statusBar()->showMessage(fpsStatusText);
