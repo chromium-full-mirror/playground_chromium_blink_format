@@ -40,6 +40,12 @@ namespace WebCore {
 NativeImageSkia::NativeImageSkia()
     : m_isDataComplete(false), m_lastRequestSize(0, 0), m_resizeRequests(0) {}
 
+NativeImageSkia::NativeImageSkia(const SkBitmap& other)
+    : SkBitmap(other),
+      m_isDataComplete(false),
+      m_lastRequestSize(0, 0),
+      m_resizeRequests(0) {}
+
 int NativeImageSkia::decodedSize() const {
   return getSize() + m_resizedImage.getSize();
 }
