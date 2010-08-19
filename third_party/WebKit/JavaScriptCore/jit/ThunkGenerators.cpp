@@ -166,7 +166,16 @@ MacroAssemblerCodePtr powThunkGenerator(JSGlobalData* globalData,
       .linkTo(startLoop, &jit);
 
   exponentIsZero.link(&jit);
-  jit.returnDouble(SpecializedThunkJIT::fpRegT1);
+
+  {
+    SpecializedThunkJIT::JumpList doubleResult;
+    jit.branchConvertDoubleToInt32(SpecializedThunkJIT::fpRegT1,
+                                   SpecializedThunkJIT::regT0, doubleResult,
+                                   SpecializedThunkJIT::fpRegT0);
+    jit.returnInt32(SpecializedThunkJIT::regT0);
+    doubleResult.link(&jit);
+    jit.returnDouble(SpecializedThunkJIT::fpRegT1);
+  }
 
   if (jit.supportsFloatingPointSqrt()) {
     nonIntExponent.link(&jit);
@@ -181,6 +190,13 @@ MacroAssemblerCodePtr powThunkGenerator(JSGlobalData* globalData,
         SpecializedThunkJIT::fpRegT3));
     jit.sqrtDouble(SpecializedThunkJIT::fpRegT0, SpecializedThunkJIT::fpRegT0);
     jit.divDouble(SpecializedThunkJIT::fpRegT0, SpecializedThunkJIT::fpRegT1);
+
+    SpecializedThunkJIT::JumpList doubleResult;
+    jit.branchConvertDoubleToInt32(SpecializedThunkJIT::fpRegT1,
+                                   SpecializedThunkJIT::regT0, doubleResult,
+                                   SpecializedThunkJIT::fpRegT0);
+    jit.returnInt32(SpecializedThunkJIT::regT0);
+    doubleResult.link(&jit);
     jit.returnDouble(SpecializedThunkJIT::fpRegT1);
   } else
     jit.appendFailure(nonIntExponent);
