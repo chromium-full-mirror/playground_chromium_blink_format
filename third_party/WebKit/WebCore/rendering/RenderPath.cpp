@@ -150,7 +150,8 @@ static inline void fillAndStrokePath(const Path& path,
     if (style->svgStyle()->vectorEffect() == VE_NON_SCALING_STROKE) {
       SVGStyledTransformableElement* element =
           static_cast<SVGStyledTransformableElement*>(object->node());
-      AffineTransform transform = element->getScreenCTM();
+      AffineTransform transform =
+          element->getScreenCTM(SVGLocatable::DisallowStyleUpdate);
       if (!transform.isInvertible())
         return;
 

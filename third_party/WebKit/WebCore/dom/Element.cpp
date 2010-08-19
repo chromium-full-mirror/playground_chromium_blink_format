@@ -1357,9 +1357,6 @@ void Element::focus(bool restorePreviousSelection) {
   if (doc->focusedNode() == this)
     return;
 
-  if (!supportsFocus())
-    return;
-
   // If the stylesheets have already been loaded we can reliably check
   // isFocusable.
   // If not, we continue and set the focused node on the focus controller below
@@ -1370,6 +1367,9 @@ void Element::focus(bool restorePreviousSelection) {
     if (!isFocusable())
       return;
   }
+
+  if (!supportsFocus())
+    return;
 
   RefPtr<Node> protect;
   if (Page* page = doc->page()) {

@@ -38,8 +38,9 @@ class SVGStyledTransformableElement : public SVGStyledLocatableElement,
 
   virtual bool isStyledTransformable() const { return true; }
 
-  virtual AffineTransform getCTM() const;
-  virtual AffineTransform getScreenCTM() const;
+  virtual AffineTransform getCTM(StyleUpdateStrategy = AllowStyleUpdate) const;
+  virtual AffineTransform getScreenCTM(
+      StyleUpdateStrategy = AllowStyleUpdate) const;
   virtual SVGElement* nearestViewportElement() const;
   virtual SVGElement* farthestViewportElement() const;
 
@@ -50,7 +51,7 @@ class SVGStyledTransformableElement : public SVGStyledLocatableElement,
   virtual AffineTransform animatedLocalTransform() const;
   virtual AffineTransform* supplementalTransform();
 
-  virtual FloatRect getBBox() const;
+  virtual FloatRect getBBox(StyleUpdateStrategy = AllowStyleUpdate) const;
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);

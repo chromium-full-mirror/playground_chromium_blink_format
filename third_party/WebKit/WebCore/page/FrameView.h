@@ -90,6 +90,7 @@ class FrameView : public ScrollView {
   void scheduleRelayoutOfSubtree(RenderObject*);
   void unscheduleRelayout();
   bool layoutPending() const;
+  bool isInLayout() const { return m_inLayout; }
 
   RenderObject* layoutRoot(bool onlyDuringLayout = false) const;
   int layoutCount() const { return m_layoutCount; }
@@ -349,7 +350,7 @@ class FrameView : public ScrollView {
   RenderObject* m_layoutRoot;
 
   bool m_layoutSchedulingEnabled;
-  bool m_midLayout;
+  bool m_inLayout;
   int m_layoutCount;
   unsigned m_nestedLayoutCount;
   Timer<FrameView> m_postLayoutTasksTimer;

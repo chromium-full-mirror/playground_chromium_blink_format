@@ -41,12 +41,16 @@ SVGStyledTransformableElement::SVGStyledTransformableElement(
 
 SVGStyledTransformableElement::~SVGStyledTransformableElement() {}
 
-AffineTransform SVGStyledTransformableElement::getCTM() const {
-  return SVGLocatable::computeCTM(this, SVGLocatable::NearestViewportScope);
+AffineTransform SVGStyledTransformableElement::getCTM(
+    StyleUpdateStrategy styleUpdateStrategy) const {
+  return SVGLocatable::computeCTM(this, SVGLocatable::NearestViewportScope,
+                                  styleUpdateStrategy);
 }
 
-AffineTransform SVGStyledTransformableElement::getScreenCTM() const {
-  return SVGLocatable::computeCTM(this, SVGLocatable::ScreenScope);
+AffineTransform SVGStyledTransformableElement::getScreenCTM(
+    StyleUpdateStrategy styleUpdateStrategy) const {
+  return SVGLocatable::computeCTM(this, SVGLocatable::ScreenScope,
+                                  styleUpdateStrategy);
 }
 
 AffineTransform SVGStyledTransformableElement::animatedLocalTransform() const {
@@ -95,8 +99,9 @@ SVGElement* SVGStyledTransformableElement::farthestViewportElement() const {
   return SVGTransformable::farthestViewportElement(this);
 }
 
-FloatRect SVGStyledTransformableElement::getBBox() const {
-  return SVGTransformable::getBBox(this);
+FloatRect SVGStyledTransformableElement::getBBox(
+    StyleUpdateStrategy styleUpdateStrategy) const {
+  return SVGTransformable::getBBox(this, styleUpdateStrategy);
 }
 
 RenderObject* SVGStyledTransformableElement::createRenderer(RenderArena* arena,

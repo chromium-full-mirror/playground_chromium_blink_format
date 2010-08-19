@@ -66,9 +66,11 @@ SVGElement* SVGLocatable::farthestViewportElement(const SVGElement* element) {
   return farthest;
 }
 
-FloatRect SVGLocatable::getBBox(const SVGElement* element) {
+FloatRect SVGLocatable::getBBox(const SVGElement* element,
+                                StyleUpdateStrategy styleUpdateStrategy) {
   ASSERT(element);
-  element->document()->updateLayoutIgnorePendingStylesheets();
+  if (styleUpdateStrategy == AllowStyleUpdate)
+    element->document()->updateLayoutIgnorePendingStylesheets();
 
   // FIXME: Eventually we should support getBBox for detached elements.
   if (!element->renderer())
@@ -77,10 +79,13 @@ FloatRect SVGLocatable::getBBox(const SVGElement* element) {
   return element->renderer()->objectBoundingBox();
 }
 
-AffineTransform SVGLocatable::computeCTM(const SVGElement* element,
-                                         CTMScope mode) {
+AffineTransform SVGLocatable::computeCTM(
+    const SVGElement* element,
+    CTMScope mode,
+    StyleUpdateStrategy styleUpdateStrategy) {
   ASSERT(element);
-  element->document()->updateLayoutIgnorePendingStylesheets();
+  if (styleUpdateStrategy == AllowStyleUpdate)
+    element->document()->updateLayoutIgnorePendingStylesheets();
 
   AffineTransform ctm;
 
@@ -106,13 +111,16 @@ AffineTransform SVGLocatable::computeCTM(const SVGElement* element,
   return ctm;
 }
 
-AffineTransform SVGLocatable::getTransformToElement(SVGElement* target,
-                                                    ExceptionCode& ec) const {
-  AffineTransform ctm = getCTM();
+AffineTransform SVGLocatable::getTransformToElement(
+    SVGElement* target,
+    ExceptionCode& ec,
+    StyleUpdateStrategy styleUpdateStrategy) const {
+  AffineTransform ctm = getCTM(styleUpdateStrategy);
 
   if (target && target->isStyledLocatable()) {
     AffineTransform targetCTM =
-        static_cast<SVGStyledLocatableElement*>(target)->getCTM();
+        static_cast<SVGStyledLocatableElement*>(target)->getCTM(
+            styleUpdateStrategy);
     if (!targetCTM.isInvertible()) {
       ec = SVGException::SVG_MATRIX_NOT_INVERTABLE;
       return ctm;
