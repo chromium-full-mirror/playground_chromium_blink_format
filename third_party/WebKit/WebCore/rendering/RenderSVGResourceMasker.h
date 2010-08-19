@@ -66,8 +66,7 @@ class RenderSVGResourceMasker : public RenderSVGResourceContainer {
   static RenderSVGResourceType s_resourceType;
 
  private:
-  void drawContentIntoMaskImage(const FloatRect& maskRect,
-                                MaskerData*,
+  void drawContentIntoMaskImage(MaskerData*,
                                 const SVGMaskElement*,
                                 RenderObject*);
   void calculateMaskContentRepaintRect();
