@@ -203,10 +203,12 @@ class WebPageProxy : public APIObject {
 
   void decidePolicyForNavigationAction(WebFrameProxy*,
                                        WebCore::NavigationType navigationType,
+                                       WebEvent::Modifiers modifiers,
                                        const WTF::String& url,
                                        uint64_t listenerID);
   void decidePolicyForNewWindowAction(WebFrameProxy*,
                                       WebCore::NavigationType navigationType,
+                                      WebEvent::Modifiers modifiers,
                                       const WTF::String& url,
                                       uint64_t listenerID);
   void decidePolicyForMIMEType(WebFrameProxy*,

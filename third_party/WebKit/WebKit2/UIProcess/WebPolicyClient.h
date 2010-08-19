@@ -27,6 +27,7 @@
 #define WebPolicyClient_h
 
 #include "WKPage.h"
+#include "WebEvent.h"
 #include <WebCore/FrameLoaderTypes.h>
 #include <wtf/Forward.h>
 
@@ -43,11 +44,13 @@ class WebPolicyClient {
 
   bool decidePolicyForNavigationAction(WebPageProxy*,
                                        WebCore::NavigationType,
+                                       WebEvent::Modifiers,
                                        const WTF::String& url,
                                        WebFrameProxy*,
                                        WebFramePolicyListenerProxy*);
   bool decidePolicyForNewWindowAction(WebPageProxy*,
                                       WebCore::NavigationType,
+                                      WebEvent::Modifiers,
                                       const WTF::String& url,
                                       WebFrameProxy*,
                                       WebFramePolicyListenerProxy*);

@@ -48,6 +48,14 @@ enum {
 };
 typedef uint32_t WKFrameNavigationType;
 
+enum {
+  kWKEventModifiersShiftKey = 1 << 0,
+  kWKEventModifiersControlKey = 1 << 1,
+  kWKEventModifiersAltKey = 1 << 2,
+  kWKEventModifiersMetaKey = 1 << 3
+};
+typedef uint32_t WKEventModifiers;
+
 // FrameLoad Client
 typedef void (*WKPageDidStartProvisionalLoadForFrameCallback)(
     WKPageRef page,
@@ -138,6 +146,7 @@ typedef struct WKPageLoaderClient WKPageLoaderClient;
 typedef void (*WKPageDecidePolicyForNavigationActionCallback)(
     WKPageRef page,
     WKFrameNavigationType navigationType,
+    WKEventModifiers modifiers,
     WKURLRef url,
     WKFrameRef frame,
     WKFramePolicyListenerRef listener,
@@ -145,6 +154,7 @@ typedef void (*WKPageDecidePolicyForNavigationActionCallback)(
 typedef void (*WKPageDecidePolicyForNewWindowActionCallback)(
     WKPageRef page,
     WKFrameNavigationType navigationType,
+    WKEventModifiers modifiers,
     WKURLRef url,
     WKFrameRef frame,
     WKFramePolicyListenerRef listener,
