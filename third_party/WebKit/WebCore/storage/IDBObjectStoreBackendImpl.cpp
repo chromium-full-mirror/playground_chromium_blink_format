@@ -111,7 +111,7 @@ void IDBObjectStoreBackendImpl::get(PassRefPtr<IDBKey> key,
       "SELECT keyString, keyDate, keyNumber, value FROM ObjectStoreData " +
           whereClause(key->type()));
   bool ok = query.prepare() == SQLResultOk;
-  ASSERT(ok);  // FIXME: Better error handling?
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
 
   bindWhereClause(query, m_id, key.get());
   if (query.step() != SQLResultRow) {
@@ -159,7 +159,7 @@ void IDBObjectStoreBackendImpl::put(PassRefPtr<SerializedScriptValue> value,
   SQLiteStatement getQuery(sqliteDatabase(), "SELECT id FROM ObjectStoreData " +
                                                  whereClause(key->type()));
   bool ok = getQuery.prepare() == SQLResultOk;
-  ASSERT(ok);  // FIXME: Better error handling?
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
 
   bindWhereClause(getQuery, m_id, key.get());
   bool existingValue = getQuery.step() == SQLResultRow;
@@ -177,7 +177,7 @@ void IDBObjectStoreBackendImpl::put(PassRefPtr<SerializedScriptValue> value,
                      "keyNumber, value, objectStoreId) VALUES (?, ?, ?, ?, ?)";
   SQLiteStatement putQuery(sqliteDatabase(), sql);
   ok = putQuery.prepare() == SQLResultOk;
-  ASSERT(ok);  // FIXME: Better error handling?
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
   switch (key->type()) {
     case IDBKey::StringType:
       putQuery.bindText(1, key->string());
@@ -205,7 +205,7 @@ void IDBObjectStoreBackendImpl::put(PassRefPtr<SerializedScriptValue> value,
     putQuery.bindInt64(5, m_id);
 
   ok = putQuery.step() == SQLResultDone;
-  ASSERT(ok);  // FIXME: Better error handling?
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
 
   callbacks->onSuccess(key.get());
 }
@@ -215,7 +215,7 @@ void IDBObjectStoreBackendImpl::remove(PassRefPtr<IDBKey> key,
   SQLiteStatement query(sqliteDatabase(), "DELETE FROM ObjectStoreData " +
                                               whereClause(key->type()));
   bool ok = query.prepare() == SQLResultOk;
-  ASSERT(ok);  // FIXME: Better error handling?
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
 
   bindWhereClause(query, m_id, key.get());
   if (query.step() != SQLResultDone) {
@@ -243,13 +243,13 @@ void IDBObjectStoreBackendImpl::createIndex(
                          "INSERT INTO Indexes (objectStoreId, name, keyPath, "
                          "isUnique) VALUES (?, ?, ?, ?)");
   bool ok = insert.prepare() == SQLResultOk;
-  ASSERT(ok);  // FIXME: Better error handling.
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
   insert.bindInt64(1, m_id);
   insert.bindText(2, name);
   insert.bindText(3, keyPath);
   insert.bindInt(4, static_cast<int>(unique));
   ok = insert.step() == SQLResultDone;
-  ASSERT(ok);  // FIXME: Better error handling.
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
   int64_t id = sqliteDatabase().lastInsertRowID();
 
   RefPtr<IDBIndexBackendInterface> index =
@@ -277,11 +277,11 @@ void IDBObjectStoreBackendImpl::removeIndex(
       sqliteDatabase(),
       "DELETE FROM Indexes WHERE name = ? AND objectStoreId = ?");
   bool ok = deleteQuery.prepare() == SQLResultOk;
-  ASSERT(ok);  // FIXME: Better error handling.
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
   deleteQuery.bindText(1, name);
   deleteQuery.bindInt64(2, m_id);
   ok = deleteQuery.step() == SQLResultDone;
-  ASSERT(ok);  // FIXME: Better error handling.
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
 
   m_indexes.remove(name);
   callbacks->onSuccess();
@@ -297,7 +297,7 @@ void IDBObjectStoreBackendImpl::openCursor(PassRefPtr<IDBKeyRange> range,
       sqliteDatabase(),
       "SELECT id, value FROM ObjectStoreData " + whereClause(key->type()));
   bool ok = query.prepare() == SQLResultOk;
-  ASSERT(ok);  // FIXME: Better error handling?
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
 
   bindWhereClause(query, m_id, key.get());
   if (query.step() != SQLResultRow) {
@@ -318,7 +318,7 @@ void IDBObjectStoreBackendImpl::loadIndexes() {
                              "SELECT id, name, keyPath, isUnique FROM Indexes "
                              "WHERE objectStoreId = ?");
   bool ok = indexQuery.prepare() == SQLResultOk;
-  ASSERT(ok);  // FIXME: Better error handling?
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
 
   indexQuery.bindInt64(1, m_id);
 
