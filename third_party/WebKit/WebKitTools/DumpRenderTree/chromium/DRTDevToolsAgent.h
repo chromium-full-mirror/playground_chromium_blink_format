@@ -64,7 +64,6 @@ class DRTDevToolsAgent : public WebKit::WebDevToolsAgentClient,
   virtual void forceRepaint();
   virtual void runtimePropertyChanged(const WebKit::WebString& name,
                                       const WebKit::WebString& value);
-  virtual WebKit::WebCString injectedScriptSource();
   virtual WebKit::WebCString debuggerScriptSource();
 
   void asyncCall(const DRTDevToolsCallArgs&);
