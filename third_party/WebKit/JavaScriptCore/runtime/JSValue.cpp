@@ -132,15 +132,12 @@ char* JSValue::description() {
 #endif
 
 int32_t toInt32SlowCase(double d, bool& ok) {
-  ok = true;
-
-  if (d >= -D32 / 2 && d < D32 / 2)
-    return static_cast<int32_t>(d);
-
   if (isnan(d) || isinf(d)) {
     ok = false;
     return 0;
   }
+
+  ok = true;
 
   double d32 = fmod(trunc(d), D32);
   if (d32 >= D32 / 2)
@@ -151,15 +148,12 @@ int32_t toInt32SlowCase(double d, bool& ok) {
 }
 
 uint32_t toUInt32SlowCase(double d, bool& ok) {
-  ok = true;
-
-  if (d >= 0.0 && d < D32)
-    return static_cast<uint32_t>(d);
-
   if (isnan(d) || isinf(d)) {
     ok = false;
     return 0;
   }
+
+  ok = true;
 
   double d32 = fmod(trunc(d), D32);
   if (d32 < 0)
