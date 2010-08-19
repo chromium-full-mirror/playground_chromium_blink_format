@@ -59,8 +59,6 @@ class WebDevToolsAgent {
 
   virtual void inspectElementAt(const WebPoint&) = 0;
 
-  virtual void setRuntimeFeatureEnabled(const WebString& feature,
-                                        bool enabled) = 0;
   virtual void setRuntimeProperty(const WebString& name,
                                   const WebString& value) = 0;
 
