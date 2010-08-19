@@ -109,6 +109,8 @@ IDBDatabaseBackendImpl::IDBDatabaseBackendImpl(
 
   if (!result || m_description != foundDescription)
     setMetaData(m_sqliteDatabase.get(), m_name, m_description, m_version);
+
+  loadObjectStores();
 }
 
 IDBDatabaseBackendImpl::~IDBDatabaseBackendImpl() {}
@@ -141,8 +143,21 @@ void IDBDatabaseBackendImpl::createObjectStore(
     return;
   }
 
+  SQLiteStatement insert(sqliteDatabase(),
+                         "INSERT INTO ObjectStores (name, keyPath, "
+                         "doAutoIncrement) VALUES (?, ?, ?)");
+  bool ok = insert.prepare() == SQLResultOk;
+  ASSERT(ok);  // FIXME: Better error handling.
+  insert.bindText(1, name);
+  insert.bindText(2, keyPath);
+  insert.bindInt(3, static_cast<int>(autoIncrement));
+  ok = insert.step() == SQLResultDone;
+  ASSERT(ok);  // FIXME: Better error handling.
+  int64_t id = sqliteDatabase().lastInsertRowID();
+
   RefPtr<IDBObjectStoreBackendInterface> objectStore =
-      IDBObjectStoreBackendImpl::create(name, keyPath, autoIncrement);
+      IDBObjectStoreBackendImpl::create(this, id, name, keyPath, autoIncrement);
+  ASSERT(objectStore->name() == name);
   m_objectStores.set(name, objectStore);
   callbacks->onSuccess(objectStore.release());
 }
@@ -165,6 +180,14 @@ void IDBDatabaseBackendImpl::removeObjectStore(
     return;
   }
 
+  SQLiteStatement deleteQuery(sqliteDatabase(),
+                              "DELETE FROM ObjectStores WHERE name = ?");
+  bool ok = deleteQuery.prepare() == SQLResultOk;
+  ASSERT(ok);  // FIXME: Better error handling.
+  deleteQuery.bindText(1, name);
+  ok = deleteQuery.step() == SQLResultDone;
+  ASSERT(ok);  // FIXME: Better error handling.
+
   m_objectStores.remove(name);
   callbacks->onSuccess();
 }
@@ -176,6 +199,24 @@ PassRefPtr<IDBTransactionBackendInterface> IDBDatabaseBackendImpl::transaction(
   // FIXME: Ask the transaction manager for a new IDBTransactionBackendImpl.
   ASSERT_NOT_REACHED();
   return 0;
+}
+
+void IDBDatabaseBackendImpl::loadObjectStores() {
+  SQLiteStatement objectStoresQuery(
+      sqliteDatabase(),
+      "SELECT id, name, keyPath, doAutoIncrement FROM ObjectStores");
+  bool ok = objectStoresQuery.prepare() == SQLResultOk;
+  ASSERT(ok);  // FIXME: Better error handling?
+
+  while (objectStoresQuery.step() == SQLResultRow) {
+    int64_t id = objectStoresQuery.getColumnInt64(0);
+    String name = objectStoresQuery.getColumnText(1);
+    String keyPath = objectStoresQuery.getColumnText(2);
+    bool autoIncrement = !!objectStoresQuery.getColumnInt(3);
+
+    m_objectStores.set(name, IDBObjectStoreBackendImpl::create(
+                                 this, id, name, keyPath, autoIncrement));
+  }
 }
 
 }  // namespace WebCore

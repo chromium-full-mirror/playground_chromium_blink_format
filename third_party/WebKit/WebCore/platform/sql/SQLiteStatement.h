@@ -42,6 +42,7 @@ class SQLiteStatement : public Noncopyable {
   int prepare();
   int bindBlob(int index, const void* blob, int size);
   int bindText(int index, const String&);
+  int bindInt(int index, int);
   int bindInt64(int index, int64_t);
   int bindDouble(int index, double);
   int bindNull(int index);
@@ -74,6 +75,7 @@ class SQLiteStatement : public Noncopyable {
   // returned in the last step()
   int columnCount();
 
+  bool isColumnNull(int col);
   String getColumnName(int col);
   SQLValue getColumnValue(int col);
   String getColumnText(int col);

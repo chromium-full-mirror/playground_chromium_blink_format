@@ -48,6 +48,7 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
   virtual ~IDBDatabaseBackendImpl();
 
   void setDescription(const String& description);
+  SQLiteDatabase& sqliteDatabase() const { return *m_sqliteDatabase.get(); }
 
   // Implements IDBDatabase
   virtual String name() const { return m_name; }
@@ -72,6 +73,8 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
   IDBDatabaseBackendImpl(const String& name,
                          const String& description,
                          PassOwnPtr<SQLiteDatabase> database);
+
+  void loadObjectStores();
 
   OwnPtr<SQLiteDatabase> m_sqliteDatabase;
 

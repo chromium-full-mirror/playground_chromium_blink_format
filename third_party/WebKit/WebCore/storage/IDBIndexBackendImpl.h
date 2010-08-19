@@ -32,12 +32,19 @@
 
 namespace WebCore {
 
+class IDBObjectStoreBackendImpl;
+class SQLiteDatabase;
+
 class IDBIndexBackendImpl : public IDBIndexBackendInterface {
  public:
-  static PassRefPtr<IDBIndexBackendImpl> create(const String& name,
-                                                const String& keyPath,
-                                                bool unique) {
-    return adoptRef(new IDBIndexBackendImpl(name, keyPath, unique));
+  static PassRefPtr<IDBIndexBackendImpl> create(
+      IDBObjectStoreBackendImpl* objectStore,
+      int64_t id,
+      const String& name,
+      const String& keyPath,
+      bool unique) {
+    return adoptRef(
+        new IDBIndexBackendImpl(objectStore, id, name, keyPath, unique));
   }
   virtual ~IDBIndexBackendImpl();
 
@@ -47,8 +54,17 @@ class IDBIndexBackendImpl : public IDBIndexBackendInterface {
   virtual bool unique() { return m_unique; }
 
  private:
-  IDBIndexBackendImpl(const String& name, const String& keyPath, bool unique);
+  IDBIndexBackendImpl(IDBObjectStoreBackendImpl*,
+                      int64_t id,
+                      const String& name,
+                      const String& keyPath,
+                      bool unique);
 
+  SQLiteDatabase& sqliteDatabase() const;
+
+  RefPtr<IDBObjectStoreBackendImpl> m_objectStore;
+
+  int64_t m_id;
   String m_name;
   String m_keyPath;
   bool m_unique;
