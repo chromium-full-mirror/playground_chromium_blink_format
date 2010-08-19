@@ -410,9 +410,8 @@ void LayerRendererChromium::drawLayers(const IntRect& updateRect,
 #endif
 
     scrolledLayerMatrix.translate3d(
-        (int)floorf(0.5 * visibleRect.width()) - scrollDelta.x(),
-        (int)floorf(0.5 * visibleRect.height()) + scaleFactor * scrollDelta.y(),
-        0);
+        0.5 * visibleRect.width() - scrollDelta.x(),
+        0.5 * visibleRect.height() + scaleFactor * scrollDelta.y(), 0);
     scrolledLayerMatrix.scale3d(1, -1, 1);
 
     // Switch shaders to avoid RGB swizzling.
@@ -428,6 +427,12 @@ void LayerRendererChromium::drawLayers(const IntRect& updateRect,
                         contentRect.height());
 
     checkGLError();
+    m_scrollPosition = scrollPosition;
+  } else if (abs(scrollDelta.y()) > contentRect.height() ||
+             abs(scrollDelta.x()) > contentRect.width()) {
+    // Scrolling larger than the contentRect size does not preserve any of the
+    // pixels, so there is
+    // no need to copy framebuffer pixels back into the texture.
     m_scrollPosition = scrollPosition;
   }
 
