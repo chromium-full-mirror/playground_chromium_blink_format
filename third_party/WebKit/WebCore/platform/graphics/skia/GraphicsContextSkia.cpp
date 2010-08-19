@@ -310,14 +310,12 @@ void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
 void GraphicsContext::addPath(const Path& path) {
   if (paintingDisabled())
     return;
-  platformContext()->prepareForSoftwareDraw();
   platformContext()->addPath(*path.platformPath());
 }
 
 void GraphicsContext::beginPath() {
   if (paintingDisabled())
     return;
-  platformContext()->prepareForSoftwareDraw();
   platformContext()->beginPath();
 }
 
