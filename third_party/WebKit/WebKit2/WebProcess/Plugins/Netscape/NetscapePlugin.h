@@ -67,6 +67,7 @@ class NetscapePlugin : public Plugin {
                bool sendNotification,
                void* notificationData);
   NPError destroyStream(NPStream*, NPReason);
+  void setIsWindowed(bool windowed) { m_isWindowed = windowed; }
   void setStatusbarText(const WTF::String&);
   static void setException(const WTF::String&);
   bool evaluate(NPObject*, const WTF::String& scriptString, NPVariant* result);
@@ -183,6 +184,7 @@ class NetscapePlugin : public Plugin {
   CString m_userAgent;
 
   bool m_isStarted;
+  bool m_isWindowed;
   bool m_inNPPNew;
   bool m_loadManually;
   RefPtr<NetscapePluginStream> m_manualStream;

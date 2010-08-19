@@ -45,7 +45,15 @@ NetscapePlugin::NetscapePlugin(PassRefPtr<NetscapePluginModule> pluginModule)
       m_nextRequestID(0),
       m_pluginModule(pluginModule),
       m_npWindow(),
-      m_isStarted(false),
+      m_isStarted(false)
+#if PLATFORM(MAC)
+      ,
+      m_isWindowed(false)
+#else
+      ,
+      m_isWindowed(true)
+#endif
+      ,
       m_inNPPNew(false),
       m_loadManually(false)
 #if PLATFORM(MAC)

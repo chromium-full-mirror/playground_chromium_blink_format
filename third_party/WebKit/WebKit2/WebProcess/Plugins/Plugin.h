@@ -65,7 +65,9 @@ class Plugin : public RefCounted<Plugin> {
   virtual void destroy() = 0;
 
   // Tells the plug-in to paint itself into the given graphics context. The
-  // passed in dirty rect is in window coordinates.
+  // passed-in context and
+  // dirty rect are in window coordinates. The context is saved/restored by the
+  // caller.
   virtual void paint(WebCore::GraphicsContext*,
                      const WebCore::IntRect& dirtyRect) = 0;
 
