@@ -54,7 +54,6 @@ class WebDevToolsAgentClient {
   virtual void runtimePropertyChanged(const WebString& name,
                                       const WebString& value) {}
 
-  virtual WebCString injectedScriptSource() { return WebCString(); }
   virtual WebCString debuggerScriptSource() { return WebCString(); }
 
   class WebKitClientMessageLoop {

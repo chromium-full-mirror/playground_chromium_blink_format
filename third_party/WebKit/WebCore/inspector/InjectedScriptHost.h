@@ -57,6 +57,7 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
 
   ~InjectedScriptHost();
 
+  String injectedScriptSource() { return m_injectedScriptSource; }
   void setInjectedScriptSource(const String& source) {
     m_injectedScriptSource = source;
   }
