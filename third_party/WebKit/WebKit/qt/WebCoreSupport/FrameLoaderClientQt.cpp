@@ -1472,7 +1472,9 @@ PassRefPtr<Widget> FrameLoaderClientQt::createPlugin(
 #endif
     // FIXME: make things work for widgetless plugins as well
     delete object;
-  } else {  // NPAPI Plugins
+  }
+#if ENABLE(NETSCAPE_PLUGIN_API)
+  else {  // NPAPI Plugins
     Vector<String> params = paramNames;
     Vector<String> values = paramValues;
     if (mimeType == "application/x-shockwave-flash") {
@@ -1498,6 +1500,7 @@ PassRefPtr<Widget> FrameLoaderClientQt::createPlugin(
                            mimeType, loadManually);
     return pluginView;
   }
+#endif  // ENABLE(NETSCAPE_PLUGIN_API)
 
   return 0;
 }
