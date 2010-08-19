@@ -50,6 +50,7 @@ class EventSource;
 class FileReader;
 class FileWriter;
 class IDBRequest;
+class IDBTransaction;
 class MessagePort;
 class Node;
 class Notification;
@@ -127,6 +128,7 @@ class EventTarget {
 
 #if ENABLE(INDEXED_DATABASE)
   virtual IDBRequest* toIDBRequest();
+  virtual IDBTransaction* toIDBTransaction();
 #endif
 
   virtual ScriptExecutionContext* scriptExecutionContext() const = 0;

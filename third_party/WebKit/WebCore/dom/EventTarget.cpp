@@ -151,6 +151,9 @@ FileWriter* EventTarget::toFileWriter() {
 IDBRequest* EventTarget::toIDBRequest() {
   return 0;
 }
+IDBTransaction* EventTarget::toIDBTransaction() {
+  return 0;
+}
 #endif
 
 bool EventTarget::addEventListener(const AtomicString& eventType,

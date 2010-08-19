@@ -37,6 +37,8 @@
 #include "DocumentLoader.h"
 #include "Frame.h"
 #include "FrameLoaderClient.h"
+#include "IDBFactoryBackendInterface.h"
+#include "IDBPendingTransactionMonitor.h"
 #include "InspectorTimelineAgent.h"
 #include "Page.h"
 #include "PageGroup.h"
@@ -461,7 +463,7 @@ v8::Local<v8::Value> V8Proxy::runScript(v8::Handle<v8::Script> script,
   }
 
   // Release the storage mutex if applicable.
-  releaseStorageMutex();
+  didLeaveScriptContext();
 
   if (handleOutOfMemory())
     ASSERT(result.IsEmpty());
@@ -539,7 +541,7 @@ v8::Local<v8::Value> V8Proxy::callFunction(v8::Handle<v8::Function> function,
   }
 
   // Release the storage mutex if applicable.
-  releaseStorageMutex();
+  didLeaveScriptContext();
 
   if (v8::V8::IsDead())
     handleFatalErrorInV8();
@@ -644,14 +646,24 @@ V8Proxy* V8Proxy::retrieve(ScriptExecutionContext* context) {
 
 void V8Proxy::disconnectFrame() {}
 
-void V8Proxy::releaseStorageMutex() {
+void V8Proxy::didLeaveScriptContext() {
+  Page* page = m_frame->page();
+  if (!page)
+    return;
+  // If we've just left a script context and indexed database has been
+  // instantiated, we must let its transaction coordinator know so it can
+  // terminate
+  // any not-yet-started transactions.
+  if (IDBPendingTransactionMonitor::hasPendingTransactions()) {
+    ASSERT(page->group().hasIDBFactory());
+    page->group().idbFactory()->abortPendingTransactions(
+        IDBPendingTransactionMonitor::pendingTransactions());
+    IDBPendingTransactionMonitor::clearPendingTransactions();
+  }
   // If we've just left a top level script context and local storage has been
   // instantiated, we must ensure that any storage locks have been freed.
   // Per http://dev.w3.org/html5/spec/Overview.html#storage-mutex
   if (m_recursion != 0)
-    return;
-  Page* page = m_frame->page();
-  if (!page)
     return;
   if (page->group().hasLocalStorage())
     page->group().localStorage()->unlock();

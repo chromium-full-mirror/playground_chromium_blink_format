@@ -37,7 +37,9 @@
 namespace WebCore {
 
 class DOMStringList;
+
 class IDBDatabaseBackendImpl;
+class IDBTransactionCoordinator;
 
 class IDBFactoryBackendImpl : public IDBFactoryBackendInterface {
  public:
@@ -51,12 +53,14 @@ class IDBFactoryBackendImpl : public IDBFactoryBackendInterface {
                     PassRefPtr<IDBCallbacks>,
                     PassRefPtr<SecurityOrigin>,
                     Frame*);
+  virtual void abortPendingTransactions(const Vector<int>& pendingIDs);
 
  private:
   IDBFactoryBackendImpl();
 
   typedef HashMap<String, RefPtr<IDBDatabaseBackendImpl>> IDBDatabaseBackendMap;
   IDBDatabaseBackendMap m_databaseBackendMap;
+  RefPtr<IDBTransactionCoordinator> m_transactionCoordinator;
 
   // We only create one instance of this class at a time.
   static IDBFactoryBackendImpl* idbFactoryBackendImpl;

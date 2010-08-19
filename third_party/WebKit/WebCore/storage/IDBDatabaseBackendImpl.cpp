@@ -29,6 +29,7 @@
 #include "DOMStringList.h"
 #include "IDBDatabaseException.h"
 #include "IDBObjectStoreBackendImpl.h"
+#include "IDBTransactionCoordinator.h"
 #include "SQLiteDatabase.h"
 #include "SQLiteStatement.h"
 
@@ -96,8 +97,12 @@ static bool setMetaData(SQLiteDatabase* sqliteDatabase,
 IDBDatabaseBackendImpl::IDBDatabaseBackendImpl(
     const String& name,
     const String& description,
-    PassOwnPtr<SQLiteDatabase> sqliteDatabase)
-    : m_sqliteDatabase(sqliteDatabase), m_name(name), m_version("") {
+    PassOwnPtr<SQLiteDatabase> sqliteDatabase,
+    IDBTransactionCoordinator* coordinator)
+    : m_sqliteDatabase(sqliteDatabase),
+      m_name(name),
+      m_version(""),
+      m_transactionCoordinator(coordinator) {
   ASSERT(!m_name.isNull());
 
   // FIXME: The spec is in flux about how to handle description. Sync it up once
@@ -193,12 +198,11 @@ void IDBDatabaseBackendImpl::removeObjectStore(
 }
 
 PassRefPtr<IDBTransactionBackendInterface> IDBDatabaseBackendImpl::transaction(
-    DOMStringList*,
-    unsigned short,
-    unsigned long) {
-  // FIXME: Ask the transaction manager for a new IDBTransactionBackendImpl.
-  ASSERT_NOT_REACHED();
-  return 0;
+    DOMStringList* objectStores,
+    unsigned short mode,
+    unsigned long timeout) {
+  return m_transactionCoordinator->createTransaction(objectStores, mode,
+                                                     timeout);
 }
 
 void IDBDatabaseBackendImpl::loadObjectStores() {

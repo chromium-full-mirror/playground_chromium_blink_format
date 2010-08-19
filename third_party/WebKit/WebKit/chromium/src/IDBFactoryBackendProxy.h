@@ -52,6 +52,7 @@ class IDBFactoryBackendProxy : public IDBFactoryBackendInterface {
                     PassRefPtr<IDBCallbacks>,
                     PassRefPtr<SecurityOrigin>,
                     Frame*);
+  virtual void abortPendingTransactions(const Vector<int>& pendingIDs);
 
  private:
   IDBFactoryBackendProxy();

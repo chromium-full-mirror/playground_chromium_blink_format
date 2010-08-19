@@ -74,6 +74,7 @@ class PageGroup : public Noncopyable {
 #endif
 #if ENABLE(INDEXED_DATABASE)
   IDBFactoryBackendInterface* idbFactory();
+  bool hasIDBFactory() { return m_factoryBackend; }
 #endif
 
   void addUserScriptToWorld(DOMWrapperWorld*,

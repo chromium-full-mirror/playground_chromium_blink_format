@@ -34,12 +34,12 @@
 #include "WebIDBCallbacks.h"
 #include "WebSecurityOrigin.h"
 #include "WebString.h"
+#include "WebVector.h"
 
 namespace WebKit {
 
 class WebFrame;
 class WebIDBDatabase;
-class WebString;
 class WebSecurityOrigin;
 
 // The entry point into the IndexedDatabase API.  These classes match their Foo
@@ -69,6 +69,10 @@ class WebIDBFactory {
                     WebFrame* webFrame,
                     int& exceptionCode) {
     open(name, description, callbacks, origin, webFrame);
+  }
+
+  virtual void abortPendingTransactions(const WebVector<int>& pendingIDs) {
+    WEBKIT_ASSERT_NOT_REACHED();
   }
 };
 

@@ -37,6 +37,7 @@
 namespace WebCore {
 
 class IDBObjectStoreBackendInterface;
+class IDBTransactionCallbacks;
 class SQLiteDatabase;
 
 // This class is shared by IDBTransaction (async) and IDBTransactionSync (sync).
@@ -55,7 +56,8 @@ class IDBTransactionBackendInterface
   virtual unsigned short mode() const = 0;
   virtual void scheduleTask(PassOwnPtr<ScriptExecutionContext::Task>) = 0;
   virtual void abort() = 0;
-  virtual SQLiteDatabase* sqliteDatabase() = 0;
+  virtual int id() const = 0;
+  virtual void setCallbacks(IDBTransactionCallbacks*) = 0;
 };
 
 }  // namespace WebCore
