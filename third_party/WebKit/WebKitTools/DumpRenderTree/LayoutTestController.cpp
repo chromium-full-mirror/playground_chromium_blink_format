@@ -1921,6 +1921,27 @@ static JSValueRef setUserStyleSheetLocationCallback(
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setViewModeMediaFeatureCallback(JSContextRef context,
+                                                  JSObjectRef function,
+                                                  JSObjectRef thisObject,
+                                                  size_t argumentCount,
+                                                  const JSValueRef arguments[],
+                                                  JSValueRef* exception) {
+  // Has mac implementation
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  JSRetainPtr<JSStringRef> mode(
+      Adopt, JSValueToStringCopy(context, arguments[0], exception));
+  ASSERT(!*exception);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setViewModeMediaFeature(mode.get());
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setWillSendRequestClearHeaderCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -2932,6 +2953,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setUserStyleSheetEnabled", setUserStyleSheetEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setUserStyleSheetLocation", setUserStyleSheetLocationCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setViewModeMediaFeature", setViewModeMediaFeatureCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setWebViewEditable", setWebViewEditableCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

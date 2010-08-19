@@ -111,6 +111,10 @@ void LayoutTestController::setUserStyleSheetEnabled(bool flag) {}
 
 void LayoutTestController::setUserStyleSheetLocation(JSStringRef path) {}
 
+void LayoutTestController::setViewModeMediaFeature(JSStringRef mode) {
+  // FIXME: implement
+}
+
 void LayoutTestController::setWindowIsKey(bool windowIsKey) {
   // FIXME: implement
 }
