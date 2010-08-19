@@ -223,6 +223,11 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getAttachedShadersCallback(
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
       V8WebGLRenderingContext::toNative(args.Holder());
+  if (args.Length() > 0 && !isUndefinedOrNull(args[0]) &&
+      !V8WebGLProgram::HasInstance(args[0])) {
+    V8Proxy::throwTypeError();
+    return notHandledByInterceptor();
+  }
   WebGLProgram* program =
       V8WebGLProgram::HasInstance(args[0])
           ? V8WebGLProgram::toNative(v8::Handle<v8::Object>::Cast(args[0]))
@@ -323,6 +328,11 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getProgramParameterCallback(
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
       V8WebGLRenderingContext::toNative(args.Holder());
+  if (args.Length() > 0 && !isUndefinedOrNull(args[0]) &&
+      !V8WebGLProgram::HasInstance(args[0])) {
+    V8Proxy::throwTypeError();
+    return notHandledByInterceptor();
+  }
   WebGLProgram* program =
       V8WebGLProgram::HasInstance(args[0])
           ? V8WebGLProgram::toNative(v8::Handle<v8::Object>::Cast(args[0]))
@@ -359,6 +369,11 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getShaderParameterCallback(
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
       V8WebGLRenderingContext::toNative(args.Holder());
+  if (args.Length() > 0 && !isUndefinedOrNull(args[0]) &&
+      !V8WebGLShader::HasInstance(args[0])) {
+    V8Proxy::throwTypeError();
+    return notHandledByInterceptor();
+  }
   WebGLShader* shader =
       V8WebGLShader::HasInstance(args[0])
           ? V8WebGLShader::toNative(v8::Handle<v8::Object>::Cast(args[0]))
@@ -395,11 +410,21 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getUniformCallback(
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
       V8WebGLRenderingContext::toNative(args.Holder());
+  if (args.Length() > 0 && !isUndefinedOrNull(args[0]) &&
+      !V8WebGLProgram::HasInstance(args[0])) {
+    V8Proxy::throwTypeError();
+    return notHandledByInterceptor();
+  }
   WebGLProgram* program =
       V8WebGLProgram::HasInstance(args[0])
           ? V8WebGLProgram::toNative(v8::Handle<v8::Object>::Cast(args[0]))
           : 0;
 
+  if (args.Length() > 1 && !isUndefinedOrNull(args[1]) &&
+      !V8WebGLUniformLocation::HasInstance(args[1])) {
+    V8Proxy::throwTypeError();
+    return notHandledByInterceptor();
+  }
   bool ok = false;
   WebGLUniformLocation* location = toWebGLUniformLocation(args[1], ok);
 
@@ -473,8 +498,14 @@ static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
 
   if (isFunctionToCallForAttribute(functionToCall))
     index = toInt32(args[0], ok);
-  else
+  else {
+    if (args.Length() > 0 && !isUndefinedOrNull(args[0]) &&
+        !V8WebGLUniformLocation::HasInstance(args[0])) {
+      V8Proxy::throwTypeError();
+      return notHandledByInterceptor();
+    }
     location = toWebGLUniformLocation(args[0], ok);
+  }
 
   WebGLRenderingContext* context =
       V8WebGLRenderingContext::toNative(args.Holder());
@@ -584,6 +615,11 @@ static v8::Handle<v8::Value> uniformHelperi(const v8::Arguments& args,
 
   WebGLRenderingContext* context =
       V8WebGLRenderingContext::toNative(args.Holder());
+  if (args.Length() > 0 && !isUndefinedOrNull(args[0]) &&
+      !V8WebGLUniformLocation::HasInstance(args[0])) {
+    V8Proxy::throwTypeError();
+    return notHandledByInterceptor();
+  }
   bool ok = false;
   WebGLUniformLocation* location = toWebGLUniformLocation(args[0], ok);
 
@@ -719,6 +755,11 @@ static v8::Handle<v8::Value> uniformMatrixHelper(const v8::Arguments& args,
   WebGLRenderingContext* context =
       V8WebGLRenderingContext::toNative(args.Holder());
 
+  if (args.Length() > 0 && !isUndefinedOrNull(args[0]) &&
+      !V8WebGLUniformLocation::HasInstance(args[0])) {
+    V8Proxy::throwTypeError();
+    return notHandledByInterceptor();
+  }
   bool ok = false;
   WebGLUniformLocation* location = toWebGLUniformLocation(args[0], ok);
 
