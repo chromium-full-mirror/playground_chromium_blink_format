@@ -31,6 +31,7 @@
 #include "FloatRect.h"
 #include "FrameLoadRequest.h"
 #include "GtkVersioning.h"
+#include "HTMLNames.h"
 #include "IntRect.h"
 #include "HitTestResult.h"
 #include "Icon.h"
@@ -632,4 +633,25 @@ PassRefPtr<WebCore::SearchPopupMenu> ChromeClient::createSearchPopupMenu(
     WebCore::PopupMenuClient* client) const {
   return adoptRef(new SearchPopupMenuGtk(client));
 }
+
+#if ENABLE(VIDEO)
+
+bool ChromeClient::supportsFullscreenForNode(const Node* node) {
+  return node->hasTagName(HTMLNames::videoTag);
+}
+
+void ChromeClient::enterFullscreenForNode(Node* node) {
+  WebCore::Frame* frame = node->document()->frame();
+  WebKitWebFrame* webFrame = kit(frame);
+  WebKitWebView* webView = getViewFromFrame(webFrame);
+  webkitWebViewEnterFullscreen(webView, node);
+}
+
+void ChromeClient::exitFullscreenForNode(Node* node) {
+  WebCore::Frame* frame = node->document()->frame();
+  WebKitWebFrame* webFrame = kit(frame);
+  WebKitWebView* webView = getViewFromFrame(webFrame);
+  webkitWebViewExitFullscreen(webView);
+}
+#endif
 }
