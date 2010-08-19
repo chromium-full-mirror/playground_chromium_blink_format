@@ -599,6 +599,7 @@ void SelectElement::menuListDefaultEventHandler(SelectElementData& data,
       handled = true;
     }
 #else
+    UNUSED_PARAM(htmlForm);
     const Vector<Element*>& listItems = data.listItems(element);
 
     int listIndex =
