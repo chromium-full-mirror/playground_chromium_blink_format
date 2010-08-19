@@ -50,7 +50,9 @@ using namespace HTMLNames;
 
 class FTPDirectoryDocumentParser : public HTMLDocumentParser {
  public:
-  FTPDirectoryDocumentParser(HTMLDocument*);
+  static PassRefPtr<FTPDirectoryDocumentParser> create(HTMLDocument* document) {
+    return adoptRef(new FTPDirectoryDocumentParser(document));
+  }
 
   virtual void append(const SegmentedString&);
   virtual void finish();
@@ -70,6 +72,8 @@ class FTPDirectoryDocumentParser : public HTMLDocumentParser {
   }
 
  private:
+  FTPDirectoryDocumentParser(HTMLDocument*);
+
   // The parser will attempt to load the document template specified via the
   // preference
   // Failing that, it will fall back and create the basic document which will
@@ -459,8 +463,8 @@ FTPDirectoryDocument::FTPDirectoryDocument(Frame* frame, const KURL& url)
 #endif
 }
 
-DocumentParser* FTPDirectoryDocument::createParser() {
-  return new FTPDirectoryDocumentParser(this);
+PassRefPtr<DocumentParser> FTPDirectoryDocument::createParser() {
+  return FTPDirectoryDocumentParser::create(this);
 }
 }
 

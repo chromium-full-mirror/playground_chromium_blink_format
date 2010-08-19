@@ -40,10 +40,10 @@ class TextDocument : public HTMLDocument {
  private:
   TextDocument(Frame*, const KURL&);
 
-  virtual DocumentParser* createParser();
+  virtual PassRefPtr<DocumentParser> createParser();
 };
 
-DocumentParser* createTextDocumentParser(HTMLViewSourceDocument*);
+PassRefPtr<DocumentParser> createTextDocumentParser(HTMLViewSourceDocument*);
 }
 
 #endif  // TextDocument_h

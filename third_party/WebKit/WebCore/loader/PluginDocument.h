@@ -45,7 +45,7 @@ class PluginDocument : public HTMLDocument {
  private:
   PluginDocument(Frame*, const KURL&);
 
-  virtual DocumentParser* createParser();
+  virtual PassRefPtr<DocumentParser> createParser();
 };
 }
 

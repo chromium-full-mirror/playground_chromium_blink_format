@@ -47,6 +47,8 @@ class HTMLConstructionSite : public Noncopyable {
                        bool isParsingFragment);
   ~HTMLConstructionSite();
 
+  void detach();
+
   void insertDoctype(AtomicHTMLToken&);
   void insertComment(AtomicHTMLToken&);
   void insertCommentOnDocument(AtomicHTMLToken&);

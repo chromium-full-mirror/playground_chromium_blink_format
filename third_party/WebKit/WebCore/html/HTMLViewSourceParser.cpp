@@ -32,6 +32,9 @@
 
 namespace WebCore {
 
+HTMLViewSourceParser::HTMLViewSourceParser(HTMLViewSourceDocument* document)
+    : DecodedDataDocumentParser(document) {}
+
 HTMLViewSourceParser::~HTMLViewSourceParser() {}
 
 void HTMLViewSourceParser::insert(const SegmentedString&) {

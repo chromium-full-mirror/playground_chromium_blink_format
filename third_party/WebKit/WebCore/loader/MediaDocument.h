@@ -45,7 +45,7 @@ class MediaDocument : public HTMLDocument {
   MediaDocument(Frame*, const KURL&);
 
   virtual bool isMediaDocument() const { return true; }
-  virtual DocumentParser* createParser();
+  virtual PassRefPtr<DocumentParser> createParser();
 
   virtual void defaultEventHandler(Event*);
 

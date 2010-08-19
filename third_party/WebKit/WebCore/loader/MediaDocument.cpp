@@ -47,10 +47,14 @@ using namespace HTMLNames;
 // FIXME: Share more code with PluginDocumentParser.
 class MediaDocumentParser : public RawDataDocumentParser {
  public:
+  static PassRefPtr<MediaDocumentParser> create(MediaDocument* document) {
+    return adoptRef(new MediaDocumentParser(document));
+  }
+
+ private:
   MediaDocumentParser(Document* document)
       : RawDataDocumentParser(document), m_mediaElement(0) {}
 
- private:
   virtual void appendBytes(DocumentWriter*, const char*, int, bool);
 
   void createDocumentStructure();
@@ -113,8 +117,8 @@ MediaDocument::~MediaDocument() {
   ASSERT(!m_replaceMediaElementTimer.isActive());
 }
 
-DocumentParser* MediaDocument::createParser() {
-  return new MediaDocumentParser(this);
+PassRefPtr<DocumentParser> MediaDocument::createParser() {
+  return MediaDocumentParser::create(this);
 }
 
 void MediaDocument::defaultEventHandler(Event* event) {

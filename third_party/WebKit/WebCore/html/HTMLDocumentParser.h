@@ -54,12 +54,18 @@ class HTMLDocumentParser : public ScriptableDocumentParser,
                            HTMLScriptRunnerHost,
                            CachedResourceClient {
  public:
-  // FIXME: These constructors should be made private and replaced by create()
-  // methods.
-  HTMLDocumentParser(HTMLDocument*, bool reportErrors);
-  HTMLDocumentParser(DocumentFragment*,
-                     Element* contextElement,
-                     FragmentScriptingPermission);
+  static PassRefPtr<HTMLDocumentParser> create(HTMLDocument* document,
+                                               bool reportErrors) {
+    return adoptRef(new HTMLDocumentParser(document, reportErrors));
+  }
+  static PassRefPtr<HTMLDocumentParser> create(
+      DocumentFragment* fragment,
+      Element* contextElement,
+      FragmentScriptingPermission permission) {
+    return adoptRef(
+        new HTMLDocumentParser(fragment, contextElement, permission));
+  }
+
   virtual ~HTMLDocumentParser();
 
   // Exposed for HTMLParserScheduler
@@ -75,8 +81,14 @@ class HTMLDocumentParser : public ScriptableDocumentParser,
   virtual void insert(const SegmentedString&);
   virtual void finish();
 
+  HTMLDocumentParser(HTMLDocument*, bool reportErrors);
+  HTMLDocumentParser(DocumentFragment*,
+                     Element* contextElement,
+                     FragmentScriptingPermission);
+
  private:
   // DocumentParser
+  virtual void detach();
   virtual bool hasInsertionPoint();
   virtual void append(const SegmentedString&);
   virtual bool finishWasCalled();

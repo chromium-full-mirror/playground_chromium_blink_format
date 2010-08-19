@@ -71,14 +71,18 @@ class ImageEventListener : public EventListener {
 
 class ImageDocumentParser : public RawDataDocumentParser {
  public:
-  ImageDocumentParser(ImageDocument* document)
-      : RawDataDocumentParser(document) {}
+  static PassRefPtr<ImageDocumentParser> create(ImageDocument* document) {
+    return adoptRef(new ImageDocumentParser(document));
+  }
 
   ImageDocument* document() const {
     return static_cast<ImageDocument*>(m_document);
   }
 
  private:
+  ImageDocumentParser(ImageDocument* document)
+      : RawDataDocumentParser(document) {}
+
   virtual void appendBytes(DocumentWriter*, const char*, int, bool);
   virtual void finish();
 };
@@ -173,8 +177,8 @@ ImageDocument::ImageDocument(Frame* frame, const KURL& url)
   setParseMode(Compat);
 }
 
-DocumentParser* ImageDocument::createParser() {
-  return new ImageDocumentParser(this);
+PassRefPtr<DocumentParser> ImageDocument::createParser() {
+  return ImageDocumentParser::create(this);
 }
 
 void ImageDocument::createDocumentStructure() {

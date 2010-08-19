@@ -60,6 +60,8 @@ class HTMLTreeBuilder : public Noncopyable {
                   FragmentScriptingPermission);
   ~HTMLTreeBuilder();
 
+  void detach();
+
   void setPaused(bool paused) { m_isPaused = paused; }
   bool isPaused() const { return m_isPaused; }
 

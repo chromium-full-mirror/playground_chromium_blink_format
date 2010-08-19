@@ -34,4 +34,15 @@ DocumentParser::DocumentParser(Document* document)
     : m_parserStopped(false), m_document(document) {
   ASSERT(document);
 }
+
+DocumentParser::~DocumentParser() {
+  // Document is expected to call detach() before releasing its ref.
+  // This ASSERT is slightly awkward for parsers with a fragment case
+  // as there is no Document to release the ref.
+  ASSERT(!m_document);
+}
+
+void DocumentParser::detach() {
+  m_document = 0;
+}
 };

@@ -267,13 +267,13 @@ void HTMLDocument::captureEvents() {}
 
 void HTMLDocument::releaseEvents() {}
 
-DocumentParser* HTMLDocument::createParser() {
+PassRefPtr<DocumentParser> HTMLDocument::createParser() {
   bool reportErrors = false;
 #if ENABLE(INSPECTOR)
   if (Page* page = this->page())
     reportErrors = page->inspectorController()->windowVisible();
 #endif
-  return new HTMLDocumentParser(this, reportErrors);
+  return HTMLDocumentParser::create(this, reportErrors);
 }
 
 // --------------------------------------------------------------------------

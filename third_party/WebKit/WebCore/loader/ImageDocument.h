@@ -48,7 +48,7 @@ class ImageDocument : public HTMLDocument {
  private:
   ImageDocument(Frame*, const KURL&);
 
-  virtual DocumentParser* createParser();
+  virtual PassRefPtr<DocumentParser> createParser();
   virtual bool isImageDocument() const { return true; }
 
   void createDocumentStructure();

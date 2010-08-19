@@ -74,6 +74,10 @@ HTMLScriptRunner::~HTMLScriptRunner() {
     stopWatchingForLoad(m_parsingBlockingScript);
 }
 
+void HTMLScriptRunner::detach() {
+  m_document = 0;
+}
+
 static KURL documentURLForScriptExecution(Document* document) {
   if (!document || !document->frame())
     return KURL();
@@ -114,6 +118,7 @@ bool HTMLScriptRunner::isPendingScriptReady(const PendingScript& script) {
 }
 
 void HTMLScriptRunner::executeParsingBlockingScript() {
+  ASSERT(m_document);
   ASSERT(!m_scriptNestingLevel);
   ASSERT(m_document->haveStylesheetsLoaded());
   ASSERT(isPendingScriptReady(m_parsingBlockingScript));
@@ -150,6 +155,7 @@ void HTMLScriptRunner::executePendingScriptAndDispatchEvent(
 
 void HTMLScriptRunner::executeScript(Element* element,
                                      const ScriptSourceCode& sourceCode) const {
+  ASSERT(m_document);
   ScriptElement* scriptElement = toScriptElement(element);
   ASSERT(scriptElement);
   if (!scriptElement->shouldExecuteAsJavaScript())
@@ -218,6 +224,7 @@ bool HTMLScriptRunner::executeScriptsWaitingForLoad(
 }
 
 bool HTMLScriptRunner::executeScriptsWaitingForStylesheets() {
+  ASSERT(m_document);
   // Callers should check hasScriptsWaitingForStylesheets() before calling
   // to prevent parser or script re-entry during </style> parsing.
   ASSERT(hasScriptsWaitingForStylesheets());
@@ -264,6 +271,7 @@ bool HTMLScriptRunner::requestPendingScript(PendingScript& pendingScript,
 // This method is meant to match the HTML5 definition of "running a script"
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1.html#running-a-script
 void HTMLScriptRunner::runScript(Element* script, int startingLineNumber) {
+  ASSERT(m_document);
   ASSERT(!haveParsingBlockingScript());
   {
     InsertionPointRecord insertionPointRecord(m_host->inputStream());

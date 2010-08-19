@@ -633,7 +633,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   CSSStyleSheet* elementSheet();
   CSSStyleSheet* mappedElementSheet();
 
-  virtual DocumentParser* createParser();
+  virtual PassRefPtr<DocumentParser> createParser();
   DocumentParser* parser() const { return m_parser.get(); }
   ScriptableDocumentParser* scriptableDocumentParser() const;
 
@@ -1178,6 +1178,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void clearXMLVersion() { m_xmlVersion = String(); }
 
  private:
+  void detachParser();
+
   typedef void (*ArgumentsCallback)(const String& keyString,
                                     const String& valueString,
                                     Document*,
@@ -1232,7 +1234,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   Frame* m_frame;
   OwnPtr<DocLoader> m_docLoader;
-  OwnPtr<DocumentParser> m_parser;
+  RefPtr<DocumentParser> m_parser;
   bool m_wellFormed;
 
   // Document URLs.
