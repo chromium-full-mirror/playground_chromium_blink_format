@@ -213,6 +213,12 @@ TextStream& FEGaussianBlur::externalRepresentation(TextStream& ts,
   return ts;
 }
 
+float FEGaussianBlur::calculateStdDeviation(float radius) {
+  // Blur radius represents 2/3 times the kernel size, the dest pixel is half of
+  // the radius applied 3 times
+  return max((radius * 2 / 3.f - 0.5f) / gGaussianKernelFactor, 0.f);
+}
+
 }  // namespace WebCore
 
 #endif  // ENABLE(FILTERS)

@@ -377,10 +377,10 @@ class GraphicsContext : public Noncopyable {
   void createPlatformShadow(PassOwnPtr<ImageBuffer> buffer,
                             const Color& shadowColor,
                             const FloatRect& shadowRect,
-                            float kernelSize);
+                            float radius);
   static void calculateShadowBufferDimensions(IntSize& shadowBufferSize,
                                               FloatRect& shadowRect,
-                                              float& kernelSize,
+                                              float& radius,
                                               const FloatRect& sourceRect,
                                               const FloatSize& shadowSize,
                                               float shadowBlur);

@@ -47,6 +47,8 @@ class FEGaussianBlur : public FilterEffect {
   void dump();
   TextStream& externalRepresentation(TextStream&, int indent) const;
 
+  static float calculateStdDeviation(float);
+
  private:
   FEGaussianBlur(FilterEffect*, const float&, const float&);
   static void kernelPosition(int boxBlur,
