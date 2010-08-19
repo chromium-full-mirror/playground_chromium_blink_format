@@ -25,6 +25,7 @@
 
 #include "WKDictionary.h"
 
+#include "ImmutableArray.h"
 #include "ImmutableDictionary.h"
 #include "WKAPICast.h"
 
@@ -41,6 +42,11 @@ WKTypeRef WKDictionaryGetItemForKey(WKDictionaryRef dictionaryRef,
 
 size_t WKDictionaryGetSize(WKDictionaryRef dictionaryRef) {
   return toWK(dictionaryRef)->size();
+}
+
+WKArrayRef WKDictionaryCopyKeys(WKDictionaryRef dictionaryRef) {
+  RefPtr<ImmutableArray> keys = toWK(dictionaryRef)->keys();
+  return toRef(keys.release().releaseRef());
 }
 
 WKDictionaryRef WKDictionaryRetain(WKDictionaryRef dictionaryRef) {
