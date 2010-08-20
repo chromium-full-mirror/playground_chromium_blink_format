@@ -80,7 +80,12 @@ class RenderSVGResourceClipper : public RenderSVGResourceContainer {
                               const FloatRect&,
                               GraphicsContext*);
   bool pathOnlyClipping(GraphicsContext*, const FloatRect&);
-  bool createClipData(ClipperData*, const FloatRect&, const FloatRect&);
+  bool createClipData(ClipperData*,
+                      const FloatRect& objectBoundingBox,
+                      const FloatRect& repaintRect,
+                      const FloatRect& clampedAbsoluteTargetRect,
+                      const AffineTransform& absoluteTransform);
+
   void calculateClipContentRepaintRect();
 
   bool m_invalidationBlocked;
