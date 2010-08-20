@@ -108,6 +108,12 @@ ScriptObject InjectedScriptHost::createInjectedScript(const String& source,
   return ScriptObject();
 }
 
+void InjectedScriptHost::discardInjectedScript(ScriptState* scriptState) {
+  JSDOMGlobalObject* globalObject =
+      static_cast<JSDOMGlobalObject*>(scriptState->lexicalGlobalObject());
+  globalObject->setInjectedScript(0);
+}
+
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 JSValue JSInjectedScriptHost::currentCallFrame(ExecState* exec) {
   JavaScriptCallFrame* callFrame =

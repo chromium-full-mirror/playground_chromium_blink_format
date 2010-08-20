@@ -46,6 +46,7 @@
 #include "V8BindingState.h"
 #include "V8DOMWindow.h"
 #include "V8Database.h"
+#include "V8HiddenPropertyName.h"
 #include "V8JavaScriptCallFrame.h"
 #include "V8Node.h"
 #include "V8Proxy.h"
@@ -128,6 +129,22 @@ ScriptObject InjectedScriptHost::createInjectedScript(
       v8::Function::Cast(*v)->Call(windowGlobal, 4, args);
   v8::Local<v8::Object> injectedScript(v8::Object::Cast(*injectedScriptValue));
   return ScriptObject(inspectedScriptState, injectedScript);
+}
+
+void InjectedScriptHost::discardInjectedScript(
+    ScriptState* inspectedScriptState) {
+  v8::HandleScope handleScope;
+  v8::Local<v8::Context> context = inspectedScriptState->context();
+  v8::Context::Scope contextScope(context);
+
+  v8::Local<v8::Object> global = context->Global();
+  // Skip proxy object. The proxy object will survive page navigation while we
+  // need
+  // an object whose lifetime consides with that of the inspected context.
+  global = v8::Local<v8::Object>::Cast(global->GetPrototype());
+
+  v8::Handle<v8::String> key = V8HiddenPropertyName::devtoolsInjectedScript();
+  global->DeleteHiddenValue(key);
 }
 
 v8::Handle<v8::Value> V8InjectedScriptHost::nodeForIdCallback(
@@ -219,7 +236,7 @@ InjectedScript InjectedScriptHost::injectedScriptFor(
   // an object whose lifetime consides with that of the inspected context.
   global = v8::Local<v8::Object>::Cast(global->GetPrototype());
 
-  v8::Local<v8::String> key = v8::String::New("Devtools_InjectedScript");
+  v8::Handle<v8::String> key = V8HiddenPropertyName::devtoolsInjectedScript();
   v8::Local<v8::Value> val = global->GetHiddenValue(key);
   if (!val.IsEmpty() && val->IsObject())
     return InjectedScript(

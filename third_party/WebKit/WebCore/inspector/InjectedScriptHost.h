@@ -101,6 +101,7 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
   ScriptObject createInjectedScript(const String& source,
                                     ScriptState* scriptState,
                                     long id);
+  void discardInjectedScript(ScriptState*);
 
   InspectorController* m_inspectorController;
   String m_injectedScriptSource;
