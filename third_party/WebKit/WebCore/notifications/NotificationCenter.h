@@ -64,7 +64,7 @@ class NotificationCenter : public RefCounted<NotificationCenter>,
       return 0;
     }
     return Notification::create(m_scriptExecutionContext->completeURL(URI),
-                                context(), ec, presenter());
+                                context(), ec, this);
   }
 
   PassRefPtr<Notification> createNotification(const String& iconURI,
@@ -79,7 +79,7 @@ class NotificationCenter : public RefCounted<NotificationCenter>,
         iconURI.isEmpty() ? KURL()
                           : m_scriptExecutionContext->completeURL(iconURI),
         title, body);
-    return Notification::create(contents, context(), ec, presenter());
+    return Notification::create(contents, context(), ec, this);
   }
 
   ScriptExecutionContext* context() const { return m_scriptExecutionContext; }
