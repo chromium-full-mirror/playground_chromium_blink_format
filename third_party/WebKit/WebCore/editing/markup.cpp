@@ -27,6 +27,7 @@
 #include "config.h"
 #include "markup.h"
 
+#include "ApplyStyleCommand.h"
 #include "CDATASection.h"
 #include "CharacterNames.h"
 #include "Comment.h"
@@ -53,13 +54,12 @@
 #include "Logging.h"
 #include "ProcessingInstruction.h"
 #include "Range.h"
-#include "VisibleSelection.h"
 #include "TextIterator.h"
+#include "VisibleSelection.h"
 #include "XMLNSNames.h"
 #include "htmlediting.h"
 #include "visible_units.h"
 #include <wtf/StdLibExtras.h>
-#include "ApplyStyleCommand.h"
 
 using namespace std;
 
@@ -267,12 +267,11 @@ void MarkupAccumulator::appendAttributeValue(Vector<UChar>& result,
         lastCopiedFrom = i + 1;
         break;
       case noBreakSpace:
-        if (escapeNBSP) {
-          result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
-          append(result, nbspEntity);
-          lastCopiedFrom = i + 1;
-        }
-        break;
+        if (!escapeNBSP)
+          break;
+        result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
+        append(result, nbspEntity);
+        lastCopiedFrom = i + 1;
     }
   }
 
@@ -310,11 +309,11 @@ static void appendEscapedContent(Vector<UChar>& result,
         lastCopiedFrom = i + 1;
         break;
       case noBreakSpace:
-        if (escapeNBSP) {
-          result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
-          append(result, nbspEntity);
-          lastCopiedFrom = i + 1;
-        }
+        if (!escapeNBSP)
+          break;
+        result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
+        append(result, nbspEntity);
+        lastCopiedFrom = i + 1;
         break;
     }
   }
@@ -558,26 +557,26 @@ void MarkupAccumulator::appendStartMarkup(
             parent->hasTagName(xmpTag)) {
           appendUCharRange(result, ucharRange(node, m_range));
           break;
-        } else if (parent->hasTagName(textareaTag)) {
+        }
+        if (parent->hasTagName(textareaTag)) {
           appendEscapedContent(result, ucharRange(node, m_range),
                                documentIsHTML);
           break;
         }
       }
-      if (!shouldAnnotate()) {
-        appendEscapedContent(result, ucharRange(node, m_range), documentIsHTML);
+      if (shouldAnnotate()) {
+        bool useRenderedText = !enclosingNodeWithTag(
+            Position(const_cast<Node*>(node), 0), selectTag);
+        String markup = escapeContentText(
+            useRenderedText ? renderedText(node, m_range)
+                            : stringValueForRange(node, m_range),
+            false);
+        markup = convertHTMLTextToInterchangeFormat(
+            markup, static_cast<const Text*>(node));
+        append(result, markup);
         break;
       }
-
-      bool useRenderedText = !enclosingNodeWithTag(
-          Position(const_cast<Node*>(node), 0), selectTag);
-      String markup = escapeContentText(
-          useRenderedText ? renderedText(node, m_range)
-                          : stringValueForRange(node, m_range),
-          false);
-      markup = convertHTMLTextToInterchangeFormat(
-          markup, static_cast<const Text*>(node));
-      append(result, markup);
+      appendEscapedContent(result, ucharRange(node, m_range), documentIsHTML);
       break;
     }
     case Node::COMMENT_NODE:
@@ -607,57 +606,59 @@ void MarkupAccumulator::appendStartMarkup(
     }
     case Node::ELEMENT_NODE: {
       result.append('<');
-      const Element* el = static_cast<const Element*>(node);
+      Element* element =
+          const_cast<Element*>(static_cast<const Element*>(node));
       bool convert = convertBlocksToInlines && isBlock(const_cast<Node*>(node));
-      append(result, el->nodeNamePreservingCase());
-      NamedNodeMap* attrs = el->attributes();
-      unsigned length = attrs->length();
-      if (!documentIsHTML && namespaces && shouldAddNamespaceElement(el))
-        appendNamespace(result, el->prefix(), el->namespaceURI(), *namespaces);
+      append(result, element->nodeNamePreservingCase());
+      if (!documentIsHTML && namespaces && shouldAddNamespaceElement(element))
+        appendNamespace(result, element->prefix(), element->namespaceURI(),
+                        *namespaces);
 
+      NamedNodeMap* attributes = element->attributes();
+      unsigned length = attributes->length();
       for (unsigned int i = 0; i < length; i++) {
-        Attribute* attr = attrs->attributeItem(i);
+        Attribute* attribute = attributes->attributeItem(i);
         // We'll handle the style attribute separately, below.
-        if (attr->name() == styleAttr && el->isHTMLElement() &&
+        if (attribute->name() == styleAttr && element->isHTMLElement() &&
             (shouldAnnotate() || convert))
           continue;
         result.append(' ');
 
         if (documentIsHTML)
-          append(result, attr->name().localName());
+          append(result, attribute->name().localName());
         else
-          append(result, attr->name().toString());
+          append(result, attribute->name().toString());
 
         result.append('=');
 
-        if (el->isURLAttribute(attr)) {
+        if (element->isURLAttribute(attribute)) {
           // We don't want to complete file:/// URLs because it may contain
           // sensitive information
           // about the user's system.
           if (shouldResolveURLs() && !node->document()->url().isLocalFile())
             appendQuotedURLAttributeValue(
-                result, node->document()->completeURL(attr->value()).string());
+                result,
+                node->document()->completeURL(attribute->value()).string());
           else
-            appendQuotedURLAttributeValue(result, attr->value().string());
+            appendQuotedURLAttributeValue(result, attribute->value().string());
         } else {
           result.append('\"');
-          appendAttributeValue(result, attr->value(), documentIsHTML);
+          appendAttributeValue(result, attribute->value(), documentIsHTML);
           result.append('\"');
         }
 
         if (!documentIsHTML && namespaces &&
-            shouldAddNamespaceAttribute(attr, *namespaces))
-          appendNamespace(result, attr->prefix(), attr->namespaceURI(),
-                          *namespaces);
+            shouldAddNamespaceAttribute(attribute, *namespaces))
+          appendNamespace(result, attribute->prefix(),
+                          attribute->namespaceURI(), *namespaces);
       }
 
-      if (el->isHTMLElement() && (shouldAnnotate() || convert)) {
-        Element* element = const_cast<Element*>(el);
+      if (element->isHTMLElement() && (shouldAnnotate() || convert)) {
         RefPtr<CSSMutableStyleDeclaration> style =
             static_cast<HTMLElement*>(element)->getInlineStyleDecl()->copy();
         if (shouldAnnotate()) {
           RefPtr<CSSMutableStyleDeclaration> styleFromMatchedRules =
-              styleFromMatchedRulesForElement(const_cast<Element*>(el));
+              styleFromMatchedRulesForElement(const_cast<Element*>(element));
           // Styles from the inline style declaration, held in the variable
           // "style", take precedence
           // over those from matched rules.
@@ -691,7 +692,6 @@ void MarkupAccumulator::appendStartMarkup(
                         CSSProperty(property.id(), computedPropertyValue));
             }
           }
-
           style->merge(fromComputedStyle.get());
         }
         if (convert)
@@ -709,8 +709,8 @@ void MarkupAccumulator::appendStartMarkup(
         }
       }
 
-      if (shouldSelfClose(el)) {
-        if (el->isHTMLElement())
+      if (shouldSelfClose(element)) {
+        if (element->isHTMLElement())
           result.append(' ');  // XHTML 1.0 <-> HTML compatibility.
         result.append('/');
       }
@@ -781,13 +781,14 @@ static void completeURLs(Node* node, const String& baseURL) {
   for (Node* n = node; n != end; n = n->traverseNextNode()) {
     if (n->isElementNode()) {
       Element* e = static_cast<Element*>(n);
-      NamedNodeMap* attrs = e->attributes();
-      unsigned length = attrs->length();
+      NamedNodeMap* attributes = e->attributes();
+      unsigned length = attributes->length();
       for (unsigned i = 0; i < length; i++) {
-        Attribute* attr = attrs->attributeItem(i);
-        if (e->isURLAttribute(attr))
+        Attribute* attribute = attributes->attributeItem(i);
+        if (e->isURLAttribute(attribute))
           changes.append(AttributeChange(
-              e, attr->name(), KURL(parsedBaseURL, attr->value()).string()));
+              e, attribute->name(),
+              KURL(parsedBaseURL, attribute->value()).string()));
       }
     }
   }
@@ -991,11 +992,11 @@ String createMarkup(const Range* range,
 
   ExceptionCode ec = 0;
   bool collapsed = updatedRange->collapsed(ec);
-  ASSERT(ec == 0);
+  ASSERT(!ec);
   if (collapsed)
     return "";
   Node* commonAncestor = updatedRange->commonAncestorContainer(ec);
-  ASSERT(ec == 0);
+  ASSERT(!ec);
   if (!commonAncestor)
     return "";
 
@@ -1285,7 +1286,7 @@ static void fillContainerFromString(ContainerNode* paragraph,
   ExceptionCode ec = 0;
   if (string.isEmpty()) {
     paragraph->appendChild(createBlockPlaceholderElement(document), ec);
-    ASSERT(ec == 0);
+    ASSERT(!ec);
     return;
   }
 
@@ -1303,13 +1304,13 @@ static void fillContainerFromString(ContainerNode* paragraph,
     if (!s.isEmpty()) {
       if (!tabText.isEmpty()) {
         paragraph->appendChild(createTabSpanElement(document, tabText), ec);
-        ASSERT(ec == 0);
+        ASSERT(!ec);
         tabText = "";
       }
       RefPtr<Node> textNode = document->createTextNode(
           stringWithRebalancedWhitespace(s, first, i + 1 == numEntries));
       paragraph->appendChild(textNode.release(), ec);
-      ASSERT(ec == 0);
+      ASSERT(!ec);
     }
 
     // there is a tab after every entry, except the last entry
@@ -1318,7 +1319,7 @@ static void fillContainerFromString(ContainerNode* paragraph,
       tabText.append('\t');
     else if (!tabText.isEmpty()) {
       paragraph->appendChild(createTabSpanElement(document, tabText), ec);
-      ASSERT(ec == 0);
+      ASSERT(!ec);
     }
 
     first = false;
@@ -1365,12 +1366,12 @@ PassRefPtr<DocumentFragment> createFragmentFromText(Range* context,
   RenderObject* renderer = styleNode->renderer();
   if (renderer && renderer->style()->preserveNewline()) {
     fragment->appendChild(document->createTextNode(string), ec);
-    ASSERT(ec == 0);
+    ASSERT(!ec);
     if (string.endsWith("\n")) {
       RefPtr<Element> element = createBreakElement(document);
       element->setAttribute(classAttr, AppleInterchangeNewline);
       fragment->appendChild(element.release(), ec);
-      ASSERT(ec == 0);
+      ASSERT(!ec);
     }
     return fragment.release();
   }
@@ -1409,7 +1410,7 @@ PassRefPtr<DocumentFragment> createFragmentFromText(Range* context,
       fillContainerFromString(element.get(), s);
     }
     fragment->appendChild(element.release(), ec);
-    ASSERT(ec == 0);
+    ASSERT(!ec);
   }
   return fragment.release();
 }
@@ -1432,9 +1433,9 @@ PassRefPtr<DocumentFragment> createFragmentFromNodes(
   for (size_t i = 0; i < size; ++i) {
     RefPtr<Element> element = createDefaultParagraphElement(document);
     element->appendChild(nodes[i], ec);
-    ASSERT(ec == 0);
+    ASSERT(!ec);
     fragment->appendChild(element.release(), ec);
-    ASSERT(ec == 0);
+    ASSERT(!ec);
   }
 
   if (document->frame())
