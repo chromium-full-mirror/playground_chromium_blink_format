@@ -38,10 +38,8 @@
 #include "NotImplemented.h"
 #include "Pattern.h"
 #include "PlatformString.h"
-
 #include <cairo.h>
 #include <wtf/Vector.h>
-#include <math.h>
 
 using namespace std;
 
@@ -93,7 +91,7 @@ GraphicsContext* ImageBuffer::context() const {
 }
 
 bool ImageBuffer::drawsUsingCopy() const {
-  return true;
+  return false;
 }
 
 PassRefPtr<Image> ImageBuffer::copyImage() const {
@@ -103,6 +101,8 @@ PassRefPtr<Image> ImageBuffer::copyImage() const {
 
 void ImageBuffer::clip(GraphicsContext*, const FloatRect&) const {
   notImplemented();
+  // See https://bugs.webkit.org/show_bug.cgi?id=23526 for why this is
+  // unimplemented.
 }
 
 void ImageBuffer::draw(GraphicsContext* context,
@@ -111,8 +111,10 @@ void ImageBuffer::draw(GraphicsContext* context,
                        const FloatRect& srcRect,
                        CompositeOperator op,
                        bool useLowQualityScale) {
-  RefPtr<Image> imageCopy = copyImage();
-  context->drawImage(imageCopy.get(), styleColorSpace, destRect, srcRect, op,
+  // BitmapImage will release the passed in surface on destruction
+  RefPtr<Image> image =
+      BitmapImage::create(cairo_surface_reference(m_data.m_surface));
+  context->drawImage(image.get(), styleColorSpace, destRect, srcRect, op,
                      useLowQualityScale);
 }
 
@@ -123,9 +125,11 @@ void ImageBuffer::drawPattern(GraphicsContext* context,
                               ColorSpace styleColorSpace,
                               CompositeOperator op,
                               const FloatRect& destRect) {
-  RefPtr<Image> imageCopy = copyImage();
-  imageCopy->drawPattern(context, srcRect, patternTransform, phase,
-                         styleColorSpace, op, destRect);
+  // BitmapImage will release the passed in surface on destruction
+  RefPtr<Image> image =
+      BitmapImage::create(cairo_surface_reference(m_data.m_surface));
+  image->drawPattern(context, srcRect, patternTransform, phase, styleColorSpace,
+                     op, destRect);
 }
 
 void ImageBuffer::platformTransformColorSpace(const Vector<int>& lookUpTable) {
