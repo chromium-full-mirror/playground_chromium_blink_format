@@ -82,12 +82,18 @@ class RenderView : public RenderBlock {
                     int endPos,
                     SelectionRepaintMode = RepaintNewXOROld);
   void clearSelection();
-  virtual RenderObject* selectionStart() const { return m_selectionStart; }
-  virtual RenderObject* selectionEnd() const { return m_selectionEnd; }
+  RenderObject* selectionStart() const { return m_selectionStart; }
+  RenderObject* selectionEnd() const { return m_selectionEnd; }
+  IntRect selectionBounds(bool clipToVisibleContent = true) const;
+  void selectionStartEnd(int& startPos, int& endPos) const;
 
   bool printing() const;
   void setPrintImages(bool enable) { m_printImages = enable; }
   bool printImages() const { return m_printImages; }
+
+  IntRect printRect() const { return m_printRect; }
+  void setPrintRect(const IntRect& r) { m_printRect = r; }
+
   void setTruncatedAt(int y) {
     m_truncatedAt = y;
     m_bestTruncatedAt = m_truncatorWidth = 0;
@@ -106,8 +112,6 @@ class RenderView : public RenderBlock {
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
   virtual void absoluteQuads(Vector<FloatQuad>&);
 
-  IntRect selectionBounds(bool clipToVisibleContent = true) const;
-
 #if USE(ACCELERATED_COMPOSITING)
   void setMaximalOutlineSize(int o);
 #else
@@ -116,11 +120,6 @@ class RenderView : public RenderBlock {
   int maximalOutlineSize() const { return m_maximalOutlineSize; }
 
   virtual IntRect viewRect() const;
-
-  void selectionStartEnd(int& startPos, int& endPos) const;
-
-  IntRect printRect() const { return m_printRect; }
-  void setPrintRect(const IntRect& r) { m_printRect = r; }
 
   void updateWidgetPositions();
   void addWidget(RenderWidget*);
