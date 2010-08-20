@@ -27,6 +27,7 @@
 #include "WebPageNamespace.h"
 #include "qwkpage.h"
 #include "qwkpage_p.h"
+#include <QCursor>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QPainter>
@@ -68,6 +69,8 @@ QGraphicsWKView::QGraphicsWKView(WKPageNamespaceRef pageNamespaceRef,
           SIGNAL(initialLayoutCompleted()));
   connect(d->page, SIGNAL(urlChanged(const QUrl&)), this,
           SIGNAL(urlChanged(const QUrl&)));
+  connect(d->page, SIGNAL(cursorChanged(const QCursor&)), this,
+          SLOT(updateCursor(const QCursor&)));
 }
 
 QGraphicsWKView::~QGraphicsWKView() {
@@ -128,6 +131,10 @@ void QGraphicsWKView::reload() {
 
 void QGraphicsWKView::stop() {
   page()->triggerAction(QWKPage::Stop);
+}
+
+void QGraphicsWKView::updateCursor(const QCursor& cursor) {
+  setCursor(cursor);
 }
 
 /*! \reimp
