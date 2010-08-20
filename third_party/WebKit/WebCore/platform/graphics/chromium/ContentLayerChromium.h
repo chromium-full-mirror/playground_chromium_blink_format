@@ -28,8 +28,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TransformLayerChromium_h
-#define TransformLayerChromium_h
+#ifndef ContentLayerChromium_h
+#define ContentLayerChromium_h
 
 #if USE(ACCELERATED_COMPOSITING)
 
@@ -37,16 +37,54 @@
 
 namespace WebCore {
 
-// A Layer that doesn't draw any content but simply exists to group and
-// transform its descendants.
-class TransformLayerChromium : public LayerChromium {
- public:
-  static PassRefPtr<TransformLayerChromium> create(
-      GraphicsLayerChromium* owner = 0);
-  virtual bool drawsContent() { return false; }
+// A Layer that requires a GraphicsContext to render its contents.
+class ContentLayerChromium : public LayerChromium {
+  friend class LayerRendererChromium;
 
- private:
-  TransformLayerChromium(GraphicsLayerChromium* owner);
+ public:
+  static PassRefPtr<ContentLayerChromium> create(
+      GraphicsLayerChromium* owner = 0);
+
+  ~ContentLayerChromium();
+
+  virtual void updateContents();
+  virtual void draw();
+  virtual bool drawsContent() { return m_owner && m_owner->drawsContent(); }
+
+  // Stores values that are shared between instances of this class that are
+  // associated with the same LayerRendererChromium (and hence the same GL
+  // context).
+  class SharedValues {
+   public:
+    SharedValues();
+    ~SharedValues();
+
+    unsigned contentShaderProgram() const { return m_contentShaderProgram; }
+    int shaderSamplerLocation() const { return m_shaderSamplerLocation; }
+    int shaderMatrixLocation() const { return m_shaderMatrixLocation; }
+    int shaderAlphaLocation() const { return m_shaderAlphaLocation; }
+    int initialized() const { return m_initialized; }
+
+   private:
+    unsigned m_contentShaderProgram;
+    int m_shaderSamplerLocation;
+    int m_shaderMatrixLocation;
+    int m_shaderAlphaLocation;
+    int m_initialized;
+  };
+
+ protected:
+  ContentLayerChromium(GraphicsLayerChromium* owner);
+
+  void updateTextureRect(void* pixels,
+                         const IntSize& bitmapSize,
+                         const IntSize& requiredTextureSize,
+                         const IntRect& updateRect,
+                         unsigned textureId);
+
+  unsigned m_contentsTexture;
+  IntSize m_allocatedTextureSize;
+  bool m_skipsDraw;
 };
 }
 #endif  // USE(ACCELERATED_COMPOSITING)

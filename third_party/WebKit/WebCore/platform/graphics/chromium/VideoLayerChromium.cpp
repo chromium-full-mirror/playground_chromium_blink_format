@@ -54,8 +54,7 @@ PassRefPtr<VideoLayerChromium> VideoLayerChromium::create(
 }
 
 VideoLayerChromium::VideoLayerChromium(GraphicsLayerChromium* owner)
-    : LayerChromium(owner),
-      m_allocatedTextureId(0)
+    : ContentLayerChromium(owner)
 #if PLATFORM(SKIA)
       ,
       m_canvas(0),
@@ -65,7 +64,7 @@ VideoLayerChromium::VideoLayerChromium(GraphicsLayerChromium* owner)
       m_graphicsContext(0) {
 }
 
-void VideoLayerChromium::updateTextureContents(unsigned textureId) {
+void VideoLayerChromium::updateContents() {
   RenderLayerBacking* backing =
       static_cast<RenderLayerBacking*>(m_owner->client());
   if (!backing || backing->paintingGoesToWindow())
@@ -112,9 +111,20 @@ void VideoLayerChromium::updateTextureContents(unsigned textureId) {
   m_canvas->translate(static_cast<SkScalar>(-dirtyRect.x()),
                       static_cast<SkScalar>(-dirtyRect.y()));
 
+  // FIXME: Remove this test when tiled layers are implemented.
+  m_skipsDraw = false;
+  if (!layerRenderer()->checkTextureSize(requiredTextureSize)) {
+    m_skipsDraw = true;
+    return;
+  }
+
+  unsigned textureId = m_contentsTexture;
+  if (!textureId)
+    textureId = layerRenderer()->createLayerTexture();
+
   // If the texture id or size changed since last time, then we need to tell GL
   // to re-allocate a texture.
-  if (m_allocatedTextureId != textureId ||
+  if (m_contentsTexture != textureId ||
       requiredTextureSize != m_allocatedTextureSize)
     createTextureRect(requiredTextureSize, dirtyRect, textureId);
   else
@@ -157,7 +167,7 @@ void VideoLayerChromium::createTextureRect(const IntSize& requiredTextureSize,
                requiredTextureSize.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
                pixels);
 
-  m_allocatedTextureId = textureId;
+  m_contentsTexture = textureId;
   m_allocatedTextureSize = requiredTextureSize;
 
   updateCompleted();

@@ -49,6 +49,7 @@
 
 #include "GraphicsLayerChromium.h"
 
+#include "ContentLayerChromium.h"
 #include "FloatConversion.h"
 #include "FloatRect.h"
 #include "Image.h"
@@ -56,7 +57,6 @@
 #include "LayerChromium.h"
 #include "PlatformString.h"
 #include "SystemTime.h"
-#include "TransformLayerChromium.h"
 
 #include <wtf/CurrentTime.h>
 #include <wtf/StringExtras.h>
@@ -95,7 +95,7 @@ GraphicsLayerChromium::GraphicsLayerChromium(GraphicsLayerClient* client)
     : GraphicsLayer(client),
       m_contentsLayerPurpose(NoContentsLayer),
       m_contentsLayerHasBackgroundColor(false) {
-  m_layer = LayerChromium::create(this);
+  m_layer = ContentLayerChromium::create(this);
 
   updateDebugIndicators();
 }
@@ -512,7 +512,7 @@ void GraphicsLayerChromium::updateBackfaceVisibility() {
 void GraphicsLayerChromium::updateLayerPreserves3D() {
   if (m_preserves3D && !m_transformLayer) {
     // Create the transform layer.
-    m_transformLayer = TransformLayerChromium::create(this);
+    m_transformLayer = LayerChromium::create(this);
 
     // Copy the position from this layer.
     updateLayerPosition();
