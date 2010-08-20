@@ -74,6 +74,7 @@ class ScriptDebugServer : public Noncopyable {
   void setPauseOnExceptionsState(PauseOnExceptionsState pauseOnExceptionsState);
 
   void pause();
+  void breakProgram();
   void continueProgram();
   void stepIntoStatement();
   void stepOverStatement();
@@ -118,6 +119,9 @@ class ScriptDebugServer : public Noncopyable {
   ScriptDebugServer();
   ~ScriptDebugServer() {}
 
+  static v8::Handle<v8::Value> breakProgramCallback(const v8::Arguments& args);
+  void breakProgram(v8::Handle<v8::Object> executionState);
+
   static void v8DebugEventCallback(const v8::Debug::EventDetails& eventDetails);
   void handleV8DebugEvent(const v8::Debug::EventDetails& eventDetails);
 
@@ -136,6 +140,7 @@ class ScriptDebugServer : public Noncopyable {
   OwnHandle<v8::Object> m_executionState;
   OwnPtr<ClientMessageLoop> m_clientMessageLoop;
   Page* m_pausedPage;
+  v8::Local<v8::Context> m_pausedPageContext;
   bool m_enabled;
 };
 
