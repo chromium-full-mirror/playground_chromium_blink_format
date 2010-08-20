@@ -36,6 +36,7 @@
 #include "FrameView.h"
 #include "HTMLCanvasElement.h"
 #include "HTMLImageElement.h"
+#include "HTMLVideoElement.h"
 #include "ImageBuffer.h"
 #include "ImageData.h"
 #include "NotImplemented.h"
@@ -94,6 +95,7 @@ WebGLRenderingContext::WebGLRenderingContext(
       m_needsUpdate(true),
       m_markedCanvasDirty(false),
       m_activeTextureUnit(0),
+      m_videoCache(4),
       m_packAlignment(4),
       m_unpackAlignment(4),
       m_unpackFlipY(false),
@@ -2336,6 +2338,24 @@ void WebGLRenderingContext::texImage2D(unsigned target,
                  ec);
 }
 
+PassRefPtr<Image> WebGLRenderingContext::videoFrameToImage(
+    HTMLVideoElement* video) {
+  if (!video || !video->videoWidth() || !video->videoHeight()) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+    return 0;
+  }
+  IntSize size(video->videoWidth(), video->videoHeight());
+  ImageBuffer* buf = m_videoCache.imageBuffer(size);
+  if (!buf) {
+    m_context->synthesizeGLError(GraphicsContext3D::OUT_OF_MEMORY);
+    return 0;
+  }
+  IntRect destRect(0, 0, size.width(), size.height());
+  // FIXME: Turn this into a GPU-GPU texture copy instead of CPU readback.
+  video->paintCurrentFrameInContext(buf->context(), destRect);
+  return buf->copyImage();
+}
+
 void WebGLRenderingContext::texImage2D(unsigned target,
                                        unsigned level,
                                        unsigned internalformat,
@@ -2343,16 +2363,12 @@ void WebGLRenderingContext::texImage2D(unsigned target,
                                        unsigned type,
                                        HTMLVideoElement* video,
                                        ExceptionCode& ec) {
-  // FIXME: Need to implement this call
-  UNUSED_PARAM(target);
-  UNUSED_PARAM(level);
-  UNUSED_PARAM(internalformat);
-  UNUSED_PARAM(format);
-  UNUSED_PARAM(type);
-  UNUSED_PARAM(video);
-
   ec = 0;
-  cleanupAfterGraphicsCall(false);
+  RefPtr<Image> image = videoFrameToImage(video);
+  if (!video)
+    return;
+  texImage2DImpl(target, level, internalformat, format, type, image.get(),
+                 m_unpackFlipY, m_unpackPremultiplyAlpha, ec);
 }
 
 void WebGLRenderingContext::texParameter(unsigned long target,
@@ -2546,16 +2562,12 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
                                           unsigned type,
                                           HTMLVideoElement* video,
                                           ExceptionCode& ec) {
-  // FIXME: Need to implement this call
-  UNUSED_PARAM(target);
-  UNUSED_PARAM(level);
-  UNUSED_PARAM(xoffset);
-  UNUSED_PARAM(yoffset);
-  UNUSED_PARAM(format);
-  UNUSED_PARAM(type);
-  UNUSED_PARAM(video);
   ec = 0;
-  cleanupAfterGraphicsCall(false);
+  RefPtr<Image> image = videoFrameToImage(video);
+  if (!video)
+    return;
+  texSubImage2DImpl(target, level, xoffset, yoffset, format, type, image.get(),
+                    m_unpackFlipY, m_unpackPremultiplyAlpha, ec);
 }
 
 void WebGLRenderingContext::uniform1f(const WebGLUniformLocation* location,
@@ -3905,6 +3917,38 @@ void WebGLRenderingContext::restoreStatesAfterVertexAttrib0Simulation() {
   }
   m_context->bindBuffer(GraphicsContext3D::ARRAY_BUFFER,
                         objectOrZero(m_boundArrayBuffer.get()));
+}
+
+WebGLRenderingContext::LRUImageBufferCache::LRUImageBufferCache(int capacity)
+    : m_buffers(new OwnPtr<ImageBuffer>[capacity]), m_capacity(capacity) {}
+
+ImageBuffer* WebGLRenderingContext::LRUImageBufferCache::imageBuffer(
+    const IntSize& size) {
+  int i;
+  for (i = 0; i < m_capacity; ++i) {
+    ImageBuffer* buf = m_buffers[i].get();
+    if (!buf)
+      break;
+    if (buf->size() != size)
+      continue;
+    bubbleToFront(i);
+    return buf;
+  }
+
+  OwnPtr<ImageBuffer> temp = ImageBuffer::create(size);
+  if (!temp)
+    return 0;
+  i = std::min(m_capacity - 1, i);
+  m_buffers[i] = temp.release();
+
+  ImageBuffer* buf = m_buffers[i].get();
+  bubbleToFront(i);
+  return buf;
+}
+
+void WebGLRenderingContext::LRUImageBufferCache::bubbleToFront(int idx) {
+  for (int i = idx; i > 0; --i)
+    m_buffers[i].swap(m_buffers[i - 1]);
 }
 
 }  // namespace WebCore
