@@ -422,13 +422,13 @@ void RedirectScheduler::scheduleHistoryNavigation(int steps) {
   }
 
 #if !ENABLE(HISTORY_ALWAYS_ASYNC)
-  // If the specified entry and the current entry have the same document, this
-  // is either a state object traversal or a fragment
-  // traversal (or both) and should be performed synchronously.
+  // If the specified entry and the current entry have the same document (or
+  // documents, in there are frames), this is either a
+  // state object traversal or a fragment traversal (or both) and should be
+  // performed synchronously.
   HistoryItem* currentEntry = m_frame->loader()->history()->currentItem();
   if (currentEntry != specifiedEntry &&
-      currentEntry->documentSequenceNumber() ==
-          specifiedEntry->documentSequenceNumber()) {
+      currentEntry->hasSameDocuments(specifiedEntry)) {
     m_frame->loader()->history()->goToItem(specifiedEntry,
                                            FrameLoadTypeIndexedBackForward);
     return;
