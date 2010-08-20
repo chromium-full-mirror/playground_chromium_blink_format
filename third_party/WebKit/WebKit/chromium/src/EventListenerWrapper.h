@@ -42,7 +42,6 @@ using namespace WebCore;
 namespace WebKit {
 
 class WebDOMEventListener;
-class WebEventListener;
 
 // FIXME: Remove the DeprecatedEventListenerWrapper class below once Chromium
 // switched to using WebDOMEvent.
@@ -58,20 +57,6 @@ class EventListenerWrapper : public EventListener {
 
  private:
   WebDOMEventListener* m_webDOMEventListener;
-};
-
-class DeprecatedEventListenerWrapper : public EventListener {
- public:
-  DeprecatedEventListenerWrapper(WebEventListener*);
-  ~DeprecatedEventListenerWrapper();
-
-  virtual bool operator==(const EventListener&);
-  virtual void handleEvent(ScriptExecutionContext*, Event*);
-
-  void webEventListenerDeleted();
-
- private:
-  WebEventListener* m_webEventListener;
 };
 
 }  // namespace WebKit
