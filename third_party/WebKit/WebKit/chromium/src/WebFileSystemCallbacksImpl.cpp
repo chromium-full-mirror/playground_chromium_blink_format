@@ -34,7 +34,7 @@
 
 #include "ExceptionCode.h"
 #include "FileSystemCallbacks.h"
-#include "WebFileEntry.h"
+#include "WebFileSystemEntry.h"
 #include "WebFileInfo.h"
 #include "WebString.h"
 #include <wtf/Vector.h>
@@ -62,7 +62,7 @@ void WebFileSystemCallbacksImpl::didReadMetadata(const WebFileInfo& info) {
 }
 
 void WebFileSystemCallbacksImpl::didReadDirectory(
-    const WebVector<WebFileEntry>& entries,
+    const WebVector<WebFileSystemEntry>& entries,
     bool hasMore) {
   ASSERT(m_callbacks);
   for (size_t i = 0; i < entries.size(); ++i)
