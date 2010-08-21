@@ -43,7 +43,7 @@ class Q_AUTOTEST_EXPORT QWebHistoryItemPrivate : public QSharedData {
       item->deref();
   }
 
-  static WebCore::HistoryItem* core(QWebHistoryItem* q);
+  static WebCore::HistoryItem* core(const QWebHistoryItem* q);
 
   WebCore::HistoryItem* item;
 };

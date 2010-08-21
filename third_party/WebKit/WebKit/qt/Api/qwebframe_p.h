@@ -83,8 +83,8 @@ class QWebFramePrivate {
   WebCore::Scrollbar* horizontalScrollBar() const;
   WebCore::Scrollbar* verticalScrollBar() const;
 
-  static WebCore::Frame* core(QWebFrame*);
-  static QWebFrame* kit(WebCore::Frame*);
+  static WebCore::Frame* core(const QWebFrame*);
+  static QWebFrame* kit(const WebCore::Frame*);
 
   void renderRelativeCoords(WebCore::GraphicsContext*,
                             QWebFrame::RenderLayer,

@@ -543,6 +543,6 @@ QWebPagePrivate* QWebHistoryPrivate::page() {
       ->handle();
 }
 
-WebCore::HistoryItem* QWebHistoryItemPrivate::core(QWebHistoryItem* q) {
+WebCore::HistoryItem* QWebHistoryItemPrivate::core(const QWebHistoryItem* q) {
   return q->d->item;
 }
