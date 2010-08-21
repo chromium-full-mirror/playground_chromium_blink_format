@@ -58,8 +58,13 @@ class ContainerNode : public Node {
                            ExceptionCode&,
                            bool shouldLazyAttach = false);
 
+  // These methods are only used during parsing.
+  // They don't send DOM mutation events or handle reparenting.
+  // However, arbitrary code may be run by beforeload handlers.
   virtual ContainerNode* legacyParserAddChild(PassRefPtr<Node>);
   virtual void parserAddChild(PassRefPtr<Node>);
+  virtual void parserRemoveChild(Node*);
+  virtual void parserInsertBefore(PassRefPtr<Node> newChild, Node* refChild);
 
   bool hasChildNodes() const { return m_firstChild; }
   virtual void attach();
@@ -114,6 +119,8 @@ class ContainerNode : public Node {
  private:
   // FIXME: This should take a PassRefPtr.
   void addChildCommon(Node*);
+  void removeBetween(Node* previousChild, Node* nextChild, Node* oldChild);
+  void insertBeforeCommon(Node* nextChild, Node* oldChild);
 
   static void dispatchPostAttachCallbacks();
 

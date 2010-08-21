@@ -1623,9 +1623,10 @@ void HTMLTreeBuilder::reparentChildren(Element* oldParent, Element* newParent) {
   Node* child = oldParent->firstChild();
   while (child) {
     Node* nextChild = child->nextSibling();
-    ExceptionCode ec;
-    newParent->appendChild(child, ec);
-    ASSERT(!ec);
+    oldParent->parserRemoveChild(child);
+    newParent->parserAddChild(child);
+    if (newParent->attached() && !child->attached())
+      child->attach();
     child = nextChild;
   }
 }
@@ -1706,25 +1707,29 @@ void HTMLTreeBuilder::callTheAdoptionAgency(AtomicHTMLToken& token) {
       if (lastNode == furthestBlock)
         bookmark.moveToAfter(nodeEntry);
       // 6.6
-      // Use appendChild instead of parserAddChild to handle possible
-      // reparenting.
-      ExceptionCode ec;
-      node->element()->appendChild(lastNode->element(), ec, true);
-      ASSERT(!ec);
+      if (Element* parent = lastNode->element()->parentElement())
+        parent->parserRemoveChild(lastNode->element());
+      node->element()->parserAddChild(lastNode->element());
+      if (lastNode->element()->parentElement()->attached() &&
+          !lastNode->element()->attached())
+        lastNode->element()->lazyAttach();
       // 6.7
       lastNode = node;
     }
     // 7
     const AtomicString& commonAncestorTag = commonAncestor->localName();
+    if (Element* parent = lastNode->element()->parentElement())
+      parent->parserRemoveChild(lastNode->element());
     // FIXME: If this moves to HTMLConstructionSite, this check should use
     // causesFosterParenting(tagName) instead.
     if (commonAncestorTag == tableTag || commonAncestorTag == trTag ||
         isTableBodyContextTag(commonAncestorTag))
       m_tree.fosterParent(lastNode->element());
     else {
-      ExceptionCode ec;
-      commonAncestor->appendChild(lastNode->element(), ec, true);
-      ASSERT(!ec);
+      commonAncestor->parserAddChild(lastNode->element());
+      if (lastNode->element()->parentElement()->attached() &&
+          !lastNode->element()->attached())
+        lastNode->element()->lazyAttach();
     }
     // 8
     RefPtr<Element> newElement =
