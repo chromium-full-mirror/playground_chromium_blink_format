@@ -35,6 +35,7 @@
 #include "WebFileInfo.h"
 #include "WebNonCopyable.h"
 #include "WebString.h"
+#include "WebURL.h"
 
 #if WEBKIT_IMPLEMENTATION
 namespace WebCore {
@@ -53,12 +54,13 @@ class WebHTTPBodyPrivate;
 class WebHTTPBody {
  public:
   struct Element {
-    enum { TypeData, TypeFile } type;
+    enum { TypeData, TypeFile, TypeBlob } type;
     WebData data;
     WebString filePath;
     long long fileStart;
     long long fileLength;  // -1 means to the end of the file.
     WebFileInfo fileInfo;
+    WebURL blobURL;
   };
 
   ~WebHTTPBody() { reset(); }
@@ -91,6 +93,7 @@ class WebHTTPBody {
                                   long long fileStart,
                                   long long fileLength,
                                   const WebFileInfo&);
+  WEBKIT_API void appendBlob(const WebURL&);
 
   // Identifies a particular form submission instance.  A value of 0 is
   // used to indicate an unspecified identifier.
