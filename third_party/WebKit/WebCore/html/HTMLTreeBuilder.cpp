@@ -116,7 +116,10 @@ bool isTableBodyContextTag(const AtomicString& tagName) {
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html#special
-bool isSpecialTag(const AtomicString& tagName) {
+bool isSpecialNode(Node* node) {
+  if (node->namespaceURI() != xhtmlNamespaceURI)
+    return false;
+  const AtomicString& tagName = node->localName();
   return tagName == addressTag || tagName == articleTag ||
          tagName == asideTag || tagName == baseTag || tagName == basefontTag ||
          tagName == bgsoundTag || tagName == blockquoteTag ||
@@ -166,21 +169,6 @@ bool isNonAnchorFormattingTag(const AtomicString& tagName) {
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html#formatting
 bool isFormattingTag(const AtomicString& tagName) {
   return tagName == aTag || isNonAnchorFormattingTag(tagName);
-}
-
-// http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html#phrasing
-bool isPhrasingTag(const AtomicString& tagName) {
-  return !isSpecialTag(tagName) && !isScopingTag(tagName) &&
-         !isFormattingTag(tagName);
-}
-
-bool isNotFormattingAndNotPhrasing(const Element* element) {
-  // The spec often says "node is not in the formatting category, and is not
-  // in the phrasing category". !phrasing && !formatting == scoping || special
-  // scoping || special is easier to compute.
-  // FIXME: localName() is wrong for non-html content.
-  const AtomicString& tagName = element->localName();
-  return isScopingTag(tagName) || isSpecialTag(tagName);
 }
 
 HTMLFormElement* closestFormAncestor(Element* element) {
@@ -681,7 +669,7 @@ void HTMLTreeBuilder::processCloseWhenNestedTag(AtomicHTMLToken& token) {
       processFakeEndTag(node->tagQName());
       break;
     }
-    if (isNotFormattingAndNotPhrasing(node) && !node->hasTagName(addressTag) &&
+    if (isSpecialNode(node) && !node->hasTagName(addressTag) &&
         !node->hasTagName(divTag) && !node->hasTagName(pTag))
       break;
     nodeRecord = nodeRecord->next();
@@ -1594,7 +1582,7 @@ void HTMLTreeBuilder::processAnyOtherEndTagForInBody(AtomicHTMLToken& token) {
       m_tree.openElements()->popUntilPopped(node);
       return;
     }
-    if (isNotFormattingAndNotPhrasing(node)) {
+    if (isSpecialNode(node)) {
       parseError(token);
       return;
     }
@@ -1610,7 +1598,7 @@ HTMLTreeBuilder::furthestBlockForFormattingElement(Element* formattingElement) {
   for (; record; record = record->next()) {
     if (record->element() == formattingElement)
       return furthestBlock;
-    if (isNotFormattingAndNotPhrasing(record->element()))
+    if (isSpecialNode(record->element()))
       furthestBlock = record;
   }
   ASSERT_NOT_REACHED();
@@ -2354,30 +2342,20 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
         // ElementRecord*
         HTMLElementStack::ElementRecord* nodeRecord =
             m_tree.openElements()->topRecord();
-        if (!nodeRecord->element()->hasLocalName(token.name())) {
+        if (!nodeRecord->element()->hasLocalName(token.name()))
           parseError(token);
-          // FIXME: This return is not in the spec but it needed for now
-          // to prevent walking off the bottom of the stack.
-          // http://www.w3.org/Bugs/Public/show_bug.cgi?id=10118
-          if (!m_tree.openElements()->contains(token.name()))
-            return;
-        }
         while (1) {
           if (nodeRecord->element()->hasLocalName(token.name())) {
             m_tree.openElements()->popUntilPopped(nodeRecord->element());
-            return;
+            break;
           }
           nodeRecord = nodeRecord->next();
-          if (nodeRecord->element()->namespaceURI() == xhtmlNamespaceURI) {
-            processUsingSecondaryInsertionModeAndAdjustInsertionMode(token);
-            // FIXME: This is a hack around a spec bug and is likely wrong.
-            // http://www.w3.org/Bugs/Public/show_bug.cgi?id=9581
-            if (nodeRecord != m_tree.openElements()->topRecord())
-              return;
-          }
+          if (nodeRecord->element()->namespaceURI() == xhtmlNamespaceURI)
+            break;
         }
-        return;
       }
+      // Any other end tag (also the last two steps of "An end tag, if the
+      // current node is not an element in the HTML namespace."
       processUsingSecondaryInsertionModeAndAdjustInsertionMode(token);
       break;
   }
