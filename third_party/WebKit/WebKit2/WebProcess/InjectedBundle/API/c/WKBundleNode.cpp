@@ -33,10 +33,12 @@
 using namespace WebCore;
 using namespace WebKit;
 
-WKStringRef WKBundleNodeCopyNodeName(WKBundleNodeRef node) {
-  return toCopiedRef(toWK(node)->nodeName());
+WKStringRef WKBundleNodeCopyNodeName(WKBundleNodeRef node)
+{
+    return toCopiedRef(toWK(node)->nodeName());
 }
 
-WKBundleNodeRef WKBundleNodeGetParent(WKBundleNodeRef node) {
-  return toRef(toWK(node)->parent());
+WKBundleNodeRef WKBundleNodeGetParent(WKBundleNodeRef node)
+{
+    return toRef(toWK(node)->parent());
 }

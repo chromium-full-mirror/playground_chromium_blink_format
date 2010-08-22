@@ -37,15 +37,11 @@
 extern "C" {
 #endif
 
-WK_EXPORT void WKBundleSetShouldTrackVisitedLinks(WKBundleRef bundle,
-                                                  bool shouldTrackVisitedLinks);
+WK_EXPORT void WKBundleSetShouldTrackVisitedLinks(WKBundleRef bundle, bool shouldTrackVisitedLinks);
 WK_EXPORT void WKBundleRemoveAllVisitedLinks(WKBundleRef bundle);
 WK_EXPORT void WKBundleActivateMacFontAscentHack(WKBundleRef bundle);
 WK_EXPORT void WKBundleGarbageCollectJavaScriptObjects(WKBundleRef bundle);
-WK_EXPORT void
-WKBundleGarbageCollectJavaScriptObjectsOnAlternateThreadForDebugging(
-    WKBundleRef bundle,
-    bool waitUntilDone);
+WK_EXPORT void WKBundleGarbageCollectJavaScriptObjectsOnAlternateThreadForDebugging(WKBundleRef bundle, bool waitUntilDone);
 WK_EXPORT size_t WKBundleGetJavaScriptObjectsCount(WKBundleRef bundle);
 
 #ifdef __cplusplus

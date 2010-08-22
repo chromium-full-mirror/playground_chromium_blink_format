@@ -34,76 +34,77 @@
 using namespace WebCore;
 using namespace WebKit;
 
-WKTypeID WKBundleFrameGetTypeID() {
-  return toRef(WebFrame::APIType);
+WKTypeID WKBundleFrameGetTypeID()
+{
+    return toRef(WebFrame::APIType);
 }
 
-bool WKBundleFrameIsMainFrame(WKBundleFrameRef frameRef) {
-  return toWK(frameRef)->isMainFrame();
+bool WKBundleFrameIsMainFrame(WKBundleFrameRef frameRef)
+{
+    return toWK(frameRef)->isMainFrame();
 }
 
-WKURLRef WKBundleFrameCopyURL(WKBundleFrameRef frameRef) {
-  return toCopiedURLRef(toWK(frameRef)->url());
+WKURLRef WKBundleFrameCopyURL(WKBundleFrameRef frameRef)
+{
+    return toCopiedURLRef(toWK(frameRef)->url());
 }
 
-WKArrayRef WKBundleFrameCopyChildFrames(WKBundleFrameRef frameRef) {
-  return toRef(toWK(frameRef)->childFrames().releaseRef());
+WKArrayRef WKBundleFrameCopyChildFrames(WKBundleFrameRef frameRef)
+{
+    return toRef(toWK(frameRef)->childFrames().releaseRef());    
 }
 
-unsigned WKBundleFrameGetNumberOfActiveAnimations(WKBundleFrameRef frameRef) {
-  return toWK(frameRef)->numberOfActiveAnimations();
+unsigned WKBundleFrameGetNumberOfActiveAnimations(WKBundleFrameRef frameRef)
+{
+    return toWK(frameRef)->numberOfActiveAnimations();
 }
 
-bool WKBundleFramePauseAnimationOnElementWithId(WKBundleFrameRef frameRef,
-                                                WKStringRef name,
-                                                WKStringRef elementID,
-                                                double time) {
-  return toWK(frameRef)->pauseAnimationOnElementWithId(
-      toWK(name)->string(), toWK(elementID)->string(), time);
+bool WKBundleFramePauseAnimationOnElementWithId(WKBundleFrameRef frameRef, WKStringRef name, WKStringRef elementID, double time)
+{
+    return toWK(frameRef)->pauseAnimationOnElementWithId(toWK(name)->string(), toWK(elementID)->string(), time);
 }
 
-JSGlobalContextRef WKBundleFrameGetJavaScriptContext(
-    WKBundleFrameRef frameRef) {
-  return toWK(frameRef)->jsContext();
+JSGlobalContextRef WKBundleFrameGetJavaScriptContext(WKBundleFrameRef frameRef)
+{
+    return toWK(frameRef)->jsContext();
 }
 
-JSGlobalContextRef WKBundleFrameGetJavaScriptContextForWorld(
-    WKBundleFrameRef frameRef,
-    WKBundleScriptWorldRef worldRef) {
-  return toWK(frameRef)->jsContextForWorld(toWK(worldRef));
+JSGlobalContextRef WKBundleFrameGetJavaScriptContextForWorld(WKBundleFrameRef frameRef, WKBundleScriptWorldRef worldRef)
+{
+    return toWK(frameRef)->jsContextForWorld(toWK(worldRef));
 }
 
-JSValueRef WKBundleFrameGetJavaScriptWrapperForNodeForWorld(
-    WKBundleFrameRef frameRef,
-    WKBundleNodeHandleRef nodeHandleRef,
-    WKBundleScriptWorldRef worldRef) {
-  return toWK(frameRef)->jsWrapperForWorld(toWK(nodeHandleRef), toWK(worldRef));
+JSValueRef WKBundleFrameGetJavaScriptWrapperForNodeForWorld(WKBundleFrameRef frameRef, WKBundleNodeHandleRef nodeHandleRef, WKBundleScriptWorldRef worldRef)
+{
+    return toWK(frameRef)->jsWrapperForWorld(toWK(nodeHandleRef), toWK(worldRef));
 }
 
-WKStringRef WKBundleFrameCopyName(WKBundleFrameRef frameRef) {
-  return toCopiedRef(toWK(frameRef)->name());
+WKStringRef WKBundleFrameCopyName(WKBundleFrameRef frameRef)
+{
+    return toCopiedRef(toWK(frameRef)->name());
 }
 
-JSValueRef WKBundleFrameGetComputedStyleIncludingVisitedInfo(
-    WKBundleFrameRef frameRef,
-    JSObjectRef element) {
-  return toWK(frameRef)->computedStyleIncludingVisitedInfo(element);
+JSValueRef WKBundleFrameGetComputedStyleIncludingVisitedInfo(WKBundleFrameRef frameRef, JSObjectRef element)
+{
+    return toWK(frameRef)->computedStyleIncludingVisitedInfo(element);
 }
 
-WKStringRef WKBundleFrameCopyCounterValue(WKBundleFrameRef frameRef,
-                                          JSObjectRef element) {
-  return toCopiedRef(toWK(frameRef)->counterValue(element));
+WKStringRef WKBundleFrameCopyCounterValue(WKBundleFrameRef frameRef, JSObjectRef element)
+{
+    return toCopiedRef(toWK(frameRef)->counterValue(element));
 }
 
-WKStringRef WKBundleFrameCopyMarkerText(WKBundleFrameRef frameRef,
-                                        JSObjectRef element) {
-  return toCopiedRef(toWK(frameRef)->markerText(element));
+WKStringRef WKBundleFrameCopyMarkerText(WKBundleFrameRef frameRef, JSObjectRef element)
+{
+    return toCopiedRef(toWK(frameRef)->markerText(element));
 }
 
-WKStringRef WKBundleFrameCopyInnerText(WKBundleFrameRef frameRef) {
-  return toCopiedRef(toWK(frameRef)->innerText());
+WKStringRef WKBundleFrameCopyInnerText(WKBundleFrameRef frameRef)
+{
+    return toCopiedRef(toWK(frameRef)->innerText());
 }
 
-unsigned WKBundleFrameGetPendingUnloadCount(WKBundleFrameRef frameRef) {
-  return toWK(frameRef)->pendingUnloadCount();
+unsigned WKBundleFrameGetPendingUnloadCount(WKBundleFrameRef frameRef)
+{
+    return toWK(frameRef)->pendingUnloadCount();
 }

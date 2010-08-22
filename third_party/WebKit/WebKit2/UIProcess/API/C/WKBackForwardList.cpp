@@ -69,12 +69,3 @@ WKArrayRef WKBackForwardListCopyForwardListWithLimit(
   return toRef(
       toWK(listRef)->forwardListAsImmutableArrayWithLimit(limit).releaseRef());
 }
-
-WKBackForwardListRef WKBackForwardListRetain(WKBackForwardListRef listRef) {
-  toWK(listRef)->ref();
-  return listRef;
-}
-
-void WKBackForwardListRelease(WKBackForwardListRef listRef) {
-  toWK(listRef)->deref();
-}

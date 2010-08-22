@@ -39,20 +39,11 @@ extern "C" {
 #endif
 
 WK_EXPORT WKStringRef WKBundleFrameCopyInnerText(WKBundleFrameRef frame);
-WK_EXPORT WKStringRef WKBundleFrameCopyCounterValue(WKBundleFrameRef frame,
-                                                    JSObjectRef element);
-WK_EXPORT WKStringRef WKBundleFrameCopyMarkerText(WKBundleFrameRef frame,
-                                                  JSObjectRef element);
-WK_EXPORT JSValueRef
-WKBundleFrameGetComputedStyleIncludingVisitedInfo(WKBundleFrameRef frame,
-                                                  JSObjectRef element);
-WK_EXPORT unsigned WKBundleFrameGetNumberOfActiveAnimations(
-    WKBundleFrameRef frame);
-WK_EXPORT bool WKBundleFramePauseAnimationOnElementWithId(
-    WKBundleFrameRef frame,
-    WKStringRef name,
-    WKStringRef elementID,
-    double time);
+WK_EXPORT WKStringRef WKBundleFrameCopyCounterValue(WKBundleFrameRef frame, JSObjectRef element);
+WK_EXPORT WKStringRef WKBundleFrameCopyMarkerText(WKBundleFrameRef frame, JSObjectRef element);
+WK_EXPORT JSValueRef WKBundleFrameGetComputedStyleIncludingVisitedInfo(WKBundleFrameRef frame, JSObjectRef element);
+WK_EXPORT unsigned WKBundleFrameGetNumberOfActiveAnimations(WKBundleFrameRef frame);
+WK_EXPORT bool WKBundleFramePauseAnimationOnElementWithId(WKBundleFrameRef frame, WKStringRef name, WKStringRef elementID, double time);
 WK_EXPORT unsigned WKBundleFrameGetPendingUnloadCount(WKBundleFrameRef frame);
 
 #ifdef __cplusplus

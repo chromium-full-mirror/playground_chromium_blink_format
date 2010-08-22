@@ -38,7 +38,7 @@ WKTypeID WKPreferencesGetTypeID() {
 
 WKPreferencesRef WKPreferencesCreate() {
   RefPtr<WebPreferences> preferences = WebPreferences::create();
-  return toRef(preferences.release().releaseRef());
+  return toRef(preferences.release().leakRef());
 }
 
 WKPreferencesRef WKPreferencesCreateCopy(WKPreferencesRef preferencesRef) {
@@ -84,13 +84,4 @@ void WKPreferencesSetLocalStorageEnabled(WKPreferencesRef preferencesRef,
 
 bool WKPreferencesGetLocalStorageEnabled(WKPreferencesRef preferencesRef) {
   return toWK(preferencesRef)->localStorageEnabled();
-}
-
-WKPreferencesRef WKPreferencesRetain(WKPreferencesRef preferencesRef) {
-  toWK(preferencesRef)->ref();
-  return preferencesRef;
-}
-
-void WKPreferencesRelease(WKPreferencesRef preferencesRef) {
-  toWK(preferencesRef)->deref();
 }

@@ -36,250 +36,124 @@ extern "C" {
 #endif
 
 enum {
-  kWKInsertActionTyped = 0,
-  kWKInsertActionPasted = 1,
-  kWKInsertActionDropped = 2
+    kWKInsertActionTyped = 0,
+    kWKInsertActionPasted = 1,
+    kWKInsertActionDropped = 2
 };
 typedef uint32_t WKInsertActionType;
 
-enum { kWKAffinityUpstream, kWKAffinityDownstream };
+enum {
+    kWKAffinityUpstream,
+    kWKAffinityDownstream
+};
 typedef uint32_t WKAffinityType;
 
 // Loader Client
-typedef void (*WKBundlePageDidStartProvisionalLoadForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (
-    *WKBundlePageDidReceiveServerRedirectForProvisionalLoadForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageDidFailProvisionalLoadWithErrorForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    const void* clientInfo);  // FIXME: Add WKErrorRef.
-typedef void (*WKBundlePageDidCommitLoadForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageDidFinishLoadForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageDidFailLoadWithErrorForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    const void* clientInfo);  // FIXME: Add WKErrorRef.
-typedef void (*WKBundlePageDidReceiveTitleForFrameCallback)(
-    WKBundlePageRef page,
-    WKStringRef title,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageDidClearWindowObjectForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    JSGlobalContextRef context,
-    JSObjectRef window,
-    const void* clientInfo);
-typedef void (*WKBundlePageDidCancelClientRedirectForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageWillPerformClientRedirectForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    WKURLRef url,
-    double delay,
-    double date,
-    const void* clientInfo);
-typedef void (*WKBundlePageDidChangeLocationWithinPageForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageDidFinishDocumentLoadForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageDidHandleOnloadEventsForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageDidDisplayInsecureContentForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageDidRunInsecureContentForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    const void* clientInfo);  // FIXME: Add WKSecurityOriginRef.
+typedef void (*WKBundlePageDidStartProvisionalLoadForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
+typedef void (*WKBundlePageDidReceiveServerRedirectForProvisionalLoadForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
+typedef void (*WKBundlePageDidFailProvisionalLoadWithErrorForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo); // FIXME: Add WKErrorRef.
+typedef void (*WKBundlePageDidCommitLoadForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
+typedef void (*WKBundlePageDidFinishLoadForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
+typedef void (*WKBundlePageDidFailLoadWithErrorForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo); // FIXME: Add WKErrorRef.
+typedef void (*WKBundlePageDidReceiveTitleForFrameCallback)(WKBundlePageRef page, WKStringRef title, WKBundleFrameRef frame, const void *clientInfo);
+typedef void (*WKBundlePageDidClearWindowObjectForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, JSGlobalContextRef context, JSObjectRef window, const void *clientInfo);
+typedef void (*WKBundlePageDidCancelClientRedirectForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
+typedef void (*WKBundlePageWillPerformClientRedirectForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, WKURLRef url, double delay, double date, const void *clientInfo);
+typedef void (*WKBundlePageDidChangeLocationWithinPageForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
+typedef void (*WKBundlePageDidFinishDocumentLoadForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
+typedef void (*WKBundlePageDidHandleOnloadEventsForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
+typedef void (*WKBundlePageDidDisplayInsecureContentForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
+typedef void (*WKBundlePageDidRunInsecureContentForFrameCallback)(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo); // FIXME: Add WKSecurityOriginRef.
+
 
 struct WKBundlePageLoaderClient {
-  int version;
-  const void* clientInfo;
-  WKBundlePageDidStartProvisionalLoadForFrameCallback
-      didStartProvisionalLoadForFrame;
-  WKBundlePageDidReceiveServerRedirectForProvisionalLoadForFrameCallback
-      didReceiveServerRedirectForProvisionalLoadForFrame;
-  WKBundlePageDidFailProvisionalLoadWithErrorForFrameCallback
-      didFailProvisionalLoadWithErrorForFrame;
-  WKBundlePageDidCommitLoadForFrameCallback didCommitLoadForFrame;
-  WKBundlePageDidFinishLoadForFrameCallback didFinishLoadForFrame;
-  WKBundlePageDidFailLoadWithErrorForFrameCallback didFailLoadWithErrorForFrame;
-  WKBundlePageDidReceiveTitleForFrameCallback didReceiveTitleForFrame;
-  WKBundlePageDidClearWindowObjectForFrameCallback didClearWindowObjectForFrame;
-  WKBundlePageDidCancelClientRedirectForFrameCallback
-      didCancelClientRedirectForFrame;
-  WKBundlePageWillPerformClientRedirectForFrameCallback
-      willPerformClientRedirectForFrame;
-  WKBundlePageDidChangeLocationWithinPageForFrameCallback
-      didChangeLocationWithinPageForFrame;
-  WKBundlePageDidFinishDocumentLoadForFrameCallback
-      didFinishDocumentLoadForFrame;
-  WKBundlePageDidHandleOnloadEventsForFrameCallback
-      didHandleOnloadEventsForFrame;
-  WKBundlePageDidDisplayInsecureContentForFrameCallback
-      didDisplayInsecureContentForFrame;
-  WKBundlePageDidRunInsecureContentForFrameCallback
-      didRunInsecureContentForFrame;
+    int                                                                 version;
+    const void *                                                        clientInfo;
+    WKBundlePageDidStartProvisionalLoadForFrameCallback                 didStartProvisionalLoadForFrame;
+    WKBundlePageDidReceiveServerRedirectForProvisionalLoadForFrameCallback    didReceiveServerRedirectForProvisionalLoadForFrame;
+    WKBundlePageDidFailProvisionalLoadWithErrorForFrameCallback         didFailProvisionalLoadWithErrorForFrame;
+    WKBundlePageDidCommitLoadForFrameCallback                           didCommitLoadForFrame;
+    WKBundlePageDidFinishLoadForFrameCallback                           didFinishLoadForFrame;
+    WKBundlePageDidFailLoadWithErrorForFrameCallback                    didFailLoadWithErrorForFrame;
+    WKBundlePageDidReceiveTitleForFrameCallback                         didReceiveTitleForFrame;
+    WKBundlePageDidClearWindowObjectForFrameCallback                    didClearWindowObjectForFrame;
+    WKBundlePageDidCancelClientRedirectForFrameCallback                 didCancelClientRedirectForFrame;
+    WKBundlePageWillPerformClientRedirectForFrameCallback               willPerformClientRedirectForFrame;
+    WKBundlePageDidChangeLocationWithinPageForFrameCallback             didChangeLocationWithinPageForFrame;
+    WKBundlePageDidFinishDocumentLoadForFrameCallback                   didFinishDocumentLoadForFrame;
+    WKBundlePageDidHandleOnloadEventsForFrameCallback                   didHandleOnloadEventsForFrame;
+    WKBundlePageDidDisplayInsecureContentForFrameCallback               didDisplayInsecureContentForFrame;
+    WKBundlePageDidRunInsecureContentForFrameCallback                   didRunInsecureContentForFrame;
 };
 typedef struct WKBundlePageLoaderClient WKBundlePageLoaderClient;
 
 // UI Client
-typedef void (*WKBundlePageWillAddMessageToConsoleCallback)(
-    WKBundlePageRef page,
-    WKStringRef message,
-    uint32_t lineNumber,
-    const void* clientInfo);
-typedef void (*WKBundlePageWillSetStatusbarTextCallback)(
-    WKBundlePageRef page,
-    WKStringRef statusbarText,
-    const void* clientInfo);
-typedef void (*WKBundlePageWillRunJavaScriptAlertCallback)(
-    WKBundlePageRef page,
-    WKStringRef alertText,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageWillRunJavaScriptConfirmCallback)(
-    WKBundlePageRef page,
-    WKStringRef message,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageWillRunJavaScriptPromptCallback)(
-    WKBundlePageRef page,
-    WKStringRef message,
-    WKStringRef defaultValue,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
+typedef void (*WKBundlePageWillAddMessageToConsoleCallback)(WKBundlePageRef page, WKStringRef message, uint32_t lineNumber, const void *clientInfo);
+typedef void (*WKBundlePageWillSetStatusbarTextCallback)(WKBundlePageRef page, WKStringRef statusbarText, const void *clientInfo);
+typedef void (*WKBundlePageWillRunJavaScriptAlertCallback)(WKBundlePageRef page, WKStringRef alertText, WKBundleFrameRef frame, const void *clientInfo);
+typedef void (*WKBundlePageWillRunJavaScriptConfirmCallback)(WKBundlePageRef page, WKStringRef message, WKBundleFrameRef frame, const void *clientInfo);
+typedef void (*WKBundlePageWillRunJavaScriptPromptCallback)(WKBundlePageRef page, WKStringRef message, WKStringRef defaultValue, WKBundleFrameRef frame, const void *clientInfo);
 
 struct WKBundlePageUIClient {
-  int version;
-  const void* clientInfo;
-  WKBundlePageWillAddMessageToConsoleCallback willAddMessageToConsole;
-  WKBundlePageWillSetStatusbarTextCallback willSetStatusbarText;
-  WKBundlePageWillRunJavaScriptAlertCallback willRunJavaScriptAlert;
-  WKBundlePageWillRunJavaScriptConfirmCallback willRunJavaScriptConfirm;
-  WKBundlePageWillRunJavaScriptPromptCallback willRunJavaScriptPrompt;
+    int                                                                 version;
+    const void *                                                        clientInfo;
+    WKBundlePageWillAddMessageToConsoleCallback                         willAddMessageToConsole;
+    WKBundlePageWillSetStatusbarTextCallback                            willSetStatusbarText;
+    WKBundlePageWillRunJavaScriptAlertCallback                          willRunJavaScriptAlert;
+    WKBundlePageWillRunJavaScriptConfirmCallback                        willRunJavaScriptConfirm;
+    WKBundlePageWillRunJavaScriptPromptCallback                         willRunJavaScriptPrompt;
 };
 typedef struct WKBundlePageUIClient WKBundlePageUIClient;
 
 // Editor client
-typedef bool (*WKBundlePageShouldBeginEditingCallback)(WKBundlePageRef page,
-                                                       WKBundleRangeRef range,
-                                                       const void* clientInfo);
-typedef bool (*WKBundlePageShouldEndEditingCallback)(WKBundlePageRef page,
-                                                     WKBundleRangeRef range,
-                                                     const void* clientInfo);
-typedef bool (*WKBundlePageShouldInsertNodeCallback)(
-    WKBundlePageRef page,
-    WKBundleNodeRef node,
-    WKBundleRangeRef rangeToReplace,
-    WKInsertActionType action,
-    const void* clientInfo);
-typedef bool (*WKBundlePageShouldInsertTextCallback)(
-    WKBundlePageRef page,
-    WKStringRef string,
-    WKBundleRangeRef rangeToReplace,
-    WKInsertActionType action,
-    const void* clientInfo);
-typedef bool (*WKBundlePageShouldDeleteRangeCallback)(WKBundlePageRef page,
-                                                      WKBundleRangeRef range,
-                                                      const void* clientInfo);
-typedef bool (*WKBundlePageShouldChangeSelectedRange)(
-    WKBundlePageRef page,
-    WKBundleRangeRef fromRange,
-    WKBundleRangeRef toRange,
-    WKAffinityType affinity,
-    bool stillSelecting,
-    const void* clientInfo);
-typedef bool (*WKBundlePageShouldApplyStyle)(
-    WKBundlePageRef page,
-    WKBundleCSSStyleDeclarationRef style,
-    WKBundleRangeRef range,
-    const void* clientInfo);
-typedef void (*WKBundlePageEditingNotification)(WKBundlePageRef page,
-                                                WKStringRef notificationName,
-                                                const void* clientInfo);
+typedef bool (*WKBundlePageShouldBeginEditingCallback)(WKBundlePageRef page, WKBundleRangeRef range, const void* clientInfo);
+typedef bool (*WKBundlePageShouldEndEditingCallback)(WKBundlePageRef page, WKBundleRangeRef range, const void* clientInfo);
+typedef bool (*WKBundlePageShouldInsertNodeCallback)(WKBundlePageRef page, WKBundleNodeRef node, WKBundleRangeRef rangeToReplace, WKInsertActionType action, const void* clientInfo);
+typedef bool (*WKBundlePageShouldInsertTextCallback)(WKBundlePageRef page, WKStringRef string, WKBundleRangeRef rangeToReplace, WKInsertActionType action, const void* clientInfo);
+typedef bool (*WKBundlePageShouldDeleteRangeCallback)(WKBundlePageRef page, WKBundleRangeRef range, const void* clientInfo);
+typedef bool (*WKBundlePageShouldChangeSelectedRange)(WKBundlePageRef page, WKBundleRangeRef fromRange, WKBundleRangeRef toRange, WKAffinityType affinity, bool stillSelecting, const void* clientInfo);
+typedef bool (*WKBundlePageShouldApplyStyle)(WKBundlePageRef page, WKBundleCSSStyleDeclarationRef style, WKBundleRangeRef range, const void* clientInfo);
+typedef void (*WKBundlePageEditingNotification)(WKBundlePageRef page, WKStringRef notificationName, const void* clientInfo);
 
 struct WKBundlePageEditorClient {
-  int version;
-  const void* clientInfo;
-  WKBundlePageShouldBeginEditingCallback shouldBeginEditing;
-  WKBundlePageShouldEndEditingCallback shouldEndEditing;
-  WKBundlePageShouldInsertNodeCallback shouldInsertNode;
-  WKBundlePageShouldInsertTextCallback shouldInsertText;
-  WKBundlePageShouldDeleteRangeCallback shouldDeleteRange;
-  WKBundlePageShouldChangeSelectedRange shouldChangeSelectedRange;
-  WKBundlePageShouldApplyStyle shouldApplyStyle;
-  WKBundlePageEditingNotification didBeginEditing;
-  WKBundlePageEditingNotification didEndEditing;
-  WKBundlePageEditingNotification didChange;
-  WKBundlePageEditingNotification didChangeSelection;
+    int                                                                 version;
+    const void *                                                        clientInfo;
+    WKBundlePageShouldBeginEditingCallback                              shouldBeginEditing;
+    WKBundlePageShouldEndEditingCallback                                shouldEndEditing;
+    WKBundlePageShouldInsertNodeCallback                                shouldInsertNode;
+    WKBundlePageShouldInsertTextCallback                                shouldInsertText;
+    WKBundlePageShouldDeleteRangeCallback                               shouldDeleteRange;
+    WKBundlePageShouldChangeSelectedRange                               shouldChangeSelectedRange;
+    WKBundlePageShouldApplyStyle                                        shouldApplyStyle;
+    WKBundlePageEditingNotification                                     didBeginEditing;
+    WKBundlePageEditingNotification                                     didEndEditing;
+    WKBundlePageEditingNotification                                     didChange;
+    WKBundlePageEditingNotification                                     didChangeSelection;
 };
 typedef struct WKBundlePageEditorClient WKBundlePageEditorClient;
 
 // Form client
-typedef void (*WKBundlePageTextFieldDidBeginEditingCallback)(
-    WKBundlePageRef page,
-    WKBundleNodeHandleRef htmlInputElementHandle,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageTextFieldDidEndEditingCallback)(
-    WKBundlePageRef page,
-    WKBundleNodeHandleRef htmlInputElementHandle,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageTextDidChangeInTextFieldCallback)(
-    WKBundlePageRef page,
-    WKBundleNodeHandleRef htmlInputElementHandle,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
-typedef void (*WKBundlePageTextDidChangeInTextAreaCallback)(
-    WKBundlePageRef page,
-    WKBundleNodeHandleRef htmlTextAreaElementHandle,
-    WKBundleFrameRef frame,
-    const void* clientInfo);
+typedef void (*WKBundlePageTextFieldDidBeginEditingCallback)(WKBundlePageRef page, WKBundleNodeHandleRef htmlInputElementHandle, WKBundleFrameRef frame, const void* clientInfo);
+typedef void (*WKBundlePageTextFieldDidEndEditingCallback)(WKBundlePageRef page, WKBundleNodeHandleRef htmlInputElementHandle, WKBundleFrameRef frame, const void* clientInfo);
+typedef void (*WKBundlePageTextDidChangeInTextFieldCallback)(WKBundlePageRef page, WKBundleNodeHandleRef htmlInputElementHandle, WKBundleFrameRef frame, const void* clientInfo);
+typedef void (*WKBundlePageTextDidChangeInTextAreaCallback)(WKBundlePageRef page, WKBundleNodeHandleRef htmlTextAreaElementHandle, WKBundleFrameRef frame, const void* clientInfo);
 
 struct WKBundlePageFormClient {
-  int version;
-  const void* clientInfo;
-  WKBundlePageTextFieldDidBeginEditingCallback textFieldDidBeginEditing;
-  WKBundlePageTextFieldDidEndEditingCallback textFieldDidEndEditing;
-  WKBundlePageTextDidChangeInTextFieldCallback textDidChangeInTextField;
-  WKBundlePageTextDidChangeInTextAreaCallback textDidChangeInTextArea;
+    int                                                                 version;
+    const void *                                                        clientInfo;
+    WKBundlePageTextFieldDidBeginEditingCallback                        textFieldDidBeginEditing;
+    WKBundlePageTextFieldDidEndEditingCallback                          textFieldDidEndEditing;
+    WKBundlePageTextDidChangeInTextFieldCallback                        textDidChangeInTextField;
+    WKBundlePageTextDidChangeInTextAreaCallback                         textDidChangeInTextArea;
 };
 typedef struct WKBundlePageFormClient WKBundlePageFormClient;
 
 WK_EXPORT WKTypeID WKBundlePageGetTypeID();
 
-WK_EXPORT void WKBundlePageSetEditorClient(WKBundlePageRef page,
-                                           WKBundlePageEditorClient* client);
-WK_EXPORT void WKBundlePageSetFormClient(WKBundlePageRef page,
-                                         WKBundlePageFormClient* client);
-WK_EXPORT void WKBundlePageSetLoaderClient(WKBundlePageRef page,
-                                           WKBundlePageLoaderClient* client);
-WK_EXPORT void WKBundlePageSetUIClient(WKBundlePageRef page,
-                                       WKBundlePageUIClient* client);
+WK_EXPORT void WKBundlePageSetEditorClient(WKBundlePageRef page, WKBundlePageEditorClient* client);
+WK_EXPORT void WKBundlePageSetFormClient(WKBundlePageRef page, WKBundlePageFormClient* client);
+WK_EXPORT void WKBundlePageSetLoaderClient(WKBundlePageRef page, WKBundlePageLoaderClient* client);
+WK_EXPORT void WKBundlePageSetUIClient(WKBundlePageRef page, WKBundlePageUIClient* client);
 
 WK_EXPORT WKBundleFrameRef WKBundlePageGetMainFrame(WKBundlePageRef page);
 

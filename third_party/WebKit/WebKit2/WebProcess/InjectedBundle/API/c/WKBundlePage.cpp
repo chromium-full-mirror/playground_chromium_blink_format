@@ -32,76 +32,81 @@
 
 using namespace WebKit;
 
-WKTypeID WKBundlePageGetTypeID() {
-  return toRef(WebPage::APIType);
+WKTypeID WKBundlePageGetTypeID()
+{
+    return toRef(WebPage::APIType);
 }
 
-void WKBundlePageSetEditorClient(WKBundlePageRef pageRef,
-                                 WKBundlePageEditorClient* wkClient) {
-  if (wkClient && !wkClient->version)
-    toWK(pageRef)->initializeInjectedBundleEditorClient(wkClient);
+void WKBundlePageSetEditorClient(WKBundlePageRef pageRef, WKBundlePageEditorClient* wkClient)
+{
+    if (wkClient && !wkClient->version)
+        toWK(pageRef)->initializeInjectedBundleEditorClient(wkClient);
 }
 
-void WKBundlePageSetFormClient(WKBundlePageRef pageRef,
-                               WKBundlePageFormClient* wkClient) {
-  if (wkClient && !wkClient->version)
-    toWK(pageRef)->initializeInjectedBundleFormClient(wkClient);
+void WKBundlePageSetFormClient(WKBundlePageRef pageRef, WKBundlePageFormClient* wkClient)
+{
+    if (wkClient && !wkClient->version)
+        toWK(pageRef)->initializeInjectedBundleFormClient(wkClient);
 }
 
-void WKBundlePageSetLoaderClient(WKBundlePageRef pageRef,
-                                 WKBundlePageLoaderClient* wkClient) {
-  if (wkClient && !wkClient->version)
-    toWK(pageRef)->initializeInjectedBundleLoaderClient(wkClient);
+void WKBundlePageSetLoaderClient(WKBundlePageRef pageRef, WKBundlePageLoaderClient* wkClient)
+{
+    if (wkClient && !wkClient->version)
+        toWK(pageRef)->initializeInjectedBundleLoaderClient(wkClient);
 }
 
-void WKBundlePageSetUIClient(WKBundlePageRef pageRef,
-                             WKBundlePageUIClient* wkClient) {
-  if (wkClient && !wkClient->version)
-    toWK(pageRef)->initializeInjectedBundleUIClient(wkClient);
+void WKBundlePageSetUIClient(WKBundlePageRef pageRef, WKBundlePageUIClient* wkClient)
+{
+    if (wkClient && !wkClient->version)
+        toWK(pageRef)->initializeInjectedBundleUIClient(wkClient);
 }
 
-WKBundleFrameRef WKBundlePageGetMainFrame(WKBundlePageRef pageRef) {
-  return toRef(toWK(pageRef)->mainFrame());
+WKBundleFrameRef WKBundlePageGetMainFrame(WKBundlePageRef pageRef)
+{
+    return toRef(toWK(pageRef)->mainFrame());
 }
 
-WKStringRef WKBundlePageCopyRenderTreeExternalRepresentation(
-    WKBundlePageRef pageRef) {
-  return toCopiedRef(toWK(pageRef)->renderTreeExternalRepresentation());
+WKStringRef WKBundlePageCopyRenderTreeExternalRepresentation(WKBundlePageRef pageRef)
+{
+    return toCopiedRef(toWK(pageRef)->renderTreeExternalRepresentation());
 }
 
-void WKBundlePageExecuteEditingCommand(WKBundlePageRef pageRef,
-                                       WKStringRef name,
-                                       WKStringRef argument) {
-  toWK(pageRef)->executeEditingCommand(toWK(name)->string(),
-                                       toWK(argument)->string());
+void WKBundlePageExecuteEditingCommand(WKBundlePageRef pageRef, WKStringRef name, WKStringRef argument)
+{
+    toWK(pageRef)->executeEditingCommand(toWK(name)->string(), toWK(argument)->string());
 }
 
-bool WKBundlePageIsEditingCommandEnabled(WKBundlePageRef pageRef,
-                                         WKStringRef name) {
-  return toWK(pageRef)->isEditingCommandEnabled(toWK(name)->string());
+bool WKBundlePageIsEditingCommandEnabled(WKBundlePageRef pageRef, WKStringRef name)
+{
+    return toWK(pageRef)->isEditingCommandEnabled(toWK(name)->string());
 }
 
-void WKBundlePageClearMainFrameName(WKBundlePageRef pageRef) {
-  toWK(pageRef)->clearMainFrameName();
+void WKBundlePageClearMainFrameName(WKBundlePageRef pageRef)
+{
+    toWK(pageRef)->clearMainFrameName();
 }
 
-void WKBundlePageClose(WKBundlePageRef pageRef) {
-  toWK(pageRef)->sendClose();
+void WKBundlePageClose(WKBundlePageRef pageRef)
+{
+    toWK(pageRef)->sendClose();
 }
 
-float WKBundlePageGetZoomFactor(WKBundlePageRef pageRef) {
-  return toWK(pageRef)->zoomFactor();
+float WKBundlePageGetZoomFactor(WKBundlePageRef pageRef)
+{
+    return toWK(pageRef)->zoomFactor();
 }
 
-void WKBundlePageSetZoomFactor(WKBundlePageRef pageRef, float zoomFactor) {
-  toWK(pageRef)->setZoomFactor(zoomFactor);
+void WKBundlePageSetZoomFactor(WKBundlePageRef pageRef, float zoomFactor)
+{
+    toWK(pageRef)->setZoomFactor(zoomFactor);
 }
 
-void WKBundlePageSetZoomMode(WKBundlePageRef pageRef,
-                             WKBundlePageZoomMode zoomMode) {
-  toWK(pageRef)->setZoomMode(toZoomMode(zoomMode));
+void WKBundlePageSetZoomMode(WKBundlePageRef pageRef, WKBundlePageZoomMode zoomMode)
+{
+    toWK(pageRef)->setZoomMode(toZoomMode(zoomMode));
 }
 
-void WKBundlePageStopLoading(WKBundlePageRef pageRef) {
-  toWK(pageRef)->stopLoading();
+void WKBundlePageStopLoading(WKBundlePageRef pageRef)
+{
+    toWK(pageRef)->stopLoading();
 }

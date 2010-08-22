@@ -38,14 +38,3 @@ void WKFormSubmissionListenerContinue(
     WKFormSubmissionListenerRef submissionListener) {
   toWK(submissionListener)->continueSubmission();
 }
-
-WKFormSubmissionListenerRef WKFormSubmissionListenerRetain(
-    WKFormSubmissionListenerRef submissionListenerRef) {
-  toWK(submissionListenerRef)->ref();
-  return submissionListenerRef;
-}
-
-void WKFormSubmissionListenerRelease(
-    WKFormSubmissionListenerRef submissionListenerRef) {
-  toWK(submissionListenerRef)->deref();
-}

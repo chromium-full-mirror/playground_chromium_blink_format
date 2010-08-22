@@ -30,8 +30,7 @@
 namespace WebKit {
 
 WebPreferences* WebPreferences::shared() {
-  static WebPreferences* sharedPreferences =
-      WebPreferences::create().releaseRef();
+  static WebPreferences* sharedPreferences = WebPreferences::create().leakRef();
   return sharedPreferences;
 }
 

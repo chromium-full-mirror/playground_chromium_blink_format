@@ -32,46 +32,48 @@
 
 using namespace WebKit;
 
-WKTypeID WKBundleGetTypeID() {
-  return toRef(InjectedBundle::APIType);
+WKTypeID WKBundleGetTypeID()
+{
+    return toRef(InjectedBundle::APIType);
 }
 
-void WKBundleSetClient(WKBundleRef bundleRef, WKBundleClient* wkClient) {
-  if (wkClient && !wkClient->version)
-    toWK(bundleRef)->initializeClient(wkClient);
+void WKBundleSetClient(WKBundleRef bundleRef, WKBundleClient * wkClient)
+{
+    if (wkClient && !wkClient->version)
+        toWK(bundleRef)->initializeClient(wkClient);
 }
 
-void WKBundlePostMessage(WKBundleRef bundleRef,
-                         WKStringRef messageNameRef,
-                         WKTypeRef messageBodyRef) {
-  toWK(bundleRef)->postMessage(toWK(messageNameRef)->string(),
-                               toWK(messageBodyRef));
+void WKBundlePostMessage(WKBundleRef bundleRef, WKStringRef messageNameRef, WKTypeRef messageBodyRef)
+{
+    toWK(bundleRef)->postMessage(toWK(messageNameRef)->string(), toWK(messageBodyRef));
 }
 
-void WKBundleSetShouldTrackVisitedLinks(WKBundleRef bundleRef,
-                                        bool shouldTrackVisitedLinks) {
-  toWK(bundleRef)->setShouldTrackVisitedLinks(shouldTrackVisitedLinks);
+void WKBundleSetShouldTrackVisitedLinks(WKBundleRef bundleRef, bool shouldTrackVisitedLinks)
+{
+    toWK(bundleRef)->setShouldTrackVisitedLinks(shouldTrackVisitedLinks);
 }
 
-void WKBundleRemoveAllVisitedLinks(WKBundleRef bundleRef) {
-  toWK(bundleRef)->removeAllVisitedLinks();
+void WKBundleRemoveAllVisitedLinks(WKBundleRef bundleRef)
+{
+    toWK(bundleRef)->removeAllVisitedLinks();
 }
 
-void WKBundleActivateMacFontAscentHack(WKBundleRef bundleRef) {
-  toWK(bundleRef)->activateMacFontAscentHack();
+void WKBundleActivateMacFontAscentHack(WKBundleRef bundleRef)
+{
+    toWK(bundleRef)->activateMacFontAscentHack();
 }
 
-void WKBundleGarbageCollectJavaScriptObjects(WKBundleRef bundleRef) {
-  toWK(bundleRef)->garbageCollectJavaScriptObjects();
+void WKBundleGarbageCollectJavaScriptObjects(WKBundleRef bundleRef)
+{
+    toWK(bundleRef)->garbageCollectJavaScriptObjects();
 }
 
-void WKBundleGarbageCollectJavaScriptObjectsOnAlternateThreadForDebugging(
-    WKBundleRef bundleRef,
-    bool waitUntilDone) {
-  toWK(bundleRef)->garbageCollectJavaScriptObjectsOnAlternateThreadForDebugging(
-      waitUntilDone);
+void WKBundleGarbageCollectJavaScriptObjectsOnAlternateThreadForDebugging(WKBundleRef bundleRef, bool waitUntilDone)
+{
+    toWK(bundleRef)->garbageCollectJavaScriptObjectsOnAlternateThreadForDebugging(waitUntilDone);
 }
 
-size_t WKBundleGetJavaScriptObjectsCount(WKBundleRef bundleRef) {
-  return toWK(bundleRef)->javaScriptObjectsCount();
+size_t WKBundleGetJavaScriptObjectsCount(WKBundleRef bundleRef)
+{
+    return toWK(bundleRef)->javaScriptObjectsCount();
 }

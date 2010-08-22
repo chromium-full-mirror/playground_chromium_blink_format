@@ -46,12 +46,3 @@ const unsigned char* WKDataGetBytes(WKDataRef dataRef) {
 size_t WKDataGetSize(WKDataRef dataRef) {
   return toWK(dataRef)->size();
 }
-
-WKDataRef WKDataRetain(WKDataRef dataRef) {
-  toWK(dataRef)->ref();
-  return dataRef;
-}
-
-void WKDataRelease(WKDataRef dataRef) {
-  toWK(dataRef)->deref();
-}

@@ -204,12 +204,3 @@ void WKPageRenderTreeExternalRepresentation_b(
       callRenderTreeExternalRepresentationBlockAndDispose);
 }
 #endif
-
-WKPageRef WKPageRetain(WKPageRef pageRef) {
-  toWK(pageRef)->ref();
-  return pageRef;
-}
-
-void WKPageRelease(WKPageRef pageRef) {
-  toWK(pageRef)->deref();
-}

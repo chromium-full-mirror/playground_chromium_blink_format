@@ -46,13 +46,3 @@ void WKFramePolicyListenerDownload(WKFramePolicyListenerRef policyListenerRef) {
 void WKFramePolicyListenerIgnore(WKFramePolicyListenerRef policyListenerRef) {
   toWK(policyListenerRef)->ignore();
 }
-
-WKFramePolicyListenerRef WKFramePolicyListenerRetain(
-    WKFramePolicyListenerRef policyListenerRef) {
-  toWK(policyListenerRef)->ref();
-  return policyListenerRef;
-}
-
-void WKFramePolicyListenerRelease(WKFramePolicyListenerRef policyListenerRef) {
-  toWK(policyListenerRef)->deref();
-}

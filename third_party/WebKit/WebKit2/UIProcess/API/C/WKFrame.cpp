@@ -64,12 +64,3 @@ WKURLRef WKFrameCopyURL(WKFrameRef frameRef) {
 WKPageRef WKFrameGetPage(WKFrameRef frameRef) {
   return toRef(toWK(frameRef)->page());
 }
-
-WKFrameRef WKFrameRetain(WKFrameRef frameRef) {
-  toWK(frameRef)->ref();
-  return frameRef;
-}
-
-void WKFrameRelease(WKFrameRef frameRef) {
-  toWK(frameRef)->deref();
-}

@@ -32,18 +32,22 @@
 using namespace WebCore;
 using namespace WebKit;
 
-unsigned WKBundleRangeGetStartOffset(WKBundleRangeRef range) {
-  return toWK(range)->startOffset();
+unsigned WKBundleRangeGetStartOffset(WKBundleRangeRef range)
+{
+    return toWK(range)->startOffset();
 }
 
-WKBundleNodeRef WKBundleRangeGetStartContainer(WKBundleRangeRef range) {
-  return toRef(toWK(range)->startContainer());
+WKBundleNodeRef WKBundleRangeGetStartContainer(WKBundleRangeRef range)
+{
+    return toRef(toWK(range)->startContainer());
 }
 
-unsigned WKBundleRangeGetEndOffset(WKBundleRangeRef range) {
-  return toWK(range)->endOffset();
+unsigned WKBundleRangeGetEndOffset(WKBundleRangeRef range)
+{
+    return toWK(range)->endOffset();
 }
 
-WKBundleNodeRef WKBundleRangeGetEndContainer(WKBundleRangeRef range) {
-  return toRef(toWK(range)->endContainer());
+WKBundleNodeRef WKBundleRangeGetEndContainer(WKBundleRangeRef range)
+{
+    return toRef(toWK(range)->endContainer());
 }

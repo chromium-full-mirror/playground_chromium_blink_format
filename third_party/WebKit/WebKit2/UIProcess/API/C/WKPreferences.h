@@ -66,13 +66,8 @@ WK_EXPORT void WKPreferencesSetLocalStorageEnabled(WKPreferencesRef preferences,
 WK_EXPORT bool WKPreferencesGetLocalStorageEnabled(
     WKPreferencesRef preferences);
 
-WK_EXPORT WKPreferencesRef WKPreferencesRetain(WKPreferencesRef preferences);
-WK_EXPORT void WKPreferencesRelease(WKPreferencesRef preferences);
-
 #ifdef __cplusplus
 }
 #endif
-
-WK_DECLARE_RETAIN_RELEASE_OVERLOADS(WKPreferences)
 
 #endif /* WKPreferences_h */

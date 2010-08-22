@@ -54,12 +54,3 @@ WKTypeRef WKArrayGetItemAtIndex(WKArrayRef arrayRef, size_t index) {
 size_t WKArrayGetSize(WKArrayRef arrayRef) {
   return toWK(arrayRef)->size();
 }
-
-WKArrayRef WKArrayRetain(WKArrayRef arrayRef) {
-  toWK(arrayRef)->ref();
-  return arrayRef;
-}
-
-void WKArrayRelease(WKArrayRef arrayRef) {
-  toWK(arrayRef)->deref();
-}

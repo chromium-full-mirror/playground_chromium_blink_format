@@ -31,16 +31,7 @@
 
 using namespace WebKit;
 
-WKTypeID WKBundleNodeHandleGetTypeID() {
-  return toRef(InjectedBundleNodeHandle::APIType);
-}
-
-WKBundleNodeHandleRef WKBundleNodeHandleRetain(
-    WKBundleNodeHandleRef nodeHandleRef) {
-  toWK(nodeHandleRef)->ref();
-  return nodeHandleRef;
-}
-
-void WKBundleNodeHandleRelease(WKBundleNodeHandleRef nodeHandleRef) {
-  toWK(nodeHandleRef)->deref();
+WKTypeID WKBundleNodeHandleGetTypeID()
+{
+    return toRef(InjectedBundleNodeHandle::APIType);
 }
