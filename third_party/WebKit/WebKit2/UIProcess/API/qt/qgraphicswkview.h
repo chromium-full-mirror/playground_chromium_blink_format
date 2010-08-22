@@ -72,6 +72,7 @@ class QWEBKIT_EXPORT QGraphicsWKView : public QGraphicsWidget {
   virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent*);
   virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent*);
   virtual void wheelEvent(QGraphicsSceneWheelEvent*);
+  virtual void touchEvent(QTouchEvent*);
 
   virtual void hoverMoveEvent(QGraphicsSceneHoverEvent*);
 
