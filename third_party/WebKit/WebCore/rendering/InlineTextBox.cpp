@@ -952,8 +952,8 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
       markerRect = renderer()
                        ->localToAbsoluteQuad(FloatRect(markerRect))
                        .enclosingBoundingBox();
-      renderer()->document()->setRenderedRectForMarker(renderer()->node(),
-                                                       marker, markerRect);
+      renderer()->document()->markers()->setRenderedRectForMarker(
+          renderer()->node(), marker, markerRect);
     }
   }
 
@@ -1009,8 +1009,8 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
   markerRect = renderer()
                    ->localToAbsoluteQuad(FloatRect(markerRect))
                    .enclosingBoundingBox();
-  renderer()->document()->setRenderedRectForMarker(renderer()->node(), marker,
-                                                   markerRect);
+  renderer()->document()->markers()->setRenderedRectForMarker(
+      renderer()->node(), marker, markerRect);
 
   // Optionally highlight the text
   if (renderer()->frame()->markedTextMatchesAreHighlighted()) {
@@ -1052,8 +1052,8 @@ void InlineTextBox::computeRectForReplacementMarker(
   markerRect = renderer()
                    ->localToAbsoluteQuad(FloatRect(markerRect))
                    .enclosingBoundingBox();
-  renderer()->document()->setRenderedRectForMarker(renderer()->node(), marker,
-                                                   markerRect);
+  renderer()->document()->markers()->setRenderedRectForMarker(
+      renderer()->node(), marker, markerRect);
 }
 
 void InlineTextBox::paintDocumentMarkers(GraphicsContext* pt,
@@ -1066,7 +1066,7 @@ void InlineTextBox::paintDocumentMarkers(GraphicsContext* pt,
     return;
 
   Vector<DocumentMarker> markers =
-      renderer()->document()->markersForNode(renderer()->node());
+      renderer()->document()->markers()->markersForNode(renderer()->node());
   Vector<DocumentMarker>::iterator markerIt = markers.begin();
 
   // Give any document markers that touch this run a chance to draw before the

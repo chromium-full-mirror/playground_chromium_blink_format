@@ -1621,8 +1621,8 @@ void Editor::ignoreSpelling() {
 
   RefPtr<Range> selectedRange = frame()->selection()->toNormalizedRange();
   if (selectedRange)
-    frame()->document()->removeMarkers(selectedRange.get(),
-                                       DocumentMarker::Spelling);
+    frame()->document()->markers()->removeMarkers(selectedRange.get(),
+                                                  DocumentMarker::Spelling);
 
   String text = frame()->selectedText();
   ASSERT(text.length());
@@ -1698,7 +1698,7 @@ static String findFirstMisspellingInRange(
 
         // Store marker for misspelled word.
         ExceptionCode ec = 0;
-        misspellingRange->startContainer(ec)->document()->addMarker(
+        misspellingRange->startContainer(ec)->document()->markers()->addMarker(
             misspellingRange.get(), DocumentMarker::Spelling);
         ASSERT(!ec);
 
@@ -1781,7 +1781,7 @@ static int findFirstGrammarDetailInRange(
           badGrammarPhraseLocation - startOffset + detail->location,
           detail->length);
       ExceptionCode ec = 0;
-      badGrammarRange->startContainer(ec)->document()->addMarker(
+      badGrammarRange->startContainer(ec)->document()->markers()->addMarker(
           badGrammarRange.get(), DocumentMarker::Grammar,
           detail->userDescription);
       ASSERT(!ec);
@@ -2261,9 +2261,9 @@ void Editor::advanceToNextMisspelling(bool startBeforeSelection) {
 
     client()->updateSpellingUIWithGrammarString(badGrammarPhrase,
                                                 grammarDetail);
-    frame()->document()->addMarker(badGrammarRange.get(),
-                                   DocumentMarker::Grammar,
-                                   grammarDetail.userDescription);
+    frame()->document()->markers()->addMarker(badGrammarRange.get(),
+                                              DocumentMarker::Grammar,
+                                              grammarDetail.userDescription);
 #endif
   } else if (!misspelledWord.isEmpty()) {
     // We found a misspelling, but not any earlier bad grammar. Select the
@@ -2277,8 +2277,8 @@ void Editor::advanceToNextMisspelling(bool startBeforeSelection) {
     frame()->revealSelection();
 
     client()->updateSpellingUIWithMisspelledWord(misspelledWord);
-    frame()->document()->addMarker(misspellingRange.get(),
-                                   DocumentMarker::Spelling);
+    frame()->document()->markers()->addMarker(misspellingRange.get(),
+                                              DocumentMarker::Spelling);
   }
 }
 
@@ -2840,7 +2840,7 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
       RefPtr<Range> misspellingRange = TextIterator::subrange(
           spellingRange, resultLocation - spellingRangeStartOffset,
           resultLength);
-      misspellingRange->startContainer(ec)->document()->addMarker(
+      misspellingRange->startContainer(ec)->document()->markers()->addMarker(
           misspellingRange.get(), DocumentMarker::Spelling);
     } else if (markGrammar && result->type == TextCheckingTypeGrammar &&
                resultLocation < grammarRangeEndOffset &&
@@ -2856,7 +2856,7 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
               grammarRange,
               resultLocation + detail->location - grammarRangeStartOffset,
               detail->length);
-          grammarRange->startContainer(ec)->document()->addMarker(
+          grammarRange->startContainer(ec)->document()->markers()->addMarker(
               badGrammarRange.get(), DocumentMarker::Grammar,
               detail->userDescription);
         }
@@ -2896,7 +2896,8 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
         Node* node = rangeToReplace->startContainer();
         int startOffset = rangeToReplace->startOffset();
         int endOffset = startOffset + replacementLength;
-        Vector<DocumentMarker> markers = node->document()->markersForNode(node);
+        Vector<DocumentMarker> markers =
+            node->document()->markers()->markersForNode(node);
         size_t markerCount = markers.size();
         for (size_t i = 0; i < markerCount; ++i) {
           const DocumentMarker& marker = markers[i];
@@ -2941,7 +2942,7 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
             // be re-corrected.
             RefPtr<Range> replacedRange = TextIterator::subrange(
                 paragraphRange.get(), resultLocation, replacementLength);
-            replacedRange->startContainer()->document()->addMarker(
+            replacedRange->startContainer()->document()->markers()->addMarker(
                 replacedRange.get(), DocumentMarker::Replacement,
                 replacedString);
           }
@@ -2992,7 +2993,7 @@ void Editor::changeBackToReplacedString(const String& replacedString) {
   replaceSelectionWithText(replacedString, false, false);
   RefPtr<Range> changedRange = TextIterator::subrange(
       paragraphRange.get(), selectionOffset, replacedString.length());
-  changedRange->startContainer()->document()->addMarker(
+  changedRange->startContainer()->document()->markers()->addMarker(
       changedRange.get(), DocumentMarker::Replacement, String());
 }
 

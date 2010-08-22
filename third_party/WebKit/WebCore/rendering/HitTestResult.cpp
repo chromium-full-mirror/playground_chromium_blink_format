@@ -154,7 +154,7 @@ String HitTestResult::spellingToolTip(TextDirection& dir) const {
     return String();
 
   DocumentMarker* marker =
-      m_innerNonSharedNode->document()->markerContainingPoint(
+      m_innerNonSharedNode->document()->markers()->markerContainingPoint(
           m_point, DocumentMarker::Grammar);
   if (!marker)
     return String();
@@ -173,7 +173,7 @@ String HitTestResult::replacedString() const {
     return String();
 
   DocumentMarker* marker =
-      m_innerNonSharedNode->document()->markerContainingPoint(
+      m_innerNonSharedNode->document()->markers()->markerContainingPoint(
           m_point, DocumentMarker::Replacement);
   if (!marker)
     return String();

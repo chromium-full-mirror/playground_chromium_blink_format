@@ -1740,8 +1740,8 @@ void FrameView::invalidateScrollbarRect(Scrollbar* scrollbar,
 }
 
 void FrameView::getTickmarks(Vector<IntRect>& tickmarks) const {
-  tickmarks =
-      frame()->document()->renderedRectsForMarkers(DocumentMarker::TextMatch);
+  tickmarks = frame()->document()->markers()->renderedRectsForMarkers(
+      DocumentMarker::TextMatch);
 }
 
 IntRect FrameView::windowResizerRect() const {
@@ -1955,7 +1955,7 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect) {
 
   PaintBehavior oldPaintBehavior = m_paintBehavior;
   if (m_paintBehavior == PaintBehaviorNormal)
-    document->invalidateRenderedRectsForMarkersInRect(rect);
+    document->markers()->invalidateRenderedRectsForMarkersInRect(rect);
 
   if (document->printing())
     m_paintBehavior |= PaintBehaviorFlattenCompositingLayers;

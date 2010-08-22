@@ -34,7 +34,7 @@
 #include "CollectionType.h"
 #include "Color.h"
 #include "ContainerNode.h"
-#include "DocumentMarker.h"
+#include "DocumentMarkerController.h"
 #include "QualifiedName.h"
 #include "ScriptExecutionContext.h"
 #include "Timer.h"
@@ -911,6 +911,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   HTMLHeadElement* head();
 
+  DocumentMarkerController* markers() const { return m_markers.get(); }
+
   bool execCommand(const String& command,
                    bool userInterface = false,
                    const String& value = String());
@@ -919,41 +921,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool queryCommandState(const String& command);
   bool queryCommandSupported(const String& command);
   String queryCommandValue(const String& command);
-
-  void addMarker(Range*,
-                 DocumentMarker::MarkerType,
-                 String description = String());
-  void addMarker(Node*, DocumentMarker);
-  void copyMarkers(Node* srcNode,
-                   unsigned startOffset,
-                   int length,
-                   Node* dstNode,
-                   int delta,
-                   DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
-  void removeMarkers(Range*,
-                     DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
-  void removeMarkers(Node*,
-                     unsigned startOffset,
-                     int length,
-                     DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
-  void removeMarkers(DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
-  void removeMarkers(Node*);
-  void repaintMarkers(DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
-  void setRenderedRectForMarker(Node*, const DocumentMarker&, const IntRect&);
-  void invalidateRenderedRectsForMarkersInRect(const IntRect&);
-  void shiftMarkers(Node*,
-                    unsigned startOffset,
-                    int delta,
-                    DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
-  void setMarkersActive(Range*, bool);
-  void setMarkersActive(Node*, unsigned startOffset, unsigned endOffset, bool);
-
-  DocumentMarker* markerContainingPoint(
-      const IntPoint&,
-      DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
-  Vector<DocumentMarker> markersForNode(Node*);
-  Vector<IntRect> renderedRectsForMarkers(
-      DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
 
   // designMode support
   enum InheritedBool { off = false, on = true, inherit };
@@ -1359,12 +1326,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   OwnPtr<RenderArena> m_renderArena;
 
-  typedef std::pair<Vector<DocumentMarker>, Vector<IntRect>>
-      MarkerMapVectorPair;
-  typedef HashMap<RefPtr<Node>, MarkerMapVectorPair*> MarkerMap;
-  MarkerMap m_markers;
-
   mutable AXObjectCache* m_axObjectCache;
+  OwnPtr<DocumentMarkerController> m_markers;
 
   Timer<Document> m_updateFocusAppearanceTimer;
 
