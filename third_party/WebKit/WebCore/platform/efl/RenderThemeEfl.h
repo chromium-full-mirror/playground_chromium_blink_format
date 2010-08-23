@@ -236,6 +236,11 @@ class RenderThemeEfl : public RenderTheme {
                                 const PaintInfo&,
                                 const IntRect&);
 
+  static void setDefaultFontSize(int size);
+
+ protected:
+  static float defaultFontSize;
+
  private:
   void createCanvas();
   void createEdje();
