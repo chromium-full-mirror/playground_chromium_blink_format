@@ -1279,6 +1279,11 @@ void Element::setAttributeNS(const AtomicString& namespaceURI,
   if (!Document::parseQualifiedName(qualifiedName, prefix, localName, ec))
     return;
 
+  if (namespaceURI.isNull() && !prefix.isNull()) {
+    ec = NAMESPACE_ERR;
+    return;
+  }
+
   QualifiedName qName(prefix, localName, namespaceURI);
 
   if (scriptingPermission == FragmentScriptingNotAllowed &&
