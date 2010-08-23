@@ -119,6 +119,7 @@ bool isTableBodyContextTag(const AtomicString& tagName) {
 bool isSpecialNode(Node* node) {
   if (node->namespaceURI() != xhtmlNamespaceURI)
     return false;
+  // FIXME: This list is out of sync with the spec.
   const AtomicString& tagName = node->localName();
   return tagName == addressTag || tagName == articleTag ||
          tagName == asideTag || tagName == baseTag || tagName == basefontTag ||
@@ -132,13 +133,13 @@ bool isSpecialNode(Node* node) {
          tagName == frameTag || tagName == framesetTag ||
          isNumberedHeaderTag(tagName) || tagName == headTag ||
          tagName == headerTag || tagName == hgroupTag || tagName == hrTag ||
-         tagName == iframeTag || tagName == imgTag || tagName == inputTag ||
-         tagName == isindexTag || tagName == liTag || tagName == linkTag ||
-         tagName == listingTag || tagName == menuTag || tagName == metaTag ||
-         tagName == navTag || tagName == noembedTag || tagName == noframesTag ||
-         tagName == noscriptTag || tagName == olTag || tagName == pTag ||
-         tagName == paramTag || tagName == plaintextTag || tagName == preTag ||
-         tagName == scriptTag || tagName == sectionTag ||
+         tagName == htmlTag || tagName == iframeTag || tagName == imgTag ||
+         tagName == inputTag || tagName == isindexTag || tagName == liTag ||
+         tagName == linkTag || tagName == listingTag || tagName == menuTag ||
+         tagName == metaTag || tagName == navTag || tagName == noembedTag ||
+         tagName == noframesTag || tagName == noscriptTag || tagName == olTag ||
+         tagName == pTag || tagName == paramTag || tagName == plaintextTag ||
+         tagName == preTag || tagName == scriptTag || tagName == sectionTag ||
          tagName == selectTag || tagName == styleTag ||
          isTableBodyContextTag(tagName) || tagName == textareaTag ||
          tagName == titleTag || tagName == trTag || tagName == ulTag ||
