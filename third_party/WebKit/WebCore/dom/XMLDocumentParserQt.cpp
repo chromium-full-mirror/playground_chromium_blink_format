@@ -256,24 +256,12 @@ void XMLDocumentParser::resumeParsing() {
     end();
 }
 
-bool XMLDocumentParser::parseDocumentFragment(
-    const String& chunk,
-    DocumentFragment* fragment,
-    Element* parent,
-    FragmentScriptingPermission scriptingPermission) {
-  if (!chunk.length())
-    return true;
-
-  RefPtr<XMLDocumentParser> parser =
-      XMLDocumentParser::create(fragment, parent, scriptingPermission);
-
-  parser->append(String("<qxmlstreamdummyelement>"));
-  parser->append(chunk);
-  parser->append(String("</qxmlstreamdummyelement>"));
-  parser->finish();
-  parser->detach();  // Allows ~DocumentParser to assert it was detached before
-                     // destruction.
-  return !parser->hasError();
+bool XMLDocumentParser::appendFragmentSource(const String& source) {
+  ASSERT(!m_sawFirstElement);
+  append(String("<qxmlstreamdummyelement>"));
+  append(source);
+  append(String("</qxmlstreamdummyelement>"));
+  return !hasError();
 }
 
 // --------------------------------

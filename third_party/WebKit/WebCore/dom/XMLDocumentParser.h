@@ -135,6 +135,8 @@ class XMLDocumentParser : public ScriptableDocumentParser,
   void pauseParsing();
   void resumeParsing();
 
+  bool appendFragmentSource(const String&);
+
 #if USE(QXMLSTREAM)
  private:
   void parse();
