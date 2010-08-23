@@ -4,7 +4,7 @@
  * Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies)
  * Copyright (C) 2008 Collabora Ltd. All rights reserved.
  * Coypright (C) 2008 Holger Hans Peter Freyther
- * Coypright (C) 2009 Girish Ramakrishnan <girish@forwardbias.in>
+ * Coypright (C) 2009, 2010 Girish Ramakrishnan <girish@forwardbias.in>
  *
  * All rights reserved.
  *
@@ -1479,11 +1479,20 @@ PassRefPtr<Widget> FrameLoaderClientQt::createPlugin(
     Vector<String> values = paramValues;
     if (mimeType == "application/x-shockwave-flash") {
       QWebPageClient* client = m_webFrame->page()->d->client;
+      const bool isQWebView =
+          client && qobject_cast<QWidget*>(client->pluginParent());
 #if defined(MOZ_PLATFORM_MAEMO) && (MOZ_PLATFORM_MAEMO == 5)
-      if (true) {
+      size_t wmodeIndex = params.find("wmode");
+      if (wmodeIndex == -1) {
+        // Disable XEmbed mode and force it to opaque mode
+        params.append("wmode");
+        values.append("opaque");
+      } else if (!isQWebView) {
+        // Disable transparency if client is not a QWebView
+        values[wmodeIndex] = "opaque";
+      }
 #else
-      if (!client || !qobject_cast<QWidget*>(client->pluginParent())) {
-#endif
+      if (!isQWebView) {
         // inject wmode=opaque when there is no client or the client is not a
         // QWebView
         size_t wmodeIndex = params.find("wmode");
@@ -1493,6 +1502,7 @@ PassRefPtr<Widget> FrameLoaderClientQt::createPlugin(
         } else
           values[wmodeIndex] = "opaque";
       }
+#endif
     }
 
     RefPtr<PluginView> pluginView =
