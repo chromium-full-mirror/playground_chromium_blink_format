@@ -755,7 +755,7 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
 
 #if USE(GLES2_RENDERING)
   if (platformContext()->useGPU() && !m_common->state.fillPattern &&
-      !m_common->state.fillGradient) {
+      !m_common->state.fillGradient && !platformContext()->getDrawLooper()) {
     platformContext()->prepareForHardwareDraw();
     platformContext()->gpuCanvas()->fillRect(rect);
     return;
