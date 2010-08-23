@@ -43,9 +43,7 @@ class WebSpeechInputController {
   // runs to the limit or stopRecording is called. Progress indications and the
   // recognized
   // text are returned via the listener interface.
-  virtual bool startRecognition(int) { return startRecognition(); }
-  // FIXME: Remove this once chromium has picked up this change.
-  virtual bool startRecognition() {
+  virtual bool startRecognition(int) {
     WEBKIT_ASSERT_NOT_REACHED();
     return false;
   }
@@ -53,9 +51,7 @@ class WebSpeechInputController {
   // Cancels an ongoing recognition and discards any audio recorded so far. No
   // partial
   // recognition results are returned to the listener.
-  virtual void cancelRecognition(int) { cancelRecognition(); }
-  // FIXME: Remove this once chromium has picked up this change.
-  virtual void cancelRecognition() { WEBKIT_ASSERT_NOT_REACHED(); }
+  virtual void cancelRecognition(int) { WEBKIT_ASSERT_NOT_REACHED(); }
 
   // Stops audio recording and performs recognition with the audio recorded
   // until now
@@ -66,9 +62,7 @@ class WebSpeechInputController {
   // recording 'endpointer' should detect silence in the input and stop
   // recording automatically.
   // Call startRecognition() to record audio and recognize speech again.
-  virtual void stopRecording(int) { stopRecording(); }
-  // FIXME: Remove this once chromium has picked up this change.
-  virtual void stopRecording() { WEBKIT_ASSERT_NOT_REACHED(); }
+  virtual void stopRecording(int) { WEBKIT_ASSERT_NOT_REACHED(); }
 
  protected:
   virtual ~WebSpeechInputController() {}
