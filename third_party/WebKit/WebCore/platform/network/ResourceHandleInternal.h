@@ -98,7 +98,6 @@ class ResourceHandleInternal : public Noncopyable {
 #endif
 #if USE(WININET)
         ,
-        m_fileHandle(INVALID_HANDLE_VALUE),
         m_fileLoadTimer(loader, &ResourceHandle::fileLoadTimer),
         m_resourceHandle(0),
         m_secondaryHandle(0),
@@ -180,7 +179,6 @@ class ResourceHandleInternal : public Noncopyable {
   bool m_needsSiteSpecificQuirks;
 #endif
 #if USE(WININET)
-  HANDLE m_fileHandle;
   Timer<ResourceHandle> m_fileLoadTimer;
   HINTERNET m_resourceHandle;
   HINTERNET m_secondaryHandle;
