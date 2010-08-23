@@ -89,8 +89,7 @@ class FrontendMenuProvider : public ContextMenuProvider {
     if (m_frontendHost) {
       int itemNumber = item->action() - ContextMenuItemBaseCustomTag;
 
-      ScriptFunctionCall function(m_webInspector, "dispatch");
-      function.appendArgument("contextMenuItemSelected");
+      ScriptFunctionCall function(m_webInspector, "contextMenuItemSelected");
       function.appendArgument(itemNumber);
       function.call();
     }
@@ -98,8 +97,7 @@ class FrontendMenuProvider : public ContextMenuProvider {
 
   virtual void contextMenuCleared() {
     if (m_frontendHost) {
-      ScriptFunctionCall function(m_webInspector, "dispatch");
-      function.appendArgument("contextMenuCleared");
+      ScriptFunctionCall function(m_webInspector, "contextMenuCleared");
       function.call();
 
       m_frontendHost->m_menuProvider = 0;
