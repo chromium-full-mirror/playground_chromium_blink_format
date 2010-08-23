@@ -37,7 +37,7 @@ class StringBuilder {
   void append(const char* str) { append(str, strlen(str)); }
 
   void append(const char* str, size_t len) {
-    buffer.reserveCapacity(buffer.size() + len);
+    reserveCapacity(buffer.size() + len);
     for (size_t i = 0; i < len; i++)
       buffer.append(static_cast<unsigned char>(str[i]));
   }
@@ -50,7 +50,10 @@ class StringBuilder {
 
   bool isEmpty() { return buffer.isEmpty(); }
   void reserveCapacity(size_t newCapacity) {
-    buffer.reserveCapacity(newCapacity);
+    if (newCapacity < buffer.capacity())
+      return;
+    buffer.reserveCapacity(
+        std::max(newCapacity, buffer.capacity() + buffer.capacity() / 4 + 1));
   }
   void resize(size_t size) { buffer.resize(size); }
   size_t size() const { return buffer.size(); }
