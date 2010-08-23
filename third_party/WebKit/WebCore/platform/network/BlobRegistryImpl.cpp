@@ -123,6 +123,7 @@ void BlobRegistryImpl::appendStorageItems(BlobStorageData* blobStorageData,
                                          newLength,
                                          iter->expectedModificationTime);
     }
+    length -= newLength;
     offset = 0;
   }
 }

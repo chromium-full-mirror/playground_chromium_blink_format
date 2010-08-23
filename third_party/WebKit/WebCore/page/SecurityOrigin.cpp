@@ -29,6 +29,7 @@
 #include "config.h"
 #include "SecurityOrigin.h"
 
+#include "BlobURL.h"
 #include "Document.h"
 #include "FileSystem.h"
 #include "KURL.h"
@@ -120,6 +121,10 @@ PassRefPtr<SecurityOrigin> SecurityOrigin::create(const KURL& url,
                                                   SandboxFlags sandboxFlags) {
   if (!url.isValid())
     return adoptRef(new SecurityOrigin(KURL(), sandboxFlags));
+#if ENABLE(BLOB)
+  if (url.protocolIs("blob"))
+    return adoptRef(new SecurityOrigin(BlobURL::getOrigin(url), sandboxFlags));
+#endif
   return adoptRef(new SecurityOrigin(url, sandboxFlags));
 }
 
@@ -266,6 +271,14 @@ bool SecurityOrigin::isAccessWhiteListed(
 bool SecurityOrigin::canLoad(const KURL& url,
                              const String& referrer,
                              Document* document) {
+#if ENABLE(BLOB)
+  if (url.protocolIs("blob") && document) {
+    SecurityOrigin* documentOrigin = document->securityOrigin();
+    RefPtr<SecurityOrigin> targetOrigin = SecurityOrigin::create(url);
+    return documentOrigin->isSameSchemeHostPort(targetOrigin.get());
+  }
+#endif
+
   if (!SchemeRegistry::shouldTreatURLAsLocal(url.string()))
     return true;
 

@@ -158,6 +158,9 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
 #if USE(CFNETWORK)
   virtual bool shouldCacheResponse(ResourceHandle*, CFCachedURLResponseRef);
 #endif
+#if ENABLE(BLOB)
+  virtual AsyncFileStream* createAsyncFileStream(FileStreamClient*);
+#endif
 
   ResourceHandle* handle() const { return m_handle.get(); }
   bool sendResourceLoadCallbacks() const { return m_sendResourceLoadCallbacks; }

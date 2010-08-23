@@ -28,6 +28,7 @@
 #include "ResourceHandle.h"
 #include "ResourceHandleInternal.h"
 
+#include "BlobRegistry.h"
 #include "DNS.h"
 #include "Logging.h"
 #include "ResourceHandleClient.h"
@@ -65,6 +66,15 @@ PassRefPtr<ResourceHandle> ResourceHandle::create(
     Frame* frame,
     bool defersLoading,
     bool shouldContentSniff) {
+#if ENABLE(BLOB)
+  if (request.url().protocolIs("blob")) {
+    PassRefPtr<ResourceHandle> handle =
+        blobRegistry().createResourceHandle(request, client);
+    if (handle)
+      return handle;
+  }
+#endif
+
   RefPtr<ResourceHandle> newHandle(adoptRef(
       new ResourceHandle(request, client, defersLoading, shouldContentSniff)));
 
