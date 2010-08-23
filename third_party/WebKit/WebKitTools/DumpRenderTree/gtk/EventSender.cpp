@@ -175,6 +175,7 @@ bool prepareMouseButtonEvent(GdkEvent* event, int eventSenderButtonNumber) {
   event->button.device = gdk_device_get_core_pointer();
   event->button.state = getStateFlags();
   event->button.time = GDK_CURRENT_TIME;
+  event->button.axes = 0;
 
   int xRoot, yRoot;
   gdk_window_get_root_coords(gtk_widget_get_window(GTK_WIDGET(view)),
@@ -322,6 +323,7 @@ static JSValueRef mouseMoveToCallback(JSContextRef context,
   event.motion.window = gtk_widget_get_window(GTK_WIDGET(view));
   event.motion.device = gdk_device_get_core_pointer();
   event.motion.state = getStateFlags();
+  event.motion.axes = 0;
 
   int xRoot, yRoot;
   gdk_window_get_root_coords(gtk_widget_get_window(GTK_WIDGET(view)),
