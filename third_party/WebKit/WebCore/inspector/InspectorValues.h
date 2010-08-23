@@ -173,6 +173,7 @@ class InspectorObject : public InspectorValue {
   void setObject(const String& name, PassRefPtr<InspectorObject>);
   void setArray(const String& name, PassRefPtr<InspectorArray>);
 
+  const_iterator find(const String& name) const;
   bool getBool(const String& name, bool* output) const;
   bool getNumber(const String& name, double* output) const;
   bool getString(const String& name, String* output) const;
@@ -219,6 +220,11 @@ class InspectorArray : public InspectorValue {
   InspectorArray() : InspectorValue(TypeArray) {}
   Vector<RefPtr<InspectorValue>> m_data;
 };
+
+inline InspectorObject::const_iterator InspectorObject::find(
+    const String& name) const {
+  return m_data.find(name);
+}
 
 inline void InspectorObject::setBool(const String& name, bool value) {
   setValue(name, InspectorBasicValue::create(value));
