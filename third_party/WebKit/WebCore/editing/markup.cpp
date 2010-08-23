@@ -47,6 +47,7 @@
 #include "DocumentType.h"
 #include "Editor.h"
 #include "Frame.h"
+#include "HTMLBodyElement.h"
 #include "HTMLElement.h"
 #include "HTMLNames.h"
 #include "InlineTextBox.h"
@@ -1219,10 +1220,13 @@ PassRefPtr<DocumentFragment> createFragmentFromMarkup(
     const String& markup,
     const String& baseURL,
     FragmentScriptingPermission scriptingPermission) {
+  // We use a fake body element here to trick the HTML parser to using the
+  // InBody insertion mode.  Really, all this code is wrong and need to be
+  // changed not to use deprecatedCreateContextualFragment.
+  RefPtr<HTMLBodyElement> fakeBody = HTMLBodyElement::create(document);
   // FIXME: This should not use deprecatedCreateContextualFragment
   RefPtr<DocumentFragment> fragment =
-      document->documentElement()->deprecatedCreateContextualFragment(
-          markup, scriptingPermission);
+      fakeBody->deprecatedCreateContextualFragment(markup, scriptingPermission);
 
   if (fragment && !baseURL.isEmpty() && baseURL != blankURL() &&
       baseURL != document->baseURL())
