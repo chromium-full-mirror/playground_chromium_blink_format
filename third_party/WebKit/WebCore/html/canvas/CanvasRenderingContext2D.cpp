@@ -1866,8 +1866,21 @@ void CanvasRenderingContext2D::strokeText(const String& text,
 PassRefPtr<TextMetrics> CanvasRenderingContext2D::measureText(
     const String& text) {
   RefPtr<TextMetrics> metrics = TextMetrics::create();
+
+#if PLATFORM(QT)
+  // We always use complex text shaping since it can't be turned off for
+  // QPainterPath::addText().
+  Font::CodePath oldCodePath = Font::codePath();
+  Font::setCodePath(Font::Complex);
+#endif
+
   metrics->setWidth(
       accessFont().width(TextRun(text.characters(), text.length())));
+
+#if PLATFORM(QT)
+  Font::setCodePath(oldCodePath);
+#endif
+
   return metrics;
 }
 
@@ -1986,7 +1999,19 @@ void CanvasRenderingContext2D::drawTextInternal(const String& text,
 #endif
 
   c->setTextDrawingMode(fill ? cTextFill : cTextStroke);
+
+#if PLATFORM(QT)
+  // We always use complex text shaping since it can't be turned off for
+  // QPainterPath::addText().
+  Font::CodePath oldCodePath = Font::codePath();
+  Font::setCodePath(Font::Complex);
+#endif
+
   c->drawBidiText(font, textRun, location);
+
+#if PLATFORM(QT)
+  Font::setCodePath(oldCodePath);
+#endif
 }
 
 const Font& CanvasRenderingContext2D::accessFont() {
