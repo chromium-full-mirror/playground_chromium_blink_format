@@ -38,7 +38,7 @@
 namespace WebCore {
 
 IDBDatabase::IDBDatabase(PassRefPtr<IDBDatabaseBackendInterface> backend)
-    : m_backend(backend), m_description(m_backend->description()) {
+    : m_backend(backend) {
   // We pass a reference to this object before it can be adopted.
   relaxAdoptionRequirement();
 }

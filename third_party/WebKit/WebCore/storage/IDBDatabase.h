@@ -52,7 +52,6 @@ class IDBDatabase : public RefCounted<IDBDatabase> {
 
   // Implement the IDL
   String name() const { return m_backend->name(); }
-  String description() const { return m_description; }
   String version() const { return m_backend->version(); }
   PassRefPtr<DOMStringList> objectStores() const {
     return m_backend->objectStores();
@@ -76,8 +75,6 @@ class IDBDatabase : public RefCounted<IDBDatabase> {
   IDBDatabase(PassRefPtr<IDBDatabaseBackendInterface>);
 
   RefPtr<IDBDatabaseBackendInterface> m_backend;
-
-  String m_description;
 };
 
 }  // namespace WebCore
