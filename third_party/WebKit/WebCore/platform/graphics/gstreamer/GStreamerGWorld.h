@@ -22,7 +22,6 @@
 
 #if ENABLE(VIDEO)
 
-#include "MediaPlayerPrivateGStreamer.h"
 #include "PlatformVideoWindow.h"
 #include "RefCounted.h"
 #include "RefPtr.h"
@@ -47,10 +46,10 @@ class GStreamerGWorld : public RefCounted<GStreamerGWorld> {
                                                gpointer data);
 
  public:
-  static PassRefPtr<GStreamerGWorld> createGWorld(MediaPlayerPrivateGStreamer*);
+  static PassRefPtr<GStreamerGWorld> createGWorld(GstElement*);
   ~GStreamerGWorld();
 
-  GstElement* pipeline() const { return m_player->pipeline(); }
+  GstElement* pipeline() const { return m_pipeline; }
 
   // Returns the full-screen window created
   bool enterFullscreen();
@@ -62,8 +61,8 @@ class GStreamerGWorld : public RefCounted<GStreamerGWorld> {
   }
 
  private:
-  GStreamerGWorld(MediaPlayerPrivateGStreamer*);
-  MediaPlayerPrivateGStreamer* m_player;
+  GStreamerGWorld(GstElement*);
+  GstElement* m_pipeline;
   RefPtr<PlatformVideoWindow> m_videoWindow;
   gchar* m_dynamicPadName;
 };
