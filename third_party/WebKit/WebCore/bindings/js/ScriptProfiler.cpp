@@ -46,6 +46,10 @@ PassRefPtr<ScriptProfile> ScriptProfiler::stop(ScriptState* state,
   return ScriptProfile::create(profile);
 }
 
+bool ScriptProfiler::isProfilerAlwaysEnabled() {
+  return false;
+}
+
 }  // namespace WebCore
 
 #endif  // ENABLE(JAVASCRIPT_DEBUGGER)
