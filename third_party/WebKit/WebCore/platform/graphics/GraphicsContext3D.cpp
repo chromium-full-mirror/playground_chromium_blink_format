@@ -136,7 +136,7 @@ bool GraphicsContext3D::extractTextureData(unsigned int width,
                                            unsigned int unpackAlignment,
                                            bool flipY,
                                            bool premultiplyAlpha,
-                                           ArrayBufferView* pixels,
+                                           const void* pixels,
                                            Vector<uint8_t>& data) {
   // Assumes format, type, etc. have already been validated.
   SourceDataFormat sourceDataFormat = kSourceFormatRGBA8;
@@ -183,9 +183,8 @@ bool GraphicsContext3D::extractTextureData(unsigned int width,
   unsigned long bytesPerPixel = componentsPerPixel * bytesPerComponent;
   data.resize(width * height * bytesPerPixel);
 
-  if (!packPixels(static_cast<uint8_t*>(pixels->baseAddress()),
-                  sourceDataFormat, width, height, unpackAlignment, format,
-                  type,
+  if (!packPixels(static_cast<const uint8_t*>(pixels), sourceDataFormat, width,
+                  height, unpackAlignment, format, type,
                   (premultiplyAlpha ? kAlphaDoPremultiply : kAlphaDoNothing),
                   data.data()))
     return false;

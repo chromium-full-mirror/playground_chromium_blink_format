@@ -78,15 +78,10 @@ const Platform3DObject NullPlatform3DObject = 0;
 #endif
 
 namespace WebCore {
-class ArrayBuffer;
-class ArrayBufferView;
 class CanvasRenderingContext;
-class Float32Array;
 class HostWindow;
 class Image;
 class ImageData;
-class Int32Array;
-class Uint8Array;
 class WebGLActiveInfo;
 
 struct ActiveInfo {
@@ -521,7 +516,7 @@ class GraphicsContext3D : public Noncopyable {
                           unsigned int unpackAlignment,
                           bool flipY,
                           bool premultiplyAlpha,
-                          ArrayBufferView* pixels,
+                          const void* pixels,
                           Vector<uint8_t>& data);
 
   // Flips the given image data vertically, in-place.
@@ -570,12 +565,14 @@ class GraphicsContext3D : public Noncopyable {
                          unsigned long dstAlpha);
 
   void bufferData(unsigned long target, int size, unsigned long usage);
-  void bufferData(unsigned long target, ArrayBuffer* data, unsigned long usage);
   void bufferData(unsigned long target,
-                  ArrayBufferView* data,
+                  int size,
+                  const void* data,
                   unsigned long usage);
-  void bufferSubData(unsigned long target, long offset, ArrayBuffer* data);
-  void bufferSubData(unsigned long target, long offset, ArrayBufferView* data);
+  void bufferSubData(unsigned long target,
+                     long offset,
+                     int size,
+                     const void* data);
 
   unsigned long checkFramebufferStatus(unsigned long target);
   void clear(unsigned long mask);
