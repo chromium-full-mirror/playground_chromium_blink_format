@@ -148,6 +148,7 @@ Node* TreeWalker::previousSibling(ScriptState* state) {
         case NodeFilter::FILTER_SKIP:
           if (sibling->lastChild()) {
             sibling = sibling->lastChild();
+            node = sibling;
             continue;
           }
           break;
@@ -183,6 +184,7 @@ Node* TreeWalker::nextSibling(ScriptState* state) {
         case NodeFilter::FILTER_SKIP:
           if (sibling->firstChild()) {
             sibling = sibling->firstChild();
+            node = sibling;
             continue;
           }
           break;
