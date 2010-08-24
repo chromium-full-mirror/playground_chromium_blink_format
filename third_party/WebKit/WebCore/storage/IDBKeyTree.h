@@ -126,7 +126,7 @@ template <typename ValueType>
 void IDBKeyTree<ValueType>::put(IDBKey* key, ValueType* value) {
   TreeNode* node = m_tree.search(key);
   if (!node) {
-    node = leakPtr(new TreeNode());
+    node = new TreeNode();
     node->key = key;
     m_tree.insert(node);
   }
