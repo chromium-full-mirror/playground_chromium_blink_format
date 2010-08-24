@@ -325,9 +325,8 @@ String HTMLElement::outerHTML() const {
   return createMarkup(this);
 }
 
-static bool useLegacyTreeBuilder(Document* document) {
-  return !document || !document->settings() ||
-         !document->settings()->html5TreeBuilderEnabled();
+static bool useLegacyTreeBuilder(Document*) {
+  return false;
 }
 
 // FIXME: This logic should move into Range::createContextualFragment
