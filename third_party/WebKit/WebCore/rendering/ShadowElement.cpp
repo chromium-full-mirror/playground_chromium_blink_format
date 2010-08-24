@@ -29,11 +29,12 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-PassRefPtr<ShadowBlockElement> ShadowBlockElement::create(Node* shadowParent) {
+PassRefPtr<ShadowBlockElement> ShadowBlockElement::create(
+    HTMLElement* shadowParent) {
   return adoptRef(new ShadowBlockElement(shadowParent));
 }
 
-ShadowBlockElement::ShadowBlockElement(Node* shadowParent)
+ShadowBlockElement::ShadowBlockElement(HTMLElement* shadowParent)
     : ShadowElement<HTMLDivElement>(divTag, shadowParent) {}
 
 void ShadowBlockElement::layoutAsPart(const IntRect& partRect) {
@@ -63,7 +64,7 @@ void ShadowBlockElement::updateStyleForPart(PseudoId pseudoId) {
 }
 
 PassRefPtr<ShadowBlockElement> ShadowBlockElement::createForPart(
-    Node* shadowParent,
+    HTMLElement* shadowParent,
     PseudoId pseudoId) {
   RenderObject* parentRenderer = shadowParent->renderer();
   RefPtr<RenderStyle> styleForPart =
@@ -103,11 +104,12 @@ bool ShadowBlockElement::partShouldHaveStyle(const RenderObject* parentRenderer,
   return !(pseudoStyle && pseudoStyle->hasAppearance());
 }
 
-PassRefPtr<ShadowInputElement> ShadowInputElement::create(Node* shadowParent) {
+PassRefPtr<ShadowInputElement> ShadowInputElement::create(
+    HTMLElement* shadowParent) {
   return adoptRef(new ShadowInputElement(shadowParent));
 }
 
-ShadowInputElement::ShadowInputElement(Node* shadowParent)
+ShadowInputElement::ShadowInputElement(HTMLElement* shadowParent)
     : ShadowElement<HTMLInputElement>(inputTag, shadowParent) {}
 
 }  // namespace WebCore

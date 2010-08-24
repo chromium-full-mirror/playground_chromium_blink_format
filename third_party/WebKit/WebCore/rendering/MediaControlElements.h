@@ -81,7 +81,7 @@ class MediaControlShadowRootElement : public HTMLDivElement {
   MediaControlShadowRootElement(HTMLMediaElement*);
 
   virtual bool isShadowNode() const { return true; }
-  virtual Node* shadowParentNode() { return m_mediaElement; }
+  virtual ContainerNode* shadowParentNode() { return m_mediaElement; }
 
   HTMLMediaElement* m_mediaElement;
 };

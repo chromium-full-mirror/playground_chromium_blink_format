@@ -37,30 +37,30 @@ namespace WebCore {
 template <class BaseElement>
 class ShadowElement : public BaseElement {
  protected:
-  ShadowElement(const QualifiedName& name, Node* shadowParent)
+  ShadowElement(const QualifiedName& name, HTMLElement* shadowParent)
       : BaseElement(name, shadowParent->document()),
         m_shadowParent(shadowParent) {}
 
-  Node* shadowParent() const { return m_shadowParent; }
+  HTMLElement* shadowParent() const { return m_shadowParent; }
 
  private:
   virtual bool isShadowNode() const { return true; }
-  virtual Node* shadowParentNode() { return m_shadowParent; }
+  virtual ContainerNode* shadowParentNode() { return m_shadowParent; }
 
-  Node* m_shadowParent;
+  HTMLElement* m_shadowParent;
 };
 
 class ShadowBlockElement : public ShadowElement<HTMLDivElement> {
  public:
-  static PassRefPtr<ShadowBlockElement> create(Node*);
-  static PassRefPtr<ShadowBlockElement> createForPart(Node*, PseudoId);
+  static PassRefPtr<ShadowBlockElement> create(HTMLElement*);
+  static PassRefPtr<ShadowBlockElement> createForPart(HTMLElement*, PseudoId);
   static bool partShouldHaveStyle(const RenderObject* parentRenderer,
                                   PseudoId pseudoId);
   void layoutAsPart(const IntRect& partRect);
   void updateStyleForPart(PseudoId);
 
  protected:
-  ShadowBlockElement(Node*);
+  ShadowBlockElement(HTMLElement*);
 
  private:
   static PassRefPtr<RenderStyle> createStyleForPart(RenderObject*, PseudoId);
@@ -68,10 +68,10 @@ class ShadowBlockElement : public ShadowElement<HTMLDivElement> {
 
 class ShadowInputElement : public ShadowElement<HTMLInputElement> {
  public:
-  static PassRefPtr<ShadowInputElement> create(Node*);
+  static PassRefPtr<ShadowInputElement> create(HTMLElement*);
 
  protected:
-  ShadowInputElement(Node*);
+  ShadowInputElement(HTMLElement*);
 };
 
 }  // namespace WebCore

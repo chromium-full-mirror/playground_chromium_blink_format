@@ -102,11 +102,11 @@ VisiblePosition RenderTextControlInnerBlock::positionForPoint(
 // ----------------------------
 
 TextControlInnerElement::TextControlInnerElement(Document* document,
-                                                 Node* shadowParent)
+                                                 HTMLElement* shadowParent)
     : HTMLDivElement(divTag, document), m_shadowParent(shadowParent) {}
 
 PassRefPtr<TextControlInnerElement> TextControlInnerElement::create(
-    Node* shadowParent) {
+    HTMLElement* shadowParent) {
   return adoptRef(
       new TextControlInnerElement(shadowParent->document(), shadowParent));
 }
@@ -143,12 +143,12 @@ void TextControlInnerElement::attachInnerElement(Node* parent,
 
 inline TextControlInnerTextElement::TextControlInnerTextElement(
     Document* document,
-    Node* shadowParent)
+    HTMLElement* shadowParent)
     : TextControlInnerElement(document, shadowParent) {}
 
 PassRefPtr<TextControlInnerTextElement> TextControlInnerTextElement::create(
     Document* document,
-    Node* shadowParent) {
+    HTMLElement* shadowParent) {
   return adoptRef(new TextControlInnerTextElement(document, shadowParent));
 }
 
@@ -274,12 +274,13 @@ void SearchFieldCancelButtonElement::defaultEventHandler(Event* event) {
 
 // ----------------------------
 
-inline SpinButtonElement::SpinButtonElement(Node* shadowParent)
+inline SpinButtonElement::SpinButtonElement(HTMLElement* shadowParent)
     : TextControlInnerElement(shadowParent->document(), shadowParent),
       m_capturing(false),
       m_upDownState(Indeterminate) {}
 
-PassRefPtr<SpinButtonElement> SpinButtonElement::create(Node* shadowParent) {
+PassRefPtr<SpinButtonElement> SpinButtonElement::create(
+    HTMLElement* shadowParent) {
   return adoptRef(new SpinButtonElement(shadowParent));
 }
 
