@@ -193,13 +193,14 @@ static JSValueRef contextClickCallback(JSContextRef context,
                                        size_t argumentCount,
                                        const JSValueRef arguments[],
                                        JSValueRef* exception) {
-  GdkEvent* event = gdk_event_new(GDK_BUTTON_PRESS);
-  if (!prepareMouseButtonEvent(event, 2))
+  GdkEvent* pressEvent = gdk_event_new(GDK_BUTTON_PRESS);
+  if (!prepareMouseButtonEvent(pressEvent, 2))
     return JSValueMakeUndefined(context);
 
-  sendOrQueueEvent(event);
-  event->type = GDK_BUTTON_RELEASE;
-  sendOrQueueEvent(event);
+  GdkEvent* releaseEvent = gdk_event_copy(pressEvent);
+  sendOrQueueEvent(pressEvent);
+  releaseEvent->type = GDK_BUTTON_RELEASE;
+  sendOrQueueEvent(releaseEvent);
 
   return JSValueMakeUndefined(context);
 }
@@ -608,11 +609,11 @@ static JSValueRef keyDownCallback(JSContextRef context,
     return JSValueMakeUndefined(context);
 
   // create and send the event
-  GdkEvent* event = gdk_event_new(GDK_KEY_PRESS);
-  event->key.keyval = gdkKeySym;
-  event->key.state = state;
-  event->key.window = gtk_widget_get_window(GTK_WIDGET(view));
-  g_object_ref(event->key.window);
+  GdkEvent* pressEvent = gdk_event_new(GDK_KEY_PRESS);
+  pressEvent->key.keyval = gdkKeySym;
+  pressEvent->key.state = state;
+  pressEvent->key.window = gtk_widget_get_window(GTK_WIDGET(view));
+  g_object_ref(pressEvent->key.window);
 
   // When synthesizing an event, an invalid hardware_keycode value
   // can cause it to be badly processed by Gtk+.
@@ -620,14 +621,14 @@ static JSValueRef keyDownCallback(JSContextRef context,
   gint n_keys;
   if (gdk_keymap_get_entries_for_keyval(gdk_keymap_get_default(), gdkKeySym,
                                         &keys, &n_keys)) {
-    event->key.hardware_keycode = keys[0].keycode;
+    pressEvent->key.hardware_keycode = keys[0].keycode;
     g_free(keys);
   }
 
-  dispatchEvent(event);
-
-  event->key.type = GDK_KEY_RELEASE;
-  dispatchEvent(event);
+  GdkEvent* releaseEvent = gdk_event_copy(pressEvent);
+  dispatchEvent(pressEvent);
+  releaseEvent->key.type = GDK_KEY_RELEASE;
+  dispatchEvent(releaseEvent);
 
   return JSValueMakeUndefined(context);
 }
