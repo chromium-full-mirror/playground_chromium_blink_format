@@ -363,7 +363,7 @@ void SpinButtonElement::setHovered(bool flag) {
 #if ENABLE(INPUT_SPEECH)
 
 inline InputFieldSpeechButtonElement::InputFieldSpeechButtonElement(
-    Node* shadowParent)
+    HTMLElement* shadowParent)
     : TextControlInnerElement(shadowParent->document(), shadowParent),
       m_capturing(false),
       m_state(Idle),
@@ -379,7 +379,7 @@ InputFieldSpeechButtonElement::~InputFieldSpeechButtonElement() {
 }
 
 PassRefPtr<InputFieldSpeechButtonElement> InputFieldSpeechButtonElement::create(
-    Node* shadowParent) {
+    HTMLElement* shadowParent) {
   return adoptRef(new InputFieldSpeechButtonElement(shadowParent));
 }
 

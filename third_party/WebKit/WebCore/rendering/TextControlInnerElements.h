@@ -136,7 +136,7 @@ class InputFieldSpeechButtonElement : public TextControlInnerElement,
     Recognizing,
   };
 
-  static PassRefPtr<InputFieldSpeechButtonElement> create(Node*);
+  static PassRefPtr<InputFieldSpeechButtonElement> create(HTMLElement*);
   virtual ~InputFieldSpeechButtonElement();
 
   virtual void detach();
@@ -149,7 +149,7 @@ class InputFieldSpeechButtonElement : public TextControlInnerElement,
   void setRecognitionResult(int, const String& result);
 
  private:
-  InputFieldSpeechButtonElement(Node*);
+  InputFieldSpeechButtonElement(HTMLElement*);
   SpeechInput* speechInput();
   void setState(SpeechInputState state);
 
