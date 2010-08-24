@@ -252,7 +252,7 @@ void HTMLElementStack::insertAbove(PassRefPtr<Element> element,
       continue;
 
     recordAbove->setNext(
-        new ElementRecord(element, recordAbove->releaseNext()));
+        adoptPtr(new ElementRecord(element, recordAbove->releaseNext())));
     recordAbove->next()->element()->beginParsingChildren();
     return;
   }
@@ -423,7 +423,7 @@ Element* HTMLElementStack::bodyElement() const {
 
 void HTMLElementStack::pushCommon(PassRefPtr<Element> element) {
   ASSERT(m_htmlElement);
-  m_top.set(new ElementRecord(element, m_top.release()));
+  m_top = adoptPtr(new ElementRecord(element, m_top.release()));
   top()->beginParsingChildren();
 }
 

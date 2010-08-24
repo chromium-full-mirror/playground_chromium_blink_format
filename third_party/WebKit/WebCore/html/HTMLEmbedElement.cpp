@@ -97,7 +97,7 @@ void HTMLEmbedElement::parseMappedAttribute(Attribute* attr) {
     m_url = deprecatedParseURL(value.string());
     if (renderer() && isImageType()) {
       if (!m_imageLoader)
-        m_imageLoader.set(new HTMLImageLoader(this));
+        m_imageLoader = adoptPtr(new HTMLImageLoader(this));
       m_imageLoader->updateFromElementIgnoringPreviousError();
     }
   } else if (attr->name() == hiddenAttr) {
@@ -164,7 +164,7 @@ void HTMLEmbedElement::attach() {
 
   if (isImage && renderer()) {
     if (!m_imageLoader)
-      m_imageLoader.set(new HTMLImageLoader(this));
+      m_imageLoader = adoptPtr(new HTMLImageLoader(this));
     m_imageLoader->updateFromElement();
 
     if (renderer())
