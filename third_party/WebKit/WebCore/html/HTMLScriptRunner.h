@@ -42,7 +42,10 @@ class ScriptSourceCode;
 
 class HTMLScriptRunner : public Noncopyable {
  public:
-  HTMLScriptRunner(Document*, HTMLScriptRunnerHost*);
+  static PassOwnPtr<HTMLScriptRunner> create(Document* document,
+                                             HTMLScriptRunnerHost* host) {
+    return adoptPtr(new HTMLScriptRunner(document, host));
+  }
   ~HTMLScriptRunner();
 
   void detach();
@@ -59,6 +62,8 @@ class HTMLScriptRunner : public Noncopyable {
   bool isExecutingScript() const { return !!m_scriptNestingLevel; }
 
  private:
+  HTMLScriptRunner(Document*, HTMLScriptRunnerHost*);
+
   Frame* frame() const;
 
   void executeParsingBlockingScript();

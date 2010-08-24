@@ -95,7 +95,7 @@ HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* document,
                                        bool reportErrors)
     : ScriptableDocumentParser(document),
       m_tokenizer(new HTMLTokenizer),
-      m_scriptRunner(new HTMLScriptRunner(document, this)),
+      m_scriptRunner(HTMLScriptRunner::create(document, this)),
       m_treeBuilder(
           HTMLTreeBuilder::create(m_tokenizer.get(), document, reportErrors)),
       m_parserScheduler(new HTMLParserScheduler(this)),
