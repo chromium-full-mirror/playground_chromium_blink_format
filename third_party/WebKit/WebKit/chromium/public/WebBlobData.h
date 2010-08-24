@@ -31,8 +31,9 @@
 #ifndef WebBlobData_h
 #define WebBlobData_h
 
-#include "WebData.h"
+#include "WebCString.h"
 #include "WebString.h"
+#include "WebURL.h"
 
 #if WEBKIT_IMPLEMENTATION
 namespace WebCore {
@@ -52,8 +53,9 @@ class WebBlobData {
  public:
   struct Item {
     enum { TypeData, TypeFile, TypeBlob } type;
-    WebData data;
-    WebString pathOrURL;
+    WebCString data;
+    WebString filePath;
+    WebURL blobURL;
     long long offset;
     long long length;  // -1 means go to the end of the file/blob.
     double expectedModificationTime;  // 0.0 means that the time is not set.
@@ -76,13 +78,13 @@ class WebBlobData {
   WEBKIT_API bool itemAt(size_t index, Item& result) const;
 
   // Appends to the list of items.
-  WEBKIT_API void appendData(const WebData&);
+  WEBKIT_API void appendData(const WebCString&);
   WEBKIT_API void appendFile(const WebString& filePath);
   WEBKIT_API void appendFile(const WebString& filePath,
                              long long offset,
                              long long length,
                              double expectedModificationTime);
-  WEBKIT_API void appendBlob(const WebString& blobURL,
+  WEBKIT_API void appendBlob(const WebURL& blobURL,
                              long long offset,
                              long long length);
 
