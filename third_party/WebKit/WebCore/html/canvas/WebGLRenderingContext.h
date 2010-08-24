@@ -531,10 +531,6 @@ class WebGLRenderingContext : public CanvasRenderingContext {
 
   void removeObject(WebGLObject*);
 
-  bool paintsIntoCanvasBuffer() const {
-    return m_context->paintsIntoCanvasBuffer();
-  }
-
  private:
   friend class WebGLObject;
 

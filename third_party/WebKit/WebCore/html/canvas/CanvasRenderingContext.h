@@ -55,6 +55,7 @@ class CanvasRenderingContext : public Noncopyable {
   virtual GraphicsContext3D* graphicsContext3D() const { return 0; }
 
   virtual void paintRenderingResultsToCanvas() {}
+  bool paintsIntoCanvasBuffer() const;
 
  private:
   HTMLCanvasElement* m_canvas;
