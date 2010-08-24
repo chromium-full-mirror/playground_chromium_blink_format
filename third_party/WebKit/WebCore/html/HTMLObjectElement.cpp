@@ -88,7 +88,7 @@ void HTMLObjectElement::parseMappedAttribute(Attribute* attr) {
       m_needWidgetUpdate = true;
     if (renderer() && isImageType()) {
       if (!m_imageLoader)
-        m_imageLoader.set(new HTMLImageLoader(this));
+        m_imageLoader = adoptPtr(new HTMLImageLoader(this));
       m_imageLoader->updateFromElementIgnoringPreviousError();
     }
   } else if (attr->name() == classidAttr) {
@@ -156,7 +156,7 @@ void HTMLObjectElement::attach() {
 
   if (isImage && renderer() && !m_useFallbackContent) {
     if (!m_imageLoader)
-      m_imageLoader.set(new HTMLImageLoader(this));
+      m_imageLoader = adoptPtr(new HTMLImageLoader(this));
     m_imageLoader->updateFromElement();
   }
 }

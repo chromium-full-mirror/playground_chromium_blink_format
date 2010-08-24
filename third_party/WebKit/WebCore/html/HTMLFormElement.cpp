@@ -520,7 +520,7 @@ void HTMLFormElement::addElementAlias(HTMLFormControlElement* element,
   if (alias.isEmpty())
     return;
   if (!m_elementAliases)
-    m_elementAliases.set(new AliasMap);
+    m_elementAliases = adoptPtr(new AliasMap);
   m_elementAliases->set(alias.impl(), element);
 }
 

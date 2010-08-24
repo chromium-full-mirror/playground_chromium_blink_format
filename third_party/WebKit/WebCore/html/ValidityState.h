@@ -32,7 +32,7 @@ namespace WebCore {
 class ValidityState : public Noncopyable {
  public:
   static PassOwnPtr<ValidityState> create(HTMLFormControlElement* control) {
-    return new ValidityState(control);
+    return adoptPtr(new ValidityState(control));
   }
 
   void ref() { m_control->ref(); }
