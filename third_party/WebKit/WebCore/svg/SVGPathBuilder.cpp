@@ -36,7 +36,7 @@ void SVGPathBuilder::moveTo(const FloatPoint& targetPoint,
   ASSERT(m_path);
   m_current =
       mode == AbsoluteCoordinates ? targetPoint : m_current + targetPoint;
-  if (closed)
+  if (closed && !m_path->isEmpty())
     m_path->closeSubpath();
   m_path->moveTo(m_current);
 }
