@@ -1010,9 +1010,8 @@ void InspectorDOMAgent::didInsertDOMNode(Node* node) {
         return;
     }
     uint32_t mask = m_breakpoints.get(parent);
-    mask = mask |
-           (mask >> domBreakpointDerivedTypeShift) &
-               ((1 << domBreakpointDerivedTypeShift) - 1);
+    mask = (mask | (mask >> domBreakpointDerivedTypeShift)) &
+           ((1 << domBreakpointDerivedTypeShift) - 1);
     updateSubtreeBreakpoints(node, mask, true);
   }
 
@@ -1099,6 +1098,8 @@ bool InspectorDOMAgent::pauseOnBreakpoint() {
   bool deleted = !s_domAgentOnBreakpoint;
   s_domAgentOnBreakpoint = 0;
   return !deleted;
+#else
+  return true;
 #endif
 }
 
