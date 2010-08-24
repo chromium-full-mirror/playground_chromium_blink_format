@@ -75,7 +75,7 @@ bool causesFosterParenting(const QualifiedName& tagName) {
 
 template <typename ChildType>
 PassRefPtr<ChildType> HTMLConstructionSite::attach(
-    Node* parent,
+    ContainerNode* parent,
     PassRefPtr<ChildType> prpChild) {
   RefPtr<ChildType> child = prpChild;
 
@@ -428,7 +428,8 @@ void HTMLConstructionSite::findFosterSite(AttachmentSite& site) {
       m_openElements.topmost(tableTag.localName());
   if (lastTableElementRecord) {
     Element* lastTableElement = lastTableElementRecord->element();
-    if (Node* parent = lastTableElement->parent()) {
+    if (ContainerNode* parent =
+            static_cast<ContainerNode*>(lastTableElement->parent())) {
       site.parent = parent;
       site.nextChild = lastTableElement;
       return;
