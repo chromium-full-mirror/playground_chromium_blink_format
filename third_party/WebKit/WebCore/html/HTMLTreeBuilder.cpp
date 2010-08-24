@@ -39,7 +39,6 @@
 #include "HTMLScriptElement.h"
 #include "HTMLToken.h"
 #include "HTMLTokenizer.h"
-#include "LegacyHTMLTreeBuilder.h"
 #include "LocalizedStrings.h"
 #include "MathMLNames.h"
 #include "NotImplemented.h"
@@ -93,12 +92,6 @@ inline bool isAllWhitespaceOrReplacementCharacters(const String& string) {
       string);
 }
 
-bool shouldUseLegacyTreeBuilder(Document*) {
-  // Never use the LegacyHTMLTreeBuilder.  We'll remove the 10k+ lines of
-  // code supporting this bool in later commits.
-  return false;
-}
-
 bool isNumberedHeaderTag(const AtomicString& tagName) {
   return tagName == h1Tag || tagName == h2Tag || tagName == h3Tag ||
          tagName == h4Tag || tagName == h5Tag || tagName == h6Tag;
@@ -148,7 +141,6 @@ bool isSpecialNode(Node* node) {
 }
 
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html#scoping
-// Same as isScopingTag in LegacyHTMLTreeBuilder.cpp
 // and isScopeMarker in HTMLElementStack.cpp
 bool isScopingTag(const AtomicString& tagName) {
   return tagName == appletTag || tagName == captionTag ||
@@ -289,8 +281,8 @@ HTMLTreeBuilder::HTMLTreeBuilder(HTMLTokenizer* tokenizer,
       m_originalInsertionMode(InitialMode),
       m_secondaryInsertionMode(InitialMode),
       m_tokenizer(tokenizer),
-      m_lastScriptElementStartLine(uninitializedLineNumberValue),
-      m_scriptToProcessStartLine(uninitializedLineNumberValue) {}
+      m_scriptToProcessStartLine(uninitializedLineNumberValue),
+      m_lastScriptElementStartLine(uninitializedLineNumberValue) {}
 
 // FIXME: Member variables should be grouped into self-initializing structs to
 // minimize code duplication between these constructors.
@@ -300,10 +292,7 @@ HTMLTreeBuilder::HTMLTreeBuilder(
     Element* contextElement,
     FragmentScriptingPermission scriptingPermission)
     : m_framesetOk(true),
-      m_fragmentContext(fragment,
-                        contextElement,
-                        scriptingPermission,
-                        shouldUseLegacyTreeBuilder(fragment->document())),
+      m_fragmentContext(fragment, contextElement, scriptingPermission),
       m_document(m_fragmentContext.document()),
       m_tree(m_document, scriptingPermission, true),
       m_reportErrors(false)  // FIXME: Why not report errors in fragments?
@@ -313,14 +302,8 @@ HTMLTreeBuilder::HTMLTreeBuilder(
       m_originalInsertionMode(InitialMode),
       m_secondaryInsertionMode(InitialMode),
       m_tokenizer(tokenizer),
-      m_legacyTreeBuilder(
-          shouldUseLegacyTreeBuilder(fragment->document())
-              ? new LegacyHTMLTreeBuilder(fragment, scriptingPermission)
-              : 0),
-      m_lastScriptElementStartLine(uninitializedLineNumberValue),
-      m_scriptToProcessStartLine(uninitializedLineNumberValue) {
-  if (shouldUseLegacyTreeBuilder(fragment->document()))
-    return;
+      m_scriptToProcessStartLine(uninitializedLineNumberValue),
+      m_lastScriptElementStartLine(uninitializedLineNumberValue) {
   if (contextElement) {
     // Steps 4.2-4.6 of the HTML5 Fragment Case parsing algorithm:
     // http://www.whatwg.org/specs/web-apps/current-work/multipage/the-end.html#fragment-case
@@ -345,25 +328,19 @@ void HTMLTreeBuilder::detach() {
 HTMLTreeBuilder::FragmentParsingContext::FragmentParsingContext()
     : m_fragment(0),
       m_contextElement(0),
-      m_usingLegacyTreeBuilder(false),
       m_scriptingPermission(FragmentScriptingAllowed) {}
 
 HTMLTreeBuilder::FragmentParsingContext::FragmentParsingContext(
     DocumentFragment* fragment,
     Element* contextElement,
-    FragmentScriptingPermission scriptingPermission,
-    bool legacyMode)
-    : m_dummyDocumentForFragmentParsing(
-          legacyMode ? 0 : HTMLDocument::create(0, KURL())),
+    FragmentScriptingPermission scriptingPermission)
+    : m_dummyDocumentForFragmentParsing(HTMLDocument::create(0, KURL())),
       m_fragment(fragment),
       m_contextElement(contextElement),
-      m_usingLegacyTreeBuilder(legacyMode),
       m_scriptingPermission(scriptingPermission) {}
 
 Document* HTMLTreeBuilder::FragmentParsingContext::document() const {
   ASSERT(m_fragment);
-  if (m_usingLegacyTreeBuilder)
-    return m_fragment->document();
   return m_dummyDocumentForFragmentParsing.get();
 }
 
@@ -385,39 +362,6 @@ void HTMLTreeBuilder::FragmentParsingContext::finished() {
 }
 
 HTMLTreeBuilder::FragmentParsingContext::~FragmentParsingContext() {}
-
-static void convertToOldStyle(AtomicHTMLToken& token, Token& oldStyleToken) {
-  switch (token.type()) {
-    case HTMLToken::Uninitialized:
-    case HTMLToken::DOCTYPE:
-      ASSERT_NOT_REACHED();
-      break;
-    case HTMLToken::EndOfFile:
-      ASSERT_NOT_REACHED();
-      notImplemented();
-      break;
-    case HTMLToken::StartTag:
-    case HTMLToken::EndTag: {
-      oldStyleToken.beginTag = (token.type() == HTMLToken::StartTag);
-      // The LegacyHTMLTreeBuilder seems to work better if we lie here and
-      // say that tags are never self closing.  As a wise man once said:
-      // "You can't handle the truth!"
-      oldStyleToken.selfClosingTag = false;
-      oldStyleToken.tagName = token.name();
-      oldStyleToken.attrs = token.takeAtributes();
-      break;
-    }
-    case HTMLToken::Comment:
-      oldStyleToken.tagName = commentAtom;
-      oldStyleToken.text = token.comment().impl();
-      break;
-    case HTMLToken::Character:
-      oldStyleToken.tagName = textAtom;
-      oldStyleToken.text = StringImpl::create(token.characters().data(),
-                                              token.characters().size());
-      break;
-  }
-}
 
 PassRefPtr<Element> HTMLTreeBuilder::takeScriptToProcess(int& scriptStartLine) {
   // Unpause ourselves, callers may pause us again when processing the script.
@@ -449,82 +393,7 @@ HTMLTokenizer::State HTMLTreeBuilder::adjustedLexerState(
   return state;
 }
 
-void HTMLTreeBuilder::passTokenToLegacyParser(HTMLToken& token) {
-  ASSERT(m_document);
-  if (token.type() == HTMLToken::DOCTYPE) {
-    DoctypeToken doctypeToken;
-    doctypeToken.m_name.append(token.name().data(), token.name().size());
-    doctypeToken.m_publicID = token.publicIdentifier();
-    doctypeToken.m_systemID = token.systemIdentifier();
-    doctypeToken.m_forceQuirks = token.forceQuirks();
-
-    m_legacyTreeBuilder->parseDoctypeToken(&doctypeToken);
-    return;
-  }
-
-  if (token.type() == HTMLToken::EndOfFile)
-    return;
-
-  // For now, we translate into an old-style token for testing.
-  Token oldStyleToken;
-  AtomicHTMLToken atomicToken(token);
-  convertToOldStyle(atomicToken, oldStyleToken);
-
-  RefPtr<Node> result = m_legacyTreeBuilder->parseToken(&oldStyleToken);
-  if (token.type() == HTMLToken::StartTag) {
-    // This work is supposed to be done by the parser, but
-    // when using the old parser for we have to do this manually.
-    if (oldStyleToken.tagName == scriptTag) {
-      m_tokenizer->setState(HTMLTokenizer::ScriptDataState);
-      m_lastScriptElement = static_pointer_cast<Element>(result);
-      m_lastScriptElementStartLine = m_tokenizer->lineNumber();
-    } else if (oldStyleToken.tagName == preTag ||
-               oldStyleToken.tagName == listingTag)
-      m_tokenizer->setSkipLeadingNewLineForListing(true);
-    else
-      m_tokenizer->setState(adjustedLexerState(
-          m_tokenizer->state(), oldStyleToken.tagName, m_document->frame()));
-  } else if (token.type() == HTMLToken::EndTag) {
-    if (oldStyleToken.tagName == scriptTag) {
-      if (m_lastScriptElement) {
-        ASSERT(m_lastScriptElementStartLine != uninitializedLineNumberValue);
-        if (m_fragmentContext.scriptingPermission() ==
-            FragmentScriptingNotAllowed) {
-          // FIXME: This is a horrible hack for platform/Pasteboard.
-          // Clear the <script> tag when using the Parser to create
-          // a DocumentFragment for pasting so that javascript content
-          // does not show up in pasted HTML.
-          m_lastScriptElement->removeChildren();
-        } else if (insertionMode() != AfterFramesetMode) {
-          ASSERT(
-              !m_scriptToProcess);  // Caller never called takeScriptToProcess!
-          ASSERT(m_scriptToProcessStartLine ==
-                 uninitializedLineNumberValue);  // Caller never called
-                                                 // takeScriptToProcess!
-          // Pause ourselves so that parsing stops until the script can be
-          // processed by the caller.
-          m_isPaused = true;
-          m_scriptToProcess = m_lastScriptElement.get();
-          // Lexer line numbers are 0-based, ScriptSourceCode expects 1-based
-          // lines,
-          // so we convert here before passing the line number off to
-          // HTMLScriptRunner.
-          m_scriptToProcessStartLine = m_lastScriptElementStartLine + 1;
-        }
-        m_lastScriptElement = 0;
-        m_lastScriptElementStartLine = uninitializedLineNumberValue;
-      }
-    } else if (oldStyleToken.tagName == framesetTag)
-      setInsertionMode(AfterFramesetMode);
-  }
-}
-
 void HTMLTreeBuilder::constructTreeFromToken(HTMLToken& rawToken) {
-  if (m_legacyTreeBuilder) {
-    passTokenToLegacyParser(rawToken);
-    return;
-  }
-
   AtomicHTMLToken token(rawToken);
   processToken(token);
 
@@ -2791,13 +2660,6 @@ void HTMLTreeBuilder::processScriptStartTag(AtomicHTMLToken& token) {
 
 void HTMLTreeBuilder::finished() {
   ASSERT(m_document);
-  // We should call m_document->finishedParsing() here, except
-  // m_legacyTreeBuilder->finished() does it for us.
-  if (m_legacyTreeBuilder) {
-    m_legacyTreeBuilder->finished();
-    return;
-  }
-
   if (isParsingFragment()) {
     m_fragmentContext.finished();
     return;
