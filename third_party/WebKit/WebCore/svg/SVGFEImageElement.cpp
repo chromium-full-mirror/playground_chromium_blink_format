@@ -30,10 +30,10 @@
 #include "Document.h"
 #include "RenderObject.h"
 #include "RenderSVGResource.h"
+#include "SVGImageBufferTools.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
 #include "SVGPreserveAspectRatio.h"
-#include "SVGRenderSupport.h"
 
 namespace WebCore {
 
@@ -130,7 +130,9 @@ PassRefPtr<FilterEffect> SVGFEImageElement::build(SVGFilterBuilder*) {
     IntRect targetRect = enclosingIntRect(renderer->objectBoundingBox());
     m_targetImage = ImageBuffer::create(targetRect.size(), LinearRGB);
 
-    SVGRenderSupport::renderSubtreeToImage(m_targetImage.get(), renderer);
+    AffineTransform contentTransformation;
+    SVGImageBufferTools::renderSubtreeToImageBuffer(
+        m_targetImage.get(), renderer, contentTransformation);
   }
 
   return FEImage::create(

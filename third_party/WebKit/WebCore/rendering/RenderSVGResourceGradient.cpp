@@ -85,19 +85,21 @@ static inline bool createMaskAndSwapContextForTextGradient(
       SVGRenderSupport::findTextRootObject(object);
   ASSERT(textRootBlock);
 
-  AffineTransform absoluteTransform(
-      SVGImageBufferTools::transformationToOutermostSVGCoordinateSystem(
-          textRootBlock));
+  AffineTransform absoluteTransform;
+  SVGImageBufferTools::calculateTransformationToOutermostSVGCoordinateSystem(
+      textRootBlock, absoluteTransform);
+
+  FloatRect absoluteTargetRect =
+      absoluteTransform.mapRect(textRootBlock->repaintRectInLocalCoordinates());
   FloatRect clampedAbsoluteTargetRect =
       SVGImageBufferTools::clampedAbsoluteTargetRectForRenderer(
-          textRootBlock, absoluteTransform,
-          textRootBlock->repaintRectInLocalCoordinates());
+          textRootBlock, absoluteTargetRect);
   if (clampedAbsoluteTargetRect.isEmpty())
     return false;
 
   OwnPtr<ImageBuffer> maskImage;
-  if (!SVGImageBufferTools::createImageBuffer(clampedAbsoluteTargetRect,
-                                              maskImage, DeviceRGB))
+  if (!SVGImageBufferTools::createImageBuffer(
+          absoluteTargetRect, clampedAbsoluteTargetRect, maskImage, DeviceRGB))
     return false;
 
   GraphicsContext* maskImageContext = maskImage->context();
@@ -125,15 +127,17 @@ static inline AffineTransform clipToTextMask(GraphicsContext* context,
 
   targetRect = textRootBlock->repaintRectInLocalCoordinates();
 
-  AffineTransform absoluteTransform(
-      SVGImageBufferTools::transformationToOutermostSVGCoordinateSystem(
-          textRootBlock));
+  AffineTransform absoluteTransform;
+  SVGImageBufferTools::calculateTransformationToOutermostSVGCoordinateSystem(
+      textRootBlock, absoluteTransform);
+
+  FloatRect absoluteTargetRect = absoluteTransform.mapRect(targetRect);
   FloatRect clampedAbsoluteTargetRect =
       SVGImageBufferTools::clampedAbsoluteTargetRectForRenderer(
-          textRootBlock, absoluteTransform, targetRect);
+          textRootBlock, absoluteTargetRect);
 
   SVGImageBufferTools::clipToImageBuffer(
-      context, absoluteTransform, clampedAbsoluteTargetRect, imageBuffer.get());
+      context, absoluteTransform, clampedAbsoluteTargetRect, imageBuffer);
 
   AffineTransform matrix;
   if (gradientData->boundingBoxMode) {

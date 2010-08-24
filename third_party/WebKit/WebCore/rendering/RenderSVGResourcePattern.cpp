@@ -110,9 +110,10 @@ bool RenderSVGResourcePattern::applyResource(RenderObject* object,
     AffineTransform tileImageTransform = buildTileImageTransform(
         object, attributes, patternElement, tileBoundaries);
 
-    AffineTransform absoluteTransform(
-        SVGImageBufferTools::transformationToOutermostSVGCoordinateSystem(
-            object));
+    AffineTransform absoluteTransform;
+    SVGImageBufferTools::calculateTransformationToOutermostSVGCoordinateSystem(
+        object, absoluteTransform);
+
     FloatRect absoluteTileBoundaries =
         absoluteTransform.mapRect(tileBoundaries);
 
@@ -271,20 +272,13 @@ PassOwnPtr<ImageBuffer> RenderSVGResourcePattern::createTileImage(
 
   OwnPtr<ImageBuffer> tileImage;
 
-  if (!SVGImageBufferTools::createImageBuffer(clampedAbsoluteTileBoundaries,
+  if (!SVGImageBufferTools::createImageBuffer(absoluteTileBoundaries,
+                                              clampedAbsoluteTileBoundaries,
                                               tileImage, DeviceRGB))
     return PassOwnPtr<ImageBuffer>();
 
   GraphicsContext* tileImageContext = tileImage->context();
   ASSERT(tileImageContext);
-
-  // Compensate rounding effects, as the absolute target rect is using
-  // floating-point numbers and the image buffer size is integer.
-  IntSize unclampedImageSize(SVGImageBufferTools::roundedImageBufferSize(
-      absoluteTileBoundaries.size()));
-  tileImageContext->scale(
-      FloatSize(unclampedImageSize.width() / absoluteTileBoundaries.width(),
-                unclampedImageSize.height() / absoluteTileBoundaries.height()));
 
   // The image buffer represents the final rendered size, so the content has to
   // be scaled (to avoid pixelation).
@@ -296,13 +290,16 @@ PassOwnPtr<ImageBuffer> RenderSVGResourcePattern::createTileImage(
   if (!tileImageTransform.isIdentity())
     tileImageContext->concatCTM(tileImageTransform);
 
+  AffineTransform contentTransformation;
+
   // Draw the content into the ImageBuffer.
   for (Node* node = attributes.patternContentElement()->firstChild(); node;
        node = node->nextSibling()) {
     if (!node->isSVGElement() || !static_cast<SVGElement*>(node)->isStyled() ||
         !node->renderer())
       continue;
-    SVGRenderSupport::renderSubtreeToImage(tileImage.get(), node->renderer());
+    SVGImageBufferTools::renderSubtreeToImageBuffer(
+        tileImage.get(), node->renderer(), contentTransformation);
   }
 
   return tileImage.release();

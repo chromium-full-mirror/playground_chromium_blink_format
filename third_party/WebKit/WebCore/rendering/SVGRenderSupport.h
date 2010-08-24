@@ -90,10 +90,6 @@ class SVGRenderSupport {
                                   bool fixed,
                                   TransformState&);
 
-  // This offers a way to render parts of a WebKit rendering tree into a
-  // ImageBuffer.
-  static void renderSubtreeToImage(ImageBuffer*, RenderObject*);
-
   // Shared between SVG renderers and resources.
   static void applyStrokeStyleToContext(GraphicsContext*,
                                         const RenderStyle*,
