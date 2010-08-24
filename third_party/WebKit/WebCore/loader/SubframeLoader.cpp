@@ -38,9 +38,6 @@
 #include "FrameLoaderClient.h"
 #include "HTMLAppletElement.h"
 #include "HTMLFrameElementBase.h"
-#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
-#include "HTMLMediaElement.h"
-#endif
 #include "HTMLNames.h"
 #include "HTMLPlugInElement.h"
 #include "MIMETypeRegistry.h"
@@ -48,12 +45,14 @@
 #include "Page.h"
 #include "PluginData.h"
 #include "RenderEmbeddedObject.h"
-#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
-#include "RenderVideo.h"
-#endif
 #include "RenderView.h"
 #include "Settings.h"
 #include "XSSAuditor.h"
+
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+#include "HTMLMediaElement.h"
+#include "RenderVideo.h"
+#endif
 
 namespace WebCore {
 
@@ -90,15 +89,8 @@ bool SubframeLoader::requestFrame(HTMLFrameOwnerElement* ownerElement,
   } else
     url = completeURL(urlString);
 
-  Frame* frame = ownerElement->contentFrame();
-  if (frame)
-    frame->redirectScheduler()->scheduleLocationChange(
-        url.string(), m_frame->loader()->outgoingReferrer(), lockHistory,
-        lockBackForwardList, m_frame->loader()->isProcessingUserGesture());
-  else
-    frame = loadSubframe(ownerElement, url, frameName,
-                         m_frame->loader()->outgoingReferrer());
-
+  Frame* frame = loadOrRedirectSubframe(ownerElement, url, frameName,
+                                        lockHistory, lockBackForwardList);
   if (!frame)
     return false;
 
@@ -152,12 +144,12 @@ bool SubframeLoader::requestObject(RenderEmbeddedObject* renderer,
   HTMLPlugInElement* element =
       static_cast<HTMLPlugInElement*>(renderer->node());
 
-  // If the plug-in element already contains a subframe, requestFrame will
-  // re-use it. Otherwise,
+  // If the plug-in element already contains a subframe, loadOrRedirectSubframe
+  // will re-use it. Otherwise,
   // it will create a new frame and set it as the RenderPart's widget, causing
   // what was previously
   // in the widget to be torn down.
-  return requestFrame(element, completedURL, frameName);
+  return loadOrRedirectSubframe(element, completedURL, frameName, true, true);
 }
 
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
@@ -256,6 +248,23 @@ PassRefPtr<Widget> SubframeLoader::createJavaAppletWidget(
 
   m_containsPlugins = true;
   return widget;
+}
+
+Frame* SubframeLoader::loadOrRedirectSubframe(
+    HTMLFrameOwnerElement* ownerElement,
+    const KURL& url,
+    const AtomicString& frameName,
+    bool lockHistory,
+    bool lockBackForwardList) {
+  Frame* frame = ownerElement->contentFrame();
+  if (frame)
+    frame->redirectScheduler()->scheduleLocationChange(
+        url.string(), m_frame->loader()->outgoingReferrer(), lockHistory,
+        lockBackForwardList, m_frame->loader()->isProcessingUserGesture());
+  else
+    frame = loadSubframe(ownerElement, url, frameName,
+                         m_frame->loader()->outgoingReferrer());
+  return frame;
 }
 
 Frame* SubframeLoader::loadSubframe(HTMLFrameOwnerElement* ownerElement,

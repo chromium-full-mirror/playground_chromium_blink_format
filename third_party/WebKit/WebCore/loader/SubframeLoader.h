@@ -91,6 +91,11 @@ class SubframeLoader : public Noncopyable {
   bool containsPlugins() const { return m_containsPlugins; }
 
  private:
+  Frame* loadOrRedirectSubframe(HTMLFrameOwnerElement*,
+                                const KURL&,
+                                const AtomicString& frameName,
+                                bool lockHistory,
+                                bool lockBackForwardList);
   Frame* loadSubframe(HTMLFrameOwnerElement*,
                       const KURL&,
                       const String& name,
