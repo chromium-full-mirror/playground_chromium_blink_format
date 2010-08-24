@@ -189,7 +189,7 @@ class CloseSyncDatabaseOnContextThreadTask
  public:
   static PassOwnPtr<CloseSyncDatabaseOnContextThreadTask> create(
       PassRefPtr<DatabaseSync> database) {
-    return new CloseSyncDatabaseOnContextThreadTask(database);
+    return adoptPtr(new CloseSyncDatabaseOnContextThreadTask(database));
   }
 
   virtual void performTask(ScriptExecutionContext*) {

@@ -362,7 +362,7 @@ void DatabaseTracker::populateOrigins() {
   if (m_quotaMap)
     return;
 
-  m_quotaMap.set(new QuotaMap);
+  m_quotaMap = adoptPtr(new QuotaMap);
 
   openTrackerDatabase(false);
   if (!m_database.isOpen())
@@ -569,7 +569,7 @@ void DatabaseTracker::addOpenDatabase(AbstractDatabase* database) {
     MutexLocker openDatabaseMapLock(m_openDatabaseMapGuard);
 
     if (!m_openDatabaseMap)
-      m_openDatabaseMap.set(new DatabaseOriginMap);
+      m_openDatabaseMap = adoptPtr(new DatabaseOriginMap);
 
     String name(database->stringIdentifier());
     DatabaseNameMap* nameMap =

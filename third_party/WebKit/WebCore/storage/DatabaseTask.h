@@ -104,8 +104,8 @@ class Database::DatabaseOpenTask : public DatabaseTask {
       DatabaseTaskSynchronizer* synchronizer,
       ExceptionCode& code,
       bool& success) {
-    return new DatabaseOpenTask(db, setVersionInNewDatabase, synchronizer, code,
-                                success);
+    return adoptPtr(new DatabaseOpenTask(db, setVersionInNewDatabase,
+                                         synchronizer, code, success));
   }
 
  private:
@@ -130,7 +130,7 @@ class Database::DatabaseCloseTask : public DatabaseTask {
   static PassOwnPtr<DatabaseCloseTask> create(
       Database* db,
       DatabaseTaskSynchronizer* synchronizer) {
-    return new DatabaseCloseTask(db, synchronizer);
+    return adoptPtr(new DatabaseCloseTask(db, synchronizer));
   }
 
  private:
@@ -147,7 +147,7 @@ class Database::DatabaseTransactionTask : public DatabaseTask {
   // Transaction task is never synchronous, so no 'synchronizer' parameter.
   static PassOwnPtr<DatabaseTransactionTask> create(
       PassRefPtr<SQLTransaction> transaction) {
-    return new DatabaseTransactionTask(transaction);
+    return adoptPtr(new DatabaseTransactionTask(transaction));
   }
 
   SQLTransaction* transaction() const { return m_transaction.get(); }
@@ -169,7 +169,7 @@ class Database::DatabaseTableNamesTask : public DatabaseTask {
       Database* db,
       DatabaseTaskSynchronizer* synchronizer,
       Vector<String>& names) {
-    return new DatabaseTableNamesTask(db, synchronizer, names);
+    return adoptPtr(new DatabaseTableNamesTask(db, synchronizer, names));
   }
 
  private:
