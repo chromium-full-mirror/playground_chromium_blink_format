@@ -94,7 +94,7 @@ HTMLTokenizer::State tokenizerStateForContextElement(Element* contextElement,
 HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* document,
                                        bool reportErrors)
     : ScriptableDocumentParser(document),
-      m_tokenizer(new HTMLTokenizer),
+      m_tokenizer(HTMLTokenizer::create()),
       m_scriptRunner(HTMLScriptRunner::create(document, this)),
       m_treeBuilder(
           HTMLTreeBuilder::create(m_tokenizer.get(), document, reportErrors)),
@@ -109,7 +109,7 @@ HTMLDocumentParser::HTMLDocumentParser(
     Element* contextElement,
     FragmentScriptingPermission scriptingPermission)
     : ScriptableDocumentParser(fragment->document()),
-      m_tokenizer(new HTMLTokenizer),
+      m_tokenizer(HTMLTokenizer::create()),
       m_treeBuilder(HTMLTreeBuilder::create(m_tokenizer.get(),
                                             fragment,
                                             contextElement,

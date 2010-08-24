@@ -71,7 +71,7 @@ class HTMLViewSourceParser : public DecodedDataDocumentParser {
   HTMLInputStream m_input;
   SegmentedString m_source;
   HTMLToken m_token;
-  HTMLTokenizer m_tokenizer;
+  OwnPtr<HTMLTokenizer> m_tokenizer;
 };
 }
 
