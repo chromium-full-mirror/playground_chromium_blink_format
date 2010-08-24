@@ -2343,7 +2343,6 @@ exit:
     unsigned size = textSegments->size();
     for (unsigned i = 0; i < size; ++i)
       free(textSegments->at(i).first);
-    textSegments.clear();
   }
 
   if (isDisplayString && r->ownerDocument())
