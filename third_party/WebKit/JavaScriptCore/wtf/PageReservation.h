@@ -254,14 +254,14 @@ inline PageReservation PageReservation::systemReserve(size_t size,
 
 inline bool PageReservation::systemCommit(void* start, size_t size) {
   intptr_t offset =
-      reinterpret_cast<intptr_t>(m_base) - reinterpret_cast<intptr_t>(start);
+      reinterpret_cast<intptr_t>(start) - reinterpret_cast<intptr_t>(m_base);
   m_chunk->Commit(offset, size);
   return true;
 }
 
 inline void PageReservation::systemDecommit(void* start, size_t size) {
   intptr_t offset =
-      reinterpret_cast<intptr_t>(m_base) - reinterpret_cast<intptr_t>(start);
+      reinterpret_cast<intptr_t>(start) - reinterpret_cast<intptr_t>(m_base);
   m_chunk->Decommit(offset, size);
 }
 
