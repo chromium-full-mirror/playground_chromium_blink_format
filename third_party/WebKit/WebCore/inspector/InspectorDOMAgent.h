@@ -152,6 +152,7 @@ class InspectorDOMAgent : public EventListener {
                long selectedNodeId,
                RefPtr<InspectorValue>* ruleObject,
                bool* selectorAffectsNode);
+  void getSupportedCSSProperties(RefPtr<InspectorArray>* cssProperties);
 
   // Methods called from the InspectorController.
   void setDocument(Document* document);

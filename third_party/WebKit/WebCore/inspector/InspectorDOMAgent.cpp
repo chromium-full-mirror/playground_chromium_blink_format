@@ -35,6 +35,7 @@
 
 #include "CSSComputedStyleDeclaration.h"
 #include "CSSMutableStyleDeclaration.h"
+#include "CSSPropertyNames.h"
 #include "CSSRule.h"
 #include "CSSRuleList.h"
 #include "CSSStyleRule.h"
@@ -1503,6 +1504,14 @@ void InspectorDOMAgent::addRule(const String& selector,
       static_cast<CSSStyleRule*>(styleSheet->item(styleSheet->length() - 1));
   *selectorAffectsNode = ruleAffectsNode(newRule, node);
   *ruleObject = buildObjectForRule(node->ownerDocument(), newRule);
+}
+
+void InspectorDOMAgent::getSupportedCSSProperties(
+    RefPtr<InspectorArray>* cssProperties) {
+  RefPtr<InspectorArray> properties = InspectorArray::create();
+  for (int i = 0; i < numCSSProperties; ++i)
+    properties->pushString(propertyNameStrings[i]);
+  *cssProperties = properties.release();
 }
 
 PassRefPtr<InspectorObject> InspectorDOMAgent::buildObjectForStyle(
