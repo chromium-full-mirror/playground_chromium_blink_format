@@ -97,17 +97,16 @@ static bool createTables(SQLiteDatabase* sqliteDatabase) {
 
       "DROP TABLE IF EXISTS Indexes",
       "CREATE TABLE IF NOT EXISTS Indexes (id INTEGER PRIMARY KEY, "
-      "objectStoreId INTEGER NOT NULL REFERENCES ObjectStore(id) ON DELETE "
-      "CASCADE, name TEXT NOT NULL, keyPath TEXT, isUnique INTEGER NOT NULL)",
+      "objectStoreId INTEGER NOT NULL REFERENCES ObjectStore(id), name TEXT "
+      "NOT NULL, keyPath TEXT, isUnique INTEGER NOT NULL)",
       "DROP INDEX IF EXISTS Indexes_composit",
       "CREATE UNIQUE INDEX IF NOT EXISTS Indexes_composit ON "
       "Indexes(objectStoreId, name)",
 
       "DROP TABLE IF EXISTS ObjectStoreData",
       "CREATE TABLE IF NOT EXISTS ObjectStoreData (id INTEGER PRIMARY KEY, "
-      "objectStoreId INTEGER NOT NULL REFERENCES ObjectStore(id) ON DELETE "
-      "CASCADE, keyString TEXT, keyDate INTEGER, keyNumber INTEGER, value TEXT "
-      "NOT NULL)",
+      "objectStoreId INTEGER NOT NULL REFERENCES ObjectStore(id), keyString "
+      "TEXT, keyDate INTEGER, keyNumber INTEGER, value TEXT NOT NULL)",
       "DROP INDEX IF EXISTS ObjectStoreData_composit",
       "CREATE UNIQUE INDEX IF NOT EXISTS ObjectStoreData_composit ON "
       "ObjectStoreData(keyString, keyDate, keyNumber, objectStoreId)"};

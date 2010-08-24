@@ -293,6 +293,8 @@ void IDBObjectStoreBackendImpl::removeIndex(
   ok = deleteQuery.step() == SQLResultDone;
   ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
 
+  // FIXME: Delete index data as well.
+
   m_indexes.remove(name);
   callbacks->onSuccess();
 }

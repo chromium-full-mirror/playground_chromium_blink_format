@@ -39,7 +39,7 @@ class SQLiteDatabase;
 
 class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
  public:
-  static PassRefPtr<IDBObjectStoreBackendInterface> create(
+  static PassRefPtr<IDBObjectStoreBackendImpl> create(
       IDBDatabaseBackendImpl* database,
       int64_t id,
       const String& name,
@@ -50,6 +50,7 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
   }
   ~IDBObjectStoreBackendImpl();
 
+  int64_t id() const { return m_id; }
   String name() const { return m_name; }
   String keyPath() const { return m_keyPath; }
   PassRefPtr<DOMStringList> indexNames() const;
