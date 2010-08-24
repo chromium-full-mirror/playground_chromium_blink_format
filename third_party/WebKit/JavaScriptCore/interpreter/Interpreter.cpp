@@ -3305,7 +3305,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
           JSObject* baseObject = asObject(baseCell);
           int direct = vPC[8].u.operand;
 
-          if (direct) {
+          if (!direct) {
             RefPtr<Structure>* it = vPC[6].u.structureChain->head();
 
             JSValue proto =
