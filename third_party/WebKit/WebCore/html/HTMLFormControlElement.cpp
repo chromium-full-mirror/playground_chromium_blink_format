@@ -39,7 +39,6 @@
 #include "HTMLFormElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
-#include "LegacyHTMLTreeBuilder.h"
 #include "LabelsNodeList.h"
 #include "Page.h"
 #include "RenderBox.h"
@@ -170,13 +169,7 @@ void HTMLFormControlElement::removedFromTree(bool deep) {
   // to the form.
   // Otherwise, null out our form and remove ourselves from the form's list of
   // elements.
-  LegacyHTMLTreeBuilder* treeBuilder = 0;
-  if (DocumentParser* parser = document()->parser())
-    treeBuilder = parser->htmlTreeBuilder();
-
-  if (m_form &&
-      !(treeBuilder && treeBuilder->isHandlingResidualStyleAcrossBlocks()) &&
-      findRoot(this) != findRoot(m_form)) {
+  if (m_form && findRoot(this) != findRoot(m_form)) {
     m_form->removeFormElement(this);
     m_form = 0;
   }

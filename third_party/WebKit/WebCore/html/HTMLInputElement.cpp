@@ -51,7 +51,7 @@
 #include "HTMLImageLoader.h"
 #include "HTMLNames.h"
 #include "HTMLOptionElement.h"
-#include "LegacyHTMLTreeBuilder.h"
+#include "HTMLTreeBuilder.h"
 #include "KeyboardEvent.h"
 #include "LocalizedStrings.h"
 #include "MouseEvent.h"
