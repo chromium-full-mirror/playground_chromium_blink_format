@@ -380,6 +380,10 @@ class FrameLoader : public Noncopyable {
 
   void started();
 
+  bool pageDismissalEventBeingDispatched() const {
+    return m_pageDismissalEventBeingDispatched;
+  }
+
  private:
   bool canCachePageContainingThisFrame();
 #ifndef NDEBUG
