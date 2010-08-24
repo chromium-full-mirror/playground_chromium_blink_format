@@ -2291,7 +2291,7 @@ UChar* plainTextToMallocAllocatedBuffer(const Range* r,
   static const unsigned cMaxSegmentSize = 1 << 16;
   bufferLength = 0;
   typedef pair<UChar*, unsigned> TextSegment;
-  Vector<TextSegment>* textSegments = 0;
+  OwnPtr<Vector<TextSegment>> textSegments;
   Vector<UChar> textBuffer;
   textBuffer.reserveInitialCapacity(cMaxSegmentSize);
   for (TextIterator it(r, isDisplayString
@@ -2307,7 +2307,7 @@ UChar* plainTextToMallocAllocatedBuffer(const Range* r,
       memcpy(newSegmentBuffer, textBuffer.data(),
              textBuffer.size() * sizeof(UChar));
       if (!textSegments)
-        textSegments = new Vector<TextSegment>;
+        textSegments = adoptPtr(new Vector<TextSegment>);
       textSegments->append(
           make_pair(newSegmentBuffer, (unsigned)textBuffer.size()));
       textBuffer.clear();
@@ -2343,7 +2343,7 @@ exit:
     unsigned size = textSegments->size();
     for (unsigned i = 0; i < size; ++i)
       free(textSegments->at(i).first);
-    delete textSegments;
+    textSegments.clear();
   }
 
   if (isDisplayString && r->ownerDocument())
