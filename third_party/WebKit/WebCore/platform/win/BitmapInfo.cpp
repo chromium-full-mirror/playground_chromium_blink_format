@@ -33,20 +33,15 @@
 
 namespace WebCore {
 
-BitmapInfo bitmapInfoForSize(int width, int height, WORD bitCount) {
-  ASSERT_ARG(bitCount, bitCount == 16 || bitCount == 32);
-
+BitmapInfo bitmapInfoForSize(int width,
+                             int height,
+                             BitmapInfo::BitCount bitCount) {
   BitmapInfo bitmapInfo;
   bitmapInfo.bmiHeader.biWidth = width;
   bitmapInfo.bmiHeader.biHeight = height;
   bitmapInfo.bmiHeader.biPlanes = 1;
   bitmapInfo.bmiHeader.biBitCount = bitCount;
   bitmapInfo.bmiHeader.biCompression = BI_RGB;
-  bitmapInfo.bmiHeader.biSizeImage = 0;
-  bitmapInfo.bmiHeader.biXPelsPerMeter = 0;
-  bitmapInfo.bmiHeader.biYPelsPerMeter = 0;
-  bitmapInfo.bmiHeader.biClrUsed = 0;
-  bitmapInfo.bmiHeader.biClrImportant = 0;
 
   return bitmapInfo;
 }
@@ -56,11 +51,11 @@ BitmapInfo::BitmapInfo() {
   bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 }
 
-BitmapInfo BitmapInfo::create(const IntSize& size, WORD bitCount) {
+BitmapInfo BitmapInfo::create(const IntSize& size, BitCount bitCount) {
   return bitmapInfoForSize(size.width(), size.height(), bitCount);
 }
 
-BitmapInfo BitmapInfo::createBottomUp(const IntSize& size, WORD bitCount) {
+BitmapInfo BitmapInfo::createBottomUp(const IntSize& size, BitCount bitCount) {
   return bitmapInfoForSize(size.width(), -size.height(), bitCount);
 }
 
