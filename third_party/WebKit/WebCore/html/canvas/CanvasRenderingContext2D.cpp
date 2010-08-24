@@ -2022,7 +2022,8 @@ const Font& CanvasRenderingContext2D::accessFont() {
 
 void CanvasRenderingContext2D::paintRenderingResultsToCanvas() {
 #if ENABLE(ACCELERATED_2D_CANVAS)
-  drawingContext()->syncSoftwareCanvas();
+  if (GraphicsContext* c = drawingContext())
+    c->syncSoftwareCanvas();
 #endif
 }
 
