@@ -350,6 +350,10 @@ class Editor {
                        bool matchStyle);
   void pasteAsPlainText(const String&, bool smartReplace);
 
+  // This is only necessary while paste is primarily implemented in WebKit for
+  // the mac platform.
+  void pasteAsPlainTextBypassingDHTML();
+
   Node* findEventTargetFrom(const VisibleSelection& selection) const;
 
  private:

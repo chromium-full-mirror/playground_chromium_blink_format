@@ -335,6 +335,10 @@ void Editor::pasteAsFragment(PassRefPtr<DocumentFragment> pastingFragment,
       ec);
 }
 
+void Editor::pasteAsPlainTextBypassingDHTML() {
+  pasteAsPlainTextWithPasteboard(Pasteboard::generalPasteboard());
+}
+
 void Editor::pasteAsPlainTextWithPasteboard(Pasteboard* pasteboard) {
   String text = pasteboard->plainText(m_frame);
   if (client() &&
