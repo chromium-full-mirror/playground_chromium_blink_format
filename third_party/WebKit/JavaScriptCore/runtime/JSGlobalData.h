@@ -211,8 +211,6 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   UString cachedDateString;
   double cachedDateStringValue;
 
-  WeakRandom weakRandom;
-
   int maxReentryDepth;
 
   RegExpCache* m_regExpCache;

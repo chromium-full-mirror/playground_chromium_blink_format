@@ -155,7 +155,6 @@ JSGlobalData::JSGlobalData(GlobalDataType globalDataType,
       firstStringifierToMark(0),
       markStack(jsArrayVPtr),
       cachedUTCOffset(NaN),
-      weakRandom(static_cast<int>(currentTime())),
       maxReentryDepth(threadStackType == ThreadStackTypeSmall
                           ? MaxSmallThreadReentryDepth
                           : MaxLargeThreadReentryDepth),
