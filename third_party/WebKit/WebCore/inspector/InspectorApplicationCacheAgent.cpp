@@ -36,16 +36,16 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "InspectorController.h"
+#include "InspectorFrontend.h"
 #include "InspectorValues.h"
 #include "Page.h"
-#include "RemoteInspectorFrontend.h"
 #include "ResourceResponse.h"
 
 namespace WebCore {
 
 InspectorApplicationCacheAgent::InspectorApplicationCacheAgent(
     InspectorController* inspectorController,
-    RemoteInspectorFrontend* frontend)
+    InspectorFrontend* frontend)
     : m_inspectorController(inspectorController), m_frontend(frontend) {}
 
 void InspectorApplicationCacheAgent::didReceiveManifestResponse(

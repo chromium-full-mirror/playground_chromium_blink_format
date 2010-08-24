@@ -33,9 +33,9 @@
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 #include "InjectedScript.h"
 #include "InjectedScriptHost.h"
+#include "InspectorFrontend.h"
 #include "InspectorValues.h"
 #include "PlatformString.h"
-#include "RemoteInspectorFrontend.h"
 #include "ScriptDebugServer.h"
 #include <wtf/MD5.h>
 
@@ -47,9 +47,9 @@ static String formatBreakpointId(const String& sourceID, unsigned lineNumber) {
 
 PassOwnPtr<InspectorDebuggerAgent> InspectorDebuggerAgent::create(
     InspectorController* inspectorController,
-    RemoteInspectorFrontend* remoteFrontend) {
+    InspectorFrontend* frontend) {
   OwnPtr<InspectorDebuggerAgent> agent =
-      adoptPtr(new InspectorDebuggerAgent(inspectorController, remoteFrontend));
+      adoptPtr(new InspectorDebuggerAgent(inspectorController, frontend));
   ScriptDebugServer::shared().clearBreakpoints();
   ScriptDebugServer::shared().addListener(agent.get(),
                                           inspectorController->inspectedPage());
@@ -58,9 +58,9 @@ PassOwnPtr<InspectorDebuggerAgent> InspectorDebuggerAgent::create(
 
 InspectorDebuggerAgent::InspectorDebuggerAgent(
     InspectorController* inspectorController,
-    RemoteInspectorFrontend* remoteFrontend)
+    InspectorFrontend* frontend)
     : m_inspectorController(inspectorController),
-      m_remoteFrontend(remoteFrontend),
+      m_frontend(frontend),
       m_pausedScriptState(0),
       m_breakpointsLoaded(false) {}
 
@@ -174,7 +174,7 @@ void InspectorDebuggerAgent::stepOutOfFunction() {
 void InspectorDebuggerAgent::setPauseOnExceptionsState(long pauseState) {
   ScriptDebugServer::shared().setPauseOnExceptionsState(
       static_cast<ScriptDebugServer::PauseOnExceptionsState>(pauseState));
-  m_remoteFrontend->updatePauseOnExceptionsState(
+  m_frontend->updatePauseOnExceptionsState(
       ScriptDebugServer::shared().pauseOnExceptionsState());
 }
 
@@ -262,7 +262,7 @@ void InspectorDebuggerAgent::didParseSource(const String& sourceID,
                                             int firstLine,
                                             ScriptWorldType worldType) {
   // Don't send script content to the front end until it's really needed.
-  m_remoteFrontend->parsedScriptSource(sourceID, url, "", firstLine, worldType);
+  m_frontend->parsedScriptSource(sourceID, url, "", firstLine, worldType);
 
   m_scriptIDToContent.set(sourceID, data);
 
@@ -283,9 +283,9 @@ void InspectorDebuggerAgent::didParseSource(const String& sourceID,
           sourceID, breakpointIt->second, lineNumber, &actualLineNumber);
       if (!success)
         continue;
-      m_remoteFrontend->restoredBreakpoint(sourceID, url, actualLineNumber,
-                                           breakpointIt->second.enabled,
-                                           breakpointIt->second.condition);
+      m_frontend->restoredBreakpoint(sourceID, url, actualLineNumber,
+                                     breakpointIt->second.enabled,
+                                     breakpointIt->second.condition);
       String breakpointId = formatBreakpointId(sourceID, actualLineNumber);
       m_breakpointsMapping.set(breakpointId, lineNumber);
     }
@@ -298,20 +298,20 @@ void InspectorDebuggerAgent::failedToParseSource(const String& url,
                                                  int firstLine,
                                                  int errorLine,
                                                  const String& errorMessage) {
-  m_remoteFrontend->failedToParseScriptSource(url, data, firstLine, errorLine,
-                                              errorMessage);
+  m_frontend->failedToParseScriptSource(url, data, firstLine, errorLine,
+                                        errorMessage);
 }
 
 void InspectorDebuggerAgent::didPause(ScriptState* scriptState) {
   ASSERT(scriptState && !m_pausedScriptState);
   m_pausedScriptState = scriptState;
   RefPtr<InspectorValue> callFrames = currentCallFrames();
-  m_remoteFrontend->pausedScript(callFrames.get());
+  m_frontend->pausedScript(callFrames.get());
 }
 
 void InspectorDebuggerAgent::didContinue() {
   m_pausedScriptState = 0;
-  m_remoteFrontend->resumedScript();
+  m_frontend->resumedScript();
 }
 
 }  // namespace WebCore

@@ -40,7 +40,6 @@ namespace WebCore {
 class InspectorApplicationCacheAgent;
 class InspectorDOMAgent;
 class InspectorFrontend;
-class RemoteInspectorFrontend;
 
 class InspectorBackend : public RefCounted<InspectorBackend> {
  public:
@@ -89,7 +88,7 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
  private:
   InspectorBackend(InspectorController* inspectorController);
-  RemoteInspectorFrontend* remoteFrontend();
+  InspectorFrontend* frontend();
 
   InspectorController* m_inspectorController;
 };

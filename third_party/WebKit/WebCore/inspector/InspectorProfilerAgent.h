@@ -42,9 +42,9 @@ namespace WebCore {
 
 class InspectorArray;
 class InspectorController;
+class InspectorFrontend;
 class InspectorObject;
 class ScriptProfile;
-class RemoteInspectorFrontend;
 
 class InspectorProfilerAgent : public Noncopyable {
  public:
@@ -73,9 +73,7 @@ class InspectorProfilerAgent : public Noncopyable {
   }
   void removeProfile(unsigned uid);
   void resetState();
-  void setRemoteFrontend(RemoteInspectorFrontend* frontend) {
-    m_remoteFrontend = frontend;
-  }
+  void setFrontend(InspectorFrontend* frontend) { m_frontend = frontend; }
   void startProfiling() { startUserInitiatedProfiling(); }
   void startUserInitiatedProfiling();
   void stopProfiling() { stopUserInitiatedProfiling(); }
@@ -89,7 +87,7 @@ class InspectorProfilerAgent : public Noncopyable {
   PassRefPtr<InspectorObject> createProfileHeader(const ScriptProfile& profile);
 
   InspectorController* m_inspectorController;
-  RemoteInspectorFrontend* m_remoteFrontend;
+  InspectorFrontend* m_frontend;
   bool m_enabled;
   bool m_recordingUserInitiatedProfile;
   int m_currentUserInitiatedProfileNumber;

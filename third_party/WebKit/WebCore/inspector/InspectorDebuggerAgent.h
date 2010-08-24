@@ -42,13 +42,13 @@
 namespace WebCore {
 class InjectedScriptHost;
 class InspectorController;
+class InspectorFrontend;
 class InspectorValue;
-class RemoteInspectorFrontend;
 
 class InspectorDebuggerAgent : public ScriptDebugListener, public Noncopyable {
  public:
   static PassOwnPtr<InspectorDebuggerAgent> create(InspectorController*,
-                                                   RemoteInspectorFrontend*);
+                                                   InspectorFrontend*);
   virtual ~InspectorDebuggerAgent();
 
   static bool isDebuggerAlwaysEnabled();
@@ -83,7 +83,7 @@ class InspectorDebuggerAgent : public ScriptDebugListener, public Noncopyable {
   static String md5Base16(const String& string);
 
  private:
-  InspectorDebuggerAgent(InspectorController*, RemoteInspectorFrontend*);
+  InspectorDebuggerAgent(InspectorController*, InspectorFrontend*);
 
   PassRefPtr<InspectorValue> currentCallFrames();
 
@@ -104,7 +104,7 @@ class InspectorDebuggerAgent : public ScriptDebugListener, public Noncopyable {
   virtual void didContinue();
 
   InspectorController* m_inspectorController;
-  RemoteInspectorFrontend* m_remoteFrontend;
+  InspectorFrontend* m_frontend;
   ScriptState* m_pausedScriptState;
   HashMap<String, String> m_sourceIDToURL;
   HashMap<String, String> m_scriptIDToContent;

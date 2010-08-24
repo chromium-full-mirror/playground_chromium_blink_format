@@ -34,6 +34,7 @@
 
 #include "Database.h"
 #include "ExceptionCode.h"
+#include "InspectorFrontend.h"
 #include "InspectorValues.h"
 #include "SQLError.h"
 #include "SQLStatementCallback.h"
@@ -43,7 +44,6 @@
 #include "SQLTransactionCallback.h"
 #include "SQLTransactionErrorCallback.h"
 #include "SQLValue.h"
-#include "RemoteInspectorFrontend.h"
 #include "VoidCallback.h"
 
 #include <wtf/Vector.h>
@@ -215,7 +215,7 @@ class TransactionSuccessCallback : public VoidCallback {
 
 }  // namespace
 
-InspectorStorageAgent::InspectorStorageAgent(RemoteInspectorFrontend* frontend)
+InspectorStorageAgent::InspectorStorageAgent(InspectorFrontend* frontend)
     : m_frontend(frontend) {}
 
 InspectorStorageAgent::~InspectorStorageAgent() {}
