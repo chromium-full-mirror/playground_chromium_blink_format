@@ -273,12 +273,6 @@ void webkit_init() {
   // resources
   webkit_set_cache_model(WEBKIT_CACHE_MODEL_WEB_BROWSER);
 
-#ifdef HAVE_GSETTINGS
-  // Initialize settings variables here to make sure this happens in
-  // the main thread.
-  inspectorGSettings();
-#endif
-
 #if ENABLE(DATABASE)
   gchar* databaseDirectory =
       g_build_filename(g_get_user_data_dir(), "webkit", "databases", NULL);
