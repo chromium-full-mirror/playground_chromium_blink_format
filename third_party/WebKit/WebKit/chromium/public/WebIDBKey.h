@@ -41,6 +41,9 @@ class WebSerializedScriptValue;
 
 class WebIDBKey {
  public:
+  // Please use one of the factory methods. This is public only to allow
+  // WebVector.
+  WebIDBKey() {}
   ~WebIDBKey() { reset(); }
 
   WEBKIT_API static WebIDBKey createNull();
@@ -83,8 +86,6 @@ class WebIDBKey {
 #endif
 
  private:
-  WebIDBKey() {}
-
   WebPrivatePtr<WebCore::IDBKey> m_private;
 };
 

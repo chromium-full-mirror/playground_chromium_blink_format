@@ -72,8 +72,10 @@ class GeolocationServiceChromium;
 class GraphicsContext;
 class Image;
 class IDBFactoryBackendInterface;
+class IDBKey;
 class IntRect;
 class KURL;
+class SerializedScriptValue;
 class Widget;
 
 struct Cookie;
@@ -192,6 +194,11 @@ class ChromiumBridge {
 
   // IndexedDB ----------------------------------------------------------
   static PassRefPtr<IDBFactoryBackendInterface> idbFactory();
+  // Extracts keyPath from values and returns the corresponding keys.
+  static void createIDBKeysFromSerializedValuesAndKeyPath(
+      const Vector<RefPtr<SerializedScriptValue>>& values,
+      const String& keyPath,
+      Vector<RefPtr<IDBKey>>& keys);
 
   // JavaScript ---------------------------------------------------------
   static void notifyJSOutOfMemory(Frame*);

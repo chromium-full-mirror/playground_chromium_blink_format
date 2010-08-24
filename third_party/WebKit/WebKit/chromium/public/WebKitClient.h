@@ -35,6 +35,7 @@
 #include "WebData.h"
 #include "WebLocalizedString.h"
 #include "WebString.h"
+#include "WebVector.h"
 #include "WebURL.h"
 
 #include <time.h>
@@ -55,10 +56,12 @@ class WebFileUtilities;
 class WebGLES2Context;
 class WebGraphicsContext3D;
 class WebIDBFactory;
+class WebIDBKey;
 class WebMessagePortChannel;
 class WebMimeRegistry;
 class WebPluginListBuilder;
 class WebSandboxSupport;
+class WebSerializedScriptValue;
 class WebSharedWorkerRepository;
 class WebSocketStreamHandle;
 class WebStorageNamespace;
@@ -153,6 +156,10 @@ class WebKitClient {
   // Indexed Database ----------------------------------------------------
 
   virtual WebIDBFactory* idbFactory() { return 0; }
+  virtual void createIDBKeysFromSerializedValuesAndKeyPath(
+      const WebVector<WebSerializedScriptValue>& values,
+      const WebString& keyPath,
+      WebVector<WebIDBKey>& keys) {}
 
   // Keygen --------------------------------------------------------------
 
