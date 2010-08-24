@@ -115,6 +115,8 @@ class XMLDocumentParser : public ScriptableDocumentParser,
   virtual int lineNumber() const;
   virtual int columnNumber() const;
 
+  static bool supportsXMLVersion(const String&);
+
  private:
   XMLDocumentParser(Document*, FrameView* = 0);
   XMLDocumentParser(DocumentFragment*, Element*, FragmentScriptingPermission);
