@@ -97,7 +97,7 @@ HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* document,
       m_tokenizer(new HTMLTokenizer),
       m_scriptRunner(new HTMLScriptRunner(document, this)),
       m_treeBuilder(
-          new HTMLTreeBuilder(m_tokenizer.get(), document, reportErrors)),
+          HTMLTreeBuilder::create(m_tokenizer.get(), document, reportErrors)),
       m_parserScheduler(new HTMLParserScheduler(this)),
       m_endWasDelayed(false),
       m_writeNestingLevel(0) {}
@@ -110,10 +110,10 @@ HTMLDocumentParser::HTMLDocumentParser(
     FragmentScriptingPermission scriptingPermission)
     : ScriptableDocumentParser(fragment->document()),
       m_tokenizer(new HTMLTokenizer),
-      m_treeBuilder(new HTMLTreeBuilder(m_tokenizer.get(),
-                                        fragment,
-                                        contextElement,
-                                        scriptingPermission)),
+      m_treeBuilder(HTMLTreeBuilder::create(m_tokenizer.get(),
+                                            fragment,
+                                            contextElement,
+                                            scriptingPermission)),
       m_endWasDelayed(false),
       m_writeNestingLevel(0) {
   bool reportErrors =

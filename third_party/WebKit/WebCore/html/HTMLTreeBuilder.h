@@ -52,12 +52,19 @@ class Node;
 
 class HTMLTreeBuilder : public Noncopyable {
  public:
-  // FIXME: Replace constructors with create() functions returning PassOwnPtrs
-  HTMLTreeBuilder(HTMLTokenizer*, HTMLDocument*, bool reportErrors);
-  HTMLTreeBuilder(HTMLTokenizer*,
-                  DocumentFragment*,
-                  Element* contextElement,
-                  FragmentScriptingPermission);
+  static PassOwnPtr<HTMLTreeBuilder> create(HTMLTokenizer* tokenizer,
+                                            HTMLDocument* document,
+                                            bool reportErrors) {
+    return adoptPtr(new HTMLTreeBuilder(tokenizer, document, reportErrors));
+  }
+  static PassOwnPtr<HTMLTreeBuilder> create(
+      HTMLTokenizer* tokenizer,
+      DocumentFragment* fragment,
+      Element* contextElement,
+      FragmentScriptingPermission scriptingPermission) {
+    return adoptPtr(new HTMLTreeBuilder(tokenizer, fragment, contextElement,
+                                        scriptingPermission));
+  }
   ~HTMLTreeBuilder();
 
   void detach();
@@ -116,6 +123,12 @@ class HTMLTreeBuilder : public Noncopyable {
     AfterAfterBodyMode,
     AfterAfterFramesetMode,
   };
+
+  HTMLTreeBuilder(HTMLTokenizer*, HTMLDocument*, bool reportErrors);
+  HTMLTreeBuilder(HTMLTokenizer*,
+                  DocumentFragment*,
+                  Element* contextElement,
+                  FragmentScriptingPermission);
 
   bool isParsingFragment() const { return !!m_fragmentContext.fragment(); }
 
