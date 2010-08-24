@@ -202,7 +202,7 @@ PassRefPtr<IDBTransactionBackendInterface> IDBDatabaseBackendImpl::transaction(
     unsigned short mode,
     unsigned long timeout) {
   return m_transactionCoordinator->createTransaction(objectStores, mode,
-                                                     timeout);
+                                                     timeout, this);
 }
 
 void IDBDatabaseBackendImpl::loadObjectStores() {

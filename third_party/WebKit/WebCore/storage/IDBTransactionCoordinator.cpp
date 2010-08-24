@@ -28,9 +28,10 @@
 
 #if ENABLE(INDEXED_DATABASE)
 
-#include "IDBObjectStore.h"
+#include "IDBDatabaseBackendImpl.h"
 #include "IDBObjectStoreBackendInterface.h"
 #include "IDBTransactionBackendImpl.h"
+#include "SQLiteDatabase.h"
 #include "ScriptExecutionContext.h"
 
 namespace WebCore {
@@ -42,10 +43,11 @@ IDBTransactionCoordinator::~IDBTransactionCoordinator() {}
 PassRefPtr<IDBTransactionBackendInterface>
 IDBTransactionCoordinator::createTransaction(DOMStringList* objectStores,
                                              unsigned short mode,
-                                             unsigned long timeout) {
+                                             unsigned long timeout,
+                                             IDBDatabaseBackendImpl* database) {
   RefPtr<IDBTransactionBackendInterface> transaction =
-      IDBTransactionBackendImpl::create(objectStores, mode, timeout,
-                                        ++m_nextID);
+      IDBTransactionBackendImpl::create(objectStores, mode, timeout, ++m_nextID,
+                                        database);
   m_transactionQueue.add(transaction.get());
   m_idMap.add(m_nextID, transaction);
   return transaction.release();
