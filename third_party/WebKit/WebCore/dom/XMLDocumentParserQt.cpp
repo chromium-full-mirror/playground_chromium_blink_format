@@ -711,7 +711,7 @@ void XMLDocumentParser::parseDtd() {
     handleError(fatal, "Invalid DTD Public ID", lineNumber(), columnNumber());
 #endif
   if (!m_parsingFragment)
-    document()->deprecatedParserAddChild(
+    document()->parserAddChild(
         DocumentType::create(document(), name, publicId, systemId));
 }
 }
