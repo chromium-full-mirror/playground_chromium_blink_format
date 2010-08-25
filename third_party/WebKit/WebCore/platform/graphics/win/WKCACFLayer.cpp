@@ -44,6 +44,24 @@ namespace WebCore {
 
 using namespace std;
 
+#ifndef NDEBUG
+void WKCACFLayer::internalCheckLayerConsistency() {
+  ASSERT(layer());
+  size_t n = sublayerCount();
+  for (size_t i = 0; i < n; ++i) {
+    // This will ASSERT in internalSublayerAtIndex if this entry doesn't have
+    // proper user data
+    WKCACFLayer* sublayer = internalSublayerAtIndex(i);
+
+    // Make sure we don't have any null entries in the list
+    ASSERT(sublayer);
+
+    // Make sure the each layer has a corresponding CACFLayer
+    ASSERT(sublayer->layer());
+  }
+}
+#endif
+
 static void displayCallback(CACFLayerRef layer, CGContextRef context) {
   ASSERT_ARG(layer, WKCACFLayer::layer(layer));
   WKCACFLayer::layer(layer)->drawInContext(context);
@@ -177,7 +195,14 @@ WKCACFLayer::~WKCACFLayer() {
   // way for us to be destroyed while we still have a superlayer.
   ASSERT(!superlayer());
 
+  // Get rid of the children so we don't have any dangling references around
+  removeAllSublayers();
+
+#ifndef NDEBUG
+  CACFLayerSetUserData(layer(), reinterpret_cast<void*>(0xDEADBEEF));
+#else
   CACFLayerSetUserData(layer(), 0);
+#endif
   CACFLayerSetDisplayCallback(layer(), 0);
 }
 
@@ -204,10 +229,11 @@ void WKCACFLayer::addSublayer(PassRefPtr<WKCACFLayer> sublayer) {
 
 void WKCACFLayer::internalInsertSublayer(PassRefPtr<WKCACFLayer> sublayer,
                                          size_t index) {
-  index = min(index, sublayerCount());
+  index = min(index, sublayerCount() + 1);
   sublayer->removeFromSuperlayer();
   CACFLayerInsertSublayer(layer(), sublayer->layer(), index);
   setNeedsCommit();
+  checkLayerConsistency();
 }
 
 void WKCACFLayer::insertSublayerAboveLayer(PassRefPtr<WKCACFLayer> sublayer,
@@ -278,11 +304,13 @@ void WKCACFLayer::adoptSublayers(WKCACFLayer* source) {
     sublayers.append(source->internalSublayerAtIndex(i));
 
   setSublayers(sublayers);
+  source->checkLayerConsistency();
 }
 
 void WKCACFLayer::removeFromSuperlayer() {
   WKCACFLayer* superlayer = this->superlayer();
   CACFLayerRemoveFromSuperlayer(layer());
+  checkLayerConsistency();
 
   if (superlayer)
     superlayer->setNeedsCommit();
