@@ -133,6 +133,54 @@ static void initializeOffScreenResourceHandleWindow() {
       HWND_MESSAGE, 0, WebCore::instanceHandle(), 0);
 }
 
+class WebCoreSynchronousLoader : public ResourceHandleClient,
+                                 public Noncopyable {
+ public:
+  WebCoreSynchronousLoader(ResourceError&,
+                           ResourceResponse&,
+                           Vector<char>&,
+                           const String& userAgent);
+
+  virtual void didReceiveResponse(ResourceHandle*, const ResourceResponse&);
+  virtual void didReceiveData(ResourceHandle*,
+                              const char*,
+                              int,
+                              int lengthReceived);
+  virtual void didFinishLoading(ResourceHandle*);
+  virtual void didFail(ResourceHandle*, const ResourceError&);
+
+ private:
+  ResourceError& m_error;
+  ResourceResponse& m_response;
+  Vector<char>& m_data;
+};
+
+WebCoreSynchronousLoader::WebCoreSynchronousLoader(ResourceError& error,
+                                                   ResourceResponse& response,
+                                                   Vector<char>& data,
+                                                   const String& userAgent)
+    : m_error(error), m_response(response), m_data(data) {}
+
+void WebCoreSynchronousLoader::didReceiveResponse(
+    ResourceHandle*,
+    const ResourceResponse& response) {
+  m_response = response;
+}
+
+void WebCoreSynchronousLoader::didReceiveData(ResourceHandle*,
+                                              const char* data,
+                                              int length,
+                                              int) {
+  m_data.append(data, length);
+}
+
+void WebCoreSynchronousLoader::didFinishLoading(ResourceHandle*) {}
+
+void WebCoreSynchronousLoader::didFail(ResourceHandle*,
+                                       const ResourceError& error) {
+  m_error = error;
+}
+
 ResourceHandleInternal::~ResourceHandleInternal() {
   if (m_fileHandle != INVALID_HANDLE_VALUE)
     CloseHandle(m_fileHandle);
@@ -486,6 +534,22 @@ void ResourceHandle::cancel() {
     // error, to be deleted later.
     // FIXME: need real cancel error
     client()->didFail(this, ResourceError());
+}
+
+void ResourceHandle::loadResourceSynchronously(
+    const ResourceRequest& request,
+    StoredCredentials storedCredentials,
+    ResourceError& error,
+    ResourceResponse& response,
+    Vector<char>& data,
+    Frame* frame) {
+  UNUSED_PARAM(storedCredentials);
+
+  WebCoreSynchronousLoader syncLoader(error, response, data,
+                                      request.httpUserAgent());
+  ResourceHandle handle(request, &syncLoader, true, false);
+
+  handle.start(frame);
 }
 
 void ResourceHandle::setHasReceivedResponse(bool b) {
