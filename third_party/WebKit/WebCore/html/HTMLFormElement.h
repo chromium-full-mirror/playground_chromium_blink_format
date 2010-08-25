@@ -119,7 +119,6 @@ class HTMLFormElement : public HTMLElement {
   HTMLFormElement(const QualifiedName&, Document*);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
-  virtual int tagPriority() const { return 3; }
 
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual void insertedIntoDocument();

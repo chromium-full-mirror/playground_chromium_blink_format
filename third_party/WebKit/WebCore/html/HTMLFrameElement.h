@@ -40,7 +40,6 @@ class HTMLFrameElement : public HTMLFrameElementBase {
   HTMLFrameElement(const QualifiedName&, Document*);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-  virtual int tagPriority() const { return 0; }
 
   virtual void attach();
 

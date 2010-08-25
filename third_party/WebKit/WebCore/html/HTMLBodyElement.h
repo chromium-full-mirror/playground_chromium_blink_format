@@ -70,7 +70,6 @@ class HTMLBodyElement : public HTMLElement {
   HTMLBodyElement(const QualifiedName&, Document*);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
-  virtual int tagPriority() const { return 10; }
 
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(Attribute*);

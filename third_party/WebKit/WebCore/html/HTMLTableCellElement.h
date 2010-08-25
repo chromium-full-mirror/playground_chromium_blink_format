@@ -58,7 +58,6 @@ class HTMLTableCellElement : public HTMLTablePartElement {
   HTMLTableCellElement(const QualifiedName&, Document*);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
-  virtual int tagPriority() const { return 6; }
 
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(Attribute*);

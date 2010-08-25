@@ -37,7 +37,6 @@ class HTMLKeygenElement : public HTMLSelectElement {
  private:
   HTMLKeygenElement(const QualifiedName&, Document*, HTMLFormElement*);
 
-  virtual int tagPriority() const { return 0; }
   virtual const AtomicString& formControlType() const;
   virtual bool isEnumeratable() const { return false; }
   virtual void parseMappedAttribute(Attribute*);

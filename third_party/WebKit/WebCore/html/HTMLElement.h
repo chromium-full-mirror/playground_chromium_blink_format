@@ -83,7 +83,6 @@ class HTMLElement : public StyledElement {
   virtual void accessKeyAction(bool sendToAnyElement);
 
   virtual HTMLTagStatus endTagRequirement() const;
-  virtual int tagPriority() const;
 
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);

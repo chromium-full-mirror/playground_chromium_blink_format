@@ -66,7 +66,6 @@ class HTMLVideoElement : public HTMLMediaElement {
  private:
   HTMLVideoElement(const QualifiedName&, Document*);
 
-  virtual int tagPriority() const { return 5; }
   virtual bool rendererIsNeeded(RenderStyle*);
 #if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);

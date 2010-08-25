@@ -55,7 +55,6 @@ class HTMLTableRowElement : public HTMLTablePartElement {
   HTMLTableRowElement(const QualifiedName&, Document*);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
-  virtual int tagPriority() const { return 7; }
   virtual bool checkDTD(const Node*);
 };
 
