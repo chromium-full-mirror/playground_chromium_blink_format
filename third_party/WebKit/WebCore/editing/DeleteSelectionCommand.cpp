@@ -893,7 +893,7 @@ void DeleteSelectionCommand::doApply() {
   if (!m_hasSelectionToDelete)
     m_selectionToDelete = endingSelection();
 
-  if (!m_selectionToDelete.isRange())
+  if (!m_selectionToDelete.isNonOrphanedRange())
     return;
 
   // If the deletion is occurring in a text field, and we're not deleting to

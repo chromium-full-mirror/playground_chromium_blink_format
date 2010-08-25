@@ -158,7 +158,7 @@ InsertParagraphSeparatorCommand::cloneHierarchyUnderNewBlock(
 
 void InsertParagraphSeparatorCommand::doApply() {
   bool splitText = false;
-  if (endingSelection().isNone())
+  if (!endingSelection().isNonOrphanedCaretOrRange())
     return;
 
   Position insertionPosition = endingSelection().start();

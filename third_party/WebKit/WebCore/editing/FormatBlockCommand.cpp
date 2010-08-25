@@ -68,7 +68,7 @@ bool FormatBlockCommand::modifyRange() {
 }
 
 void FormatBlockCommand::doApply() {
-  if (endingSelection().isNone())
+  if (!endingSelection().isNonOrphanedCaretOrRange())
     return;
 
   if (!endingSelection().rootEditableElement())

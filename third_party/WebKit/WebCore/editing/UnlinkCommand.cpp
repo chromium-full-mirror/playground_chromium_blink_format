@@ -36,7 +36,7 @@ UnlinkCommand::UnlinkCommand(Document* document)
 void UnlinkCommand::doApply() {
   // FIXME: If a caret is inside a link, we should remove it, but currently we
   // don't.
-  if (!endingSelection().isRange())
+  if (!endingSelection().isNonOrphanedRange())
     return;
 
   pushPartiallySelectedAnchorElementsDown();

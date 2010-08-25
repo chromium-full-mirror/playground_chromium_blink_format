@@ -96,7 +96,7 @@ InsertListCommand::InsertListCommand(Document* document, Type type)
     : CompositeEditCommand(document), m_type(type) {}
 
 void InsertListCommand::doApply() {
-  if (endingSelection().isNone())
+  if (!endingSelection().isNonOrphanedCaretOrRange())
     return;
 
   if (!endingSelection().rootEditableElement())

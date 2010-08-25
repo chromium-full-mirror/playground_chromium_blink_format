@@ -412,7 +412,7 @@ void IndentOutdentCommand::outdentRegion(
 }
 
 void IndentOutdentCommand::doApply() {
-  if (endingSelection().isNone())
+  if (!endingSelection().isNonOrphanedCaretOrRange())
     return;
 
   if (!endingSelection().rootEditableElement())
