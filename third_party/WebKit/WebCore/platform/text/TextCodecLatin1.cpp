@@ -174,7 +174,7 @@ String TextCodecLatin1::decode(const char* bytes,
       // words.
       if (!(reinterpret_cast<ptrdiff_t>(src) & (sizeof(uintptr_t) - 1))) {
         while (src < alignedEnd) {
-          uintptr_t chunk = *reinterpret_cast<const uintptr_t*>(src);
+          uintptr_t chunk = *reinterpret_cast_ptr<const uintptr_t*>(src);
 
           if (chunk & NonASCIIMask<sizeof(uintptr_t)>::value())
             goto useLookupTable;

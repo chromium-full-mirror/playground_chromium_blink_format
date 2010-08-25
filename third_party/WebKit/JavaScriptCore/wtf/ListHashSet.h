@@ -24,6 +24,7 @@
 #include "Assertions.h"
 #include "HashSet.h"
 #include "OwnPtr.h"
+#include "StdLibExtras.h"
 
 namespace WTF {
 
@@ -199,7 +200,7 @@ struct ListHashSetNodeAllocator {
   }
 
  private:
-  Node* pool() { return reinterpret_cast<Node*>(m_pool.pool); }
+  Node* pool() { return reinterpret_cast_ptr<Node*>(m_pool.pool); }
   Node* pastPool() { return pool() + m_poolSize; }
 
   bool inPool(Node* node) { return node >= pool() && node < pastPool(); }
