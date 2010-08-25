@@ -39,6 +39,7 @@
 #include "Page.h"
 #include "RenderLayer.h"
 #include "RenderTextControlSingleLine.h"
+#include "ScrollbarTheme.h"
 #include "SpeechInput.h"
 
 namespace WebCore {
@@ -281,7 +282,9 @@ void SearchFieldCancelButtonElement::defaultEventHandler(Event* event) {
 inline SpinButtonElement::SpinButtonElement(HTMLElement* shadowParent)
     : TextControlInnerElement(shadowParent->document(), shadowParent),
       m_capturing(false),
-      m_upDownState(Indeterminate) {}
+      m_upDownState(Indeterminate),
+      m_pressStartingState(Indeterminate),
+      m_repeatingTimer(this, &SpinButtonElement::repeatingTimerFired) {}
 
 PassRefPtr<SpinButtonElement> SpinButtonElement::create(
     HTMLElement* shadowParent) {
@@ -302,7 +305,6 @@ void SpinButtonElement::defaultEventHandler(Event* event) {
     return;
   }
 
-  MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);
   HTMLInputElement* input =
       static_cast<HTMLInputElement*>(shadowAncestorNode());
   if (input->disabled() || input->isReadOnlyFormControl()) {
@@ -311,21 +313,23 @@ void SpinButtonElement::defaultEventHandler(Event* event) {
     return;
   }
 
+  MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);
   IntPoint local = roundedIntPoint(
       box->absoluteToLocal(mouseEvent->absoluteLocation(), false, true));
-  if (event->type() == eventNames().clickEvent &&
+  if (mouseEvent->type() == eventNames().mousedownEvent &&
       mouseEvent->button() == LeftButton) {
     if (box->borderBoxRect().contains(local)) {
       RefPtr<Node> protector(input);
       input->focus();
       input->select();
-      if (local.y() < box->height() / 2)
-        input->stepUpFromRenderer(1);
-      else
-        input->stepUpFromRenderer(-1);
+      input->stepUpFromRenderer(m_upDownState == Up ? 1 : -1);
       event->setDefaultHandled();
+      startRepeatingTimer();
     }
-  } else if (event->type() == eventNames().mousemoveEvent) {
+  } else if (mouseEvent->type() == eventNames().mouseupEvent &&
+             mouseEvent->button() == LeftButton)
+    stopRepeatingTimer();
+  else if (event->type() == eventNames().mousemoveEvent) {
     if (box->borderBoxRect().contains(local)) {
       if (!m_capturing) {
         if (Frame* frame = document()->frame()) {
@@ -339,6 +343,7 @@ void SpinButtonElement::defaultEventHandler(Event* event) {
         renderer()->repaint();
     } else {
       if (m_capturing) {
+        stopRepeatingTimer();
         if (Frame* frame = document()->frame()) {
           frame->eventHandler()->setCapturingMouseEventsNode(0);
           m_capturing = false;
@@ -349,6 +354,32 @@ void SpinButtonElement::defaultEventHandler(Event* event) {
 
   if (!event->defaultHandled())
     HTMLDivElement::defaultEventHandler(event);
+}
+
+void SpinButtonElement::startRepeatingTimer() {
+  m_pressStartingState = m_upDownState;
+  ScrollbarTheme* theme = ScrollbarTheme::nativeTheme();
+  m_repeatingTimer.start(theme->initialAutoscrollTimerDelay(),
+                         theme->autoscrollTimerDelay());
+}
+
+void SpinButtonElement::stopRepeatingTimer() {
+  m_repeatingTimer.stop();
+}
+
+void SpinButtonElement::repeatingTimerFired(Timer<SpinButtonElement>*) {
+  HTMLInputElement* input =
+      static_cast<HTMLInputElement*>(shadowAncestorNode());
+  if (input->disabled() || input->isReadOnlyFormControl())
+    return;
+// On Mac OS, NSStepper updates the value for the button under the mouse
+// cursor regardless of the button pressed at the beginning. So the
+// following check is not needed for Mac OS.
+#if !OS(MAC_OS_X)
+  if (m_upDownState != m_pressStartingState)
+    return;
+#endif
+  input->stepUpFromRenderer(m_upDownState == Up ? 1 : -1);
 }
 
 void SpinButtonElement::setHovered(bool flag) {

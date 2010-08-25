@@ -29,6 +29,7 @@
 
 #include "HTMLDivElement.h"
 #include "SpeechInputListener.h"
+#include "Timer.h"
 #include <wtf/Forward.h>
 
 namespace WebCore {
@@ -119,10 +120,15 @@ class SpinButtonElement : public TextControlInnerElement {
         ->isReadOnlyFormControl();
   }
   virtual void defaultEventHandler(Event*);
+  void startRepeatingTimer();
+  void stopRepeatingTimer();
+  void repeatingTimerFired(Timer<SpinButtonElement>*);
   virtual void setHovered(bool = true);
 
   bool m_capturing;
   UpDownState m_upDownState;
+  UpDownState m_pressStartingState;
+  Timer<SpinButtonElement> m_repeatingTimer;
 };
 
 #if ENABLE(INPUT_SPEECH)
