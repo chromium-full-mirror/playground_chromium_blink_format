@@ -127,10 +127,6 @@ class SVGDocumentExtensions;
 class TransformSource;
 #endif
 
-#if ENABLE(XBL)
-class XBLBindingManager;
-#endif
-
 #if ENABLE(XPATH)
 class XPathEvaluator;
 class XPathExpression;
@@ -948,11 +944,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   TransformSource* transformSource() const { return m_transformSource.get(); }
 #endif
 
-#if ENABLE(XBL)
-  // XBL methods
-  XBLBindingManager* bindingManager() const { return m_bindingManager.get(); }
-#endif
-
   void incDOMTreeVersion() { ++m_domTreeVersion; }
   unsigned domTreeVersion() const { return m_domTreeVersion; }
 
@@ -1347,12 +1338,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 #if ENABLE(XSLT)
   OwnPtr<TransformSource> m_transformSource;
   RefPtr<Document> m_transformSourceDocument;
-#endif
-
-#if ENABLE(XBL)
-  OwnPtr<XBLBindingManager> m_bindingManager;  // The access point through which
-                                               // documents and elements
-                                               // communicate with XBL.
 #endif
 
   typedef HashMap<AtomicStringImpl*, HTMLMapElement*> ImageMapsByName;

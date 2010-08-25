@@ -97,9 +97,6 @@ class Cache : public Noncopyable {
 #if ENABLE(XSLT)
     TypeStatistic xslStyleSheets;
 #endif
-#if ENABLE(XBL)
-    TypeStatistic xblDocs;
-#endif
     TypeStatistic fonts;
   };
 

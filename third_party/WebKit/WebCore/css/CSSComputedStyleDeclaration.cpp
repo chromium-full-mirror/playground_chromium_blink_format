@@ -883,8 +883,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return CSSPrimitiveValue::create(
           style->fontDescription().computedPixelSize(),
           CSSPrimitiveValue::CSS_PX);
-    case CSSPropertyWebkitBinding:
-      break;
     case CSSPropertyFontStyle:
       if (style->fontDescription().italic())
         return CSSPrimitiveValue::createIdentifier(CSSValueItalic);

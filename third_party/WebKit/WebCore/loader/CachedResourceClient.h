@@ -29,12 +29,6 @@
 #include <wtf/FastAllocBase.h>
 #include <wtf/Forward.h>
 
-#if ENABLE(XBL)
-namespace XBL {
-class XBLDocument;
-}
-#endif
-
 namespace WebCore {
 
 class CachedCSSStyleSheet;
@@ -78,13 +72,7 @@ class CachedResourceClient : public FastAllocBase {
   virtual void setXSLStyleSheet(const String& /* href */,
                                 const KURL& /* baseURL */,
                                 const String& /* sheet */) {}
-
   virtual void fontLoaded(CachedFont*){};
-
-#if ENABLE(XBL)
-  virtual void setXBLDocument(const String& /*URL*/, XBL::XBLDocument*) {}
-#endif
-
   virtual void notifyFinished(CachedResource*) {}
 };
 }

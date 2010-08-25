@@ -165,10 +165,6 @@
 #include "XSLTProcessor.h"
 #endif
 
-#if ENABLE(XBL)
-#include "XBLBindingManager.h"
-#endif
-
 #if ENABLE(SVG)
 #include "SVGDocumentExtensions.h"
 #include "SVGElementFactory.h"
@@ -384,12 +380,7 @@ Document::Document(Frame* frame, const KURL& url, bool isXHTML, bool isHTML)
       m_extraLayoutDelay(0),
       m_asyncScriptRunner(AsyncScriptRunner::create()),
       m_xmlVersion("1.0"),
-      m_xmlStandalone(false)
-#if ENABLE(XBL)
-      ,
-      m_bindingManager(new XBLBindingManager(this))
-#endif
-      ,
+      m_xmlStandalone(false),
       m_savedRenderer(0),
       m_designMode(inherit),
       m_selfOnlyRefCount(0)
@@ -561,10 +552,6 @@ Document::~Document() {
   m_docLoader.clear();
 
   m_renderArena.clear();
-
-#if ENABLE(XBL)
-  m_bindingManager.clear();
-#endif
 
   clearAXObjectCache();
 

@@ -65,10 +65,6 @@ class CachedResource : public Noncopyable {
     ,
     XSLStyleSheet
 #endif
-#if ENABLE(XBL)
-    ,
-    XBL
-#endif
 #if ENABLE(LINK_PREFETCH)
     ,
     LinkPrefetch

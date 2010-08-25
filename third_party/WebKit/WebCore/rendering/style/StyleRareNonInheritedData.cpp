@@ -58,12 +58,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
       m_backfaceVisibility(RenderStyle::initialBackfaceVisibility()),
       m_perspective(RenderStyle::initialPerspective()),
       m_perspectiveOriginX(RenderStyle::initialPerspectiveOriginX()),
-      m_perspectiveOriginY(RenderStyle::initialPerspectiveOriginY())
-#if ENABLE(XBL)
-      ,
-      bindingURI(0)
-#endif
-      ,
+      m_perspectiveOriginY(RenderStyle::initialPerspectiveOriginY()),
       m_pageSize(),
       m_pageSizeType(PAGE_SIZE_AUTO) {
 }
@@ -103,30 +98,12 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(
       m_backfaceVisibility(o.m_backfaceVisibility),
       m_perspective(o.m_perspective),
       m_perspectiveOriginX(o.m_perspectiveOriginX),
-      m_perspectiveOriginY(o.m_perspectiveOriginY)
-#if ENABLE(XBL)
-      ,
-      bindingURI(o.bindingURI ? o.bindingURI->copy() : 0)
-#endif
-      ,
+      m_perspectiveOriginY(o.m_perspectiveOriginY),
       m_pageSize(o.m_pageSize),
       m_pageSizeType(o.m_pageSizeType) {
 }
 
 StyleRareNonInheritedData::~StyleRareNonInheritedData() {}
-
-#if ENABLE(XBL)
-bool StyleRareNonInheritedData::bindingsEquivalent(
-    const StyleRareNonInheritedData& o) const {
-  if (this == &o)
-    return true;
-  if (!bindingURI && o.bindingURI || bindingURI && !o.bindingURI)
-    return false;
-  if (bindingURI && o.bindingURI && (*bindingURI != *o.bindingURI))
-    return false;
-  return true;
-}
-#endif
 
 bool StyleRareNonInheritedData::operator==(
     const StyleRareNonInheritedData& o) const {
@@ -150,11 +127,8 @@ bool StyleRareNonInheritedData::operator==(
 #endif
          && shadowDataEquivalent(o) && reflectionDataEquivalent(o) &&
          animationDataEquivalent(o) && transitionDataEquivalent(o) &&
-         m_mask == o.m_mask && m_maskBoxImage == o.m_maskBoxImage
-#if ENABLE(XBL)
-         && bindingsEquivalent(o)
-#endif
-         && (m_transformStyle3D == o.m_transformStyle3D) &&
+         m_mask == o.m_mask && m_maskBoxImage == o.m_maskBoxImage &&
+         (m_transformStyle3D == o.m_transformStyle3D) &&
          (m_backfaceVisibility == o.m_backfaceVisibility) &&
          (m_perspective == o.m_perspective) &&
          (m_perspectiveOriginX == o.m_perspectiveOriginX) &&
