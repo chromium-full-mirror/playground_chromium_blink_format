@@ -283,7 +283,7 @@ MediaPlayer::MediaPlayer(MediaPlayerClient* client)
 MediaPlayer::~MediaPlayer() {}
 
 void MediaPlayer::load(const String& url, const ContentType& contentType) {
-  String type = contentType.type();
+  String type = contentType.type().lower();
   String typeCodecs = contentType.parameter(codecs());
 
   // If the MIME type is unhelpful, see if the type registry has a match for the
@@ -527,7 +527,7 @@ void MediaPlayer::paintCurrentFrameInContext(GraphicsContext* p,
 }
 
 MediaPlayer::SupportsType MediaPlayer::supportsType(ContentType contentType) {
-  String type = contentType.type();
+  String type = contentType.type().lower();
   String typeCodecs = contentType.parameter(codecs());
 
   // 4.8.10.3 MIME types - In the absence of a specification to the contrary,
@@ -547,7 +547,6 @@ MediaPlayer::SupportsType MediaPlayer::supportsType(ContentType contentType) {
 
   MediaPlayerFactory* engine =
       chooseBestEngineForTypeAndCodecs(type, typeCodecs);
-
   if (!engine)
     return IsNotSupported;
 
