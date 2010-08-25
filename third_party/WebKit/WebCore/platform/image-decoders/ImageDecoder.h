@@ -149,7 +149,7 @@ class RGBA32Buffer {
 #elif PLATFORM(QT)
     m_image = m_pixmap.toImage();
     m_pixmap = QPixmap();
-    return reinterpret_cast<QRgb*>(m_image.scanLine(y)) + x;
+    return reinterpret_cast_ptr<QRgb*>(m_image.scanLine(y)) + x;
 #else
     return m_bytes.data() + (y * width()) + x;
 #endif

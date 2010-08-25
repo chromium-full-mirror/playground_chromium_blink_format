@@ -223,12 +223,12 @@ PassRefPtr<ImageData> getImageData(const IntRect& rect,
 #endif
 
   quint32* destRows =
-      reinterpret_cast<quint32*>(&data[desty * rect.width() + destx]);
+      reinterpret_cast_ptr<quint32*>(&data[desty * rect.width() + destx]);
 
   if (multiplied == Unmultiplied) {
     for (int y = 0; y < numRows; ++y) {
-      const quint32* scanLine =
-          reinterpret_cast<const quint32*>(bits + (y + originy) * bytesPerLine);
+      const quint32* scanLine = reinterpret_cast_ptr<const quint32*>(
+          bits + (y + originy) * bytesPerLine);
       for (int x = 0; x < numColumns; x++) {
         QRgb pixel = scanLine[x + originx];
         int alpha = qAlpha(pixel);
@@ -248,8 +248,8 @@ PassRefPtr<ImageData> getImageData(const IntRect& rect,
     }
   } else {
     for (int y = 0; y < numRows; ++y) {
-      const quint32* scanLine =
-          reinterpret_cast<const quint32*>(bits + (y + originy) * bytesPerLine);
+      const quint32* scanLine = reinterpret_cast_ptr<const quint32*>(
+          bits + (y + originy) * bytesPerLine);
       for (int x = 0; x < numColumns; x++) {
         QRgb pixel = scanLine[x + originx];
         // Convert RGB to BGR.
@@ -327,13 +327,13 @@ void putImageData(ImageData*& source,
   uchar* bits = image.bits();
   const int bytesPerLine = image.bytesPerLine();
 
-  const quint32* srcScanLine = reinterpret_cast<const quint32*>(
+  const quint32* srcScanLine = reinterpret_cast_ptr<const quint32*>(
       source->data()->data()->data() + originy * srcBytesPerRow + originx * 4);
 
   if (multiplied == Unmultiplied) {
     for (int y = 0; y < numRows; ++y) {
       quint32* destScanLine =
-          reinterpret_cast<quint32*>(bits + y * bytesPerLine);
+          reinterpret_cast_ptr<quint32*>(bits + y * bytesPerLine);
       for (int x = 0; x < numColumns; x++) {
         // Premultiply and convert BGR to RGB.
         quint32 pixel = srcScanLine[x];
@@ -344,7 +344,7 @@ void putImageData(ImageData*& source,
   } else {
     for (int y = 0; y < numRows; ++y) {
       quint32* destScanLine =
-          reinterpret_cast<quint32*>(bits + y * bytesPerLine);
+          reinterpret_cast_ptr<quint32*>(bits + y * bytesPerLine);
       for (int x = 0; x < numColumns; x++) {
         // Convert BGR to RGB.
         quint32 pixel = srcScanLine[x];

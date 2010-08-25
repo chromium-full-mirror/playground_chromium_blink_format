@@ -105,7 +105,7 @@ String TextCodecQt::decode(const char* bytes,
     int size = end - buf;
     size = qMin(size, MaxInputChunkSize);
     QString decoded = m_codec->toUnicode(buf, size, &m_state);
-    unicode.append(reinterpret_cast<const UChar*>(decoded.unicode()),
+    unicode.append(reinterpret_cast_ptr<const UChar*>(decoded.unicode()),
                    decoded.length());
     buf += size;
   }
