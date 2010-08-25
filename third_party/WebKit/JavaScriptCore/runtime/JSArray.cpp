@@ -457,10 +457,12 @@ NEVER_INLINE void JSArray::putSlowCase(ExecState* exec,
   if (i >= MIN_SPARSE_ARRAY_INDEX)
     newNumValuesInVector -= map->contains(i);
   if (isDenseEnoughForVector(newVectorLength, newNumValuesInVector)) {
+    unsigned needLength = max(i + 1, storage->m_length);
     unsigned proposedNewNumValuesInVector = newNumValuesInVector;
     // If newVectorLength is already the maximum - MAX_STORAGE_VECTOR_LENGTH -
     // then do not attempt to grow any further.
-    while (newVectorLength < MAX_STORAGE_VECTOR_LENGTH) {
+    while ((newVectorLength < needLength) &&
+           (newVectorLength < MAX_STORAGE_VECTOR_LENGTH)) {
       unsigned proposedNewVectorLength =
           getNewVectorLength(newVectorLength + 1);
       for (unsigned j = max(newVectorLength, MIN_SPARSE_ARRAY_INDEX);
@@ -596,10 +598,10 @@ ALWAYS_INLINE unsigned JSArray::getNewVectorLength(unsigned desiredLength) {
   ASSERT(desiredLength <= MAX_STORAGE_VECTOR_LENGTH);
 
   unsigned increasedLength;
-  unsigned length = m_storage->m_length;
+  unsigned maxInitLength = min(m_storage->m_length, 100000U);
 
-  if (desiredLength < length)
-    increasedLength = length;
+  if (desiredLength < maxInitLength)
+    increasedLength = maxInitLength;
   else if (!m_vectorLength)
     increasedLength = max(desiredLength, lastArraySize);
   else {
