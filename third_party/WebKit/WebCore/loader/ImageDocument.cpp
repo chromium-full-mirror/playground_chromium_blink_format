@@ -76,7 +76,7 @@ class ImageDocumentParser : public RawDataDocumentParser {
   }
 
   ImageDocument* document() const {
-    return static_cast<ImageDocument*>(m_document);
+    return static_cast<ImageDocument*>(RawDataDocumentParser::document());
   }
 
  private:

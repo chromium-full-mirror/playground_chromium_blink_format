@@ -128,6 +128,7 @@ class XMLDocumentParser : public ScriptableDocumentParser,
   virtual bool finishWasCalled();
   virtual bool isWaitingForScripts() const;
   virtual void stopParsing();
+  virtual void detach();
 
   // from CachedResourceClient
   virtual void notifyFinished(CachedResource*);
