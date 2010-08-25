@@ -43,8 +43,6 @@ class DocumentFragment : public ContainerNode {
  private:
   DocumentFragment(Document*);
 
-  bool shouldUseLegacyHTMLParser() const;
-
   virtual String nodeName() const;
   virtual NodeType nodeType() const;
   virtual PassRefPtr<Node> cloneNode(bool deep);
