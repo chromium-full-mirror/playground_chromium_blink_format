@@ -202,8 +202,9 @@ class MatchPlainTextJob : public MatchXPathJob {
   virtual ~MatchPlainTextJob() {}
 };
 
-enum DOMBreakpointType { DOMBreakpointTypeSubtreeModified = 0 };
+enum DOMBreakpointType { SubtreeModified = 0, AttributeModified, NodeRemoved };
 
+const uint32_t inheritableDOMBreakpointTypesMask = (1 << SubtreeModified);
 const int domBreakpointDerivedTypeShift = 16;
 }
 
@@ -772,9 +773,11 @@ void InspectorDOMAgent::setDOMBreakpoint(long nodeId, long type) {
 
   uint32_t rootBit = 1 << type;
   m_breakpoints.set(node, m_breakpoints.get(node) | rootBit);
-  for (Node* child = innerFirstChild(node); child;
-       child = innerNextSibling(child))
-    updateSubtreeBreakpoints(child, rootBit, true);
+  if (rootBit & inheritableDOMBreakpointTypesMask) {
+    for (Node* child = innerFirstChild(node); child;
+         child = innerNextSibling(child))
+      updateSubtreeBreakpoints(child, rootBit, true);
+  }
 }
 
 void InspectorDOMAgent::removeDOMBreakpoint(long nodeId, long type) {
@@ -788,12 +791,13 @@ void InspectorDOMAgent::removeDOMBreakpoint(long nodeId, long type) {
     m_breakpoints.set(node, mask);
   else
     m_breakpoints.remove(node);
-  if (mask & (rootBit << domBreakpointDerivedTypeShift))
-    return;
 
-  for (Node* child = innerFirstChild(node); child;
-       child = innerNextSibling(child))
-    updateSubtreeBreakpoints(child, rootBit, false);
+  if ((rootBit & inheritableDOMBreakpointTypesMask) &&
+      !(mask & (rootBit << domBreakpointDerivedTypeShift))) {
+    for (Node* child = innerFirstChild(node); child;
+         child = innerNextSibling(child))
+      updateSubtreeBreakpoints(child, rootBit, false);
+  }
 }
 
 String InspectorDOMAgent::documentURLString(Document* document) const {
@@ -1006,14 +1010,16 @@ void InspectorDOMAgent::didInsertDOMNode(Node* node) {
 
   if (m_breakpoints.size()) {
     Node* parent = innerParentNode(node);
-    if (hasBreakpoint(parent, DOMBreakpointTypeSubtreeModified)) {
+    if (hasBreakpoint(parent, SubtreeModified)) {
       if (!pauseOnBreakpoint())
         return;
     }
     uint32_t mask = m_breakpoints.get(parent);
-    mask = (mask | (mask >> domBreakpointDerivedTypeShift)) &
-           ((1 << domBreakpointDerivedTypeShift) - 1);
-    updateSubtreeBreakpoints(node, mask, true);
+    uint32_t inheritableTypesMask =
+        (mask | (mask >> domBreakpointDerivedTypeShift)) &
+        inheritableDOMBreakpointTypesMask;
+    if (inheritableTypesMask)
+      updateSubtreeBreakpoints(node, inheritableTypesMask, true);
   }
 
   // We could be attaching existing subtree. Forget the bindings.
@@ -1043,8 +1049,8 @@ void InspectorDOMAgent::didRemoveDOMNode(Node* node) {
     return;
 
   if (m_breakpoints.size()) {
-    if (hasBreakpoint(innerParentNode(node),
-                      DOMBreakpointTypeSubtreeModified)) {
+    if (hasBreakpoint(node, NodeRemoved) ||
+        hasBreakpoint(innerParentNode(node), SubtreeModified)) {
       if (!pauseOnBreakpoint())
         return;
     }
@@ -1082,6 +1088,11 @@ void InspectorDOMAgent::didModifyDOMAttr(Element* element) {
   // If node is not mapped yet -> ignore the event.
   if (!id)
     return;
+
+  if (hasBreakpoint(element, AttributeModified)) {
+    if (!pauseOnBreakpoint())
+      return;
+  }
 
   m_frontend->attributesUpdated(id, buildArrayForElementAttributes(element));
 }
