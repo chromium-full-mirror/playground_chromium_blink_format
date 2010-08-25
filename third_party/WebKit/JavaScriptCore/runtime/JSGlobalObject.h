@@ -108,8 +108,6 @@ class JSGlobalObject : public JSVariableObject {
     ScopeChain globalScopeChain;
     Register globalCallFrame[RegisterFile::CallFrameHeaderSize];
 
-    int recursion;
-
     RegExpConstructor* regExpConstructor;
     ErrorConstructor* errorConstructor;
     NativeErrorConstructor* evalErrorConstructor;
@@ -306,10 +304,6 @@ class JSGlobalObject : public JSVariableObject {
   void setDebugger(Debugger* debugger) { d()->debugger = debugger; }
 
   virtual bool supportsProfiling() const { return false; }
-
-  int recursion() { return d()->recursion; }
-  void incRecursion() { ++d()->recursion; }
-  void decRecursion() { --d()->recursion; }
 
   ScopeChain& globalScopeChain() { return d()->globalScopeChain; }
 
