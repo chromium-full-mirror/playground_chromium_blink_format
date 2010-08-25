@@ -40,7 +40,6 @@ void dtoa(DtoaBuffer result,
           int* decpt,
           int* sign,
           char** rve);
-double intPow10(int);
 
 }  // namespace WTF
 
