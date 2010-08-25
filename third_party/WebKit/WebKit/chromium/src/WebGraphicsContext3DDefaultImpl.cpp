@@ -177,6 +177,14 @@ bool WebGraphicsContext3DDefaultImpl::isGLES2Compliant() {
   return false;
 }
 
+bool WebGraphicsContext3DDefaultImpl::isGLES2NPOTStrict() {
+  return false;
+}
+
+bool WebGraphicsContext3DDefaultImpl::isErrorGeneratedOnOutOfBoundsAccesses() {
+  return false;
+}
+
 unsigned int WebGraphicsContext3DDefaultImpl::getPlatformTextureId() {
   ASSERT_NOT_REACHED();
   return 0;

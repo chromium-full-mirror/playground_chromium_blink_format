@@ -100,7 +100,7 @@ unsigned long WebGLFramebuffer::getColorBufferFormat() {
       }
     } else if (m_colorAttachment->isTexture())
       return (reinterpret_cast<WebGLTexture*>(m_colorAttachment))
-          ->getInternalFormat();
+          ->getInternalFormat(0);
   }
   return 0;
 }

@@ -469,6 +469,8 @@ class GraphicsContext3D : public Noncopyable {
   int sizeInBytes(int type);
 
   bool isGLES2Compliant() const;
+  bool isGLES2NPOTStrict() const;
+  bool isErrorGeneratedOnOutOfBoundsAccesses() const;
 
   //----------------------------------------------------------------------
   // Helpers for texture uploading and pixel readback.

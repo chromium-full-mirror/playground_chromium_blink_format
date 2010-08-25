@@ -106,6 +106,8 @@ class GraphicsContext3DInternal {
   CanvasLayerChromium* platformLayer() const;
 #endif
   bool isGLES2Compliant() const;
+  bool isGLES2NPOTStrict() const;
+  bool isErrorGeneratedOnOutOfBoundsAccesses() const;
 
   //----------------------------------------------------------------------
   // Entry points for WebGL.
@@ -646,6 +648,14 @@ DELEGATE_TO_IMPL_1R(sizeInBytes, int, int)
 
 bool GraphicsContext3DInternal::isGLES2Compliant() const {
   return m_impl->isGLES2Compliant();
+}
+
+bool GraphicsContext3DInternal::isGLES2NPOTStrict() const {
+  return m_impl->isGLES2NPOTStrict();
+}
+
+bool GraphicsContext3DInternal::isErrorGeneratedOnOutOfBoundsAccesses() const {
+  return m_impl->isErrorGeneratedOnOutOfBoundsAccesses();
 }
 
 DELEGATE_TO_IMPL_1(activeTexture, unsigned long)
@@ -1464,6 +1474,14 @@ DELEGATE_TO_INTERNAL_R(supportsBGRA, bool)
 
 bool GraphicsContext3D::isGLES2Compliant() const {
   return m_internal->isGLES2Compliant();
+}
+
+bool GraphicsContext3D::isGLES2NPOTStrict() const {
+  return m_internal->isGLES2NPOTStrict();
+}
+
+bool GraphicsContext3D::isErrorGeneratedOnOutOfBoundsAccesses() const {
+  return m_internal->isErrorGeneratedOnOutOfBoundsAccesses();
 }
 
 }  // namespace WebCore
