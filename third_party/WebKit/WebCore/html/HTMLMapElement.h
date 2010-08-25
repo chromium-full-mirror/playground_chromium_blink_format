@@ -48,7 +48,6 @@ class HTMLMapElement : public HTMLElement {
   HTMLMapElement(const QualifiedName&, Document*);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
-  virtual bool checkDTD(const Node*);
 
   virtual void parseMappedAttribute(Attribute*);
 

@@ -36,8 +36,6 @@ class HTMLTitleElement : public HTMLElement {
  private:
   HTMLTitleElement(const QualifiedName&, Document*);
 
-  virtual bool checkDTD(const Node* newChild) { return newChild->isTextNode(); }
-
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void childrenChanged(bool changedByParser = false,

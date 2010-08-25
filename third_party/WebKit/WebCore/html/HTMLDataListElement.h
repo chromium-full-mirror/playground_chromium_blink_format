@@ -48,8 +48,6 @@ class HTMLDataListElement : public HTMLElement {
 
  private:
   HTMLDataListElement(const QualifiedName&, Document*);
-
-  virtual bool checkDTD(const Node*);
 };
 
 }  // namespace WebCore

@@ -629,9 +629,7 @@ const AtomicString& Node::virtualNamespaceURI() const {
   return nullAtom;
 }
 
-ContainerNode* Node::legacyParserAddChild(PassRefPtr<Node>) {
-  return 0;
-}
+void Node::deprecatedParserAddChild(PassRefPtr<Node>) {}
 
 bool Node::isContentEditable() const {
   return parent() && parent()->isContentEditable();
@@ -1203,10 +1201,6 @@ bool Node::contains(const Node* node) const {
   if (!node)
     return false;
   return this == node || node->isDescendantOf(this);
-}
-
-bool Node::childAllowed(Node* newChild) {
-  return childTypeAllowed(newChild->nodeType());
 }
 
 void Node::attach() {

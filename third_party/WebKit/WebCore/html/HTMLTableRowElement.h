@@ -37,8 +37,6 @@ class HTMLTableRowElement : public HTMLTablePartElement {
   static PassRefPtr<HTMLTableRowElement> create(const QualifiedName&,
                                                 Document*);
 
-  virtual ContainerNode* legacyParserAddChild(PassRefPtr<Node>);
-
   int rowIndex() const;
   void setRowIndex(int);
 
@@ -55,7 +53,6 @@ class HTMLTableRowElement : public HTMLTablePartElement {
   HTMLTableRowElement(const QualifiedName&, Document*);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
-  virtual bool checkDTD(const Node*);
 };
 
 }  // namespace

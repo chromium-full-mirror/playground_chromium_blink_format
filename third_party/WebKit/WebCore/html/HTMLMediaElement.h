@@ -204,7 +204,6 @@ class HTMLMediaElement : public HTMLElement,
   virtual void setDisplayMode(DisplayMode mode) { m_displayMode = mode; }
 
  private:
-  virtual bool checkDTD(const Node* newChild);
   virtual void attributeChanged(Attribute*, bool preserveDecls);
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);

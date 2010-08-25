@@ -47,10 +47,6 @@ PassRefPtr<HTMLFieldSetElement> HTMLFieldSetElement::create(
   return adoptRef(new HTMLFieldSetElement(tagName, document, form));
 }
 
-bool HTMLFieldSetElement::checkDTD(const Node* newChild) {
-  return newChild->hasTagName(legendTag) || HTMLElement::checkDTD(newChild);
-}
-
 bool HTMLFieldSetElement::supportsFocus() const {
   return HTMLElement::supportsFocus();
 }

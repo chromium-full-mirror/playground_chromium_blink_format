@@ -36,7 +36,6 @@ class HTMLNoScriptElement : public HTMLElement {
  private:
   HTMLNoScriptElement(const QualifiedName&, Document*);
 
-  virtual bool checkDTD(const Node*);
   virtual void attach();
   virtual void recalcStyle(StyleChange);
   virtual bool childShouldCreateRenderer(Node*) const;

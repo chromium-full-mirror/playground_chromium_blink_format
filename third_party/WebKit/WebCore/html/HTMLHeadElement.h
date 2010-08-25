@@ -37,8 +37,6 @@ class HTMLHeadElement : public HTMLElement {
   HTMLHeadElement(const QualifiedName&, Document*);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
-  virtual bool childAllowed(Node* newChild);
-  virtual bool checkDTD(const Node* newChild);
 };
 
 }  // namespace

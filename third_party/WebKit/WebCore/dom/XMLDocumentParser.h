@@ -188,7 +188,7 @@ class XMLDocumentParser : public ScriptableDocumentParser,
 
   void insertErrorMessageBlock();
 
-  bool enterText();
+  void enterText();
   void exitText();
 
   void doWrite(const String&);

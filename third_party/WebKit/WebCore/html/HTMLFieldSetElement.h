@@ -37,8 +37,6 @@ class HTMLFieldSetElement : public HTMLFormControlElement {
  private:
   HTMLFieldSetElement(const QualifiedName&, Document*, HTMLFormElement*);
 
-  virtual bool checkDTD(const Node* newChild);
-
   virtual bool supportsFocus() const;
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual const AtomicString& formControlType() const;

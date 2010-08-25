@@ -86,10 +86,6 @@ PassRefPtr<HTMLOptionElement> HTMLOptionElement::createForJSConstructor(
   return element.release();
 }
 
-bool HTMLOptionElement::checkDTD(const Node* newChild) {
-  return newChild->isTextNode() || newChild->hasTagName(scriptTag);
-}
-
 void HTMLOptionElement::attach() {
   if (parentNode()->renderStyle())
     setRenderStyle(styleForRenderer());

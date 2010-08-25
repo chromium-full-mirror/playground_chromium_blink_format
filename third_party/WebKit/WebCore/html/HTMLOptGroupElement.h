@@ -45,7 +45,6 @@ class HTMLOptGroupElement : public HTMLFormControlElement,
  private:
   HTMLOptGroupElement(const QualifiedName&, Document*, HTMLFormElement*);
 
-  virtual bool checkDTD(const Node*);
   virtual const AtomicString& formControlType() const;
   virtual bool supportsFocus() const;
   virtual bool isFocusable() const;

@@ -171,15 +171,13 @@ void XMLDocumentParser::handleError(ErrorType type,
     stopParsing();
 }
 
-bool XMLDocumentParser::enterText() {
+void XMLDocumentParser::enterText() {
 #if !USE(QXMLSTREAM)
   ASSERT(m_bufferedText.size() == 0);
 #endif
   RefPtr<Node> newNode = Text::create(document(), "");
-  if (!m_currentNode->legacyParserAddChild(newNode.get()))
-    return false;
+  m_currentNode->deprecatedParserAddChild(newNode.get());
   pushCurrentNode(newNode.get());
-  return true;
 }
 
 #if !USE(QXMLSTREAM)
