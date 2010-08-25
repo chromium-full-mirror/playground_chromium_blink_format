@@ -40,7 +40,8 @@ namespace WebCore {
 // don't pack).
 static const size_t sizeOfFileHeader = 14;
 
-BMPImageDecoder::BMPImageDecoder() : m_decodedOffset(0) {}
+BMPImageDecoder::BMPImageDecoder(bool premultiplyAlpha)
+    : ImageDecoder(premultiplyAlpha), m_decodedOffset(0) {}
 
 void BMPImageDecoder::setData(SharedBuffer* data, bool allDataReceived) {
   if (failed())
@@ -62,8 +63,10 @@ RGBA32Buffer* BMPImageDecoder::frameBufferAtIndex(size_t index) {
   if (index)
     return 0;
 
-  if (m_frameBufferCache.isEmpty())
+  if (m_frameBufferCache.isEmpty()) {
     m_frameBufferCache.resize(1);
+    m_frameBufferCache.first().setPremultiplyAlpha(m_premultiplyAlpha);
+  }
 
   RGBA32Buffer* buffer = &m_frameBufferCache.first();
   if (buffer->status() != RGBA32Buffer::FrameComplete)

@@ -65,7 +65,11 @@ void sharedBufferRelease(void* info) {
 }
 #endif
 
-ImageSource::ImageSource() : m_decoder(0) {}
+ImageSource::ImageSource(bool premultiplyAlpha)
+    : m_decoder(0)
+      // FIXME: m_premultiplyAlpha is ignored in cg at the moment.
+      ,
+      m_premultiplyAlpha(premultiplyAlpha) {}
 
 ImageSource::~ImageSource() {
   clear(true);

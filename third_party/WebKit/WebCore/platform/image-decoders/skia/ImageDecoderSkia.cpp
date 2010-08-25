@@ -32,7 +32,8 @@ namespace WebCore {
 RGBA32Buffer::RGBA32Buffer()
     : m_status(FrameEmpty),
       m_duration(0),
-      m_disposalMethod(DisposeNotSpecified) {}
+      m_disposalMethod(DisposeNotSpecified),
+      m_premultiplyAlpha(true) {}
 
 RGBA32Buffer& RGBA32Buffer::operator=(const RGBA32Buffer& other) {
   if (this == &other)
@@ -46,6 +47,7 @@ RGBA32Buffer& RGBA32Buffer::operator=(const RGBA32Buffer& other) {
   setStatus(other.status());
   setDuration(other.duration());
   setDisposalMethod(other.disposalMethod());
+  setPremultiplyAlpha(other.premultiplyAlpha());
   return *this;
 }
 
