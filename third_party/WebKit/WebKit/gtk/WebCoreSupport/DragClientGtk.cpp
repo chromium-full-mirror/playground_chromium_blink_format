@@ -73,7 +73,7 @@ void DragClient::startDrag(DragImageRef image,
 
   WebKitWebView* webView = webkit_web_frame_get_web_view(kit(frame));
   RefPtr<DataObjectGtk> dataObject = clipboardGtk->dataObject();
-  GRefPtr<GtkTargetList> targetList(
+  PlatformRefPtr<GtkTargetList> targetList(
       clipboardGtk->helper()->targetListForDataObject(dataObject.get()));
   GOwnPtr<GdkEvent> currentEvent(gtk_get_current_event());
 

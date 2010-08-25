@@ -211,22 +211,22 @@ void FrameLoaderClient::dispatchWillSendRequest(
     unsigned long identifier,
     ResourceRequest& request,
     const ResourceResponse& redirectResponse) {
-  GRefPtr<WebKitNetworkResponse> networkResponse(0);
+  PlatformRefPtr<WebKitNetworkResponse> networkResponse(0);
 
   // We are adding one more resource to the load, or maybe we are
   // just redirecting a load.
   if (redirectResponse.isNull())
     static_cast<WebKit::DocumentLoader*>(loader)->increaseLoadCount(identifier);
   else
-    networkResponse = adoptGRef(
+    networkResponse = adoptPlatformRef(
         webkit_network_response_new_with_core_response(redirectResponse));
 
   WebKitWebView* webView = getViewFromFrame(m_frame);
   GOwnPtr<gchar> identifierString(toString(identifier));
   WebKitWebResource* webResource =
       webkit_web_view_get_resource(webView, identifierString.get());
-  GRefPtr<WebKitNetworkRequest> networkRequest(
-      adoptGRef(webkit_network_request_new_with_core_request(request)));
+  PlatformRefPtr<WebKitNetworkRequest> networkRequest(
+      adoptPlatformRef(webkit_network_request_new_with_core_request(request)));
 
   if (!redirectResponse.isNull()) {
     // This is a redirect, so we need to update the WebResource's knowledge
@@ -342,8 +342,8 @@ void FrameLoaderClient::dispatchDecidePolicyForMIMEType(
   if (isHandled)
     return;
 
-  GRefPtr<WebKitNetworkResponse> networkResponse(
-      adoptGRef(webkit_web_frame_get_network_response(m_frame)));
+  PlatformRefPtr<WebKitNetworkResponse> networkResponse(
+      adoptPlatformRef(webkit_web_frame_get_network_response(m_frame)));
   if (networkResponse) {
     ResourceResponse response = core(networkResponse.get());
     if (response.isAttachment()) {
@@ -502,8 +502,8 @@ PassRefPtr<Widget> FrameLoaderClient::createPlugin(
   CString mimeTypeString = mimeType.utf8();
 
   ASSERT(paramNames.size() == paramValues.size());
-  GRefPtr<GHashTable> hash =
-      adoptGRef(g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free));
+  PlatformRefPtr<GHashTable> hash = adoptPlatformRef(
+      g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free));
   for (unsigned i = 0; i < paramNames.size(); ++i) {
     g_hash_table_insert(hash.get(), g_strdup(paramNames[i].utf8().data()),
                         g_strdup(paramValues[i].utf8().data()));

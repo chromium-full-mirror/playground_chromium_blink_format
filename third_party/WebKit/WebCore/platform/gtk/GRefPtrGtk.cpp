@@ -27,27 +27,27 @@
 namespace WTF {
 
 template <>
-GtkTargetList* refGPtr(GtkTargetList* ptr) {
+GtkTargetList* refPlatformPtr(GtkTargetList* ptr) {
   if (ptr)
     gtk_target_list_ref(ptr);
   return ptr;
 }
 
 template <>
-void derefGPtr(GtkTargetList* ptr) {
+void derefPlatformPtr(GtkTargetList* ptr) {
   if (ptr)
     gtk_target_list_unref(ptr);
 }
 
 template <>
-GdkCursor* refGPtr(GdkCursor* ptr) {
+GdkCursor* refPlatformPtr(GdkCursor* ptr) {
   if (ptr)
     gdk_cursor_ref(ptr);
   return ptr;
 }
 
 template <>
-void derefGPtr(GdkCursor* ptr) {
+void derefPlatformPtr(GdkCursor* ptr) {
   if (ptr)
     gdk_cursor_unref(ptr);
 }

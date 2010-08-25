@@ -90,7 +90,7 @@ class FullscreenVideoController : public Noncopyable {
   guint m_volumeUpdateId;
   bool m_seekLock;
   GtkWidget* m_window;
-  GRefPtr<GdkCursor> m_cursor;
+  PlatformRefPtr<GdkCursor> m_cursor;
   GtkWidget* m_hudWindow;
   GtkAction* m_playPauseAction;
   GtkAction* m_exitFullscreenAction;

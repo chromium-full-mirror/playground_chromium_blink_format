@@ -18,34 +18,34 @@
  */
 
 #include "config.h"
-#include "GRefPtrCairo.h"
+#include "PlatformRefPtrCairo.h"
 
 #include <cairo.h>
 
 namespace WTF {
 
 template <>
-cairo_t* refGPtr(cairo_t* ptr) {
+cairo_t* refPlatformPtr(cairo_t* ptr) {
   if (ptr)
     cairo_reference(ptr);
   return ptr;
 }
 
 template <>
-void derefGPtr(cairo_t* ptr) {
+void derefPlatformPtr(cairo_t* ptr) {
   if (ptr)
     cairo_destroy(ptr);
 }
 
 template <>
-cairo_surface_t* refGPtr(cairo_surface_t* ptr) {
+cairo_surface_t* refPlatformPtr(cairo_surface_t* ptr) {
   if (ptr)
     cairo_surface_reference(ptr);
   return ptr;
 }
 
 template <>
-void derefGPtr(cairo_surface_t* ptr) {
+void derefPlatformPtr(cairo_surface_t* ptr) {
   if (ptr)
     cairo_surface_destroy(ptr);
 }

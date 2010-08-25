@@ -328,7 +328,8 @@ void ClipboardGtk::declareAndWriteDragImage(Element* element,
   if (!image || !image->isLoaded())
     return;
 
-  GRefPtr<GdkPixbuf> pixbuf = adoptGRef(image->image()->getGdkPixbuf());
+  PlatformRefPtr<GdkPixbuf> pixbuf =
+      adoptPlatformRef(image->image()->getGdkPixbuf());
   if (!pixbuf)
     return;
 

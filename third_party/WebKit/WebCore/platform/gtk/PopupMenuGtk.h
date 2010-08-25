@@ -62,7 +62,7 @@ class PopupMenuGtk : public PopupMenu {
 
   PopupMenuClient* m_popupClient;
   IntPoint m_menuPosition;
-  GRefPtr<GtkMenu> m_popup;
+  PlatformRefPtr<GtkMenu> m_popup;
   HashMap<GtkWidget*, int> m_indexMap;
 };
 }

@@ -908,7 +908,7 @@ static void webkit_download_error(WebKitDownload* download,
   webkit_download_close_stream(download);
 
   WebKitDownloadPrivate* priv = download->priv;
-  GRefPtr<WebKitDownload> protect(download);
+  PlatformRefPtr<WebKitDownload> protect(download);
 
   g_timer_stop(priv->timer);
   webkit_download_set_status(download, WEBKIT_DOWNLOAD_STATUS_ERROR);

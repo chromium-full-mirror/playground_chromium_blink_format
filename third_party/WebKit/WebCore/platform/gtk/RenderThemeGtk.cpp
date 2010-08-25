@@ -154,7 +154,7 @@ RenderThemeGtk::RenderThemeGtk()
       m_pauseButton(0),
       m_seekBackButton(0),
       m_seekForwardButton(0),
-      m_partsTable(adoptGRef(g_hash_table_new_full(0, 0, 0, g_free))) {
+      m_partsTable(adoptPlatformRef(g_hash_table_new_full(0, 0, 0, g_free))) {
   if (!mozGtkRefCount) {
     moz_gtk_init();
 
@@ -326,7 +326,7 @@ static bool paintMozillaGtkWidget(const RenderThemeGtk* theme,
   else if (type == MOZ_GTK_CHECKBUTTON || type == MOZ_GTK_RADIOBUTTON)
     flags = theme->isChecked(o);
 
-  GRefPtr<GdkDrawable> drawable(i.context->gdkDrawable());
+  PlatformRefPtr<GdkDrawable> drawable(i.context->gdkDrawable());
   GdkRectangle paintRect, clipRect;
   if (drawable) {
     AffineTransform ctm = i.context->getCTM();
@@ -353,7 +353,7 @@ static bool paintMozillaGtkWidget(const RenderThemeGtk* theme,
     // backed by a GdkDrawable. In those situations, we render onto a pixmap and
     // then
     // copy the rendered data back to the GraphicsContext via Cairo.
-    drawable = adoptGRef(
+    drawable = adoptPlatformRef(
         gdk_pixmap_new(0, rect.width(), rect.height(),
                        gdk_visual_get_depth(gdk_visual_get_system())));
     paintRect = clipRect = IntRect(0, 0, rect.width(), rect.height());

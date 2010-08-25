@@ -29,14 +29,14 @@ typedef struct _GdkCursor GdkCursor;
 namespace WTF {
 
 template <>
-GtkTargetList* refGPtr(GtkTargetList* ptr);
+GtkTargetList* refPlatformPtr(GtkTargetList* ptr);
 template <>
-void derefGPtr(GtkTargetList* ptr);
+void derefPlatformPtr(GtkTargetList* ptr);
 
 template <>
-GdkCursor* refGPtr(GdkCursor* ptr);
+GdkCursor* refPlatformPtr(GdkCursor* ptr);
 template <>
-void derefGPtr(GdkCursor* ptr);
+void derefPlatformPtr(GdkCursor* ptr);
 }
 
 #endif

@@ -246,7 +246,7 @@ class RenderThemeGtk : public RenderTheme {
   RefPtr<Image> m_seekBackButton;
   RefPtr<Image> m_seekForwardButton;
   Page* m_page;
-  GRefPtr<GHashTable> m_partsTable;
+  PlatformRefPtr<GHashTable> m_partsTable;
 };
 }
 
