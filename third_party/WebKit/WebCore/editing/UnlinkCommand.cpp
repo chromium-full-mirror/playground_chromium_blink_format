@@ -39,8 +39,6 @@ void UnlinkCommand::doApply() {
   if (!endingSelection().isNonOrphanedRange())
     return;
 
-  pushPartiallySelectedAnchorElementsDown();
-
   removeStyledElement(HTMLAnchorElement::create(document()));
 }
 }

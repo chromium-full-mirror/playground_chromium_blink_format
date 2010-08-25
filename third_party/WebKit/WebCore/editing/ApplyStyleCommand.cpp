@@ -91,6 +91,19 @@ class StyleChange {
   String fontFace() { return m_applyFontFace; }
   String fontSize() { return m_applyFontSize; }
 
+  bool operator==(const StyleChange& other) {
+    return m_cssStyle == other.m_cssStyle && m_applyBold == other.m_applyBold &&
+           m_applyItalic == other.m_applyItalic &&
+           m_applyUnderline == other.m_applyUnderline &&
+           m_applyLineThrough == other.m_applyLineThrough &&
+           m_applySubscript == other.m_applySubscript &&
+           m_applySuperscript == other.m_applySuperscript &&
+           m_applyFontColor == other.m_applyFontColor &&
+           m_applyFontFace == other.m_applyFontFace &&
+           m_applyFontSize == other.m_applyFontSize;
+  }
+  bool operator!=(const StyleChange& other) { return !(*this == other); }
+
  private:
   void init(PassRefPtr<CSSStyleDeclaration>, const Position&);
   void reconcileTextDecorationProperties(CSSMutableStyleDeclaration*);
@@ -1220,16 +1233,20 @@ void ApplyStyleCommand::applyInlineStyleToRange(
       Node* runStart = node;
       // Find the end of the run.
       Node* sibling = node->nextSibling();
+      StyleChange startChange(style, Position(node, 0));
       while (sibling && sibling != pastEndNode &&
-             (!sibling->isElementNode() || sibling->hasTagName(brTag)) &&
-             !isBlock(sibling)) {
+             !sibling->contains(pastEndNode) &&
+             (!isBlock(sibling) || sibling->hasTagName(brTag)) &&
+             StyleChange(style, Position(sibling, 0)) == startChange) {
         node = sibling;
         sibling = node->nextSibling();
       }
       // Recompute next, since node has changed.
-      next = node->traverseNextNode();
+      next = node->traverseNextSibling();
       // Apply the style to the run.
-      addInlineStyleIfNeeded(style, runStart, node);
+      addInlineStyleIfNeeded(style, runStart, node, m_removeOnly
+                                                        ? DoNotAddStyledElement
+                                                        : AddStyledElement);
     }
   }
 }
@@ -1500,6 +1517,7 @@ HTMLElement* ApplyStyleCommand::highestAncestorWithConflictingInlineStyle(
 
 PassRefPtr<CSSMutableStyleDeclaration>
 ApplyStyleCommand::extractInlineStyleToPushDown(Node* node,
+                                                bool isStyledElement,
                                                 const Vector<int>& properties) {
   ASSERT(node);
   ASSERT(node->isElementNode());
@@ -1510,11 +1528,15 @@ ApplyStyleCommand::extractInlineStyleToPushDown(Node* node,
 
   HTMLElement* element = static_cast<HTMLElement*>(node);
   RefPtr<CSSMutableStyleDeclaration> style = element->inlineStyleDecl();
+  if (isStyledElement) {
+    removeNodePreservingChildren(element);
+    return style.release();
+  }
+
   if (!style)
     return 0;
 
   style = style->copyPropertiesInSet(properties.data(), properties.size());
-
   for (size_t i = 0; i < properties.size(); i++) {
     RefPtr<CSSValue> property = style->getPropertyCSSValue(properties[i]);
     if (property)
@@ -1601,7 +1623,13 @@ void ApplyStyleCommand::applyInlineStyleToPushDown(
     return;
 
   // FIXME: addInlineStyleIfNeeded may override the style of node
-  addInlineStyleIfNeeded(style, node, node);
+  // We can't wrap node with the styled element here because new styled element
+  // will never be removed if we did.
+  // If we modified the child pointer in pushDownInlineStyleAroundNode to point
+  // to new style element
+  // then we fall into an infinite loop where we keep removing and adding styled
+  // element wrapping node.
+  addInlineStyleIfNeeded(style, node, node, DoNotAddStyledElement);
 }
 
 void ApplyStyleCommand::pushDownInlineStyleAroundNode(
@@ -1626,16 +1654,41 @@ void ApplyStyleCommand::pushDownInlineStyleAroundNode(
     ASSERT(current->isHTMLElement());
     ASSERT(current->contains(targetNode));
     Node* child = current->firstChild();
+    Node* lastChild = current->lastChild();
+    RefPtr<StyledElement> styledElement;
+    if (current->isStyledElement() && m_styledInlineElement &&
+        current->hasTagName(m_styledInlineElement->tagQName()))
+      styledElement = static_cast<StyledElement*>(current);
     RefPtr<CSSMutableStyleDeclaration> styleToPushDown =
-        extractInlineStyleToPushDown(current, properties);
+        extractInlineStyleToPushDown(current, styledElement, properties);
 
     // The inner loop will go through children on each level
+    // FIXME: we should aggregate inline child elements together so that we
+    // don't wrap each child separately.
     while (child) {
       Node* nextChild = child->nextSibling();
 
+      if (child != targetNode && styledElement) {
+        // If child has children, wrap children of child by a clone of the
+        // styled element to avoid infinite loop.
+        // Otherwise, wrap the child by the styled element, and we won't fall
+        // into an infinite loop.
+        RefPtr<Element> wrapper = styledElement->cloneElementWithoutChildren();
+        ExceptionCode ec = 0;
+        wrapper->removeAttribute(styleAttr, ec);
+        ASSERT(!ec);
+        if (child->firstChild())
+          surroundNodeRangeWithElement(child->firstChild(), child->lastChild(),
+                                       wrapper);
+        else
+          surroundNodeRangeWithElement(child, child, wrapper);
+      }
+
       // Apply text decoration to all nodes containing targetNode and their
       // siblings but NOT to targetNode
-      if (child != targetNode)
+      // But if we've removed styledElement then go ahead and always apply the
+      // style.
+      if (child != targetNode || styledElement)
         applyInlineStyleToPushDown(child, styleToPushDown.get());
 
       // We found the next node for the outer loop (contains targetNode)
@@ -1644,6 +1697,8 @@ void ApplyStyleCommand::pushDownInlineStyleAroundNode(
       if (child == targetNode || child->contains(targetNode))
         current = child;
 
+      if (child == lastChild || child->contains(lastChild))
+        break;
       child = nextChild;
     }
   }
@@ -1947,12 +2002,9 @@ void ApplyStyleCommand::surroundNodeRangeWithElement(
 
   Node* node = startNode;
   while (1) {
-    Node* next = node->traverseNextNode();
-    if (node->childNodeCount() == 0 && node->renderer() &&
-        node->renderer()->isInline()) {
-      removeNode(node);
-      appendNode(node, element);
-    }
+    Node* next = node->nextSibling();
+    removeNode(node);
+    appendNode(node, element);
     if (node == endNode)
       break;
     node = next;
@@ -2000,10 +2052,8 @@ void ApplyStyleCommand::addBlockStyle(const StyleChange& styleChange,
 void ApplyStyleCommand::addInlineStyleIfNeeded(
     CSSMutableStyleDeclaration* style,
     Node* startNode,
-    Node* endNode) {
-  if (m_removeOnly)
-    return;
-
+    Node* endNode,
+    EAddStyledElement addStyledElement) {
   StyleChange styleChange(style, Position(startNode, 0));
 
   // Font tags need to go outside of CSS so that CSS font sizes override leagcy
@@ -2051,7 +2101,7 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
     surroundNodeRangeWithElement(startNode, endNode,
                                  createHTMLElement(document(), supTag));
 
-  if (m_styledInlineElement)
+  if (m_styledInlineElement && addStyledElement == AddStyledElement)
     surroundNodeRangeWithElement(
         startNode, endNode,
         m_styledInlineElement->cloneElementWithoutChildren());

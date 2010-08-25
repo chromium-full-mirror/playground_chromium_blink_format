@@ -123,7 +123,6 @@ class CompositeEditCommand : public EditCommand {
   PassRefPtr<Node> moveParagraphContentsToNewBlockIfNecessary(const Position&);
 
   void pushAnchorElementDown(Node*);
-  void pushPartiallySelectedAnchorElementsDown();
 
   void moveParagraph(const VisiblePosition&,
                      const VisiblePosition&,
