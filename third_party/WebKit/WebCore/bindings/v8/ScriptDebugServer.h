@@ -142,6 +142,8 @@ class ScriptDebugServer : public Noncopyable {
   Page* m_pausedPage;
   v8::Local<v8::Context> m_pausedPageContext;
   bool m_enabled;
+
+  bool m_breakpointsActivated;
 };
 
 }  // namespace WebCore
