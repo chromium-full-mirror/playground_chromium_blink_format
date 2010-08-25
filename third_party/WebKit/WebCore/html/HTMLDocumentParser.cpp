@@ -98,7 +98,7 @@ HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* document,
       m_scriptRunner(HTMLScriptRunner::create(document, this)),
       m_treeBuilder(
           HTMLTreeBuilder::create(m_tokenizer.get(), document, reportErrors)),
-      m_parserScheduler(new HTMLParserScheduler(this)),
+      m_parserScheduler(HTMLParserScheduler::create(this)),
       m_endWasDelayed(false),
       m_writeNestingLevel(0) {}
 

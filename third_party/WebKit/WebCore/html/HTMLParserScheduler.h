@@ -29,6 +29,7 @@
 #include "Timer.h"
 #include <wtf/CurrentTime.h>
 #include <wtf/Noncopyable.h>
+#include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
 
@@ -36,7 +37,9 @@ class HTMLDocumentParser;
 
 class HTMLParserScheduler : public Noncopyable {
  public:
-  HTMLParserScheduler(HTMLDocumentParser*);
+  static PassOwnPtr<HTMLParserScheduler> create(HTMLDocumentParser* parser) {
+    return adoptPtr(new HTMLParserScheduler(parser));
+  }
   ~HTMLParserScheduler();
 
   struct PumpSession {
@@ -67,6 +70,8 @@ class HTMLParserScheduler : public Noncopyable {
   }
 
  private:
+  HTMLParserScheduler(HTMLDocumentParser*);
+
   void continueNextChunkTimerFired(Timer<HTMLParserScheduler>*);
 
   HTMLDocumentParser* m_parser;
