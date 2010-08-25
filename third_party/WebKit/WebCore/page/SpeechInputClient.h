@@ -35,6 +35,7 @@
 
 namespace WebCore {
 
+class IntRect;
 class SpeechInputListener;
 
 // Provides an interface for SpeechInput to call into the embedder.
@@ -49,7 +50,7 @@ class SpeechInputClient {
   virtual void setListener(SpeechInputListener*) = 0;
 
   // Starts speech recognition and audio recording.
-  virtual bool startRecognition(int requestId) = 0;
+  virtual bool startRecognition(int requestId, const IntRect& elementRect) = 0;
 
   // Stops audio recording and performs recognition with the audio recorded
   // until now

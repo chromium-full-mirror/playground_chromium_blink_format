@@ -53,9 +53,11 @@ void SpeechInputClientImpl::setListener(
   m_listener = listener;
 }
 
-bool SpeechInputClientImpl::startRecognition(int requestId) {
+bool SpeechInputClientImpl::startRecognition(
+    int requestId,
+    const WebCore::IntRect& elementRect) {
   ASSERT(m_listener);
-  return m_controller->startRecognition(requestId);
+  return m_controller->startRecognition(requestId, elementRect);
 }
 
 void SpeechInputClientImpl::stopRecording(int requestId) {

@@ -449,7 +449,8 @@ void InputFieldSpeechButtonElement::defaultEventHandler(Event* event) {
   if (event->type() == eventNames().clickEvent) {
     switch (m_state) {
       case Idle:
-        if (speechInput()->startRecognition(m_listenerId))
+        if (speechInput()->startRecognition(
+                m_listenerId, input->renderer()->absoluteBoundingBoxRect()))
           setState(Recording);
         break;
       case Recording:
@@ -505,6 +506,10 @@ void InputFieldSpeechButtonElement::detach() {
     if (Frame* frame = document()->frame())
       frame->eventHandler()->setCapturingMouseEventsNode(0);
   }
+
+  if (m_state != Idle)
+    speechInput()->cancelRecognition(m_listenerId);
+
   TextControlInnerElement::detach();
 }
 
