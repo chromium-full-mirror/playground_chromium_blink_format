@@ -2691,10 +2691,8 @@ bool HTMLTreeBuilder::pluginsEnabled(Frame* frame) {
 String serializeForNumberType(double number) {
   // According to HTML5, "the best representation of the number n as a floating
   // point number" is a string produced by applying ToString() to n.
-  DtoaBuffer buffer;
-  unsigned length;
-  doubleToStringInJavaScriptFormat(number, buffer, &length);
-  return String(buffer, length);
+  NumberToStringBuffer buffer;
+  return String(buffer, numberToString(number, buffer));
 }
 
 // FIXME: Move this function to a more appropriate place.
