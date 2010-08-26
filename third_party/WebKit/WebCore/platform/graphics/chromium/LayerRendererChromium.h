@@ -109,13 +109,17 @@ class LayerRendererChromium : public Noncopyable {
                              const TransformationMatrix& parentMatrix,
                              float opacity);
 
-  void drawLayersRecursive(LayerChromium*);
+  void drawLayersRecursive(LayerChromium*, const FloatRect& scissorRect);
 
   void drawLayer(LayerChromium*);
 
   bool isLayerVisible(LayerChromium*,
                       const TransformationMatrix&,
                       const IntRect& visibleRect);
+
+  void drawLayerIntoStencilBuffer(LayerChromium*, bool decrement);
+
+  void scissorToRect(const FloatRect&);
 
   bool makeContextCurrent();
 
@@ -153,9 +157,11 @@ class LayerRendererChromium : public Noncopyable {
 
   IntSize m_rootLayerCanvasSize;
 
-  IntRect m_visibleRect;
+  IntRect m_rootVisibleRect;
 
   int m_maxTextureSize;
+
+  int m_numStencilBits;
 
   // Store values that are shared between instances of each layer type
   // associated with this instance of the compositor. Since there can be
