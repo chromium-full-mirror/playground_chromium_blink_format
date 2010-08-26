@@ -34,19 +34,20 @@
 #if USE(ACCELERATED_COMPOSITING)
 
 #include "ContentLayerChromium.h"
+#include "VideoFrameProvider.h"
 
 namespace WebCore {
 
 // A Layer that contains a Video element.
 class VideoLayerChromium : public ContentLayerChromium {
  public:
-  static PassRefPtr<VideoLayerChromium> create(
-      GraphicsLayerChromium* owner = 0);
+  static PassRefPtr<VideoLayerChromium> create(GraphicsLayerChromium* owner = 0,
+                                               VideoFrameProvider* = 0);
   virtual bool drawsContent() { return true; }
   virtual void updateContents();
 
  private:
-  VideoLayerChromium(GraphicsLayerChromium* owner);
+  VideoLayerChromium(GraphicsLayerChromium* owner, VideoFrameProvider*);
   void createTextureRect(const IntSize& requiredTextureSize,
                          const IntRect& updateRect,
                          unsigned textureId);
@@ -58,6 +59,7 @@ class VideoLayerChromium : public ContentLayerChromium {
   OwnPtr<PlatformContextSkia> m_skiaContext;
 #endif
   OwnPtr<GraphicsContext> m_graphicsContext;
+  OwnPtr<VideoFrameProvider> m_provider;
 };
 }
 #endif  // USE(ACCELERATED_COMPOSITING)
