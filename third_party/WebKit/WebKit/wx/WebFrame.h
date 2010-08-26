@@ -135,7 +135,8 @@ class WXDLLIMPEXP_WEBKIT wxWebFrame {
 
   wxString GetPageSource();
   void SetPageSource(const wxString& source,
-                     const wxString& baseUrl = wxEmptyString);
+                     const wxString& baseUrl = wxEmptyString,
+                     const wxString& mimetype = wxT("text/html"));
 
   wxString GetInnerText();
   wxString GetAsMarkup();

@@ -216,6 +216,28 @@ wxWebViewWindowObjectClearedEvent::wxWebViewWindowObjectClearedEvent(
     SetId(win->GetId());
 }
 
+IMPLEMENT_DYNAMIC_CLASS(wxWebViewContentsChangedEvent, wxCommandEvent)
+
+DEFINE_EVENT_TYPE(wxEVT_WEBVIEW_CONTENTS_CHANGED)
+
+wxWebViewContentsChangedEvent::wxWebViewContentsChangedEvent(wxWindow* win) {
+  SetEventType(wxEVT_WEBVIEW_CONTENTS_CHANGED);
+  SetEventObject(win);
+  if (win)
+    SetId(win->GetId());
+}
+
+IMPLEMENT_DYNAMIC_CLASS(wxWebViewSelectionChangedEvent, wxCommandEvent)
+
+DEFINE_EVENT_TYPE(wxEVT_WEBVIEW_SELECTION_CHANGED)
+
+wxWebViewSelectionChangedEvent::wxWebViewSelectionChangedEvent(wxWindow* win) {
+  SetEventType(wxEVT_WEBVIEW_SELECTION_CHANGED);
+  SetEventObject(win);
+  if (win)
+    SetId(win->GetId());
+}
+
 //---------------------------------------------------------
 // DOM Element info data type
 //---------------------------------------------------------
@@ -420,9 +442,11 @@ wxString wxWebView::GetPageSource() {
   return wxEmptyString;
 }
 
-void wxWebView::SetPageSource(const wxString& source, const wxString& baseUrl) {
+void wxWebView::SetPageSource(const wxString& source,
+                              const wxString& baseUrl,
+                              const wxString& mimetype) {
   if (m_mainFrame)
-    m_mainFrame->SetPageSource(source, baseUrl);
+    m_mainFrame->SetPageSource(source, baseUrl, mimetype);
 }
 
 wxString wxWebView::GetInnerText() {

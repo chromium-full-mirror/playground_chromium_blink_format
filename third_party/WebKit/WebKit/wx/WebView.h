@@ -157,7 +157,8 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   // bool CanGetPageSource();
   wxString GetPageSource();
   void SetPageSource(const wxString& source,
-                     const wxString& baseUrl = wxEmptyString);
+                     const wxString& baseUrl = wxEmptyString,
+                     const wxString& mimetype = wxT("text/html"));
 
   wxString GetInnerText();
   wxString GetAsMarkup();
@@ -523,6 +524,31 @@ class WXDLLIMPEXP_WEBKIT wxWebViewWindowObjectClearedEvent
   JSObjectRef m_windowObject;
 };
 
+class WXDLLIMPEXP_WEBKIT wxWebViewContentsChangedEvent : public wxCommandEvent {
+#ifndef SWIG
+  DECLARE_DYNAMIC_CLASS(wxWebViewContentsChangedEvent)
+#endif
+
+ public:
+  wxWebViewContentsChangedEvent(wxWindow* win = static_cast<wxWindow*>(0));
+  wxEvent* Clone(void) const {
+    return new wxWebViewContentsChangedEvent(*this);
+  }
+};
+
+class WXDLLIMPEXP_WEBKIT wxWebViewSelectionChangedEvent
+    : public wxCommandEvent {
+#ifndef SWIG
+  DECLARE_DYNAMIC_CLASS(wxWebViewSelectionChangedEvent)
+#endif
+
+ public:
+  wxWebViewSelectionChangedEvent(wxWindow* win = static_cast<wxWindow*>(0));
+  wxEvent* Clone(void) const {
+    return new wxWebViewSelectionChangedEvent(*this);
+  }
+};
+
 typedef void (wxEvtHandler::*wxWebViewLoadEventFunction)(wxWebViewLoadEvent&);
 typedef void (wxEvtHandler::*wxWebViewBeforeLoadEventFunction)(
     wxWebViewBeforeLoadEvent&);
@@ -541,6 +567,10 @@ typedef void (wxEvtHandler::*wxWebViewReceivedTitleEventFunction)(
     wxWebViewReceivedTitleEvent&);
 typedef void (wxEvtHandler::*wxWebViewWindowObjectClearedFunction)(
     wxWebViewWindowObjectClearedEvent&);
+typedef void (wxEvtHandler::*wxWebViewContentsChangedFunction)(
+    wxWebViewContentsChangedEvent&);
+typedef void (wxEvtHandler::*wxWebViewSelectionChangedFunction)(
+    wxWebViewSelectionChangedEvent&);
 
 #define wxWebViewLoadEventHandler(func)    \
   (wxObjectEventFunction)(wxEventFunction) \
@@ -572,6 +602,12 @@ typedef void (wxEvtHandler::*wxWebViewWindowObjectClearedFunction)(
 #define wxWebViewWindowObjectClearedEventHandler(func) \
   (wxObjectEventFunction)(wxEventFunction)             \
       wxStaticCastEvent(wxWebViewWindowObjectClearedFunction, &func)
+#define wxWebViewContentsChangedEventHandler(func) \
+  (wxObjectEventFunction)(wxEventFunction)         \
+      wxStaticCastEvent(wxWebViewContentsChangedEventFunction, &func)
+#define wxWebViewSelectionChangedEventHandler(func) \
+  (wxObjectEventFunction)(wxEventFunction)          \
+      wxStaticCastEvent(wxWebViewSelectionChangedEventFunction, &func)
 
 #ifndef SWIG
 BEGIN_DECLARE_EVENT_TYPES()
@@ -602,6 +638,12 @@ DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WEBKIT,
                             wxID_ANY)
 DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WEBKIT,
                             wxEVT_WEBVIEW_WINDOW_OBJECT_CLEARED,
+                            wxID_ANY)
+DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WEBKIT,
+                            wxEVT_WEBVIEW_CONTENTS_CHANGED,
+                            wxID_ANY)
+DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WEBKIT,
+                            wxEVT_WEBVIEW_SELECTION_CHANGED,
                             wxID_ANY)
 END_DECLARE_EVENT_TYPES()
 #endif
@@ -674,6 +716,20 @@ END_DECLARE_EVENT_TYPES()
       wxEVT_WEBVIEW_WINDOW_OBJECT_CLEARED, winid, wxID_ANY,               \
       (wxObjectEventFunction)(wxWebViewWindowObjectClearedFunction)&func, \
       static_cast<wxObject*>(NULL))                                       \
+  ,
+
+#define EVT_WEBVIEW_CONTENTS_CHANGED(winid, func)                          \
+  DECLARE_EVENT_TABLE_ENTRY(                                               \
+      wxEVT_WEBVIEW_CONTENTS_CHANGED, winid, wxID_ANY,                     \
+      (wxObjectEventFunction)(wxWebViewContentsChangedEventFunction)&func, \
+      static_cast<wxObject*>(0))                                           \
+  ,
+
+#define EVT_WEBVIEW_SELECTION_CHANGED(winid, func)                          \
+  DECLARE_EVENT_TABLE_ENTRY(                                                \
+      wxEVT_WEBVIEW_SELECTION_CHANGED, winid, wxID_ANY,                     \
+      (wxObjectEventFunction)(wxWebViewSelectionChangedEventFunction)&func, \
+      static_cast<wxObject*>(0))                                            \
   ,
 
 #endif  // ifndef WXWEBVIEW_H

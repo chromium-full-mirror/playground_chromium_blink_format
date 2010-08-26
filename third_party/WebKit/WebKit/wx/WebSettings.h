@@ -66,6 +66,8 @@ class WXDLLIMPEXP_WEBKIT wxWebSettings : public wxObject {
 
   wxWebSettings() : wxObject() {}
 
+  virtual ~wxWebSettings() {}
+
   /**
       Sets the default font size for fixed fonts.
   */

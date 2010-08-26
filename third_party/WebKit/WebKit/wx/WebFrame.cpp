@@ -153,7 +153,8 @@ wxString wxWebFrame::GetPageSource() {
 }
 
 void wxWebFrame::SetPageSource(const wxString& source,
-                               const wxString& baseUrl) {
+                               const wxString& baseUrl,
+                               const wxString& mimetype) {
   if (m_impl->frame && m_impl->frame->loader()) {
     WebCore::KURL url(WebCore::KURL(), baseUrl);
 
@@ -163,8 +164,7 @@ void wxWebFrame::SetPageSource(const wxString& source,
     WTF::PassRefPtr<WebCore::SharedBuffer> sharedBuffer =
         WebCore::SharedBuffer::create(contents, strlen(contents));
     WebCore::SubstituteData substituteData(
-        sharedBuffer, WTF::String("text/html"), WTF::String("UTF-8"),
-        WebCore::blankURL(), url);
+        sharedBuffer, mimetype, WTF::String("UTF-8"), WebCore::blankURL(), url);
 
     m_impl->frame->loader()->stop();
     m_impl->frame->loader()->load(WebCore::ResourceRequest(url), substituteData,
