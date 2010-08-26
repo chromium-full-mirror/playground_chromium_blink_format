@@ -31,6 +31,8 @@
     "Chromium should not compile this file and instead define its own version of this factory that navigates the multi-process boundry."
 #endif
 
+#if ENABLE(INDEXED_DATABASE)
+
 void IDBKeyPathBackendImpl::createIDBKeysFromSerializedValuesAndKeyPath(
     const Vector<RefPtr<SerializedScriptValue>&, 0> values,
     const String& keyPath,
@@ -38,3 +40,5 @@ void IDBKeyPathBackendImpl::createIDBKeysFromSerializedValuesAndKeyPath(
   // FIXME: Implement this method once JSC supports WireFormat for
   // SerializedScriptValue.
 }
+
+#endif  // ENABLE(INDEXED_DATABASE)
