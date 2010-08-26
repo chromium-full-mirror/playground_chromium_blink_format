@@ -238,7 +238,7 @@ void RenderEmbeddedObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
             (equalIgnoringCase(name, "src") ||
              equalIgnoringCase(name, "movie") ||
              equalIgnoringCase(name, "code") || equalIgnoringCase(name, "url")))
-          url = p->value();
+          url = deprecatedParseURL(p->value());
         if (serviceType.isEmpty() && equalIgnoringCase(name, "type")) {
           serviceType = p->value();
           size_t pos = serviceType.find(";");
