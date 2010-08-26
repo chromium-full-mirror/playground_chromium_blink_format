@@ -84,7 +84,7 @@ class InspectorFrontendClient : public WebCore::InspectorFrontendClientLocal {
 
   void disconnectInspectorClient() { m_inspectorClient = 0; }
 
-  void destroyInspectorWindow();
+  void destroyInspectorWindow(bool notifyInspectorController);
 
   virtual WTF::String localizedStringsURL();
 
@@ -92,6 +92,7 @@ class InspectorFrontendClient : public WebCore::InspectorFrontendClientLocal {
 
   virtual void bringToFront();
   virtual void closeWindow();
+  virtual void disconnectFromBackend();
 
   virtual void attachWindow();
   virtual void detachWindow();

@@ -272,20 +272,11 @@ void InspectorFrontendClientQt::bringToFront() {
 }
 
 void InspectorFrontendClientQt::closeWindow() {
-  if (m_destroyingInspectorView)
-    return;
-  m_destroyingInspectorView = true;
+  destroyInspectorView(true);
+}
 
-  // Clear reference from QWebInspector to the frontend view.
-  m_inspectedWebPage->d->getOrCreateInspector()->d->setFrontend(0);
-#if ENABLE(INSPECTOR)
-  m_inspectedWebPage->d->inspectorController()->disconnectFrontend();
-#endif
-  m_inspectorClient->releaseFrontendPage();
-
-  // Clear pointer before deleting WebView to avoid recursive calls to its
-  // destructor.
-  OwnPtr<QWebView> inspectorView = m_inspectorView.release();
+void InspectorFrontendClientQt::disconnectFromBackend() {
+  destroyInspectorView(false);
 }
 
 void InspectorFrontendClientQt::attachWindow() {
@@ -312,6 +303,26 @@ void InspectorFrontendClientQt::updateWindowTitle() {
             .arg(m_inspectedURL);
     m_inspectedWebPage->d->inspector->setWindowTitle(caption);
   }
+}
+
+void InspectorFrontendClientQt::destroyInspectorView(
+    bool notifyInspectorController) {
+  if (m_destroyingInspectorView)
+    return;
+  m_destroyingInspectorView = true;
+
+  if (notifyInspectorController) {
+    // Clear reference from QWebInspector to the frontend view.
+    m_inspectedWebPage->d->getOrCreateInspector()->d->setFrontend(0);
+#if ENABLE(INSPECTOR)
+    m_inspectedWebPage->d->inspectorController()->disconnectFrontend();
+#endif
+    m_inspectorClient->releaseFrontendPage();
+  }
+
+  // Clear pointer before deleting WebView to avoid recursive calls to its
+  // destructor.
+  OwnPtr<QWebView> inspectorView = m_inspectorView.release();
 }
 }
 
