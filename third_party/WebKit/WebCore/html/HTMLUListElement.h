@@ -35,8 +35,6 @@ class HTMLUListElement : public HTMLElement {
  private:
   HTMLUListElement(const QualifiedName&, Document*);
 
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
-
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(Attribute*);
 };

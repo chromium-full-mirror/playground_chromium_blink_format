@@ -97,7 +97,6 @@ class HTMLAnchorElement : public HTMLElement {
   virtual void parseMappedAttribute(Attribute*);
 
  private:
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual bool supportsFocus() const;
   virtual bool isMouseFocusable() const;
   virtual bool isKeyboardFocusable(KeyboardEvent*) const;

@@ -768,12 +768,15 @@ void MarkupAccumulator::appendStartMarkup(
   }
 }
 
-static inline bool doesHTMLForbidEndTag(const Node* node) {
-  if (node->isHTMLElement()) {
-    const HTMLElement* htmlElt = static_cast<const HTMLElement*>(node);
-    return (htmlElt->endTagRequirement() == TagStatusForbidden);
-  }
-  return false;
+static inline bool elementCannotHaveEndTag(const Node* node) {
+  if (!node->isHTMLElement())
+    return false;
+
+  // FIXME: ieForbidsInsertHTML may not be the right function to call here
+  // ieForbidsInsertHTML is used to disallow setting innerHTML/outerHTML
+  // or createContextualFragment.  It does not necessarily align with
+  // which elements should be serialized w/o end tags.
+  return static_cast<const HTMLElement*>(node)->ieForbidsInsertHTML();
 }
 
 // Rules of self-closure
@@ -787,7 +790,7 @@ bool MarkupAccumulator::shouldSelfClose(const Node* node) {
     return false;
   if (node->hasChildNodes())
     return false;
-  if (node->isHTMLElement() && !doesHTMLForbidEndTag(node))
+  if (node->isHTMLElement() && !elementCannotHaveEndTag(node))
     return false;
   return true;
 }
@@ -795,7 +798,7 @@ bool MarkupAccumulator::shouldSelfClose(const Node* node) {
 void MarkupAccumulator::appendEndMarkup(Vector<UChar>& result,
                                         const Node* node) {
   if (!node->isElementNode() || shouldSelfClose(node) ||
-      (!node->hasChildNodes() && doesHTMLForbidEndTag(node)))
+      (!node->hasChildNodes() && elementCannotHaveEndTag(node)))
     return;
 
   result.append('<');
@@ -1281,7 +1284,7 @@ static void serializeNodesWithNamespaces(MarkupAccumulator& accumulator,
   if (!childrenOnly)
     accumulator.appendStartTag(node, &namespaceHash);
 
-  if (!(node->document()->isHTMLDocument() && doesHTMLForbidEndTag(node))) {
+  if (!(node->document()->isHTMLDocument() && elementCannotHaveEndTag(node))) {
     for (Node* current = node->firstChild(); current;
          current = current->nextSibling())
       serializeNodesWithNamespaces(accumulator, current, nodeToSkip,

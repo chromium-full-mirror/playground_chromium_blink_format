@@ -35,8 +35,6 @@ class HTMLHeadElement : public HTMLElement {
 
  private:
   HTMLHeadElement(const QualifiedName&, Document*);
-
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
 };
 
 }  // namespace

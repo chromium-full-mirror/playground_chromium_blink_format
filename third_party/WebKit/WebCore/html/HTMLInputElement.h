@@ -233,8 +233,6 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   virtual void willMoveToNewOwnerDocument();
   virtual void didMoveToNewOwnerDocument();
 
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-
   virtual bool isKeyboardFocusable(KeyboardEvent*) const;
   virtual bool isMouseFocusable() const;
   virtual bool isEnumeratable() const { return inputType() != IMAGE; }

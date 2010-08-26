@@ -80,8 +80,6 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
   bool isIcon() const { return m_relAttribute.m_isIcon; }
 
  private:
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-
   virtual void parseMappedAttribute(Attribute*);
 
   void process();

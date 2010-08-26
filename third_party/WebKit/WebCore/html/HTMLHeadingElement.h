@@ -33,8 +33,6 @@ class HTMLHeadingElement : public HTMLElement {
 
  private:
   HTMLHeadingElement(const QualifiedName&, Document*);
-
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
 };
 
 }  // namespace WebCore

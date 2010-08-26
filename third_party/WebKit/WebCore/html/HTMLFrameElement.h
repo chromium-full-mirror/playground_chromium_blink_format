@@ -39,8 +39,6 @@ class HTMLFrameElement : public HTMLFrameElementBase {
  private:
   HTMLFrameElement(const QualifiedName&, Document*);
 
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-
   virtual void attach();
 
   virtual bool rendererIsNeeded(RenderStyle*);

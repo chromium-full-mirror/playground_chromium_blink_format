@@ -38,8 +38,6 @@ class HTMLEmbedElement : public HTMLPlugInImageElement {
  private:
   HTMLEmbedElement(const QualifiedName&, Document*);
 
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(Attribute*);

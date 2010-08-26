@@ -49,8 +49,6 @@ class HTMLSourceElement : public HTMLElement {
  private:
   HTMLSourceElement(const QualifiedName&, Document*);
 
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-
   virtual void insertedIntoTree(bool);
   virtual bool isURLAttribute(Attribute*) const;
 

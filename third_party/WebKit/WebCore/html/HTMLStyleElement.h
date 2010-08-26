@@ -43,8 +43,6 @@ class HTMLStyleElement : public HTMLElement, private StyleElement {
  private:
   HTMLStyleElement(const QualifiedName&, Document*, bool createdByParser);
 
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
-
   // overload from HTMLElement
   virtual void parseMappedAttribute(Attribute*);
   virtual void insertedIntoDocument();

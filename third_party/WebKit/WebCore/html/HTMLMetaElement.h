@@ -38,8 +38,6 @@ class HTMLMetaElement : public HTMLElement {
  private:
   HTMLMetaElement(const QualifiedName&, Document*);
 
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-
   virtual void parseMappedAttribute(Attribute*);
   virtual void insertedIntoDocument();
 

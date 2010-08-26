@@ -36,8 +36,6 @@ class HTMLHtmlElement : public HTMLElement {
  private:
   HTMLHtmlElement(const QualifiedName&, Document*);
 
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
-
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   virtual void insertedIntoDocument();
 #endif

@@ -34,8 +34,6 @@ class HTMLModElement : public HTMLElement {
 
  private:
   HTMLModElement(const QualifiedName&, Document*);
-
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
 };
 
 }  // namespace

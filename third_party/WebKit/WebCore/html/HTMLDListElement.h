@@ -33,8 +33,6 @@ class HTMLDListElement : public HTMLElement {
 
  private:
   HTMLDListElement(const QualifiedName&, Document*);
-
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
 };
 
 }  // namespace

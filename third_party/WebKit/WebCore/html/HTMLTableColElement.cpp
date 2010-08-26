@@ -46,10 +46,6 @@ PassRefPtr<HTMLTableColElement> HTMLTableColElement::create(
   return adoptRef(new HTMLTableColElement(tagName, document));
 }
 
-HTMLTagStatus HTMLTableColElement::endTagRequirement() const {
-  return hasLocalName(colTag) ? TagStatusForbidden : TagStatusOptional;
-}
-
 bool HTMLTableColElement::mapToEntry(const QualifiedName& attrName,
                                      MappedAttributeEntry& result) const {
   if (attrName == widthAttr) {

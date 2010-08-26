@@ -34,8 +34,6 @@ class HTMLBaseElement : public HTMLElement {
  private:
   HTMLBaseElement(const QualifiedName&, Document*);
 
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-
   virtual String target() const { return m_target; }
 
   virtual void parseMappedAttribute(Attribute*);

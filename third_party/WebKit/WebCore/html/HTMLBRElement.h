@@ -36,8 +36,6 @@ class HTMLBRElement : public HTMLElement {
  private:
   HTMLBRElement(const QualifiedName&, Document*);
 
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(Attribute*);
 

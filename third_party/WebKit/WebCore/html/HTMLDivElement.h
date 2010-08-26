@@ -36,8 +36,6 @@ class HTMLDivElement : public HTMLElement {
   HTMLDivElement(const QualifiedName&, Document*);
 
  private:
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
-
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(Attribute*);
 };

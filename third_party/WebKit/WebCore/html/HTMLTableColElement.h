@@ -43,7 +43,6 @@ class HTMLTableColElement : public HTMLTablePartElement {
  private:
   HTMLTableColElement(const QualifiedName& tagName, Document*);
 
-  virtual HTMLTagStatus endTagRequirement() const;
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(Attribute*);
   virtual bool canHaveAdditionalAttributeStyleDecls() const { return true; }
