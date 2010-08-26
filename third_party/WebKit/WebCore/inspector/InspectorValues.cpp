@@ -493,7 +493,7 @@ inline void doubleQuoteString(const String& str, Vector<UChar>* dst) {
 
 }  // anonymous namespace
 
-bool InspectorValue::asBool(bool*) const {
+bool InspectorValue::asBoolean(bool*) const {
   return false;
 }
 
@@ -560,7 +560,7 @@ void InspectorValue::writeJSON(Vector<UChar>* output) const {
   output->append(nullString, 4);
 }
 
-bool InspectorBasicValue::asBool(bool* output) const {
+bool InspectorBasicValue::asBoolean(bool* output) const {
   if (type() != TypeBoolean)
     return false;
   *output = m_boolValue;
@@ -568,41 +568,41 @@ bool InspectorBasicValue::asBool(bool* output) const {
 }
 
 bool InspectorBasicValue::asNumber(double* output) const {
-  if (type() != TypeDouble)
+  if (type() != TypeNumber)
     return false;
   *output = m_doubleValue;
   return true;
 }
 
 bool InspectorBasicValue::asNumber(long* output) const {
-  if (type() != TypeDouble)
+  if (type() != TypeNumber)
     return false;
   *output = static_cast<long>(m_doubleValue);
   return true;
 }
 
 bool InspectorBasicValue::asNumber(unsigned long* output) const {
-  if (type() != TypeDouble)
+  if (type() != TypeNumber)
     return false;
   *output = static_cast<unsigned long>(m_doubleValue);
   return true;
 }
 
 bool InspectorBasicValue::asNumber(unsigned int* output) const {
-  if (type() != TypeDouble)
+  if (type() != TypeNumber)
     return false;
   *output = static_cast<unsigned int>(m_doubleValue);
   return true;
 }
 
 void InspectorBasicValue::writeJSON(Vector<UChar>* output) const {
-  ASSERT(type() == TypeBoolean || type() == TypeDouble);
+  ASSERT(type() == TypeBoolean || type() == TypeNumber);
   if (type() == TypeBoolean) {
     if (m_boolValue)
       output->append(trueString, 4);
     else
       output->append(falseString, 5);
-  } else if (type() == TypeDouble) {
+  } else if (type() == TypeNumber) {
     String value = String::format("%f", m_doubleValue);
     value.replace(',', '.');
     output->append(value.characters(), value.length());
@@ -628,11 +628,11 @@ PassRefPtr<InspectorObject> InspectorObject::asObject() {
   return this;
 }
 
-bool InspectorObject::getBool(const String& name, bool* output) const {
+bool InspectorObject::getBoolean(const String& name, bool* output) const {
   RefPtr<InspectorValue> value = get(name);
   if (!value)
     return false;
-  return value->asBool(output);
+  return value->asBoolean(output);
 }
 
 bool InspectorObject::getNumber(const String& name, double* output) const {

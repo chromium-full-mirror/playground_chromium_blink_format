@@ -58,7 +58,7 @@ class InspectorValue : public RefCounted<InspectorValue> {
   typedef enum {
     TypeNull = 0,
     TypeBoolean,
-    TypeDouble,
+    TypeNumber,
     TypeString,
     TypeObject,
     TypeArray
@@ -66,7 +66,7 @@ class InspectorValue : public RefCounted<InspectorValue> {
 
   Type type() const { return m_type; }
 
-  virtual bool asBool(bool* output) const;
+  virtual bool asBoolean(bool* output) const;
   virtual bool asNumber(double* output) const;
   virtual bool asNumber(long* output) const;
   virtual bool asNumber(unsigned long* output) const;
@@ -104,7 +104,7 @@ class InspectorBasicValue : public InspectorValue {
     return adoptRef(new InspectorBasicValue(value));
   }
 
-  virtual bool asBool(bool* output) const;
+  virtual bool asBoolean(bool* output) const;
   virtual bool asNumber(double* output) const;
   virtual bool asNumber(long* output) const;
   virtual bool asNumber(unsigned long* output) const;
@@ -116,9 +116,9 @@ class InspectorBasicValue : public InspectorValue {
   explicit InspectorBasicValue(bool value)
       : InspectorValue(TypeBoolean), m_boolValue(value) {}
   explicit InspectorBasicValue(int value)
-      : InspectorValue(TypeDouble), m_doubleValue((double)value) {}
+      : InspectorValue(TypeNumber), m_doubleValue((double)value) {}
   explicit InspectorBasicValue(double value)
-      : InspectorValue(TypeDouble), m_doubleValue(value) {}
+      : InspectorValue(TypeNumber), m_doubleValue(value) {}
 
   union {
     bool m_boolValue;
@@ -166,7 +166,7 @@ class InspectorObject : public InspectorValue {
   virtual bool asObject(RefPtr<InspectorObject>* output);
   virtual PassRefPtr<InspectorObject> asObject();
 
-  void setBool(const String& name, bool);
+  void setBoolean(const String& name, bool);
   void setNumber(const String& name, double);
   void setString(const String& name, const String&);
   void setValue(const String& name, PassRefPtr<InspectorValue>);
@@ -174,7 +174,7 @@ class InspectorObject : public InspectorValue {
   void setArray(const String& name, PassRefPtr<InspectorArray>);
 
   const_iterator find(const String& name) const;
-  bool getBool(const String& name, bool* output) const;
+  bool getBoolean(const String& name, bool* output) const;
   bool getNumber(const String& name, double* output) const;
   bool getString(const String& name, String* output) const;
   PassRefPtr<InspectorObject> getObject(const String& name) const;
@@ -204,7 +204,7 @@ class InspectorArray : public InspectorValue {
   virtual bool asArray(RefPtr<InspectorArray>* output);
   virtual PassRefPtr<InspectorArray> asArray();
 
-  void pushBool(bool);
+  void pushBoolean(bool);
   void pushNumber(double);
   void pushString(const String&);
   void pushValue(PassRefPtr<InspectorValue>);
@@ -226,7 +226,7 @@ inline InspectorObject::const_iterator InspectorObject::find(
   return m_data.find(name);
 }
 
-inline void InspectorObject::setBool(const String& name, bool value) {
+inline void InspectorObject::setBoolean(const String& name, bool value) {
   setValue(name, InspectorBasicValue::create(value));
 }
 
@@ -257,7 +257,7 @@ inline void InspectorObject::setArray(const String& name,
     m_order.append(name);
 }
 
-inline void InspectorArray::pushBool(bool value) {
+inline void InspectorArray::pushBoolean(bool value) {
   m_data.append(InspectorBasicValue::create(value));
 }
 
