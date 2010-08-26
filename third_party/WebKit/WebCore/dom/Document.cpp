@@ -1402,6 +1402,11 @@ PassRefPtr<TreeWalker> Document::createTreeWalker(Node* root,
   return TreeWalker::create(root, whatToShow, filter, expandEntityReferences);
 }
 
+void Document::scheduleForcedStyleRecalc() {
+  m_pendingStyleRecalcShouldForce = true;
+  scheduleStyleRecalc();
+}
+
 void Document::scheduleStyleRecalc() {
   if (m_styleRecalcTimer.isActive() || inPageCache())
     return;
@@ -2801,8 +2806,7 @@ void Document::styleSelectorChanged(StyleSelectorUpdateFlag updateFlag) {
   recalcStyleSelector();
 
   if (updateFlag == DeferRecalcStyle) {
-    m_pendingStyleRecalcShouldForce = true;
-    scheduleStyleRecalc();
+    scheduleForcedStyleRecalc();
     return;
   }
 

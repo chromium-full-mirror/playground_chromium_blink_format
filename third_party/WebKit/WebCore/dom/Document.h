@@ -716,6 +716,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void setCSSTarget(Element*);
   Element* cssTarget() const { return m_cssTarget; }
 
+  void scheduleForcedStyleRecalc();
   void scheduleStyleRecalc();
   void unscheduleStyleRecalc();
   void styleRecalcTimerFired(Timer<Document>*);
