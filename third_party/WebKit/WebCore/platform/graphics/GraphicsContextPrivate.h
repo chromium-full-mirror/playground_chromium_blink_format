@@ -74,7 +74,7 @@ struct GraphicsContextState {
 
   bool paintingDisabled;
 
-  FloatSize shadowSize;
+  FloatSize shadowOffset;
   float shadowBlur;
   Color shadowColor;
 

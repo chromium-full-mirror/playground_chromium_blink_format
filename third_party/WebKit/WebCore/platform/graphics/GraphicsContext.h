@@ -385,7 +385,7 @@ class GraphicsContext : public Noncopyable {
                                               FloatRect& shadowRect,
                                               float& radius,
                                               const FloatRect& sourceRect,
-                                              const FloatSize& shadowSize,
+                                              const FloatSize& shadowOffset,
                                               float shadowBlur);
 #endif
 

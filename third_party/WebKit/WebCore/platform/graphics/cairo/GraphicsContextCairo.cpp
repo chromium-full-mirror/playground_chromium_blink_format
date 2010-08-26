@@ -183,7 +183,7 @@ void GraphicsContext::calculateShadowBufferDimensions(
     FloatRect& shadowRect,
     float& radius,
     const FloatRect& sourceRect,
-    const FloatSize& shadowSize,
+    const FloatSize& shadowOffset,
     float shadowBlur) {
 #if ENABLE(FILTERS)
   // limit radius to 128
@@ -194,7 +194,8 @@ void GraphicsContext::calculateShadowBufferDimensions(
 
   // determine dimensions of shadow rect
   shadowRect = FloatRect(sourceRect.location(), shadowBufferSize);
-  shadowRect.move(shadowSize.width() - radius, shadowSize.height() - radius);
+  shadowRect.move(shadowOffset.width() - radius,
+                  shadowOffset.height() - radius);
 #endif
 }
 
@@ -203,10 +204,10 @@ static inline void drawPathShadow(GraphicsContext* context,
                                   bool fillShadow,
                                   bool strokeShadow) {
 #if ENABLE(FILTERS)
-  FloatSize shadowSize;
+  FloatSize shadowOffset;
   float shadowBlur;
   Color shadowColor;
-  if (!context->getShadow(shadowSize, shadowBlur, shadowColor))
+  if (!context->getShadow(shadowOffset, shadowBlur, shadowColor))
     return;
 
   // Calculate filter values to create appropriate shadow.
@@ -223,7 +224,7 @@ static inline void drawPathShadow(GraphicsContext* context,
   FloatRect shadowRect;
   float radius = 0;
   GraphicsContext::calculateShadowBufferDimensions(
-      shadowBufferSize, shadowRect, radius, rect, shadowSize, shadowBlur);
+      shadowBufferSize, shadowRect, radius, rect, shadowOffset, shadowBlur);
 
   // Create suitably-sized ImageBuffer to hold the shadow.
   OwnPtr<ImageBuffer> shadowBuffer = ImageBuffer::create(shadowBufferSize);
@@ -646,18 +647,18 @@ static void drawBorderlessRectShadow(GraphicsContext* context,
                                      const FloatRect& rect,
                                      const Color& rectColor) {
 #if ENABLE(FILTERS)
-  FloatSize shadowSize;
+  FloatSize shadowOffset;
   float shadowBlur;
   Color shadowColor;
 
-  if (!context->getShadow(shadowSize, shadowBlur, shadowColor))
+  if (!context->getShadow(shadowOffset, shadowBlur, shadowColor))
     return;
 
   IntSize shadowBufferSize;
   FloatRect shadowRect;
   float radius = 0;
   GraphicsContext::calculateShadowBufferDimensions(
-      shadowBufferSize, shadowRect, radius, rect, shadowSize, shadowBlur);
+      shadowBufferSize, shadowRect, radius, rect, shadowOffset, shadowBlur);
 
   // Draw shadow into a new ImageBuffer
   OwnPtr<ImageBuffer> shadowBuffer = ImageBuffer::create(shadowBufferSize);
@@ -949,7 +950,7 @@ void GraphicsContext::setPlatformShadow(FloatSize const& size,
     // Meaning that this graphics context is associated with a
     // CanvasRenderingContext
     // We flip the height since CG and HTML5 Canvas have opposite Y axis
-    m_common->state.shadowSize = FloatSize(size.width(), -size.height());
+    m_common->state.shadowOffset = FloatSize(size.width(), -size.height());
   }
 }
 
