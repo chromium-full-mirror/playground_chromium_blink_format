@@ -1469,6 +1469,7 @@ PassRefPtr<RenderStyle> CSSStyleSelector::styleForElement(
   }
   applyDeclarations<false>(true, firstUARule, lastUARule);
 
+  ASSERT(!m_fontDirty);
   // If our font got dirtied by one of the non-essential font props,
   // go ahead and update it a second time.
   if (m_fontDirty)
@@ -3236,7 +3237,7 @@ void CSSStyleSelector::applyDeclarations(bool isImportant,
         if (applyFirst) {
           COMPILE_ASSERT(firstCSSProperty == CSSPropertyColor,
                          CSS_color_is_first_property);
-          COMPILE_ASSERT(CSSPropertyZoom == CSSPropertyColor + 11,
+          COMPILE_ASSERT(CSSPropertyZoom == CSSPropertyColor + 12,
                          CSS_zoom_is_end_of_first_prop_range);
           COMPILE_ASSERT(CSSPropertyLineHeight == CSSPropertyZoom + 1,
                          CSS_line_height_is_after_zoom);
