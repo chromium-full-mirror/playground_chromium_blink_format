@@ -79,9 +79,6 @@ class DumpRenderTree : public QObject {
   void setTextOutputEnabled(bool enable) { m_enableTextOutput = enable; }
   bool isTextOutputEnabled() { return m_enableTextOutput; }
 
-  void setSingleFileMode(bool flag) { m_singleFileMode = flag; }
-  bool isSingleFileMode() { return m_singleFileMode; }
-
   void setGraphicsBased(bool flag) { m_graphicsBased = flag; }
   bool isGraphicsBased() { return m_graphicsBased; }
 
@@ -110,6 +107,7 @@ class DumpRenderTree : public QObject {
 #if defined(Q_WS_X11)
   static void initializeFonts();
 #endif
+  void processArgsLine(const QStringList&);
 
  public Q_SLOTS:
   void initJSObjects();
@@ -132,8 +130,12 @@ class DumpRenderTree : public QObject {
   void showPage();
   void hidePage();
   void dryRunPrint(QWebFrame*);
+  void loadNextTestInStandAloneMode();
 
  private:
+  void setStandAloneMode(bool flag) { m_standAloneMode = flag; }
+  bool isStandAloneMode() { return m_standAloneMode; }
+
   QString dumpFramesAsText(QWebFrame* frame);
   QString dumpBackForwardList(QWebPage* page);
   QString dumpFrameScrollPosition(QWebFrame* frame);
@@ -141,6 +143,7 @@ class DumpRenderTree : public QObject {
 
   bool m_dumpPixels;
   QString m_expectedHash;
+  QStringList m_standAloneModeTestList;
 
   WebPage* m_page;
   QWidget* m_mainView;
@@ -154,7 +157,7 @@ class DumpRenderTree : public QObject {
 
   QList<QObject*> windows;
   bool m_enableTextOutput;
-  bool m_singleFileMode;
+  bool m_standAloneMode;
   bool m_graphicsBased;
   QString m_persistentStoragePath;
 };
