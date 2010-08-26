@@ -414,7 +414,8 @@ Document::Document(Frame* frame, const KURL& url, bool isXHTML, bool isHTML)
 #endif
       ,
       m_weakReference(DocumentWeakReference::create(this)),
-      m_idAttributeName(idAttr) {
+      m_idAttributeName(idAttr),
+      m_loadEventDelayCount(0) {
   m_document = this;
 
   m_pageGroupUserSheetCacheValid = false;
@@ -4644,5 +4645,13 @@ InspectorController* Document::inspectorController() const {
   return page() ? page()->inspectorController() : 0;
 }
 #endif
+
+void Document::decrementLoadEventDelayCount() {
+  ASSERT(m_loadEventDelayCount);
+  --m_loadEventDelayCount;
+
+  if (frame() && !m_loadEventDelayCount)
+    frame()->loader()->checkCompleted();
+}
 
 }  // namespace WebCore

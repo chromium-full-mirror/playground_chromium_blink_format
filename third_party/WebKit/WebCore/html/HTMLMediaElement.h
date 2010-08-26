@@ -308,6 +308,8 @@ class HTMLMediaElement : public HTMLElement,
 
   virtual void mediaCanStart();
 
+  void setShouldDelayLoadEvent(bool);
+
   // Restrictions to change default behaviors. This is effectively a compile
   // time choice at the moment
   // because there are no accessor functions.
@@ -373,7 +375,7 @@ class HTMLMediaElement : public HTMLElement,
 
   bool m_playing : 1;
   bool m_isWaitingUntilMediaCanStart : 1;
-  bool m_delayingTheLoadEvent : 1;
+  bool m_shouldDelayLoadEvent : 1;
   bool m_haveFiredLoadedData : 1;
   bool m_inActiveDocument : 1;
   bool m_autoplaying : 1;
