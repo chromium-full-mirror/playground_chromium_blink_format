@@ -29,6 +29,7 @@
 #define RenderThemeGtk_h
 
 #include "GRefPtr.h"
+#include "gtkdrawing.h"
 #include "RenderTheme.h"
 
 typedef struct _GtkWidget GtkWidget;
@@ -99,7 +100,12 @@ class RenderThemeGtk : public RenderTheme {
   virtual String extraMediaControlsStyleSheet();
 #endif
 
-  GtkThemeParts* partsForDrawable(GdkDrawable*) const;
+  bool paintMozillaGtkWidget(GtkThemeWidgetType,
+                             GraphicsContext*,
+                             const IntRect&,
+                             GtkWidgetState*,
+                             int flags,
+                             GtkTextDirection = GTK_TEXT_DIR_NONE);
 
  protected:
   virtual bool paintCheckbox(RenderObject* o,
@@ -222,6 +228,13 @@ class RenderThemeGtk : public RenderTheme {
    * our fake widgets
    */
   GtkContainer* gtkContainer() const;
+
+  bool paintRenderObject(GtkThemeWidgetType,
+                         RenderObject*,
+                         GraphicsContext*,
+                         const IntRect& rect,
+                         int flags = 0);
+  GtkThemeParts* partsForDrawable(GdkDrawable*) const;
 
   mutable GtkWidget* m_gtkWindow;
   mutable GtkContainer* m_gtkContainer;
