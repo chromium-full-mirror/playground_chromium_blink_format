@@ -3152,6 +3152,18 @@ bool webkit_web_view_use_primary_for_paste(WebKitWebView* webView) {
   return webView->priv->usePrimaryForPaste;
 }
 
+/**
+ * webkit_web_view_set_settings:
+ * @web_view: a #WebKitWebView
+ * @settings: (transfer none): the #WebKitWebSettings to be set
+ *
+ * Replaces the #WebKitWebSettings instance that is currently attached
+ * to @web_view with @settings. The reference held by the @web_view on
+ * the old #WebKitWebSettings instance is dropped, and the reference
+ * count of @settings is inscreased.
+ *
+ * The settings are automatically applied to @web_view.
+ */
 void webkit_web_view_set_settings(WebKitWebView* webView,
                                   WebKitWebSettings* webSettings) {
   g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
@@ -3169,6 +3181,19 @@ void webkit_web_view_set_settings(WebKitWebView* webView,
   g_object_notify(G_OBJECT(webView), "settings");
 }
 
+/**
+ * webkit_web_view_get_settings:
+ * @web_view: a #WebKitWebView
+ *
+ * Obtains the #WebKitWebSettings associated with the
+ * #WebKitWebView. The #WebKitWebView always has an associated
+ * instance of #WebKitWebSettings. The reference that is returned by
+ * this call is owned by the #WebKitWebView. You may need to increase
+ * its reference count if you intend to keep it alive for longer than
+ * the #WebKitWebView.
+ *
+ * Return value: (transfer none): the #WebKitWebSettings instance
+ */
 WebKitWebSettings* webkit_web_view_get_settings(WebKitWebView* webView) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), NULL);
 
@@ -3186,9 +3211,7 @@ WebKitWebSettings* webkit_web_view_get_settings(WebKitWebView* webView) {
  * so this function will only return NULL if the argument is not a
  * valid #WebKitWebView.
  *
- * Returns: the #WebKitWebInspector instance associated with the
- * #WebKitWebView; %NULL is only returned if the argument is not a
- * valid #WebKitWebView.
+ * Return value: (transfer none): the #WebKitWebInspector instance.
  *
  * Since: 1.0.3
  */
@@ -3224,7 +3247,7 @@ static void webkit_web_view_set_window_features(
  * Returns the instance of #WebKitWebWindowFeatures held by the given
  * #WebKitWebView.
  *
- * Return value: the #WebKitWebWindowFeatures
+ * Return value: (transfer none): the #WebKitWebWindowFeatures
  *
  * Since: 1.0.3
  */
