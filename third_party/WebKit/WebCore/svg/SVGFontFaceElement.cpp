@@ -323,7 +323,7 @@ void SVGFontFaceElement::rebuildFontFace() {
     }
   }
 
-  document()->updateStyleSelector();
+  document()->styleSelectorChanged(DeferRecalcStyle);
 }
 
 void SVGFontFaceElement::insertedIntoDocument() {
@@ -358,7 +358,7 @@ void SVGFontFaceElement::removeFromMappedElementSheet() {
       break;
     }
   }
-  document()->updateStyleSelector();
+  document()->styleSelectorChanged(DeferRecalcStyle);
 }
 
 }  // namespace WebCore

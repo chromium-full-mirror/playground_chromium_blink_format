@@ -196,6 +196,8 @@ enum PageshowEventPersistence {
   PageshowEventPersisted = 1
 };
 
+enum StyleSelectorUpdateFlag { RecalcStyleImmediately, DeferRecalcStyle };
+
 class Document : public ContainerNode, public ScriptExecutionContext {
  public:
   static PassRefPtr<Document> create(Frame* frame, const KURL& url) {
@@ -487,8 +489,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
    * found and is used to calculate the derived styles for all rendering
    * objects.
    */
-  void updateStyleSelector();
-
+  void styleSelectorChanged(StyleSelectorUpdateFlag);
   void recalcStyleSelector();
 
   bool usesDescendantRules() const { return m_usesDescendantRules; }
@@ -1296,9 +1297,12 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_loadingSheet;
   bool m_visuallyOrdered;
   bool m_bParsing;
+
   Timer<Document> m_styleRecalcTimer;
+  bool m_pendingStyleRecalcShouldForce;
   bool m_inStyleRecalc;
   bool m_closeAfterStyleRecalc;
+
   bool m_usesDescendantRules;
   bool m_usesSiblingRules;
   bool m_usesFirstLineRules;

@@ -660,7 +660,7 @@ void Frame::setPrinting(bool printing,
   m_doc->setPrinting(printing);
   view()->adjustMediaTypeForPrinting(printing);
 
-  m_doc->updateStyleSelector();
+  m_doc->styleSelectorChanged(RecalcStyleImmediately);
   view()->forceLayoutForPagination(pageSize, maximumShrinkRatio,
                                    shouldAdjustViewSize);
 
@@ -704,7 +704,7 @@ void Frame::reapplyStyles() {
   // sheet.
   // But we had problems when this code was removed. Details are in
   // <http://bugs.webkit.org/show_bug.cgi?id=8079>.
-  m_doc->updateStyleSelector();
+  m_doc->styleSelectorChanged(RecalcStyleImmediately);
 }
 
 void Frame::injectUserScripts(UserScriptInjectionTime injectionTime) {
