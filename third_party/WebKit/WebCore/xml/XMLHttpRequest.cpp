@@ -49,7 +49,6 @@
 #include <wtf/text/CString.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/RefCountedLeakCounter.h>
-#include <wtf/UnusedParam.h>
 
 #if USE(JSC)
 #include "JSDOMBinding.h"
@@ -217,26 +216,11 @@ XMLHttpRequest::State XMLHttpRequest::readyState() const {
   return m_state;
 }
 
-const ScriptString& XMLHttpRequest::responseText(ExceptionCode& ec) const {
-#if ENABLE(XHR_RESPONSE_BLOB)
-  if (m_asBlob)
-    ec = INVALID_STATE_ERR;
-#else
-  UNUSED_PARAM(ec);
-#endif
+const ScriptString& XMLHttpRequest::responseText() const {
   return m_responseText;
 }
 
-Document* XMLHttpRequest::responseXML(ExceptionCode& ec) const {
-#if ENABLE(XHR_RESPONSE_BLOB)
-  if (m_asBlob) {
-    ec = INVALID_STATE_ERR;
-    return 0;
-  }
-#else
-  UNUSED_PARAM(ec);
-#endif
-
+Document* XMLHttpRequest::responseXML() const {
   if (m_state != DONE)
     return 0;
 
@@ -261,16 +245,6 @@ Document* XMLHttpRequest::responseXML(ExceptionCode& ec) const {
 
   return m_responseXML.get();
 }
-
-#if ENABLE(XHR_RESPONSE_BLOB)
-Blob* XMLHttpRequest::responseBlob(ExceptionCode& ec) const {
-  if (!m_asBlob) {
-    ec = INVALID_STATE_ERR;
-    return 0;
-  }
-  return m_responseBlob.get();
-}
-#endif
 
 XMLHttpRequestUpload* XMLHttpRequest::upload() {
   if (!m_upload)
@@ -340,17 +314,6 @@ void XMLHttpRequest::setWithCredentials(bool value, ExceptionCode& ec) {
   m_includeCredentials = value;
 }
 
-#if ENABLE(XHR_RESPONSE_BLOB)
-void XMLHttpRequest::setAsBlob(bool value, ExceptionCode& ec) {
-  if (m_state != OPENED || m_loader) {
-    ec = INVALID_STATE_ERR;
-    return;
-  }
-
-  m_asBlob = value;
-}
-#endif
-
 void XMLHttpRequest::open(const String& method,
                           const KURL& url,
                           ExceptionCode& ec) {
@@ -365,9 +328,7 @@ void XMLHttpRequest::open(const String& method,
   State previousState = m_state;
   m_state = UNSENT;
   m_error = false;
-#if ENABLE(XHR_RESPONSE_BLOB)
-  m_asBlob = false;
-#endif
+
   m_uploadComplete = false;
 
   // clear stuff from possible previous load
@@ -661,9 +622,6 @@ void XMLHttpRequest::abort() {
   m_responseText = "";
   m_createdDocument = false;
   m_responseXML = 0;
-#if ENABLE(XHR_RESPONSE_BLOB)
-  m_responseBlob = 0;
-#endif
 
   // Clear headers as required by the spec
   m_requestHeaders.clear();
@@ -711,9 +669,6 @@ void XMLHttpRequest::clearResponse() {
   m_responseText = "";
   m_createdDocument = false;
   m_responseXML = 0;
-#if ENABLE(XHR_RESPONSE_BLOB)
-  m_responseBlob = 0;
-#endif
 }
 
 void XMLHttpRequest::clearRequest() {
@@ -986,10 +941,6 @@ void XMLHttpRequest::didFinishLoading(unsigned long identifier) {
 
   if (m_decoder)
     m_responseText += m_decoder->flush();
-
-#if ENABLE(XHR_RESPONSE_BLOB)
-// FIXME: Set m_responseBlob to something here in the m_asBlob case.
-#endif
 
 #if ENABLE(INSPECTOR)
   if (InspectorController* inspector =
