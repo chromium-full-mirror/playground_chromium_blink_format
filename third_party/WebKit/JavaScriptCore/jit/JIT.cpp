@@ -524,13 +524,9 @@ JITCode JIT::privateCompile(CodePtr* functionEntryArityCheck) {
 
   ASSERT(m_jmpTable.isEmpty());
 
-  RefPtr<ExecutablePool> executablePool =
-      m_globalData->executableAllocator.poolForSize(m_assembler.size());
-  if (!executablePool)
-    return JITCode();
-  LinkBuffer patchBuffer(this, executablePool.release(), m_linkerOffset);
-  if (!patchBuffer.allocationSuccessful())
-    return JITCode();
+  LinkBuffer patchBuffer(
+      this, m_globalData->executableAllocator.poolForSize(m_assembler.size()),
+      m_linkerOffset);
 
   // Translate vPC offsets into addresses in JIT generated code, for switch
   // tables.

@@ -571,8 +571,10 @@ class MIPSAssembler {
 
   void* executableCopy(ExecutablePool* allocator) {
     void* result = m_buffer.executableCopy(allocator);
-    if (result)
-      relocateJumps(m_buffer.data(), result);
+    if (!result)
+      return 0;
+
+    relocateJumps(m_buffer.data(), result);
     return result;
   }
 

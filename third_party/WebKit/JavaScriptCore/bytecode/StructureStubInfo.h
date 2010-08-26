@@ -63,8 +63,7 @@ struct StructureStubInfo {
   }
 
   void initGetByIdProto(Structure* baseObjectStructure,
-                        Structure* prototypeStructure,
-                        CodeLocationLabel routine) {
+                        Structure* prototypeStructure) {
     accessType = access_get_by_id_proto;
 
     u.getByIdProto.baseObjectStructure = baseObjectStructure;
@@ -72,13 +71,9 @@ struct StructureStubInfo {
 
     u.getByIdProto.prototypeStructure = prototypeStructure;
     prototypeStructure->ref();
-
-    stubRoutine = routine;
   }
 
-  void initGetByIdChain(Structure* baseObjectStructure,
-                        StructureChain* chain,
-                        CodeLocationLabel routine) {
+  void initGetByIdChain(Structure* baseObjectStructure, StructureChain* chain) {
     accessType = access_get_by_id_chain;
 
     u.getByIdChain.baseObjectStructure = baseObjectStructure;
@@ -86,34 +81,29 @@ struct StructureStubInfo {
 
     u.getByIdChain.chain = chain;
     chain->ref();
-
-    stubRoutine = routine;
   }
 
-  void initGetByIdSelfList(PolymorphicAccessStructureList* structureList) {
+  void initGetByIdSelfList(PolymorphicAccessStructureList* structureList,
+                           int listSize) {
     accessType = access_get_by_id_self_list;
 
     u.getByIdProtoList.structureList = structureList;
-    u.getByIdProtoList.listSize = 1;
-
-    stubRoutine = CodeLocationLabel();
+    u.getByIdProtoList.listSize = listSize;
   }
 
-  void initGetByIdProtoList(PolymorphicAccessStructureList* structureList) {
+  void initGetByIdProtoList(PolymorphicAccessStructureList* structureList,
+                            int listSize) {
     accessType = access_get_by_id_proto_list;
 
     u.getByIdProtoList.structureList = structureList;
-    u.getByIdProtoList.listSize = 1;
-
-    stubRoutine = CodeLocationLabel();
+    u.getByIdProtoList.listSize = listSize;
   }
 
   // PutById*
 
   void initPutByIdTransition(Structure* previousStructure,
                              Structure* structure,
-                             StructureChain* chain,
-                             CodeLocationLabel routine) {
+                             StructureChain* chain) {
     accessType = access_put_by_id_transition;
 
     u.putByIdTransition.previousStructure = previousStructure;
@@ -124,8 +114,6 @@ struct StructureStubInfo {
 
     u.putByIdTransition.chain = chain;
     chain->ref();
-
-    stubRoutine = routine;
   }
 
   void initPutByIdReplace(Structure* baseObjectStructure) {

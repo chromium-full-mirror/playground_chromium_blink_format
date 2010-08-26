@@ -273,14 +273,14 @@ class JITThunks {
   JITThunks(JSGlobalData*);
   ~JITThunks();
 
-  static bool tryCacheGetByID(CallFrame*,
+  static void tryCacheGetByID(CallFrame*,
                               CodeBlock*,
                               ReturnAddressPtr returnAddress,
                               JSValue baseValue,
                               const Identifier& propertyName,
                               const PropertySlot&,
                               StructureStubInfo* stubInfo);
-  static bool tryCachePutByID(CallFrame*,
+  static void tryCachePutByID(CallFrame*,
                               CodeBlock*,
                               ReturnAddressPtr returnAddress,
                               JSValue baseValue,

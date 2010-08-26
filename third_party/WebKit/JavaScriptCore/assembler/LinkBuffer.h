@@ -66,12 +66,6 @@ class LinkBuffer : public Noncopyable {
   typedef MacroAssembler::JumpLinkType JumpLinkType;
 #endif
 
-  enum LinkBufferState {
-    StateInit,
-    StateChecked,
-    StateFinalized,
-  };
-
  public:
   // Note: Initialization sequence is significant, since executablePool is a
   // PassRefPtr.
@@ -90,24 +84,13 @@ class LinkBuffer : public Noncopyable {
         m_assembler(masm)
 #ifndef NDEBUG
         ,
-        m_state(StateInit)
+        m_completed(false)
 #endif
   {
     linkCode(linkOffset);
   }
 
-  ~LinkBuffer() { ASSERT(m_state == StateFinalized); }
-
-  // After constructing a link buffer, a client must call allocationSuccessful()
-  // to check alloc did not return 0.
-  bool allocationSuccessful() {
-#ifndef NDEBUG
-    ASSERT(m_state == StateInit);
-    m_state = StateChecked;
-#endif
-
-    return m_code;
-  }
+  ~LinkBuffer() { ASSERT(m_completed); }
 
   // These methods are used to link or set values at code generation time.
 
@@ -292,8 +275,8 @@ class LinkBuffer : public Noncopyable {
 
   void performFinalization() {
 #ifndef NDEBUG
-    ASSERT(m_state == StateChecked);
-    m_state = StateFinalized;
+    ASSERT(!m_completed);
+    m_completed = true;
 #endif
 
     ExecutableAllocator::makeExecutable(code(), m_size);
@@ -305,7 +288,7 @@ class LinkBuffer : public Noncopyable {
   void* m_code;
   MacroAssembler* m_assembler;
 #ifndef NDEBUG
-  LinkBufferState m_state;
+  bool m_completed;
 #endif
 };
 

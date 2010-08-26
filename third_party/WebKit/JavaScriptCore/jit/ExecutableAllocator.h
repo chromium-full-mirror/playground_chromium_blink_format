@@ -103,7 +103,9 @@ class ExecutablePool : public RefCounted<ExecutablePool> {
 #endif
   typedef Vector<Allocation, 2> AllocationList;
 
-  static PassRefPtr<ExecutablePool> create(size_t n);
+  static PassRefPtr<ExecutablePool> create(size_t n) {
+    return adoptRef(new ExecutablePool(n));
+  }
 
   void* alloc(size_t n) {
     ASSERT(m_freePtr <= m_end);
@@ -139,7 +141,7 @@ class ExecutablePool : public RefCounted<ExecutablePool> {
   static Allocation systemAlloc(size_t n);
   static void systemRelease(Allocation& alloc);
 
-  ExecutablePool(Allocation&);
+  ExecutablePool(size_t n);
 
   void* poolAllocate(size_t n);
 
@@ -156,12 +158,9 @@ class ExecutableAllocator {
   ExecutableAllocator() {
     if (!pageSize)
       intializePageSize();
-    if (isValid()) {
+    if (isValid())
       m_smallAllocationPool =
           ExecutablePool::create(JIT_ALLOCATOR_LARGE_ALLOC_SIZE);
-      if (!m_smallAllocationPool)
-        CRASH();
-    }
 #if !ENABLE(INTERPRETER)
     else
       CRASH();
@@ -292,19 +291,14 @@ class ExecutableAllocator {
   static void intializePageSize();
 };
 
-inline PassRefPtr<ExecutablePool> ExecutablePool::create(size_t n) {
-  Allocation mem =
-      systemAlloc(roundUpAllocationSize(n, JIT_ALLOCATOR_PAGE_SIZE));
-  if (!mem)
-    return 0;
-  return adoptRef(new ExecutablePool(mem));
-}
-
-inline ExecutablePool::ExecutablePool(Allocation& mem) {
-  ASSERT(!!mem);
+inline ExecutablePool::ExecutablePool(size_t n) {
+  size_t allocSize = roundUpAllocationSize(n, JIT_ALLOCATOR_PAGE_SIZE);
+  Allocation mem = systemAlloc(allocSize);
   m_pools.append(mem);
   m_freePtr = static_cast<char*>(mem.base());
-  m_end = m_freePtr + mem.size();
+  if (!m_freePtr)
+    CRASH();  // Failed to allocate
+  m_end = m_freePtr + allocSize;
 }
 
 inline void* ExecutablePool::poolAllocate(size_t n) {
@@ -312,7 +306,7 @@ inline void* ExecutablePool::poolAllocate(size_t n) {
 
   Allocation result = systemAlloc(allocSize);
   if (!result.base())
-    return 0;  // Failed to allocate
+    CRASH();  // Failed to allocate
 
   ASSERT(m_end >= m_freePtr);
   if ((allocSize - n) > static_cast<size_t>(m_end - m_freePtr)) {
