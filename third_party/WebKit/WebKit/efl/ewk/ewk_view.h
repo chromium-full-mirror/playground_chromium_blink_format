@@ -91,6 +91,7 @@ extern "C" {
  *  - "viewport,changed", void: Report that viewport has changed.
  *  - "inputmethods,changed" with a boolean indicating whether it's enabled or
  * not.
+ *  - "view,resized", void: view object's size has changed.
  */
 
 typedef struct _Ewk_View_Smart_Data Ewk_View_Smart_Data;
