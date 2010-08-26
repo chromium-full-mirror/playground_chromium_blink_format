@@ -235,9 +235,10 @@ static void workerContextDidReceiveData(
 void WorkerThreadableLoader::MainThreadBridge::didReceiveData(
     const char* data,
     int lengthReceived) {
-  OwnPtr<Vector<char>> vector(
-      new Vector<char>(lengthReceived));  // needs to be an OwnPtr for usage
-                                          // with createCallbackTask.
+  OwnPtr<Vector<char>> vector =
+      adoptPtr(new Vector<char>(lengthReceived));  // needs to be an OwnPtr for
+                                                   // usage with
+                                                   // createCallbackTask.
   memcpy(vector->data(), data, lengthReceived);
   m_loaderProxy.postTaskForModeToWorkerContext(
       createCallbackTask(&workerContextDidReceiveData, m_workerClientWrapper,

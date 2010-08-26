@@ -177,7 +177,8 @@ void ProgressTracker::incrementProgress(unsigned long identifier,
     item->bytesReceived = 0;
     item->estimatedLength = estimatedLength;
   } else
-    m_progressItems.set(identifier, new ProgressItem(estimatedLength));
+    m_progressItems.set(identifier,
+                        adoptPtr(new ProgressItem(estimatedLength)).leakPtr());
 }
 
 void ProgressTracker::incrementProgress(unsigned long identifier,

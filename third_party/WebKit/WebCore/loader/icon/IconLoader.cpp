@@ -47,7 +47,7 @@ IconLoader::IconLoader(Frame* frame)
     : m_frame(frame), m_loadIsInProgress(false) {}
 
 PassOwnPtr<IconLoader> IconLoader::create(Frame* frame) {
-  return new IconLoader(frame);
+  return adoptPtr(new IconLoader(frame));
 }
 
 IconLoader::~IconLoader() {}

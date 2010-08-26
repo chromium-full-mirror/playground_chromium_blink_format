@@ -89,7 +89,7 @@ DocumentLoader::DocumentLoader(const ResourceRequest& req,
       m_didCreateGlobalHistoryEntry(false)
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
       ,
-      m_applicationCacheHost(new ApplicationCacheHost(this))
+      m_applicationCacheHost(adoptPtr(new ApplicationCacheHost(this)))
 #endif
 {
 }
@@ -394,7 +394,7 @@ bool DocumentLoader::isLoadingInAPISense() const {
 
 void DocumentLoader::addAllArchiveResources(Archive* archive) {
   if (!m_archiveResourceCollection)
-    m_archiveResourceCollection.set(new ArchiveResourceCollection);
+    m_archiveResourceCollection = adoptPtr(new ArchiveResourceCollection);
 
   ASSERT(archive);
   if (!archive)
@@ -410,7 +410,7 @@ void DocumentLoader::addAllArchiveResources(Archive* archive) {
 // without reducing functionality of those apps?
 void DocumentLoader::addArchiveResource(PassRefPtr<ArchiveResource> resource) {
   if (!m_archiveResourceCollection)
-    m_archiveResourceCollection.set(new ArchiveResourceCollection);
+    m_archiveResourceCollection = adoptPtr(new ArchiveResourceCollection);
 
   ASSERT(resource);
   if (!resource)

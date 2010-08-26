@@ -101,7 +101,8 @@ DocumentThreadableLoader::DocumentThreadableLoader(
 
   ASSERT(m_options.crossOriginRequestPolicy == UseAccessControl);
 
-  OwnPtr<ResourceRequest> crossOriginRequest(new ResourceRequest(request));
+  OwnPtr<ResourceRequest> crossOriginRequest =
+      adoptPtr(new ResourceRequest(request));
   crossOriginRequest->removeCredentials();
   crossOriginRequest->setAllowCookies(m_options.allowCredentials);
 
@@ -229,7 +230,7 @@ void DocumentThreadableLoader::didReceiveResponse(
       return;
     }
 
-    OwnPtr<CrossOriginPreflightResultCacheItem> preflightResult(
+    OwnPtr<CrossOriginPreflightResultCacheItem> preflightResult = adoptPtr(
         new CrossOriginPreflightResultCacheItem(m_options.allowCredentials));
     if (!preflightResult->parse(response, accessControlErrorDescription) ||
         !preflightResult->allowsCrossOriginMethod(
