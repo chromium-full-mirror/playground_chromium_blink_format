@@ -498,25 +498,6 @@ void InspectorController::connectFrontend() {
   m_frontend->inspectedURLChanged(
       m_inspectedPage->mainFrame()->loader()->url().string());
 
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-  if (InspectorDebuggerAgent::isDebuggerAlwaysEnabled()) {
-    // FIXME (40364): This will force pushing script sources to frontend even if
-    // script
-    // panel is inactive.
-    enableDebuggerFromFrontend(false);
-  } else {
-    String debuggerEnabled = setting(debuggerEnabledSettingName);
-    if (debuggerEnabled == "true" || m_attachDebuggerWhenShown)
-      enableDebugger();
-  }
-  m_profilerAgent->setFrontend(m_frontend.get());
-  if (!ScriptProfiler::isProfilerAlwaysEnabled()) {
-    String profilerEnabledSetting = setting(profilerEnabledSettingName);
-    if (profilerEnabledSetting == "true")
-      enableProfiler();
-  }
-#endif
-
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   m_applicationCacheAgent =
       new InspectorApplicationCacheAgent(this, m_frontend.get());
@@ -688,6 +669,22 @@ void InspectorController::populateScriptObjects() {
        it != m_pendingEvaluateTestCommands.end(); ++it)
     m_frontend->evaluateForTestInFrontend((*it).first, (*it).second);
   m_pendingEvaluateTestCommands.clear();
+
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+  if (InspectorDebuggerAgent::isDebuggerAlwaysEnabled())
+    enableDebuggerFromFrontend(false);
+  else {
+    String debuggerEnabled = setting(debuggerEnabledSettingName);
+    if (debuggerEnabled == "true" || m_attachDebuggerWhenShown)
+      enableDebugger();
+  }
+  m_profilerAgent->setFrontend(m_frontend.get());
+  if (!ScriptProfiler::isProfilerAlwaysEnabled()) {
+    String profilerEnabledSetting = setting(profilerEnabledSettingName);
+    if (profilerEnabledSetting == "true")
+      enableProfiler();
+  }
+#endif
 }
 
 void InspectorController::unbindAllResources() {
