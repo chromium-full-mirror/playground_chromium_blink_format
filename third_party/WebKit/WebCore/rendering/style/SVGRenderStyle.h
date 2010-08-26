@@ -51,10 +51,6 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
   bool inheritedNotEqual(const SVGRenderStyle*) const;
   void inheritFrom(const SVGRenderStyle*);
 
-  // FIXME: These functions should move to ShadowData.
-  void inflateForShadow(IntRect&) const;
-  void inflateForShadow(FloatRect&) const;
-
   StyleDifference diff(const SVGRenderStyle*) const;
 
   bool operator==(const SVGRenderStyle&) const;
