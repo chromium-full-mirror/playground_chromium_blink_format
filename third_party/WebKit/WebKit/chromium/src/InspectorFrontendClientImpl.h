@@ -63,7 +63,6 @@ class InspectorFrontendClientImpl : public WebCore::InspectorFrontendClient,
 
   virtual void bringToFront();
   virtual void closeWindow();
-  virtual void disconnectFromBackend();
 
   virtual void requestAttachWindow();
   virtual void requestDetachWindow();

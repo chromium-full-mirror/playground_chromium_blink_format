@@ -96,10 +96,6 @@ void InspectorFrontendClientImpl::closeWindow() {
   m_client->closeWindow();
 }
 
-void InspectorFrontendClientImpl::disconnectFromBackend() {
-  m_client->closeWindow();
-}
-
 void InspectorFrontendClientImpl::requestAttachWindow() {
   m_client->requestDockWindow();
 }

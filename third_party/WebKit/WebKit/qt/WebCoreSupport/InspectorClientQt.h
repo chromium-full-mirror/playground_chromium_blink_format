@@ -81,7 +81,6 @@ class InspectorFrontendClientQt : public InspectorFrontendClientLocal {
 
   virtual void bringToFront();
   virtual void closeWindow();
-  virtual void disconnectFromBackend();
 
   virtual void attachWindow();
   virtual void detachWindow();
@@ -92,7 +91,6 @@ class InspectorFrontendClientQt : public InspectorFrontendClientLocal {
 
  private:
   void updateWindowTitle();
-  void destroyInspectorView(bool notifyInspectorController);
   QWebPage* m_inspectedWebPage;
   OwnPtr<QWebView> m_inspectorView;
   QString m_inspectedURL;

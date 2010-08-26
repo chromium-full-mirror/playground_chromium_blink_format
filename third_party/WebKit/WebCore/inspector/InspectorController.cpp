@@ -197,7 +197,7 @@ InspectorController::~InspectorController() {
 
 void InspectorController::inspectedPageDestroyed() {
   if (m_frontend)
-    m_frontend->disconnectFromBackend();
+    m_frontend->inspectedPageDestroyed();
 
   hideHighlight();
 
@@ -543,8 +543,7 @@ void InspectorController::showPanel(const String& panel) {
 void InspectorController::close() {
   if (!m_frontend)
     return;
-  m_frontend->disconnectFromBackend();
-  disconnectFrontend();
+  m_frontend->close();
 }
 
 void InspectorController::disconnectFrontend() {
