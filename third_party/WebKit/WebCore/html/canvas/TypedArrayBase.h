@@ -61,7 +61,7 @@ class TypedArrayBase : public ArrayBufferView {
   }
 
   template <class Subclass>
-  static PassRefPtr<Subclass> create(T* array, unsigned length) {
+  static PassRefPtr<Subclass> create(const T* array, unsigned length) {
     RefPtr<Subclass> a = create<Subclass>(length);
     if (a)
       for (unsigned i = 0; i < length; ++i)
