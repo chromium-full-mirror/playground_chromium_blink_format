@@ -31,6 +31,8 @@ class OwnArrayPtr;
 template <typename T>
 class OwnPtr;
 template <typename T>
+class PassOwnArrayPtr;
+template <typename T>
 class PassOwnPtr;
 template <typename T>
 class PassRefPtr;
@@ -50,6 +52,7 @@ class StringImpl;
 using WTF::ListRefPtr;
 using WTF::OwnArrayPtr;
 using WTF::OwnPtr;
+using WTF::PassOwnArrayPtr;
 using WTF::PassOwnPtr;
 using WTF::PassRefPtr;
 using WTF::RefPtr;

@@ -39,6 +39,7 @@
 #include <WebCore/JSDOMWindow.h>
 #include <WebCore/PageGroup.h>
 #include <wtf/OwnArrayPtr.h>
+#include <wtf/PassOwnArrayPtr.h>
 
 using namespace WebCore;
 using namespace JSC;
@@ -126,7 +127,7 @@ class PostMessageDecoder {
         }
 
         *(coder.m_root) =
-            ImmutableArray::create(array.release(), size).leakRef();
+            ImmutableArray::create(array.release().leakPtr(), size).leakRef();
         break;
       }
       case APIObject::TypeString: {

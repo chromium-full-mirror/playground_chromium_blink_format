@@ -36,6 +36,7 @@
 #include "WebProcessMessageKinds.h"
 #include "WebProcessProxy.h"
 #include <wtf/OwnArrayPtr.h>
+#include <wtf/PassOwnArrayPtr.h>
 
 #include "WKContextPrivate.h"
 
@@ -131,7 +132,7 @@ class PostMessageDecoder {
         }
 
         *(coder.m_root) =
-            ImmutableArray::create(array.release(), size).leakRef();
+            ImmutableArray::create(array.release().leakPtr(), size).leakRef();
         break;
       }
       case APIObject::TypeString: {
