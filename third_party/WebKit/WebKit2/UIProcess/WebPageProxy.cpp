@@ -162,11 +162,7 @@ void WebPageProxy::close() {
 
   m_closed = true;
 
-  Vector<RefPtr<WebFrameProxy>> frames;
-  copyValuesToVector(m_frameMap, frames);
-  for (size_t i = 0, size = frames.size(); i < size; ++i)
-    frames[i]->disconnect();
-  m_frameMap.clear();
+  process()->disconnectFramesFromPage(this);
   m_mainFrame = 0;
 
   m_pageTitle = String();
@@ -392,11 +388,7 @@ void WebPageProxy::preferencesDidChange() {
 }
 
 void WebPageProxy::getStatistics(WKContextStatistics* statistics) {
-  statistics->numberOfWKFrames += m_frameMap.size();
-}
-
-WebFrameProxy* WebPageProxy::webFrame(uint64_t frameID) const {
-  return m_frameMap.get(frameID).get();
+  statistics->numberOfWKFrames += process()->frameCountInPage(this);
 }
 
 void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
@@ -427,7 +419,7 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       String url;
       if (!arguments->decode(CoreIPC::Out(frameID, url)))
         return;
-      didStartProvisionalLoadForFrame(webFrame(frameID), url);
+      didStartProvisionalLoadForFrame(process()->webFrame(frameID), url);
       break;
     }
     case WebPageProxyMessage::
@@ -435,35 +427,36 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       uint64_t frameID;
       if (!arguments->decode(frameID))
         return;
-      didReceiveServerRedirectForProvisionalLoadForFrame(webFrame(frameID));
+      didReceiveServerRedirectForProvisionalLoadForFrame(
+          process()->webFrame(frameID));
       break;
     }
     case WebPageProxyMessage::DidFailProvisionalLoadForFrame: {
       uint64_t frameID;
       if (!arguments->decode(frameID))
         return;
-      didFailProvisionalLoadForFrame(webFrame(frameID));
+      didFailProvisionalLoadForFrame(process()->webFrame(frameID));
       break;
     }
     case WebPageProxyMessage::DidCommitLoadForFrame: {
       uint64_t frameID;
       if (!arguments->decode(frameID))
         return;
-      didCommitLoadForFrame(webFrame(frameID));
+      didCommitLoadForFrame(process()->webFrame(frameID));
       break;
     }
     case WebPageProxyMessage::DidFinishLoadForFrame: {
       uint64_t frameID;
       if (!arguments->decode(frameID))
         return;
-      didFinishLoadForFrame(webFrame(frameID));
+      didFinishLoadForFrame(process()->webFrame(frameID));
       break;
     }
     case WebPageProxyMessage::DidFailLoadForFrame: {
       uint64_t frameID;
       if (!arguments->decode(frameID))
         return;
-      didFailLoadForFrame(webFrame(frameID));
+      didFailLoadForFrame(process()->webFrame(frameID));
       break;
     }
     case WebPageProxyMessage::DidReceiveTitleForFrame: {
@@ -471,21 +464,21 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       String title;
       if (!arguments->decode(CoreIPC::Out(frameID, title)))
         return;
-      didReceiveTitleForFrame(webFrame(frameID), title);
+      didReceiveTitleForFrame(process()->webFrame(frameID), title);
       break;
     }
     case WebPageProxyMessage::DidFirstLayoutForFrame: {
       uint64_t frameID;
       if (!arguments->decode(frameID))
         return;
-      didFirstLayoutForFrame(webFrame(frameID));
+      didFirstLayoutForFrame(process()->webFrame(frameID));
       break;
     }
     case WebPageProxyMessage::DidFirstVisuallyNonEmptyLayoutForFrame: {
       uint64_t frameID;
       if (!arguments->decode(frameID))
         return;
-      didFirstVisuallyNonEmptyLayoutForFrame(webFrame(frameID));
+      didFirstVisuallyNonEmptyLayoutForFrame(process()->webFrame(frameID));
       break;
     }
     case WebPageProxyMessage::DidStartProgress:
@@ -526,7 +519,8 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
                                           url, listenerID)))
         return;
       decidePolicyForNavigationAction(
-          webFrame(frameID), static_cast<NavigationType>(navigationType),
+          process()->webFrame(frameID),
+          static_cast<NavigationType>(navigationType),
           static_cast<WebEvent::Modifiers>(modifiers), url, listenerID);
       break;
     }
@@ -540,7 +534,8 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
                                           url, listenerID)))
         return;
       decidePolicyForNewWindowAction(
-          webFrame(frameID), static_cast<NavigationType>(navigationType),
+          process()->webFrame(frameID),
+          static_cast<NavigationType>(navigationType),
           static_cast<WebEvent::Modifiers>(modifiers), url, listenerID);
       break;
     }
@@ -551,7 +546,8 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       uint64_t listenerID;
       if (!arguments->decode(CoreIPC::Out(frameID, MIMEType, url, listenerID)))
         return;
-      decidePolicyForMIMEType(webFrame(frameID), MIMEType, url, listenerID);
+      decidePolicyForMIMEType(process()->webFrame(frameID), MIMEType, url,
+                              listenerID);
       break;
     }
     case WebPageProxyMessage::WillSubmitForm: {
@@ -562,8 +558,9 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       if (!arguments->decode(CoreIPC::Out(frameID, sourceFrameID,
                                           textFieldValues, listenerID)))
         return;
-      willSubmitForm(webFrame(frameID), webFrame(sourceFrameID),
-                     textFieldValues, listenerID);
+      willSubmitForm(process()->webFrame(frameID),
+                     process()->webFrame(sourceFrameID), textFieldValues,
+                     listenerID);
       break;
     }
 
@@ -626,7 +623,7 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       uint64_t frameID;
       if (!arguments->decode(CoreIPC::Out(frameID, size)))
         return;
-      contentsSizeChanged(webFrame(frameID), size);
+      contentsSizeChanged(process()->webFrame(frameID), size);
       break;
     }
     default:
@@ -666,7 +663,7 @@ void WebPageProxy::didReceiveSyncMessage(CoreIPC::Connection* connection,
       String message;
       if (!arguments->decode(CoreIPC::Out(frameID, message)))
         return;
-      runJavaScriptAlert(webFrame(frameID), message);
+      runJavaScriptAlert(process()->webFrame(frameID), message);
       break;
     }
     case WebPageProxyMessage::RunJavaScriptConfirm: {
@@ -677,7 +674,7 @@ void WebPageProxy::didReceiveSyncMessage(CoreIPC::Connection* connection,
       if (!arguments->decode(CoreIPC::Out(frameID, message)))
         return;
 
-      bool result = runJavaScriptConfirm(webFrame(frameID), message);
+      bool result = runJavaScriptConfirm(process()->webFrame(frameID), message);
       reply->encode(CoreIPC::In(result));
       break;
     }
@@ -690,8 +687,8 @@ void WebPageProxy::didReceiveSyncMessage(CoreIPC::Connection* connection,
       if (!arguments->decode(CoreIPC::Out(frameID, message, defaultValue)))
         return;
 
-      String result =
-          runJavaScriptPrompt(webFrame(frameID), message, defaultValue);
+      String result = runJavaScriptPrompt(process()->webFrame(frameID), message,
+                                          defaultValue);
       reply->encode(CoreIPC::In(result));
       break;
     }
@@ -754,18 +751,14 @@ void WebPageProxy::didReceiveSyncMessage(CoreIPC::Connection* connection,
 
 void WebPageProxy::didCreateMainFrame(uint64_t frameID) {
   ASSERT(!m_mainFrame);
-  ASSERT(m_frameMap.isEmpty());
 
   m_mainFrame = WebFrameProxy::create(this, frameID);
-  m_frameMap.set(frameID, m_mainFrame);
+  process()->frameCreated(frameID, m_mainFrame.get());
 }
 
 void WebPageProxy::didCreateSubFrame(uint64_t frameID) {
   ASSERT(m_mainFrame);
-  ASSERT(!m_frameMap.isEmpty());
-  ASSERT(!m_frameMap.contains(frameID));
-
-  m_frameMap.set(frameID, WebFrameProxy::create(this, frameID));
+  process()->frameCreated(frameID, WebFrameProxy::create(this, frameID).get());
 }
 
 void WebPageProxy::didStartProgress() {
@@ -1016,11 +1009,6 @@ void WebPageProxy::processDidExit() {
   if (m_mainFrame)
     m_urlAtProcessExit = m_mainFrame->url();
 
-  Vector<RefPtr<WebFrameProxy>> frames;
-  copyValuesToVector(m_frameMap, frames);
-  for (size_t i = 0, size = frames.size(); i < size; ++i)
-    frames[i]->disconnect();
-  m_frameMap.clear();
   m_mainFrame = 0;
 
   m_pageTitle = String();

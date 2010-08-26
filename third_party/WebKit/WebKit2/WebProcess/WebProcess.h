@@ -41,6 +41,7 @@ class IntSize;
 namespace WebKit {
 
 class InjectedBundle;
+class WebFrame;
 class WebPage;
 struct WebPreferencesStore;
 
@@ -72,6 +73,10 @@ class WebProcess : CoreIPC::Connection::Client {
 
   void addVisitedLink(WebCore::LinkHash);
   bool isLinkVisited(WebCore::LinkHash) const;
+
+  WebFrame* webFrame(uint64_t) const;
+  void addWebFrame(uint64_t, WebFrame*);
+  void removeWebFrame(uint64_t);
 
  private:
   WebProcess();
@@ -110,6 +115,8 @@ class WebProcess : CoreIPC::Connection::Client {
 #if USE(ACCELERATED_COMPOSITING) && PLATFORM(MAC)
   mach_port_t m_compositingRenderServerPort;
 #endif
+
+  HashMap<uint64_t, WebFrame*> m_frameMap;
 };
 
 }  // namespace WebKit
