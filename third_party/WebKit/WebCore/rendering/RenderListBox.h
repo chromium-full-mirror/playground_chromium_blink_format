@@ -75,7 +75,7 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
 
   virtual bool scroll(ScrollDirection,
                       ScrollGranularity,
-                      float multiplier = 1.0f,
+                      float multiplier = 1,
                       Node** stopNode = 0);
 
   virtual void calcPrefWidths();

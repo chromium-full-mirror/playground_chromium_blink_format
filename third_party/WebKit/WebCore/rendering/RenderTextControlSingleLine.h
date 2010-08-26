@@ -92,7 +92,7 @@ class RenderTextControlSingleLine : public RenderTextControl,
   virtual void setScrollTop(int);
   virtual bool scroll(ScrollDirection,
                       ScrollGranularity,
-                      float multiplier = 1.0f,
+                      float multiplier = 1,
                       Node** stopNode = 0);
 
   int textBlockWidth() const;

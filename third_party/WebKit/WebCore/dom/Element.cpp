@@ -270,8 +270,8 @@ static float localZoomForRenderer(RenderObject* renderer) {
   // render tree every
   // time (or store an additional bit in the RenderStyle to indicate that a zoom
   // was specified).
-  float zoomFactor = 1.0f;
-  if (renderer->style()->effectiveZoom() != 1.0f) {
+  float zoomFactor = 1;
+  if (renderer->style()->effectiveZoom() != 1) {
     // Need to find the nearest enclosing RenderObject that set up
     // a differing zoom, and then we divide our result by it to eliminate the
     // zoom.
