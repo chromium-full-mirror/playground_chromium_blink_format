@@ -271,8 +271,6 @@ Exactly one of IEEE_8087, IEEE_ARM or
 #endif
 #endif
 
-#define Kmax 15
-
   struct BigInt {
     BigInt() : sign(0) {}
     int sign;
@@ -332,12 +330,6 @@ Exactly one of IEEE_8087, IEEE_ARM or
   }
 
   static void s2b(BigInt & b, const char* s, int nd0, int nd, uint32_t y9) {
-    int k;
-    int32_t y;
-    int32_t x = (nd + 8) / 9;
-
-    for (k = 0, y = 1; x > y; y <<= 1, k++) {
-    }
 #ifdef Pack_32
     b.sign = 0;
     b.resize(1);
