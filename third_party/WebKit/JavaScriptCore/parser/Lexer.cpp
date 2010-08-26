@@ -867,7 +867,6 @@ inMultiLineComment:
       shift();
   }
   shift();
-  m_atLineStart = false;
   goto start;
 
 startNumberWithZeroDigit:
