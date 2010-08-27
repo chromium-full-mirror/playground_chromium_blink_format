@@ -930,7 +930,13 @@ void QWebView::paintEvent(QPaintEvent* ev) {
    this
     method is not called, unless explicitly done so in the reimplementation.
 
-    \sa QWebPage::createWindow()
+    \note In the cases when the window creation is being triggered by
+   JavaScript, apart from
+    reimplementing this method application must also set the
+   JavaScriptCanOpenWindows attribute
+    of QWebSettings to true in order to get it called..
+
+    \sa QWebPage::createWindow(), QWebPage::acceptNavigationRequest()
 */
 QWebView* QWebView::createWindow(QWebPage::WebWindowType type) {
   Q_UNUSED(type)
