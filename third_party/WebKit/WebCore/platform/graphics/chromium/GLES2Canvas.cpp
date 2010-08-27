@@ -33,11 +33,11 @@
 #include "GLES2Canvas.h"
 
 #include "FloatRect.h"
-#include "GLES2Texture.h"
 #include "GraphicsContext3D.h"
 #include "IntRect.h"
 #include "PlatformString.h"
 #include "Shader.h"
+#include "Texture.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -151,7 +151,7 @@ void GLES2Canvas::restore() {
   m_state = &m_stateStack.last();
 }
 
-void GLES2Canvas::drawTexturedRect(GLES2Texture* texture,
+void GLES2Canvas::drawTexturedRect(Texture* texture,
                                    const FloatRect& srcRect,
                                    const FloatRect& dstRect,
                                    ColorSpace colorSpace,
@@ -160,7 +160,7 @@ void GLES2Canvas::drawTexturedRect(GLES2Texture* texture,
                    colorSpace, compositeOp);
 }
 
-void GLES2Canvas::drawTexturedRect(GLES2Texture* texture,
+void GLES2Canvas::drawTexturedRect(Texture* texture,
                                    const FloatRect& srcRect,
                                    const FloatRect& dstRect,
                                    const AffineTransform& transform,
@@ -182,7 +182,7 @@ void GLES2Canvas::drawTexturedRect(GLES2Texture* texture,
   }
 }
 
-void GLES2Canvas::drawTexturedRectTile(GLES2Texture* texture,
+void GLES2Canvas::drawTexturedRectTile(Texture* texture,
                                        int tile,
                                        const FloatRect& srcRect,
                                        const FloatRect& dstRect,
@@ -308,22 +308,22 @@ unsigned GLES2Canvas::getQuadVertices() {
   return m_quadVertices;
 }
 
-GLES2Texture* GLES2Canvas::createTexture(NativeImagePtr ptr,
-                                         GLES2Texture::Format format,
-                                         int width,
-                                         int height) {
-  PassRefPtr<GLES2Texture> texture = m_textures.get(ptr);
+Texture* GLES2Canvas::createTexture(NativeImagePtr ptr,
+                                    Texture::Format format,
+                                    int width,
+                                    int height) {
+  PassRefPtr<Texture> texture = m_textures.get(ptr);
   if (texture)
     return texture.get();
 
-  texture = GLES2Texture::create(m_context, format, width, height);
-  GLES2Texture* t = texture.get();
+  texture = Texture::create(m_context, format, width, height);
+  Texture* t = texture.get();
   m_textures.set(ptr, texture);
   return t;
 }
 
-GLES2Texture* GLES2Canvas::getTexture(NativeImagePtr ptr) {
-  PassRefPtr<GLES2Texture> texture = m_textures.get(ptr);
+Texture* GLES2Canvas::getTexture(NativeImagePtr ptr) {
+  PassRefPtr<Texture> texture = m_textures.get(ptr);
   return texture ? texture.get() : 0;
 }
 

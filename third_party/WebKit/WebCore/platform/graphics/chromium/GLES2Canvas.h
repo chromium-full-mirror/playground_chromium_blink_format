@@ -34,9 +34,9 @@
 #include "AffineTransform.h"
 #include "Color.h"
 #include "ColorSpace.h"
-#include "GLES2Texture.h"
 #include "GraphicsTypes.h"
 #include "ImageSource.h"
+#include "Texture.h"
 
 #include <wtf/HashMap.h>
 #include <wtf/Noncopyable.h>
@@ -50,7 +50,7 @@ class GraphicsContext3D;
 class SolidFillShader;
 class TexShader;
 
-typedef HashMap<NativeImagePtr, RefPtr<GLES2Texture>> TextureHashMap;
+typedef HashMap<NativeImagePtr, RefPtr<Texture>> TextureHashMap;
 
 class GLES2Canvas : public Noncopyable {
  public:
@@ -74,27 +74,27 @@ class GLES2Canvas : public Noncopyable {
   // non-standard functions
   // These are not standard GraphicsContext functions, and should be pushed
   // down into a PlatformContextGLES2 at some point.
-  void drawTexturedRect(GLES2Texture*,
+  void drawTexturedRect(Texture*,
                         const FloatRect& srcRect,
                         const FloatRect& dstRect,
                         const AffineTransform&,
                         float alpha,
                         ColorSpace,
                         CompositeOperator);
-  void drawTexturedRect(GLES2Texture*,
+  void drawTexturedRect(Texture*,
                         const FloatRect& srcRect,
                         const FloatRect& dstRect,
                         ColorSpace,
                         CompositeOperator);
   GraphicsContext3D* context() { return m_context; }
-  GLES2Texture* createTexture(NativeImagePtr,
-                              GLES2Texture::Format,
-                              int width,
-                              int height);
-  GLES2Texture* getTexture(NativeImagePtr);
+  Texture* createTexture(NativeImagePtr,
+                         Texture::Format,
+                         int width,
+                         int height);
+  Texture* getTexture(NativeImagePtr);
 
  private:
-  void drawTexturedRectTile(GLES2Texture* texture,
+  void drawTexturedRectTile(Texture* texture,
                             int tile,
                             const FloatRect& srcRect,
                             const FloatRect& dstRect,
