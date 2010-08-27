@@ -186,7 +186,7 @@ WebView::WebView(RECT rect, WebPageNamespace* pageNamespace, HWND hostWindow)
   m_page = pageNamespace->createWebPage();
   m_page->setPageClient(this);
   m_page->initializeWebPage(IntRect(rect).size(),
-                            new ChunkedUpdateDrawingAreaProxy(this));
+                            ChunkedUpdateDrawingAreaProxy::create(this));
 
   m_window = ::CreateWindowEx(
       0, kWebKit2WebViewWindowClassName, 0,
