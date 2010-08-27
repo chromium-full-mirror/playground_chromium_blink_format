@@ -240,7 +240,7 @@ WebInspectorFrontendClient::WebInspectorFrontendClient(
 }
 
 WebInspectorFrontendClient::~WebInspectorFrontendClient() {
-  destroyInspectorView();
+  destroyInspectorView(true);
 }
 
 void WebInspectorFrontendClient::frontendLoaded() {
@@ -270,7 +270,11 @@ void WebInspectorFrontendClient::bringToFront() {
 }
 
 void WebInspectorFrontendClient::closeWindow() {
-  destroyInspectorView();
+  destroyInspectorView(true);
+}
+
+void WebInspectorFrontendClient::disconnectFromBackend() {
+  destroyInspectorView(false);
 }
 
 void WebInspectorFrontendClient::attachWindow() {
@@ -357,8 +361,6 @@ void WebInspectorFrontendClient::closeWindowWithoutNotifications() {
   HWND hostWindow;
   if (SUCCEEDED(m_inspectedWebView->hostWindow((OLE_HANDLE*)&hostWindow)))
     SendMessage(hostWindow, WM_SIZE, 0, 0);
-
-  m_inspectorClient->updateHighlight();
 }
 
 void WebInspectorFrontendClient::showWindowWithoutNotifications() {
@@ -415,15 +417,19 @@ void WebInspectorFrontendClient::showWindowWithoutNotifications() {
   m_inspectorClient->updateHighlight();
 }
 
-void WebInspectorFrontendClient::destroyInspectorView() {
+void WebInspectorFrontendClient::destroyInspectorView(
+    bool notifyInspectorController) {
   if (m_destroyingInspectorView)
     return;
   m_destroyingInspectorView = true;
 
-  m_inspectedWebView->page()->inspectorController()->disconnectFrontend();
-
   closeWindowWithoutNotifications();
-  m_inspectorClient->frontendClosing();
+
+  if (notifyInspectorController) {
+    m_inspectedWebView->page()->inspectorController()->disconnectFrontend();
+    m_inspectorClient->updateHighlight();
+    m_inspectorClient->frontendClosing();
+  }
   ::DestroyWindow(m_frontendHwnd);
 }
 
