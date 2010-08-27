@@ -31,8 +31,6 @@
 #ifndef GLES2Texture_h
 #define GLES2Texture_h
 
-#if USE(GLES2_RENDERING)
-
 #include "RefCounted.h"
 #include "RefPtr.h"
 #include "TilingData.h"
@@ -69,7 +67,5 @@ class GLES2Texture : public RefCounted<GLES2Texture> {
   OwnPtr<Vector<unsigned int>> m_tileTextureIds;
 };
 }
-
-#endif
 
 #endif  // GLES2Texture_h

@@ -31,8 +31,6 @@
 #ifndef GLES2Canvas_h
 #define GLES2Canvas_h
 
-#if USE(GLES2_RENDERING)
-
 #include "AffineTransform.h"
 #include "Color.h"
 #include "ColorSpace.h"
@@ -120,7 +118,5 @@ class GLES2Canvas : public Noncopyable {
                                         // stack.
 };
 }
-
-#endif
 
 #endif  // GLES2Canvas_h

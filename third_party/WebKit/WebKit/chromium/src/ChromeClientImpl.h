@@ -167,11 +167,6 @@ class ChromeClientImpl : public WebCore::ChromeClientChromium {
   virtual void scheduleCompositingLayerSync();
 #endif
 
-#if USE(GLES2_RENDERING)
-  virtual PassOwnPtr<WebCore::GLES2Context> getOnscreenGLES2Context();
-  virtual PassOwnPtr<WebCore::GLES2Context> getOffscreenGLES2Context();
-#endif
-
   virtual bool supportsFullscreenForNode(const WebCore::Node*);
   virtual void enterFullscreenForNode(WebCore::Node*);
   virtual void exitFullscreenForNode(WebCore::Node*);
