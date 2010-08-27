@@ -69,7 +69,6 @@
 #if HAVE(ERRNO_H)
 #include <errno.h>
 #endif
-#include <fenv.h>
 #include <float.h>
 #include <math.h>
 #include <stdint.h>
