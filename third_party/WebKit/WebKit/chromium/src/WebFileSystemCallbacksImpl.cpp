@@ -32,8 +32,9 @@
 
 #if ENABLE(FILE_SYSTEM)
 
+#include "AsyncFileSystemCallbacks.h"
+#include "AsyncFileSystemChromium.h"
 #include "ExceptionCode.h"
-#include "FileSystemCallbacks.h"
 #include "WebFileSystemEntry.h"
 #include "WebFileInfo.h"
 #include "WebString.h"
@@ -44,7 +45,7 @@ using namespace WebCore;
 namespace WebKit {
 
 WebFileSystemCallbacksImpl::WebFileSystemCallbacksImpl(
-    PassOwnPtr<FileSystemCallbacksBase> callbacks)
+    PassOwnPtr<AsyncFileSystemCallbacks> callbacks)
     : m_callbacks(callbacks) {}
 
 WebFileSystemCallbacksImpl::~WebFileSystemCallbacksImpl() {}
@@ -74,7 +75,7 @@ void WebFileSystemCallbacksImpl::didReadDirectory(
 
 void WebFileSystemCallbacksImpl::didOpenFileSystem(const WebString& name,
                                                    const WebString& path) {
-  m_callbacks->didOpenFileSystem(name, path);
+  m_callbacks->didOpenFileSystem(name, new AsyncFileSystemChromium(path));
   delete this;
 }
 
