@@ -50,7 +50,11 @@ v8::Handle<v8::Value> V8XMLHttpRequest::responseTextAccessorGetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.XMLHttpRequest.responsetext._get");
   XMLHttpRequest* xmlHttpRequest = V8XMLHttpRequest::toNative(info.Holder());
-  return xmlHttpRequest->responseText().v8StringOrNull();
+  ExceptionCode ec = 0;
+  const ScriptString& text = xmlHttpRequest->responseText(ec);
+  if (ec)
+    return throwError(ec);
+  return text.v8StringOrNull();
 }
 
 v8::Handle<v8::Value> V8XMLHttpRequest::openCallback(
