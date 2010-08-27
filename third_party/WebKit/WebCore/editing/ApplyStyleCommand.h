@@ -89,11 +89,6 @@ class ApplyStyleCommand : public CompositeEditCommand {
   CSSMutableStyleDeclaration* style() const { return m_style.get(); }
 
   // style-removal helpers
-  bool shouldRemoveTextDecorationTag(CSSStyleDeclaration* styleToApply,
-                                     int textDecorationAddedByTag) const;
-  bool implicitlyStyledElementShouldBeRemovedWhenApplyingStyle(
-      HTMLElement*,
-      CSSMutableStyleDeclaration*);
   bool removeInlineStyleFromElement(
       CSSMutableStyleDeclaration*,
       HTMLElement*,
@@ -103,15 +98,10 @@ class ApplyStyleCommand : public CompositeEditCommand {
       HTMLElement* element) {
     return removeInlineStyleFromElement(style, element, RemoveNone);
   }
+  bool removeImplicitlyStyledElement(CSSMutableStyleDeclaration*,
+                                     HTMLElement*,
+                                     InlineStyleRemovalMode);
   void replaceWithSpanOrRemoveIfWithoutAttributes(HTMLElement*&);
-  bool removeHTMLFontStyle(
-      CSSMutableStyleDeclaration*,
-      HTMLElement*,
-      InlineStyleRemovalMode = RemoveAttributesAndElements);
-  bool removeHTMLBidiEmbeddingStyle(
-      CSSMutableStyleDeclaration*,
-      HTMLElement*,
-      InlineStyleRemovalMode = RemoveAttributesAndElements);
   bool removeCSSStyle(CSSMutableStyleDeclaration*,
                       HTMLElement*,
                       InlineStyleRemovalMode = RemoveAttributesAndElements);
