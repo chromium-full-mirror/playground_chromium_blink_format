@@ -291,7 +291,7 @@ void HTMLLinkElement::setCSSStyleSheet(const String& href,
                                        const CachedCSSStyleSheet* sheet) {
   m_sheet = CSSStyleSheet::create(this, href, baseURL, charset);
 
-  bool strictParsing = !document()->inCompatMode();
+  bool strictParsing = !document()->inQuirksMode();
   bool enforceMIMEType = strictParsing;
   bool crossOriginCSS = false;
   bool validMIMEType = false;
@@ -304,7 +304,7 @@ void HTMLLinkElement::setCSSStyleSheet(const String& href,
   // Running in iWeb 2 is one example of where we don't want to -
   // <rdar://problem/6099748>
   if (enforceMIMEType && document()->page() &&
-      !document()->page()->settings()->enforceCSSMIMETypeInStrictMode())
+      !document()->page()->settings()->enforceCSSMIMETypeInNoQuirksMode())
     enforceMIMEType = false;
 
 #if defined(BUILDING_ON_TIGER) || defined(BUILDING_ON_LEOPARD)

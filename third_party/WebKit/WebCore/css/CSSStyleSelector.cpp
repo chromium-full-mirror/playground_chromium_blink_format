@@ -1231,8 +1231,6 @@ PassRefPtr<RenderStyle> CSSStyleSelector::styleForDocument(Document* document) {
 
   documentStyle->setFontDescription(fontDescription);
   documentStyle->font().update(0);
-  if (document->inCompatMode())
-    documentStyle->setHtmlHacks(true);  // enable html specific rendering tricks
 
   return documentStyle.release();
 }
@@ -4498,10 +4496,12 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
                                            CSSValueXxSmall + 1);
             break;
           case CSSValueLarger:
-            size = largerFontSize(oldSize, m_style->htmlHacks());
+            size =
+                largerFontSize(oldSize, m_checker.m_document->inQuirksMode());
             break;
           case CSSValueSmaller:
-            size = smallerFontSize(oldSize, m_style->htmlHacks());
+            size =
+                smallerFontSize(oldSize, m_checker.m_document->inQuirksMode());
             break;
           default:
             return;
@@ -6971,7 +6971,7 @@ float CSSStyleSelector::fontSizeForKeyword(Document* document,
   if (!settings)
     return 1.0f;
 
-  bool quirksMode = document->inCompatMode();
+  bool quirksMode = document->inQuirksMode();
   int mediumSize =
       fixed ? settings->defaultFixedFontSize() : settings->defaultFontSize();
   if (mediumSize >= fontSizeTableMin && mediumSize <= fontSizeTableMax) {

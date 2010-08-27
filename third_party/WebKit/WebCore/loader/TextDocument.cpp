@@ -193,7 +193,10 @@ bool TextDocumentParser::finishWasCalled() {
 }
 
 TextDocument::TextDocument(Frame* frame, const KURL& url)
-    : HTMLDocument(frame, url) {}
+    : HTMLDocument(frame, url) {
+  setCompatibilityMode(QuirksMode);
+  lockCompatibilityMode();
+}
 
 PassRefPtr<DocumentParser> TextDocument::createParser() {
   return TextDocumentParser::create(this);

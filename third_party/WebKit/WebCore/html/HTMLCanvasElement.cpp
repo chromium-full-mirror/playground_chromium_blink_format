@@ -156,7 +156,7 @@ CanvasRenderingContext* HTMLCanvasElement::getContext(
             settings->usesDashboardBackwardCompatibilityMode();
 #endif
       m_context = adoptPtr(new CanvasRenderingContext2D(
-          this, document()->inCompatMode(), usesDashbardCompatibilityMode));
+          this, document()->inQuirksMode(), usesDashbardCompatibilityMode));
 #if ENABLE(ACCELERATED_2D_CANVAS) && USE(ACCELERATED_COMPOSITING)
       if (m_context) {
         // Need to make sure a RenderLayer and compositing layer get created for

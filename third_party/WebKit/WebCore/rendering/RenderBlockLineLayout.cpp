@@ -213,7 +213,7 @@ static inline InlineBox* createInlineBoxForRenderer(RenderObject* obj,
     // (Note the use of strict mode.  In "almost strict" mode, we don't treat
     // the box for <br> as text.)
     if (obj->isBR())
-      textBox->setIsText(isOnlyRun || obj->document()->inStrictMode());
+      textBox->setIsText(isOnlyRun || obj->document()->inNoQuirksMode());
     return textBox;
   }
 
@@ -1652,7 +1652,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
   // very specific circumstances (in order to match common WinIE renderings).
   // Not supporting the quirk has caused us to mis-render some real sites. (See
   // Bugzilla 10517.)
-  bool allowImagesToBreak = !style()->htmlHacks() || !isTableCell() ||
+  bool allowImagesToBreak = !document()->inQuirksMode() || !isTableCell() ||
                             !style()->width().isIntrinsicOrAuto();
 
   EWhiteSpace currWS = style()->whiteSpace();

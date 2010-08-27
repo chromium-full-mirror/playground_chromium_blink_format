@@ -1177,7 +1177,7 @@ bool RenderBlock::isSelfCollapsingBlock() const {
     return false;
 
   bool hasAutoHeight = style()->height().isAuto();
-  if (style()->height().isPercent() && !style()->htmlHacks()) {
+  if (style()->height().isPercent() && !document()->inQuirksMode()) {
     hasAutoHeight = true;
     for (RenderBlock* cb = containingBlock(); !cb->isRenderView();
          cb = cb->containingBlock()) {
@@ -1651,7 +1651,8 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
     // This child is collapsing with the top of the
     // block.  If it has larger margin values, then we need to update
     // our own maximal values.
-    if (!style()->htmlHacks() || !marginInfo.quirkContainer() || !topQuirk)
+    if (!document()->inQuirksMode() || !marginInfo.quirkContainer() ||
+        !topQuirk)
       setMaxTopMargins(max(posTop, maxTopPosMargin()),
                        max(negTop, maxTopNegMargin()));
 
@@ -1705,7 +1706,7 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
       ypos = height();
     } else if (!marginInfo.atTopOfBlock() ||
                (!marginInfo.canCollapseTopWithChildren() &&
-                (!style()->htmlHacks() || !marginInfo.quirkContainer() ||
+                (!document()->inQuirksMode() || !marginInfo.quirkContainer() ||
                  !marginInfo.topQuirk()))) {
       // We're collapsing with a previous sibling's margins and not
       // with the top of the block.
@@ -1892,7 +1893,7 @@ void RenderBlock::handleBottomOfBlock(int top,
   // If we can't collapse with children then go ahead and add in the bottom
   // margin.
   if (!marginInfo.canCollapseWithBottom() && !marginInfo.canCollapseWithTop() &&
-      (!style()->htmlHacks() || !marginInfo.quirkContainer() ||
+      (!document()->inQuirksMode() || !marginInfo.quirkContainer() ||
        !marginInfo.bottomQuirk()))
     setHeight(height() + marginInfo.margin());
 
@@ -5216,7 +5217,7 @@ void RenderBlock::calcInlinePrefWidths() {
   // very specific cirucumstances (in order to match common WinIE renderings).
   // Not supporting the quirk has caused us to mis-render some real sites. (See
   // Bugzilla 10517.)
-  bool allowImagesToBreak = !style()->htmlHacks() || !isTableCell() ||
+  bool allowImagesToBreak = !document()->inQuirksMode() || !isTableCell() ||
                             !style()->width().isIntrinsicOrAuto();
 
   bool autoWrap, oldAutoWrap;
@@ -5574,7 +5575,7 @@ void RenderBlock::calcBlockPrefWidths() {
     // tables
     // with percentage widths be infinite (as long as they are not inside a
     // table cell).
-    if (style()->htmlHacks() && child->style()->width().isPercent() &&
+    if (document()->inQuirksMode() && child->style()->width().isPercent() &&
         !isTableCell() && child->isTable() &&
         m_maxPrefWidth < BLOCK_MAX_WIDTH) {
       RenderBlock* cb = containingBlock();

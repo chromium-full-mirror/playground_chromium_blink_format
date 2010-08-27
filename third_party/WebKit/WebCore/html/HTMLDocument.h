@@ -50,6 +50,7 @@ class HTMLDocument : public Document, public CachedResourceClient {
   void setDesignMode(const String&);
 
   String compatMode() const;
+  virtual void setCompatibilityModeFromDoctype();
 
   Element* activeElement();
   bool hasFocus();
@@ -87,7 +88,6 @@ class HTMLDocument : public Document, public CachedResourceClient {
 
   virtual bool isFrameSet() const;
   virtual PassRefPtr<DocumentParser> createParser();
-  virtual void determineParseMode();
 
   void addItemToMap(HashCountedSet<AtomicStringImpl*>&, const AtomicString&);
   void removeItemFromMap(HashCountedSet<AtomicStringImpl*>&,

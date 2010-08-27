@@ -1736,7 +1736,7 @@ int RenderBox::calcPercentageHeight(const Length& height) {
   int result = -1;
   bool skippedAutoHeightContainingBlock = false;
   RenderBlock* cb = containingBlock();
-  if (style()->htmlHacks()) {
+  if (document()->inQuirksMode()) {
     // In quirks mode, blocks with auto height are skipped, and we keep looking
     // for an enclosing
     // block that may have a specified height and then use it.  In strict mode,
@@ -1806,7 +1806,8 @@ int RenderBox::calcPercentageHeight(const Length& height) {
     result = cb->calcPercentageHeight(cb->style()->height());
     if (result != -1)
       result = cb->calcContentBoxHeight(result);
-  } else if (cb->isRenderView() || (cb->isBody() && style()->htmlHacks()) ||
+  } else if (cb->isRenderView() ||
+             (cb->isBody() && document()->inQuirksMode()) ||
              isPositionedWithSpecifiedHeight) {
     // Don't allow this to affect the block' height() member variable, since
     // this
@@ -2058,7 +2059,7 @@ void RenderBox::calcAbsoluteHorizontal() {
 
   // To match WinIE, in quirks mode use the parent's 'direction' property
   // instead of the the container block's.
-  TextDirection containerDirection = (style()->htmlHacks())
+  TextDirection containerDirection = (document()->inQuirksMode())
                                          ? parent()->style()->direction()
                                          : containerBlock->style()->direction();
 
@@ -2646,7 +2647,7 @@ void RenderBox::calcAbsoluteHorizontalReplaced() {
 
   // To match WinIE, in quirks mode use the parent's 'direction' property
   // instead of the the container block's.
-  TextDirection containerDirection = (style()->htmlHacks())
+  TextDirection containerDirection = (document()->inQuirksMode())
                                          ? parent()->style()->direction()
                                          : containerBlock->style()->direction();
 

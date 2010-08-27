@@ -174,7 +174,8 @@ ImageDocument::ImageDocument(Frame* frame, const KURL& url)
       m_imageSizeIsKnown(false),
       m_didShrinkImage(false),
       m_shouldShrinkImage(shouldShrinkToFit()) {
-  setParseMode(Compat);
+  setCompatibilityMode(QuirksMode);
+  lockCompatibilityMode();
 }
 
 PassRefPtr<DocumentParser> ImageDocument::createParser() {

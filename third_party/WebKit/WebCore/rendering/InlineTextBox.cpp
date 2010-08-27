@@ -639,7 +639,7 @@ void InlineTextBox::paint(PaintInfo& paintInfo, int tx, int ty) {
 
   // Paint decorations
   if (d != TDNONE && paintInfo.phase != PaintPhaseSelection &&
-      styleToUse->htmlHacks()) {
+      renderer()->document()->inQuirksMode()) {
     context->setStrokeColor(styleToUse->visitedDependentColor(CSSPropertyColor),
                             styleToUse->colorSpace());
     paintDecoration(context, tx, ty, d, textShadow);

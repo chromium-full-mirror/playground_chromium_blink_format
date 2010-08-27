@@ -623,9 +623,11 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   CSSStyleSheet* pageUserSheet();
   void clearPageUserSheet();
+  void updatePageUserSheet();
 
   const Vector<RefPtr<CSSStyleSheet>>* pageGroupUserSheets() const;
   void clearPageGroupUserSheets();
+  void updatePageGroupUserSheets();
 
   CSSStyleSheet* elementSheet();
   CSSStyleSheet* mappedElementSheet();
@@ -642,14 +644,18 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   bool paginated() const { return printing() || paginatedForScreen(); }
 
-  enum ParseMode { Compat, AlmostStrict, Strict };
+  enum CompatibilityMode { QuirksMode, LimitedQuirksMode, NoQuirksMode };
 
-  void setParseMode(ParseMode m) { m_parseMode = m; }
-  ParseMode parseMode() const { return m_parseMode; }
+  virtual void setCompatibilityModeFromDoctype() {}
+  void setCompatibilityMode(CompatibilityMode m);
+  void lockCompatibilityMode() { m_compatibilityModeLocked = true; }
+  CompatibilityMode compatibilityMode() const { return m_compatibilityMode; }
 
-  bool inCompatMode() const { return m_parseMode == Compat; }
-  bool inAlmostStrictMode() const { return m_parseMode == AlmostStrict; }
-  bool inStrictMode() const { return m_parseMode == Strict; }
+  bool inQuirksMode() const { return m_compatibilityMode == QuirksMode; }
+  bool inLimitedQuirksMode() const {
+    return m_compatibilityMode == LimitedQuirksMode;
+  }
+  bool inNoQuirksMode() const { return m_compatibilityMode == NoQuirksMode; }
 
   void setParsing(bool);
   bool parsing() const { return m_bParsing; }
@@ -1154,7 +1160,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   virtual bool isDocument() const { return true; }
   virtual void removedLastRef();
-  virtual void determineParseMode() {}
 
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,
@@ -1252,7 +1257,9 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   bool m_ignoreAutofocus;
 
-  ParseMode m_parseMode;
+  CompatibilityMode m_compatibilityMode;
+  bool m_compatibilityModeLocked;  // This is cheaper than making
+                                   // setCompatibilityMode virtual.
 
   Color m_textColor;
 

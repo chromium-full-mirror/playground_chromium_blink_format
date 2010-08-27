@@ -148,6 +148,7 @@ static RenderObject* getParentOfFirstLineBox(RenderBlock* curr,
   if (!firstChild)
     return 0;
 
+  bool inQuirksMode = curr->document()->inQuirksMode();
   for (RenderObject* currChild = firstChild; currChild;
        currChild = currChild->nextSibling()) {
     if (currChild == marker)
@@ -164,9 +165,9 @@ static RenderObject* getParentOfFirstLineBox(RenderBlock* curr,
     if (currChild->isTable() || !currChild->isRenderBlock())
       break;
 
-    if (curr->isListItem() && currChild->style()->htmlHacks() &&
-        currChild->node() && (currChild->node()->hasTagName(ulTag) ||
-                              currChild->node()->hasTagName(olTag)))
+    if (curr->isListItem() && inQuirksMode && currChild->node() &&
+        (currChild->node()->hasTagName(ulTag) ||
+         currChild->node()->hasTagName(olTag)))
       break;
 
     RenderObject* lineBox =

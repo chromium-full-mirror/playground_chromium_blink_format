@@ -138,7 +138,7 @@ void StyleElement::createSheet(Element* e,
       m_loading = true;
       m_sheet =
           CSSStyleSheet::create(e, String(), KURL(), document->inputEncoding());
-      m_sheet->parseStringAtLine(text, !document->inCompatMode(),
+      m_sheet->parseStringAtLine(text, !document->inQuirksMode(),
                                  startLineNumber);
       m_sheet->setMedia(mediaList.get());
       m_sheet->setTitle(e->title());

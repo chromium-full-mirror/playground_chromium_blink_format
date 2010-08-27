@@ -353,7 +353,7 @@ int RenderTableSection::calcRowHeight() {
       // the right
       // thing and actually add in the border and padding.
       ch = cell->style()->height().calcValue(0) +
-           (cell->style()->htmlHacks()
+           (document()->inQuirksMode()
                 ? 0
                 : (adjustedPaddingTop + adjustedPaddingBottom +
                    cell->borderTop() + cell->borderBottom()));

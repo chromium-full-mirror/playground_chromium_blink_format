@@ -157,7 +157,7 @@ void StyledElement::createInlineStyleDecl() {
   m_inlineStyleDecl->setParent(document()->elementSheet());
   m_inlineStyleDecl->setNode(this);
   m_inlineStyleDecl->setStrictParsing(isHTMLElement() &&
-                                      !document()->inCompatMode());
+                                      !document()->inQuirksMode());
 }
 
 void StyledElement::destroyInlineStyleDecl() {
@@ -265,7 +265,7 @@ void StyledElement::parseMappedAttribute(Attribute* attr) {
     if (attributeMap()) {
       if (attr->isNull())
         attributeMap()->setIdForStyleResolution(nullAtom);
-      else if (document()->inCompatMode())
+      else if (document()->inQuirksMode())
         attributeMap()->setIdForStyleResolution(attr->value().lower());
       else
         attributeMap()->setIdForStyleResolution(attr->value());

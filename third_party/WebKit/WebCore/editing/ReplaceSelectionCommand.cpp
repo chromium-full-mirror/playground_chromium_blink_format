@@ -1318,7 +1318,7 @@ bool ReplaceSelectionCommand::shouldRemoveEndBR(
     return false;
 
   // Remove the br if it is collapsed away and so is unnecessary.
-  if (!document()->inStrictMode() && isEndOfBlock(visiblePos) &&
+  if (!document()->inNoQuirksMode() && isEndOfBlock(visiblePos) &&
       !isStartOfParagraph(visiblePos))
     return true;
 

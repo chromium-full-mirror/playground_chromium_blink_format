@@ -192,7 +192,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
              (_white_space == other._white_space) &&
              (_box_direction == other._box_direction) &&
              (_visuallyOrdered == other._visuallyOrdered) &&
-             (_htmlHacks == other._htmlHacks) &&
              (_force_backgrounds_to_white ==
               other._force_backgrounds_to_white) &&
              (_pointerEvents == other._pointerEvents) &&
@@ -221,7 +220,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
 
     // non CSS2 inherited
     bool _visuallyOrdered : 1;
-    bool _htmlHacks : 1;
     bool _force_backgrounds_to_white : 1;
     unsigned _pointerEvents : 4;  // EPointerEvents
     unsigned _insideLink : 2;     // EInsideLink
@@ -294,7 +292,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
     inherited_flags._border_collapse = initialBorderCollapse();
     inherited_flags._white_space = initialWhiteSpace();
     inherited_flags._visuallyOrdered = initialVisuallyOrdered();
-    inherited_flags._htmlHacks = false;
     inherited_flags._box_direction = initialBoxDirection();
     inherited_flags._force_backgrounds_to_white = false;
     inherited_flags._pointerEvents = initialPointerEvents();
@@ -1382,9 +1379,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void setForceBackgroundsToWhite(bool b = true) {
     inherited_flags._force_backgrounds_to_white = b;
   }
-
-  bool htmlHacks() const { return inherited_flags._htmlHacks; }
-  void setHtmlHacks(bool b = true) { inherited_flags._htmlHacks = b; }
 
   bool hasAutoZIndex() const { return m_box->hasAutoZIndex(); }
   void setHasAutoZIndex() {

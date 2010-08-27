@@ -46,7 +46,8 @@ class SinkDocumentParser : public RawDataDocumentParser {
 
 SinkDocument::SinkDocument(Frame* frame, const KURL& url)
     : HTMLDocument(frame, url) {
-  setParseMode(Compat);
+  setCompatibilityMode(QuirksMode);
+  lockCompatibilityMode();
 }
 
 PassRefPtr<DocumentParser> SinkDocument::createParser() {

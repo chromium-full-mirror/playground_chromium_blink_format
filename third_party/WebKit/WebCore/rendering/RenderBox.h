@@ -309,7 +309,7 @@ class RenderBox : public RenderBoxModelObject {
   virtual void calcHeight();
 
   bool stretchesToViewHeight() const {
-    return style()->htmlHacks() && style()->height().isAuto() &&
+    return document()->inQuirksMode() && style()->height().isAuto() &&
            !isFloatingOrPositioned() && (isRoot() || isBody());
   }
 

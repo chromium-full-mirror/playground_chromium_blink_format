@@ -302,9 +302,9 @@ class Settings : public Noncopyable {
   void setZoomMode(ZoomMode);
   ZoomMode zoomMode() const { return m_zoomMode; }
 
-  void setEnforceCSSMIMETypeInStrictMode(bool);
-  bool enforceCSSMIMETypeInStrictMode() {
-    return m_enforceCSSMIMETypeInStrictMode;
+  void setEnforceCSSMIMETypeInNoQuirksMode(bool);
+  bool enforceCSSMIMETypeInNoQuirksMode() {
+    return m_enforceCSSMIMETypeInNoQuirksMode;
   }
 
   void setMaximumDecodedImageSize(size_t size) {
@@ -465,7 +465,7 @@ class Settings : public Noncopyable {
   bool m_inApplicationChromeMode : 1;
   bool m_offlineWebApplicationCacheEnabled : 1;
   bool m_shouldPaintCustomScrollbars : 1;
-  bool m_enforceCSSMIMETypeInStrictMode : 1;
+  bool m_enforceCSSMIMETypeInNoQuirksMode : 1;
   bool m_usesEncodingDetector : 1;
   bool m_allowScriptsToCloseWindows : 1;
   unsigned m_editingBehaviorType : 1;
