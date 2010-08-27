@@ -166,12 +166,14 @@ class HistoryItem : public RefCounted<HistoryItem> {
   void addChildItem(PassRefPtr<HistoryItem>);
   void setChildItem(PassRefPtr<HistoryItem>);
   HistoryItem* childItemWithTarget(const String&) const;
+  HistoryItem* childItemWithDocumentSequenceNumber(long long number) const;
   HistoryItem* targetItem();
   const HistoryItemVector& children() const;
   bool hasChildren() const;
   void clearChildren();
 
   bool hasSameDocuments(HistoryItem* otherItem);
+  bool hasSameFrames(HistoryItem* otherItem);
 
   // This should not be called directly for HistoryItems that are already
   // included

@@ -91,7 +91,7 @@ class HistoryController : public Noncopyable {
   PassRefPtr<HistoryItem> createItemTree(Frame* targetFrame, bool clipAtTarget);
 
   void recursiveGoToItem(HistoryItem*, HistoryItem*, FrameLoadType);
-  bool childFramesMatchItem(HistoryItem*) const;
+  bool currentFramesMatchItem(HistoryItem*) const;
   void updateBackForwardListClippedAtTarget(bool doClip);
 
   Frame* m_frame;
