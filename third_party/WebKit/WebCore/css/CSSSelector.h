@@ -213,6 +213,10 @@ class CSSSelector : public Noncopyable {
     PseudoLeftPage,
     PseudoRightPage,
     PseudoFirstPage,
+#if ENABLE(FULLSCREEN_API)
+    PseudoFullScreen,
+    PseudoFullScreenDocument,
+#endif
   };
 
   enum MarginBoxType {

@@ -94,7 +94,10 @@ namespace WebCore {
                                                                                                       macro(                        \
                                                                                                           loadend)                  \
                                                                                                                                     \
-      // end of DOM_EVENT_NAMES_FOR_EACH
+                                                                                                          macro(                    \
+                                                                                                              webkitfullscreenchange)
+
+// end of DOM_EVENT_NAMES_FOR_EACH
 
 class EventNames : public Noncopyable {
   int dummy;  // Needed to make initialization macro work.

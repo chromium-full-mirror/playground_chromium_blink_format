@@ -193,6 +193,12 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void exitFullscreenForNode(WebCore::Node*);
 #endif
 
+#if ENABLE(FULLSCREEN_API)
+  virtual bool supportsFullScreenForElement(const WebCore::Element*);
+  virtual void enterFullScreenForElement(WebCore::Element*);
+  virtual void exitFullScreenForElement(WebCore::Element*);
+#endif
+
   virtual void requestGeolocationPermissionForFrame(WebCore::Frame*,
                                                     WebCore::Geolocation*);
   virtual void cancelGeolocationPermissionRequestForFrame(

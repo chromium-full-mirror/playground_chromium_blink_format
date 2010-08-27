@@ -260,6 +260,9 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(ControlPart e)
     case MediaControlsBackgroundPart:
       m_value.ident = CSSValueMediaControlsBackground;
       break;
+    case MediaControlsFullscreenBackgroundPart:
+      m_value.ident = CSSValueMediaControlsFullscreenBackground;
+      break;
     case MediaCurrentTimePart:
       m_value.ident = CSSValueMediaCurrentTimeDisplay;
       break;

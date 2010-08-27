@@ -99,6 +99,15 @@ enum {
 - (void)deny;
 @end
 
+#if ENABLE(FULLSCREEN_API)
+@protocol WebKitFullScreenListener<NSObject>
+- (void)webkitWillEnterFullScreen;
+- (void)webkitDidEnterFullScreen;
+- (void)webkitWillExitFullScreen;
+- (void)webkitDidExitFullScreen;
+@end
+#endif
+
 @interface NSObject (WebUIDelegatePrivate)
 
 - (void)webView:(WebView*)webView addMessageToConsole:(NSDictionary*)message;
@@ -203,5 +212,12 @@ enum {
    be printed.
 */
 - (void)webView:(WebView*)sender printFrame:(WebFrame*)frame;
+
+#if ENABLE(FULLSCREEN_API)
+- (BOOL)webView:(WebView*)sender
+    supportsFullScreenForElement:(DOMElement*)element;
+- (void)webView:(WebView*)sender enterFullScreenForElement:(DOMElement*)element;
+- (void)webView:(WebView*)sender exitFullScreenForElement:(DOMElement*)element;
+#endif
 
 @end

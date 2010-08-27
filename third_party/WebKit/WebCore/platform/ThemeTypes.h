@@ -74,6 +74,7 @@ enum ControlPart {
   MediaVolumeSliderThumbPart,
   MediaVolumeSliderMuteButtonPart,
   MediaControlsBackgroundPart,
+  MediaControlsFullscreenBackgroundPart,
   MediaCurrentTimePart,
   MediaTimeRemainingPart,
   MenulistPart,

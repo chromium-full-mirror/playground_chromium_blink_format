@@ -1654,4 +1654,10 @@ bool Element::childShouldCreateRenderer(Node* child) const {
 }
 #endif
 
+#if ENABLE(FULLSCREEN_API)
+void Element::webkitRequestFullScreen(unsigned short flags) {
+  document()->webkitRequestFullScreenForElement(this, flags);
+}
+#endif
+
 }  // namespace WebCore
