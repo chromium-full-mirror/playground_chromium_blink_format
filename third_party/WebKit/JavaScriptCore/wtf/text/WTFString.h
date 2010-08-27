@@ -53,11 +53,6 @@ class BString;
 
 namespace WTF {
 
-// Size = 80 for sizeof(DtoaBuffer) + some sign bits, decimal point, 'e',
-// exponent digits.
-typedef UChar NumberToStringBuffer[96];
-unsigned numberToString(double, NumberToStringBuffer&);
-
 class CString;
 
 // Declarations of string operations
@@ -586,8 +581,5 @@ using WTF::charactersAreAllASCII;
 using WTF::charactersToInt;
 using WTF::charactersToFloat;
 using WTF::charactersToDouble;
-
-using WTF::NumberToStringBuffer;
-using WTF::numberToString;
 
 #endif

@@ -27,6 +27,7 @@
 
 #include "JSGlobalObjectFunctions.h"
 #include "Collector.h"
+#include "dtoa.h"
 #include "Identifier.h"
 #include "Operations.h"
 #include <ctype.h>
@@ -39,7 +40,6 @@
 #include <wtf/MathExtras.h>
 #include <wtf/StringExtras.h>
 #include <wtf/Vector.h>
-#include <wtf/text/WTFString.h>
 #include <wtf/unicode/UTF8.h>
 
 #if HAVE(STRINGS_H)
@@ -189,8 +189,10 @@ UString UString::number(long l) {
 }
 
 UString UString::number(double d) {
-  NumberToStringBuffer buffer;
-  return StringImpl::create(buffer, numberToString(d, buffer));
+  DtoaBuffer buffer;
+  unsigned length;
+  doubleToStringInJavaScriptFormat(d, buffer, &length);
+  return UString(buffer, length);
 }
 
 UString UString::substringSharingImpl(unsigned offset, unsigned length) const {
