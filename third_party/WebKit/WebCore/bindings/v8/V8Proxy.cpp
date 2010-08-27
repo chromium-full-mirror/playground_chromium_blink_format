@@ -650,6 +650,7 @@ void V8Proxy::didLeaveScriptContext() {
   Page* page = m_frame->page();
   if (!page)
     return;
+#if ENABLE(INDEXED_DATABASE)
   // If we've just left a script context and indexed database has been
   // instantiated, we must let its transaction coordinator know so it can
   // terminate
@@ -660,6 +661,7 @@ void V8Proxy::didLeaveScriptContext() {
         IDBPendingTransactionMonitor::pendingTransactions());
     IDBPendingTransactionMonitor::clearPendingTransactions();
   }
+#endif  // ENABLE(INDEXED_DATABASE)
   // If we've just left a top level script context and local storage has been
   // instantiated, we must ensure that any storage locks have been freed.
   // Per http://dev.w3.org/html5/spec/Overview.html#storage-mutex
