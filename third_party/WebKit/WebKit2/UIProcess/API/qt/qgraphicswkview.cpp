@@ -55,10 +55,10 @@ QGraphicsWKView::QGraphicsWKView(WKPageNamespaceRef pageNamespaceRef,
     : QGraphicsWidget(parent), d(new QGraphicsWKViewPrivate(this)) {
   setFocusPolicy(Qt::StrongFocus);
   setAcceptHoverEvents(true);
-  DrawingAreaProxy* drawingAreaProxy = new ChunkedUpdateDrawingAreaProxy(this);
 
   d->page = new QWKPage(pageNamespaceRef);
-  d->page->d->init(size().toSize(), drawingAreaProxy);
+  d->page->d->init(size().toSize(),
+                   ChunkedUpdateDrawingAreaProxy::create(this));
   connect(d->page, SIGNAL(titleChanged(QString)), this,
           SIGNAL(titleChanged(QString)));
   connect(d->page, SIGNAL(loadStarted()), this, SIGNAL(loadStarted()));

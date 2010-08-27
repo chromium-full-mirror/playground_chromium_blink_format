@@ -27,6 +27,8 @@
 #define ImmutableArray_h
 
 #include "APIObject.h"
+#include <wtf/OwnArrayPtr.h>
+#include <wtf/PassOwnArrayPtr.h>
 #include <wtf/PassRefPtr.h>
 
 namespace WebKit {
@@ -43,9 +45,11 @@ class ImmutableArray : public APIObject {
   static PassRefPtr<ImmutableArray> create(APIObject** entries, size_t size) {
     return adoptRef(new ImmutableArray(entries, size));
   }
-  static PassRefPtr<ImmutableArray> adopt(APIObject** entries, size_t size) {
-    return adoptRef(new ImmutableArray(entries, size, Adopt));
+  static PassRefPtr<ImmutableArray> adopt(PassOwnArrayPtr<APIObject*> entries,
+                                          size_t size) {
+    return adoptRef(new ImmutableArray(entries, size));
   }
+
   ~ImmutableArray();
 
   template <typename T>
@@ -65,12 +69,11 @@ class ImmutableArray : public APIObject {
  private:
   ImmutableArray();
   ImmutableArray(APIObject** entries, size_t size);
-  enum AdoptTag { Adopt };
-  ImmutableArray(APIObject** entries, size_t size, AdoptTag);
+  ImmutableArray(PassOwnArrayPtr<APIObject*> entries, size_t size);
 
   virtual Type type() const { return APIType; }
 
-  APIObject** m_entries;
+  OwnArrayPtr<APIObject*> m_entries;
   size_t m_size;
 };
 

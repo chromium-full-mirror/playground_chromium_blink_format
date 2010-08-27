@@ -30,13 +30,11 @@ namespace WebKit {
 ImmutableArray::ImmutableArray() : m_entries(0), m_size(0) {}
 
 ImmutableArray::ImmutableArray(APIObject** entries, size_t size)
-    : m_entries(new APIObject*[size]), m_size(size) {
-  memcpy(m_entries, entries, m_size);
-  for (size_t i = 0; i < m_size; ++i)
-    m_entries[i]->ref();
+    : m_entries(adoptArrayPtr(new APIObject*[size])), m_size(size) {
+  memcpy(m_entries.get(), entries, m_size);
 }
 
-ImmutableArray::ImmutableArray(APIObject** entries, size_t size, AdoptTag)
+ImmutableArray::ImmutableArray(PassOwnArrayPtr<APIObject*> entries, size_t size)
     : m_entries(entries), m_size(size) {}
 
 ImmutableArray::~ImmutableArray() {
@@ -45,7 +43,6 @@ ImmutableArray::~ImmutableArray() {
 
   for (size_t i = 0; i < m_size; ++i)
     m_entries[i]->deref();
-  delete[] m_entries;
 }
 
 }  // namespace WebKit
