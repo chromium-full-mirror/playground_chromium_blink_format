@@ -27,7 +27,6 @@
 
 #include "JSGlobalObjectFunctions.h"
 #include "Collector.h"
-#include "dtoa.h"
 #include "Identifier.h"
 #include "Operations.h"
 #include <ctype.h>
@@ -37,6 +36,7 @@
 #include <stdlib.h>
 #include <wtf/ASCIICType.h>
 #include <wtf/Assertions.h>
+#include <wtf/DecimalNumber.h>
 #include <wtf/MathExtras.h>
 #include <wtf/StringExtras.h>
 #include <wtf/Vector.h>
@@ -189,9 +189,8 @@ UString UString::number(long l) {
 }
 
 UString UString::number(double d) {
-  DtoaBuffer buffer;
-  unsigned length;
-  doubleToStringInJavaScriptFormat(d, buffer, &length);
+  NumberToStringBuffer buffer;
+  unsigned length = numberToString(d, buffer);
   return UString(buffer, length);
 }
 
