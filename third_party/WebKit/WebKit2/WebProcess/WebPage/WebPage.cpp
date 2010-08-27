@@ -77,7 +77,13 @@ PassRefPtr<WebPage> WebPage::create(
     const IntSize& viewSize,
     const WebPreferencesStore& store,
     const DrawingAreaBase::DrawingAreaInfo& drawingAreaInfo) {
-  return adoptRef(new WebPage(pageID, viewSize, store, drawingAreaInfo));
+  RefPtr<WebPage> page =
+      adoptRef(new WebPage(pageID, viewSize, store, drawingAreaInfo));
+
+  if (WebProcess::shared().injectedBundle())
+    WebProcess::shared().injectedBundle()->didCreatePage(page.get());
+
+  return page.release();
 }
 
 WebPage::WebPage(uint64_t pageID,
@@ -128,9 +134,6 @@ WebPage::WebPage(uint64_t pageID,
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidCreateMainFrame, m_pageID,
       CoreIPC::In(m_mainFrame->frameID()));
-
-  if (WebProcess::shared().injectedBundle())
-    WebProcess::shared().injectedBundle()->didCreatePage(this);
 
 #ifndef NDEBUG
   webPageCounter.increment();
