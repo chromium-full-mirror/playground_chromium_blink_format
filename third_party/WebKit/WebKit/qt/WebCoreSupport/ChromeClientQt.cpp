@@ -204,7 +204,6 @@ void ChromeClientQt::setStatusbarVisible(bool visible) {
 
 bool ChromeClientQt::statusbarVisible() {
   return statusBarVisible;
-  return false;
 }
 
 void ChromeClientQt::setScrollbarsVisible(bool) {
