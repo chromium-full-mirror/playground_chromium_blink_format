@@ -159,7 +159,7 @@ void Connection::readEventHandler() {
 
         // FIXME: We should figure out why we're getting this error.
         case ERROR_IO_INCOMPLETE:
-          break;
+          return;
         default:
           ASSERT_NOT_REACHED();
       }
@@ -178,6 +178,7 @@ void Connection::readEventHandler() {
       // ::PeekNamedPipe tells us the size below. We never set m_readBuffer to a
       // size larger
       // than the message.
+      ASSERT(m_readBuffer.size() >= sizeof(MessageID));
       size_t realBufferSize = m_readBuffer.size() - sizeof(MessageID);
 
       unsigned messageID =
@@ -261,6 +262,10 @@ void Connection::writeEventHandler() {
   if (!::GetOverlappedResult(m_connectionPipe, &m_writeState,
                              &numberOfBytesWritten, FALSE)) {
     DWORD error = ::GetLastError();
+    if (error == ERROR_IO_INCOMPLETE) {
+      // FIXME: We should figure out why we're getting this error.
+      return;
+    }
     ASSERT_NOT_REACHED();
   }
 
