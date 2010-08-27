@@ -77,6 +77,11 @@ WebCString DRTDevToolsAgent::debuggerScriptSource() {
   return webkit_support::GetDevToolsDebuggerScriptSource();
 }
 
+WebDevToolsAgentClient::WebKitClientMessageLoop*
+DRTDevToolsAgent::createClientMessageLoop() {
+  return webkit_support::CreateDevToolsMessageLoop();
+}
+
 void DRTDevToolsAgent::asyncCall(const DRTDevToolsCallArgs& args) {
   webkit_support::PostTaskFromHere(
       m_callMethodFactory.NewRunnableMethod(&DRTDevToolsAgent::call, args));
