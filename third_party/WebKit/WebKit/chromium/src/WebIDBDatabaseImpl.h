@@ -59,6 +59,7 @@ class WebIDBDatabaseImpl : public WebIDBDatabase {
                                          unsigned short mode);
   virtual void removeObjectStore(const WebString& name,
                                  WebIDBCallbacks* callbacks);
+  virtual void setVersion(const WebString& version, WebIDBCallbacks* callbacks);
   virtual WebIDBTransaction* transaction(const WebDOMStringList& names,
                                          unsigned short mode,
                                          unsigned long timeout);

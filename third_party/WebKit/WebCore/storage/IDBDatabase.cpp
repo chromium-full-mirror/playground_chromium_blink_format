@@ -74,6 +74,14 @@ PassRefPtr<IDBRequest> IDBDatabase::removeObjectStore(
   return request;
 }
 
+PassRefPtr<IDBRequest> IDBDatabase::setVersion(ScriptExecutionContext* context,
+                                               const String& version) {
+  RefPtr<IDBRequest> request =
+      IDBRequest::create(context, IDBAny::create(this));
+  m_backend->setVersion(version, request);
+  return request;
+}
+
 PassRefPtr<IDBTransaction> IDBDatabase::transaction(
     ScriptExecutionContext* context,
     DOMStringList* storeNames,

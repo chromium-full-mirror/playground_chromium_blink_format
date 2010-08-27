@@ -85,6 +85,11 @@ void WebIDBDatabaseImpl::removeObjectStore(const WebString& name,
                                        IDBCallbacksProxy::create(callbacks));
 }
 
+void WebIDBDatabaseImpl::setVersion(const WebString& version,
+                                    WebIDBCallbacks* callbacks) {
+  m_databaseBackend->setVersion(version, IDBCallbacksProxy::create(callbacks));
+}
+
 WebIDBTransaction* WebIDBDatabaseImpl::transaction(
     const WebDOMStringList& names,
     unsigned short mode,

@@ -212,6 +212,13 @@ void IDBDatabaseBackendImpl::removeObjectStore(
   callbacks->onSuccess();
 }
 
+void IDBDatabaseBackendImpl::setVersion(const String& version,
+                                        PassRefPtr<IDBCallbacks> callbacks) {
+  m_version = version;
+  setMetaData(m_sqliteDatabase.get(), m_name, m_description, m_version);
+  callbacks->onSuccess();
+}
+
 PassRefPtr<IDBTransactionBackendInterface> IDBDatabaseBackendImpl::transaction(
     DOMStringList* objectStores,
     unsigned short mode,

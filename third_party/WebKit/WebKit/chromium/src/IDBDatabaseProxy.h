@@ -60,6 +60,7 @@ class IDBDatabaseProxy : public IDBDatabaseBackendInterface {
       const String& name,
       unsigned short mode);
   virtual void removeObjectStore(const String& name, PassRefPtr<IDBCallbacks>);
+  virtual void setVersion(const String& version, PassRefPtr<IDBCallbacks>);
   virtual PassRefPtr<IDBTransactionBackendInterface> transaction(
       DOMStringList* storeNames,
       unsigned short mode,

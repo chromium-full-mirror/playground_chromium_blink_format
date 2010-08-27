@@ -73,6 +73,10 @@ class WebIDBDatabase {
                                  WebIDBCallbacks* callbacks) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
+  virtual void setVersion(const WebString& version,
+                          WebIDBCallbacks* callbacks) {
+    WEBKIT_ASSERT_NOT_REACHED();
+  }
   // Transfers ownership of the WebIDBTransaction to the caller.
   virtual WebIDBTransaction* transaction(const WebDOMStringList& names,
                                          unsigned short mode,
