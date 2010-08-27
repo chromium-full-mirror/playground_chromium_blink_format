@@ -124,6 +124,12 @@ enum FileOpenMode { OpenForRead = 0, OpenForWrite };
 
 enum FileSeekOrigin { SeekFromBeginning = 0, SeekFromCurrent, SeekFromEnd };
 
+#if OS(WINDOWS)
+static const char PlatformFilePathSeparator = '\\';
+#else
+static const char PlatformFilePathSeparator = '/';
+#endif
+
 bool fileExists(const String&);
 bool deleteFile(const String&);
 bool deleteEmptyDirectory(const String&);

@@ -33,6 +33,7 @@
 
 #if ENABLE(FILE_SYSTEM)
 
+#include "AsyncFileSystemCallbacks.h"
 #include "PlatformString.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/Vector.h>
@@ -49,11 +50,7 @@ class MetadataCallback;
 class ScriptExecutionContext;
 class VoidCallback;
 
-typedef int ExceptionCode;
-
-// A base class for FileSystem callbacks that bundles successCallback,
-// errorCallback and some closure data for the callbacks.
-class FileSystemCallbacksBase : public Noncopyable {
+class FileSystemCallbacksBase : public AsyncFileSystemCallbacks {
  public:
   virtual ~FileSystemCallbacksBase();
 
@@ -61,7 +58,8 @@ class FileSystemCallbacksBase : public Noncopyable {
   virtual void didSucceed();
 
   // For FileSystemCallbacks.
-  virtual void didOpenFileSystem(const String& name, const String& rootPath);
+  virtual void didOpenFileSystem(const String& name,
+                                 PassOwnPtr<AsyncFileSystem>);
 
   // For MetadataCallbacks.
   virtual void didReadMetadata(double modificationTime);
@@ -71,10 +69,10 @@ class FileSystemCallbacksBase : public Noncopyable {
   // have been read (i.e. good time to call back to the application).  If
   // hasMore is true there can be more chunks.
   virtual void didReadDirectoryEntry(const String& name, bool isDirectory);
-  virtual void didReadDirectoryChunkDone(bool hasMore);
+  virtual void didReadDirectoryEntries(bool hasMore);
 
   // For ErrorCallback.
-  virtual void didFail(ExceptionCode code);
+  virtual void didFail(int code);
 
  protected:
   FileSystemCallbacksBase(PassRefPtr<ErrorCallback> errorCallback);
@@ -106,7 +104,7 @@ class EntriesCallbacks : public FileSystemCallbacksBase {
                    DOMFileSystem*,
                    const String& basePath);
   virtual void didReadDirectoryEntry(const String& name, bool isDirectory);
-  virtual void didReadDirectoryChunkDone(bool hasMore);
+  virtual void didReadDirectoryEntries(bool hasMore);
 
  private:
   RefPtr<EntriesCallback> m_successCallback;
@@ -118,11 +116,14 @@ class EntriesCallbacks : public FileSystemCallbacksBase {
 class FileSystemCallbacks : public FileSystemCallbacksBase {
  public:
   FileSystemCallbacks(PassRefPtr<FileSystemCallback>,
-                      PassRefPtr<ErrorCallback>);
-  virtual void didOpenFileSystem(const String& name, const String& rootPath);
+                      PassRefPtr<ErrorCallback>,
+                      ScriptExecutionContext*);
+  virtual void didOpenFileSystem(const String& name,
+                                 PassOwnPtr<AsyncFileSystem>);
 
  private:
   RefPtr<FileSystemCallback> m_successCallback;
+  RefPtr<ScriptExecutionContext> m_scriptExecutionContext;
 };
 
 class MetadataCallbacks : public FileSystemCallbacksBase {
