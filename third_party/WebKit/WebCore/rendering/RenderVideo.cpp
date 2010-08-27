@@ -109,7 +109,7 @@ IntSize RenderVideo::calculateIntrinsicSize() {
     return player()->naturalSize();
 
   if (video->shouldDisplayPosterImage() && !m_cachedImageSize.isEmpty() &&
-      !errorOccurred())
+      !imageResource()->errorOccurred())
     return m_cachedImageSize;
 
   // When the natural size of the video is unavailable, we use the provided

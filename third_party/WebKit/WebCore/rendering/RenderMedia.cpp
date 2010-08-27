@@ -55,7 +55,9 @@ RenderMedia::RenderMedia(HTMLMediaElement* video)
       m_opacityAnimationStartTime(0),
       m_opacityAnimationDuration(0),
       m_opacityAnimationFrom(0),
-      m_opacityAnimationTo(1.0f) {}
+      m_opacityAnimationTo(1.0f) {
+  setImageResource(RenderImageResource::create());
+}
 
 RenderMedia::RenderMedia(HTMLMediaElement* video, const IntSize& intrinsicSize)
     : RenderImage(video),
@@ -66,6 +68,7 @@ RenderMedia::RenderMedia(HTMLMediaElement* video, const IntSize& intrinsicSize)
       m_opacityAnimationDuration(0),
       m_opacityAnimationFrom(0),
       m_opacityAnimationTo(1.0f) {
+  setImageResource(RenderImageResource::create());
   setIntrinsicSize(intrinsicSize);
 }
 
