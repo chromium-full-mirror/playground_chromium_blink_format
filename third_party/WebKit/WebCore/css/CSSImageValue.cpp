@@ -44,6 +44,9 @@ CSSImageValue::~CSSImageValue() {
 }
 
 StyleImage* CSSImageValue::cachedOrPendingImage() {
+  if (getIdent() == CSSValueNone)
+    return 0;
+
   if (!m_image)
     m_image = StylePendingImage::create(this);
 
