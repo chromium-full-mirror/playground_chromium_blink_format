@@ -138,6 +138,7 @@ void SelectionController::setSelection(
     m_selection = s;
     m_caretRectNeedsUpdate = true;
     invalidateCaretRect();
+    updateCaretRect();
     return;
   }
   if (!m_frame) {
