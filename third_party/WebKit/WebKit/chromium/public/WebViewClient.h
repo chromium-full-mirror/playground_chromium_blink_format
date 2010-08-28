@@ -301,6 +301,10 @@ class WebViewClient : virtual public WebWidgetClient {
   virtual void didChangeAccessibilityObjectState(
       const WebAccessibilityObject&) {}
 
+  // Notifies embedder that the children of an accessibility object has changed.
+  virtual void didChangeAccessibilityObjectChildren(
+      const WebAccessibilityObject&) {}
+
   // Developer tools -----------------------------------------------------
 
   // Called to notify the client that the inspector's settings were

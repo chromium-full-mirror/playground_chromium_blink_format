@@ -117,6 +117,7 @@ class AXObjectCache : public Noncopyable {
   enum AXNotification {
     AXActiveDescendantChanged,
     AXCheckedStateChanged,
+    AXChildrenChanged,
     AXFocusedUIElementChanged,
     AXLayoutComplete,
     AXLoadComplete,

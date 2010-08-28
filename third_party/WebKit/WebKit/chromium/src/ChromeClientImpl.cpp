@@ -658,6 +658,14 @@ void ChromeClientImpl::didChangeAccessibilityObjectState(
         WebAccessibilityObject(obj));
 }
 
+void ChromeClientImpl::didChangeAccessibilityObjectChildren(
+    WebCore::AccessibilityObject* obj) {
+  // Alert assistive technology about the accessibility object children change
+  if (obj)
+    m_webView->client()->didChangeAccessibilityObjectChildren(
+        WebAccessibilityObject(obj));
+}
+
 #if ENABLE(NOTIFICATIONS)
 NotificationPresenter* ChromeClientImpl::notificationPresenter() const {
   return m_webView->notificationPresenterImpl();
