@@ -1113,11 +1113,11 @@ wxWebSettings wxWebView::GetWebSettings() {
   return wxWebSettings();
 }
 
-wxWebKitParseMode wxWebView::GetParseMode() const {
+wxWebKitCompatibilityMode wxWebView::GetCompatibilityMode() const {
   if (m_mainFrame)
-    return m_mainFrame->GetParseMode();
+    return m_mainFrame->GetCompatibilityMode();
 
-  return NoDocument;
+  return QuirksMode;
 }
 
 void wxWebView::GrantUniversalAccess() {

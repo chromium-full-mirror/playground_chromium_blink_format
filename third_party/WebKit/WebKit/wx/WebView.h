@@ -228,7 +228,7 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
                            const wxString& password = wxEmptyString);
 
   wxWebSettings GetWebSettings();
-  wxWebKitParseMode GetParseMode() const;
+  wxWebKitCompatibilityMode GetCompatibilityMode() const;
 
   /*
       This method allows cross site-scripting (XSS) in the WebView.
