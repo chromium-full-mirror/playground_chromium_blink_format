@@ -33,6 +33,7 @@
 
 #if ENABLE(INSPECTOR)
 
+#include "Attr.h"
 #include "CSSComputedStyleDeclaration.h"
 #include "CSSMutableStyleDeclaration.h"
 #include "CSSPropertyNames.h"
@@ -881,6 +882,10 @@ PassRefPtr<InspectorObject> InspectorDOMAgent::buildObjectForNode(
     value->setString("publicId", docType->publicId());
     value->setString("systemId", docType->systemId());
     value->setString("internalSubset", docType->internalSubset());
+  } else if (node->nodeType() == Node::ATTRIBUTE_NODE) {
+    Attr* attribute = static_cast<Attr*>(node);
+    value->setString("name", attribute->name());
+    value->setString("value", attribute->value());
   }
   return value.release();
 }
