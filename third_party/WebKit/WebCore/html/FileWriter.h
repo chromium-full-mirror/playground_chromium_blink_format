@@ -35,42 +35,52 @@
 
 #include "ActiveDOMObject.h"
 #include "EventTarget.h"
+#include "FileWriterClient.h"
+#include <wtf/OwnPtr.h>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
 
+class AsyncFileWriter;
 class Blob;
 class FileError;
 class ScriptExecutionContext;
 
-// FIXME: This is an empty, do-nothing placeholder for implementation yet to
-// come.
 class FileWriter : public RefCounted<FileWriter>,
                    public ActiveDOMObject,
-                   public EventTarget {
+                   public EventTarget,
+                   public FileWriterClient {
  public:
   static PassRefPtr<FileWriter> create(ScriptExecutionContext* context) {
     return adoptRef(new FileWriter(context));
   }
 
-  enum ReadyState { EMPTY = 0, WRITING = 1, DONE = 2 };
+  void initialize(PassOwnPtr<AsyncFileWriter> writer, long long length);
 
-  void write(Blob*);
-  void seek(long long position);
-  void truncate(long long length);
-  void abort();
+  enum ReadyState { INIT = 0, WRITING = 1, DONE = 2 };
 
-  ReadyState readyState() const;
-  FileError* error() const { return m_error; };
-  long long position() const { return 0; };
-  long long length() const { return 0; };
+  void write(Blob* data, ExceptionCode& ec);
+  void seek(long long position, ExceptionCode& ec);
+  void truncate(long long length, ExceptionCode& ec);
+  void abort(ExceptionCode& ec);
+
+  ReadyState readyState() const { return m_readyState; }
+  FileError* error() const { return m_error.get(); }
+  long long position() const { return m_position; }
+  long long length() const { return m_length; }
+
+  // FileWriterClient
+  void didWrite(long long bytes, bool complete);
+  void didTruncate(long long length);
+  void didFail(ExceptionCode ec);
 
   // ActiveDOMObject
   virtual bool canSuspend() const;
-  virtual void stop();
   virtual bool hasPendingActivity() const;
+  virtual void stop();
 
   // EventTarget
   virtual FileWriter* toFileWriter() { return this; }
@@ -103,8 +113,16 @@ class FileWriter : public RefCounted<FileWriter>,
     return &m_eventTargetData;
   }
 
-  RefPtr<FileError*> m_error;
+  void fireEvent(const AtomicString& type);
+
+  RefPtr<FileError> m_error;
   EventTargetData m_eventTargetData;
+  OwnPtr<AsyncFileWriter> m_writer;
+  ReadyState m_readyState;
+  long long m_position;
+  long long m_length;
+  long long m_bytesWritten;
+  long long m_bytesToWrite;
 };
 
 }  // namespace WebCore
