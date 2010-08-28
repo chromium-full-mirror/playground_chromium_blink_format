@@ -50,6 +50,14 @@ class PluginPackage : public RefCounted<PluginPackage> {
   ~PluginPackage();
   static PassRefPtr<PluginPackage> createPackage(const String& path,
                                                  const time_t& lastModified);
+#if ENABLE(NETSCAPE_PLUGIN_METADATA_CACHE)
+  static PassRefPtr<PluginPackage> createPackageFromCache(
+      const String& path,
+      const time_t& lastModified,
+      const String& name,
+      const String& description,
+      const String& mimeDescription);
+#endif
 
   const String& name() const { return m_name; }
   const String& description() const { return m_description; }
@@ -85,6 +93,11 @@ class PluginPackage : public RefCounted<PluginPackage> {
   NPInterface* npInterface() const { return m_npInterface; }
 #endif  // OS(SYMBIAN)
 
+#if ENABLE(NETSCAPE_PLUGIN_METADATA_CACHE)
+  bool ensurePluginLoaded();
+  void setMIMEDescription(const String& mimeDescription);
+  String fullMIMEDescription() const { return m_fullMIMEDescription; }
+#endif
  private:
   PluginPackage(const String& path, const time_t& lastModified);
 
@@ -126,6 +139,10 @@ class PluginPackage : public RefCounted<PluginPackage> {
   Timer<PluginPackage> m_freeLibraryTimer;
 
   PluginQuirkSet m_quirks;
+#if ENABLE(NETSCAPE_PLUGIN_METADATA_CACHE)
+  String m_fullMIMEDescription;
+  bool m_infoIsFromCache;
+#endif
 };
 
 struct PluginPackageHash {

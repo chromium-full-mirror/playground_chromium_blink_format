@@ -107,7 +107,12 @@ PluginPackage::PluginPackage(const String& path, const time_t& lastModified)
       m_moduleVersion(0),
       m_module(0),
       m_lastModified(lastModified),
-      m_freeLibraryTimer(this, &PluginPackage::freeLibraryTimerFired) {
+      m_freeLibraryTimer(this, &PluginPackage::freeLibraryTimerFired)
+#if ENABLE(NETSCAPE_PLUGIN_METADATA_CACHE)
+      ,
+      m_infoIsFromCache(true)
+#endif
+{
   m_fileName = pathGetFileName(m_path);
   m_parentDirectory = m_path.left(m_path.length() - m_fileName.length() - 1);
 }
@@ -163,6 +168,24 @@ PassRefPtr<PluginPackage> PluginPackage::createPackage(
 
   return package.release();
 }
+
+#if ENABLE(NETSCAPE_PLUGIN_METADATA_CACHE)
+PassRefPtr<PluginPackage> PluginPackage::createPackageFromCache(
+    const String& path,
+    const time_t& lastModified,
+    const String& name,
+    const String& description,
+    const String& mimeDescription) {
+  RefPtr<PluginPackage> package =
+      adoptRef(new PluginPackage(path, lastModified));
+  package->m_name = name;
+  package->m_description = description;
+  package->determineModuleVersionFromDescription();
+  package->setMIMEDescription(mimeDescription);
+  package->m_infoIsFromCache = true;
+  return package.release();
+}
+#endif
 
 #if defined(XP_UNIX)
 void PluginPackage::determineQuirks(const String& mimeType) {
@@ -345,4 +368,19 @@ int PluginPackage::compareFileVersion(
 
   return 0;
 }
+
+#if ENABLE(NETSCAPE_PLUGIN_METADATA_CACHE)
+bool PluginPackage::ensurePluginLoaded() {
+  if (!m_infoIsFromCache)
+    return m_isLoaded;
+
+  m_quirks = PluginQuirkSet();
+  m_name = String();
+  m_description = String();
+  m_fullMIMEDescription = String();
+  m_moduleVersion = 0;
+
+  return fetchInfo();
+}
+#endif
 }
