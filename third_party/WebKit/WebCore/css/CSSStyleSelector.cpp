@@ -1623,7 +1623,7 @@ void CSSStyleSelector::keyframeStylesForAnimation(
   // If the 0% keyframe is missing, create it (but only if there is at least one
   // other keyframe)
   int initialListSize = list.size();
-  if (initialListSize > 0 && list.beginKeyframes()->key() != 0) {
+  if (initialListSize > 0 && list[0].key() != 0) {
     RefPtr<WebKitCSSKeyframeRule> keyframe = WebKitCSSKeyframeRule::create();
     keyframe->setKeyText("0%");
     keyframeStyle = styleForKeyframe(elementStyle, keyframe.get(), list);
@@ -1632,7 +1632,7 @@ void CSSStyleSelector::keyframeStylesForAnimation(
 
   // If the 100% keyframe is missing, create it (but only if there is at least
   // one other keyframe)
-  if (initialListSize > 0 && (list.endKeyframes() - 1)->key() != 1) {
+  if (initialListSize > 0 && (list[list.size() - 1].key() != 1)) {
     RefPtr<WebKitCSSKeyframeRule> keyframe = WebKitCSSKeyframeRule::create();
     keyframe->setKeyText("100%");
     keyframeStyle = styleForKeyframe(elementStyle, keyframe.get(), list);
