@@ -45,6 +45,7 @@ class RenderImageResourceStyleImage : public RenderImageResource {
   virtual void initialize(RenderObject*);
   virtual void shutdown();
 
+  virtual bool hasImage() const { return true; }
   virtual Image* image(int width = 0, int height = 0) {
     return m_styleImage->image(m_renderer, IntSize(width, height));
   }
