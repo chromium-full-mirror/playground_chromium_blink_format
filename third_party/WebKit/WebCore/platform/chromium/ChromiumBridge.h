@@ -110,7 +110,9 @@ class ChromiumBridge {
   static void clipboardWritePlainText(const String&);
   static void clipboardWriteURL(const KURL&, const String&);
   static void clipboardWriteImage(NativeImagePtr, const KURL&, const String&);
-  static void clipboardWriteData(ClipboardData*);
+  static void clipboardWriteData(const String& type,
+                                 const String& data,
+                                 const String& metadata);
 
   // Interface for handling copy and paste, drag and drop, and selection copy.
   static HashSet<String> clipboardReadAvailableTypes(
