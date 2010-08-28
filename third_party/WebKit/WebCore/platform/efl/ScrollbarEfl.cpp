@@ -131,8 +131,8 @@ void ScrollbarEfl::setParent(ScrollView* view) {
   if (!edje_object_file_set(o, theme.utf8().data(), group)) {
     int err = edje_object_load_error_get(o);
     const char* errmsg = edje_load_error_str(err);
-    EINA_LOG_ERR("Could not load theme '%s' from file '%s': #%d '%s'",
-                 theme.utf8().data(), group, err, errmsg);
+    EINA_LOG_ERR("Could not load theme '%s' from file '%s': #%d '%s'", group,
+                 theme.utf8().data(), err, errmsg);
     return;
   }
 
