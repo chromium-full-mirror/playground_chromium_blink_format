@@ -38,6 +38,12 @@
     return library;                                         \
   }
 
+#if OS(WINCE)
+#define SOFT_LINK_GETPROCADDRESS GetProcAddressA
+#else
+#define SOFT_LINK_GETPROCADDRESS GetProcAddress
+#endif
+
 #define SOFT_LINK_LIBRARY(lib) SOFT_LINK_LIBRARY_HELPER(lib, L".dll")
 #define SOFT_LINK_DEBUG_LIBRARY(lib) \
   SOFT_LINK_LIBRARY_HELPER(lib, L"_debug.dll")
@@ -53,7 +59,7 @@
       init##functionName parameterDeclarations {                             \
     softLink##functionName = reinterpret_cast<resultType(callingConvention*) \
                                                   parameterDeclarations>(    \
-        GetProcAddress(library##Library(), #functionName));                  \
+        SOFT_LINK_GETPROCADDRESS(library##Library(), #functionName));        \
     ASSERT(softLink##functionName);                                          \
     return softLink##functionName parameterNames;                            \
   }                                                                          \
@@ -62,21 +68,21 @@
     return softLink##functionName parameterNames;                            \
   }
 
-#define SOFT_LINK_OPTIONAL(library, functionName, resultType,        \
-                           callingConvention, parameterDeclarations) \
-  typedef resultType(callingConvention* functionName##PtrType)       \
-      parameterDeclarations;                                         \
-  static functionName##PtrType functionName##Ptr() {                 \
-    static functionName##PtrType ptr;                                \
-    static bool initialized;                                         \
-                                                                     \
-    if (initialized)                                                 \
-      return ptr;                                                    \
-    initialized = true;                                              \
-                                                                     \
-    ptr = reinterpret_cast<functionName##PtrType>(                   \
-        GetProcAddress(library##Library(), #functionName));          \
-    return ptr;                                                      \
+#define SOFT_LINK_OPTIONAL(library, functionName, resultType,         \
+                           callingConvention, parameterDeclarations)  \
+  typedef resultType(callingConvention* functionName##PtrType)        \
+      parameterDeclarations;                                          \
+  static functionName##PtrType functionName##Ptr() {                  \
+    static functionName##PtrType ptr;                                 \
+    static bool initialized;                                          \
+                                                                      \
+    if (initialized)                                                  \
+      return ptr;                                                     \
+    initialized = true;                                               \
+                                                                      \
+    ptr = reinterpret_cast<functionName##PtrType>(                    \
+        SOFT_LINK_GETPROCADDRESS(library##Library(), #functionName)); \
+    return ptr;                                                       \
   }
 
 #endif  // SoftLinking_h
