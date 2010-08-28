@@ -407,7 +407,7 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
     CanvasWillDrawApplyAll = 0xffffffff
   };
 
-  void willDraw(const FloatRect&, unsigned options = CanvasWillDrawApplyAll);
+  void didDraw(const FloatRect&, unsigned options = CanvasWillDrawApplyAll);
 
   GraphicsContext* drawingContext() const;
 

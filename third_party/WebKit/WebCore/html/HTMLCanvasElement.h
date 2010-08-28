@@ -90,7 +90,7 @@ class HTMLCanvasElement : public HTMLElement {
   }
 
   // Used for rendering
-  void willDraw(const FloatRect&);
+  void didDraw(const FloatRect&);
 
   void paint(GraphicsContext*, const IntRect&);
 

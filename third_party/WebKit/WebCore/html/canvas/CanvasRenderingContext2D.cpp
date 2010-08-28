@@ -816,8 +816,8 @@ void CanvasRenderingContext2D::fill() {
   if (!m_path.isEmpty()) {
     c->beginPath();
     c->addPath(m_path);
-    willDraw(m_path.boundingRect());
     c->fillPath();
+    didDraw(m_path.boundingRect());
   }
 
 #if ENABLE(DASHBOARD_SUPPORT)
@@ -846,9 +846,8 @@ void CanvasRenderingContext2D::stroke() {
     CanvasStrokeStyleApplier strokeApplier(this);
     FloatRect boundingRect = m_path.strokeBoundingRect(&strokeApplier);
 #endif
-    willDraw(boundingRect);
-
     c->strokePath();
+    didDraw(boundingRect);
   }
 
 #if ENABLE(DASHBOARD_SUPPORT)
@@ -896,8 +895,8 @@ void CanvasRenderingContext2D::clearRect(float x,
 
   save();
   setAllAttributesToDefault();
-  willDraw(rect);
   context->clearRect(rect);
+  didDraw(rect);
   restore();
 }
 
@@ -923,9 +922,9 @@ void CanvasRenderingContext2D::fillRect(float x,
     return;
 
   FloatRect rect(x, y, width, height);
-  willDraw(rect);
 
   c->fillRect(rect);
+  didDraw(rect);
 }
 
 void CanvasRenderingContext2D::strokeRect(float x,
@@ -958,9 +957,9 @@ void CanvasRenderingContext2D::strokeRect(float x,
 
   FloatRect boundingRect = rect;
   boundingRect.inflate(lineWidth / 2);
-  willDraw(boundingRect);
 
   c->strokeRect(rect, lineWidth);
+  didDraw(boundingRect);
 }
 
 #if PLATFORM(CG)
@@ -1258,9 +1257,9 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
 
   FloatRect sourceRect = c->roundToDevicePixels(srcRect);
   FloatRect destRect = c->roundToDevicePixels(dstRect);
-  willDraw(destRect);
   c->drawImage(cachedImage->image(), DeviceColorSpace, destRect, sourceRect,
                state().m_globalComposite);
+  didDraw(destRect);
 }
 
 void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* canvas,
@@ -1349,11 +1348,7 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* sourceCanvas,
 
   c->drawImageBuffer(buffer, DeviceColorSpace, destRect, sourceRect,
                      state().m_globalComposite);
-  willDraw(destRect);  // This call comes after drawImage, since the buffer we
-                       // draw into may be our own, and we need to make sure it
-                       // is dirty.
-  // FIXME: Arguably willDraw should become didDraw and occur after drawing
-  // calls and not before them to avoid problems like this.
+  didDraw(destRect);
 }
 
 #if ENABLE(VIDEO)
@@ -1436,7 +1431,6 @@ void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
 
   FloatRect sourceRect = c->roundToDevicePixels(srcRect);
   FloatRect destRect = c->roundToDevicePixels(dstRect);
-  willDraw(destRect);
 
   c->save();
   c->clip(destRect);
@@ -1446,6 +1440,7 @@ void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
   c->translate(-sourceRect.x(), -sourceRect.y());
   video->paintCurrentFrameInContext(c, IntRect(IntPoint(), size(video)));
   c->restore();
+  didDraw(destRect);
 }
 #endif
 
@@ -1487,9 +1482,9 @@ void CanvasRenderingContext2D::drawImageFromRect(
     op = CompositeSourceOver;
 
   FloatRect destRect = FloatRect(dx, dy, dw, dh);
-  willDraw(destRect);
   c->drawImage(cachedImage->image(), DeviceColorSpace, destRect,
                FloatRect(sx, sy, sw, sh), op);
+  didDraw(destRect);
 }
 
 void CanvasRenderingContext2D::setAlpha(float alpha) {
@@ -1596,7 +1591,7 @@ PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
                                canvas->originClean());
 }
 
-void CanvasRenderingContext2D::willDraw(const FloatRect& r, unsigned options) {
+void CanvasRenderingContext2D::didDraw(const FloatRect& r, unsigned options) {
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
@@ -1635,7 +1630,7 @@ void CanvasRenderingContext2D::willDraw(const FloatRect& r, unsigned options) {
     renderBox->layer()->rendererContentChanged();
   else
 #endif
-    canvas()->willDraw(dirtyRect);
+    canvas()->didDraw(dirtyRect);
 }
 
 GraphicsContext* CanvasRenderingContext2D::drawingContext() const {
@@ -1766,11 +1761,11 @@ void CanvasRenderingContext2D::putImageData(ImageData* data,
   sourceRect.intersect(IntRect(IntPoint(), buffer->size()));
   if (sourceRect.isEmpty())
     return;
-  willDraw(sourceRect, 0);  // ignore transform, shadow and clip
   sourceRect.move(-destOffset);
   IntPoint destPoint(destOffset.width(), destOffset.height());
 
   buffer->putUnmultipliedImageData(data, sourceRect, destPoint);
+  didDraw(sourceRect, 0);  // ignore transform, shadow and clip
 }
 
 String CanvasRenderingContext2D::font() const {
@@ -1957,14 +1952,6 @@ void CanvasRenderingContext2D::drawTextInternal(const String& text,
   if (!fill)
     textRect.inflate(c->strokeThickness() / 2);
 
-  if (fill)
-    canvas()->willDraw(textRect);
-  else {
-    // When stroking text, pointy miters can extend outside of textRect, so we
-    // punt and dirty the whole canvas.
-    canvas()->willDraw(FloatRect(0, 0, canvas()->width(), canvas()->height()));
-  }
-
 #if PLATFORM(CG)
   CanvasStyle* drawStyle =
       fill ? state().m_fillStyle.get() : state().m_strokeStyle.get();
@@ -2008,6 +1995,14 @@ void CanvasRenderingContext2D::drawTextInternal(const String& text,
 #endif
 
   c->drawBidiText(font, textRun, location);
+
+  if (fill)
+    canvas()->didDraw(textRect);
+  else {
+    // When stroking text, pointy miters can extend outside of textRect, so we
+    // punt and dirty the whole canvas.
+    canvas()->didDraw(FloatRect(0, 0, canvas()->width(), canvas()->height()));
+  }
 
 #if PLATFORM(QT)
   Font::setCodePath(oldCodePath);
