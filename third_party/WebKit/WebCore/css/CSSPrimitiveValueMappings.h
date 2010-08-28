@@ -990,6 +990,9 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(EListStyleType e)
     case Armenian:
       m_value.ident = CSSValueArmenian;
       break;
+    case Asterisks:
+      m_value.ident = CSSValueAsterisks;
+      break;
     case BinaryListStyle:
       m_value.ident = CSSValueBinary;
       break;
@@ -1070,6 +1073,9 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(EListStyleType e)
       break;
     case EthiopicHalehameTig:
       m_value.ident = CSSValueEthiopicHalehameTig;
+      break;
+    case Footnotes:
+      m_value.ident = CSSValueFootnotes;
       break;
     case Georgian:
       m_value.ident = CSSValueGeorgian;

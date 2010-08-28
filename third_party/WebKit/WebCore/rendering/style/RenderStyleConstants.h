@@ -333,6 +333,8 @@ enum EListStyleType {
   EthiopicAbegedeTiEt,
   UpperGreek,
   UpperNorwegian,
+  Asterisks,
+  Footnotes,
   Hebrew,
   Armenian,
   Georgian,
