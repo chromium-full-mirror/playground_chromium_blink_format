@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,7 +32,6 @@
 
 #import "WebFramePrivate.h"
 #import "WebPreferencesPrivate.h"
-
 #import <WebCore/EditAction.h>
 #import <WebCore/FrameLoaderTypes.h>
 #import <WebCore/SelectionController.h>
@@ -167,10 +167,6 @@ _rangeByAlteringCurrentSelection:
                        direction:
                            (WebCore::SelectionController::EDirection)direction
                      granularity:(WebCore::TextGranularity)granularity;
-- (void)_smartInsertForString:(NSString*)pasteString
-               replacingRange:(DOMRange*)charRangeToReplace
-                 beforeString:(NSString**)beforeString
-                  afterString:(NSString**)afterString;
 - (NSRange)_convertToNSRange:(WebCore::Range*)range;
 - (DOMRange*)_convertNSRangeToDOMRange:(NSRange)range;
 - (NSRange)_convertDOMRangeToNSRange:(DOMRange*)range;
