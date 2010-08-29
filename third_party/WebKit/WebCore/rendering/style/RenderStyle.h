@@ -1662,7 +1662,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void clearContent();
   void setContent(PassRefPtr<StringImpl>, bool add = false);
   void setContent(PassRefPtr<StyleImage>, bool add = false);
-  void setContent(CounterContent*, bool add = false);
+  void setContent(PassOwnPtr<CounterContent>, bool add = false);
 
   const CounterDirectiveMap* counterDirectives() const;
   CounterDirectiveMap& accessCounterDirectives();
@@ -1893,6 +1893,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
 
   const Color colorIncludingFallback(int colorProperty,
                                      EBorderStyle borderStyle) const;
+
+  ContentData* prepareToSetContent(StringImpl*, bool add);
 };
 
 }  // namespace WebCore

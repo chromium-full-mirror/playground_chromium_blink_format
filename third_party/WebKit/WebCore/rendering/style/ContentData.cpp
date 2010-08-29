@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -31,24 +32,14 @@ namespace WebCore {
 void ContentData::clear() {
   deleteContent();
 
-  ContentData* n = m_next;
-  m_next = 0;
-
-  // Reverse the list so we can delete without recursing.
-  ContentData* last = 0;
-  ContentData* c;
-  while ((c = n)) {
-    n = c->m_next;
-    c->m_next = last;
-    last = c;
-  }
-  for (c = last; c; c = n) {
-    n = c->m_next;
-    c->m_next = 0;
-    delete c;
+  // Delete the singly-linked list without recursing.
+  for (OwnPtr<ContentData> next = m_next.release(); next;
+       next = next->m_next.release()) {
   }
 }
 
+// FIXME: Why isn't this just operator==?
+// FIXME: This is not a good name for a boolean-returning function.
 bool ContentData::dataEquivalent(const ContentData& other) const {
   if (type() != other.type())
     return false;
@@ -56,16 +47,12 @@ bool ContentData::dataEquivalent(const ContentData& other) const {
   switch (type()) {
     case CONTENT_NONE:
       return true;
-      break;
     case CONTENT_TEXT:
       return equal(text(), other.text());
-      break;
     case CONTENT_OBJECT:
       return StyleImage::imagesEquivalent(image(), other.image());
-      break;
     case CONTENT_COUNTER:
       return *counter() == *other.counter();
-      break;
   }
 
   ASSERT_NOT_REACHED();

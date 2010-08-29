@@ -1,6 +1,7 @@
 /*
  * (C) 1999-2003 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -58,7 +59,7 @@ class CSSValueList : public CSSValue {
 
   virtual String cssText() const;
 
-  CSSParserValueList* createParserValueList() const;
+  PassOwnPtr<CSSParserValueList> createParserValueList() const;
 
   virtual void addSubresourceStyleURLs(ListHashSet<KURL>&,
                                        const CSSStyleSheet*);

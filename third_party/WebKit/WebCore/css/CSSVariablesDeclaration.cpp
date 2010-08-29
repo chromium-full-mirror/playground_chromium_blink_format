@@ -175,7 +175,7 @@ void CSSVariablesDeclaration::setNeedsStyleRecalc() {
   while (StyleBase* parent = root->parent())
     root = parent;
   if (root->isCSSStyleSheet())
-    static_cast<CSSStyleSheet*>(root)->doc()->styleSelectorChanged(
+    static_cast<CSSStyleSheet*>(root)->document()->styleSelectorChanged(
         DeferRecalcStyle);
 }
 }

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2003 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004, 2005, 2006, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  * Copyright (C) 2008 Eric Seidel <eric@webkit.org>
  * Copyright (C) 2009 - 2010  Torch Mobile (Beijing) Co. Ltd. All rights
  * reserved.
@@ -232,15 +233,15 @@ class CSSParser {
 
   MediaQueryExp* createFloatingMediaQueryExp(const AtomicString&,
                                              CSSParserValueList*);
-  MediaQueryExp* sinkFloatingMediaQueryExp(MediaQueryExp*);
+  PassOwnPtr<MediaQueryExp> sinkFloatingMediaQueryExp(MediaQueryExp*);
   Vector<MediaQueryExp*>* createFloatingMediaQueryExpList();
-  Vector<MediaQueryExp*>* sinkFloatingMediaQueryExpList(
+  PassOwnPtr<Vector<MediaQueryExp*>> sinkFloatingMediaQueryExpList(
       Vector<MediaQueryExp*>*);
   MediaQuery* createFloatingMediaQuery(MediaQuery::Restrictor,
                                        const String&,
-                                       Vector<MediaQueryExp*>*);
-  MediaQuery* createFloatingMediaQuery(Vector<MediaQueryExp*>*);
-  MediaQuery* sinkFloatingMediaQuery(MediaQuery*);
+                                       PassOwnPtr<Vector<MediaQueryExp*>>);
+  MediaQuery* createFloatingMediaQuery(PassOwnPtr<Vector<MediaQueryExp*>>);
+  PassOwnPtr<MediaQuery> sinkFloatingMediaQuery(MediaQuery*);
 
   void addNamespace(const AtomicString& prefix, const AtomicString& uri);
 
@@ -264,7 +265,7 @@ class CSSParser {
   CSSStyleSheet* m_styleSheet;
   RefPtr<CSSRule> m_rule;
   RefPtr<CSSRule> m_keyframe;
-  MediaQuery* m_mediaQuery;
+  OwnPtr<MediaQuery> m_mediaQuery;
   CSSParserValueList* m_valueList;
   CSSProperty** m_parsedProperties;
   CSSSelectorList* m_selectorListForParseSelector;
@@ -346,9 +347,9 @@ class CSSParser {
   HashSet<CSSParserValueList*> m_floatingValueLists;
   HashSet<CSSParserFunction*> m_floatingFunctions;
 
-  MediaQuery* m_floatingMediaQuery;
-  MediaQueryExp* m_floatingMediaQueryExp;
-  Vector<MediaQueryExp*>* m_floatingMediaQueryExpList;
+  OwnPtr<MediaQuery> m_floatingMediaQuery;
+  OwnPtr<MediaQueryExp> m_floatingMediaQueryExp;
+  OwnPtr<Vector<MediaQueryExp*>> m_floatingMediaQueryExpList;
 
   Vector<CSSSelector*> m_reusableSelectorVector;
 
