@@ -51,7 +51,6 @@
 #include "CSSVariablesRule.h"
 #include "CachedImage.h"
 #include "Counter.h"
-#include "CounterContent.h"
 #include "FocusController.h"
 #include "FontFamilyValue.h"
 #include "FontValue.h"

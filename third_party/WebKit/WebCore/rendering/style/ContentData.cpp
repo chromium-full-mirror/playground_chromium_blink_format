@@ -23,7 +23,6 @@
 #include "config.h"
 #include "ContentData.h"
 
-#include "CounterContent.h"
 #include "StyleImage.h"
 #include <wtf/text/StringImpl.h>
 
