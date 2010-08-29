@@ -35,6 +35,8 @@ class HTMLBlockquoteElement : public HTMLElement {
 
  private:
   HTMLBlockquoteElement(const QualifiedName&, Document*);
+
+  virtual bool isURLAttribute(Attribute*) const;
 };
 
 }  // namespace WebCore

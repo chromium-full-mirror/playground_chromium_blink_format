@@ -37,4 +37,8 @@ PassRefPtr<HTMLModElement> HTMLModElement::create(const QualifiedName& tagName,
                                                   Document* document) {
   return adoptRef(new HTMLModElement(tagName, document));
 }
+
+bool HTMLModElement::isURLAttribute(Attribute* attribute) const {
+  return attribute->name() == citeAttr;
+}
 }

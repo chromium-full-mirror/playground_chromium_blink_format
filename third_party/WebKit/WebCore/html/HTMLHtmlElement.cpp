@@ -50,6 +50,10 @@ PassRefPtr<HTMLHtmlElement> HTMLHtmlElement::create(
   return adoptRef(new HTMLHtmlElement(tagName, document));
 }
 
+bool HTMLHtmlElement::isURLAttribute(Attribute* attribute) const {
+  return attribute->name() == manifestAttr;
+}
+
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
 void HTMLHtmlElement::insertedIntoDocument() {
   HTMLElement::insertedIntoDocument();
@@ -70,8 +74,8 @@ void HTMLHtmlElement::insertedIntoDocument() {
   // handle empty
   // manifest attributes. As spec'd, and coded here, the system will initiate an
   // update
-  // passing in the document url as the manifest url. That's not a good thing.
-  AtomicString manifest = getAttribute(manifestAttr);
+  // passing in the document URL as the manifest URL. That's not a good thing.
+  const AtomicString& manifest = getAttribute(manifestAttr);
   if (manifest.isNull())
     documentLoader->applicationCacheHost()->selectCacheWithoutManifest();
   else

@@ -37,6 +37,7 @@ class HTMLQuoteElement : public HTMLElement {
   HTMLQuoteElement(const QualifiedName&, Document*);
 
   virtual void insertedIntoDocument();
+  virtual bool isURLAttribute(Attribute*) const;
 };
 
 }  // namespace

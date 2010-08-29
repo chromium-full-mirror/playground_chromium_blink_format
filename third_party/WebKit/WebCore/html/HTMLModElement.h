@@ -34,6 +34,8 @@ class HTMLModElement : public HTMLElement {
 
  private:
   HTMLModElement(const QualifiedName&, Document*);
+
+  virtual bool isURLAttribute(Attribute*) const;
 };
 
 }  // namespace
