@@ -417,7 +417,7 @@ ALWAYS_INLINE int32_t JSValue::toInt32(ExecState* exec) const {
 
 inline uint32_t JSValue::toUInt32(ExecState* exec) const {
   if (isUInt32())
-    return asInt32();
+    return asUInt32();
 
   double val = toNumber(exec);
 
