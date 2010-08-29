@@ -60,6 +60,7 @@ class Frame;
 class FrameView;
 class KURL;
 class KeyframeList;
+class KeyframeValue;
 class MediaQueryEvaluator;
 class Node;
 class Settings;
@@ -135,7 +136,7 @@ class CSSStyleSelector : public Noncopyable {
 
   PassRefPtr<RenderStyle> styleForKeyframe(const RenderStyle*,
                                            const WebKitCSSKeyframeRule*,
-                                           KeyframeList&);
+                                           KeyframeValue&);
 
  public:
   // These methods will give back the set of rules that matched for a given

@@ -1506,7 +1506,7 @@ PassRefPtr<RenderStyle> CSSStyleSelector::styleForElement(
 PassRefPtr<RenderStyle> CSSStyleSelector::styleForKeyframe(
     const RenderStyle* elementStyle,
     const WebKitCSSKeyframeRule* keyframeRule,
-    KeyframeList& list) {
+    KeyframeValue& keyframe) {
   if (keyframeRule->style())
     addMatchedDeclaration(keyframeRule->style());
 
@@ -1542,7 +1542,7 @@ PassRefPtr<RenderStyle> CSSStyleSelector::styleForKeyframe(
   // Start loading images referenced by this style.
   loadPendingImages();
 
-  // Add all the animating properties to the list
+  // Add all the animating properties to the keyframe.
   if (keyframeRule->style()) {
     CSSMutableStyleDeclaration::const_iterator end =
         keyframeRule->style()->end();
@@ -1554,7 +1554,7 @@ PassRefPtr<RenderStyle> CSSStyleSelector::styleForKeyframe(
       // animated; it just
       // describes the timing function between this keyframe and the next.
       if (property != CSSPropertyWebkitAnimationTimingFunction)
-        list.addProperty(property);
+        keyframe.addProperty(property);
     }
   }
 
@@ -1578,7 +1578,6 @@ void CSSStyleSelector::keyframeStylesForAnimation(
 
   const WebKitCSSKeyframesRule* rule =
       m_keyframesRuleMap.find(list.animationName().impl()).get()->second.get();
-  RefPtr<RenderStyle> keyframeStyle;
 
   // Construct and populate the style for each keyframe
   for (unsigned i = 0; i < rule->length(); ++i) {
@@ -1589,35 +1588,41 @@ void CSSStyleSelector::keyframeStylesForAnimation(
 
     const WebKitCSSKeyframeRule* keyframeRule = rule->item(i);
 
-    keyframeStyle = styleForKeyframe(elementStyle, keyframeRule, list);
+    KeyframeValue keyframe(0, 0);
+    keyframe.setStyle(styleForKeyframe(elementStyle, keyframeRule, keyframe));
 
     // Add this keyframe style to all the indicated key times
     Vector<float> keys;
     keyframeRule->getKeys(keys);
     for (size_t keyIndex = 0; keyIndex < keys.size(); ++keyIndex) {
-      float key = keys[keyIndex];
-      list.insert(key, keyframeStyle.get());
+      keyframe.setKey(keys[keyIndex]);
+      list.insert(keyframe);
     }
-    keyframeStyle.release();
   }
 
   // If the 0% keyframe is missing, create it (but only if there is at least one
   // other keyframe)
   int initialListSize = list.size();
   if (initialListSize > 0 && list[0].key() != 0) {
-    RefPtr<WebKitCSSKeyframeRule> keyframe = WebKitCSSKeyframeRule::create();
-    keyframe->setKeyText("0%");
-    keyframeStyle = styleForKeyframe(elementStyle, keyframe.get(), list);
-    list.insert(0, keyframeStyle.release());
+    RefPtr<WebKitCSSKeyframeRule> keyframeRule =
+        WebKitCSSKeyframeRule::create();
+    keyframeRule->setKeyText("0%");
+    KeyframeValue keyframe(0, 0);
+    keyframe.setStyle(
+        styleForKeyframe(elementStyle, keyframeRule.get(), keyframe));
+    list.insert(keyframe);
   }
 
   // If the 100% keyframe is missing, create it (but only if there is at least
   // one other keyframe)
   if (initialListSize > 0 && (list[list.size() - 1].key() != 1)) {
-    RefPtr<WebKitCSSKeyframeRule> keyframe = WebKitCSSKeyframeRule::create();
-    keyframe->setKeyText("100%");
-    keyframeStyle = styleForKeyframe(elementStyle, keyframe.get(), list);
-    list.insert(1, keyframeStyle.release());
+    RefPtr<WebKitCSSKeyframeRule> keyframeRule =
+        WebKitCSSKeyframeRule::create();
+    keyframeRule->setKeyText("100%");
+    KeyframeValue keyframe(1, 0);
+    keyframe.setStyle(
+        styleForKeyframe(elementStyle, keyframeRule.get(), keyframe));
+    list.insert(keyframe);
   }
 }
 

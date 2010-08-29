@@ -97,11 +97,12 @@ class KeyframeAnimation : public AnimationBase {
                     RenderStyle* unanimatedStyle);
   virtual ~KeyframeAnimation();
 
-  // Get the styles surrounding the current animation time and the progress
-  // between them
-  void getKeyframeAnimationInterval(const RenderStyle*& fromStyle,
-                                    const RenderStyle*& toStyle,
-                                    double& progress) const;
+  // Get the styles for the given property surrounding the current animation
+  // time and the progress between them.
+  void fetchIntervalEndpointsForProperty(int property,
+                                         const RenderStyle*& fromStyle,
+                                         const RenderStyle*& toStyle,
+                                         double& progress) const;
 
   // The keyframes that we are blending.
   KeyframeList m_keyframes;
