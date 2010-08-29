@@ -337,6 +337,18 @@ class OffsetBuffer {
   unsigned m_currentOffset;
 };
 
+static void switchToUTF16(xmlParserCtxtPtr ctxt) {
+  // Hack around libxml2's lack of encoding overide support by manually
+  // resetting the encoding to UTF-16 before every chunk.  Otherwise libxml
+  // will detect <?xml version="1.0" encoding="<encoding name>"?> blocks
+  // and switch encodings, causing the parse to fail.
+  const UChar BOM = 0xFEFF;
+  const unsigned char BOMHighByte =
+      *reinterpret_cast<const unsigned char*>(&BOM);
+  xmlSwitchEncoding(ctxt, BOMHighByte == 0xFF ? XML_CHAR_ENCODING_UTF16LE
+                                              : XML_CHAR_ENCODING_UTF16BE);
+}
+
 static bool shouldAllowExternalLoad(const KURL& url) {
   String urlString = url.string();
 
@@ -450,11 +462,7 @@ PassRefPtr<XMLParserContext> XMLParserContext::createStringParser(
   xmlParserCtxtPtr parser = xmlCreatePushParserCtxt(handlers, 0, 0, 0, 0);
   parser->_private = userData;
   parser->replaceEntities = true;
-  const UChar BOM = 0xFEFF;
-  const unsigned char BOMHighByte =
-      *reinterpret_cast<const unsigned char*>(&BOM);
-  xmlSwitchEncoding(parser, BOMHighByte == 0xFF ? XML_CHAR_ENCODING_UTF16LE
-                                                : XML_CHAR_ENCODING_UTF16BE);
+  switchToUTF16(parser);
 
   return adoptRef(new XMLParserContext(parser));
 }
@@ -627,17 +635,7 @@ void XMLDocumentParser::doWrite(const String& parseString) {
     // keep this alive until this function is done.
     RefPtr<XMLDocumentParser> protect(this);
 
-    // Hack around libxml2's lack of encoding overide support by manually
-    // resetting the encoding to UTF-16 before every chunk.  Otherwise libxml
-    // will detect <?xml version="1.0" encoding="<encoding name>"?> blocks
-    // and switch encodings, causing the parse to fail.
-    const UChar BOM = 0xFEFF;
-    const unsigned char BOMHighByte =
-        *reinterpret_cast<const unsigned char*>(&BOM);
-    xmlSwitchEncoding(context->context(), BOMHighByte == 0xFF
-                                              ? XML_CHAR_ENCODING_UTF16LE
-                                              : XML_CHAR_ENCODING_UTF16BE);
-
+    switchToUTF16(context->context());
     XMLDocumentParserScope scope(document()->docLoader());
     xmlParseChunk(context->context(),
                   reinterpret_cast<const char*>(parseString.characters()),
@@ -1254,6 +1252,7 @@ static xmlEntityPtr getEntityHandler(void* closure, const xmlChar* name) {
 
 static void startDocumentHandler(void* closure) {
   xmlParserCtxt* ctxt = static_cast<xmlParserCtxt*>(closure);
+  switchToUTF16(ctxt);
   getParser(closure)->startDocument(ctxt->version, ctxt->encoding,
                                     ctxt->standalone);
   xmlSAX2StartDocument(closure);
