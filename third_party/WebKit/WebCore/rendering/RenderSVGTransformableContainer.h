@@ -37,7 +37,7 @@ class RenderSVGTransformableContainer : public RenderSVGContainer {
   virtual void setNeedsTransformUpdate() { m_needsTransformUpdate = true; }
 
  private:
-  virtual void calculateLocalTransform();
+  virtual bool calculateLocalTransform();
   virtual AffineTransform localTransform() const { return m_localTransform; }
 
   bool m_needsTransformUpdate : 1;
