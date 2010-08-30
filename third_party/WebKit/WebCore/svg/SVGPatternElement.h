@@ -45,8 +45,10 @@ class SVGPatternElement : public SVGStyledElement,
  public:
   static PassRefPtr<SVGPatternElement> create(const QualifiedName&, Document*);
 
+  PatternAttributes collectPatternProperties() const;
+
+ private:
   SVGPatternElement(const QualifiedName&, Document*);
-  virtual ~SVGPatternElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }
   virtual bool needsPendingResourceHandling() const { return false; }
@@ -61,9 +63,6 @@ class SVGPatternElement : public SVGStyledElement,
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
-  PatternAttributes collectPatternProperties() const;
-
- private:
   virtual bool selfHasRelativeLengths() const;
 
   DECLARE_ANIMATED_PROPERTY(SVGPatternElement, SVGNames::xAttr, SVGLength, X, x)

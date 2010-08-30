@@ -57,10 +57,9 @@ void mapAttributeToCSSProperty(
   propertyNameToIdMap->set(attrName.localName().impl(), propertyId);
 }
 
-SVGStyledElement::SVGStyledElement(const QualifiedName& tagName, Document* doc)
-    : SVGElement(tagName, doc) {}
-
-SVGStyledElement::~SVGStyledElement() {}
+SVGStyledElement::SVGStyledElement(const QualifiedName& tagName,
+                                   Document* document)
+    : SVGElement(tagName, document) {}
 
 String SVGStyledElement::title() const {
   // According to spec, we should not return titles when hovering over <svg>

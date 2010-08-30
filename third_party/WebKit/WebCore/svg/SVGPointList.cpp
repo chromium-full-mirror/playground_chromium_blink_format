@@ -30,8 +30,6 @@ namespace WebCore {
 SVGPointList::SVGPointList(const QualifiedName& attributeName)
     : SVGPODList<FloatPoint>(attributeName) {}
 
-SVGPointList::~SVGPointList() {}
-
 String SVGPointList::valueAsString() const {
   String result;
 

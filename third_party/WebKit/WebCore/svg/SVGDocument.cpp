@@ -38,8 +38,6 @@ namespace WebCore {
 SVGDocument::SVGDocument(Frame* frame, const KURL& url)
     : Document(frame, url, false, false) {}
 
-SVGDocument::~SVGDocument() {}
-
 SVGSVGElement* SVGDocument::rootElement() const {
   Element* elem = documentElement();
   if (elem && elem->hasTagName(SVGNames::svgTag))

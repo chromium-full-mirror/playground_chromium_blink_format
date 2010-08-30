@@ -32,8 +32,6 @@ namespace WebCore {
 
 SVGImageLoader::SVGImageLoader(SVGImageElement* node) : ImageLoader(node) {}
 
-SVGImageLoader::~SVGImageLoader() {}
-
 void SVGImageLoader::dispatchLoadEvent() {
   if (image()->errorOccurred())
     element()->dispatchEvent(

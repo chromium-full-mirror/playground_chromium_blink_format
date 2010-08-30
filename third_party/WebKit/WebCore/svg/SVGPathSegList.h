@@ -33,7 +33,6 @@ class SVGPathSegList : public SVGList<RefPtr<SVGPathSeg>> {
   static PassRefPtr<SVGPathSegList> create(const QualifiedName& attributeName) {
     return adoptRef(new SVGPathSegList(attributeName));
   }
-  virtual ~SVGPathSegList();
 
  private:
   SVGPathSegList(const QualifiedName&);

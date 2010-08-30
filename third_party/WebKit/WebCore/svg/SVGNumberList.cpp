@@ -30,8 +30,6 @@ namespace WebCore {
 SVGNumberList::SVGNumberList(const QualifiedName& attributeName)
     : SVGPODList<float>(attributeName) {}
 
-SVGNumberList::~SVGNumberList() {}
-
 void SVGNumberList::parse(const String& value) {
   ExceptionCode ec = 0;
   clear(ec);

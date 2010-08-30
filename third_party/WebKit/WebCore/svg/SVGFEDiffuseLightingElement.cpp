@@ -35,20 +35,18 @@ namespace WebCore {
 char SVGKernelUnitLengthXIdentifier[] = "SVGKernelUnitLengthX";
 char SVGKernelUnitLengthYIdentifier[] = "SVGKernelUnitLengthY";
 
-SVGFEDiffuseLightingElement::SVGFEDiffuseLightingElement(
+inline SVGFEDiffuseLightingElement::SVGFEDiffuseLightingElement(
     const QualifiedName& tagName,
-    Document* doc)
-    : SVGFilterPrimitiveStandardAttributes(tagName, doc),
-      m_diffuseConstant(1.0f),
-      m_surfaceScale(1.0f) {}
+    Document* document)
+    : SVGFilterPrimitiveStandardAttributes(tagName, document),
+      m_diffuseConstant(1),
+      m_surfaceScale(1) {}
 
 PassRefPtr<SVGFEDiffuseLightingElement> SVGFEDiffuseLightingElement::create(
     const QualifiedName& tagName,
     Document* document) {
   return new SVGFEDiffuseLightingElement(tagName, document);
 }
-
-SVGFEDiffuseLightingElement::~SVGFEDiffuseLightingElement() {}
 
 void SVGFEDiffuseLightingElement::parseMappedAttribute(Attribute* attr) {
   const String& value = attr->value();

@@ -41,14 +41,13 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
   static PassRefPtr<SVGFETurbulenceElement> create(const QualifiedName&,
                                                    Document*);
 
+ private:
   SVGFETurbulenceElement(const QualifiedName&, Document*);
-  virtual ~SVGFETurbulenceElement();
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 
- private:
   DECLARE_ANIMATED_PROPERTY_MULTIPLE_WRAPPERS(SVGFETurbulenceElement,
                                               SVGNames::baseFrequencyAttr,
                                               SVGBaseFrequencyXIdentifier,

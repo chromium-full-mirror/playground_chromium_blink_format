@@ -30,8 +30,8 @@ class SVGPolygonElement : public SVGPolyElement {
  public:
   static PassRefPtr<SVGPolygonElement> create(const QualifiedName&, Document*);
 
+ private:
   SVGPolygonElement(const QualifiedName&, Document*);
-  virtual ~SVGPolygonElement();
 
   virtual Path toPathData() const;
 };

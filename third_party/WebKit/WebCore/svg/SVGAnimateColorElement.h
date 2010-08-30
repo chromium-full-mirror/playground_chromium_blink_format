@@ -33,6 +33,7 @@ class SVGAnimateColorElement : public SVGAnimateElement {
   static PassRefPtr<SVGAnimateColorElement> create(const QualifiedName&,
                                                    Document*);
 
+ private:
   SVGAnimateColorElement(const QualifiedName&, Document*);
 };
 

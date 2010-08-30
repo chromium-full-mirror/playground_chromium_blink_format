@@ -45,13 +45,13 @@ class SVGPathSegLinetoHorizontalAbs : public SVGPathSegLinetoHorizontal {
     return adoptRef(new SVGPathSegLinetoHorizontalAbs(x));
   }
 
+ private:
+  SVGPathSegLinetoHorizontalAbs(float x);
+
   virtual unsigned short pathSegType() const {
     return PATHSEG_LINETO_HORIZONTAL_ABS;
   }
   virtual String pathSegTypeAsLetter() const { return "H"; }
-
- private:
-  SVGPathSegLinetoHorizontalAbs(float x);
 };
 
 class SVGPathSegLinetoHorizontalRel : public SVGPathSegLinetoHorizontal {
@@ -60,13 +60,13 @@ class SVGPathSegLinetoHorizontalRel : public SVGPathSegLinetoHorizontal {
     return adoptRef(new SVGPathSegLinetoHorizontalRel(x));
   }
 
+ private:
+  SVGPathSegLinetoHorizontalRel(float x);
+
   virtual unsigned short pathSegType() const {
     return PATHSEG_LINETO_HORIZONTAL_REL;
   }
   virtual String pathSegTypeAsLetter() const { return "h"; }
-
- private:
-  SVGPathSegLinetoHorizontalRel(float x);
 };
 
 }  // namespace WebCore

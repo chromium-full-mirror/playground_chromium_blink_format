@@ -43,8 +43,6 @@ class SVGUseElement : public SVGStyledTransformableElement,
  public:
   static PassRefPtr<SVGUseElement> create(const QualifiedName&, Document*);
 
-  virtual ~SVGUseElement();
-
   SVGElementInstance* instanceRoot() const;
   SVGElementInstance* animatedInstanceRoot() const;
   SVGElementInstance* instanceForShadowTreeElement(Node*) const;

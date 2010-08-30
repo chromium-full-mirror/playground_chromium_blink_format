@@ -37,8 +37,6 @@ class SVGDocument : public Document {
     return adoptRef(new SVGDocument(frame, url));
   }
 
-  virtual ~SVGDocument();
-
   SVGSVGElement* rootElement() const;
 
   void dispatchZoomEvent(float prevScale, float newScale);

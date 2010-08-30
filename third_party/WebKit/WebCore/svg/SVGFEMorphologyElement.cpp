@@ -31,8 +31,9 @@ namespace WebCore {
 char SVGRadiusXAttrIdentifier[] = "SVGRadiusXAttr";
 char SVGRadiusYAttrIdentifier[] = "SVGRadiusYAttr";
 
-SVGFEMorphologyElement::SVGFEMorphologyElement(const QualifiedName& tagName,
-                                               Document* document)
+inline SVGFEMorphologyElement::SVGFEMorphologyElement(
+    const QualifiedName& tagName,
+    Document* document)
     : SVGFilterPrimitiveStandardAttributes(tagName, document),
       m__operator(FEMORPHOLOGY_OPERATOR_ERODE) {}
 
@@ -41,8 +42,6 @@ PassRefPtr<SVGFEMorphologyElement> SVGFEMorphologyElement::create(
     Document* document) {
   return new SVGFEMorphologyElement(tagName, document);
 }
-
-SVGFEMorphologyElement::~SVGFEMorphologyElement() {}
 
 void SVGFEMorphologyElement::setRadius(float, float) {
   // FIXME: Needs an implementation.

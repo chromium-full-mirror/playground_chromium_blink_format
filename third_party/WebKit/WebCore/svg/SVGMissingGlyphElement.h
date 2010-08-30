@@ -24,11 +24,13 @@
 #include "SVGStyledElement.h"
 
 namespace WebCore {
+
 class SVGMissingGlyphElement : public SVGStyledElement {
  public:
   static PassRefPtr<SVGMissingGlyphElement> create(const QualifiedName&,
                                                    Document*);
 
+ private:
   SVGMissingGlyphElement(const QualifiedName&, Document*);
 
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }

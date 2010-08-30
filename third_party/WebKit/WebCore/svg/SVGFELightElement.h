@@ -31,10 +31,12 @@ namespace WebCore {
 
 class SVGFELightElement : public SVGElement {
  public:
-  SVGFELightElement(const QualifiedName&, Document*);
-  virtual ~SVGFELightElement();
-
   virtual PassRefPtr<LightSource> lightSource() const = 0;
+
+ protected:
+  SVGFELightElement(const QualifiedName&, Document*);
+
+ private:
   virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
@@ -43,7 +45,6 @@ class SVGFELightElement : public SVGElement {
                                Node* afterChange = 0,
                                int childCountDelta = 0);
 
- private:
   DECLARE_ANIMATED_PROPERTY(SVGFELightElement,
                             SVGNames::azimuthAttr,
                             float,

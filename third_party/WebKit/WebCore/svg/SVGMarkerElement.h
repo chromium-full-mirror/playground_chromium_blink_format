@@ -56,16 +56,16 @@ class SVGMarkerElement : public SVGStyledElement,
 
   static PassRefPtr<SVGMarkerElement> create(const QualifiedName&, Document*);
 
-  SVGMarkerElement(const QualifiedName&, Document*);
-  virtual ~SVGMarkerElement();
-
-  virtual bool needsPendingResourceHandling() const { return false; }
-
   AffineTransform viewBoxToViewTransform(float viewWidth,
                                          float viewHeight) const;
 
   void setOrientToAuto();
   void setOrientToAngle(const SVGAngle&);
+
+ private:
+  SVGMarkerElement(const QualifiedName&, Document*);
+
+  virtual bool needsPendingResourceHandling() const { return false; }
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
@@ -77,7 +77,6 @@ class SVGMarkerElement : public SVGStyledElement,
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
- private:
   virtual bool selfHasRelativeLengths() const;
 
   DECLARE_ANIMATED_PROPERTY(SVGMarkerElement,

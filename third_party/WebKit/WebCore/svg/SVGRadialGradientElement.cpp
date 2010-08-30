@@ -40,9 +40,10 @@
 
 namespace WebCore {
 
-SVGRadialGradientElement::SVGRadialGradientElement(const QualifiedName& tagName,
-                                                   Document* doc)
-    : SVGGradientElement(tagName, doc),
+inline SVGRadialGradientElement::SVGRadialGradientElement(
+    const QualifiedName& tagName,
+    Document* document)
+    : SVGGradientElement(tagName, document),
       m_cx(LengthModeWidth, "50%"),
       m_cy(LengthModeHeight, "50%"),
       m_r(LengthModeOther, "50%"),
@@ -57,8 +58,6 @@ PassRefPtr<SVGRadialGradientElement> SVGRadialGradientElement::create(
     Document* document) {
   return new SVGRadialGradientElement(tagName, document);
 }
-
-SVGRadialGradientElement::~SVGRadialGradientElement() {}
 
 void SVGRadialGradientElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::cxAttr)

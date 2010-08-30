@@ -38,11 +38,12 @@ class SVGPathSegListBuilder : public SVGPathConsumer {
   void setCurrentSVGPathSegList(SVGPathSegList* pathSegList) {
     m_pathSegList = pathSegList;
   }
+
+ private:
   virtual void incrementPathSegmentCount() {}
   virtual bool continueConsuming() { return true; }
   virtual void cleanup() { m_pathSegList = 0; }
 
- private:
   // Used in UnalteredParisng/NormalizedParsing modes.
   virtual void moveTo(const FloatPoint&, bool closed, PathCoordinateMode);
   virtual void lineTo(const FloatPoint&, PathCoordinateMode);
@@ -52,7 +53,6 @@ class SVGPathSegListBuilder : public SVGPathConsumer {
                             PathCoordinateMode);
   virtual void closePath();
 
- private:
   // Only used in UnalteredParsing mode.
   virtual void lineToHorizontal(float, PathCoordinateMode);
   virtual void lineToVertical(float, PathCoordinateMode);

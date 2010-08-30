@@ -37,14 +37,13 @@ class SVGFESpecularLightingElement
   static PassRefPtr<SVGFESpecularLightingElement> create(const QualifiedName&,
                                                          Document*);
 
+ private:
   SVGFESpecularLightingElement(const QualifiedName&, Document*);
-  virtual ~SVGFESpecularLightingElement();
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 
- private:
   DECLARE_ANIMATED_PROPERTY(SVGFESpecularLightingElement,
                             SVGNames::inAttr,
                             String,

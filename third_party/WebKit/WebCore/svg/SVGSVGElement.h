@@ -47,11 +47,6 @@ class SVGSVGElement : public SVGStyledLocatableElement,
  public:
   static PassRefPtr<SVGSVGElement> create(const QualifiedName&, Document*);
 
-  SVGSVGElement(const QualifiedName&, Document*);
-  virtual ~SVGSVGElement();
-
-  virtual bool isSVG() const { return true; }
-
   virtual bool isValid() const { return SVGTests::isValid(); }
 
   // 'SVGSVGElement' functions
@@ -117,6 +112,21 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   static SVGTransform createSVGTransform();
   static SVGTransform createSVGTransformFromMatrix(const AffineTransform&);
 
+  AffineTransform viewBoxToViewTransform(float viewWidth,
+                                         float viewHeight) const;
+
+  void inheritViewAttributes(SVGViewElement*);
+
+  bool isOutermostSVG() const;
+
+  Element* getElementById(const AtomicString&) const;
+
+ private:
+  SVGSVGElement(const QualifiedName&, Document*);
+  virtual ~SVGSVGElement();
+
+  virtual bool isSVG() const { return true; }
+
   virtual void parseMappedAttribute(Attribute*);
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
@@ -130,16 +140,6 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 
-  AffineTransform viewBoxToViewTransform(float viewWidth,
-                                         float viewHeight) const;
-
-  void inheritViewAttributes(SVGViewElement*);
-
-  bool isOutermostSVG() const;
-
-  Element* getElementById(const AtomicString&) const;
-
- private:
   virtual bool selfHasRelativeLengths() const;
 
   DECLARE_ANIMATED_PROPERTY(SVGSVGElement, SVGNames::xAttr, SVGLength, X, x)

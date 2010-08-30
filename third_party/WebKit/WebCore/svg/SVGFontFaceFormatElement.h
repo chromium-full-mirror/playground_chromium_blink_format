@@ -30,6 +30,7 @@ class SVGFontFaceFormatElement : public SVGElement {
   static PassRefPtr<SVGFontFaceFormatElement> create(const QualifiedName&,
                                                      Document*);
 
+ private:
   SVGFontFaceFormatElement(const QualifiedName&, Document*);
 
   virtual void childrenChanged(bool changedByParser = false,

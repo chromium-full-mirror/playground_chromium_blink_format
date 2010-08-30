@@ -37,8 +37,6 @@ class SVGViewElement : public SVGStyledElement,
  public:
   static PassRefPtr<SVGViewElement> create(const QualifiedName&, Document*);
 
-  virtual ~SVGViewElement();
-
   SVGStringList* viewTarget() const;
 
  private:

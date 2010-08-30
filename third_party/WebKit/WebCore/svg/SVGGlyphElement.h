@@ -89,16 +89,6 @@ class SVGGlyphElement : public SVGStyledElement {
  public:
   static PassRefPtr<SVGGlyphElement> create(const QualifiedName&, Document*);
 
-  SVGGlyphElement(const QualifiedName&, Document*);
-  virtual ~SVGGlyphElement();
-
-  virtual void parseMappedAttribute(Attribute*);
-
-  virtual void insertedIntoDocument();
-  virtual void removedFromDocument();
-
-  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
-
   SVGGlyphIdentifier buildGlyphIdentifier() const;
 
   // Helper function used by SVGFont
@@ -110,6 +100,15 @@ class SVGGlyphElement : public SVGStyledElement {
   static SVGGlyphIdentifier buildGenericGlyphIdentifier(const SVGElement*);
 
  private:
+  SVGGlyphElement(const QualifiedName&, Document*);
+
+  virtual void parseMappedAttribute(Attribute*);
+
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
+
+  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
+
   void invalidateGlyphCache();
 };
 

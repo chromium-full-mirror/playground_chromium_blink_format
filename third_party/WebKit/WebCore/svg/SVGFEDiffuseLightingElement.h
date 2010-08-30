@@ -40,15 +40,14 @@ class SVGFEDiffuseLightingElement
   static PassRefPtr<SVGFEDiffuseLightingElement> create(const QualifiedName&,
                                                         Document*);
 
+ private:
   SVGFEDiffuseLightingElement(const QualifiedName&, Document*);
-  virtual ~SVGFEDiffuseLightingElement();
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 
- private:
   DECLARE_ANIMATED_PROPERTY(SVGFEDiffuseLightingElement,
                             SVGNames::inAttr,
                             String,

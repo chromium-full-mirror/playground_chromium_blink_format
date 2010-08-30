@@ -35,7 +35,8 @@
 
 namespace WebCore {
 
-SVGTextElement::SVGTextElement(const QualifiedName& tagName, Document* doc)
+inline SVGTextElement::SVGTextElement(const QualifiedName& tagName,
+                                      Document* doc)
     : SVGTextPositioningElement(tagName, doc),
       SVGTransformable(),
       m_transform(SVGTransformList::create(SVGNames::transformAttr)) {}
@@ -44,8 +45,6 @@ PassRefPtr<SVGTextElement> SVGTextElement::create(const QualifiedName& tagName,
                                                   Document* document) {
   return new SVGTextElement(tagName, document);
 }
-
-SVGTextElement::~SVGTextElement() {}
 
 void SVGTextElement::parseMappedAttribute(Attribute* attr) {
   if (SVGTransformable::isKnownAttribute(attr->name())) {

@@ -30,8 +30,6 @@ namespace WebCore {
 
 SVGPathSegList::SVGPathSegList(const QualifiedName& attributeName)
     : SVGList<RefPtr<SVGPathSeg>>(attributeName) {}
-
-SVGPathSegList::~SVGPathSegList() {}
 }
 
 #endif  // ENABLE(SVG)

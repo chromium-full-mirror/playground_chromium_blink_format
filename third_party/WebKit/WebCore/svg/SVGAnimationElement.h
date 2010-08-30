@@ -44,13 +44,6 @@ class SVGAnimationElement : public SVGSMILElement,
                             public SVGExternalResourcesRequired,
                             public ElementTimeControl {
  public:
-  SVGAnimationElement(const QualifiedName&, Document*);
-  virtual ~SVGAnimationElement();
-
-  virtual void parseMappedAttribute(Attribute*);
-  virtual void attributeChanged(Attribute*, bool preserveDecls);
-  virtual void synchronizeProperty(const QualifiedName&);
-
   // SVGAnimationElement
   float getStartTime() const;
   float getCurrentTime() const;
@@ -65,6 +58,10 @@ class SVGAnimationElement : public SVGSMILElement,
   static bool attributeIsCSS(const String& attributeName);
 
  protected:
+  SVGAnimationElement(const QualifiedName&, Document*);
+
+  virtual void parseMappedAttribute(Attribute*);
+
   enum CalcMode {
     CalcModeDiscrete,
     CalcModeLinear,
@@ -108,6 +105,9 @@ class SVGAnimationElement : public SVGSMILElement,
   virtual void endedActiveInterval();
 
  private:
+  virtual void attributeChanged(Attribute*, bool preserveDecls);
+  virtual void synchronizeProperty(const QualifiedName&);
+
   virtual bool calculateFromAndToValues(const String& fromString,
                                         const String& toString) = 0;
   virtual bool calculateFromAndByValues(const String& fromString,
@@ -133,7 +133,6 @@ class SVGAnimationElement : public SVGSMILElement,
                                   String& to) const;
   float calculatePercentForSpline(float percent, unsigned splineIndex) const;
 
- protected:
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_PROPERTY(SVGAnimationElement,
                             SVGNames::externalResourcesRequiredAttr,

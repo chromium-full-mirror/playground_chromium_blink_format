@@ -32,10 +32,8 @@ namespace WebCore {
 
 SVGStyledLocatableElement::SVGStyledLocatableElement(
     const QualifiedName& tagName,
-    Document* doc)
-    : SVGLocatable(), SVGStyledElement(tagName, doc) {}
-
-SVGStyledLocatableElement::~SVGStyledLocatableElement() {}
+    Document* document)
+    : SVGStyledElement(tagName, document) {}
 
 SVGElement* SVGStyledLocatableElement::nearestViewportElement() const {
   return SVGLocatable::nearestViewportElement(this);

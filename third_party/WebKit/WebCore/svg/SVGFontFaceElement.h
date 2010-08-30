@@ -35,18 +35,6 @@ class SVGFontFaceElement : public SVGElement {
  public:
   static PassRefPtr<SVGFontFaceElement> create(const QualifiedName&, Document*);
 
-  SVGFontFaceElement(const QualifiedName&, Document*);
-  virtual ~SVGFontFaceElement();
-
-  virtual void parseMappedAttribute(Attribute*);
-
-  virtual void childrenChanged(bool changedByParser = false,
-                               Node* beforeChange = 0,
-                               Node* afterChange = 0,
-                               int childCountDelta = 0);
-  virtual void insertedIntoDocument();
-  virtual void removedFromDocument();
-
   unsigned unitsPerEm() const;
   int xHeight() const;
   float horizontalOriginX() const;
@@ -64,6 +52,17 @@ class SVGFontFaceElement : public SVGElement {
   void removeFromMappedElementSheet();
 
  private:
+  SVGFontFaceElement(const QualifiedName&, Document*);
+
+  virtual void parseMappedAttribute(Attribute*);
+
+  virtual void childrenChanged(bool changedByParser = false,
+                               Node* beforeChange = 0,
+                               Node* afterChange = 0,
+                               int childCountDelta = 0);
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
+
   RefPtr<CSSFontFaceRule> m_fontFaceRule;
   RefPtr<CSSMutableStyleDeclaration> m_styleDeclaration;
 

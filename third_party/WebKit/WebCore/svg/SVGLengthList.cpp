@@ -30,8 +30,6 @@ namespace WebCore {
 SVGLengthList::SVGLengthList(const QualifiedName& attributeName)
     : SVGPODList<SVGLength>(attributeName) {}
 
-SVGLengthList::~SVGLengthList() {}
-
 void SVGLengthList::parse(const String& value, SVGLengthMode mode) {
   ExceptionCode ec = 0;
   clear(ec);

@@ -55,12 +55,9 @@
 
 namespace WebCore {
 
-SVGUseElement::SVGUseElement(const QualifiedName& tagName, Document* doc)
-    : SVGStyledTransformableElement(tagName, doc),
-      SVGTests(),
-      SVGLangSpace(),
-      SVGExternalResourcesRequired(),
-      SVGURIReference(),
+inline SVGUseElement::SVGUseElement(const QualifiedName& tagName,
+                                    Document* document)
+    : SVGStyledTransformableElement(tagName, document),
       m_x(LengthModeWidth),
       m_y(LengthModeHeight),
       m_width(LengthModeWidth),
@@ -73,8 +70,6 @@ PassRefPtr<SVGUseElement> SVGUseElement::create(const QualifiedName& tagName,
                                                 Document* document) {
   return new SVGUseElement(tagName, document);
 }
-
-SVGUseElement::~SVGUseElement() {}
 
 SVGElementInstance* SVGUseElement::instanceRoot() const {
   // If there is no element instance tree, force immediate SVGElementInstance
@@ -929,7 +924,7 @@ void SVGUseElement::expandSymbolElementsInShadowTree(
     // the generated
     // 'svg' element will use values of 100% for these attributes.
     RefPtr<SVGSVGElement> svgElement =
-        new SVGSVGElement(SVGNames::svgTag, document());
+        SVGSVGElement::create(SVGNames::svgTag, document());
 
     // Transfer all attributes from <symbol> to the new <svg> element
     svgElement->attributes()->setAttributes(*element->attributes());

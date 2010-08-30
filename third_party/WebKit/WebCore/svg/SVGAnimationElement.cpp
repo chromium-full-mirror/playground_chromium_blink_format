@@ -53,13 +53,8 @@ using namespace std;
 namespace WebCore {
 
 SVGAnimationElement::SVGAnimationElement(const QualifiedName& tagName,
-                                         Document* doc)
-    : SVGSMILElement(tagName, doc),
-      SVGTests(),
-      SVGExternalResourcesRequired(),
-      m_animationValid(false) {}
-
-SVGAnimationElement::~SVGAnimationElement() {}
+                                         Document* document)
+    : SVGSMILElement(tagName, document), m_animationValid(false) {}
 
 static void parseKeyTimes(const String& parse,
                           Vector<float>& result,

@@ -24,15 +24,18 @@
 #include "SVGElement.h"
 
 namespace WebCore {
+
 class CSSValueList;
+
 class SVGFontFaceSrcElement : public SVGElement {
  public:
   static PassRefPtr<SVGFontFaceSrcElement> create(const QualifiedName&,
                                                   Document*);
 
-  SVGFontFaceSrcElement(const QualifiedName&, Document*);
-
   PassRefPtr<CSSValueList> srcValue() const;
+
+ private:
+  SVGFontFaceSrcElement(const QualifiedName&, Document*);
 
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,

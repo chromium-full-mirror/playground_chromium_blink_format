@@ -53,12 +53,6 @@ class SVGFontElement : public SVGStyledElement,
  public:
   static PassRefPtr<SVGFontElement> create(const QualifiedName&, Document*);
 
-  SVGFontElement(const QualifiedName&, Document*);
-  virtual ~SVGFontElement();
-
-  virtual void synchronizeProperty(const QualifiedName&);
-  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
-
   void invalidateGlyphCache();
 
   void getGlyphIdentifiersForString(const String&,
@@ -76,14 +70,19 @@ class SVGFontElement : public SVGStyledElement,
   SVGMissingGlyphElement* firstMissingGlyphElement() const;
 
  private:
+  SVGFontElement(const QualifiedName&, Document*);
+
+  virtual void synchronizeProperty(const QualifiedName&);
+  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
+
+  void ensureGlyphCache() const;
+
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_PROPERTY(SVGFontElement,
                             SVGNames::externalResourcesRequiredAttr,
                             bool,
                             ExternalResourcesRequired,
                             externalResourcesRequired)
-
-  void ensureGlyphCache() const;
 
   mutable KerningPairVector m_horizontalKerningPairs;
   mutable KerningPairVector m_verticalKerningPairs;

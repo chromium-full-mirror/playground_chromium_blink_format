@@ -50,14 +50,9 @@ using namespace std;
 
 namespace WebCore {
 
-SVGPatternElement::SVGPatternElement(const QualifiedName& tagName,
-                                     Document* doc)
-    : SVGStyledElement(tagName, doc),
-      SVGURIReference(),
-      SVGTests(),
-      SVGLangSpace(),
-      SVGExternalResourcesRequired(),
-      SVGFitToViewBox(),
+inline SVGPatternElement::SVGPatternElement(const QualifiedName& tagName,
+                                            Document* document)
+    : SVGStyledElement(tagName, document),
       m_x(LengthModeWidth),
       m_y(LengthModeHeight),
       m_width(LengthModeWidth),
@@ -72,8 +67,6 @@ PassRefPtr<SVGPatternElement> SVGPatternElement::create(
     Document* document) {
   return new SVGPatternElement(tagName, document);
 }
-
-SVGPatternElement::~SVGPatternElement() {}
 
 void SVGPatternElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::patternUnitsAttr) {

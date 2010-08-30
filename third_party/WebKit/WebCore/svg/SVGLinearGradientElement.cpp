@@ -39,9 +39,10 @@
 
 namespace WebCore {
 
-SVGLinearGradientElement::SVGLinearGradientElement(const QualifiedName& tagName,
-                                                   Document* doc)
-    : SVGGradientElement(tagName, doc),
+inline SVGLinearGradientElement::SVGLinearGradientElement(
+    const QualifiedName& tagName,
+    Document* document)
+    : SVGGradientElement(tagName, document),
       m_x1(LengthModeWidth),
       m_y1(LengthModeHeight),
       m_x2(LengthModeWidth, "100%"),
@@ -55,8 +56,6 @@ PassRefPtr<SVGLinearGradientElement> SVGLinearGradientElement::create(
     Document* document) {
   return new SVGLinearGradientElement(tagName, document);
 }
-
-SVGLinearGradientElement::~SVGLinearGradientElement() {}
 
 void SVGLinearGradientElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::x1Attr)

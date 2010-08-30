@@ -40,12 +40,6 @@ SVGColor::SVGColor(SVGColorType colorType) : m_colorType(colorType) {}
 SVGColor::SVGColor(const Color& c)
     : m_color(c), m_colorType(SVG_COLORTYPE_RGBCOLOR) {}
 
-SVGColor::~SVGColor() {}
-
-unsigned short SVGColor::colorType() const {
-  return m_colorType;
-}
-
 PassRefPtr<RGBColor> SVGColor::rgbColor() const {
   return RGBColor::create(m_color.rgb());
 }
@@ -86,10 +80,6 @@ String SVGColor::cssText() const {
     return m_color.name();
 
   return String();
-}
-
-const Color& SVGColor::color() const {
-  return m_color;
 }
 }
 

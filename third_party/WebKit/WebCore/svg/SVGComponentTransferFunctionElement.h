@@ -31,13 +31,13 @@ namespace WebCore {
 
 class SVGComponentTransferFunctionElement : public SVGElement {
  public:
+  ComponentTransferFunction transferFunction() const;
+
+ protected:
   SVGComponentTransferFunctionElement(const QualifiedName&, Document*);
-  virtual ~SVGComponentTransferFunctionElement();
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
-
-  ComponentTransferFunction transferFunction() const;
 
  private:
   DECLARE_ANIMATED_PROPERTY(SVGComponentTransferFunctionElement,

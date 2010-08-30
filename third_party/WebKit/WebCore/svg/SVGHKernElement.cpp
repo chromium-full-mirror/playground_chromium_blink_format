@@ -35,16 +35,15 @@ namespace WebCore {
 
 using namespace SVGNames;
 
-SVGHKernElement::SVGHKernElement(const QualifiedName& tagName, Document* doc)
-    : SVGElement(tagName, doc) {}
+inline SVGHKernElement::SVGHKernElement(const QualifiedName& tagName,
+                                        Document* document)
+    : SVGElement(tagName, document) {}
 
 PassRefPtr<SVGHKernElement> SVGHKernElement::create(
     const QualifiedName& tagName,
     Document* document) {
   return new SVGHKernElement(tagName, document);
 }
-
-SVGHKernElement::~SVGHKernElement() {}
 
 void SVGHKernElement::insertedIntoDocument() {
   Node* fontNode = parentNode();

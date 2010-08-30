@@ -34,23 +34,23 @@ class SVGGradientElement : public SVGStyledElement,
                            public SVGURIReference,
                            public SVGExternalResourcesRequired {
  public:
-  SVGGradientElement(const QualifiedName&, Document*);
-  virtual ~SVGGradientElement();
+  Vector<Gradient::ColorStop> buildStops();
 
-  virtual bool needsPendingResourceHandling() const { return false; }
+ protected:
+  SVGGradientElement(const QualifiedName&, Document*);
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
+
+ private:
+  virtual bool needsPendingResourceHandling() const { return false; }
 
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,
                                Node* afterChange = 0,
                                int childCountDelta = 0);
 
-  Vector<Gradient::ColorStop> buildStops();
-
- protected:
   DECLARE_ANIMATED_PROPERTY(SVGGradientElement,
                             SVGNames::spreadMethodAttr,
                             int,

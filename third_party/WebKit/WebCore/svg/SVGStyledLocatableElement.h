@@ -32,11 +32,6 @@ class SVGElement;
 class SVGStyledLocatableElement : public SVGStyledElement,
                                   virtual public SVGLocatable {
  public:
-  SVGStyledLocatableElement(const QualifiedName&, Document*);
-  virtual ~SVGStyledLocatableElement();
-
-  virtual bool isStyledLocatable() const { return true; }
-
   virtual SVGElement* nearestViewportElement() const;
   virtual SVGElement* farthestViewportElement() const;
 
@@ -49,6 +44,12 @@ class SVGStyledLocatableElement : public SVGStyledElement,
       SVGLocatable::CTMScope mode) const {
     return SVGLocatable::localCoordinateSpaceTransform(mode);
   }
+
+ protected:
+  SVGStyledLocatableElement(const QualifiedName&, Document*);
+
+ private:
+  virtual bool isStyledLocatable() const { return true; }
 };
 
 }  // namespace WebCore

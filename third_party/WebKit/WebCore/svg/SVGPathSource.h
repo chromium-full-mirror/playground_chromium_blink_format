@@ -50,9 +50,6 @@ class SVGPathSource : public Noncopyable {
                                  bool&,
                                  bool&,
                                  FloatPoint&) = 0;
-
- public:
-  SVGPathSource() {}
 };
 
 }  // namespace WebCore

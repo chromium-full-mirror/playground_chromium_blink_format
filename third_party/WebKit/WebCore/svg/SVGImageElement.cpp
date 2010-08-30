@@ -36,12 +36,9 @@
 
 namespace WebCore {
 
-SVGImageElement::SVGImageElement(const QualifiedName& tagName, Document* doc)
-    : SVGStyledTransformableElement(tagName, doc),
-      SVGTests(),
-      SVGLangSpace(),
-      SVGExternalResourcesRequired(),
-      SVGURIReference(),
+inline SVGImageElement::SVGImageElement(const QualifiedName& tagName,
+                                        Document* document)
+    : SVGStyledTransformableElement(tagName, document),
       m_x(LengthModeWidth),
       m_y(LengthModeHeight),
       m_width(LengthModeWidth),
@@ -53,8 +50,6 @@ PassRefPtr<SVGImageElement> SVGImageElement::create(
     Document* document) {
   return new SVGImageElement(tagName, document);
 }
-
-SVGImageElement::~SVGImageElement() {}
 
 void SVGImageElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::xAttr)

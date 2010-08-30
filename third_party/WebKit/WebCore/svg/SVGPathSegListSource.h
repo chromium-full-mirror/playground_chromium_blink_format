@@ -36,7 +36,8 @@ class SVGPathSegListSource : public SVGPathSource {
     return adoptPtr(new SVGPathSegListSource(pathSegList));
   }
 
-  virtual ~SVGPathSegListSource();
+ private:
+  SVGPathSegListSource(SVGPathSegList*);
 
   virtual bool hasMoreData() const;
   virtual bool moveToNextToken() { return true; }
@@ -57,9 +58,6 @@ class SVGPathSegListSource : public SVGPathSource {
                                  bool&,
                                  bool&,
                                  FloatPoint&);
-
- private:
-  SVGPathSegListSource(SVGPathSegList*);
 
   SVGPathSegList* m_pathSegList;
   RefPtr<SVGPathSeg> m_segment;

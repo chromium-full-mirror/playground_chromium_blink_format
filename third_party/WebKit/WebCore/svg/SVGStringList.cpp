@@ -30,8 +30,6 @@ namespace WebCore {
 SVGStringList::SVGStringList(const QualifiedName& attributeName)
     : SVGList<String>(attributeName) {}
 
-SVGStringList::~SVGStringList() {}
-
 void SVGStringList::reset(const String& str) {
   ExceptionCode ec = 0;
 

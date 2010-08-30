@@ -28,9 +28,10 @@
 
 namespace WebCore {
 
-SVGFECompositeElement::SVGFECompositeElement(const QualifiedName& tagName,
-                                             Document* doc)
-    : SVGFilterPrimitiveStandardAttributes(tagName, doc),
+inline SVGFECompositeElement::SVGFECompositeElement(
+    const QualifiedName& tagName,
+    Document* document)
+    : SVGFilterPrimitiveStandardAttributes(tagName, document),
       m__operator(FECOMPOSITE_OPERATOR_OVER) {}
 
 PassRefPtr<SVGFECompositeElement> SVGFECompositeElement::create(
@@ -38,8 +39,6 @@ PassRefPtr<SVGFECompositeElement> SVGFECompositeElement::create(
     Document* document) {
   return new SVGFECompositeElement(tagName, document);
 }
-
-SVGFECompositeElement::~SVGFECompositeElement() {}
 
 void SVGFECompositeElement::parseMappedAttribute(Attribute* attr) {
   const String& value = attr->value();

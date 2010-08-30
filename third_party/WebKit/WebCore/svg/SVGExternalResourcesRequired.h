@@ -40,8 +40,7 @@ class Attribute;
 // externalResourcesRequired
 class SVGExternalResourcesRequired {
  public:
-  SVGExternalResourcesRequired();
-  virtual ~SVGExternalResourcesRequired();
+  virtual ~SVGExternalResourcesRequired() {}
 
   bool parseMappedAttribute(Attribute*);
   bool isKnownAttribute(const QualifiedName&);

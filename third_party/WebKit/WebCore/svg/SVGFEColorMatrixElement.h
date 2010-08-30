@@ -33,14 +33,13 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   static PassRefPtr<SVGFEColorMatrixElement> create(const QualifiedName&,
                                                     Document*);
 
+ private:
   SVGFEColorMatrixElement(const QualifiedName&, Document*);
-  virtual ~SVGFEColorMatrixElement();
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 
- private:
   DECLARE_ANIMATED_PROPERTY(SVGFEColorMatrixElement,
                             SVGNames::inAttr,
                             String,

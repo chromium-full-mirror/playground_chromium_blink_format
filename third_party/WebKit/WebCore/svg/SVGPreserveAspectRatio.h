@@ -54,7 +54,6 @@ class SVGPreserveAspectRatio {
   };
 
   SVGPreserveAspectRatio();
-  virtual ~SVGPreserveAspectRatio();
 
   void setAlign(unsigned short);
   unsigned short align() const;

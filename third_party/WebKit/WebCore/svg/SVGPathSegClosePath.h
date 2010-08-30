@@ -33,13 +33,12 @@ class SVGPathSegClosePath : public SVGPathSeg {
   static PassRefPtr<SVGPathSegClosePath> create() {
     return adoptRef(new SVGPathSegClosePath);
   }
-  virtual ~SVGPathSegClosePath();
+
+ private:
+  SVGPathSegClosePath() {}
 
   virtual unsigned short pathSegType() const { return PATHSEG_CLOSEPATH; }
   virtual String pathSegTypeAsLetter() const { return "Z"; }
-
- private:
-  SVGPathSegClosePath();
 };
 
 }  // namespace WebCore

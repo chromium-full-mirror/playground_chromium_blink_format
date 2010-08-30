@@ -32,12 +32,9 @@
 
 namespace WebCore {
 
-SVGEllipseElement::SVGEllipseElement(const QualifiedName& tagName,
-                                     Document* doc)
-    : SVGStyledTransformableElement(tagName, doc),
-      SVGTests(),
-      SVGLangSpace(),
-      SVGExternalResourcesRequired(),
+inline SVGEllipseElement::SVGEllipseElement(const QualifiedName& tagName,
+                                            Document* document)
+    : SVGStyledTransformableElement(tagName, document),
       m_cx(LengthModeWidth),
       m_cy(LengthModeHeight),
       m_rx(LengthModeWidth),
@@ -48,8 +45,6 @@ PassRefPtr<SVGEllipseElement> SVGEllipseElement::create(
     Document* document) {
   return new SVGEllipseElement(tagName, document);
 }
-
-SVGEllipseElement::~SVGEllipseElement() {}
 
 void SVGEllipseElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::cxAttr)

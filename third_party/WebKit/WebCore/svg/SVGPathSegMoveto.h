@@ -33,11 +33,11 @@ class SVGPathSegMovetoAbs : public SVGPathSegSingleCoord {
     return adoptRef(new SVGPathSegMovetoAbs(x, y));
   }
 
-  virtual unsigned short pathSegType() const { return PATHSEG_MOVETO_ABS; }
-  virtual String pathSegTypeAsLetter() const { return "M"; }
-
  private:
   SVGPathSegMovetoAbs(float x, float y);
+
+  virtual unsigned short pathSegType() const { return PATHSEG_MOVETO_ABS; }
+  virtual String pathSegTypeAsLetter() const { return "M"; }
 };
 
 class SVGPathSegMovetoRel : public SVGPathSegSingleCoord {
@@ -46,11 +46,11 @@ class SVGPathSegMovetoRel : public SVGPathSegSingleCoord {
     return adoptRef(new SVGPathSegMovetoRel(x, y));
   }
 
-  virtual unsigned short pathSegType() const { return PATHSEG_MOVETO_REL; }
-  virtual String pathSegTypeAsLetter() const { return "m"; }
-
  private:
   SVGPathSegMovetoRel(float x, float y);
+
+  virtual unsigned short pathSegType() const { return PATHSEG_MOVETO_REL; }
+  virtual String pathSegTypeAsLetter() const { return "m"; }
 };
 
 }  // namespace WebCore

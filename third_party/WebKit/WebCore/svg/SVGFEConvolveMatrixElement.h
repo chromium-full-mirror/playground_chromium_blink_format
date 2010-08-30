@@ -32,16 +32,15 @@ class SVGFEConvolveMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   static PassRefPtr<SVGFEConvolveMatrixElement> create(const QualifiedName&,
                                                        Document*);
 
-  SVGFEConvolveMatrixElement(const QualifiedName&, Document*);
-  virtual ~SVGFEConvolveMatrixElement();
-
   void setOrder(float orderX, float orderY);
   void setKernelUnitLength(float kernelUnitLengthX, float kernelUnitLengthY);
+
+ private:
+  SVGFEConvolveMatrixElement(const QualifiedName&, Document*);
 
   virtual void parseMappedAttribute(Attribute*);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 
- private:
   DECLARE_ANIMATED_PROPERTY(SVGFEConvolveMatrixElement,
                             SVGNames::inAttr,
                             String,

@@ -36,8 +36,8 @@ class SVGCircleElement : public SVGStyledTransformableElement,
  public:
   static PassRefPtr<SVGCircleElement> create(const QualifiedName&, Document*);
 
+ private:
   SVGCircleElement(const QualifiedName&, Document*);
-  virtual ~SVGCircleElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }
 
@@ -47,7 +47,6 @@ class SVGCircleElement : public SVGStyledTransformableElement,
 
   virtual Path toPathData() const;
 
- private:
   virtual bool selfHasRelativeLengths() const;
 
   DECLARE_ANIMATED_PROPERTY(SVGCircleElement,

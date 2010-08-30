@@ -42,11 +42,6 @@ class SVGTextContentElement : public SVGStyledElement,
     LENGTHADJUST_SPACINGANDGLYPHS = 2
   };
 
-  virtual ~SVGTextContentElement();
-
-  virtual bool isValid() const { return SVGTests::isValid(); }
-  virtual bool isTextContent() const { return true; }
-
   unsigned getNumberOfChars() const;
   float getComputedTextLength() const;
   float getSubStringLength(unsigned charnum,
@@ -59,17 +54,21 @@ class SVGTextContentElement : public SVGStyledElement,
   int getCharNumAtPosition(const FloatPoint&) const;
   void selectSubString(unsigned charnum, unsigned nchars, ExceptionCode&) const;
 
-  virtual void parseMappedAttribute(Attribute*);
-  virtual void synchronizeProperty(const QualifiedName&);
-
   bool isKnownAttribute(const QualifiedName&);
 
  protected:
   SVGTextContentElement(const QualifiedName&, Document*);
 
+  virtual bool isValid() const { return SVGTests::isValid(); }
+
+  virtual void parseMappedAttribute(Attribute*);
+  virtual void synchronizeProperty(const QualifiedName&);
+
   virtual bool selfHasRelativeLengths() const;
 
  private:
+  virtual bool isTextContent() const { return true; }
+
   DECLARE_ANIMATED_PROPERTY(SVGTextContentElement,
                             SVGNames::textLengthAttr,
                             SVGLength,

@@ -35,10 +35,12 @@ namespace WebCore {
 
 class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
  public:
-  SVGFilterPrimitiveStandardAttributes(const QualifiedName&, Document*);
-  virtual ~SVGFilterPrimitiveStandardAttributes();
+  void setStandardAttributes(bool, FilterEffect*) const;
 
-  virtual bool isFilterEffect() const { return true; }
+  virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*) = 0;
+
+ protected:
+  SVGFilterPrimitiveStandardAttributes(const QualifiedName&, Document*);
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
@@ -47,13 +49,12 @@ class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
                                Node* beforeChange = 0,
                                Node* afterChange = 0,
                                int childCountDelta = 0);
-  virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*) = 0;
+
+ private:
+  virtual bool isFilterEffect() const { return true; }
 
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 
-  void setStandardAttributes(bool, FilterEffect*) const;
-
- private:
   DECLARE_ANIMATED_PROPERTY(SVGFilterPrimitiveStandardAttributes,
                             SVGNames::xAttr,
                             SVGLength,

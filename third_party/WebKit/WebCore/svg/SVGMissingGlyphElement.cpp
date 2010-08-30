@@ -24,9 +24,10 @@
 
 namespace WebCore {
 
-SVGMissingGlyphElement::SVGMissingGlyphElement(const QualifiedName& tagName,
-                                               Document* doc)
-    : SVGStyledElement(tagName, doc) {}
+inline SVGMissingGlyphElement::SVGMissingGlyphElement(
+    const QualifiedName& tagName,
+    Document* document)
+    : SVGStyledElement(tagName, document) {}
 
 PassRefPtr<SVGMissingGlyphElement> SVGMissingGlyphElement::create(
     const QualifiedName& tagName,

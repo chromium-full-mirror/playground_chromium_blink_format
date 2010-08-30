@@ -42,8 +42,6 @@ SVGTransform::SVGTransform(SVGTransformType type)
 SVGTransform::SVGTransform(const AffineTransform& matrix)
     : m_type(SVG_TRANSFORM_MATRIX), m_angle(0), m_matrix(matrix) {}
 
-SVGTransform::~SVGTransform() {}
-
 bool SVGTransform::isValid() {
   return (m_type != SVG_TRANSFORM_UNKNOWN);
 }

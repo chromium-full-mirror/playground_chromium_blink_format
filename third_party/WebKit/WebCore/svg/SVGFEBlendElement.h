@@ -30,14 +30,13 @@ class SVGFEBlendElement : public SVGFilterPrimitiveStandardAttributes {
  public:
   static PassRefPtr<SVGFEBlendElement> create(const QualifiedName&, Document*);
 
+ private:
   SVGFEBlendElement(const QualifiedName&, Document*);
-  virtual ~SVGFEBlendElement();
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 
- private:
   DECLARE_ANIMATED_PROPERTY(SVGFEBlendElement,
                             SVGNames::inAttr,
                             String,

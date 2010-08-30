@@ -27,10 +27,6 @@
 
 namespace WebCore {
 
-SVGURIReference::SVGURIReference() {}
-
-SVGURIReference::~SVGURIReference() {}
-
 bool SVGURIReference::parseMappedAttribute(Attribute* attr) {
   if (attr->name().matches(XLinkNames::hrefAttr)) {
     setHrefBaseValue(attr->value());

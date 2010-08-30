@@ -33,7 +33,6 @@ class SVGNumberList : public SVGPODList<float> {
   static PassRefPtr<SVGNumberList> create(const QualifiedName& attributeName) {
     return adoptRef(new SVGNumberList(attributeName));
   }
-  virtual ~SVGNumberList();
 
   void parse(const String& value);
 

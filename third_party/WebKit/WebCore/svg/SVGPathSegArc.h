@@ -90,9 +90,6 @@ class SVGPathSegArcAbs : public SVGPathSegArc {
         new SVGPathSegArcAbs(x, y, r1, r2, angle, largeArcFlag, sweepFlag));
   }
 
-  virtual unsigned short pathSegType() const { return PATHSEG_ARC_ABS; }
-  virtual String pathSegTypeAsLetter() const { return "A"; }
-
  private:
   SVGPathSegArcAbs(float x,
                    float y,
@@ -101,6 +98,9 @@ class SVGPathSegArcAbs : public SVGPathSegArc {
                    float angle,
                    bool largeArcFlag,
                    bool sweepFlag);
+
+  virtual unsigned short pathSegType() const { return PATHSEG_ARC_ABS; }
+  virtual String pathSegTypeAsLetter() const { return "A"; }
 };
 
 class SVGPathSegArcRel : public SVGPathSegArc {
@@ -116,9 +116,6 @@ class SVGPathSegArcRel : public SVGPathSegArc {
         new SVGPathSegArcRel(x, y, r1, r2, angle, largeArcFlag, sweepFlag));
   }
 
-  virtual unsigned short pathSegType() const { return PATHSEG_ARC_REL; }
-  virtual String pathSegTypeAsLetter() const { return "a"; }
-
  private:
   SVGPathSegArcRel(float x,
                    float y,
@@ -127,6 +124,9 @@ class SVGPathSegArcRel : public SVGPathSegArc {
                    float angle,
                    bool largeArcFlag,
                    bool sweepFlag);
+
+  virtual unsigned short pathSegType() const { return PATHSEG_ARC_REL; }
+  virtual String pathSegTypeAsLetter() const { return "a"; }
 };
 
 }  // namespace WebCore

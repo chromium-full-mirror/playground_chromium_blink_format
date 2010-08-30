@@ -32,8 +32,6 @@ class SVGTextElement : public SVGTextPositioningElement,
  public:
   static PassRefPtr<SVGTextElement> create(const QualifiedName&, Document*);
 
-  virtual ~SVGTextElement();
-
   virtual SVGElement* nearestViewportElement() const;
   virtual SVGElement* farthestViewportElement() const;
 
@@ -45,6 +43,7 @@ class SVGTextElement : public SVGTextPositioningElement,
 
  private:
   SVGTextElement(const QualifiedName&, Document*);
+
   virtual void parseMappedAttribute(Attribute*);
 
   virtual AffineTransform* supplementalTransform();

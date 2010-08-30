@@ -34,15 +34,6 @@ class SVGRadialGradientElement : public SVGGradientElement {
   static PassRefPtr<SVGRadialGradientElement> create(const QualifiedName&,
                                                      Document*);
 
-  SVGRadialGradientElement(const QualifiedName&, Document*);
-  virtual ~SVGRadialGradientElement();
-
-  virtual void parseMappedAttribute(Attribute*);
-  virtual void svgAttributeChanged(const QualifiedName&);
-  virtual void synchronizeProperty(const QualifiedName&);
-
-  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-
   RadialGradientAttributes collectGradientProperties();
   void calculateFocalCenterPointsAndRadius(const RadialGradientAttributes&,
                                            FloatPoint& focalPoint,
@@ -50,6 +41,14 @@ class SVGRadialGradientElement : public SVGGradientElement {
                                            float& radius);
 
  private:
+  SVGRadialGradientElement(const QualifiedName&, Document*);
+
+  virtual void parseMappedAttribute(Attribute*);
+  virtual void svgAttributeChanged(const QualifiedName&);
+  virtual void synchronizeProperty(const QualifiedName&);
+
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
+
   virtual bool selfHasRelativeLengths() const;
 
   DECLARE_ANIMATED_PROPERTY(SVGRadialGradientElement,

@@ -36,8 +36,8 @@ class SVGRectElement : public SVGStyledTransformableElement,
  public:
   static PassRefPtr<SVGRectElement> create(const QualifiedName&, Document*);
 
+ private:
   SVGRectElement(const QualifiedName&, Document*);
-  virtual ~SVGRectElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }
 
@@ -47,7 +47,6 @@ class SVGRectElement : public SVGStyledTransformableElement,
 
   virtual Path toPathData() const;
 
- private:
   virtual bool selfHasRelativeLengths() const;
 
   DECLARE_ANIMATED_PROPERTY(SVGRectElement, SVGNames::xAttr, SVGLength, X, x)

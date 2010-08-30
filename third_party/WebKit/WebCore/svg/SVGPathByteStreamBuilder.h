@@ -36,11 +36,12 @@ class SVGPathByteStreamBuilder : public SVGPathConsumer {
   void setCurrentByteStream(SVGPathByteStream* byteStream) {
     m_byteStream = byteStream;
   }
+
+ private:
   virtual void incrementPathSegmentCount() {}
   virtual bool continueConsuming() { return true; }
   virtual void cleanup() { m_byteStream = 0; }
 
- private:
   // Used in UnalteredParsing/NormalizedParsing modes.
   virtual void moveTo(const FloatPoint&, bool closed, PathCoordinateMode);
   virtual void lineTo(const FloatPoint&, PathCoordinateMode);
@@ -50,7 +51,6 @@ class SVGPathByteStreamBuilder : public SVGPathConsumer {
                             PathCoordinateMode);
   virtual void closePath();
 
- private:
   // Only used in UnalteredParsing mode.
   virtual void lineToHorizontal(float, PathCoordinateMode);
   virtual void lineToVertical(float, PathCoordinateMode);
@@ -69,7 +69,6 @@ class SVGPathByteStreamBuilder : public SVGPathConsumer {
                      const FloatPoint&,
                      PathCoordinateMode);
 
- private:
   template <typename ByteType>
   void writeType(const ByteType& type) {
     size_t typeSize = sizeof(ByteType);

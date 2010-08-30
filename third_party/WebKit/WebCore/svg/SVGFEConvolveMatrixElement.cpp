@@ -38,10 +38,10 @@ namespace WebCore {
 char SVGKernelUnitLengthXAttrIdentifier[] = "SVGKernelUnitLengthXAttr";
 char SVGKernelUnitLengthYAttrIdentifier[] = "SVGKernelUnitLengthYAttr";
 
-SVGFEConvolveMatrixElement::SVGFEConvolveMatrixElement(
+inline SVGFEConvolveMatrixElement::SVGFEConvolveMatrixElement(
     const QualifiedName& tagName,
-    Document* doc)
-    : SVGFilterPrimitiveStandardAttributes(tagName, doc),
+    Document* document)
+    : SVGFilterPrimitiveStandardAttributes(tagName, document),
       m_kernelMatrix(SVGNumberList::create(SVGNames::kernelMatrixAttr)),
       m_edgeMode(EDGEMODE_DUPLICATE) {}
 
@@ -50,8 +50,6 @@ PassRefPtr<SVGFEConvolveMatrixElement> SVGFEConvolveMatrixElement::create(
     Document* document) {
   return new SVGFEConvolveMatrixElement(tagName, document);
 }
-
-SVGFEConvolveMatrixElement::~SVGFEConvolveMatrixElement() {}
 
 void SVGFEConvolveMatrixElement::parseMappedAttribute(Attribute* attr) {
   const String& value = attr->value();

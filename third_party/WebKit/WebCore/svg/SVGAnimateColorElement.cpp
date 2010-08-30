@@ -25,9 +25,10 @@
 
 namespace WebCore {
 
-SVGAnimateColorElement::SVGAnimateColorElement(const QualifiedName& tagName,
-                                               Document* doc)
-    : SVGAnimateElement(tagName, doc) {}
+inline SVGAnimateColorElement::SVGAnimateColorElement(
+    const QualifiedName& tagName,
+    Document* document)
+    : SVGAnimateElement(tagName, document) {}
 
 PassRefPtr<SVGAnimateColorElement> SVGAnimateColorElement::create(
     const QualifiedName& tagName,

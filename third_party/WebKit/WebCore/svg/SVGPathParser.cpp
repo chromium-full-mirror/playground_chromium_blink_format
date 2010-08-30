@@ -35,8 +35,6 @@ namespace WebCore {
 
 SVGPathParser::SVGPathParser() : m_consumer(0) {}
 
-SVGPathParser::~SVGPathParser() {}
-
 void SVGPathParser::parseClosePathSegment() {
   // Reset m_currentPoint for the next path.
   if (m_pathParsingMode == NormalizedParsing)

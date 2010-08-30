@@ -29,8 +29,6 @@ namespace WebCore {
 SVGPathBlender::SVGPathBlender()
     : m_fromSource(0), m_toSource(0), m_consumer(0), m_progress(0) {}
 
-SVGPathBlender::~SVGPathBlender() {}
-
 float SVGPathBlender::blendAnimatedFloat(float from, float to) {
   return (to - from) * m_progress + from;
 }

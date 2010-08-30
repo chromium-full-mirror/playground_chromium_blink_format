@@ -31,8 +31,7 @@ class AffineTransform;
 
 class SVGFitToViewBox {
  public:
-  SVGFitToViewBox();
-  virtual ~SVGFitToViewBox();
+  virtual ~SVGFitToViewBox() {}
 
   bool parseViewBox(Document*,
                     const UChar*& start,

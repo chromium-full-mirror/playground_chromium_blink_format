@@ -30,8 +30,8 @@ class SVGFESpotLightElement : public SVGFELightElement {
   static PassRefPtr<SVGFESpotLightElement> create(const QualifiedName&,
                                                   Document*);
 
+ private:
   SVGFESpotLightElement(const QualifiedName&, Document*);
-  virtual ~SVGFESpotLightElement();
 
   virtual PassRefPtr<LightSource> lightSource() const;
 };

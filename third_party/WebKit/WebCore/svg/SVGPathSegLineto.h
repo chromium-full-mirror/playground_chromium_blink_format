@@ -27,17 +27,18 @@
 #include "SVGPathSeg.h"
 
 namespace WebCore {
+
 class SVGPathSegLinetoAbs : public SVGPathSegSingleCoord {
  public:
   static PassRefPtr<SVGPathSegLinetoAbs> create(float x, float y) {
     return adoptRef(new SVGPathSegLinetoAbs(x, y));
   }
 
-  virtual unsigned short pathSegType() const { return PATHSEG_LINETO_ABS; }
-  virtual String pathSegTypeAsLetter() const { return "L"; }
-
  private:
   SVGPathSegLinetoAbs(float x, float y);
+
+  virtual unsigned short pathSegType() const { return PATHSEG_LINETO_ABS; }
+  virtual String pathSegTypeAsLetter() const { return "L"; }
 };
 
 class SVGPathSegLinetoRel : public SVGPathSegSingleCoord {
@@ -46,11 +47,11 @@ class SVGPathSegLinetoRel : public SVGPathSegSingleCoord {
     return adoptRef(new SVGPathSegLinetoRel(x, y));
   }
 
-  virtual unsigned short pathSegType() const { return PATHSEG_LINETO_REL; }
-  virtual String pathSegTypeAsLetter() const { return "l"; }
-
  private:
   SVGPathSegLinetoRel(float x, float y);
+
+  virtual unsigned short pathSegType() const { return PATHSEG_LINETO_REL; }
+  virtual String pathSegTypeAsLetter() const { return "l"; }
 };
 
 }  // namespace WebCore

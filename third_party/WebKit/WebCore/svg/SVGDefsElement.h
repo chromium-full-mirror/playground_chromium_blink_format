@@ -36,15 +36,14 @@ class SVGDefsElement : public SVGStyledTransformableElement,
  public:
   static PassRefPtr<SVGDefsElement> create(const QualifiedName&, Document*);
 
+ private:
   SVGDefsElement(const QualifiedName&, Document*);
-  virtual ~SVGDefsElement();
 
   virtual bool isValid() const;
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void synchronizeProperty(const QualifiedName&);
 
- private:
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_PROPERTY(SVGDefsElement,
                             SVGNames::externalResourcesRequiredAttr,

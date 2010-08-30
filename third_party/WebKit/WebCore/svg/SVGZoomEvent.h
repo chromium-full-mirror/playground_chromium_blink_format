@@ -33,7 +33,6 @@ class SVGZoomEvent : public UIEvent {
   static PassRefPtr<SVGZoomEvent> create() {
     return adoptRef(new SVGZoomEvent);
   }
-  virtual ~SVGZoomEvent();
 
   // 'SVGZoomEvent' functions
   FloatRect zoomRectScreen() const;
@@ -48,10 +47,10 @@ class SVGZoomEvent : public UIEvent {
 
   FloatPoint newTranslate() const;
 
-  virtual bool isSVGZoomEvent() const;
-
  private:
   SVGZoomEvent();
+
+  virtual bool isSVGZoomEvent() const;
 
   float m_newScale;
   float m_previousScale;

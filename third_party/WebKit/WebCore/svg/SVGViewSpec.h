@@ -37,7 +37,6 @@ class SVGViewSpec : public SVGFitToViewBox,
                     public Noncopyable {
  public:
   SVGViewSpec(const SVGSVGElement*);
-  virtual ~SVGViewSpec();
 
   bool parseViewSpec(const String&);
 

@@ -26,10 +26,10 @@
 
 namespace WebCore {
 
-SVGFEDisplacementMapElement::SVGFEDisplacementMapElement(
+inline SVGFEDisplacementMapElement::SVGFEDisplacementMapElement(
     const QualifiedName& tagName,
-    Document* doc)
-    : SVGFilterPrimitiveStandardAttributes(tagName, doc),
+    Document* document)
+    : SVGFilterPrimitiveStandardAttributes(tagName, document),
       m_xChannelSelector(CHANNEL_A),
       m_yChannelSelector(CHANNEL_A) {}
 
@@ -38,8 +38,6 @@ PassRefPtr<SVGFEDisplacementMapElement> SVGFEDisplacementMapElement::create(
     Document* document) {
   return new SVGFEDisplacementMapElement(tagName, document);
 }
-
-SVGFEDisplacementMapElement::~SVGFEDisplacementMapElement() {}
 
 ChannelSelectorType SVGFEDisplacementMapElement::stringToChannel(
     const String& key) {

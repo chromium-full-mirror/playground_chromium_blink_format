@@ -36,8 +36,8 @@ class SVGEllipseElement : public SVGStyledTransformableElement,
  public:
   static PassRefPtr<SVGEllipseElement> create(const QualifiedName&, Document*);
 
+ private:
   SVGEllipseElement(const QualifiedName&, Document*);
-  virtual ~SVGEllipseElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }
 
@@ -47,7 +47,6 @@ class SVGEllipseElement : public SVGStyledTransformableElement,
 
   virtual Path toPathData() const;
 
- private:
   virtual bool selfHasRelativeLengths() const;
 
   DECLARE_ANIMATED_PROPERTY(SVGEllipseElement,

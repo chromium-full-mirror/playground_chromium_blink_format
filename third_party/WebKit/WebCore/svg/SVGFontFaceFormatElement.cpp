@@ -29,9 +29,10 @@ namespace WebCore {
 
 using namespace SVGNames;
 
-SVGFontFaceFormatElement::SVGFontFaceFormatElement(const QualifiedName& tagName,
-                                                   Document* doc)
-    : SVGElement(tagName, doc) {}
+inline SVGFontFaceFormatElement::SVGFontFaceFormatElement(
+    const QualifiedName& tagName,
+    Document* document)
+    : SVGElement(tagName, document) {}
 
 PassRefPtr<SVGFontFaceFormatElement> SVGFontFaceFormatElement::create(
     const QualifiedName& tagName,

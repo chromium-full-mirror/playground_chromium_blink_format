@@ -37,22 +37,32 @@ void mapAttributeToCSSProperty(
 
 class SVGStyledElement : public SVGElement, public SVGStylable {
  public:
-  SVGStyledElement(const QualifiedName&, Document*);
-  virtual ~SVGStyledElement();
-
   virtual String title() const;
 
   bool hasRelativeLengths() const {
     return !m_elementsWithRelativeLengths.isEmpty();
   }
 
-  virtual bool isStyled() const { return true; }
   virtual bool supportsMarkers() const { return false; }
 
   virtual PassRefPtr<CSSValue> getPresentationAttribute(const String& name);
-  virtual CSSStyleDeclaration* style() { return StyledElement::style(); }
 
   bool isKnownAttribute(const QualifiedName&);
+
+  // Centralized place to force a manual style resolution. Hacky but needed for
+  // now.
+  PassRefPtr<RenderStyle> resolveStyle(RenderStyle* parentStyle);
+
+  bool instanceUpdatesBlocked() const;
+  void setInstanceUpdatesBlocked(bool);
+
+  virtual AffineTransform localCoordinateSpaceTransform(
+      SVGLocatable::CTMScope) const;
+
+  virtual CSSStyleDeclaration* style() { return StyledElement::style(); }
+
+ protected:
+  SVGStyledElement(const QualifiedName&, Document*);
 
   virtual bool rendererIsNeeded(RenderStyle*);
 
@@ -69,17 +79,6 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
                                Node* afterChange = 0,
                                int childCountDelta = 0);
 
-  // Centralized place to force a manual style resolution. Hacky but needed for
-  // now.
-  PassRefPtr<RenderStyle> resolveStyle(RenderStyle* parentStyle);
-
-  bool instanceUpdatesBlocked() const;
-  void setInstanceUpdatesBlocked(bool);
-
-  virtual AffineTransform localCoordinateSpaceTransform(
-      SVGLocatable::CTMScope) const;
-
- protected:
   static int cssPropertyIdForSVGAttributeName(const QualifiedName&);
   void updateRelativeLengthsInformation() {
     updateRelativeLengthsInformation(selfHasRelativeLengths(), this);
@@ -90,7 +89,10 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   virtual bool selfHasRelativeLengths() const { return false; }
 
  private:
+  virtual bool isStyled() const { return true; }
+
   HashSet<SVGStyledElement*> m_elementsWithRelativeLengths;
+
   DECLARE_ANIMATED_PROPERTY(SVGStyledElement,
                             HTMLNames::classAttr,
                             String,

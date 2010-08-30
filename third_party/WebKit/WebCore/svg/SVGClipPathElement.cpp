@@ -34,12 +34,9 @@
 
 namespace WebCore {
 
-SVGClipPathElement::SVGClipPathElement(const QualifiedName& tagName,
-                                       Document* doc)
-    : SVGStyledTransformableElement(tagName, doc),
-      SVGTests(),
-      SVGLangSpace(),
-      SVGExternalResourcesRequired(),
+inline SVGClipPathElement::SVGClipPathElement(const QualifiedName& tagName,
+                                              Document* document)
+    : SVGStyledTransformableElement(tagName, document),
       m_clipPathUnits(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE) {}
 
 PassRefPtr<SVGClipPathElement> SVGClipPathElement::create(
@@ -47,8 +44,6 @@ PassRefPtr<SVGClipPathElement> SVGClipPathElement::create(
     Document* document) {
   return new SVGClipPathElement(tagName, document);
 }
-
-SVGClipPathElement::~SVGClipPathElement() {}
 
 void SVGClipPathElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::clipPathUnitsAttr) {

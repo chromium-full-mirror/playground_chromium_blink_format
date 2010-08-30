@@ -34,7 +34,8 @@ class SVGPathByteStreamSource : public SVGPathSource {
     return adoptPtr(new SVGPathByteStreamSource(stream));
   }
 
-  virtual ~SVGPathByteStreamSource();
+ private:
+  SVGPathByteStreamSource(SVGPathByteStream*);
 
   virtual bool hasMoreData() const;
   virtual bool moveToNextToken() { return true; }
@@ -55,9 +56,6 @@ class SVGPathByteStreamSource : public SVGPathSource {
                                  bool&,
                                  bool&,
                                  FloatPoint&);
-
- private:
-  SVGPathByteStreamSource(SVGPathByteStream*);
 
 #if COMPILER(MSVC)
 #pragma warning(disable : 4701)

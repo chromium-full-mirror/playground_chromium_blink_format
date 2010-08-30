@@ -35,16 +35,15 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
   static PassRefPtr<SVGFEGaussianBlurElement> create(const QualifiedName&,
                                                      Document*);
 
-  SVGFEGaussianBlurElement(const QualifiedName&, Document*);
-  virtual ~SVGFEGaussianBlurElement();
-
   void setStdDeviation(float stdDeviationX, float stdDeviationY);
+
+ private:
+  SVGFEGaussianBlurElement(const QualifiedName&, Document*);
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 
- private:
   DECLARE_ANIMATED_PROPERTY(SVGFEGaussianBlurElement,
                             SVGNames::inAttr,
                             String,

@@ -42,8 +42,6 @@ class SVGColor : public CSSValue {
     return adoptRef(new SVGColor(SVG_COLORTYPE_CURRENTCOLOR));
   }
 
-  virtual ~SVGColor();
-
   enum SVGColorType {
     SVG_COLORTYPE_UNKNOWN = 0,
     SVG_COLORTYPE_RGBCOLOR = 1,
@@ -52,7 +50,7 @@ class SVGColor : public CSSValue {
   };
 
   // 'SVGColor' functions
-  unsigned short colorType() const;
+  unsigned short colorType() const { return m_colorType; }
 
   PassRefPtr<RGBColor> rgbColor() const;
 
@@ -71,15 +69,14 @@ class SVGColor : public CSSValue {
                 const String& iccColor,
                 ExceptionCode&);
 
-  virtual String cssText() const;
-
-  // Helpers
-  const Color& color() const;
+  const Color& color() const { return m_color; }
 
  protected:
   SVGColor();
   SVGColor(const String& color);
   SVGColor(const Color&);
+
+  virtual String cssText() const;
 
  private:
   SVGColor(SVGColorType);

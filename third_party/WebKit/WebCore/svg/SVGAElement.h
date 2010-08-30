@@ -40,8 +40,6 @@ class SVGAElement : public SVGStyledTransformableElement,
  public:
   static PassRefPtr<SVGAElement> create(const QualifiedName&, Document*);
 
-  virtual ~SVGAElement();
-
  private:
   SVGAElement(const QualifiedName&, Document*);
 

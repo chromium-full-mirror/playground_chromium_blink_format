@@ -57,8 +57,6 @@ class SVGPaint : public SVGColor {
     return adoptRef(new SVGPaint(uri, color));
   }
 
-  virtual ~SVGPaint();
-
   // 'SVGPaint' functions
   SVGPaintType paintType() const { return m_paintType; }
   String uri() const;
@@ -69,8 +67,6 @@ class SVGPaint : public SVGColor {
                 const String& rgbPaint,
                 const String& iccPaint,
                 ExceptionCode&);
-
-  virtual String cssText() const;
 
   static SVGPaint* defaultFill();
   static SVGPaint* defaultStroke();
@@ -89,6 +85,8 @@ class SVGPaint : public SVGColor {
   SVGPaint(const String& uri, const Color& c);
 
   virtual bool isSVGPaint() const { return true; }
+
+  virtual String cssText() const;
 
   SVGPaintType m_paintType;
   String m_uri;

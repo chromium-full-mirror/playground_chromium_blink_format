@@ -35,13 +35,13 @@ class SVGPathSegCurvetoQuadraticSmoothAbs : public SVGPathSegSingleCoord {
     return adoptRef(new SVGPathSegCurvetoQuadraticSmoothAbs(x, y));
   }
 
+ private:
+  SVGPathSegCurvetoQuadraticSmoothAbs(float x, float y);
+
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_QUADRATIC_SMOOTH_ABS;
   }
   virtual String pathSegTypeAsLetter() const { return "T"; }
-
- private:
-  SVGPathSegCurvetoQuadraticSmoothAbs(float x, float y);
 };
 
 class SVGPathSegCurvetoQuadraticSmoothRel : public SVGPathSegSingleCoord {
@@ -51,13 +51,13 @@ class SVGPathSegCurvetoQuadraticSmoothRel : public SVGPathSegSingleCoord {
     return adoptRef(new SVGPathSegCurvetoQuadraticSmoothRel(x, y));
   }
 
+ private:
+  SVGPathSegCurvetoQuadraticSmoothRel(float x, float y);
+
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_QUADRATIC_SMOOTH_REL;
   }
   virtual String pathSegTypeAsLetter() const { return "t"; }
-
- private:
-  SVGPathSegCurvetoQuadraticSmoothRel(float x, float y);
 };
 
 }  // namespace WebCore

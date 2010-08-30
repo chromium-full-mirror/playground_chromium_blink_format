@@ -61,13 +61,13 @@ class SVGPathSegCurvetoCubicSmoothAbs : public SVGPathSegCurvetoCubicSmooth {
     return adoptRef(new SVGPathSegCurvetoCubicSmoothAbs(x, y, x2, y2));
   }
 
+ private:
+  SVGPathSegCurvetoCubicSmoothAbs(float x, float y, float x2, float y2);
+
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_CUBIC_SMOOTH_ABS;
   }
   virtual String pathSegTypeAsLetter() const { return "S"; }
-
- private:
-  SVGPathSegCurvetoCubicSmoothAbs(float x, float y, float x2, float y2);
 };
 
 class SVGPathSegCurvetoCubicSmoothRel : public SVGPathSegCurvetoCubicSmooth {
@@ -79,13 +79,13 @@ class SVGPathSegCurvetoCubicSmoothRel : public SVGPathSegCurvetoCubicSmooth {
     return adoptRef(new SVGPathSegCurvetoCubicSmoothRel(x, y, x2, y2));
   }
 
+ private:
+  SVGPathSegCurvetoCubicSmoothRel(float x, float y, float x2, float y2);
+
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_CUBIC_SMOOTH_REL;
   }
   virtual String pathSegTypeAsLetter() const { return "s"; }
-
- private:
-  SVGPathSegCurvetoCubicSmoothRel(float x, float y, float x2, float y2);
 };
 
 }  // namespace WebCore
