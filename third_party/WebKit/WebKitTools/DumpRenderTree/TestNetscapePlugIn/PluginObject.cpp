@@ -154,6 +154,7 @@ enum {
   ID_PROPERTY_CACHED_PRIVATE_BROWSING_ENABLED,
   ID_PROPERTY_THROW_EXCEPTION_PROPERTY,
   ID_LAST_SET_WINDOW_ARGUMENTS,
+  ID_PROPERTY_WINDOWED_PLUGIN,
   NUM_PROPERTY_IDENTIFIERS
 };
 
@@ -169,7 +170,8 @@ static const NPUTF8* pluginPropertyIdentifierNames[NUM_PROPERTY_IDENTIFIERS] = {
     "privateBrowsingEnabled",
     "cachedPrivateBrowsingEnabled",
     "testThrowExceptionProperty",
-    "lastSetWindowArguments"};
+    "lastSetWindowArguments",
+    "windowedPlugin"};
 
 enum {
   ID_TEST_CALLBACK_METHOD = 0,
@@ -360,6 +362,10 @@ static bool pluginSetProperty(NPObject* obj,
              pluginPropertyIdentifiers[ID_PROPERTY_THROW_EXCEPTION_PROPERTY]) {
     browser->setexception(obj,
                           "plugin object testThrowExceptionProperty SUCCESS");
+    return true;
+  } else if (name == pluginPropertyIdentifiers[ID_PROPERTY_WINDOWED_PLUGIN]) {
+    browser->setvalue(plugin->npp, NPPVpluginWindowBool,
+                      (void*)NPVARIANT_TO_BOOLEAN(*variant));
     return true;
   }
 
