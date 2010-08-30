@@ -40,13 +40,12 @@
 namespace WebCore {
 
 DirectoryReader::DirectoryReader(PassRefPtr<DOMFileSystem> fileSystem,
-                                 const String& path)
-    : m_fileSystem(fileSystem), m_path(path) {}
+                                 const String& fullPath)
+    : m_fileSystem(fileSystem), m_fullPath(fullPath) {}
 
-void DirectoryReader::readEntries(PassRefPtr<EntriesCallback>,
-                                  PassRefPtr<ErrorCallback>) {
-  // FIXME: to be implemented.
-  ASSERT_NOT_REACHED();
+void DirectoryReader::readEntries(PassRefPtr<EntriesCallback> entriesCallback,
+                                  PassRefPtr<ErrorCallback> errorCallback) {
+  m_fileSystem->readDirectory(m_fullPath, entriesCallback, errorCallback);
 }
 
 }  // namespace

@@ -32,15 +32,17 @@
 
 #if ENABLE(FILE_SYSTEM)
 
+#include "DOMFilePath.h"
 #include "DOMFileSystem.h"
 #include "EntryCallback.h"
 #include "ErrorCallback.h"
+#include "FileError.h"
 #include "MetadataCallback.h"
 #include "VoidCallback.h"
 
 namespace WebCore {
 
-Entry::Entry(PassRefPtr<DOMFileSystem> fileSystem, const String& fullPath)
+Entry::Entry(DOMFileSystem* fileSystem, const String& fullPath)
     : m_fileSystem(fileSystem), m_fullPath(fullPath) {
   size_t index = fullPath.reverseFind("/");
   if (index != notFound)
@@ -49,36 +51,33 @@ Entry::Entry(PassRefPtr<DOMFileSystem> fileSystem, const String& fullPath)
     m_name = fullPath;
 }
 
-void Entry::getMetadata(PassRefPtr<MetadataCallback>,
-                        PassRefPtr<ErrorCallback>) {
-  // FIXME: to be implemented.
-  ASSERT_NOT_REACHED();
+void Entry::getMetadata(PassRefPtr<MetadataCallback> successCallback,
+                        PassRefPtr<ErrorCallback> errorCallback) {
+  m_fileSystem->getMetadata(this, successCallback, errorCallback);
 }
 
-void Entry::moveTo(PassRefPtr<Entry>,
-                   const String&,
-                   PassRefPtr<EntryCallback>,
-                   PassRefPtr<ErrorCallback>) {
-  // FIXME: to be implemented.
-  ASSERT_NOT_REACHED();
+void Entry::moveTo(PassRefPtr<Entry> parent,
+                   const String& name,
+                   PassRefPtr<EntryCallback> successCallback,
+                   PassRefPtr<ErrorCallback> errorCallback) const {
+  m_fileSystem->move(this, parent, name, successCallback, errorCallback);
 }
 
-void Entry::copyTo(PassRefPtr<Entry>,
-                   const String&,
-                   PassRefPtr<EntryCallback>,
-                   PassRefPtr<ErrorCallback>) {
-  // FIXME: to be implemented.
-  ASSERT_NOT_REACHED();
+void Entry::copyTo(PassRefPtr<Entry> parent,
+                   const String& name,
+                   PassRefPtr<EntryCallback> successCallback,
+                   PassRefPtr<ErrorCallback> errorCallback) const {
+  m_fileSystem->copy(this, parent, name, successCallback, errorCallback);
 }
 
-void Entry::remove(PassRefPtr<VoidCallback>, PassRefPtr<ErrorCallback>) {
-  // FIXME: to be implemented.
-  ASSERT_NOT_REACHED();
+void Entry::remove(PassRefPtr<VoidCallback> successCallback,
+                   PassRefPtr<ErrorCallback> errorCallback) const {
+  m_fileSystem->remove(this, successCallback, errorCallback);
 }
 
-void Entry::getParent(PassRefPtr<EntryCallback>, PassRefPtr<ErrorCallback>) {
-  // FIXME: to be implemented.
-  ASSERT_NOT_REACHED();
+void Entry::getParent(PassRefPtr<EntryCallback> successCallback,
+                      PassRefPtr<ErrorCallback> errorCallback) const {
+  m_fileSystem->getParent(this, successCallback, errorCallback);
 }
 
 String Entry::toURI(const String&) {

@@ -55,8 +55,7 @@ void AsyncFileSystemChromium::move(
     const String& srcPath,
     const String& destPath,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
-  m_webFileSystem->move(virtualToPlatformPath(srcPath),
-                        virtualToPlatformPath(destPath),
+  m_webFileSystem->move(srcPath, destPath,
                         new WebKit::WebFileSystemCallbacksImpl(callbacks));
 }
 
@@ -64,15 +63,14 @@ void AsyncFileSystemChromium::copy(
     const String& srcPath,
     const String& destPath,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
-  m_webFileSystem->copy(virtualToPlatformPath(srcPath),
-                        virtualToPlatformPath(destPath),
+  m_webFileSystem->copy(srcPath, destPath,
                         new WebKit::WebFileSystemCallbacksImpl(callbacks));
 }
 
 void AsyncFileSystemChromium::remove(
     const String& path,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
-  m_webFileSystem->remove(virtualToPlatformPath(path),
+  m_webFileSystem->remove(path,
                           new WebKit::WebFileSystemCallbacksImpl(callbacks));
 }
 
@@ -80,8 +78,7 @@ void AsyncFileSystemChromium::readMetadata(
     const String& path,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
   m_webFileSystem->readMetadata(
-      virtualToPlatformPath(path),
-      new WebKit::WebFileSystemCallbacksImpl(callbacks));
+      path, new WebKit::WebFileSystemCallbacksImpl(callbacks));
 }
 
 void AsyncFileSystemChromium::createFile(
@@ -89,8 +86,7 @@ void AsyncFileSystemChromium::createFile(
     bool exclusive,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
   m_webFileSystem->createFile(
-      virtualToPlatformPath(path), exclusive,
-      new WebKit::WebFileSystemCallbacksImpl(callbacks));
+      path, exclusive, new WebKit::WebFileSystemCallbacksImpl(callbacks));
 }
 
 void AsyncFileSystemChromium::createDirectory(
@@ -98,32 +94,28 @@ void AsyncFileSystemChromium::createDirectory(
     bool exclusive,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
   m_webFileSystem->createDirectory(
-      virtualToPlatformPath(path), exclusive,
-      new WebKit::WebFileSystemCallbacksImpl(callbacks));
+      path, exclusive, new WebKit::WebFileSystemCallbacksImpl(callbacks));
 }
 
 void AsyncFileSystemChromium::fileExists(
     const String& path,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
   m_webFileSystem->fileExists(
-      virtualToPlatformPath(path),
-      new WebKit::WebFileSystemCallbacksImpl(callbacks));
+      path, new WebKit::WebFileSystemCallbacksImpl(callbacks));
 }
 
 void AsyncFileSystemChromium::directoryExists(
     const String& path,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
   m_webFileSystem->directoryExists(
-      virtualToPlatformPath(path),
-      new WebKit::WebFileSystemCallbacksImpl(callbacks));
+      path, new WebKit::WebFileSystemCallbacksImpl(callbacks));
 }
 
 void AsyncFileSystemChromium::readDirectory(
     const String& path,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
   m_webFileSystem->readDirectory(
-      virtualToPlatformPath(path),
-      new WebKit::WebFileSystemCallbacksImpl(callbacks));
+      path, new WebKit::WebFileSystemCallbacksImpl(callbacks));
 }
 
 }  // namespace WebCore

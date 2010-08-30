@@ -38,7 +38,8 @@
 
 #if ENABLE(FILE_SYSTEM)
 
-#include "DOMWindow.h"
+#include "CrossThreadTask.h"
+#include "DOMFileSystem.h"
 #include "ErrorCallback.h"
 #include "ExceptionCode.h"
 #include "FileError.h"
@@ -54,6 +55,14 @@ PassRefPtr<LocalFileSystem> LocalFileSystem::create(const String& basePath) {
   return adoptRef(new LocalFileSystem(basePath));
 }
 
+static void openFileSystem(ScriptExecutionContext*,
+                           const String& basePath,
+                           const String& identifier,
+                           AsyncFileSystem::Type type,
+                           PassOwnPtr<FileSystemCallbacks> callbacks) {
+  AsyncFileSystem::openFileSystem(basePath, identifier, type, callbacks);
+}
+
 void LocalFileSystem::requestFileSystem(
     ScriptExecutionContext* context,
     AsyncFileSystem::Type type,
@@ -62,14 +71,17 @@ void LocalFileSystem::requestFileSystem(
     PassRefPtr<ErrorCallback> errorCallback) {
   if (type != AsyncFileSystem::Temporary &&
       type != AsyncFileSystem::Persistent) {
-    errorCallback->handleEvent(
-        FileError::create(INVALID_MODIFICATION_ERR).get());
+    DOMFileSystem::scheduleCallback(
+        context, errorCallback, FileError::create(INVALID_MODIFICATION_ERR));
     return;
   }
 
-  AsyncFileSystem::openFileSystem(
-      m_basePath, context->securityOrigin()->databaseIdentifier(), type,
-      new FileSystemCallbacks(successCallback, errorCallback, context));
+  // AsyncFileSystem::openFileSystem calls callbacks synchronously, so the
+  // method needs to be called asynchronously.
+  context->postTask(createCallbackTask(
+      &openFileSystem, m_basePath,
+      context->securityOrigin()->databaseIdentifier(), type,
+      new FileSystemCallbacks(successCallback, errorCallback, context)));
 }
 
 }  // namespace

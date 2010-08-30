@@ -47,7 +47,7 @@ class ErrorCallback;
 
 class DirectoryEntry : public Entry {
  public:
-  static PassRefPtr<DirectoryEntry> create(PassRefPtr<DOMFileSystem> fileSystem,
+  static PassRefPtr<DirectoryEntry> create(DOMFileSystem* fileSystem,
                                            const String& fullPath) {
     return adoptRef(new DirectoryEntry(fileSystem, fullPath));
   }
@@ -64,7 +64,7 @@ class DirectoryEntry : public Entry {
                     PassRefPtr<ErrorCallback> errorCallback = 0);
 
  private:
-  DirectoryEntry(PassRefPtr<DOMFileSystem> fileSystem, const String& fullPath);
+  DirectoryEntry(DOMFileSystem* fileSystem, const String& fullPath);
 };
 
 }  // namespace
