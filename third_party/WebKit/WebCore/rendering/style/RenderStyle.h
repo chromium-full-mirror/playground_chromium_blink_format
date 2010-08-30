@@ -383,6 +383,13 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
   bool hasAppearance() const { return appearance() != NoControlPart; }
 
+  bool hasBackground() const {
+    Color color = visitedDependentColor(CSSPropertyBackgroundColor);
+    if (color.isValid() && color.alpha() > 0)
+      return true;
+    return hasBackgroundImage();
+  }
+
   bool visuallyOrdered() const { return inherited_flags._visuallyOrdered; }
   void setVisuallyOrdered(bool b) { inherited_flags._visuallyOrdered = b; }
 
