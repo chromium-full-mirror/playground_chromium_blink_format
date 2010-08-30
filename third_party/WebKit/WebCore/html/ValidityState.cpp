@@ -26,20 +26,14 @@
 
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
+#include "HTMLTextAreaElement.h"
 #include "HTMLTreeBuilder.h"
-#include "KURL.h"
 #include "LocalizedStrings.h"
-#include "RegularExpression.h"
 #include <wtf/StdLibExtras.h>
 
 namespace WebCore {
 
 using namespace HTMLNames;
-
-static const char emailPattern[] =
-    "[a-z0-9!#$%&'*+/=?^_`{|}~.-]+"  // local part
-    "@"
-    "[a-z0-9-]+(\\.[a-z0-9-]+)+";  // domain part
 
 String ValidityState::validationMessage() const {
   if (!m_control->willValidate())
@@ -70,80 +64,71 @@ void ValidityState::setCustomErrorMessage(const String& message) {
   m_control->setNeedsValidityCheck();
 }
 
+bool ValidityState::valueMissing() const {
+  if (m_control->hasTagName(inputTag)) {
+    HTMLInputElement* input = static_cast<HTMLInputElement*>(m_control);
+    return input->valueMissing(input->value());
+  }
+  if (m_control->hasTagName(textareaTag)) {
+    HTMLTextAreaElement* textArea =
+        static_cast<HTMLTextAreaElement*>(m_control);
+    return textArea->valueMissing(textArea->value());
+  }
+  return false;
+}
+
 bool ValidityState::typeMismatch() const {
   if (!m_control->hasTagName(inputTag))
     return false;
 
   HTMLInputElement* input = static_cast<HTMLInputElement*>(m_control);
   String value = input->value();
-
   if (value.isEmpty())
     return false;
+  return input->typeMismatch(value);
+}
 
-  switch (input->inputType()) {
-    case HTMLInputElement::COLOR:
-      return !isValidColorString(value);
-    case HTMLInputElement::NUMBER:
-      return !parseToDoubleForNumberType(value, 0);
-    case HTMLInputElement::URL:
-      return !KURL(KURL(), value).isValid();
-    case HTMLInputElement::EMAIL: {
-      if (!input->multiple())
-        return !isValidEmailAddress(value);
-      Vector<String> addresses;
-      value.split(',', addresses);
-      for (unsigned i = 0; i < addresses.size(); ++i) {
-        if (!isValidEmailAddress(addresses[i]))
-          return true;
-      }
-      return false;
-    }
-    case HTMLInputElement::DATE:
-    case HTMLInputElement::DATETIME:
-    case HTMLInputElement::DATETIMELOCAL:
-    case HTMLInputElement::MONTH:
-    case HTMLInputElement::TIME:
-    case HTMLInputElement::WEEK:
-      return !HTMLInputElement::parseToDateComponents(input->inputType(), value,
-                                                      0);
-    case HTMLInputElement::BUTTON:
-    case HTMLInputElement::CHECKBOX:
-    case HTMLInputElement::FILE:
-    case HTMLInputElement::HIDDEN:
-    case HTMLInputElement::IMAGE:
-    case HTMLInputElement::ISINDEX:
-    case HTMLInputElement::PASSWORD:
-    case HTMLInputElement::RADIO:
-    case HTMLInputElement::RANGE:
-    case HTMLInputElement::RESET:
-    case HTMLInputElement::SEARCH:
-    case HTMLInputElement::SUBMIT:
-    case HTMLInputElement::TELEPHONE:  // FIXME: Is there validation for <input
-                                       // type=telephone>?
-    case HTMLInputElement::TEXT:
-      return false;
+bool ValidityState::patternMismatch() const {
+  if (!m_control->hasTagName(inputTag))
+    return false;
+  HTMLInputElement* input = static_cast<HTMLInputElement*>(m_control);
+  return input->patternMismatch(input->value());
+}
+
+bool ValidityState::tooLong() const {
+  if (m_control->hasTagName(inputTag)) {
+    HTMLInputElement* input = static_cast<HTMLInputElement*>(m_control);
+    return input->tooLong(input->value(),
+                          HTMLTextFormControlElement::CheckDirtyFlag);
   }
-
-  ASSERT_NOT_REACHED();
+  if (m_control->hasTagName(textareaTag)) {
+    HTMLTextAreaElement* textArea =
+        static_cast<HTMLTextAreaElement*>(m_control);
+    return textArea->tooLong(textArea->value(),
+                             HTMLTextFormControlElement::CheckDirtyFlag);
+  }
   return false;
 }
 
 bool ValidityState::rangeUnderflow() const {
   if (!m_control->hasTagName(inputTag))
     return false;
-  return static_cast<HTMLInputElement*>(m_control)->rangeUnderflow();
+  HTMLInputElement* input = static_cast<HTMLInputElement*>(m_control);
+  return input->rangeUnderflow(input->value());
 }
 
 bool ValidityState::rangeOverflow() const {
   if (!m_control->hasTagName(inputTag))
     return false;
-  return static_cast<HTMLInputElement*>(m_control)->rangeOverflow();
+  HTMLInputElement* input = static_cast<HTMLInputElement*>(m_control);
+  return input->rangeOverflow(input->value());
 }
 
 bool ValidityState::stepMismatch() const {
   if (!m_control->hasTagName(inputTag))
     return false;
-  return static_cast<HTMLInputElement*>(m_control)->stepMismatch();
+  HTMLInputElement* input = static_cast<HTMLInputElement*>(m_control);
+  return input->stepMismatch(input->value());
 }
 
 bool ValidityState::valid() const {
@@ -151,32 +136,6 @@ bool ValidityState::valid() const {
                    rangeOverflow() || tooLong() || patternMismatch() ||
                    valueMissing() || customError();
   return !someError;
-}
-
-bool ValidityState::isValidColorString(const String& value) {
-  if (value.isEmpty())
-    return false;
-  if (value[0] == '#') {
-    // We don't accept #rgb and #aarrggbb formats.
-    if (value.length() != 7)
-      return false;
-  }
-  Color color(value);  // This accepts named colors such as "white".
-  return color.isValid() && !color.hasAlpha();
-}
-
-bool ValidityState::isValidEmailAddress(const String& address) {
-  int addressLength = address.length();
-  if (!addressLength)
-    return false;
-
-  DEFINE_STATIC_LOCAL(const RegularExpression, regExp,
-                      (emailPattern, TextCaseInsensitive));
-
-  int matchLength;
-  int matchOffset = regExp.match(address, 0, &matchLength);
-
-  return matchOffset == 0 && matchLength == addressLength;
 }
 
 }  // namespace

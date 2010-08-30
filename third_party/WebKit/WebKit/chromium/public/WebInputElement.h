@@ -102,6 +102,7 @@ class WebInputElement : public WebFormControlElement {
   WEBKIT_API void setSelectionRange(int, int);
   WEBKIT_API int selectionStart();
   WEBKIT_API int selectionEnd();
+  WEBKIT_API bool isValidValue(const WebString&) const;
 
 #if WEBKIT_IMPLEMENTATION
   WebInputElement(const WTF::PassRefPtr<WebCore::HTMLInputElement>&);

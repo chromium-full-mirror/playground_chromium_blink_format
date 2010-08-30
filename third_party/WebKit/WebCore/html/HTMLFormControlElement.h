@@ -96,9 +96,6 @@ class HTMLFormControlElement : public HTMLElement {
   // changed.
   void setNeedsValidityCheck();
   void setCustomValidity(const String&);
-  virtual bool valueMissing() const { return false; }
-  virtual bool patternMismatch() const { return false; }
-  virtual bool tooLong() const { return false; }
 
   void formDestroyed() { m_form = 0; }
 
@@ -187,6 +184,10 @@ class HTMLFormControlElementWithState : public HTMLFormControlElement {
 // FIXME: Give this class its own header file.
 class HTMLTextFormControlElement : public HTMLFormControlElementWithState {
  public:
+  // Common flag for HTMLInputElement::tooLong() and
+  // HTMLTextAreaElement::tooLong().
+  enum NeedsToCheckDirtyFlag { CheckDirtyFlag, IgnoreDirtyFlag };
+
   virtual ~HTMLTextFormControlElement();
 
   String strippedPlaceholder() const;

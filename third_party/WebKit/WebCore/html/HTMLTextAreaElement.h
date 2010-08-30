@@ -49,7 +49,12 @@ class HTMLTextAreaElement : public HTMLTextFormControlElement {
   int textLength() const { return value().length(); }
   int maxLength() const;
   void setMaxLength(int, ExceptionCode&);
-  virtual bool tooLong() const;
+  bool valueMissing(const String& value) const {
+    return isRequiredFormControl() && !disabled() && !readOnly() &&
+           value.isEmpty();
+  }
+  bool tooLong(const String&, NeedsToCheckDirtyFlag) const;
+  bool isValidValue(const String&) const;
 
   void rendererWillBeDestroyed();
 
@@ -91,11 +96,6 @@ class HTMLTextAreaElement : public HTMLTextFormControlElement {
   virtual void restoreFormControlState(const String&);
 
   virtual bool isTextFormControl() const { return true; }
-
-  virtual bool valueMissing() const {
-    return isRequiredFormControl() && !disabled() && !readOnly() &&
-           value().isEmpty();
-  }
 
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,
