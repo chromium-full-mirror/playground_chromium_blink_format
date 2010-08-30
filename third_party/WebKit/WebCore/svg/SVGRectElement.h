@@ -34,6 +34,8 @@ class SVGRectElement : public SVGStyledTransformableElement,
                        public SVGLangSpace,
                        public SVGExternalResourcesRequired {
  public:
+  static PassRefPtr<SVGRectElement> create(const QualifiedName&, Document*);
+
   SVGRectElement(const QualifiedName&, Document*);
   virtual ~SVGRectElement();
 

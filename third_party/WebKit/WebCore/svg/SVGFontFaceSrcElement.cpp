@@ -37,6 +37,12 @@ SVGFontFaceSrcElement::SVGFontFaceSrcElement(const QualifiedName& tagName,
                                              Document* doc)
     : SVGElement(tagName, doc) {}
 
+PassRefPtr<SVGFontFaceSrcElement> SVGFontFaceSrcElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFontFaceSrcElement(tagName, document);
+}
+
 PassRefPtr<CSSValueList> SVGFontFaceSrcElement::srcValue() const {
   RefPtr<CSSValueList> list = CSSValueList::createCommaSeparated();
   for (Node* child = firstChild(); child; child = child->nextSibling()) {

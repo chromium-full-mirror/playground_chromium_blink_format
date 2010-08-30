@@ -42,6 +42,12 @@ SVGFEDiffuseLightingElement::SVGFEDiffuseLightingElement(
       m_diffuseConstant(1.0f),
       m_surfaceScale(1.0f) {}
 
+PassRefPtr<SVGFEDiffuseLightingElement> SVGFEDiffuseLightingElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFEDiffuseLightingElement(tagName, document);
+}
+
 SVGFEDiffuseLightingElement::~SVGFEDiffuseLightingElement() {}
 
 void SVGFEDiffuseLightingElement::parseMappedAttribute(Attribute* attr) {

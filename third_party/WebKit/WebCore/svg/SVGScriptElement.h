@@ -34,6 +34,10 @@ class SVGScriptElement : public SVGElement,
                          public SVGExternalResourcesRequired,
                          public ScriptElement {
  public:
+  static PassRefPtr<SVGScriptElement> create(const QualifiedName&,
+                                             Document*,
+                                             bool createdByParser);
+
   SVGScriptElement(const QualifiedName&, Document*, bool createdByParser);
   virtual ~SVGScriptElement();
 

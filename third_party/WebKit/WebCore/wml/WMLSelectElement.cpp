@@ -43,6 +43,12 @@ WMLSelectElement::WMLSelectElement(const QualifiedName& tagName,
                                    Document* document)
     : WMLFormControlElement(tagName, document), m_initialized(false) {}
 
+PassRefPtr<WMLSelectElement> WMLSelectElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLSelectElement(tagName, document);
+}
+
 WMLSelectElement::~WMLSelectElement() {}
 
 const AtomicString& WMLSelectElement::formControlName() const {

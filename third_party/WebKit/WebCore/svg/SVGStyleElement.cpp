@@ -37,9 +37,14 @@ namespace WebCore {
 SVGStyleElement::SVGStyleElement(const QualifiedName& tagName,
                                  Document* document,
                                  bool createdByParser)
-    : SVGElement(tagName, document),
-      SVGLangSpace(),
-      StyleElement(document, createdByParser) {}
+    : SVGElement(tagName, document), StyleElement(document, createdByParser) {}
+
+PassRefPtr<SVGStyleElement> SVGStyleElement::create(
+    const QualifiedName& tagName,
+    Document* document,
+    bool createdByParser) {
+  return new SVGStyleElement(tagName, document, createdByParser);
+}
 
 const AtomicString& SVGStyleElement::type() const {
   DEFINE_STATIC_LOCAL(const AtomicString, defaultValue, ("text/css"));

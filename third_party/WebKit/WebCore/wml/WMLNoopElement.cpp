@@ -35,6 +35,11 @@ using namespace WMLNames;
 WMLNoopElement::WMLNoopElement(const QualifiedName& tagName, Document* doc)
     : WMLElement(tagName, doc) {}
 
+PassRefPtr<WMLNoopElement> WMLNoopElement::create(const QualifiedName& tagName,
+                                                  Document* document) {
+  return new WMLNoopElement(tagName, document);
+}
+
 WMLNoopElement::~WMLNoopElement() {}
 
 void WMLNoopElement::insertedIntoDocument() {

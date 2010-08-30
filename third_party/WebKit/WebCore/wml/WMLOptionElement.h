@@ -33,6 +33,8 @@ class WMLOptionElement : public WMLFormControlElement,
                          public WMLEventHandlingElement,
                          public OptionElement {
  public:
+  static PassRefPtr<WMLOptionElement> create(const QualifiedName&, Document*);
+
   WMLOptionElement(const QualifiedName& tagName, Document*);
   virtual ~WMLOptionElement();
 

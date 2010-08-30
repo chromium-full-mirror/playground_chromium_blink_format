@@ -29,6 +29,12 @@ namespace WebCore {
 SVGTitleElement::SVGTitleElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledElement(tagName, doc) {}
 
+PassRefPtr<SVGTitleElement> SVGTitleElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGTitleElement(tagName, document);
+}
+
 void SVGTitleElement::insertedIntoDocument() {
   SVGStyledElement::insertedIntoDocument();
   if (firstChild())

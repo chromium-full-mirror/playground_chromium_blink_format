@@ -56,6 +56,12 @@ SVGFontFaceElement::SVGFontFaceElement(const QualifiedName& tagName,
   m_fontFaceRule->setDeclaration(m_styleDeclaration.get());
 }
 
+PassRefPtr<SVGFontFaceElement> SVGFontFaceElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFontFaceElement(tagName, document);
+}
+
 SVGFontFaceElement::~SVGFontFaceElement() {}
 
 static int cssPropertyIdForSVGAttributeName(const QualifiedName& attrName) {

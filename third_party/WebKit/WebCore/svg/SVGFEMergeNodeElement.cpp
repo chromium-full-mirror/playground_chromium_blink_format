@@ -31,6 +31,12 @@ SVGFEMergeNodeElement::SVGFEMergeNodeElement(const QualifiedName& tagName,
                                              Document* doc)
     : SVGElement(tagName, doc) {}
 
+PassRefPtr<SVGFEMergeNodeElement> SVGFEMergeNodeElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFEMergeNodeElement(tagName, document);
+}
+
 SVGFEMergeNodeElement::~SVGFEMergeNodeElement() {}
 
 void SVGFEMergeNodeElement::parseMappedAttribute(Attribute* attr) {

@@ -42,6 +42,12 @@ SVGClipPathElement::SVGClipPathElement(const QualifiedName& tagName,
       SVGExternalResourcesRequired(),
       m_clipPathUnits(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE) {}
 
+PassRefPtr<SVGClipPathElement> SVGClipPathElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGClipPathElement(tagName, document);
+}
+
 SVGClipPathElement::~SVGClipPathElement() {}
 
 void SVGClipPathElement::parseMappedAttribute(Attribute* attr) {

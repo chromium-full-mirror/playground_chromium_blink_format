@@ -44,6 +44,12 @@ SVGFEImageElement::SVGFEImageElement(const QualifiedName& tagName,
       SVGLangSpace(),
       SVGExternalResourcesRequired() {}
 
+PassRefPtr<SVGFEImageElement> SVGFEImageElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFEImageElement(tagName, document);
+}
+
 SVGFEImageElement::~SVGFEImageElement() {
   if (m_cachedImage)
     m_cachedImage->removeClient(this);

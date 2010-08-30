@@ -33,6 +33,12 @@ SVGFEFloodElement::SVGFEFloodElement(const QualifiedName& tagName,
                                      Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc) {}
 
+PassRefPtr<SVGFEFloodElement> SVGFEFloodElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFEFloodElement(tagName, document);
+}
+
 SVGFEFloodElement::~SVGFEFloodElement() {}
 
 PassRefPtr<FilterEffect> SVGFEFloodElement::build(SVGFilterBuilder*) {

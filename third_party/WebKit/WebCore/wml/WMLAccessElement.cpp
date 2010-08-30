@@ -36,6 +36,12 @@ using namespace WMLNames;
 WMLAccessElement::WMLAccessElement(const QualifiedName& tagName, Document* doc)
     : WMLElement(tagName, doc) {}
 
+PassRefPtr<WMLAccessElement> WMLAccessElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLAccessElement(tagName, document);
+}
+
 void WMLAccessElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == domainAttr) {
     String value = parseValueForbiddingVariableReferences(attr->value());

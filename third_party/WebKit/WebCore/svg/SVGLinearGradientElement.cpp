@@ -50,6 +50,12 @@ SVGLinearGradientElement::SVGLinearGradientElement(const QualifiedName& tagName,
   // "100%" were specified.
 }
 
+PassRefPtr<SVGLinearGradientElement> SVGLinearGradientElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGLinearGradientElement(tagName, document);
+}
+
 SVGLinearGradientElement::~SVGLinearGradientElement() {}
 
 void SVGLinearGradientElement::parseMappedAttribute(Attribute* attr) {

@@ -36,6 +36,8 @@ class SVGFontData;
 
 class SVGHKernElement : public SVGElement {
  public:
+  static PassRefPtr<SVGHKernElement> create(const QualifiedName&, Document*);
+
   SVGHKernElement(const QualifiedName&, Document*);
   virtual ~SVGHKernElement();
 

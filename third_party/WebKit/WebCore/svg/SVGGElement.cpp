@@ -35,6 +35,11 @@ SVGGElement::SVGGElement(const QualifiedName& tagName, Document* doc)
       SVGLangSpace(),
       SVGExternalResourcesRequired() {}
 
+PassRefPtr<SVGGElement> SVGGElement::create(const QualifiedName& tagName,
+                                            Document* document) {
+  return new SVGGElement(tagName, document);
+}
+
 SVGGElement::~SVGGElement() {}
 
 void SVGGElement::parseMappedAttribute(Attribute* attr) {

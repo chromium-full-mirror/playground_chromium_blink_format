@@ -43,6 +43,11 @@ using namespace SVGNames;
 SVGFontElement::SVGFontElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledElement(tagName, doc), m_isGlyphCacheValid(false) {}
 
+PassRefPtr<SVGFontElement> SVGFontElement::create(const QualifiedName& tagName,
+                                                  Document* document) {
+  return new SVGFontElement(tagName, document);
+}
+
 SVGFontElement::~SVGFontElement() {}
 
 void SVGFontElement::synchronizeProperty(const QualifiedName& attrName) {

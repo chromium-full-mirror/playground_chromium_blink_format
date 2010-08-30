@@ -38,6 +38,12 @@ SVGFETurbulenceElement::SVGFETurbulenceElement(const QualifiedName& tagName,
       m_stitchTiles(SVG_STITCHTYPE_NOSTITCH),
       m_type(FETURBULENCE_TYPE_TURBULENCE) {}
 
+PassRefPtr<SVGFETurbulenceElement> SVGFETurbulenceElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFETurbulenceElement(tagName, document);
+}
+
 SVGFETurbulenceElement::~SVGFETurbulenceElement() {}
 
 void SVGFETurbulenceElement::parseMappedAttribute(Attribute* attr) {

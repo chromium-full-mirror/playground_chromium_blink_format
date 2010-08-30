@@ -29,6 +29,12 @@ SVGFESpotLightElement::SVGFESpotLightElement(const QualifiedName& tagName,
                                              Document* doc)
     : SVGFELightElement(tagName, doc) {}
 
+PassRefPtr<SVGFESpotLightElement> SVGFESpotLightElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFESpotLightElement(tagName, document);
+}
+
 SVGFESpotLightElement::~SVGFESpotLightElement() {}
 
 PassRefPtr<LightSource> SVGFESpotLightElement::lightSource() const {

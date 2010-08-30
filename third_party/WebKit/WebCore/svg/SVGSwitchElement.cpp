@@ -33,6 +33,12 @@ SVGSwitchElement::SVGSwitchElement(const QualifiedName& tagName, Document* doc)
       SVGLangSpace(),
       SVGExternalResourcesRequired() {}
 
+PassRefPtr<SVGSwitchElement> SVGSwitchElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGSwitchElement(tagName, document);
+}
+
 SVGSwitchElement::~SVGSwitchElement() {}
 
 bool SVGSwitchElement::childShouldCreateRenderer(Node* child) const {

@@ -59,6 +59,12 @@ SVGFilterElement::SVGFilterElement(const QualifiedName& tagName, Document* doc)
   // value of "120%" were specified.
 }
 
+PassRefPtr<SVGFilterElement> SVGFilterElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFilterElement(tagName, document);
+}
+
 SVGFilterElement::~SVGFilterElement() {}
 
 void SVGFilterElement::setFilterRes(unsigned long filterResX,

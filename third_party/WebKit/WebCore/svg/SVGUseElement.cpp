@@ -69,6 +69,11 @@ SVGUseElement::SVGUseElement(const QualifiedName& tagName, Document* doc)
       m_isPendingResource(false),
       m_needsShadowTreeRecreation(false) {}
 
+PassRefPtr<SVGUseElement> SVGUseElement::create(const QualifiedName& tagName,
+                                                Document* document) {
+  return new SVGUseElement(tagName, document);
+}
+
 SVGUseElement::~SVGUseElement() {}
 
 SVGElementInstance* SVGUseElement::instanceRoot() const {

@@ -54,6 +54,12 @@ SVGMarkerElement::SVGMarkerElement(const QualifiedName& tagName, Document* doc)
   // effect is as if a value of "3" were specified.
 }
 
+PassRefPtr<SVGMarkerElement> SVGMarkerElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGMarkerElement(tagName, document);
+}
+
 SVGMarkerElement::~SVGMarkerElement() {}
 
 AffineTransform SVGMarkerElement::viewBoxToViewTransform(

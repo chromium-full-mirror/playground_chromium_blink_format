@@ -29,6 +29,12 @@ SVGFEFuncBElement::SVGFEFuncBElement(const QualifiedName& tagName,
                                      Document* doc)
     : SVGComponentTransferFunctionElement(tagName, doc) {}
 
+PassRefPtr<SVGFEFuncBElement> SVGFEFuncBElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFEFuncBElement(tagName, document);
+}
+
 SVGFEFuncBElement::~SVGFEFuncBElement() {}
 }
 

@@ -55,6 +55,11 @@ SVGMaskElement::SVGMaskElement(const QualifiedName& tagName, Document* doc)
   // value of "120%" were specified.
 }
 
+PassRefPtr<SVGMaskElement> SVGMaskElement::create(const QualifiedName& tagName,
+                                                  Document* document) {
+  return new SVGMaskElement(tagName, document);
+}
+
 SVGMaskElement::~SVGMaskElement() {}
 
 void SVGMaskElement::parseMappedAttribute(Attribute* attr) {

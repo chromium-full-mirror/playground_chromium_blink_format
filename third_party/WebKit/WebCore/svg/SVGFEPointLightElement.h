@@ -24,8 +24,12 @@
 #include "SVGFELightElement.h"
 
 namespace WebCore {
+
 class SVGFEPointLightElement : public SVGFELightElement {
  public:
+  static PassRefPtr<SVGFEPointLightElement> create(const QualifiedName&,
+                                                   Document*);
+
   SVGFEPointLightElement(const QualifiedName&, Document*);
   virtual ~SVGFEPointLightElement();
 

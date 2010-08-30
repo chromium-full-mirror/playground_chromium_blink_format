@@ -30,10 +30,9 @@ namespace WebCore {
 class SVGTextElement : public SVGTextPositioningElement,
                        public SVGTransformable {
  public:
-  SVGTextElement(const QualifiedName&, Document*);
-  virtual ~SVGTextElement();
+  static PassRefPtr<SVGTextElement> create(const QualifiedName&, Document*);
 
-  virtual void parseMappedAttribute(Attribute*);
+  virtual ~SVGTextElement();
 
   virtual SVGElement* nearestViewportElement() const;
   virtual SVGElement* farthestViewportElement() const;
@@ -43,6 +42,11 @@ class SVGTextElement : public SVGTextPositioningElement,
   virtual AffineTransform getScreenCTM(
       StyleUpdateStrategy = AllowStyleUpdate) const;
   virtual AffineTransform animatedLocalTransform() const;
+
+ private:
+  SVGTextElement(const QualifiedName&, Document*);
+  virtual void parseMappedAttribute(Attribute*);
+
   virtual AffineTransform* supplementalTransform();
   virtual AffineTransform localCoordinateSpaceTransform(
       SVGLocatable::CTMScope mode) const {
@@ -55,7 +59,6 @@ class SVGTextElement : public SVGTextPositioningElement,
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 
- private:
   DECLARE_ANIMATED_PROPERTY(SVGTextElement,
                             SVGNames::transformAttr,
                             SVGTransformList*,

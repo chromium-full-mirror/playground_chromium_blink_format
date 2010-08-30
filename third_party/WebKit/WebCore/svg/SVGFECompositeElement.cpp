@@ -33,6 +33,12 @@ SVGFECompositeElement::SVGFECompositeElement(const QualifiedName& tagName,
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
       m__operator(FECOMPOSITE_OPERATOR_OVER) {}
 
+PassRefPtr<SVGFECompositeElement> SVGFECompositeElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFECompositeElement(tagName, document);
+}
+
 SVGFECompositeElement::~SVGFECompositeElement() {}
 
 void SVGFECompositeElement::parseMappedAttribute(Attribute* attr) {

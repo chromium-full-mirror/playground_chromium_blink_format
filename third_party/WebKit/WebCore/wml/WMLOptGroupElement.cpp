@@ -40,6 +40,12 @@ WMLOptGroupElement::WMLOptGroupElement(const QualifiedName& tagName,
                                        Document* doc)
     : WMLFormControlElement(tagName, doc) {}
 
+PassRefPtr<WMLOptGroupElement> WMLOptGroupElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLOptGroupElement(tagName, document);
+}
+
 WMLOptGroupElement::~WMLOptGroupElement() {}
 
 const AtomicString& WMLOptGroupElement::formControlType() const {

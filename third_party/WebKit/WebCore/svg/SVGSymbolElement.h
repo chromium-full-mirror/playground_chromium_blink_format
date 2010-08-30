@@ -34,6 +34,8 @@ class SVGSymbolElement : public SVGStyledElement,
                          public SVGExternalResourcesRequired,
                          public SVGFitToViewBox {
  public:
+  static PassRefPtr<SVGSymbolElement> create(const QualifiedName&, Document*);
+
   SVGSymbolElement(const QualifiedName&, Document*);
   virtual ~SVGSymbolElement();
 

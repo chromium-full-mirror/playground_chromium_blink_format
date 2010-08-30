@@ -40,6 +40,12 @@ using namespace WMLNames;
 WMLTimerElement::WMLTimerElement(const QualifiedName& tagName, Document* doc)
     : WMLElement(tagName, doc), m_timer(this, &WMLTimerElement::timerFired) {}
 
+PassRefPtr<WMLTimerElement> WMLTimerElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLTimerElement(tagName, document);
+}
+
 void WMLTimerElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == HTMLNames::nameAttr)
     m_name = parseValueForbiddingVariableReferences(attr->value());

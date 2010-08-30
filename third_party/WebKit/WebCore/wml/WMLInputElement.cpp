@@ -44,6 +44,12 @@ WMLInputElement::WMLInputElement(const QualifiedName& tagName, Document* doc)
       m_isEmptyOk(false),
       m_numOfCharsAllowedByMask(0) {}
 
+PassRefPtr<WMLInputElement> WMLInputElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLInputElement(tagName, document);
+}
+
 WMLInputElement::~WMLInputElement() {
   if (m_isPasswordField)
     document()->unregisterForDocumentActivationCallbacks(this);

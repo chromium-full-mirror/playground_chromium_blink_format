@@ -52,6 +52,12 @@ SVGRadialGradientElement::SVGRadialGradientElement(const QualifiedName& tagName,
   // value of "50%" were specified.
 }
 
+PassRefPtr<SVGRadialGradientElement> SVGRadialGradientElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGRadialGradientElement(tagName, document);
+}
+
 SVGRadialGradientElement::~SVGRadialGradientElement() {}
 
 void SVGRadialGradientElement::parseMappedAttribute(Attribute* attr) {

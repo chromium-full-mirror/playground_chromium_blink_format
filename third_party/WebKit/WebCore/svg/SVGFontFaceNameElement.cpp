@@ -31,6 +31,12 @@ SVGFontFaceNameElement::SVGFontFaceNameElement(const QualifiedName& tagName,
                                                Document* doc)
     : SVGElement(tagName, doc) {}
 
+PassRefPtr<SVGFontFaceNameElement> SVGFontFaceNameElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFontFaceNameElement(tagName, document);
+}
+
 PassRefPtr<CSSFontFaceSrcValue> SVGFontFaceNameElement::srcValue() const {
   return CSSFontFaceSrcValue::createLocal(getAttribute(SVGNames::nameAttr));
 }

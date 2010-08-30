@@ -56,6 +56,8 @@ class SVGPathElement : public SVGStyledTransformableElement,
                        public SVGExternalResourcesRequired,
                        public SVGAnimatedPathData {
  public:
+  static PassRefPtr<SVGPathElement> create(const QualifiedName&, Document*);
+
   SVGPathElement(const QualifiedName&, Document*);
   virtual ~SVGPathElement();
 

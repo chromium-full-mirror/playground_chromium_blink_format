@@ -33,6 +33,8 @@ class SVGSwitchElement : public SVGStyledTransformableElement,
                          public SVGLangSpace,
                          public SVGExternalResourcesRequired {
  public:
+  static PassRefPtr<SVGSwitchElement> create(const QualifiedName&, Document*);
+
   SVGSwitchElement(const QualifiedName&, Document*);
   virtual ~SVGSwitchElement();
 

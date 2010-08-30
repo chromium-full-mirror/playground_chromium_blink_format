@@ -87,6 +87,8 @@ struct SVGGlyphIdentifier {
 
 class SVGGlyphElement : public SVGStyledElement {
  public:
+  static PassRefPtr<SVGGlyphElement> create(const QualifiedName&, Document*);
+
   SVGGlyphElement(const QualifiedName&, Document*);
   virtual ~SVGGlyphElement();
 

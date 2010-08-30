@@ -38,6 +38,12 @@ using namespace SVGNames;
 SVGHKernElement::SVGHKernElement(const QualifiedName& tagName, Document* doc)
     : SVGElement(tagName, doc) {}
 
+PassRefPtr<SVGHKernElement> SVGHKernElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGHKernElement(tagName, document);
+}
+
 SVGHKernElement::~SVGHKernElement() {}
 
 void SVGHKernElement::insertedIntoDocument() {

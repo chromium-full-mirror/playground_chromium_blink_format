@@ -33,6 +33,11 @@ SVGDefsElement::SVGDefsElement(const QualifiedName& tagName, Document* doc)
       SVGLangSpace(),
       SVGExternalResourcesRequired() {}
 
+PassRefPtr<SVGDefsElement> SVGDefsElement::create(const QualifiedName& tagName,
+                                                  Document* document) {
+  return new SVGDefsElement(tagName, document);
+}
+
 SVGDefsElement::~SVGDefsElement() {}
 
 bool SVGDefsElement::isValid() const {

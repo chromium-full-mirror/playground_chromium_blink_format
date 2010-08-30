@@ -27,6 +27,11 @@ namespace WebCore {
 SVGDescElement::SVGDescElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledElement(tagName, doc), SVGLangSpace() {}
 
+PassRefPtr<SVGDescElement> SVGDescElement::create(const QualifiedName& tagName,
+                                                  Document* document) {
+  return new SVGDescElement(tagName, document);
+}
+
 SVGDescElement::~SVGDescElement() {}
 
 String SVGDescElement::description() const {

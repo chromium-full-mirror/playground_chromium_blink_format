@@ -52,6 +52,11 @@ SVGAElement::SVGAElement(const QualifiedName& tagName, Document* doc)
       SVGLangSpace(),
       SVGExternalResourcesRequired() {}
 
+PassRefPtr<SVGAElement> SVGAElement::create(const QualifiedName& tagName,
+                                            Document* document) {
+  return new SVGAElement(tagName, document);
+}
+
 SVGAElement::~SVGAElement() {}
 
 String SVGAElement::title() const {

@@ -32,6 +32,12 @@ SVGFEBlendElement::SVGFEBlendElement(const QualifiedName& tagName,
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
       m_mode(FEBLEND_MODE_NORMAL) {}
 
+PassRefPtr<SVGFEBlendElement> SVGFEBlendElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFEBlendElement(tagName, document);
+}
+
 SVGFEBlendElement::~SVGFEBlendElement() {}
 
 void SVGFEBlendElement::parseMappedAttribute(Attribute* attr) {

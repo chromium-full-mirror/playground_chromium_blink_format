@@ -38,6 +38,11 @@ SVGViewElement::SVGViewElement(const QualifiedName& tagName, Document* doc)
       SVGFitToViewBox(),
       SVGZoomAndPan() {}
 
+PassRefPtr<SVGViewElement> SVGViewElement::create(const QualifiedName& tagName,
+                                                  Document* document) {
+  return new SVGViewElement(tagName, document);
+}
+
 SVGViewElement::~SVGViewElement() {}
 
 SVGStringList* SVGViewElement::viewTarget() const {

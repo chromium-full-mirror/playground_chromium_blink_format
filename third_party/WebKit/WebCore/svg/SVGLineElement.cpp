@@ -42,6 +42,11 @@ SVGLineElement::SVGLineElement(const QualifiedName& tagName, Document* doc)
       m_x2(LengthModeWidth),
       m_y2(LengthModeHeight) {}
 
+PassRefPtr<SVGLineElement> SVGLineElement::create(const QualifiedName& tagName,
+                                                  Document* document) {
+  return new SVGLineElement(tagName, document);
+}
+
 SVGLineElement::~SVGLineElement() {}
 
 void SVGLineElement::parseMappedAttribute(Attribute* attr) {

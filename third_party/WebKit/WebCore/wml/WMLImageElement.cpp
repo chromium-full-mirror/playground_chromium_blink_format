@@ -42,6 +42,12 @@ WMLImageElement::WMLImageElement(const QualifiedName& tagName, Document* doc)
       m_imageLoader(this),
       m_useFallbackAttribute(false) {}
 
+PassRefPtr<WMLImageElement> WMLImageElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLImageElement(tagName, document);
+}
+
 WMLImageElement::~WMLImageElement() {}
 
 bool WMLImageElement::mapToEntry(const QualifiedName& attrName,

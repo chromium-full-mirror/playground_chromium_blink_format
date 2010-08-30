@@ -30,6 +30,12 @@ WMLInsertedLegendElement::WMLInsertedLegendElement(const QualifiedName& tagName,
                                                    Document* doc)
     : WMLElement(tagName, doc) {}
 
+PassRefPtr<WMLInsertedLegendElement> WMLInsertedLegendElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLInsertedLegendElement(tagName, document);
+}
+
 WMLInsertedLegendElement::~WMLInsertedLegendElement() {}
 }
 

@@ -35,6 +35,12 @@ SVGFEColorMatrixElement::SVGFEColorMatrixElement(const QualifiedName& tagName,
       m_type(FECOLORMATRIX_TYPE_UNKNOWN),
       m_values(SVGNumberList::create(SVGNames::valuesAttr)) {}
 
+PassRefPtr<SVGFEColorMatrixElement> SVGFEColorMatrixElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFEColorMatrixElement(tagName, document);
+}
+
 SVGFEColorMatrixElement::~SVGFEColorMatrixElement() {}
 
 void SVGFEColorMatrixElement::parseMappedAttribute(Attribute* attr) {

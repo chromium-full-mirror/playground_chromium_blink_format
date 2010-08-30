@@ -40,6 +40,12 @@ using namespace SVGNames;
 SVGGlyphElement::SVGGlyphElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledElement(tagName, doc) {}
 
+PassRefPtr<SVGGlyphElement> SVGGlyphElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGGlyphElement(tagName, document);
+}
+
 SVGGlyphElement::~SVGGlyphElement() {}
 
 void SVGGlyphElement::invalidateGlyphCache() {

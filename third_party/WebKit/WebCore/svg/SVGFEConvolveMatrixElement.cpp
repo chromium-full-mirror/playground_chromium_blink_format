@@ -45,6 +45,12 @@ SVGFEConvolveMatrixElement::SVGFEConvolveMatrixElement(
       m_kernelMatrix(SVGNumberList::create(SVGNames::kernelMatrixAttr)),
       m_edgeMode(EDGEMODE_DUPLICATE) {}
 
+PassRefPtr<SVGFEConvolveMatrixElement> SVGFEConvolveMatrixElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFEConvolveMatrixElement(tagName, document);
+}
+
 SVGFEConvolveMatrixElement::~SVGFEConvolveMatrixElement() {}
 
 void SVGFEConvolveMatrixElement::parseMappedAttribute(Attribute* attr) {

@@ -46,6 +46,12 @@ SVGAnimateMotionElement::SVGAnimateMotionElement(const QualifiedName& tagName,
       m_baseIndexInTransformList(0),
       m_angle(0) {}
 
+PassRefPtr<SVGAnimateMotionElement> SVGAnimateMotionElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGAnimateMotionElement(tagName, document);
+}
+
 SVGAnimateMotionElement::~SVGAnimateMotionElement() {}
 
 bool SVGAnimateMotionElement::hasValidTarget() const {

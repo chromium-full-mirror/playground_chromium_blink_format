@@ -34,6 +34,12 @@ WMLFormControlElement::WMLFormControlElement(const QualifiedName& tagName,
                                              Document* document)
     : WMLElement(tagName, document), m_valueMatchesRenderer(false) {}
 
+PassRefPtr<WMLFormControlElement> WMLFormControlElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLFormControlElement(tagName, document);
+}
+
 WMLFormControlElement::~WMLFormControlElement() {}
 
 bool WMLFormControlElement::supportsFocus() const {

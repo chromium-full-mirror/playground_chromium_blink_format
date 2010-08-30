@@ -34,6 +34,8 @@ class SVGEllipseElement : public SVGStyledTransformableElement,
                           public SVGLangSpace,
                           public SVGExternalResourcesRequired {
  public:
+  static PassRefPtr<SVGEllipseElement> create(const QualifiedName&, Document*);
+
   SVGEllipseElement(const QualifiedName&, Document*);
   virtual ~SVGEllipseElement();
 

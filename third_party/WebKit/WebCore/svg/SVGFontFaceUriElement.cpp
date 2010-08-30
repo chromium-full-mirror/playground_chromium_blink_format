@@ -40,6 +40,12 @@ SVGFontFaceUriElement::SVGFontFaceUriElement(const QualifiedName& tagName,
                                              Document* doc)
     : SVGElement(tagName, doc) {}
 
+PassRefPtr<SVGFontFaceUriElement> SVGFontFaceUriElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFontFaceUriElement(tagName, document);
+}
+
 SVGFontFaceUriElement::~SVGFontFaceUriElement() {
   if (m_cachedFont)
     m_cachedFont->removeClient(this);

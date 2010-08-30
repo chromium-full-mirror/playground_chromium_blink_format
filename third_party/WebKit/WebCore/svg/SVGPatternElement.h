@@ -43,6 +43,8 @@ class SVGPatternElement : public SVGStyledElement,
                           public SVGExternalResourcesRequired,
                           public SVGFitToViewBox {
  public:
+  static PassRefPtr<SVGPatternElement> create(const QualifiedName&, Document*);
+
   SVGPatternElement(const QualifiedName&, Document*);
   virtual ~SVGPatternElement();
 

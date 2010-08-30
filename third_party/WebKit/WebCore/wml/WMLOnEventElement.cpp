@@ -40,6 +40,12 @@ WMLOnEventElement::WMLOnEventElement(const QualifiedName& tagName,
                                      Document* doc)
     : WMLElement(tagName, doc), m_type(WMLIntrinsicEventUnknown) {}
 
+PassRefPtr<WMLOnEventElement> WMLOnEventElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLOnEventElement(tagName, document);
+}
+
 void WMLOnEventElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == HTMLNames::typeAttr) {
     String parsedValue = parseValueForbiddingVariableReferences(attr->value());

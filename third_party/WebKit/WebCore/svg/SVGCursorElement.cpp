@@ -38,6 +38,12 @@ SVGCursorElement::SVGCursorElement(const QualifiedName& tagName, Document* doc)
       m_x(LengthModeWidth),
       m_y(LengthModeHeight) {}
 
+PassRefPtr<SVGCursorElement> SVGCursorElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGCursorElement(tagName, document);
+}
+
 SVGCursorElement::~SVGCursorElement() {
   HashSet<SVGElement*>::iterator end = m_clients.end();
   for (HashSet<SVGElement*>::iterator it = m_clients.begin(); it != end; ++it)

@@ -37,6 +37,12 @@ SVGAltGlyphElement::SVGAltGlyphElement(const QualifiedName& tagName,
                                        Document* doc)
     : SVGTextPositioningElement(tagName, doc) {}
 
+PassRefPtr<SVGAltGlyphElement> SVGAltGlyphElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGAltGlyphElement(tagName, document);
+}
+
 SVGAltGlyphElement::~SVGAltGlyphElement() {}
 
 void SVGAltGlyphElement::synchronizeProperty(const QualifiedName& attrName) {

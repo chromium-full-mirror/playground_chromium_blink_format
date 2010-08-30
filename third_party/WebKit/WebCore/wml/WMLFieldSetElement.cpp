@@ -39,6 +39,12 @@ WMLFieldSetElement::WMLFieldSetElement(const QualifiedName& tagName,
                                        Document* doc)
     : WMLElement(tagName, doc) {}
 
+PassRefPtr<WMLFieldSetElement> WMLFieldSetElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLFieldSetElement(tagName, document);
+}
+
 WMLFieldSetElement::~WMLFieldSetElement() {}
 
 void WMLFieldSetElement::insertedIntoDocument() {

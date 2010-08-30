@@ -35,6 +35,11 @@ namespace WebCore {
 WMLPrevElement::WMLPrevElement(const QualifiedName& tagName, Document* doc)
     : WMLTaskElement(tagName, doc) {}
 
+PassRefPtr<WMLPrevElement> WMLPrevElement::create(const QualifiedName& tagName,
+                                                  Document* document) {
+  return new WMLPrevElement(tagName, document);
+}
+
 WMLPrevElement::~WMLPrevElement() {}
 
 void WMLPrevElement::executeTask() {

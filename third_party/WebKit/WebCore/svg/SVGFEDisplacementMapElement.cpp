@@ -33,6 +33,12 @@ SVGFEDisplacementMapElement::SVGFEDisplacementMapElement(
       m_xChannelSelector(CHANNEL_A),
       m_yChannelSelector(CHANNEL_A) {}
 
+PassRefPtr<SVGFEDisplacementMapElement> SVGFEDisplacementMapElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFEDisplacementMapElement(tagName, document);
+}
+
 SVGFEDisplacementMapElement::~SVGFEDisplacementMapElement() {}
 
 ChannelSelectorType SVGFEDisplacementMapElement::stringToChannel(

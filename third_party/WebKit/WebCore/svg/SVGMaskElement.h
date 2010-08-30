@@ -36,6 +36,8 @@ class SVGMaskElement : public SVGStyledLocatableElement,
                        public SVGLangSpace,
                        public SVGExternalResourcesRequired {
  public:
+  static PassRefPtr<SVGMaskElement> create(const QualifiedName&, Document*);
+
   SVGMaskElement(const QualifiedName&, Document*);
   virtual ~SVGMaskElement();
 

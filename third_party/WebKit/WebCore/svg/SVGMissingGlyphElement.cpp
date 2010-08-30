@@ -27,6 +27,12 @@ namespace WebCore {
 SVGMissingGlyphElement::SVGMissingGlyphElement(const QualifiedName& tagName,
                                                Document* doc)
     : SVGStyledElement(tagName, doc) {}
+
+PassRefPtr<SVGMissingGlyphElement> SVGMissingGlyphElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGMissingGlyphElement(tagName, document);
+}
 }
 
 #endif  // ENABLE(SVG_FONTS)

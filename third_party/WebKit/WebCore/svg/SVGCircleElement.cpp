@@ -41,6 +41,12 @@ SVGCircleElement::SVGCircleElement(const QualifiedName& tagName, Document* doc)
       m_cy(LengthModeHeight),
       m_r(LengthModeOther) {}
 
+PassRefPtr<SVGCircleElement> SVGCircleElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGCircleElement(tagName, document);
+}
+
 SVGCircleElement::~SVGCircleElement() {}
 
 void SVGCircleElement::parseMappedAttribute(Attribute* attr) {

@@ -48,6 +48,12 @@ SVGImageElement::SVGImageElement(const QualifiedName& tagName, Document* doc)
       m_height(LengthModeHeight),
       m_imageLoader(this) {}
 
+PassRefPtr<SVGImageElement> SVGImageElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGImageElement(tagName, document);
+}
+
 SVGImageElement::~SVGImageElement() {}
 
 void SVGImageElement::parseMappedAttribute(Attribute* attr) {

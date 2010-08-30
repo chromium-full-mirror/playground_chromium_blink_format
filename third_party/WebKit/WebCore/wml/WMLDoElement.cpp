@@ -50,6 +50,11 @@ WMLDoElement::WMLDoElement(const QualifiedName& tagName, Document* doc)
       m_isNoop(false),
       m_isOptional(false) {}
 
+PassRefPtr<WMLDoElement> WMLDoElement::create(const QualifiedName& tagName,
+                                              Document* document) {
+  return new WMLDoElement(tagName, document);
+}
+
 void WMLDoElement::defaultEventHandler(Event* event) {
   if (m_isOptional)
     return;

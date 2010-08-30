@@ -43,6 +43,11 @@ SVGRectElement::SVGRectElement(const QualifiedName& tagName, Document* doc)
       m_rx(LengthModeWidth),
       m_ry(LengthModeHeight) {}
 
+PassRefPtr<SVGRectElement> SVGRectElement::create(const QualifiedName& tagName,
+                                                  Document* document) {
+  return new SVGRectElement(tagName, document);
+}
+
 SVGRectElement::~SVGRectElement() {}
 
 void SVGRectElement::parseMappedAttribute(Attribute* attr) {

@@ -45,6 +45,12 @@ SVGAnimateElement::SVGAnimateElement(const QualifiedName& tagName,
       m_animatedNumber(numeric_limits<double>::infinity()),
       m_animatedPathPointer(0) {}
 
+PassRefPtr<SVGAnimateElement> SVGAnimateElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGAnimateElement(tagName, document);
+}
+
 SVGAnimateElement::~SVGAnimateElement() {}
 
 static bool parseNumberValueAndUnit(const String& in,

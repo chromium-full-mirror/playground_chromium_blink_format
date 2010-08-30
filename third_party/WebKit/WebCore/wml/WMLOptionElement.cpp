@@ -38,6 +38,12 @@ using namespace WMLNames;
 WMLOptionElement::WMLOptionElement(const QualifiedName& tagName, Document* doc)
     : WMLFormControlElement(tagName, doc) {}
 
+PassRefPtr<WMLOptionElement> WMLOptionElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLOptionElement(tagName, document);
+}
+
 WMLOptionElement::~WMLOptionElement() {}
 
 const AtomicString& WMLOptionElement::formControlType() const {

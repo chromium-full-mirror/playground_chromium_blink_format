@@ -43,6 +43,12 @@ using namespace WMLNames;
 WMLTableElement::WMLTableElement(const QualifiedName& tagName, Document* doc)
     : WMLElement(tagName, doc), m_columns(0) {}
 
+PassRefPtr<WMLTableElement> WMLTableElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLTableElement(tagName, document);
+}
+
 WMLTableElement::~WMLTableElement() {}
 
 bool WMLTableElement::mapToEntry(const QualifiedName& attrName,

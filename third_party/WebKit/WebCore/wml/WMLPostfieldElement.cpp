@@ -39,6 +39,12 @@ WMLPostfieldElement::WMLPostfieldElement(const QualifiedName& tagName,
                                          Document* doc)
     : WMLElement(tagName, doc) {}
 
+PassRefPtr<WMLPostfieldElement> WMLPostfieldElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new WMLPostfieldElement(tagName, document);
+}
+
 void WMLPostfieldElement::insertedIntoDocument() {
   WMLElement::insertedIntoDocument();
 

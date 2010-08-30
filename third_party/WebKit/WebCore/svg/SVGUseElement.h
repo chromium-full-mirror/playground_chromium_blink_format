@@ -41,11 +41,19 @@ class SVGUseElement : public SVGStyledTransformableElement,
                       public SVGExternalResourcesRequired,
                       public SVGURIReference {
  public:
-  SVGUseElement(const QualifiedName&, Document*);
+  static PassRefPtr<SVGUseElement> create(const QualifiedName&, Document*);
+
   virtual ~SVGUseElement();
 
   SVGElementInstance* instanceRoot() const;
   SVGElementInstance* animatedInstanceRoot() const;
+  SVGElementInstance* instanceForShadowTreeElement(Node*) const;
+  void invalidateShadowTree();
+
+  RenderObject* rendererClipChild() const;
+
+ private:
+  SVGUseElement(const QualifiedName&, Document*);
 
   virtual bool isValid() const { return SVGTests::isValid(); }
 
@@ -63,20 +71,15 @@ class SVGUseElement : public SVGStyledTransformableElement,
   virtual void detach();
 
   virtual Path toClipPath() const;
-  RenderObject* rendererClipChild() const;
 
   static void removeDisallowedElementsFromSubtree(Node* element);
-  SVGElementInstance* instanceForShadowTreeElement(Node* element) const;
-  void invalidateShadowTree();
 
   void setUpdatesBlocked(bool blocked) { m_updatesBlocked = blocked; }
 
- private:
   friend class RenderSVGShadowTreeRootContainer;
   bool isPendingResource() const { return m_isPendingResource; }
   void buildShadowAndInstanceTree(SVGShadowTreeRootElement*);
 
- private:
   virtual bool selfHasRelativeLengths() const;
 
   DECLARE_ANIMATED_PROPERTY(SVGUseElement, SVGNames::xAttr, SVGLength, X, x)
@@ -106,7 +109,6 @@ class SVGUseElement : public SVGStyledTransformableElement,
                             ExternalResourcesRequired,
                             externalResourcesRequired)
 
- private:
   // Instance tree handling
   void buildInstanceTree(SVGElement* target,
                          SVGElementInstance* targetInstance,

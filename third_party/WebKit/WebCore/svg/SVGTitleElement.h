@@ -26,8 +26,12 @@
 #include "SVGStyledElement.h"
 
 namespace WebCore {
+
 class SVGTitleElement : public SVGStyledElement, public SVGLangSpace {
  public:
+  static PassRefPtr<SVGTitleElement> create(const QualifiedName&, Document*);
+
+ private:
   SVGTitleElement(const QualifiedName&, Document*);
 
   virtual void insertedIntoDocument();

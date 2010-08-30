@@ -39,6 +39,11 @@ namespace WebCore {
 WMLBRElement::WMLBRElement(const QualifiedName& tagName, Document* doc)
     : WMLElement(tagName, doc) {}
 
+PassRefPtr<WMLBRElement> WMLBRElement::create(const QualifiedName& tagName,
+                                              Document* document) {
+  return new WMLBRElement(tagName, document);
+}
+
 bool WMLBRElement::mapToEntry(const QualifiedName& attrName,
                               MappedAttributeEntry& result) const {
   if (attrName == HTMLNames::clearAttr) {

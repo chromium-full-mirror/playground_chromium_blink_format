@@ -38,6 +38,12 @@ SVGFEComponentTransferElement::SVGFEComponentTransferElement(
     Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc) {}
 
+PassRefPtr<SVGFEComponentTransferElement> SVGFEComponentTransferElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFEComponentTransferElement(tagName, document);
+}
+
 SVGFEComponentTransferElement::~SVGFEComponentTransferElement() {}
 
 void SVGFEComponentTransferElement::parseMappedAttribute(Attribute* attr) {

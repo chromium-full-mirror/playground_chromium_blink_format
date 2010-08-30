@@ -33,6 +33,11 @@ namespace WebCore {
 WMLMetaElement::WMLMetaElement(const QualifiedName& tagName, Document* doc)
     : WMLElement(tagName, doc) {}
 
+PassRefPtr<WMLMetaElement> WMLMetaElement::create(const QualifiedName& tagName,
+                                                  Document* document) {
+  return new WMLMetaElement(tagName, document);
+}
+
 WMLMetaElement::~WMLMetaElement() {}
 
 void WMLMetaElement::parseMappedAttribute(Attribute* attr) {

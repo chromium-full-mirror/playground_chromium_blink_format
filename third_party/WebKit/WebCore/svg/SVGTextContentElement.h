@@ -42,7 +42,6 @@ class SVGTextContentElement : public SVGStyledElement,
     LENGTHADJUST_SPACINGANDGLYPHS = 2
   };
 
-  SVGTextContentElement(const QualifiedName&, Document*);
   virtual ~SVGTextContentElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }
@@ -66,6 +65,8 @@ class SVGTextContentElement : public SVGStyledElement,
   bool isKnownAttribute(const QualifiedName&);
 
  protected:
+  SVGTextContentElement(const QualifiedName&, Document*);
+
   virtual bool selfHasRelativeLengths() const;
 
  private:

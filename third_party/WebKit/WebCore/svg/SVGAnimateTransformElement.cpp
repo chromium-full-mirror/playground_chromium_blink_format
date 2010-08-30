@@ -53,6 +53,12 @@ SVGAnimateTransformElement::SVGAnimateTransformElement(
       m_type(SVGTransform::SVG_TRANSFORM_UNKNOWN),
       m_baseIndexInTransformList(0) {}
 
+PassRefPtr<SVGAnimateTransformElement> SVGAnimateTransformElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGAnimateTransformElement(tagName, document);
+}
+
 SVGAnimateTransformElement::~SVGAnimateTransformElement() {}
 
 bool SVGAnimateTransformElement::hasValidTarget() const {

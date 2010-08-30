@@ -33,6 +33,12 @@ SVGSymbolElement::SVGSymbolElement(const QualifiedName& tagName, Document* doc)
       SVGExternalResourcesRequired(),
       SVGFitToViewBox() {}
 
+PassRefPtr<SVGSymbolElement> SVGSymbolElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGSymbolElement(tagName, document);
+}
+
 SVGSymbolElement::~SVGSymbolElement() {}
 
 void SVGSymbolElement::parseMappedAttribute(Attribute* attr) {

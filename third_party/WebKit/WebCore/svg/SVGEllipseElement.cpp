@@ -43,6 +43,12 @@ SVGEllipseElement::SVGEllipseElement(const QualifiedName& tagName,
       m_rx(LengthModeWidth),
       m_ry(LengthModeHeight) {}
 
+PassRefPtr<SVGEllipseElement> SVGEllipseElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGEllipseElement(tagName, document);
+}
+
 SVGEllipseElement::~SVGEllipseElement() {}
 
 void SVGEllipseElement::parseMappedAttribute(Attribute* attr) {

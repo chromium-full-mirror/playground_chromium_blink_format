@@ -32,7 +32,11 @@ namespace WebCore {
 SVGTSpanElement::SVGTSpanElement(const QualifiedName& tagName, Document* doc)
     : SVGTextPositioningElement(tagName, doc) {}
 
-SVGTSpanElement::~SVGTSpanElement() {}
+PassRefPtr<SVGTSpanElement> SVGTSpanElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGTSpanElement(tagName, document);
+}
 
 bool SVGTSpanElement::childShouldCreateRenderer(Node* child) const {
   if (child->isTextNode()

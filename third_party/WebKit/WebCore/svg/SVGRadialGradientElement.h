@@ -31,6 +31,9 @@ class SVGLength;
 
 class SVGRadialGradientElement : public SVGGradientElement {
  public:
+  static PassRefPtr<SVGRadialGradientElement> create(const QualifiedName&,
+                                                     Document*);
+
   SVGRadialGradientElement(const QualifiedName&, Document*);
   virtual ~SVGRadialGradientElement();
 

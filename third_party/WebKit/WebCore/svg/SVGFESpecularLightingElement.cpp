@@ -40,6 +40,12 @@ SVGFESpecularLightingElement::SVGFESpecularLightingElement(
       m_specularExponent(1.0f),
       m_surfaceScale(1.0f) {}
 
+PassRefPtr<SVGFESpecularLightingElement> SVGFESpecularLightingElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFESpecularLightingElement(tagName, document);
+}
+
 SVGFESpecularLightingElement::~SVGFESpecularLightingElement() {}
 
 void SVGFESpecularLightingElement::parseMappedAttribute(Attribute* attr) {

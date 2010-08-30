@@ -31,6 +31,12 @@ SVGFEMergeElement::SVGFEMergeElement(const QualifiedName& tagName,
                                      Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc) {}
 
+PassRefPtr<SVGFEMergeElement> SVGFEMergeElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGFEMergeElement(tagName, document);
+}
+
 SVGFEMergeElement::~SVGFEMergeElement() {}
 
 PassRefPtr<FilterEffect> SVGFEMergeElement::build(

@@ -31,6 +31,12 @@ SVGPolygonElement::SVGPolygonElement(const QualifiedName& tagName,
                                      Document* doc)
     : SVGPolyElement(tagName, doc) {}
 
+PassRefPtr<SVGPolygonElement> SVGPolygonElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new SVGPolygonElement(tagName, document);
+}
+
 SVGPolygonElement::~SVGPolygonElement() {}
 
 Path SVGPolygonElement::toPathData() const {
