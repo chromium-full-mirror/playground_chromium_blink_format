@@ -1582,10 +1582,9 @@ void TCMalloc_PageHeap::scavenge() {
       // the spans in the list, else return all but 1 span.
       // Return only 50% of a spanlist at a time so spans of size 1 are not the
       // only ones left.
+      size_t length = DLL_Length(&slist->normal);
       size_t numSpansToReturn =
-          (i > kMinSpanListsWithSpans)
-              ? DLL_Length(&slist->normal)
-              : static_cast<size_t>(.5 * DLL_Length(&slist->normal));
+          (i > kMinSpanListsWithSpans) ? length : length / 2;
       for (int j = 0; static_cast<size_t>(j) < numSpansToReturn &&
                       !DLL_IsEmpty(&slist->normal) &&
                       free_committed_pages_ > targetPageCount;
