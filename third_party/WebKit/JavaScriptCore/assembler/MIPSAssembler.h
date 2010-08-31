@@ -261,6 +261,10 @@ class MIPSAssembler {
     emitInst(0x00000018 | (rs << OP_SH_RS) | (rt << OP_SH_RT));
   }
 
+  void div(RegisterID rs, RegisterID rt) {
+    emitInst(0x0000001a | (rs << OP_SH_RS) | (rt << OP_SH_RT));
+  }
+
   void mfhi(RegisterID rd) { emitInst(0x00000010 | (rd << OP_SH_RD)); }
 
   void mflo(RegisterID rd) { emitInst(0x00000012 | (rd << OP_SH_RD)); }
