@@ -43,6 +43,7 @@
 
 namespace WebCore {
 
+class Blob;
 class Database;
 class DatabaseCallback;
 class DatabaseSync;
@@ -136,6 +137,11 @@ class WorkerContext : public RefCounted<WorkerContext>,
 #endif
   virtual bool isContextThread() const;
   virtual bool isJSExecutionTerminated() const;
+
+#if ENABLE(BLOB)
+  String createBlobURL(Blob*);
+  void revokeBlobURL(const String&);
+#endif
 
   // These methods are used for GC marking. See
   // JSWorkerContext::markChildren(MarkStack&) in
