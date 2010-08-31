@@ -203,6 +203,11 @@ incremental searching), NO to begin search after the selected text.
                          caseSensitive:(BOOL)caseFlag
                              highlight:(BOOL)highlight
                                  limit:(WebNSUInteger)limit;
+- (WebNSUInteger)countMatchesForText:(NSString*)string
+                       caseSensitive:(BOOL)caseFlag
+                           highlight:(BOOL)highlight
+                               limit:(WebNSUInteger)limit
+                         markMatches:(BOOL)markMatches;
 - (void)unmarkAllTextMatches;
 - (NSArray*)rectsForTextMatches;
 

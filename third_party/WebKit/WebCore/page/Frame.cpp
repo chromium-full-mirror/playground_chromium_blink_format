@@ -1302,9 +1302,10 @@ bool Frame::findString(const String& target,
   return true;
 }
 
-unsigned Frame::markAllMatchesForText(const String& target,
-                                      bool caseFlag,
-                                      unsigned limit) {
+unsigned Frame::countMatchesForText(const String& target,
+                                    bool caseFlag,
+                                    unsigned limit,
+                                    bool markMatches) {
   if (target.isEmpty())
     return 0;
 
@@ -1328,8 +1329,9 @@ unsigned Frame::markAllMatchesForText(const String& target,
     // Only treat the result as a match if it is visible
     if (editor()->insideVisibleArea(resultRange.get())) {
       ++matchCount;
-      document()->markers()->addMarker(resultRange.get(),
-                                       DocumentMarker::TextMatch);
+      if (markMatches)
+        document()->markers()->addMarker(resultRange.get(),
+                                         DocumentMarker::TextMatch);
     }
 
     // Stop looking if we hit the specified limit. A limit of 0 means no limit.
@@ -1349,17 +1351,17 @@ unsigned Frame::markAllMatchesForText(const String& target,
                           exception);
   } while (true);
 
-  // Do a "fake" paint in order to execute the code that computes the rendered
-  // rect for
-  // each text match.
-  Document* doc = document();
-  if (m_view && contentRenderer()) {
-    doc->updateLayout();  // Ensure layout is up to date.
-    IntRect visibleRect = m_view->visibleContentRect();
-    if (!visibleRect.isEmpty()) {
-      GraphicsContext context((PlatformGraphicsContext*)0);
-      context.setPaintingDisabled(true);
-      m_view->paintContents(&context, visibleRect);
+  if (markMatches) {
+    // Do a "fake" paint in order to execute the code that computes the rendered
+    // rect for each text match.
+    if (m_view && contentRenderer()) {
+      document()->updateLayout();  // Ensure layout is up to date.
+      IntRect visibleRect = m_view->visibleContentRect();
+      if (!visibleRect.isEmpty()) {
+        GraphicsContext context((PlatformGraphicsContext*)0);
+        context.setPaintingDisabled(true);
+        m_view->paintContents(&context, visibleRect);
+      }
     }
   }
 
