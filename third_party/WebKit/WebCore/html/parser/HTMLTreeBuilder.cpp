@@ -409,6 +409,9 @@ void HTMLTreeBuilder::constructTreeFromToken(HTMLToken& rawToken) {
   // problems.
   m_tokenizer->setForceNullCharacterReplacement(
       m_insertionMode == TextMode || m_insertionMode == InForeignContentMode);
+  m_tokenizer->setShouldAllowCDATA(m_insertionMode == InForeignContentMode &&
+                                   m_tree.currentElement()->namespaceURI() !=
+                                       xhtmlNamespaceURI);
 }
 
 void HTMLTreeBuilder::processToken(AtomicHTMLToken& token) {
