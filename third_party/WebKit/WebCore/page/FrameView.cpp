@@ -130,7 +130,7 @@ FrameView::FrameView(Frame* frame)
       m_fixedObjectCount(0),
       m_layoutTimer(this, &FrameView::layoutTimerFired),
       m_layoutRoot(0),
-      m_shouldFirePostLayoutTimer(false),
+      m_hasPendingPostLayoutTasks(false),
       m_inSynchronousPostLayout(false),
       m_postLayoutTasksTimer(this, &FrameView::postLayoutTimerFired),
       m_isTransparent(false),
@@ -165,7 +165,7 @@ PassRefPtr<FrameView> FrameView::create(Frame* frame,
 }
 
 FrameView::~FrameView() {
-  if (m_shouldFirePostLayoutTimer) {
+  if (m_hasPendingPostLayoutTasks) {
     m_postLayoutTasksTimer.stop();
     m_scheduledEvents.clear();
     m_enqueueEvents = 0;
@@ -206,7 +206,7 @@ void FrameView::reset() {
   m_layoutSchedulingEnabled = true;
   m_inLayout = false;
   m_inSynchronousPostLayout = false;
-  m_shouldFirePostLayoutTimer = false;
+  m_hasPendingPostLayoutTasks = false;
   m_layoutCount = 0;
   m_nestedLayoutCount = 0;
   m_postLayoutTasksTimer.stop();
@@ -638,7 +638,7 @@ void FrameView::layout(bool allowSubtree) {
   m_layoutSchedulingEnabled = false;
 
   if (!m_nestedLayoutCount && !m_inSynchronousPostLayout &&
-      m_shouldFirePostLayoutTimer) {
+      m_hasPendingPostLayoutTasks) {
     // This is a new top-level layout. If there are any remaining tasks from the
     // previous
     // layout, finish them now.
@@ -842,7 +842,7 @@ void FrameView::layout(bool allowSubtree) {
     updateOverflowStatus(layoutWidth() < contentsWidth(),
                          layoutHeight() < contentsHeight());
 
-  if (!m_shouldFirePostLayoutTimer) {
+  if (!m_hasPendingPostLayoutTasks) {
     if (!m_inSynchronousPostLayout) {
       m_inSynchronousPostLayout = true;
       // Calls resumeScheduledEvents()
@@ -850,7 +850,7 @@ void FrameView::layout(bool allowSubtree) {
       m_inSynchronousPostLayout = false;
     }
 
-    if (!m_shouldFirePostLayoutTimer &&
+    if (!m_hasPendingPostLayoutTasks &&
         (needsLayout() || m_inSynchronousPostLayout)) {
       // If we need layout or are already in a synchronous call to
       // postLayoutTasks(),
@@ -859,7 +859,7 @@ void FrameView::layout(bool allowSubtree) {
       // can make us need to update again, and we can get stuck in a nasty cycle
       // unless
       // we call it through the timer here.
-      m_shouldFirePostLayoutTimer = true;
+      m_hasPendingPostLayoutTasks = true;
       m_postLayoutTasksTimer.startOneShot(0);
       if (needsLayout()) {
         pauseScheduledEvents();
@@ -1613,7 +1613,7 @@ bool FrameView::updateWidgets() {
 }
 
 void FrameView::performPostLayoutTasks() {
-  m_shouldFirePostLayoutTimer = false;
+  m_hasPendingPostLayoutTasks = false;
 
   if (m_firstLayoutCallbackPending) {
     m_firstLayoutCallbackPending = false;
