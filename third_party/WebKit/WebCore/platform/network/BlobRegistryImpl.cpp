@@ -30,6 +30,8 @@
 
 #include "config.h"
 
+#if ENABLE(BLOB)
+
 #include "BlobRegistryImpl.h"
 
 #include "BlobResourceHandle.h"
@@ -195,3 +197,5 @@ PassRefPtr<BlobStorageData> BlobRegistryImpl::getBlobDataFromURL(
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(BLOB)
