@@ -55,6 +55,7 @@ namespace WebCore {
 class GraphicsContext;
 class KeyboardEvent;
 class Page;
+class ResourceRequest;
 }
 
 namespace WebKit {
@@ -160,7 +161,8 @@ class WebPage : public APIObject {
 
   // Actions
   void tryClose();
-  void loadURL(const WTF::String&);
+  void loadURL(const String&);
+  void loadURLRequest(const WebCore::ResourceRequest&);
   void reload(bool reloadFromOrigin);
   void goForward(uint64_t);
   void goBack(uint64_t);

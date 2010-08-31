@@ -30,17 +30,19 @@
 
 using namespace WebCore;
 
-WKStringRef WKStringCreateWithCFString(CFStringRef cfString)
-{
-    String string(cfString);
-    return toCopiedRef(string);
+WKStringRef WKStringCreateWithCFString(CFStringRef cfString) {
+  String string(cfString);
+  return toCopiedRef(string);
 }
 
-CFStringRef WKStringCopyCFString(CFAllocatorRef allocatorRef, WKStringRef stringRef)
-{
-    ASSERT(!toWK(stringRef)->string().isNull());
+CFStringRef WKStringCopyCFString(CFAllocatorRef allocatorRef,
+                                 WKStringRef stringRef) {
+  ASSERT(!toWK(stringRef)->string().isNull());
 
-    // NOTE: This does not use StringImpl::createCFString() since that function
-    // expects to be called on the thread running WebCore.
-    return CFStringCreateWithCharacters(allocatorRef, reinterpret_cast<const UniChar*>(toWK(stringRef)->string().characters()), toWK(stringRef)->string().length());
+  // NOTE: This does not use StringImpl::createCFString() since that function
+  // expects to be called on the thread running WebCore.
+  return CFStringCreateWithCharacters(
+      allocatorRef,
+      reinterpret_cast<const UniChar*>(toWK(stringRef)->string().characters()),
+      toWK(stringRef)->string().length());
 }

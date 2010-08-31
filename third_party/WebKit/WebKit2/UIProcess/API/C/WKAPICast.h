@@ -53,7 +53,8 @@ class WebNavigationData;
 class WebPageNamespace;
 class WebPageProxy;
 class WebPreferences;
-class WebString;
+class WebURLRequest;
+class WebURLResponse;
 
 template <typename APIType>
 struct APITypeInfo {};
@@ -120,6 +121,14 @@ struct APITypeInfo<WKStringRef> {
 template <>
 struct APITypeInfo<WKURLRef> {
   typedef WebURL* ImplType;
+};
+template <>
+struct APITypeInfo<WKURLRequestRef> {
+  typedef WebURLRequest* ImplType;
+};
+template <>
+struct APITypeInfo<WKURLResponseRef> {
+  typedef WebURLResponse* ImplType;
 };
 
 template <typename ImplType>
@@ -191,6 +200,14 @@ struct ImplTypeInfo<WebString*> {
 template <>
 struct ImplTypeInfo<WebURL*> {
   typedef WKURLRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebURLRequest*> {
+  typedef WKURLRequestRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebURLResponse*> {
+  typedef WKURLResponseRef APIType;
 };
 
 template <typename ImplType,
