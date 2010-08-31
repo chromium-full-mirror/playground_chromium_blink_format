@@ -34,79 +34,80 @@
 
 #include "BlobData.h"
 #include "BlobRegistry.h"
-#include "CrossThreadTask.h"
-#include "NotImplemented.h"
 #include "ScriptExecutionContext.h"
-#include "WorkerContext.h"
-#include "WorkerLoaderProxy.h"
-#include "WorkerThread.h"
+#include <wtf/MainThread.h>
 
 namespace WebCore {
 
+struct BlobRegistryContext {
+  BlobRegistryContext(const KURL& url, PassOwnPtr<BlobData> blobData)
+      : url(url.copy()), blobData(blobData) {}
+
+  BlobRegistryContext(const KURL& url, const KURL& srcURL)
+      : url(url.copy()), srcURL(srcURL.copy()) {}
+
+  BlobRegistryContext(const KURL& url) : url(url.copy()) {}
+
+  KURL url;
+  KURL srcURL;
+  OwnPtr<BlobData> blobData;
+};
+
 #if ENABLE(BLOB)
 
-static void postTaskToMainThread(
-    ScriptExecutionContext* scriptExecutionContext,
-    PassOwnPtr<ScriptExecutionContext::Task> task) {
-#if ENABLE(WORKERS)
-  ASSERT(scriptExecutionContext->isWorkerContext());
-  WorkerLoaderProxy& proxy = static_cast<WorkerContext*>(scriptExecutionContext)
-                                 ->thread()
-                                 ->workerLoaderProxy();
-  proxy.postTaskToLoader(task);
-#else
-  notImplemented();
-#endif
+static void registerBlobURLTask(void* context) {
+  OwnPtr<BlobRegistryContext> blobRegistryContext =
+      adoptPtr(static_cast<BlobRegistryContext*>(context));
+  blobRegistry().registerBlobURL(blobRegistryContext->url,
+                                 blobRegistryContext->blobData.release());
 }
 
-static void registerBlobURLTask(ScriptExecutionContext*,
-                                const KURL& url,
-                                PassOwnPtr<BlobData> blobData) {
-  blobRegistry().registerBlobURL(url, blobData);
+void ThreadableBlobRegistry::registerBlobURL(ScriptExecutionContext*,
+                                             const KURL& url,
+                                             PassOwnPtr<BlobData> blobData) {
+  if (isMainThread())
+    blobRegistry().registerBlobURL(url, blobData);
+  else {
+    OwnPtr<BlobRegistryContext> context =
+        adoptPtr(new BlobRegistryContext(url, blobData));
+    callOnMainThread(&registerBlobURLTask, context.leakPtr());
+  }
 }
 
-void ThreadableBlobRegistry::registerBlobURL(
-    ScriptExecutionContext* scriptExecutionContext,
-    const KURL& url,
-    PassOwnPtr<BlobData> blobData) {
-  if (scriptExecutionContext->isWorkerContext())
-    postTaskToMainThread(
-        scriptExecutionContext,
-        createCallbackTask(&registerBlobURLTask, url, blobData));
-  else
-    registerBlobURLTask(scriptExecutionContext, url, blobData);
+static void registerBlobURLFromTask(void* context) {
+  OwnPtr<BlobRegistryContext> blobRegistryContext =
+      adoptPtr(static_cast<BlobRegistryContext*>(context));
+  blobRegistry().registerBlobURL(blobRegistryContext->url,
+                                 blobRegistryContext->srcURL);
 }
 
-static void registerBlobURLFromTask(ScriptExecutionContext*,
-                                    const KURL& url,
-                                    const KURL& srcURL) {
-  blobRegistry().registerBlobURL(url, srcURL);
+void ThreadableBlobRegistry::registerBlobURL(ScriptExecutionContext*,
+                                             const KURL& url,
+                                             const KURL& srcURL) {
+  if (isMainThread())
+    blobRegistry().registerBlobURL(url, srcURL);
+  else {
+    OwnPtr<BlobRegistryContext> context =
+        adoptPtr(new BlobRegistryContext(url, srcURL));
+    callOnMainThread(&registerBlobURLFromTask, context.leakPtr());
+  }
 }
 
-void ThreadableBlobRegistry::registerBlobURL(
-    ScriptExecutionContext* scriptExecutionContext,
-    const KURL& url,
-    const KURL& srcURL) {
-  if (scriptExecutionContext->isWorkerContext())
-    postTaskToMainThread(
-        scriptExecutionContext,
-        createCallbackTask(&registerBlobURLFromTask, url, srcURL));
-  else
-    registerBlobURLFromTask(scriptExecutionContext, url, srcURL);
+static void unregisterBlobURLTask(void* context) {
+  OwnPtr<BlobRegistryContext> blobRegistryContext =
+      adoptPtr(static_cast<BlobRegistryContext*>(context));
+  blobRegistry().unregisterBlobURL(blobRegistryContext->url);
 }
 
-static void unregisterBlobURLTask(ScriptExecutionContext*, const KURL& url) {
-  blobRegistry().unregisterBlobURL(url);
-}
-
-void ThreadableBlobRegistry::unregisterBlobURL(
-    ScriptExecutionContext* scriptExecutionContext,
-    const KURL& url) {
-  if (scriptExecutionContext->isWorkerContext())
-    postTaskToMainThread(scriptExecutionContext,
-                         createCallbackTask(&unregisterBlobURLTask, url));
-  else
-    unregisterBlobURLTask(scriptExecutionContext, url);
+void ThreadableBlobRegistry::unregisterBlobURL(ScriptExecutionContext*,
+                                               const KURL& url) {
+  if (isMainThread())
+    blobRegistry().unregisterBlobURL(url);
+  else {
+    OwnPtr<BlobRegistryContext> context =
+        adoptPtr(new BlobRegistryContext(url));
+    callOnMainThread(&unregisterBlobURLTask, context.leakPtr());
+  }
 }
 
 #else
