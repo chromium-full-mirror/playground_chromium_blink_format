@@ -344,7 +344,7 @@ class RenderObject : public CachedResourceClient {
   // to inherit from RenderSVGObject -> RenderObject (some need RenderBlock
   // inheritance for instance)
   virtual void setNeedsTransformUpdate() {}
-  virtual void setNeedsBoundariesUpdate();
+  virtual void setNeedsBoundariesUpdate() {}
 
   // Per SVG 1.1 objectBoundingBox ignores clipping, masking, filter effects,
   // opacity and stroke-width.

@@ -40,7 +40,6 @@ class RenderSVGBlock : public RenderBlock {
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
 
   virtual void destroy();
-  virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
   virtual void updateFromElement();
 };

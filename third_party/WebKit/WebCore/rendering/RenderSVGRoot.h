@@ -41,12 +41,6 @@ class RenderSVGRoot : public RenderBox {
   RenderObjectChildList* children() { return &m_children; }
 
   bool isLayoutSizeChanged() const { return m_isLayoutSizeChanged; }
-  virtual void setNeedsBoundariesUpdate() {
-    m_needsBoundariesOrTransformUpdate = true;
-  }
-  virtual void setNeedsTransformUpdate() {
-    m_needsBoundariesOrTransformUpdate = true;
-  }
 
  private:
   virtual RenderObjectChildList* virtualChildren() { return children(); }
@@ -66,7 +60,6 @@ class RenderSVGRoot : public RenderBox {
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
   virtual void destroy();
-  virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
   virtual void updateFromElement();
 
@@ -75,11 +68,9 @@ class RenderSVGRoot : public RenderBox {
   bool fillContains(const FloatPoint&) const;
   bool strokeContains(const FloatPoint&) const;
 
-  virtual FloatRect objectBoundingBox() const { return m_objectBoundingBox; }
-  virtual FloatRect strokeBoundingBox() const { return m_strokeBoundingBox; }
-  virtual FloatRect repaintRectInLocalCoordinates() const {
-    return m_repaintBoundingBox;
-  }
+  virtual FloatRect objectBoundingBox() const;
+  virtual FloatRect strokeBoundingBox() const;
+  virtual FloatRect repaintRectInLocalCoordinates() const;
 
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
@@ -103,7 +94,6 @@ class RenderSVGRoot : public RenderBox {
   void calcViewport();
 
   bool selfWillPaint();
-  void updateCachedBoundaries();
 
   IntSize parentOriginToBorderBox() const;
   IntSize borderOriginToContentBox() const;
@@ -113,12 +103,8 @@ class RenderSVGRoot : public RenderBox {
 
   RenderObjectChildList m_children;
   FloatSize m_viewportSize;
-  FloatRect m_objectBoundingBox;
-  FloatRect m_strokeBoundingBox;
-  FloatRect m_repaintBoundingBox;
   mutable AffineTransform m_localToParentTransform;
   bool m_isLayoutSizeChanged : 1;
-  bool m_needsBoundariesOrTransformUpdate : 1;
 };
 
 inline RenderSVGRoot* toRenderSVGRoot(RenderObject* object) {
