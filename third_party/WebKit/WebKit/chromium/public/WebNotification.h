@@ -105,6 +105,9 @@ class WebNotification {
   // the byUser parameter will be true.
   WEBKIT_API void dispatchCloseEvent(bool byUser);
 
+  // Called to indicate the notification was clicked on.
+  WEBKIT_API void dispatchClickEvent();
+
 #if WEBKIT_IMPLEMENTATION
   WebNotification(const WTF::PassRefPtr<WebCore::Notification>&);
   WebNotification& operator=(const WTF::PassRefPtr<WebCore::Notification>&);

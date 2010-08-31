@@ -94,6 +94,7 @@ class Notification : public RefCounted<Notification>,
   DEFINE_ATTRIBUTE_EVENT_LISTENER(display);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(error);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(close);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(click);
 
   using RefCounted<Notification>::ref;
   using RefCounted<Notification>::deref;
