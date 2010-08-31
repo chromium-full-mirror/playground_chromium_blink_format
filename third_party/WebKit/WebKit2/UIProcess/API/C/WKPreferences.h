@@ -66,6 +66,11 @@ WK_EXPORT void WKPreferencesSetLocalStorageEnabled(WKPreferencesRef preferences,
 WK_EXPORT bool WKPreferencesGetLocalStorageEnabled(
     WKPreferencesRef preferences);
 
+// Defaults to true.
+WK_EXPORT void WKPreferencesSetXSSAuditorEnabled(WKPreferencesRef preferences,
+                                                 bool xssAuditorEnabled);
+WK_EXPORT bool WKPreferencesGetXSSAuditorEnabled(WKPreferencesRef preferences);
+
 #ifdef __cplusplus
 }
 #endif

@@ -85,3 +85,12 @@ void WKPreferencesSetLocalStorageEnabled(WKPreferencesRef preferencesRef,
 bool WKPreferencesGetLocalStorageEnabled(WKPreferencesRef preferencesRef) {
   return toWK(preferencesRef)->localStorageEnabled();
 }
+
+void WKPreferencesSetXSSAuditorEnabled(WKPreferencesRef preferencesRef,
+                                       bool xssAuditorEnabled) {
+  toWK(preferencesRef)->setXSSAuditorEnabled(xssAuditorEnabled);
+}
+
+bool WKPreferencesGetXSSAuditorEnabled(WKPreferencesRef preferencesRef) {
+  return toWK(preferencesRef)->xssAuditorEnabled();
+}

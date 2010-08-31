@@ -69,6 +69,7 @@ class LayoutTestController : public JSWrappable {
   void setCloseRemainingWindowsWhenComplete(bool value) {
     m_shouldCloseExtraWindows = value;
   }
+  void setXSSAuditorEnabled(bool);
   unsigned windowCount();
 
   // Special DOM functions.

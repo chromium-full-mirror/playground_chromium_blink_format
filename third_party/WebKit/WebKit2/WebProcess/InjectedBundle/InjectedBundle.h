@@ -76,6 +76,7 @@ class InjectedBundle : public APIObject {
   void setShouldTrackVisitedLinks(bool);
   void removeAllVisitedLinks();
   void activateMacFontAscentHack();
+  void overrideXSSAuditorEnabledForTestRunner(bool enabled);
 
   // UserContent API
   void addUserScript(InjectedBundleScriptWorld*,

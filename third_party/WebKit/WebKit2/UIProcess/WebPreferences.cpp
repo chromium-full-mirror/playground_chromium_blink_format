@@ -92,6 +92,15 @@ bool WebPreferences::localStorageEnabled() const {
   return m_store.localStorageEnabled;
 }
 
+void WebPreferences::setXSSAuditorEnabled(bool b) {
+  m_store.xssAuditorEnabled = b;
+  update();
+}
+
+bool WebPreferences::xssAuditorEnabled() const {
+  return m_store.xssAuditorEnabled;
+}
+
 void WebPreferences::setFontSmoothingLevel(FontSmoothingLevel level) {
   m_store.fontSmoothingLevel = level;
   update();

@@ -113,6 +113,7 @@ WebPage::WebPage(uint64_t pageID,
   m_page->settings()->setOfflineWebApplicationCacheEnabled(
       store.offlineWebApplicationCacheEnabled);
   m_page->settings()->setLocalStorageEnabled(store.localStorageEnabled);
+  m_page->settings()->setXSSAuditorEnabled(store.xssAuditorEnabled);
   m_page->settings()->setMinimumFontSize(store.minimumFontSize);
   m_page->settings()->setMinimumLogicalFontSize(store.minimumLogicalFontSize);
   m_page->settings()->setDefaultFontSize(store.defaultFontSize);
@@ -494,12 +495,15 @@ void WebPage::getRenderTreeExternalRepresentation(uint64_t callbackID) {
 }
 
 void WebPage::preferencesDidChange(const WebPreferencesStore& store) {
+  WebPreferencesStore::removeTestRunnerOverrides();
+
   m_page->settings()->setJavaScriptEnabled(store.javaScriptEnabled);
   m_page->settings()->setLoadsImagesAutomatically(
       store.loadsImagesAutomatically);
   m_page->settings()->setOfflineWebApplicationCacheEnabled(
       store.offlineWebApplicationCacheEnabled);
   m_page->settings()->setLocalStorageEnabled(store.localStorageEnabled);
+  m_page->settings()->setXSSAuditorEnabled(store.xssAuditorEnabled);
 
   platformPreferencesDidChange(store);
 }

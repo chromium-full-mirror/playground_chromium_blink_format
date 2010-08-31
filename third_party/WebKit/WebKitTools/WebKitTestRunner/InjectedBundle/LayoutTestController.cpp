@@ -259,6 +259,11 @@ void LayoutTestController::setCanOpenWindows(bool) {
   // add it.
 }
 
+void LayoutTestController::setXSSAuditorEnabled(bool enabled) {
+  WKBundleOverrideXSSAuditorEnabledForTestRunner(
+      InjectedBundle::shared().bundle(), true);
+}
+
 unsigned LayoutTestController::windowCount() {
   return InjectedBundle::shared().pageCount();
 }
