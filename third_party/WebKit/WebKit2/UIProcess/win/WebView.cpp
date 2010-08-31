@@ -91,6 +91,9 @@ LRESULT WebView::wndProc(HWND hWnd,
     case WM_PAINT:
       lResult = onPaintEvent(hWnd, message, wParam, lParam, handled);
       break;
+    case WM_PRINTCLIENT:
+      lResult = onPrintClientEvent(hWnd, message, wParam, lParam, handled);
+      break;
     case WM_MOUSEMOVE:
     case WM_LBUTTONDOWN:
     case WM_MBUTTONDOWN:
@@ -369,6 +372,22 @@ LRESULT WebView::onPaintEvent(HWND hWnd,
   m_page->drawingArea()->paint(IntRect(paintStruct.rcPaint), hdc);
 
   ::EndPaint(m_window, &paintStruct);
+
+  handled = true;
+  return 0;
+}
+
+LRESULT WebView::onPrintClientEvent(HWND hWnd,
+                                    UINT,
+                                    WPARAM wParam,
+                                    LPARAM,
+                                    bool& handled) {
+  HDC hdc = reinterpret_cast<HDC>(wParam);
+  RECT winRect;
+  ::GetClientRect(hWnd, &winRect);
+  IntRect rect = winRect;
+
+  m_page->drawingArea()->paint(rect, hdc);
 
   handled = true;
   return 0;
