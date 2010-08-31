@@ -315,6 +315,8 @@ class LayoutTestController : public CppBoundClass {
   // Speech input related functions.
   void setMockSpeechInputResult(const CppArgumentList&, CppVariant*);
 
+  void markerTextForListItem(const CppArgumentList&, CppVariant*);
+
  public:
   // The following methods are not exposed to JavaScript.
   void setWorkQueueFrozen(bool frozen) { m_workQueue.setFrozen(frozen); }
