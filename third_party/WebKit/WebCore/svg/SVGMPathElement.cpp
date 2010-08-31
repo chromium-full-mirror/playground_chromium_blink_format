@@ -34,7 +34,7 @@ inline SVGMPathElement::SVGMPathElement(const QualifiedName& tagName,
 PassRefPtr<SVGMPathElement> SVGMPathElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new SVGMPathElement(tagName, document);
+  return adoptRef(new SVGMPathElement(tagName, document));
 }
 
 void SVGMPathElement::parseMappedAttribute(Attribute* attr) {

@@ -56,7 +56,7 @@ inline SVGAnimateTransformElement::SVGAnimateTransformElement(
 PassRefPtr<SVGAnimateTransformElement> SVGAnimateTransformElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new SVGAnimateTransformElement(tagName, document);
+  return adoptRef(new SVGAnimateTransformElement(tagName, document));
 }
 
 bool SVGAnimateTransformElement::hasValidTarget() const {

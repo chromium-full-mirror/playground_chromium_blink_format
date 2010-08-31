@@ -40,7 +40,7 @@ inline SVGAltGlyphElement::SVGAltGlyphElement(const QualifiedName& tagName,
 PassRefPtr<SVGAltGlyphElement> SVGAltGlyphElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new SVGAltGlyphElement(tagName, document);
+  return adoptRef(new SVGAltGlyphElement(tagName, document));
 }
 
 void SVGAltGlyphElement::synchronizeProperty(const QualifiedName& attrName) {

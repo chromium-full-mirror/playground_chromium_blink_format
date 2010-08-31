@@ -55,7 +55,7 @@ SVGMarkerElement::SVGMarkerElement(const QualifiedName& tagName,
 PassRefPtr<SVGMarkerElement> SVGMarkerElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new SVGMarkerElement(tagName, document);
+  return adoptRef(new SVGMarkerElement(tagName, document));
 }
 
 AffineTransform SVGMarkerElement::viewBoxToViewTransform(

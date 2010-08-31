@@ -44,7 +44,7 @@ inline SVGFEImageElement::SVGFEImageElement(const QualifiedName& tagName,
 PassRefPtr<SVGFEImageElement> SVGFEImageElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new SVGFEImageElement(tagName, document);
+  return adoptRef(new SVGFEImageElement(tagName, document));
 }
 
 SVGFEImageElement::~SVGFEImageElement() {

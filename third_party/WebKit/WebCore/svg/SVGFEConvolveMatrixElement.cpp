@@ -48,7 +48,7 @@ inline SVGFEConvolveMatrixElement::SVGFEConvolveMatrixElement(
 PassRefPtr<SVGFEConvolveMatrixElement> SVGFEConvolveMatrixElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new SVGFEConvolveMatrixElement(tagName, document);
+  return adoptRef(new SVGFEConvolveMatrixElement(tagName, document));
 }
 
 void SVGFEConvolveMatrixElement::parseMappedAttribute(Attribute* attr) {

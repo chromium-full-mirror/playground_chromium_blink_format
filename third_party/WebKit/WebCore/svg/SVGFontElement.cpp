@@ -46,7 +46,7 @@ inline SVGFontElement::SVGFontElement(const QualifiedName& tagName,
 
 PassRefPtr<SVGFontElement> SVGFontElement::create(const QualifiedName& tagName,
                                                   Document* document) {
-  return new SVGFontElement(tagName, document);
+  return adoptRef(new SVGFontElement(tagName, document));
 }
 
 void SVGFontElement::synchronizeProperty(const QualifiedName& attrName) {

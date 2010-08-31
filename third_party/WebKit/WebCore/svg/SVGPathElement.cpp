@@ -50,7 +50,7 @@ inline SVGPathElement::SVGPathElement(const QualifiedName& tagName,
 
 PassRefPtr<SVGPathElement> SVGPathElement::create(const QualifiedName& tagName,
                                                   Document* document) {
-  return new SVGPathElement(tagName, document);
+  return adoptRef(new SVGPathElement(tagName, document));
 }
 
 float SVGPathElement::getTotalLength() {

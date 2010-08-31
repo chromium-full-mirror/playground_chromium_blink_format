@@ -51,7 +51,7 @@ inline SVGAElement::SVGAElement(const QualifiedName& tagName,
 
 PassRefPtr<SVGAElement> SVGAElement::create(const QualifiedName& tagName,
                                             Document* document) {
-  return new SVGAElement(tagName, document);
+  return adoptRef(new SVGAElement(tagName, document));
 }
 
 String SVGAElement::title() const {

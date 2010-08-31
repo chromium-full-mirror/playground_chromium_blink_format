@@ -65,7 +65,7 @@ inline SVGPatternElement::SVGPatternElement(const QualifiedName& tagName,
 PassRefPtr<SVGPatternElement> SVGPatternElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new SVGPatternElement(tagName, document);
+  return adoptRef(new SVGPatternElement(tagName, document));
 }
 
 void SVGPatternElement::parseMappedAttribute(Attribute* attr) {

@@ -31,11 +31,7 @@ namespace WebCore {
 SVGResourcesCache::SVGResourcesCache() {}
 
 SVGResourcesCache::~SVGResourcesCache() {
-  if (m_cache.isEmpty())
-    return;
-
   deleteAllValues(m_cache);
-  m_cache.clear();
 }
 
 void SVGResourcesCache::addResourcesFromRenderObject(RenderObject* object,

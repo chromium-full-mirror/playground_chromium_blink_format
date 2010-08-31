@@ -42,7 +42,7 @@ PassRefPtr<SVGScriptElement> SVGScriptElement::create(
     const QualifiedName& tagName,
     Document* document,
     bool createdByParser) {
-  return new SVGScriptElement(tagName, document, createdByParser);
+  return adoptRef(new SVGScriptElement(tagName, document, createdByParser));
 }
 
 String SVGScriptElement::scriptContent() const {

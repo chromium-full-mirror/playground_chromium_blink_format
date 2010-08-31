@@ -245,7 +245,7 @@ bool SVGImage::dataChanged(bool allDataReceived) {
         new EmptyFrameLoaderClient;
 
     Page::PageClients pageClients;
-    m_chromeClient.set(new SVGImageChromeClient(this));
+    m_chromeClient = adoptPtr(new SVGImageChromeClient(this));
     pageClients.chromeClient = m_chromeClient.get();
 #if ENABLE(CONTEXT_MENUS)
     static ContextMenuClient* dummyContextMenuClient =

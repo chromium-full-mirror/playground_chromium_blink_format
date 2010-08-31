@@ -38,7 +38,7 @@ inline SVGViewElement::SVGViewElement(const QualifiedName& tagName,
 
 PassRefPtr<SVGViewElement> SVGViewElement::create(const QualifiedName& tagName,
                                                   Document* document) {
-  return new SVGViewElement(tagName, document);
+  return adoptRef(new SVGViewElement(tagName, document));
 }
 
 SVGStringList* SVGViewElement::viewTarget() const {

@@ -63,7 +63,7 @@ inline SVGFilterElement::SVGFilterElement(const QualifiedName& tagName,
 PassRefPtr<SVGFilterElement> SVGFilterElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new SVGFilterElement(tagName, document);
+  return adoptRef(new SVGFilterElement(tagName, document));
 }
 
 void SVGFilterElement::setFilterRes(unsigned long filterResX,

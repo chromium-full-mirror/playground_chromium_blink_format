@@ -40,7 +40,7 @@ inline SVGFEMorphologyElement::SVGFEMorphologyElement(
 PassRefPtr<SVGFEMorphologyElement> SVGFEMorphologyElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new SVGFEMorphologyElement(tagName, document);
+  return adoptRef(new SVGFEMorphologyElement(tagName, document));
 }
 
 void SVGFEMorphologyElement::setRadius(float, float) {

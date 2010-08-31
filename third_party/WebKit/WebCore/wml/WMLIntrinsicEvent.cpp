@@ -47,7 +47,7 @@ WMLIntrinsicEvent::WMLIntrinsicEvent(Document* document,
 PassRefPtr<WMLIntrinsicEvent> WMLIntrinsicEvent::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new WMLIntrinsicEvent(tagName, document);
+  return adoptRef(new WMLIntrinsicEvent(tagName, document));
 }
 
 WMLIntrinsicEvent::WMLIntrinsicEvent(WMLTaskElement* taskElement)

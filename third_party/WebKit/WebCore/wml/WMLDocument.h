@@ -34,7 +34,7 @@ class WMLCardElement;
 class WMLDocument : public Document {
  public:
   static PassRefPtr<WMLDocument> create(Frame* frame, const KURL& url) {
-    return adoptRef(new WMLDocument(frame, url));
+        return adoptRef(adoptRef(new WMLDocument(frame, url))));
   }
 
   virtual ~WMLDocument();

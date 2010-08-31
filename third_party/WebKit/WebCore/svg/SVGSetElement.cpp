@@ -30,7 +30,7 @@ inline SVGSetElement::SVGSetElement(const QualifiedName& tagName,
 
 PassRefPtr<SVGSetElement> SVGSetElement::create(const QualifiedName& tagName,
                                                 Document* document) {
-  return new SVGSetElement(tagName, document);
+  return adoptRef(new SVGSetElement(tagName, document));
 }
 }
 

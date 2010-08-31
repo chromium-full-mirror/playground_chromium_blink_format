@@ -56,7 +56,7 @@ inline SVGRadialGradientElement::SVGRadialGradientElement(
 PassRefPtr<SVGRadialGradientElement> SVGRadialGradientElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new SVGRadialGradientElement(tagName, document);
+  return adoptRef(new SVGRadialGradientElement(tagName, document));
 }
 
 void SVGRadialGradientElement::parseMappedAttribute(Attribute* attr) {

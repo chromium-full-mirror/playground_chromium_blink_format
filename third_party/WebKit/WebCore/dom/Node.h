@@ -735,7 +735,6 @@ class Node : public EventTarget,
 #endif
     StyleChangeMask =
         1 << nodeStyleChangeShift | 1 << (nodeStyleChangeShift + 1),
-    CreateWithZeroRefCountFlag = 1 << 26,
 
 #if ENABLE(SVG)
     DefaultNodeFlags = IsParsingChildrenFinishedFlag |
@@ -756,9 +755,6 @@ class Node : public EventTarget,
   void clearFlag(NodeFlags mask) const { m_nodeFlags &= ~mask; }
 
  protected:
-  // CreateWithZeroRefCountFlag is deprecated and can be removed once we convert
-  // all element
-  // classes to start with a reference count of 1.
   enum ConstructionType {
     CreateOther = DefaultNodeFlags,
     CreateText = DefaultNodeFlags | IsTextFlag,
@@ -766,12 +762,8 @@ class Node : public EventTarget,
     CreateContainer = DefaultNodeFlags | IsContainerFlag,
     CreateElement = CreateContainer | IsElementFlag,
     CreateStyledElement = CreateElement | IsStyledElementFlag,
-    CreateStyledElementZeroRefCount =
-        CreateStyledElement | CreateWithZeroRefCountFlag,
     CreateHTMLElement = CreateStyledElement | IsHTMLFlag,
     CreateSVGElement = CreateStyledElement | IsSVGFlag,
-    CreateSVGElementZeroRefCount =
-        CreateSVGElement | CreateWithZeroRefCountFlag,
   };
   Node(Document*, ConstructionType);
 
@@ -791,7 +783,6 @@ class Node : public EventTarget,
   void markCachedNodeListsSlow(JSC::MarkStack&, JSC::JSGlobalData&);
 #endif
 
-  static bool initialRefCount(ConstructionType);
   void setStyleChange(StyleChangeType);
 
   virtual void refEventTarget() { ref(); }
@@ -873,10 +864,6 @@ class Node : public EventTarget,
   void clearHasRareSVGData() { clearFlag(HasSVGRareDataFlag); }
 #endif
 };
-
-inline bool Node::initialRefCount(ConstructionType type) {
-  return !(type & CreateWithZeroRefCountFlag);
-}
 
 // Used in Node::addSubresourceAttributeURLs() and in addSubresourceStyleURLs()
 inline void addSubresourceURL(ListHashSet<KURL>& urls, const KURL& url) {
