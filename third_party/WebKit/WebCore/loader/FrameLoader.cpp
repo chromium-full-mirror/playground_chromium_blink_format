@@ -163,13 +163,6 @@ static int numRequests(Document* document) {
   return document->docLoader()->requestCount();
 }
 
-static inline bool canReferToParentFrameEncoding(const Frame* frame,
-                                                 const Frame* parentFrame) {
-  return parentFrame &&
-         parentFrame->document()->securityOrigin()->canAccess(
-             frame->document()->securityOrigin());
-}
-
 // This is not in the FrameLoader class to emphasize that it does not depend on
 // private FrameLoader data, and to avoid increasing the number of public
 // functions
