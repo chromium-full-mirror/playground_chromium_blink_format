@@ -130,6 +130,8 @@ FrameView::FrameView(Frame* frame)
       m_fixedObjectCount(0),
       m_layoutTimer(this, &FrameView::layoutTimerFired),
       m_layoutRoot(0),
+      m_shouldFirePostLayoutTimer(false),
+      m_inSynchronousPostLayout(false),
       m_postLayoutTasksTimer(this, &FrameView::postLayoutTimerFired),
       m_isTransparent(false),
       m_baseBackgroundColor(Color::white),
@@ -163,7 +165,7 @@ PassRefPtr<FrameView> FrameView::create(Frame* frame,
 }
 
 FrameView::~FrameView() {
-  if (m_postLayoutTasksTimer.isActive()) {
+  if (m_shouldFirePostLayoutTimer) {
     m_postLayoutTasksTimer.stop();
     m_scheduledEvents.clear();
     m_enqueueEvents = 0;
@@ -203,6 +205,8 @@ void FrameView::reset() {
   m_doFullRepaint = true;
   m_layoutSchedulingEnabled = true;
   m_inLayout = false;
+  m_inSynchronousPostLayout = false;
+  m_shouldFirePostLayoutTimer = false;
   m_layoutCount = 0;
   m_nestedLayoutCount = 0;
   m_postLayoutTasksTimer.stop();
@@ -633,12 +637,15 @@ void FrameView::layout(bool allowSubtree) {
 
   m_layoutSchedulingEnabled = false;
 
-  if (!m_nestedLayoutCount && m_postLayoutTasksTimer.isActive()) {
+  if (!m_nestedLayoutCount && !m_inSynchronousPostLayout &&
+      m_shouldFirePostLayoutTimer) {
     // This is a new top-level layout. If there are any remaining tasks from the
     // previous
     // layout, finish them now.
+    m_inSynchronousPostLayout = true;
     m_postLayoutTasksTimer.stop();
     performPostLayoutTasks();
+    m_inSynchronousPostLayout = false;
   }
 
   // Viewport-dependent media queries may cause us to need completely different
@@ -835,19 +842,29 @@ void FrameView::layout(bool allowSubtree) {
     updateOverflowStatus(layoutWidth() < contentsWidth(),
                          layoutHeight() < contentsHeight());
 
-  if (!m_postLayoutTasksTimer.isActive()) {
-    // Calls resumeScheduledEvents()
-    performPostLayoutTasks();
+  if (!m_shouldFirePostLayoutTimer) {
+    if (!m_inSynchronousPostLayout) {
+      m_inSynchronousPostLayout = true;
+      // Calls resumeScheduledEvents()
+      performPostLayoutTasks();
+      m_inSynchronousPostLayout = false;
+    }
 
-    if (!m_postLayoutTasksTimer.isActive() && needsLayout()) {
-      // Post-layout widget updates or an event handler made us need layout
-      // again.
-      // Lay out again, but this time defer widget updates and event dispatch
-      // until after
-      // we return.
+    if (!m_shouldFirePostLayoutTimer &&
+        (needsLayout() || m_inSynchronousPostLayout)) {
+      // If we need layout or are already in a synchronous call to
+      // postLayoutTasks(),
+      // defer widget updates and event dispatch until after we return.
+      // postLayoutTasks()
+      // can make us need to update again, and we can get stuck in a nasty cycle
+      // unless
+      // we call it through the timer here.
+      m_shouldFirePostLayoutTimer = true;
       m_postLayoutTasksTimer.startOneShot(0);
-      pauseScheduledEvents();
-      layout();
+      if (needsLayout()) {
+        pauseScheduledEvents();
+        layout();
+      }
     }
   } else {
     resumeScheduledEvents();
@@ -1453,6 +1470,8 @@ void FrameView::setNeedsLayout() {
 }
 
 void FrameView::unscheduleRelayout() {
+  m_postLayoutTasksTimer.stop();
+
   if (!m_layoutTimer.isActive())
     return;
 
@@ -1594,6 +1613,8 @@ bool FrameView::updateWidgets() {
 }
 
 void FrameView::performPostLayoutTasks() {
+  m_shouldFirePostLayoutTimer = false;
+
   if (m_firstLayoutCallbackPending) {
     m_firstLayoutCallbackPending = false;
     m_frame->loader()->didFirstLayout();
