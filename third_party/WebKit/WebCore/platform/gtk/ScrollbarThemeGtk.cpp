@@ -28,18 +28,88 @@
 
 #include "PlatformMouseEvent.h"
 #include "RenderThemeGtk.h"
+#include "ScrollView.h"
 #include "Scrollbar.h"
 #include "gtkdrawing.h"
 #include <gtk/gtk.h>
 
 namespace WebCore {
 
+static HashSet<Scrollbar*>* gScrollbars;
+static void gtkStyleSetCallback(GtkWidget*, GtkStyle*, ScrollbarThemeGtk*);
+
 ScrollbarTheme* ScrollbarTheme::nativeTheme() {
   static ScrollbarThemeGtk theme;
   return &theme;
 }
 
+ScrollbarThemeGtk::ScrollbarThemeGtk() {
+  updateThemeProperties();
+  g_signal_connect(
+      static_cast<RenderThemeGtk*>(RenderTheme::defaultTheme().get())
+          ->gtkScrollbar(),
+      "style-set", G_CALLBACK(gtkStyleSetCallback), this);
+}
+
 ScrollbarThemeGtk::~ScrollbarThemeGtk() {}
+
+void ScrollbarThemeGtk::registerScrollbar(Scrollbar* scrollbar) {
+  if (!gScrollbars)
+    gScrollbars = new HashSet<Scrollbar*>;
+  gScrollbars->add(scrollbar);
+}
+
+void ScrollbarThemeGtk::unregisterScrollbar(Scrollbar* scrollbar) {
+  gScrollbars->remove(scrollbar);
+  if (gScrollbars->isEmpty()) {
+    delete gScrollbars;
+    gScrollbars = 0;
+  }
+}
+
+void ScrollbarThemeGtk::updateThemeProperties() {
+  MozGtkScrollbarMetrics metrics;
+  moz_gtk_get_scrollbar_metrics(&metrics);
+
+  m_thumbFatness = metrics.slider_width;
+  m_troughBorderWidth = metrics.trough_border;
+  m_stepperSize = metrics.stepper_size;
+  m_stepperSpacing = metrics.stepper_spacing;
+  m_minThumbLength = metrics.min_slider_size;
+  m_troughUnderSteppers = metrics.trough_under_steppers;
+
+  if (!gScrollbars)
+    return;
+
+  // Update the thickness of every interior frame scrollbar widget. The
+  // platform-independent scrollbar them code isn't yet smart enough to get
+  // this information when it paints.
+  HashSet<Scrollbar*>::iterator end = gScrollbars->end();
+  for (HashSet<Scrollbar*>::iterator it = gScrollbars->begin(); it != end;
+       ++it) {
+    Scrollbar* scrollbar = (*it);
+
+    // Top-level scrollbar i.e. scrollbars who have a parent ScrollView
+    // with no parent are native, and thus do not need to be resized.
+    if (!scrollbar->parent() || !scrollbar->parent()->parent())
+      return;
+
+    int thickness = scrollbarThickness(scrollbar->controlSize());
+    if (scrollbar->orientation() == HorizontalScrollbar)
+      scrollbar->setFrameRect(IntRect(0,
+                                      scrollbar->parent()->height() - thickness,
+                                      scrollbar->width(), thickness));
+    else
+      scrollbar->setFrameRect(IntRect(scrollbar->parent()->width() - thickness,
+                                      0, thickness, scrollbar->height()));
+  }
+}
+
+static void gtkStyleSetCallback(GtkWidget* widget,
+                                GtkStyle* previous,
+                                ScrollbarThemeGtk* scrollbarTheme) {
+  scrollbarTheme->updateThemeProperties();
+}
 
 bool ScrollbarThemeGtk::hasThumb(Scrollbar* scrollbar) {
   // This method is just called as a paint-time optimization to see if
@@ -54,11 +124,9 @@ IntRect ScrollbarThemeGtk::backButtonRect(Scrollbar* scrollbar,
   if (part == BackButtonEndPart)
     return IntRect();
 
-  MozGtkScrollbarMetrics metrics;
-  moz_gtk_get_scrollbar_metrics(&metrics);
   IntSize size = buttonSize(scrollbar);
-  return IntRect(scrollbar->x() + metrics.trough_border,
-                 scrollbar->y() + metrics.trough_border, size.width(),
+  return IntRect(scrollbar->x() + m_troughBorderWidth,
+                 scrollbar->y() + m_troughBorderWidth, size.width(),
                  size.height());
 }
 
@@ -69,19 +137,16 @@ IntRect ScrollbarThemeGtk::forwardButtonRect(Scrollbar* scrollbar,
   if (part == ForwardButtonStartPart)
     return IntRect();
 
-  MozGtkScrollbarMetrics metrics;
-  moz_gtk_get_scrollbar_metrics(&metrics);
-
   IntSize size = buttonSize(scrollbar);
   int x, y;
   if (scrollbar->orientation() == HorizontalScrollbar) {
     x = scrollbar->x() + scrollbar->width() - size.width() -
-        metrics.trough_border;
-    y = scrollbar->y() + metrics.trough_border;
+        m_troughBorderWidth;
+    y = scrollbar->y() + m_troughBorderWidth;
   } else {
-    x = scrollbar->x() + metrics.trough_border;
+    x = scrollbar->x() + m_troughBorderWidth;
     y = scrollbar->y() + scrollbar->height() - size.height() -
-        metrics.trough_border;
+        m_troughBorderWidth;
   }
   return IntRect(x, y, size.width(), size.height());
 }
@@ -91,15 +156,11 @@ IntRect ScrollbarThemeGtk::trackRect(Scrollbar* scrollbar, bool) {
   // is the size of trough border plus the size of the stepper (button)
   // plus the size of stepper spacing (the space between the stepper and
   // the place where the thumb stops). There is often no stepper spacing.
-  MozGtkScrollbarMetrics metrics;
-  moz_gtk_get_scrollbar_metrics(&metrics);
   int movementAxisPadding =
-      metrics.trough_border + metrics.stepper_size + metrics.stepper_spacing;
+      m_troughBorderWidth + m_stepperSize + m_stepperSpacing;
 
-  // The thickness (of the long part) of the scrollbar. We could also
-  // use scrollbarThickness here, but that would mean one more call to
-  // moz_gtk_get_scrollbar_metrics.
-  int thickness = metrics.slider_width + (metrics.trough_border * 2);
+  // The fatness of the scrollbar on the non-movement axis.
+  int thickness = scrollbarThickness(scrollbar->controlSize());
 
   if (scrollbar->orientation() == HorizontalScrollbar) {
     // Once the scrollbar becomes smaller than the natural size of the
@@ -132,11 +193,8 @@ void ScrollbarThemeGtk::paintTrackBackground(GraphicsContext* context,
   // should be the full size of the scrollbar, but if is false, it should only
   // be the
   // track rect.
-  MozGtkScrollbarMetrics metrics;
-  moz_gtk_get_scrollbar_metrics(&metrics);
-
   IntRect fullScrollbarRect = rect;
-  if (metrics.trough_under_steppers)
+  if (m_troughUnderSteppers)
     fullScrollbarRect = IntRect(scrollbar->x(), scrollbar->y(),
                                 scrollbar->width(), scrollbar->height());
 
@@ -186,21 +244,18 @@ void ScrollbarThemeGtk::paintThumb(GraphicsContext* context,
 
 IntRect ScrollbarThemeGtk::thumbRect(Scrollbar* scrollbar,
                                      const IntRect& unconstrainedTrackRect) {
-  MozGtkScrollbarMetrics metrics;
-  moz_gtk_get_scrollbar_metrics(&metrics);
-
   IntRect trackRect =
       constrainTrackRectToTrackPieces(scrollbar, unconstrainedTrackRect);
-  int thickness = metrics.slider_width;
   int thumbPos = thumbPosition(scrollbar);
   if (scrollbar->orientation() == HorizontalScrollbar)
     return IntRect(trackRect.x() + thumbPos,
-                   trackRect.y() + (trackRect.height() - thickness) / 2,
-                   thumbLength(scrollbar), thickness);
+                   trackRect.y() + (trackRect.height() - m_thumbFatness) / 2,
+                   thumbLength(scrollbar), m_thumbFatness);
 
   // VerticalScrollbar
-  return IntRect(trackRect.x() + (trackRect.width() - thickness) / 2,
-                 trackRect.y() + thumbPos, thickness, thumbLength(scrollbar));
+  return IntRect(trackRect.x() + (trackRect.width() - m_thumbFatness) / 2,
+                 trackRect.y() + thumbPos, m_thumbFatness,
+                 thumbLength(scrollbar));
 }
 
 bool ScrollbarThemeGtk::paint(Scrollbar* scrollbar,
@@ -235,9 +290,7 @@ bool ScrollbarThemeGtk::paint(Scrollbar* scrollbar,
   if (damageRect.intersects(trackPaintRect))
     scrollMask |= TrackBGPart;
 
-  MozGtkScrollbarMetrics metrics;
-  moz_gtk_get_scrollbar_metrics(&metrics);
-  if (metrics.trough_under_steppers &&
+  if (m_troughUnderSteppers &&
       (scrollMask & BackButtonStartPart || scrollMask & BackButtonEndPart ||
        scrollMask & ForwardButtonStartPart ||
        scrollMask & ForwardButtonEndPart))
@@ -331,25 +384,18 @@ bool ScrollbarThemeGtk::shouldCenterOnThumb(Scrollbar*,
 }
 
 int ScrollbarThemeGtk::scrollbarThickness(ScrollbarControlSize) {
-  MozGtkScrollbarMetrics metrics;
-  moz_gtk_get_scrollbar_metrics(&metrics);
-  return metrics.slider_width + (metrics.trough_border * 2);
+  return m_thumbFatness + (m_troughBorderWidth * 2);
 }
 
 IntSize ScrollbarThemeGtk::buttonSize(Scrollbar* scrollbar) {
-  MozGtkScrollbarMetrics metrics;
-  moz_gtk_get_scrollbar_metrics(&metrics);
-
   if (scrollbar->orientation() == VerticalScrollbar)
-    return IntSize(metrics.slider_width, metrics.stepper_size);
+    return IntSize(m_thumbFatness, m_stepperSize);
 
   // HorizontalScrollbar
-  return IntSize(metrics.stepper_size, metrics.slider_width);
+  return IntSize(m_stepperSize, m_thumbFatness);
 }
 
 int ScrollbarThemeGtk::minimumThumbLength(Scrollbar* scrollbar) {
-  MozGtkScrollbarMetrics metrics;
-  moz_gtk_get_scrollbar_metrics(&metrics);
-  return metrics.min_slider_size;
+  return m_minThumbLength;
 }
 }

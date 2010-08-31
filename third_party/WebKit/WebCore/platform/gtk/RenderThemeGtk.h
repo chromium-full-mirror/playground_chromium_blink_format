@@ -94,6 +94,8 @@ class RenderThemeGtk : public RenderTheme {
                              int flags,
                              GtkTextDirection = GTK_TEXT_DIR_NONE);
 
+  GtkWidget* gtkScrollbar();
+
  protected:
   virtual bool paintCheckbox(RenderObject* o,
                              const PaintInfo& i,

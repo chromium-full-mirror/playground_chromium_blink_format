@@ -782,6 +782,10 @@ GtkWidget* RenderThemeGtk::gtkTreeView() const {
   return m_gtkTreeView;
 }
 
+GtkWidget* RenderThemeGtk::gtkScrollbar() {
+  return moz_gtk_get_scrollbar_widget();
+}
+
 void RenderThemeGtk::platformColorsDidChange() {
 #if ENABLE(VIDEO)
   initMediaStyling(gtk_rc_get_style(GTK_WIDGET(gtkContainer())), true);
