@@ -65,6 +65,12 @@ void qt_wk_didCommitLoadForFrame(WKPageRef page,
   QWKPagePrivate::get(toQWKPage(clientInfo))->updateNavigationActions();
 }
 
+void qt_wk_didFinishDocumentLoadForFrame(WKPageRef page,
+                                         WKFrameRef frame,
+                                         const void* clientInfo) {
+  // FIXME: Implement (bug #44934)
+}
+
 void qt_wk_didFinishLoadForFrame(WKPageRef page,
                                  WKFrameRef frame,
                                  const void* clientInfo) {

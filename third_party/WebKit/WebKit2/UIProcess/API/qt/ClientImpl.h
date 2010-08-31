@@ -38,6 +38,9 @@ void qt_wk_didFailProvisionalLoadWithErrorForFrame(WKPageRef,
                                                    WKFrameRef,
                                                    const void* clientInfo);
 void qt_wk_didCommitLoadForFrame(WKPageRef, WKFrameRef, const void* clientInfo);
+void qt_wk_didFinishDocumentLoadForFrame(WKPageRef,
+                                         WKFrameRef,
+                                         const void* clientInfo);
 void qt_wk_didFinishLoadForFrame(WKPageRef, WKFrameRef, const void* clientInfo);
 void qt_wk_didFailLoadWithErrorForFrame(WKPageRef,
                                         WKFrameRef,
