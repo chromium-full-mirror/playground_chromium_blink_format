@@ -76,6 +76,14 @@ void InjectedBundlePageLoaderClient::didCommitLoadForFrame(WebPage* page,
                                    m_client.clientInfo);
 }
 
+void InjectedBundlePageLoaderClient::didFinishDocumentLoadForFrame(
+    WebPage* page,
+    WebFrame* frame) {
+  if (m_client.didFinishDocumentLoadForFrame)
+    m_client.didFinishDocumentLoadForFrame(toRef(page), toRef(frame),
+                                           m_client.clientInfo);
+}
+
 void InjectedBundlePageLoaderClient::didFinishLoadForFrame(WebPage* page,
                                                            WebFrame* frame) {
   if (m_client.didFinishLoadForFrame)
@@ -136,14 +144,6 @@ void InjectedBundlePageLoaderClient::didChangeLocationWithinPageForFrame(
   if (m_client.didChangeLocationWithinPageForFrame)
     m_client.didChangeLocationWithinPageForFrame(toRef(page), toRef(frame),
                                                  m_client.clientInfo);
-}
-
-void InjectedBundlePageLoaderClient::didFinishDocumentLoadForFrame(
-    WebPage* page,
-    WebFrame* frame) {
-  if (m_client.didFinishDocumentLoadForFrame)
-    m_client.didFinishDocumentLoadForFrame(toRef(page), toRef(frame),
-                                           m_client.clientInfo);
 }
 
 void InjectedBundlePageLoaderClient::didHandleOnloadEventsForFrame(

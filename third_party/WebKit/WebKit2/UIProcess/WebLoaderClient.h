@@ -44,6 +44,7 @@ class WebLoaderClient {
                                                           WebFrameProxy*);
   void didFailProvisionalLoadWithErrorForFrame(WebPageProxy*, WebFrameProxy*);
   void didCommitLoadForFrame(WebPageProxy*, WebFrameProxy*);
+  void didFinishDocumentLoadForFrame(WebPageProxy*, WebFrameProxy*);
   void didFinishLoadForFrame(WebPageProxy*, WebFrameProxy*);
   void didFailLoadWithErrorForFrame(WebPageProxy*, WebFrameProxy*);
   void didReceiveTitleForFrame(WebPageProxy*, WTF::StringImpl*, WebFrameProxy*);

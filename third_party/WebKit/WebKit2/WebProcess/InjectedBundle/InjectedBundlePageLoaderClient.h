@@ -44,6 +44,7 @@ class InjectedBundlePageLoaderClient {
   void didReceiveServerRedirectForProvisionalLoadForFrame(WebPage*, WebFrame*);
   void didFailProvisionalLoadWithErrorForFrame(WebPage*, WebFrame*);
   void didCommitLoadForFrame(WebPage*, WebFrame*);
+  void didFinishDocumentLoadForFrame(WebPage*, WebFrame*);
   void didFinishLoadForFrame(WebPage*, WebFrame*);
   void didFailLoadWithErrorForFrame(WebPage*, WebFrame*);
   void didReceiveTitleForFrame(WebPage*, const WTF::String&, WebFrame*);
@@ -58,7 +59,6 @@ class InjectedBundlePageLoaderClient {
                                          double delay,
                                          double date);
   void didChangeLocationWithinPageForFrame(WebPage*, WebFrame*);
-  void didFinishDocumentLoadForFrame(WebPage*, WebFrame*);
   void didHandleOnloadEventsForFrame(WebPage*, WebFrame*);
   void didDisplayInsecureContentForFrame(WebPage*, WebFrame*);
   void didRunInsecureContentForFrame(WebPage*, WebFrame*);

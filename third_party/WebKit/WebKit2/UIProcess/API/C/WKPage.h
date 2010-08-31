@@ -73,6 +73,10 @@ typedef void (*WKPageDidFailProvisionalLoadWithErrorForFrameCallback)(
 typedef void (*WKPageDidCommitLoadForFrameCallback)(WKPageRef page,
                                                     WKFrameRef frame,
                                                     const void* clientInfo);
+typedef void (*WKPageDidFinishDocumentLoadForFrameCallback)(
+    WKPageRef page,
+    WKFrameRef frame,
+    const void* clientInfo);
 typedef void (*WKPageDidFinishLoadForFrameCallback)(WKPageRef page,
                                                     WKFrameRef frame,
                                                     const void* clientInfo);
@@ -121,6 +125,7 @@ struct WKPageLoaderClient {
   WKPageDidFailProvisionalLoadWithErrorForFrameCallback
       didFailProvisionalLoadWithErrorForFrame;
   WKPageDidCommitLoadForFrameCallback didCommitLoadForFrame;
+  WKPageDidFinishDocumentLoadForFrameCallback didFinishDocumentLoadForFrame;
   WKPageDidFinishLoadForFrameCallback didFinishLoadForFrame;
   WKPageDidFailLoadWithErrorForFrameCallback didFailLoadWithErrorForFrame;
   WKPageDidReceiveTitleForFrameCallback didReceiveTitleForFrame;

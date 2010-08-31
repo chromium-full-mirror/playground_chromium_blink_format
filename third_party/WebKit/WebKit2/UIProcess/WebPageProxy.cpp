@@ -457,6 +457,13 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       didCommitLoadForFrame(process()->webFrame(frameID));
       break;
     }
+    case WebPageProxyMessage::DidFinishDocumentLoadForFrame: {
+      uint64_t frameID;
+      if (!arguments->decode(frameID))
+        return;
+      didFinishDocumentLoadForFrame(process()->webFrame(frameID));
+      break;
+    }
     case WebPageProxyMessage::DidFinishLoadForFrame: {
       uint64_t frameID;
       if (!arguments->decode(frameID))
@@ -810,6 +817,10 @@ void WebPageProxy::didFailProvisionalLoadForFrame(WebFrameProxy* frame) {
 void WebPageProxy::didCommitLoadForFrame(WebFrameProxy* frame) {
   frame->didCommitLoad();
   m_loaderClient.didCommitLoadForFrame(this, frame);
+}
+
+void WebPageProxy::didFinishDocumentLoadForFrame(WebFrameProxy* frame) {
+  m_loaderClient.didFinishDocumentLoadForFrame(this, frame);
 }
 
 void WebPageProxy::didFinishLoadForFrame(WebFrameProxy* frame) {
