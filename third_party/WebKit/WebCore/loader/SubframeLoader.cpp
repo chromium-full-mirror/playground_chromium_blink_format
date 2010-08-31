@@ -282,7 +282,7 @@ Frame* SubframeLoader::loadSubframe(HTMLFrameOwnerElement* ownerElement,
     marginHeight = o->getMarginHeight();
   }
 
-  if (!SecurityOrigin::canLoad(url, referrer, 0)) {
+  if (!SecurityOrigin::canLoad(url, String(), ownerElement->document())) {
     FrameLoader::reportLocalLoadFailed(m_frame, url.string());
     return 0;
   }
