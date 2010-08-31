@@ -430,6 +430,10 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
     return m_applicationCache.get();
   }
 #endif
+#if ENABLE(BLOB)
+  String createBlobURL(Blob*);
+  void revokeBlobURL(const String&);
+#endif
 
   using RefCounted<DOMWindow>::ref;
   using RefCounted<DOMWindow>::deref;
