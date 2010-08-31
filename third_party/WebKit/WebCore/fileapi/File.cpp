@@ -63,7 +63,9 @@ File::File(ScriptExecutionContext* scriptExecutionContext,
            const String& path)
     : Blob(scriptExecutionContext, createBlobDataForFile(path), -1),
       m_path(path),
-      m_relativePath(relativePath) {}
+      m_relativePath(relativePath) {
+  m_name = pathGetFileName(path);
+}
 #endif
 
 unsigned long long File::size() const {
