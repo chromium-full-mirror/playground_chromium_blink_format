@@ -858,7 +858,7 @@ Eina_Bool ewk_frame_text_matches_nth_pos_get(Evas_Object* o,
   EINA_SAFETY_ON_NULL_RETURN_VAL(sd->frame, EINA_FALSE);
 
   Vector<WebCore::IntRect> intRects =
-      sd->frame->document()->markers()->firstRectsForMarkers(
+      sd->frame->document()->markers()->renderedRectsForMarkers(
           WebCore::DocumentMarker::TextMatch);
 
   /* remove useless values */
