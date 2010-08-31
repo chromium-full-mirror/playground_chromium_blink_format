@@ -174,6 +174,7 @@ CachedXSLStyleSheet* DocLoader::requestXSLStyleSheet(const String& url) {
 
 #if ENABLE(LINK_PREFETCH)
 CachedResource* DocLoader::requestLinkPrefetch(const String& url) {
+  ASSERT(frame());
   return requestResource(CachedResource::LinkPrefetch, url, String());
 }
 #endif
