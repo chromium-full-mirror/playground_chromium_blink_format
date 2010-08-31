@@ -36,17 +36,19 @@
 
 #include "Base64.h"
 #include "Blob.h"
+#include "CrossThreadTask.h"
 #include "File.h"
-#include "FileStreamProxy.h"
 #include "Logging.h"
 #include "ProgressEvent.h"
+#include "ResourceError.h"
+#include "ResourceRequest.h"
 #include "ScriptExecutionContext.h"
 #include "TextResourceDecoder.h"
+#include "ThreadableLoader.h"
 #include <wtf/CurrentTime.h>
 
 namespace WebCore {
 
-const unsigned bufferSize = 1024;
 const double progressNotificationIntervalMS = 50;
 
 FileReader::FileReader(ScriptExecutionContext* context)
@@ -57,9 +59,7 @@ FileReader::FileReader(ScriptExecutionContext* context)
       m_isRawDataConverted(false),
       m_bytesLoaded(0),
       m_totalBytes(0),
-      m_lastProgressNotificationTimeMS(0) {
-  m_buffer.resize(bufferSize);
-}
+      m_lastProgressNotificationTimeMS(0) {}
 
 FileReader::~FileReader() {
   terminate();
@@ -80,56 +80,58 @@ void FileReader::stop() {
   terminate();
 }
 
-void FileReader::readAsBinaryString(Blob* fileBlob) {
-  if (!fileBlob)
+void FileReader::readAsBinaryString(Blob* blob) {
+  if (!blob)
     return;
 
-  // FIXME: needs to handle non-file blobs.
-  LOG(FileAPI, "FileReader: reading as binary: %s\n",
-      fileBlob->path().utf8().data());
+  LOG(FileAPI, "FileReader: reading as binary: %s %s\n",
+      blob->url().string().utf8().data(),
+      blob->isFile() ? static_cast<File*>(blob)->path().utf8().data() : "");
 
-  readInternal(fileBlob, ReadFileAsBinaryString);
+  readInternal(blob, ReadFileAsBinaryString);
 }
 
-void FileReader::readAsText(Blob* fileBlob, const String& encoding) {
-  if (!fileBlob)
+void FileReader::readAsText(Blob* blob, const String& encoding) {
+  if (!blob)
     return;
 
-  // FIXME: needs to handle non-file blobs.
-  LOG(FileAPI, "FileReader: reading as text: %s\n",
-      fileBlob->path().utf8().data());
+  LOG(FileAPI, "FileReader: reading as text: %s %s\n",
+      blob->url().string().utf8().data(),
+      blob->isFile() ? static_cast<File*>(blob)->path().utf8().data() : "");
 
   if (!encoding.isEmpty())
     m_encoding = TextEncoding(encoding);
-  readInternal(fileBlob, ReadFileAsText);
+  readInternal(blob, ReadFileAsText);
 }
 
-void FileReader::readAsDataURL(File* file) {
-  if (!file)
+void FileReader::readAsDataURL(Blob* blob) {
+  if (!blob)
     return;
 
-  LOG(FileAPI, "FileReader: reading as data URL: %s\n",
-      file->path().utf8().data());
+  LOG(FileAPI, "FileReader: reading as data URL: %s %s\n",
+      blob->url().string().utf8().data(),
+      blob->isFile() ? static_cast<File*>(blob)->path().utf8().data() : "");
 
-  m_fileType = file->type();
-  readInternal(file, ReadFileAsDataURL);
+  m_fileType = blob->type();
+  readInternal(blob, ReadFileAsDataURL);
 }
 
-void FileReader::readInternal(Blob* fileBlob, ReadType type) {
+static void delayedStart(ScriptExecutionContext*, FileReader* reader) {
+  reader->start();
+}
+
+void FileReader::readInternal(Blob* blob, ReadType type) {
   // readAs*** methods() can be called multiple times. Only the last call before
   // the actual reading happens is processed.
   if (m_state != None && m_state != Starting)
     return;
 
-  m_fileBlob = fileBlob;
+  if (m_state == None)
+    scriptExecutionContext()->postTask(createCallbackTask(&delayedStart, this));
+
+  m_blob = blob;
   m_readType = type;
   m_state = Starting;
-
-  // When FileStreamProxy is created, FileReader::didStart() will get notified
-  // on the File thread and we will start
-  // opening and reading the file since then.
-  if (!m_streamProxy.get())
-    m_streamProxy = FileStreamProxy::create(scriptExecutionContext(), this);
 }
 
 void FileReader::abort() {
@@ -146,89 +148,65 @@ void FileReader::abort() {
 }
 
 void FileReader::terminate() {
-  if (m_streamProxy) {
-    m_streamProxy->stop();
-    m_streamProxy = 0;
+  if (m_loader) {
+    m_loader->cancel();
+    m_loader = 0;
   }
   m_state = Completed;
 }
 
-void FileReader::didStart() {
+void FileReader::start() {
   m_state = Opening;
 
-  ASSERT(m_fileBlob->items().size() == 1 &&
-         m_fileBlob->items().at(0)->toFileBlobItem());
-  const FileRangeBlobItem* fileRangeItem =
-      m_fileBlob->items().at(0)->toFileRangeBlobItem();
-  double expectedModificationTime =
-      fileRangeItem ? fileRangeItem->snapshotModificationTime() : 0;
+  // The blob is read by routing through the request handling layer given the
+  // blob url.
+  ResourceRequest request(m_blob->url());
+  request.setHTTPMethod("GET");
 
-  m_streamProxy->getSize(m_fileBlob->path(), expectedModificationTime);
+  ThreadableLoaderOptions options;
+  options.sendLoadCallbacks = true;
+  options.sniffContent = false;
+  options.forcePreflight = false;
+  options.allowCredentials = true;
+  options.crossOriginRequestPolicy = DenyCrossOriginRequests;
+
+  m_loader = ThreadableLoader::create(scriptExecutionContext(), this, request,
+                                      options);
 }
 
-void FileReader::didGetSize(long long size) {
-  // If the size is -1, it means the file has been moved or changed. Fail now.
-  if (size == -1) {
-    didFail(NOT_FOUND_ERR);
+void FileReader::didReceiveResponse(const ResourceResponse& response) {
+  if (response.httpStatusCode() != 200) {
+    failed(response.httpStatusCode());
     return;
   }
 
   m_state = Reading;
   fireEvent(eventNames().loadstartEvent);
 
-  ASSERT(m_fileBlob->items().size() == 1 &&
-         m_fileBlob->items().at(0)->toFileBlobItem());
-  const FileRangeBlobItem* fileRangeItem =
-      m_fileBlob->items().at(0)->toFileRangeBlobItem();
-  long long start = fileRangeItem ? fileRangeItem->start() : 0;
-
-  // The size passed back is the size of the whole file. If the underlying item
-  // is a sliced file, we need to use the slice length.
-  m_totalBytes = fileRangeItem ? fileRangeItem->size() : size;
-
-  m_streamProxy->openForRead(m_fileBlob->path(), start, m_totalBytes);
+  m_totalBytes = response.expectedContentLength();
 }
 
-void FileReader::didOpen(bool success) {
-  if (!success) {
-    didFail(NOT_READABLE_ERR);
-    return;
-  }
+void FileReader::didReceiveData(const char* data, int lengthReceived) {
+  ASSERT(data && lengthReceived);
 
-  m_streamProxy->read(m_buffer.data(), m_buffer.size());
-}
-
-void FileReader::didRead(int bytesRead) {
   // Bail out if we have aborted the reading.
   if (m_state == Completed)
     return;
 
-  // If bytesRead is -1, it means an error happens.
-  if (bytesRead == -1) {
-    didFail(NOT_READABLE_ERR);
-    return;
-  }
-
-  // If bytesRead is 0, it means the reading is done.
-  if (!bytesRead) {
-    didFinish();
-    return;
-  }
-
   switch (m_readType) {
     case ReadFileAsBinaryString:
-      m_result += String(m_buffer.data(), static_cast<unsigned>(bytesRead));
+      m_result += String(data, static_cast<unsigned>(lengthReceived));
       break;
     case ReadFileAsText:
     case ReadFileAsDataURL:
-      m_rawData.append(m_buffer.data(), static_cast<unsigned>(bytesRead));
+      m_rawData.append(data, static_cast<unsigned>(lengthReceived));
       m_isRawDataConverted = false;
       break;
     default:
       ASSERT_NOT_REACHED();
   }
 
-  m_bytesLoaded += bytesRead;
+  m_bytesLoaded += lengthReceived;
 
   // Fire the progress event at least every 50ms.
   double now = WTF::currentTimeMS();
@@ -239,28 +217,41 @@ void FileReader::didRead(int bytesRead) {
     fireEvent(eventNames().progressEvent);
     m_lastProgressNotificationTimeMS = now;
   }
-
-  // Continue reading.
-  m_streamProxy->read(m_buffer.data(), m_buffer.size());
 }
 
-void FileReader::didFinish() {
+void FileReader::didFinishLoading(unsigned long) {
   m_state = Completed;
-
-  m_streamProxy->close();
 
   fireEvent(eventNames().loadEvent);
   fireEvent(eventNames().loadendEvent);
+
+  m_loader = 0;
 }
 
-void FileReader::didFail(ExceptionCode ec) {
+void FileReader::didFail(const ResourceError&) {
+  // Treat as internal error.
+  failed(500);
+}
+
+void FileReader::failed(int httpStatusCode) {
   m_state = Completed;
-  m_error = FileError::create(ec);
 
-  m_streamProxy->close();
-
+  m_error = FileError::create(httpStatusCodeToExceptionCode(httpStatusCode));
   fireEvent(eventNames().errorEvent);
   fireEvent(eventNames().loadendEvent);
+
+  m_loader = 0;
+}
+
+ExceptionCode FileReader::httpStatusCodeToExceptionCode(int httpStatusCode) {
+  switch (httpStatusCode) {
+    case 403:
+      return SECURITY_ERR;
+    case 404:
+      return NOT_FOUND_ERR;
+    default:
+      return NOT_READABLE_ERR;
+  }
 }
 
 void FileReader::fireEvent(const AtomicString& type) {
@@ -301,7 +292,7 @@ const ScriptString& FileReader::result() {
     convertToText();
   // For data URL, we only do the coversion until we receive all the raw data.
   else if (m_readType == ReadFileAsDataURL && m_state == Completed)
-    convertToDataURL();
+    convertToDataURL(m_rawData, m_fileType, m_result);
 
   return m_result;
 }
@@ -328,21 +319,23 @@ void FileReader::convertToText() {
     m_result += m_decoder->flush();
 }
 
-void FileReader::convertToDataURL() {
-  m_result = "data:";
+void FileReader::convertToDataURL(const Vector<char>& rawData,
+                                  const String& fileType,
+                                  ScriptString& result) {
+  result = "data:";
 
-  if (!m_rawData.size())
+  if (!rawData.size())
     return;
 
-  m_result += m_fileType;
-  if (!m_fileType.isEmpty())
-    m_result += ";";
-  m_result += "base64,";
+  result += fileType;
+  if (!fileType.isEmpty())
+    result += ";";
+  result += "base64,";
 
   Vector<char> out;
-  base64Encode(m_rawData, out);
+  base64Encode(rawData, out);
   out.append('\0');
-  m_result += out.data();
+  result += out.data();
 }
 
 }  // namespace WebCore

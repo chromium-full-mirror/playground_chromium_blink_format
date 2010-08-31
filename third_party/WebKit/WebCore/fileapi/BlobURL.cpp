@@ -64,4 +64,11 @@ KURL BlobURL::getOrigin(const KURL& url) {
   return KURL(ParsedURLString, decodeURLEscapeSequences(origin));
 }
 
+String BlobURL::getIdentifier(const KURL& url) {
+  ASSERT(url.protocolIs("blob"));
+
+  unsigned startIndex = url.pathAfterLastSlash();
+  return url.string().substring(startIndex);
+}
+
 }  // namespace WebCore

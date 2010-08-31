@@ -171,7 +171,8 @@ BlobResourceHandle::BlobResourceHandle(PassRefPtr<BlobStorageData> blobData,
       m_readItemCount(0),
       m_fileOpened(false) {
   if (m_async) {
-    m_asyncStream = adoptRef(client->createAsyncFileStream(this));
+    // We need to take a ref.
+    m_asyncStream = client->createAsyncFileStream(this);
     callOnMainThread(delayedStart, this);
   } else
     m_stream = FileStream::create();
