@@ -252,7 +252,16 @@ void WTFLogVerbose(const char* file,
 
 #define ASSERT(assertion) ((void)0)
 #define ASSERT_NOT_REACHED() ((void)0)
+
+#if COMPILER(INTEL) && !OS(WINDOWS) || COMPILER(RVCT)
+template <typename T>
+inline void assertUnused(T& x) {
+  (void)x;
+}
+#define ASSERT_UNUSED(variable, assertion) (assertUnused(variable))
+#else
 #define ASSERT_UNUSED(variable, assertion) ((void)variable)
+#endif
 
 #else
 
