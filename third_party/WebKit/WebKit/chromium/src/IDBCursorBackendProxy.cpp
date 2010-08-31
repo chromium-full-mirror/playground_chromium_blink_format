@@ -55,10 +55,8 @@ PassRefPtr<IDBKey> IDBCursorBackendProxy::key() const {
   return m_idbCursor->key();
 }
 
-PassRefPtr<IDBAny> IDBCursorBackendProxy::value() const {
-  RefPtr<SerializedScriptValue> value =
-      PassRefPtr<SerializedScriptValue>(m_idbCursor->value());
-  return IDBAny::create(value.get());
+PassRefPtr<SerializedScriptValue> IDBCursorBackendProxy::value() const {
+  return m_idbCursor->value();
 }
 
 void IDBCursorBackendProxy::update(PassRefPtr<SerializedScriptValue> value,

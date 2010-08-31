@@ -30,12 +30,15 @@
 
 #include "IDBCursor.h"
 #include "IDBCursorBackendInterface.h"
+#include <wtf/OwnPtr.h>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
 
 class IDBKeyRange;
 class IDBObjectStoreBackendImpl;
+class SQLiteStatement;
 class SerializedScriptValue;
 
 class IDBCursorBackendImpl : public IDBCursorBackendInterface {
@@ -44,16 +47,15 @@ class IDBCursorBackendImpl : public IDBCursorBackendInterface {
       PassRefPtr<IDBObjectStoreBackendImpl> objectStore,
       PassRefPtr<IDBKeyRange> keyRange,
       IDBCursor::Direction direction,
-      PassRefPtr<IDBKey> key,
-      PassRefPtr<SerializedScriptValue> value) {
+      PassOwnPtr<SQLiteStatement> query) {
     return adoptRef(
-        new IDBCursorBackendImpl(objectStore, keyRange, direction, key, value));
+        new IDBCursorBackendImpl(objectStore, keyRange, direction, query));
   }
   virtual ~IDBCursorBackendImpl();
 
   virtual unsigned short direction() const;
   virtual PassRefPtr<IDBKey> key() const;
-  virtual PassRefPtr<IDBAny> value() const;
+  virtual PassRefPtr<SerializedScriptValue> value() const;
   virtual void update(PassRefPtr<SerializedScriptValue>,
                       PassRefPtr<IDBCallbacks>);
   virtual void continueFunction(PassRefPtr<IDBKey>, PassRefPtr<IDBCallbacks>);
@@ -63,14 +65,19 @@ class IDBCursorBackendImpl : public IDBCursorBackendInterface {
   IDBCursorBackendImpl(PassRefPtr<IDBObjectStoreBackendImpl>,
                        PassRefPtr<IDBKeyRange>,
                        IDBCursor::Direction,
-                       PassRefPtr<IDBKey>,
-                       PassRefPtr<SerializedScriptValue>);
+                       PassOwnPtr<SQLiteStatement> query);
+
+  void loadCurrentRow();
+
+  static const int64_t InvalidId = -1;
 
   RefPtr<IDBObjectStoreBackendImpl> m_idbObjectStore;
   RefPtr<IDBKeyRange> m_keyRange;
   IDBCursor::Direction m_direction;
-  RefPtr<IDBKey> m_key;
-  RefPtr<IDBAny> m_value;
+  OwnPtr<SQLiteStatement> m_query;
+  int64_t m_currentId;
+  RefPtr<IDBKey> m_currentKey;
+  RefPtr<SerializedScriptValue> m_currentValue;
 };
 
 }  // namespace WebCore
