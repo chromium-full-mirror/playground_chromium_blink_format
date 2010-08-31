@@ -278,7 +278,11 @@ static TriState stateStyle(Frame* frame,
 }
 
 static String valueStyle(Frame* frame, int propertyID) {
-  return frame->selectionStartStylePropertyValue(propertyID);
+  // FIXME: Rather than retrieving the style at the start of the current
+  // selection,
+  // we should retrieve the style present throughout the selection for non-Mac
+  // platforms.
+  return frame->editor()->selectionStartCSSPropertyValue(propertyID);
 }
 
 static TriState stateTextWritingDirection(Frame* frame,

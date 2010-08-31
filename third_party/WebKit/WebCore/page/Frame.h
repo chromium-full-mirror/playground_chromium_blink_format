@@ -223,7 +223,6 @@ class Frame : public RefCounted<Frame>
 
   void computeAndSetTypingStyle(CSSStyleDeclaration*,
                                 EditAction = EditActionUnspecified);
-  String selectionStartStylePropertyValue(int stylePropertyID) const;
   void applyEditingStyleToBodyElement() const;
   void applyEditingStyleToElement(Element*) const;
 
