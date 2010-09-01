@@ -171,10 +171,9 @@ WebPage::WebPage(QObject* parent, DumpRenderTree* drt)
                                          QWebPage::PermissionPolicy&)),
           this, SLOT(checkPermission(QWebFrame*, QWebPage::PermissionDomain,
                                      QWebPage::PermissionPolicy&)));
-  connect(this, SIGNAL(cancelRequestsForPermissionFromUser(
-                    QWebFrame*, QWebPage::PermissionDomain)),
-          this, SLOT(cancelRequestsForPermissionFromUser(
-                    QWebFrame*, QWebPage::PermissionDomain)));
+  connect(this, SIGNAL(cancelRequestsForPermission(QWebFrame*,
+                                                   QWebPage::PermissionDomain)),
+          this, SLOT(cancelPermission(QWebFrame*, QWebPage::PermissionDomain)));
 }
 
 WebPage::~WebPage() {
@@ -214,6 +213,8 @@ void WebPage::resetSettings() {
 
   QWebSettings::setMaximumPagesInCache(0);   // reset to default
   settings()->setUserStyleSheetUrl(QUrl());  // reset to default
+
+  m_pendingGeolocationRequests.clear();
 }
 
 QWebPage* WebPage::createWindow(QWebPage::WebWindowType) {
@@ -233,6 +234,15 @@ void WebPage::requestPermission(QWebFrame* frame,
     case NotificationsPermissionDomain:
       if (!m_drt->layoutTestController()->ignoreReqestForPermission())
         setUserPermission(frame, domain, PermissionGranted);
+      break;
+    case GeolocationPermissionDomain:
+      if (m_drt->layoutTestController()->isGeolocationPermissionSet())
+        if (m_drt->layoutTestController()->geolocationPermission())
+          setUserPermission(frame, domain, PermissionGranted);
+        else
+          setUserPermission(frame, domain, PermissionDenied);
+      else
+        m_pendingGeolocationRequests.append(frame);
       break;
     default:
       break;
@@ -257,8 +267,34 @@ void WebPage::checkPermission(QWebFrame* frame,
   }
 }
 
-void WebPage::cancelRequestsForPermission(QWebFrame*,
-                                          QWebPage::PermissionDomain) {}
+void WebPage::cancelPermission(QWebFrame* frame,
+                               QWebPage::PermissionDomain domain) {
+  switch (domain) {
+    case GeolocationPermissionDomain:
+      m_pendingGeolocationRequests.removeOne(frame);
+      break;
+    default:
+      break;
+  }
+}
+
+void WebPage::permissionSet(QWebPage::PermissionDomain domain) {
+  switch (domain) {
+    case GeolocationPermissionDomain: {
+      Q_ASSERT(m_drt->layoutTestController()->isGeolocationPermissionSet());
+      foreach (QWebFrame* frame, m_pendingGeolocationRequests)
+        if (m_drt->layoutTestController()->geolocationPermission())
+          setUserPermission(frame, domain, PermissionGranted);
+        else
+          setUserPermission(frame, domain, PermissionDenied);
+
+      m_pendingGeolocationRequests.clear();
+      break;
+    }
+    default:
+      break;
+  }
+}
 
 static QString urlSuitableForTestResult(const QString& url) {
   if (url.isEmpty() || !url.startsWith(QLatin1String("file://")))
@@ -390,10 +426,6 @@ QObject* WebPage::createPlugin(const QString& classId,
 #endif
 }
 
-bool WebPage::allowGeolocationRequest(QWebFrame*) {
-  return m_drt->layoutTestController()->geolocationPermission();
-}
-
 void WebPage::setViewGeometry(const QRect& rect) {
   if (WebViewGraphicsBased* v = qobject_cast<WebViewGraphicsBased*>(view()))
     v->scene()->setSceneRect(QRectF(rect));
@@ -449,6 +481,10 @@ DumpRenderTree::DumpRenderTree()
   m_controller = new LayoutTestController(this);
   connect(m_controller, SIGNAL(showPage()), this, SLOT(showPage()));
   connect(m_controller, SIGNAL(hidePage()), this, SLOT(hidePage()));
+
+  // async geolocation permission set by controller
+  connect(m_controller, SIGNAL(geolocationPermissionSet()), this,
+          SLOT(geolocationPermissionSet()));
 
   connect(m_controller, SIGNAL(done()), this, SLOT(dump()));
   m_eventSender = new EventSender(m_page);
@@ -1056,6 +1092,10 @@ void DumpRenderTree::windowCloseRequested() {
 int DumpRenderTree::windowCount() const {
   // include the main view in the count
   return windows.count() + 1;
+}
+
+void DumpRenderTree::geolocationPermissionSet() {
+  m_page->permissionSet(QWebPage::GeolocationPermissionDomain);
 }
 
 void DumpRenderTree::switchFocus(bool focused) {

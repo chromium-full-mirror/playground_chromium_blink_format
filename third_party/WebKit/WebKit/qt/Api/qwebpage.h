@@ -57,6 +57,7 @@ class FrameLoaderClientQt;
 class InspectorClientQt;
 class InspectorFrontendClientQt;
 class NotificationPresenterClientQt;
+class GeolocationPermissionClientQt;
 class ResourceHandle;
 class HitTestResult;
 class QNetworkReplyHandler;
@@ -202,7 +203,10 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
     PermissionDenied
   };
 
-  enum PermissionDomain { NotificationsPermissionDomain };
+  enum PermissionDomain {
+    NotificationsPermissionDomain,
+    GeolocationPermissionDomain
+  };
 
   class ViewportHints {
    public:
@@ -349,7 +353,6 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
  public Q_SLOTS:
   bool shouldInterruptJavaScript();
-  bool allowGeolocationRequest(QWebFrame* frame);
 
  Q_SIGNALS:
   void loadStarted();
@@ -440,6 +443,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   friend class WebCore::InspectorClientQt;
   friend class WebCore::InspectorFrontendClientQt;
   friend class WebCore::NotificationPresenterClientQt;
+  friend class WebCore::GeolocationPermissionClientQt;
   friend class WebCore::ResourceHandle;
   friend class WebCore::QNetworkReplyHandler;
   friend class DumpRenderTreeSupportQt;

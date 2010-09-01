@@ -204,7 +204,12 @@ class JSTestPage : public QWebPage {
 
  public slots:
   bool shouldInterruptJavaScript() { return true; }
-  bool allowGeolocationRequest(QWebFrame* frame) { return m_allowGeolocation; }
+  void requestPermission(QWebFrame* frame, QWebPage::PermissionDomain domain) {
+    if (m_allowGeolocation)
+      setUserPermission(frame, domain, PermissionGranted);
+    else
+      setUserPermission(frame, domain, PermissionDenied);
+  }
 
  public:
   void setGeolocationPermission(bool allow) { m_allowGeolocation = allow; }
@@ -224,6 +229,11 @@ void tst_QWebPage::infiniteLoopJS() {
 
 void tst_QWebPage::geolocationRequestJS() {
   JSTestPage* newPage = new JSTestPage(m_view);
+  connect(
+      newPage,
+      SIGNAL(requestPermissionFromUser(QWebFrame*, QWebPage::PermissionDomain)),
+      newPage, SLOT(requestPermission(QWebFrame*, QWebPage::PermissionDomain)));
+
   newPage->setGeolocationPermission(false);
   m_view->setPage(newPage);
   m_view->setHtml(QString("<html><body>test</body></html>"), QUrl());

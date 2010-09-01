@@ -131,6 +131,7 @@ class DumpRenderTree : public QObject {
   void hidePage();
   void dryRunPrint(QWebFrame*);
   void loadNextTestInStandAloneMode();
+  void geolocationPermissionSet();
 
  private:
   void setStandAloneMode(bool flag) { m_standAloneMode = flag; }
@@ -205,15 +206,15 @@ class WebPage : public QWebPage {
                         const QStringList&,
                         const QStringList&);
 
+  void permissionSet(QWebPage::PermissionDomain domain);
+
  public slots:
   bool shouldInterruptJavaScript() { return false; }
-  bool allowGeolocationRequest(QWebFrame* frame);
   void requestPermission(QWebFrame* frame, QWebPage::PermissionDomain domain);
   void checkPermission(QWebFrame* frame,
                        QWebPage::PermissionDomain domain,
                        QWebPage::PermissionPolicy& policy);
-  void cancelRequestsForPermission(QWebFrame* frame,
-                                   QWebPage::PermissionDomain domain);
+  void cancelPermission(QWebFrame* frame, QWebPage::PermissionDomain domain);
 
  protected:
   bool acceptNavigationRequest(QWebFrame* frame,
@@ -226,6 +227,7 @@ class WebPage : public QWebPage {
 
  private:
   QWebInspector* m_webInspector;
+  QList<QWebFrame*> m_pendingGeolocationRequests;
   DumpRenderTree* m_drt;
 };
 

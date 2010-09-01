@@ -65,6 +65,8 @@ void LayoutTestController::reset() {
   m_userStyleSheetEnabled = false;
   m_desktopNotificationAllowedOrigins.clear();
   m_ignoreDesktopNotification = false;
+  m_isGeolocationPermissionSet = false;
+  m_geolocationPermission = false;
 
   DumpRenderTreeSupportQt::dumpEditingCallbacks(false);
   DumpRenderTreeSupportQt::dumpFrameLoader(false);
@@ -709,6 +711,11 @@ void LayoutTestController::setMockDeviceOrientation(bool canProvideAlpha,
 }
 
 void LayoutTestController::setGeolocationPermission(bool allow) {
+  setGeolocationPermissionCommon(allow);
+  emit geolocationPermissionSet();
+}
+
+void LayoutTestController::setGeolocationPermissionCommon(bool allow) {
   m_isGeolocationPermissionSet = true;
   m_geolocationPermission = allow;
 }

@@ -87,6 +87,7 @@ class LayoutTestController : public QObject {
 
   void showPage();
   void hidePage();
+  void geolocationPermissionSet();
 
  public slots:
   void maybeDump(bool ok);
@@ -277,6 +278,9 @@ class LayoutTestController : public QObject {
 
  private slots:
   void processWork();
+
+ private:
+  void setGeolocationPermissionCommon(bool allow);
 
  private:
   bool m_hasDumped;
