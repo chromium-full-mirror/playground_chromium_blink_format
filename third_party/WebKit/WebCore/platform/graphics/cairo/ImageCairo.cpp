@@ -159,8 +159,8 @@ void BitmapImage::draw(GraphicsContext* context,
     cairo_rectangle(shadowContext, 0, 0, dstRect.width(), dstRect.height());
     cairo_fill(shadowContext);
 
-    context->createPlatformShadow(shadowBuffer.release(), shadowColor,
-                                  shadowRect, radius);
+    context->applyPlatformShadow(shadowBuffer.release(), shadowColor,
+                                 shadowRect, radius);
   }
 #endif
 
