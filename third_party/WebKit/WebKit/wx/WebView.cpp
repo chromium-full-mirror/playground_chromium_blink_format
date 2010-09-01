@@ -640,7 +640,7 @@ void wxWebView::OnPaint(wxPaintEvent& event) {
       WebCore::GraphicsContext gc(&dc);
 #endif
       if (frame->contentRenderer()) {
-        frame->view()->layoutIfNeededRecursive();
+        frame->view()->updateLayoutAndStyleIfNeededRecursive();
         frame->view()->paint(&gc, paintRect);
       }
     }

@@ -92,7 +92,7 @@ enum FindDirection { FindDirectionForward, FindDirectionBackward };
 
 class Page : public Noncopyable {
  public:
-  static void setNeedsReapplyStyles();
+  static void scheduleForcedStyleRecalcForAllPages();
 
   // It is up to the platform to ensure that non-null clients are provided where
   // required.

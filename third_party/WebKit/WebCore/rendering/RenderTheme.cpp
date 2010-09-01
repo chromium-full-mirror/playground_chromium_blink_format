@@ -1072,7 +1072,7 @@ void RenderTheme::platformColorsDidChange() {
   m_activeListBoxSelectionBackgroundColor = Color();
   m_inactiveListBoxSelectionForegroundColor = Color();
 
-  Page::setNeedsReapplyStyles();
+  Page::scheduleForcedStyleRecalcForAllPages();
 }
 
 Color RenderTheme::systemColor(int cssValueId) const {

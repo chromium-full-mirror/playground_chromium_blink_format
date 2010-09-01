@@ -294,7 +294,7 @@ void QWebFramePrivate::renderRelativeCoords(GraphicsContext* context,
   QPainter* painter = context->platformContext();
 
   WebCore::FrameView* view = frame->view();
-  view->layoutIfNeededRecursive();
+  view->updateLayoutAndStyleIfNeededRecursive();
 
   for (int i = 0; i < vector.size(); ++i) {
     const QRect& clipRect = vector.at(i);

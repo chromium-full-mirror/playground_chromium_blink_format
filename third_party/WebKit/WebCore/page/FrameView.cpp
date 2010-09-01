@@ -519,8 +519,11 @@ bool FrameView::hasCompositedContent() const {
 // Sometimes (for plug-ins) we need to eagerly go into compositing mode.
 void FrameView::enterCompositingMode() {
 #if USE(ACCELERATED_COMPOSITING)
-  if (RenderView* view = m_frame->contentRenderer())
+  if (RenderView* view = m_frame->contentRenderer()) {
     view->compositor()->enableCompositingMode();
+    if (!needsLayout())
+      view->compositor()->scheduleCompositingLayerUpdate();
+  }
 #endif
 }
 
@@ -657,10 +660,7 @@ void FrameView::layout(bool allowSubtree) {
   // Always ensure our style info is up-to-date.  This can happen in situations
   // where
   // the layout beats any sort of style recalc update that needs to occur.
-  if (m_frame->needsReapplyStyles())
-    m_frame->reapplyStyles();
-  else
-    document->updateStyleIfNeeded();
+  document->updateStyleIfNeeded();
 
   bool subtree = m_layoutRoot;
 
@@ -1450,12 +1450,7 @@ bool FrameView::needsLayout() const {
   if (!m_frame)
     return false;
   RenderView* root = m_frame->contentRenderer();
-  Document* document = m_frame->document();
   return layoutPending() || (root && root->needsLayout()) || m_layoutRoot ||
-         (document && document->childNeedsStyleRecalc())  // can occur when
-                                                          // using WebKit ObjC
-                                                          // interface
-         || m_frame->needsReapplyStyles() ||
          (m_deferSetNeedsLayouts && m_setNeedsLayoutWasDeferred);
 }
 
@@ -2019,7 +2014,7 @@ void FrameView::setNodeToDraw(Node* node) {
   m_nodeToDraw = node;
 }
 
-void FrameView::layoutIfNeededRecursive() {
+void FrameView::updateLayoutAndStyleIfNeededRecursive() {
   // We have to crawl our entire tree looking for any FrameViews that need
   // layout and make sure they are up to date.
   // Mac actually tests for intersection with the dirty region and tries not to
@@ -2033,6 +2028,8 @@ void FrameView::layoutIfNeededRecursive() {
   // the dirty region
   // when it lays out.
 
+  m_frame->document()->updateStyleIfNeeded();
+
   if (needsLayout())
     layout();
 
@@ -2042,11 +2039,11 @@ void FrameView::layoutIfNeededRecursive() {
        current != end; ++current) {
     Widget* widget = (*current).get();
     if (widget->isFrameView())
-      static_cast<FrameView*>(widget)->layoutIfNeededRecursive();
+      static_cast<FrameView*>(widget)->updateLayoutAndStyleIfNeededRecursive();
   }
 
-  // layoutIfNeededRecursive is called when we need to make sure layout is
-  // up-to-date before
+  // updateLayoutAndStyleIfNeededRecursive is called when we need to make sure
+  // style and layout are up-to-date before
   // painting, so we need to flush out any deferred repaints too.
   flushDeferredRepaints();
 }

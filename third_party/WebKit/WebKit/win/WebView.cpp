@@ -965,7 +965,7 @@ void WebView::updateBackingStore(FrameView* frameView,
     // always current.
     if (Frame* coreFrame = core(m_mainFrame))
       if (FrameView* view = coreFrame->view())
-        view->layoutIfNeededRecursive();
+        view->updateLayoutAndStyleIfNeededRecursive();
 
     Vector<IntRect> paintRects;
     if (!backingStoreCompletelyDirty && m_backingStoreDirtyRegion) {

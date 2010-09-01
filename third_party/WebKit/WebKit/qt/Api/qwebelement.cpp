@@ -1405,7 +1405,7 @@ void QWebElement::render(QPainter* painter) {
 
   FrameView* view = frame->view();
 
-  view->layoutIfNeededRecursive();
+  view->updateLayoutAndStyleIfNeededRecursive();
 
   IntRect rect = e->getRect();
 
