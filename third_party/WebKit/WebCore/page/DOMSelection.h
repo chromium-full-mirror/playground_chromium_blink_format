@@ -82,8 +82,8 @@ class DOMSelection : public RefCounted<DOMSelection> {
   bool isCollapsed() const;
   int rangeCount() const;
   void collapse(Node*, int offset, ExceptionCode&);
-  void collapseToEnd();
-  void collapseToStart();
+  void collapseToEnd(ExceptionCode&);
+  void collapseToStart(ExceptionCode&);
   void extend(Node*, int offset, ExceptionCode&);
   PassRefPtr<Range> getRangeAt(int, ExceptionCode&);
   void removeAllRanges();
