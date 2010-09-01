@@ -189,6 +189,9 @@ FloatRect SVGRenderSupport::computeContainerBoundingBox(
 
   for (RenderObject* current = container->firstChild(); current;
        current = current->nextSibling()) {
+    if (current->isSVGHiddenContainer())
+      continue;
+
     FloatRect childBoundingBox;
 
     switch (mode) {
