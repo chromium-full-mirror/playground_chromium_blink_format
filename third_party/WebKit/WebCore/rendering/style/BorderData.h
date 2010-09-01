@@ -26,7 +26,7 @@
 #define BorderData_h
 
 #include "BorderValue.h"
-#include "IntSize.h"
+#include "LengthSize.h"
 #include "NinePieceImage.h"
 
 namespace WebCore {
@@ -35,6 +35,11 @@ class BorderData {
   friend class RenderStyle;
 
  public:
+  BorderData()
+      : m_topLeft(Length(0, Fixed), Length(0, Fixed)),
+        m_topRight(Length(0, Fixed), Length(0, Fixed)),
+        m_bottomLeft(Length(0, Fixed), Length(0, Fixed)),
+        m_bottomRight(Length(0, Fixed), Length(0, Fixed)) {}
   bool hasBorder() const {
     bool haveImage = m_image.hasImage();
     return m_left.nonZero(!haveImage) || m_right.nonZero(!haveImage) ||
@@ -42,13 +47,13 @@ class BorderData {
   }
 
   bool hasBorderRadius() const {
-    if (m_topLeft.width() > 0)
+    if (m_topLeft.width().rawValue() > 0)
       return true;
-    if (m_topRight.width() > 0)
+    if (m_topRight.width().rawValue() > 0)
       return true;
-    if (m_bottomLeft.width() > 0)
+    if (m_bottomLeft.width().rawValue() > 0)
       return true;
-    if (m_bottomRight.width() > 0)
+    if (m_bottomRight.width().rawValue() > 0)
       return true;
     return false;
   }
@@ -97,10 +102,10 @@ class BorderData {
 
   const NinePieceImage& image() const { return m_image; }
 
-  const IntSize& topLeft() const { return m_topLeft; }
-  const IntSize& topRight() const { return m_topRight; }
-  const IntSize& bottomLeft() const { return m_bottomLeft; }
-  const IntSize& bottomRight() const { return m_bottomRight; }
+  const LengthSize& topLeft() const { return m_topLeft; }
+  const LengthSize& topRight() const { return m_topRight; }
+  const LengthSize& bottomLeft() const { return m_bottomLeft; }
+  const LengthSize& bottomRight() const { return m_bottomRight; }
 
  private:
   BorderValue m_left;
@@ -110,10 +115,10 @@ class BorderData {
 
   NinePieceImage m_image;
 
-  IntSize m_topLeft;
-  IntSize m_topRight;
-  IntSize m_bottomLeft;
-  IntSize m_bottomRight;
+  LengthSize m_topLeft;
+  LengthSize m_topRight;
+  LengthSize m_bottomLeft;
+  LengthSize m_bottomRight;
 };
 
 }  // namespace WebCore

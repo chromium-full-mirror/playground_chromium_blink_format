@@ -811,16 +811,16 @@ void AnimationBase::ensurePropertyMap() {
     gPropertyWrappers->append(new PropertyWrapper<float>(
         CSSPropertyWebkitTransformOriginZ, &RenderStyle::transformOriginZ,
         &RenderStyle::setTransformOriginZ));
-    gPropertyWrappers->append(new PropertyWrapper<const IntSize&>(
+    gPropertyWrappers->append(new PropertyWrapper<const LengthSize&>(
         CSSPropertyBorderTopLeftRadius, &RenderStyle::borderTopLeftRadius,
         &RenderStyle::setBorderTopLeftRadius));
-    gPropertyWrappers->append(new PropertyWrapper<const IntSize&>(
+    gPropertyWrappers->append(new PropertyWrapper<const LengthSize&>(
         CSSPropertyBorderTopRightRadius, &RenderStyle::borderTopRightRadius,
         &RenderStyle::setBorderTopRightRadius));
-    gPropertyWrappers->append(new PropertyWrapper<const IntSize&>(
+    gPropertyWrappers->append(new PropertyWrapper<const LengthSize&>(
         CSSPropertyBorderBottomLeftRadius, &RenderStyle::borderBottomLeftRadius,
         &RenderStyle::setBorderBottomLeftRadius));
-    gPropertyWrappers->append(new PropertyWrapper<const IntSize&>(
+    gPropertyWrappers->append(new PropertyWrapper<const LengthSize&>(
         CSSPropertyBorderBottomRightRadius,
         &RenderStyle::borderBottomRightRadius,
         &RenderStyle::setBorderBottomRightRadius));

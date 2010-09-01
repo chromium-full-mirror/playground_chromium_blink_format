@@ -1237,7 +1237,7 @@ bool CSSParser::parseValue(int propId, bool important) {
     case CSSPropertyBorderBottomRightRadius: {
       if (num != 1 && num != 2)
         return false;
-      validPrimitive = validUnit(value, FLength, m_strict);
+      validPrimitive = validUnit(value, FLength | FPercent, m_strict);
       if (!validPrimitive)
         return false;
       RefPtr<CSSPrimitiveValue> parsedValue1 = CSSPrimitiveValue::create(
@@ -1245,7 +1245,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       RefPtr<CSSPrimitiveValue> parsedValue2;
       if (num == 2) {
         value = m_valueList->next();
-        validPrimitive = validUnit(value, FLength, m_strict);
+        validPrimitive = validUnit(value, FLength | FPercent, m_strict);
         if (!validPrimitive)
           return false;
         parsedValue2 = CSSPrimitiveValue::create(
@@ -1263,7 +1263,7 @@ bool CSSParser::parseValue(int propId, bool important) {
     case CSSPropertyWebkitBorderRadius:
       return parseBorderRadius(propId, important);
     case CSSPropertyOutlineOffset:
-      validPrimitive = validUnit(value, FLength, m_strict);
+      validPrimitive = validUnit(value, FLength | FPercent, m_strict);
       break;
     case CSSPropertyTextShadow:  // CSS2 property, dropped in CSS2.1, back in
                                  // CSS3, so treat as CSS3
@@ -4734,7 +4734,7 @@ bool CSSParser::parseBorderRadius(int propId, bool important) {
     if (i - indexAfterSlash >= 4)
       return false;
 
-    if (!validUnit(value, FLength, m_strict))
+    if (!validUnit(value, FLength | FPercent, m_strict))
       return false;
 
     RefPtr<CSSPrimitiveValue> radius = CSSPrimitiveValue::create(

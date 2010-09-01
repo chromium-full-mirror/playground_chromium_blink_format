@@ -1562,10 +1562,13 @@ bool RenderObject::repaintAfterLayoutIfNeeded(
     style()->getBoxShadowHorizontalExtent(shadowLeft, shadowRight);
 
     int borderRight = isBox() ? toRenderBox(this)->borderRight() : 0;
+    int boxWidth = isBox() ? toRenderBox(this)->width() : 0;
     int borderWidth =
         max(-outlineStyle->outlineOffset(),
-            max(borderRight, max(style()->borderTopRightRadius().width(),
-                                 style()->borderBottomRightRadius().width()))) +
+            max(borderRight,
+                max(style()->borderTopRightRadius().width().calcValue(boxWidth),
+                    style()->borderBottomRightRadius().width().calcValue(
+                        boxWidth)))) +
         max(ow, shadowRight);
     IntRect rightRect(newOutlineBox.x() +
                           min(newOutlineBox.width(), oldOutlineBox.width()) -
@@ -1585,11 +1588,14 @@ bool RenderObject::repaintAfterLayoutIfNeeded(
     style()->getBoxShadowVerticalExtent(shadowTop, shadowBottom);
 
     int borderBottom = isBox() ? toRenderBox(this)->borderBottom() : 0;
+    int boxHeight = isBox() ? toRenderBox(this)->height() : 0;
     int borderHeight =
         max(-outlineStyle->outlineOffset(),
             max(borderBottom,
-                max(style()->borderBottomLeftRadius().height(),
-                    style()->borderBottomRightRadius().height()))) +
+                max(style()->borderBottomLeftRadius().height().calcValue(
+                        boxHeight),
+                    style()->borderBottomRightRadius().height().calcValue(
+                        boxHeight)))) +
         max(ow, shadowBottom);
     IntRect bottomRect(
         newOutlineBox.x(),
