@@ -39,7 +39,7 @@ class ErrorInstance : public JSObject {
                                JSValue message);
 
  protected:
-  explicit ErrorInstance(NonNullPassRefPtr<Structure>);
+  explicit ErrorInstance(JSGlobalData*, NonNullPassRefPtr<Structure>);
   explicit ErrorInstance(JSGlobalData*,
                          NonNullPassRefPtr<Structure>,
                          const UString&);
