@@ -2163,8 +2163,7 @@ void tst_QWebPage::originatingObjectInNetworkRequests() {
   networkManager->requests.clear();
 
   m_view->setHtml(
-      QString("data:text/html,<frameset cols=\"25%,75%\"><frame "
-              "src=\"data:text/html,"
+      QString("<frameset cols=\"25%,75%\"><frame src=\"data:text/html,"
               "<head><meta http-equiv='refresh' content='1'></head>foo \">"
               "<frame src=\"data:text/html,bar\"></frameset>"),
       QUrl());
