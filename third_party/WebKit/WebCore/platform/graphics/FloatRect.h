@@ -99,7 +99,9 @@ class FloatRect {
 
   bool isEmpty() const { return m_size.isEmpty(); }
 
+  float left() const { return x(); }
   float right() const { return x() + width(); }
+  float top() const { return y(); }
   float bottom() const { return y() + height(); }
 
   FloatPoint center() const {
@@ -141,6 +143,16 @@ class FloatRect {
   void scale(float s) { scale(s, s); }
   void scale(float sx, float sy);
 
+  // Re-initializes this rectangle to fit the sets of passed points.
+  void fitToPoints(const FloatPoint& p0, const FloatPoint& p1);
+  void fitToPoints(const FloatPoint& p0,
+                   const FloatPoint& p1,
+                   const FloatPoint& p2);
+  void fitToPoints(const FloatPoint& p0,
+                   const FloatPoint& p1,
+                   const FloatPoint& p2,
+                   const FloatPoint& p3);
+
 #if PLATFORM(CG)
   FloatRect(const CGRect&);
   operator CGRect() const;
@@ -180,6 +192,15 @@ class FloatRect {
  private:
   FloatPoint m_location;
   FloatSize m_size;
+
+  void setLocationAndSizeFromEdges(float left,
+                                   float top,
+                                   float right,
+                                   float bottom) {
+    m_location.set(left, top);
+    m_size.setWidth(right - left);
+    m_size.setHeight(bottom - top);
+  }
 };
 
 inline FloatRect intersection(const FloatRect& a, const FloatRect& b) {
