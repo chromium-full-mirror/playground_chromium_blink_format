@@ -1586,7 +1586,7 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(ETextAlign e)
     : m_type(CSS_IDENT), m_hasCachedCSSText(false) {
   switch (e) {
     case TAAUTO:
-      m_value.ident = CSSValueAuto;
+      m_value.ident = CSSValueWebkitAuto;
       break;
     case LEFT:
       m_value.ident = CSSValueLeft;
