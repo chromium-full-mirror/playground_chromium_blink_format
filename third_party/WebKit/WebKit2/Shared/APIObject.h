@@ -41,6 +41,7 @@ class APIObject : public RefCounted<APIObject> {
     TypeString,
     TypeURL,
     TypeURLRequest,
+    TypeURLResponse,
 
     // UIProcess types
     TypeBackForwardList,
