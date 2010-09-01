@@ -2416,7 +2416,7 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
       return;
     }
 
-    if (child->isReplaced() && usePrintRect &&
+    if (!child->isFloating() && child->isReplaced() && usePrintRect &&
         child->height() <= renderView->printRect().height()) {
       // Paginate block-level replaced elements.
       if (ty + child->y() + child->height() >
