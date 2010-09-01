@@ -41,8 +41,8 @@ class RenderPath : public RenderSVGModelObject {
   RenderPath(SVGStyledTransformableElement*);
 
   const Path& path() const { return m_path; }
-  void setNeedsBoundariesUpdate() { m_needsBoundariesUpdate = true; }
   void setNeedsPathUpdate() { m_needsPathUpdate = true; }
+  virtual void setNeedsBoundariesUpdate() { m_needsBoundariesUpdate = true; }
   virtual void setNeedsTransformUpdate() { m_needsTransformUpdate = true; }
 
  private:
@@ -74,7 +74,6 @@ class RenderPath : public RenderSVGModelObject {
                                 HitTestResult&,
                                 const FloatPoint& pointInParent,
                                 HitTestAction);
-  virtual void styleWillChange(StyleDifference, const RenderStyle*);
 
   FloatRect calculateMarkerBoundsIfNeeded();
   void updateCachedBoundaries();

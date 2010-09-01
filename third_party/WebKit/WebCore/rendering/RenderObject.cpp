@@ -2932,6 +2932,11 @@ RenderSVGResourceContainer* RenderObject::toRenderSVGResourceContainer() {
   return 0;
 }
 
+void RenderObject::setNeedsBoundariesUpdate() {
+  if (RenderObject* renderer = parent())
+    renderer->setNeedsBoundariesUpdate();
+}
+
 FloatRect RenderObject::objectBoundingBox() const {
   ASSERT_NOT_REACHED();
   return FloatRect();

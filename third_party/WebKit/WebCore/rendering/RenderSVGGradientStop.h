@@ -48,6 +48,7 @@ class RenderSVGGradientStop : public RenderObject {
     return IntRect();
   }
   virtual FloatRect objectBoundingBox() const { return FloatRect(); }
+  virtual FloatRect strokeBoundingBox() const { return FloatRect(); }
   virtual FloatRect repaintRectInLocalCoordinates() const {
     return FloatRect();
   }
