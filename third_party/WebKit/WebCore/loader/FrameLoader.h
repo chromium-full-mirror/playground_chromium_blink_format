@@ -307,8 +307,10 @@ class FrameLoader : public Noncopyable {
 
   void frameDetached();
 
-  const KURL& url() const;
-  void setOutgoingReferrer(const KURL&);
+  const KURL& url() const { return m_URL; }
+
+  // setURL is a low-level setter and does not trigger loading.
+  void setURL(const KURL&);
 
   void loadDone();
   void finishedParsing();
@@ -577,6 +579,7 @@ class FrameLoader : public Noncopyable {
 
   RefPtr<SerializedScriptValue> m_pendingStateObject;
 
+  KURL m_URL;
   KURL m_workingURL;
 
   OwnPtr<IconLoader> m_iconLoader;
