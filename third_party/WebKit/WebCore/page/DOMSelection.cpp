@@ -178,13 +178,21 @@ int DOMSelection::rangeCount() const {
 }
 
 void DOMSelection::collapse(Node* node, int offset, ExceptionCode& ec) {
-  if (!m_frame)
+  Document* selectionDocument = m_frame ? m_frame->document() : 0;
+  Document* nodeDocument = node ? node->document() : 0;
+
+  if (selectionDocument != nodeDocument) {
+    ec = WRONG_DOCUMENT_ERR;
     return;
+  }
 
   if (offset < 0) {
     ec = INDEX_SIZE_ERR;
     return;
   }
+
+  if (!m_frame)
+    return;
 
   if (!isValidForPosition(node))
     return;
@@ -481,6 +489,13 @@ bool DOMSelection::containsNode(const Node* n, bool allowPartial) const {
 void DOMSelection::selectAllChildren(Node* n, ExceptionCode& ec) {
   if (!n)
     return;
+
+  Document* selectionDocument = m_frame ? m_frame->document() : 0;
+
+  if (selectionDocument != n->document()) {
+    ec = WRONG_DOCUMENT_ERR;
+    return;
+  }
 
   // This doesn't (and shouldn't) select text node characters.
   setBaseAndExtent(n, 0, n, n->childNodeCount(), ec);
