@@ -48,12 +48,10 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
 
   virtual void parseMappedAttribute(Attribute*);
 
-  virtual void attach();
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
-  virtual void recalcStyle(StyleChange);
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,
                                Node* afterChange = 0,

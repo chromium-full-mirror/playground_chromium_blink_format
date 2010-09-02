@@ -53,11 +53,13 @@ class HTMLPlugInImageElement : public HTMLPlugInElement {
   String m_url;
 
   static void updateWidgetCallback(Node*);
+  virtual void attach();
   virtual void detach();
 
  private:
   virtual bool canLazyAttach() { return false; }
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
+  virtual void recalcStyle(StyleChange);
 
   virtual void finishParsingChildren();
   virtual void willMoveToNewOwnerDocument();
