@@ -347,9 +347,14 @@ class GraphicsContext : public Noncopyable {
   FloatRect roundToDevicePixels(const FloatRect&);
 
   void drawLineForText(const IntPoint&, int width, bool printing);
-  void drawLineForMisspellingOrBadGrammar(const IntPoint&,
-                                          int width,
-                                          bool grammar);
+  enum TextCheckingLineStyle {
+    TextCheckingSpellingLineStyle,
+    TextCheckingGrammarLineStyle,
+    TextCheckingReplacementLineStyle
+  };
+  void drawLineForTextChecking(const IntPoint&,
+                               int width,
+                               TextCheckingLineStyle);
 
   bool paintingDisabled() const;
   void setPaintingDisabled(bool);

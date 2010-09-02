@@ -28,6 +28,7 @@
 #define EditorClient_h
 
 #include "EditorInsertAction.h"
+#include "FloatRect.h"
 #include "PlatformString.h"
 #include "TextAffinity.h"
 #include <wtf/Forward.h>
@@ -51,6 +52,7 @@ namespace WebCore {
 
 class CSSStyleDeclaration;
 class EditCommand;
+class Editor;
 class Element;
 class Frame;
 class HTMLElement;
@@ -194,6 +196,16 @@ class EditorClient {
                                     uint64_t checkingTypes,
                                     Vector<TextCheckingResult>& results) = 0;
 #endif
+
+#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
+    !defined(BUILDING_ON_LEOPARD) && !defined(BUILDING_ON_SNOW_LEOPARD)
+  virtual void showCorrectionPanel(const FloatRect& boundingBoxOfReplacedString,
+                                   const String& replacedString,
+                                   const String& replacmentString,
+                                   Editor*) = 0;
+  virtual void dismissCorrectionPanel(bool correctionAccepted) = 0;
+#endif
+
   virtual void updateSpellingUIWithGrammarString(
       const String&,
       const GrammarDetail& detail) = 0;

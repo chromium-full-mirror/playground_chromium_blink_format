@@ -41,7 +41,8 @@ struct DocumentMarker {
     Spelling,
     Grammar,
     TextMatch,
-    Replacement
+    Replacement,
+    RejectedCorrection
   };
 
   MarkerType type;

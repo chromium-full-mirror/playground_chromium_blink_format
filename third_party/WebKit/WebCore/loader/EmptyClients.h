@@ -616,6 +616,14 @@ class EmptyEditorClient : public EditorClient, public Noncopyable {
                                     uint64_t,
                                     Vector<TextCheckingResult>&){};
 #endif
+#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
+    !defined(BUILDING_ON_LEOPARD) && !defined(BUILDING_ON_SNOW_LEOPARD)
+  virtual void showCorrectionPanel(const FloatRect&,
+                                   const String&,
+                                   const String&,
+                                   Editor*) {}
+  virtual void dismissCorrectionPanel(bool) {}
+#endif
   virtual void updateSpellingUIWithGrammarString(const String&,
                                                  const GrammarDetail&) {}
   virtual void updateSpellingUIWithMisspelledWord(const String&) {}

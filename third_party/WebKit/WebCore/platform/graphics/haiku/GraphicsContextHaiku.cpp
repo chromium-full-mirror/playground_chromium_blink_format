@@ -244,9 +244,9 @@ void GraphicsContext::drawLineForText(const IntPoint& origin,
   drawLine(origin, endPoint);
 }
 
-void GraphicsContext::drawLineForMisspellingOrBadGrammar(const IntPoint&,
-                                                         int width,
-                                                         bool grammar) {
+void GraphicsContext::drawLineForTextChecking(const IntPoint&,
+                                              int width,
+                                              TextCheckingLineStyle) {
   if (paintingDisabled())
     return;
 

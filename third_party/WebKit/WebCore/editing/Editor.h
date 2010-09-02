@@ -251,12 +251,17 @@ class Editor {
   void toggleAutomaticTextReplacement();
   bool isAutomaticSpellingCorrectionEnabled();
   void toggleAutomaticSpellingCorrection();
-  void markAllMisspellingsAndBadGrammarInRanges(
-      bool markSpelling,
-      Range* spellingRange,
-      bool markGrammar,
-      Range* grammarRange,
-      bool performTextCheckingReplacements);
+  enum TextCheckingOptionFlags {
+    MarkSpelling = 1 << 0,
+    MarkGrammar = 1 << 1,
+    PerformReplacement = 1 << 2,
+    ShowCorrectionPanel = 1 << 3,
+  };
+  typedef unsigned TextCheckingOptions;
+
+  void markAllMisspellingsAndBadGrammarInRanges(TextCheckingOptions,
+                                                Range* spellingRange,
+                                                Range* grammarRange);
   void changeBackToReplacedString(const String& replacedString);
 #endif
   void advanceToNextMisspelling(bool startBeforeSelection = false);
@@ -346,6 +351,10 @@ class Editor {
 
   void addToKillRing(Range*, bool prepend);
 
+  void handleCancelOperation();
+  void startCorrectionPanelTimer();
+  void handleRejectedCorrection();
+
   void pasteAsFragment(PassRefPtr<DocumentFragment>,
                        bool smartReplace,
                        bool matchStyle);
@@ -371,6 +380,9 @@ class Editor {
   bool m_shouldStartNewKillRingSequence;
   bool m_shouldStyleWithCSS;
   OwnPtr<KillRing> m_killRing;
+  RefPtr<Range> m_rangeToBeReplacedByCorrection;
+  String m_stringToBeReplacedByCorrection;
+  Timer<Editor> m_correctionPanelTimer;
 
   bool canDeleteRange(Range*) const;
   bool canSmartReplaceWithPasteboard(Pasteboard*);
@@ -397,6 +409,7 @@ class Editor {
   void changeSelectionAfterCommand(const VisibleSelection& newSelection,
                                    bool closeTyping,
                                    bool clearTypingStyle);
+  void correctionPanelTimerFired(Timer<Editor>*);
   Node* findEventTargetFromSelection() const;
 };
 

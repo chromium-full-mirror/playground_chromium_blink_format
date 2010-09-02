@@ -267,16 +267,16 @@ void GraphicsContext::drawLineForText(const IntPoint& origin,
   UNUSED_PARAM(printing);
 }
 
-void GraphicsContext::drawLineForMisspellingOrBadGrammar(const IntPoint& origin,
-                                                         int width,
-                                                         bool grammar) {
+void GraphicsContext::drawLineForTextChecking(const IntPoint& origin,
+                                              int width,
+                                              TextCheckingLineStyle style) {
   if (paintingDisabled())
     return;
 
   notImplemented();
   UNUSED_PARAM(origin);
   UNUSED_PARAM(width);
-  UNUSED_PARAM(grammar);
+  UNUSED_PARAM(style);
 }
 
 FloatRect GraphicsContext::roundToDevicePixels(const FloatRect& rect) {
