@@ -41,7 +41,7 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
 
   bool containsJavaApplet() const;
 
-  bool useFallbackContent() const { return m_useFallbackContent; }
+  virtual bool useFallbackContent() const { return m_useFallbackContent; }
 
  private:
   HTMLObjectElement(const QualifiedName&, Document*, bool createdByParser);
@@ -49,9 +49,7 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
   virtual void parseMappedAttribute(Attribute*);
 
   virtual void attach();
-  virtual bool canLazyAttach() { return false; }
   virtual bool rendererIsNeeded(RenderStyle*);
-  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void finishParsingChildren();
   virtual void detach();
   virtual void insertedIntoDocument();
@@ -65,8 +63,6 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
 
   virtual bool isURLAttribute(Attribute*) const;
   virtual const QualifiedName& imageSourceAttributeName() const;
-
-  virtual void updateWidget();
 
   virtual RenderWidget* renderWidgetForJSBindings() const;
 

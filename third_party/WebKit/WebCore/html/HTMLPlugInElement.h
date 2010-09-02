@@ -58,8 +58,6 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
 
   virtual void detach();
 
-  static void updateWidgetCallback(Node*);
-
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(Attribute*);
@@ -68,8 +66,6 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
   virtual void defaultEventHandler(Event*);
 
   virtual RenderWidget* renderWidgetForJSBindings() const = 0;
-
-  virtual void updateWidget() {}
 
  protected:
   AtomicString m_name;

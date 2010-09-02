@@ -137,21 +137,6 @@ bool HTMLObjectElement::rendererIsNeeded(RenderStyle* style) {
   return isGearsPlugin || HTMLPlugInImageElement::rendererIsNeeded(style);
 }
 
-RenderObject* HTMLObjectElement::createRenderer(RenderArena* arena,
-                                                RenderStyle* style) {
-  // Fallback content breaks the DOM->Renderer class relationship of this
-  // class and all superclasses because createObject won't necessarily
-  // return a RenderEmbeddedObject, RenderPart or even RenderWidget.
-  if (m_useFallbackContent)
-    return RenderObject::createObject(this, style);
-  if (isImageType()) {
-    RenderImage* image = new (arena) RenderImage(this);
-    image->setImageResource(RenderImageResource::create());
-    return image;
-  }
-  return new (arena) RenderEmbeddedObject(this);
-}
-
 void HTMLObjectElement::attach() {
   bool isImage = isImageType();
 
@@ -161,23 +146,16 @@ void HTMLObjectElement::attach() {
 
   HTMLPlugInImageElement::attach();
 
-  if (isImage && renderer() && !m_useFallbackContent) {
+  if (isImage && renderer() && !useFallbackContent()) {
     if (!m_imageLoader)
       m_imageLoader = adoptPtr(new HTMLImageLoader(this));
     m_imageLoader->updateFromElement();
   }
 }
 
-void HTMLObjectElement::updateWidget() {
-  document()->updateStyleIfNeeded();
-  if (needsWidgetUpdate() && renderEmbeddedObject() && !m_useFallbackContent &&
-      !isImageType())
-    renderEmbeddedObject()->updateWidget(true);
-}
-
 void HTMLObjectElement::finishParsingChildren() {
   HTMLPlugInImageElement::finishParsingChildren();
-  if (!m_useFallbackContent) {
+  if (!useFallbackContent()) {
     setNeedsWidgetUpdate(true);
     if (inDocument())
       setNeedsStyleRecalc();
@@ -185,7 +163,7 @@ void HTMLObjectElement::finishParsingChildren() {
 }
 
 void HTMLObjectElement::detach() {
-  if (attached() && renderer() && !m_useFallbackContent)
+  if (attached() && renderer() && !useFallbackContent())
     // Update the widget the next time we attach (detaching destroys the
     // plugin).
     setNeedsWidgetUpdate(true);
@@ -213,7 +191,7 @@ void HTMLObjectElement::removedFromDocument() {
 }
 
 void HTMLObjectElement::recalcStyle(StyleChange ch) {
-  if (!m_useFallbackContent && needsWidgetUpdate() && renderer() &&
+  if (!useFallbackContent() && needsWidgetUpdate() && renderer() &&
       !isImageType()) {
     detach();
     attach();
@@ -226,7 +204,7 @@ void HTMLObjectElement::childrenChanged(bool changedByParser,
                                         Node* afterChange,
                                         int childCountDelta) {
   updateDocNamedItem();
-  if (inDocument() && !m_useFallbackContent) {
+  if (inDocument() && !useFallbackContent()) {
     setNeedsWidgetUpdate(true);
     setNeedsStyleRecalc();
   }
@@ -244,7 +222,7 @@ const QualifiedName& HTMLObjectElement::imageSourceAttributeName() const {
 }
 
 void HTMLObjectElement::renderFallbackContent() {
-  if (m_useFallbackContent)
+  if (useFallbackContent())
     return;
 
   if (!inDocument())
