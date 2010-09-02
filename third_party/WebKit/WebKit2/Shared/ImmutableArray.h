@@ -61,6 +61,8 @@ class ImmutableArray : public APIObject {
   APIObject* at(size_t i) { return m_entries[i]; }
   size_t size() { return m_entries.size(); }
 
+  virtual bool isMutable() { return false; }
+
  protected:
   ImmutableArray();
   ImmutableArray(APIObject** entries, size_t size);

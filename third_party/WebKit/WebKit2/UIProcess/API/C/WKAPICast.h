@@ -32,6 +32,7 @@
 #include "WebString.h"
 #include "WebURL.h"
 #include <WebCore/FrameLoaderTypes.h>
+#include <wtf/TypeTraits.h>
 
 #if defined(WIN32) || defined(_WIN32)
 #include "WKAPICastWin.h"
@@ -41,6 +42,7 @@ namespace WebKit {
 
 class ImmutableArray;
 class ImmutableDictionary;
+class MutableArray;
 class WebBackForwardList;
 class WebBackForwardListItem;
 class WebContext;
@@ -58,10 +60,6 @@ class WebURLResponse;
 
 template <typename APIType>
 struct APITypeInfo {};
-template <>
-struct APITypeInfo<WKTypeRef> {
-  typedef APIObject* ImplType;
-};
 template <>
 struct APITypeInfo<WKArrayRef> {
   typedef ImmutableArray* ImplType;
@@ -99,6 +97,10 @@ struct APITypeInfo<WKFrameRef> {
   typedef WebFrameProxy* ImplType;
 };
 template <>
+struct APITypeInfo<WKMutableArrayRef> {
+  typedef MutableArray* ImplType;
+};
+template <>
 struct APITypeInfo<WKNavigationDataRef> {
   typedef WebNavigationData* ImplType;
 };
@@ -117,6 +119,10 @@ struct APITypeInfo<WKPreferencesRef> {
 template <>
 struct APITypeInfo<WKStringRef> {
   typedef WebString* ImplType;
+};
+template <>
+struct APITypeInfo<WKTypeRef> {
+  typedef APIObject* ImplType;
 };
 template <>
 struct APITypeInfo<WKURLRef> {
@@ -144,6 +150,10 @@ struct ImplTypeInfo<ImmutableArray*> {
 template <>
 struct ImplTypeInfo<ImmutableDictionary*> {
   typedef WKDictionaryRef APIType;
+};
+template <>
+struct ImplTypeInfo<MutableArray*> {
+  typedef WKMutableArrayRef APIType;
 };
 template <>
 struct ImplTypeInfo<WebBackForwardList*> {
@@ -228,7 +238,15 @@ class ProxyingRefPtr {
 
 template <typename T>
 inline typename WebKit::APITypeInfo<T>::ImplType toWK(T t) {
-  return reinterpret_cast<typename WebKit::APITypeInfo<T>::ImplType>(t);
+  // const struct OpaqueWKArray* -> const struct OpaqueWKArray -> struct
+  // OpaqueWKArray -> struct OpaqueWKArray* -> ImmutableArray*
+
+  typedef typename WTF::RemovePointer<T>::Type PotentiallyConstValueType;
+  typedef typename WTF::RemoveConst<PotentiallyConstValueType>::Type
+      NonConstValueType;
+
+  return reinterpret_cast<typename WebKit::APITypeInfo<T>::ImplType>(
+      const_cast<NonConstValueType*>(t));
 }
 
 template <typename T>
