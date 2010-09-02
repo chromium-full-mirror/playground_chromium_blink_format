@@ -398,7 +398,8 @@ void ResourceLoader::didReceiveResponse(ResourceHandle*,
 #if ENABLE(INSPECTOR)
   if (InspectorTimelineAgent::instanceCount()) {
     InspectorTimelineAgent* timelineAgent =
-        m_frame->page() ? m_frame->page()->inspectorTimelineAgent() : 0;
+        (m_frame && m_frame->page()) ? m_frame->page()->inspectorTimelineAgent()
+                                     : 0;
     if (timelineAgent)
       timelineAgent->willReceiveResourceResponse(identifier(), response);
   }
@@ -412,7 +413,8 @@ void ResourceLoader::didReceiveResponse(ResourceHandle*,
 #if ENABLE(INSPECTOR)
   if (InspectorTimelineAgent::instanceCount()) {
     InspectorTimelineAgent* timelineAgent =
-        m_frame->page() ? m_frame->page()->inspectorTimelineAgent() : 0;
+        (m_frame && m_frame->page()) ? m_frame->page()->inspectorTimelineAgent()
+                                     : 0;
     if (timelineAgent)
       timelineAgent->didReceiveResourceResponse();
   }
@@ -426,7 +428,8 @@ void ResourceLoader::didReceiveData(ResourceHandle*,
 #if ENABLE(INSPECTOR)
   if (InspectorTimelineAgent::instanceCount()) {
     InspectorTimelineAgent* timelineAgent =
-        m_frame->page() ? m_frame->page()->inspectorTimelineAgent() : 0;
+        (m_frame && m_frame->page()) ? m_frame->page()->inspectorTimelineAgent()
+                                     : 0;
     if (timelineAgent)
       timelineAgent->willReceiveResourceData(identifier());
   }
@@ -435,7 +438,8 @@ void ResourceLoader::didReceiveData(ResourceHandle*,
 #if ENABLE(INSPECTOR)
   if (InspectorTimelineAgent::instanceCount()) {
     InspectorTimelineAgent* timelineAgent =
-        m_frame->page() ? m_frame->page()->inspectorTimelineAgent() : 0;
+        (m_frame && m_frame->page()) ? m_frame->page()->inspectorTimelineAgent()
+                                     : 0;
     if (timelineAgent)
       timelineAgent->didReceiveResourceData();
   }
