@@ -43,6 +43,7 @@ namespace WebKit {
 class ImmutableArray;
 class ImmutableDictionary;
 class MutableArray;
+class MutableDictionary;
 class WebBackForwardList;
 class WebBackForwardListItem;
 class WebContext;
@@ -101,6 +102,10 @@ struct APITypeInfo<WKMutableArrayRef> {
   typedef MutableArray* ImplType;
 };
 template <>
+struct APITypeInfo<WKMutableDictionaryRef> {
+  typedef MutableDictionary* ImplType;
+};
+template <>
 struct APITypeInfo<WKNavigationDataRef> {
   typedef WebNavigationData* ImplType;
 };
@@ -154,6 +159,10 @@ struct ImplTypeInfo<ImmutableDictionary*> {
 template <>
 struct ImplTypeInfo<MutableArray*> {
   typedef WKMutableArrayRef APIType;
+};
+template <>
+struct ImplTypeInfo<MutableDictionary*> {
+  typedef WKMutableDictionaryRef APIType;
 };
 template <>
 struct ImplTypeInfo<WebBackForwardList*> {
@@ -238,6 +247,7 @@ class ProxyingRefPtr {
 
 template <typename T>
 inline typename WebKit::APITypeInfo<T>::ImplType toWK(T t) {
+  // An example of the conversions that take place:
   // const struct OpaqueWKArray* -> const struct OpaqueWKArray -> struct
   // OpaqueWKArray -> struct OpaqueWKArray* -> ImmutableArray*
 

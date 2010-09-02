@@ -43,7 +43,7 @@ class ImmutableDictionary : public APIObject {
  public:
   static const Type APIType = TypeDictionary;
 
-  typedef HashMap<WTF::String, RefPtr<APIObject>> MapType;
+  typedef HashMap<String, RefPtr<APIObject>> MapType;
 
   static PassRefPtr<ImmutableDictionary> create() {
     return adoptRef(new ImmutableDictionary);
@@ -54,7 +54,7 @@ class ImmutableDictionary : public APIObject {
   ~ImmutableDictionary();
 
   template <typename T>
-  T* get(const WTF::String& key) {
+  T* get(const String& key) {
     RefPtr<APIObject> item = m_map.get(key);
     if (!item)
       return 0;
@@ -65,13 +65,15 @@ class ImmutableDictionary : public APIObject {
     return static_cast<T*>(item.get());
   }
 
-  APIObject* get(const WTF::String& key) { return m_map.get(key).get(); }
+  APIObject* get(const String& key) { return m_map.get(key).get(); }
 
   PassRefPtr<ImmutableArray> keys() const;
 
   size_t size() { return m_map.size(); }
 
- private:
+  virtual bool isMutable() { return false; }
+
+ protected:
   ImmutableDictionary();
   enum AdoptTag { Adopt };
   ImmutableDictionary(MapType& map, AdoptTag);
