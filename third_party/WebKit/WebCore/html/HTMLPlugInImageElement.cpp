@@ -32,8 +32,16 @@
 namespace WebCore {
 
 HTMLPlugInImageElement::HTMLPlugInImageElement(const QualifiedName& tagName,
-                                               Document* document)
-    : HTMLPlugInElement(tagName, document), m_needsWidgetUpdate(false) {}
+                                               Document* document,
+                                               bool createdByParser)
+    : HTMLPlugInElement(tagName, document)
+      // m_needsWidgetUpdate(!createdByParser) allows HTMLObjectElement to delay
+      // widget updates until after all children are parsed.  For
+      // HTMLEmbedElement
+      // this delay is unnecessary, but it is simpler to make both classes share
+      // the same codepath in this class.
+      ,
+      m_needsWidgetUpdate(!createdByParser) {}
 
 RenderEmbeddedObject* HTMLPlugInImageElement::renderEmbeddedObject() const {
   // HTMLObjectElement and HTMLEmbedElement may return arbitrary renderers
@@ -71,11 +79,28 @@ RenderObject* HTMLPlugInImageElement::createRenderer(RenderArena* arena,
   return new (arena) RenderEmbeddedObject(this);
 }
 
+void HTMLPlugInImageElement::detach() {
+  if (attached() && renderer() && !useFallbackContent())
+    // Update the widget the next time we attach (detaching destroys the
+    // plugin).
+    setNeedsWidgetUpdate(true);
+  HTMLPlugInElement::detach();
+}
+
 void HTMLPlugInImageElement::updateWidget() {
   document()->updateStyleIfNeeded();
   if (needsWidgetUpdate() && renderEmbeddedObject() && !useFallbackContent() &&
       !isImageType())
     renderEmbeddedObject()->updateWidget(true);
+}
+
+void HTMLPlugInImageElement::finishParsingChildren() {
+  HTMLPlugInElement::finishParsingChildren();
+  if (!useFallbackContent()) {
+    setNeedsWidgetUpdate(true);
+    if (inDocument())
+      setNeedsStyleRecalc();
+  }
 }
 
 void HTMLPlugInImageElement::willMoveToNewOwnerDocument() {
