@@ -65,9 +65,8 @@ PassRefPtr<HTMLObjectElement> HTMLObjectElement::create(
 
 RenderWidget* HTMLObjectElement::renderWidgetForJSBindings() const {
   document()->updateLayoutIgnorePendingStylesheets();
-  if (!renderer() || !renderer()->isWidget())
-    return 0;
-  return toRenderWidget(renderer());
+  return renderPart();  // This will return 0 if the renderer is not a
+                        // RenderPart.
 }
 
 void HTMLObjectElement::parseMappedAttribute(Attribute* attr) {
@@ -139,6 +138,9 @@ bool HTMLObjectElement::rendererIsNeeded(RenderStyle* style) {
 
 RenderObject* HTMLObjectElement::createRenderer(RenderArena* arena,
                                                 RenderStyle* style) {
+  // Fallback content breaks the DOM->Renderer class relationship of this
+  // class and all superclasses because createObject won't necessarily
+  // return a RenderEmbeddedObject, RenderPart or even RenderWidget.
   if (m_useFallbackContent)
     return RenderObject::createObject(this, style);
   if (isImageType()) {
@@ -166,9 +168,9 @@ void HTMLObjectElement::attach() {
 
 void HTMLObjectElement::updateWidget() {
   document()->updateStyleIfNeeded();
-  if (m_needWidgetUpdate && renderer() && !m_useFallbackContent &&
+  if (m_needWidgetUpdate && renderEmbeddedObject() && !m_useFallbackContent &&
       !isImageType())
-    toRenderEmbeddedObject(renderer())->updateWidget(true);
+    renderEmbeddedObject()->updateWidget(true);
 }
 
 void HTMLObjectElement::finishParsingChildren() {

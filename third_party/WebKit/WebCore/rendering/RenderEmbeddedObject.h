@@ -45,7 +45,11 @@ class RenderEmbeddedObject : public RenderPart {
     return m_showsMissingPluginIndicator;
   }
 
+  // FIXME: This belongs on HTMLObjectElement.
   bool hasFallbackContent() const { return m_hasFallbackContent; }
+  void setHasFallbackContent(bool hasFallbackContent) {
+    m_hasFallbackContent = hasFallbackContent;
+  }
 
   void handleMissingPluginIndicatorEvent(Event*);
 
@@ -79,7 +83,7 @@ class RenderEmbeddedObject : public RenderPart {
                                   float& textWidth);
 
   String m_replacementText;
-  bool m_hasFallbackContent;
+  bool m_hasFallbackContent;  // FIXME: This belongs on HTMLObjectElement.
   bool m_showsMissingPluginIndicator;
   bool m_missingPluginIndicatorIsPressed;
   bool m_mouseDownWasInMissingPluginIndicator;

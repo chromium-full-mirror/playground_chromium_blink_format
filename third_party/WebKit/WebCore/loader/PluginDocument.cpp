@@ -123,7 +123,7 @@ void PluginDocumentParser::appendBytes(DocumentWriter*,
 
   document()->updateLayout();
 
-  if (RenderWidget* renderer = toRenderWidget(m_embedElement->renderer())) {
+  if (RenderPart* renderer = m_embedElement->renderPart()) {
     frame->loader()->client()->redirectDataToPlugin(renderer->widget());
     frame->loader()
         ->activeDocumentLoader()

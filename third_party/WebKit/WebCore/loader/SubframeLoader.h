@@ -41,16 +41,17 @@
 
 namespace WebCore {
 
+class Document;
 class Frame;
 class FrameLoaderClient;
 class HTMLAppletElement;
 class HTMLFrameOwnerElement;
+class HTMLPlugInElement;
 class IntSize;
 class KURL;
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
 class Node;
 #endif
-class RenderEmbeddedObject;
 class Widget;
 
 // This is a slight misnomer. It handles the higher level logic of loading both
@@ -66,7 +67,7 @@ class SubframeLoader : public Noncopyable {
                     const AtomicString& frameName,
                     bool lockHistory = true,
                     bool lockBackForwardList = true);
-  bool requestObject(RenderEmbeddedObject*,
+  bool requestObject(HTMLPlugInElement*,
                      const String& url,
                      const AtomicString& frameName,
                      const String& serviceType,
@@ -74,6 +75,8 @@ class SubframeLoader : public Noncopyable {
                      const Vector<String>& paramValues);
 
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  // FIXME: This should take Element* instead of Node*, or better yet the
+  // specific type of Element which this code depends on.
   PassRefPtr<Widget> loadMediaPlayerProxyPlugin(
       Node*,
       const KURL&,
@@ -100,7 +103,7 @@ class SubframeLoader : public Noncopyable {
                       const KURL&,
                       const String& name,
                       const String& referrer);
-  bool loadPlugin(RenderEmbeddedObject*,
+  bool loadPlugin(HTMLPlugInElement*,
                   const KURL&,
                   const String& mimeType,
                   const Vector<String>& paramNames,
@@ -111,6 +114,8 @@ class SubframeLoader : public Noncopyable {
                        const String& mimeType,
                        bool hasFallback,
                        bool& useFallback);
+
+  Document* document() const;
 
   bool m_containsPlugins;
   Frame* m_frame;

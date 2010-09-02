@@ -32,6 +32,7 @@ struct NPObject;
 
 namespace WebCore {
 
+class RenderEmbeddedObject;
 class RenderWidget;
 class Widget;
 
@@ -51,6 +52,8 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
   void setIsCapturingMouseEvents(bool capturing) {
     m_isCapturingMouseEvents = capturing;
   }
+
+  RenderEmbeddedObject* renderEmbeddedObject() const;
 
  protected:
   HTMLPlugInElement(const QualifiedName& tagName, Document*);
