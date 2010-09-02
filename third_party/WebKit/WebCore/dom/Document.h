@@ -87,7 +87,6 @@ class HTMLFrameOwnerElement;
 class HTMLHeadElement;
 class HTMLInputElement;
 class HTMLMapElement;
-class HistoryItem;
 class HitTestRequest;
 class HitTestResult;
 class InspectorTimelineAgent;
@@ -1125,6 +1124,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void enqueueEvent(PassRefPtr<Event>);
   void enqueuePageshowEvent(PageshowEventPersistence);
   void enqueueHashchangeEvent(const String& oldURL, const String& newURL);
+  void enqueuePopstateEvent(PassRefPtr<SerializedScriptValue> stateObject);
 
   void addMediaCanStartListener(MediaCanStartListener*);
   void removeMediaCanStartListener(MediaCanStartListener*);
@@ -1208,7 +1208,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   void createStyleSelector();
 
-  void enqueuePopstateEvent(PassRefPtr<SerializedScriptValue> stateObject);
   void pendingEventTimerFired(Timer<Document>*);
 
   PassRefPtr<NodeList> handleZeroPadding(const HitTestRequest&,

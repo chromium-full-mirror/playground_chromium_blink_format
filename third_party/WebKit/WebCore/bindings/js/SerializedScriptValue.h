@@ -201,6 +201,8 @@ class SerializedScriptValue : public RefCounted<SerializedScriptValue> {
     return adoptRef(new SerializedScriptValue(SerializedScriptValueData()));
   }
 
+  static SerializedScriptValue* nullValue();
+
   PassRefPtr<SerializedScriptValue> release() {
     PassRefPtr<SerializedScriptValue> result =
         adoptRef(new SerializedScriptValue(m_value));

@@ -995,6 +995,12 @@ PassRefPtr<SerializedScriptValue> SerializedScriptValue::create(
   return serializedValue;
 }
 
+SerializedScriptValue* SerializedScriptValue::nullValue() {
+  DEFINE_STATIC_LOCAL(RefPtr<SerializedScriptValue>, nullValue,
+                      (SerializedScriptValue::create()));
+  return nullValue.get();
+}
+
 JSValueRef SerializedScriptValue::deserialize(JSContextRef destinationContext,
                                               JSValueRef* exception) {
   JSLock lock(SilenceAssertionsOnly);

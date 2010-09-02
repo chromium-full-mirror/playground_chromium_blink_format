@@ -56,6 +56,8 @@ class SerializedScriptValue : public RefCounted<SerializedScriptValue> {
   static PassRefPtr<SerializedScriptValue> create(String data);
   static PassRefPtr<SerializedScriptValue> create();
 
+  static SerializedScriptValue* nullValue();
+
   PassRefPtr<SerializedScriptValue> release();
 
   String toWireString() const { return m_data; }

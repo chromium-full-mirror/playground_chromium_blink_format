@@ -1269,10 +1269,9 @@ void FrameLoader::loadInSameDocument(const KURL& url,
 
   m_client->dispatchDidNavigateWithinPage();
 
-  if (stateObject) {
-    m_frame->document()->statePopped(stateObject);
-    m_client->dispatchDidPopStateWithinPage();
-  }
+  m_frame->document()->statePopped(
+      stateObject ? stateObject : SerializedScriptValue::nullValue());
+  m_client->dispatchDidPopStateWithinPage();
 
   if (hashChange) {
     m_frame->document()->enqueueHashchangeEvent(oldURL, url);
@@ -2142,7 +2141,9 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
 
           history()->updateForBackForwardNavigation();
 
-          if (history()->currentItem())
+          // For cached pages, CachedFrame::restore will take care of firing the
+          // popstate event with the history item's state object
+          if (history()->currentItem() && !cachedPage)
             m_pendingStateObject = history()->currentItem()->stateObject();
 
           // Create a document view for this document, or used the cached view.
