@@ -301,12 +301,12 @@ static JSValueRef mouseMoveToCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
-static JSValueRef mouseWheelToCallback(JSContextRef context,
-                                       JSObjectRef function,
-                                       JSObjectRef thisObject,
-                                       size_t argumentCount,
-                                       const JSValueRef arguments[],
-                                       JSValueRef* exception) {
+static JSValueRef mouseScrollByCallback(JSContextRef context,
+                                        JSObjectRef function,
+                                        JSObjectRef thisObject,
+                                        size_t argumentCount,
+                                        const JSValueRef arguments[],
+                                        JSValueRef* exception) {
   WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
   if (!view)
     return JSValueMakeUndefined(context);
@@ -333,17 +333,27 @@ static JSValueRef mouseWheelToCallback(JSContextRef context,
   g_object_ref(event->scroll.window);
 
   if (horizontal < 0)
-    event->scroll.direction = GDK_SCROLL_LEFT;
-  else if (horizontal > 0)
     event->scroll.direction = GDK_SCROLL_RIGHT;
+  else if (horizontal > 0)
+    event->scroll.direction = GDK_SCROLL_LEFT;
   else if (vertical < 0)
-    event->scroll.direction = GDK_SCROLL_UP;
-  else if (vertical > 0)
     event->scroll.direction = GDK_SCROLL_DOWN;
+  else if (vertical > 0)
+    event->scroll.direction = GDK_SCROLL_UP;
   else
     g_assert_not_reached();
 
   sendOrQueueEvent(event);
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef continuousMouseScrollByCallback(JSContextRef context,
+                                                  JSObjectRef function,
+                                                  JSObjectRef thisObject,
+                                                  size_t argumentCount,
+                                                  const JSValueRef arguments[],
+                                                  JSValueRef* exception) {
+  // GTK doesn't support continuous scroll events.
   return JSValueMakeUndefined(context);
 }
 
@@ -667,7 +677,9 @@ static JSValueRef zoomPageOutCallback(JSContextRef context,
 }
 
 static JSStaticFunction staticFunctions[] = {
-    {"mouseWheelTo", mouseWheelToCallback,
+    {"mouseScrollBy", mouseScrollByCallback,
+     kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+    {"continuousMouseScrollBy", continuousMouseScrollByCallback,
      kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
     {"contextClick", contextClickCallback,
      kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
