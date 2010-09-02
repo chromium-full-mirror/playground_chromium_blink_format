@@ -45,7 +45,7 @@ class ImmutableArray : public APIObject {
   static PassRefPtr<ImmutableArray> create(APIObject** entries, size_t size) {
     return adoptRef(new ImmutableArray(entries, size));
   }
-  static PassRefPtr<ImmutableArray> adopt(Vector<APIObject*>& entries) {
+  static PassRefPtr<ImmutableArray> adopt(Vector<RefPtr<APIObject>>& entries) {
     return adoptRef(new ImmutableArray(entries));
   }
 
@@ -55,10 +55,10 @@ class ImmutableArray : public APIObject {
   T* at(size_t i) {
     if (m_entries[i]->type() != T::APIType)
       return 0;
-    return static_cast<T*>(m_entries[i]);
+    return static_cast<T*>(m_entries[i].get());
   }
 
-  APIObject* at(size_t i) { return m_entries[i]; }
+  APIObject* at(size_t i) { return m_entries[i].get(); }
   size_t size() { return m_entries.size(); }
 
   virtual bool isMutable() { return false; }
@@ -66,11 +66,11 @@ class ImmutableArray : public APIObject {
  protected:
   ImmutableArray();
   ImmutableArray(APIObject** entries, size_t size);
-  ImmutableArray(Vector<APIObject*>& entries);
+  ImmutableArray(Vector<RefPtr<APIObject>>& entries);
 
   virtual Type type() const { return APIType; }
 
-  Vector<APIObject*> m_entries;
+  Vector<RefPtr<APIObject>> m_entries;
 };
 
 }  // namespace WebKit

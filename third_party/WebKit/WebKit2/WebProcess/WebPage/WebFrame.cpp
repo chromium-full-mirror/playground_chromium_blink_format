@@ -220,7 +220,7 @@ PassRefPtr<ImmutableArray> WebFrame::childFrames() {
   if (!size)
     return ImmutableArray::create();
 
-  Vector<APIObject*> vector;
+  Vector<RefPtr<APIObject>> vector;
   vector.reserveInitialCapacity(size);
 
   for (Frame* child = m_coreFrame->tree()->firstChild(); child;
@@ -228,7 +228,6 @@ PassRefPtr<ImmutableArray> WebFrame::childFrames() {
     WebFrame* webFrame =
         static_cast<WebFrameLoaderClient*>(child->loader()->client())
             ->webFrame();
-    webFrame->ref();
     vector.uncheckedAppend(webFrame);
   }
 
