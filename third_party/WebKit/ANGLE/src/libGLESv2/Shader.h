@@ -18,7 +18,7 @@
 #include <list>
 #include <vector>
 
-#include "libGLESv2/Context.h"
+#include "libGLESv2/ResourceManager.h"
 
 namespace gl {
 struct Varying {
@@ -40,7 +40,7 @@ class Shader {
   friend Program;
 
  public:
-  Shader(Context* context, GLuint handle);
+  Shader(ResourceManager* manager, GLuint handle);
 
   virtual ~Shader();
 
@@ -58,9 +58,9 @@ class Shader {
   bool isCompiled();
   const char* getHLSL();
 
-  void attach();
-  void detach();
-  bool isAttached() const;
+  void addRef();
+  void release();
+  unsigned int getRefCount() const;
   bool isFlaggedForDeletion() const;
   void flagForDeletion();
 
@@ -77,7 +77,8 @@ class Shader {
   static bool compareVarying(const Varying& x, const Varying& y);
 
   const GLuint mHandle;
-  int mAttachCount;    // Number of program objects this shader is attached to
+  unsigned int
+      mRefCount;       // Number of program objects this shader is attached to
   bool mDeleteStatus;  // Flag to indicate that the shader can be deleted when
                        // no longer in use
 
@@ -89,8 +90,10 @@ class Shader {
 
   bool mUsesFragCoord;
   bool mUsesFrontFacing;
+  bool mUsesPointSize;
+  bool mUsesPointCoord;
 
-  Context* mContext;
+  ResourceManager* mResourceManager;
 
   static void* mFragmentCompiler;
   static void* mVertexCompiler;
@@ -111,7 +114,7 @@ class VertexShader : public Shader {
   friend Program;
 
  public:
-  VertexShader(Context* context, GLuint handle);
+  VertexShader(ResourceManager* manager, GLuint handle);
 
   ~VertexShader();
 
@@ -129,7 +132,7 @@ class VertexShader : public Shader {
 
 class FragmentShader : public Shader {
  public:
-  FragmentShader(Context* context, GLuint handle);
+  FragmentShader(ResourceManager* manager, GLuint handle);
 
   ~FragmentShader();
 

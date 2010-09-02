@@ -713,7 +713,8 @@ EGLContext __stdcall eglCreateContext(EGLDisplay dpy,
       return EGL_NO_CONTEXT;
     }
 
-    EGLContext context = display->createContext(config);
+    EGLContext context = display->createContext(
+        config, static_cast<gl::Context*>(share_context));
 
     return success(context);
   } catch (std::bad_alloc&) {
@@ -760,9 +761,8 @@ EGLBoolean __stdcall eglMakeCurrent(EGLDisplay dpy,
     egl::Display* display = static_cast<egl::Display*>(dpy);
     gl::Context* context = static_cast<gl::Context*>(ctx);
     IDirect3DDevice9* device = display->getDevice();
-    DWORD passes;
 
-    if (!device || device->ValidateDevice(&passes) == D3DERR_DEVICELOST) {
+    if (!device || device->TestCooperativeLevel() != D3D_OK) {
       return error(EGL_CONTEXT_LOST, EGL_FALSE);
     }
 

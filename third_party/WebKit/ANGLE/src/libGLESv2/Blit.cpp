@@ -226,14 +226,14 @@ bool Blit::setShader(
 
 bool Blit::setVertexShader(ShaderId shader) {
   return setShader<IDirect3DVertexShader9>(
-      shader, mContext->getVertexShaderProfile(),
+      shader, mContext->supportsShaderModel3() ? "vs_3_0" : "vs_2_0",
       &IDirect3DDevice9::CreateVertexShader,
       &IDirect3DDevice9::SetVertexShader);
 }
 
 bool Blit::setPixelShader(ShaderId shader) {
   return setShader<IDirect3DPixelShader9>(
-      shader, mContext->getPixelShaderProfile(),
+      shader, mContext->supportsShaderModel3() ? "ps_3_0" : "ps_2_0",
       &IDirect3DDevice9::CreatePixelShader, &IDirect3DDevice9::SetPixelShader);
 }
 
@@ -321,6 +321,7 @@ bool Blit::setFormatConvertShaders(GLenum destFormat) {
     default:
       UNREACHABLE();
     case GL_RGBA:
+    case GL_BGRA_EXT:
     case GL_RGB:
     case GL_ALPHA:
       okay = okay && setPixelShader(SHADER_PS_COMPONENTMASK);
@@ -346,6 +347,7 @@ bool Blit::setFormatConvertShaders(GLenum destFormat) {
     default:
       UNREACHABLE();
     case GL_RGBA:
+    case GL_BGRA_EXT:
       psConst0[X] = 1;
       psConst0[Z] = 1;
       break;

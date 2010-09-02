@@ -13,7 +13,7 @@
 
 namespace gl {
 
-Buffer::Buffer() {
+Buffer::Buffer(GLuint id) : RefCountObject(id) {
   mContents = NULL;
   mSize = 0;
   mUsage = GL_DYNAMIC_DRAW;

@@ -21,8 +21,8 @@ namespace gl {
 void* Shader::mFragmentCompiler = NULL;
 void* Shader::mVertexCompiler = NULL;
 
-Shader::Shader(Context* context, GLuint handle)
-    : mHandle(handle), mContext(context) {
+Shader::Shader(ResourceManager* manager, GLuint handle)
+    : mHandle(handle), mResourceManager(manager) {
   mSource = NULL;
   mHlsl = NULL;
   mInfoLog = NULL;
@@ -34,14 +34,15 @@ Shader::Shader(Context* context, GLuint handle)
 
     if (result) {
       TBuiltInResource resources;
-      resources.maxVertexAttribs = MAX_VERTEX_ATTRIBS;
-      resources.maxVertexUniformVectors = MAX_VERTEX_UNIFORM_VECTORS;
-      resources.maxVaryingVectors = MAX_VARYING_VECTORS;
-      resources.maxVertexTextureImageUnits = MAX_VERTEX_TEXTURE_IMAGE_UNITS;
-      resources.maxCombinedTextureImageUnits = MAX_COMBINED_TEXTURE_IMAGE_UNITS;
-      resources.maxTextureImageUnits = MAX_TEXTURE_IMAGE_UNITS;
-      resources.maxFragmentUniformVectors = MAX_FRAGMENT_UNIFORM_VECTORS;
-      resources.maxDrawBuffers = MAX_DRAW_BUFFERS;
+      ShInitBuiltInResource(&resources);
+      resources.MaxVertexAttribs = MAX_VERTEX_ATTRIBS;
+      resources.MaxVertexUniformVectors = MAX_VERTEX_UNIFORM_VECTORS;
+      resources.MaxVaryingVectors = MAX_VARYING_VECTORS;
+      resources.MaxVertexTextureImageUnits = MAX_VERTEX_TEXTURE_IMAGE_UNITS;
+      resources.MaxCombinedTextureImageUnits = MAX_COMBINED_TEXTURE_IMAGE_UNITS;
+      resources.MaxTextureImageUnits = MAX_TEXTURE_IMAGE_UNITS;
+      resources.MaxFragmentUniformVectors = MAX_FRAGMENT_UNIFORM_VECTORS;
+      resources.MaxDrawBuffers = MAX_DRAW_BUFFERS;
 
       mFragmentCompiler =
           ShConstructCompiler(EShLangFragment, EShSpecGLES2, &resources);
@@ -50,7 +51,7 @@ Shader::Shader(Context* context, GLuint handle)
     }
   }
 
-  mAttachCount = 0;
+  mRefCount = 0;
   mDeleteStatus = false;
 }
 
@@ -159,20 +160,20 @@ const char* Shader::getHLSL() {
   return mHlsl;
 }
 
-void Shader::attach() {
-  mAttachCount++;
+void Shader::addRef() {
+  mRefCount++;
 }
 
-void Shader::detach() {
-  mAttachCount--;
+void Shader::release() {
+  mRefCount--;
 
-  if (mAttachCount == 0 && mDeleteStatus) {
-    mContext->deleteShader(mHandle);
+  if (mRefCount == 0 && mDeleteStatus) {
+    mResourceManager->deleteShader(mHandle);
   }
 }
 
-bool Shader::isAttached() const {
-  return mAttachCount > 0;
+unsigned int Shader::getRefCount() const {
+  return mRefCount;
 }
 
 bool Shader::isFlaggedForDeletion() const {
@@ -223,6 +224,8 @@ void Shader::parseVaryings() {
 
     mUsesFragCoord = strstr(mHlsl, "GL_USES_FRAG_COORD") != NULL;
     mUsesFrontFacing = strstr(mHlsl, "GL_USES_FRONT_FACING") != NULL;
+    mUsesPointSize = strstr(mHlsl, "GL_USES_POINT_SIZE") != NULL;
+    mUsesPointCoord = strstr(mHlsl, "GL_USES_POINT_COORD") != NULL;
   }
 }
 
@@ -392,8 +395,8 @@ bool Shader::compareVarying(const Varying& x, const Varying& y) {
   return false;
 }
 
-VertexShader::VertexShader(Context* context, GLuint handle)
-    : Shader(context, handle) {}
+VertexShader::VertexShader(ResourceManager* manager, GLuint handle)
+    : Shader(manager, handle) {}
 
 VertexShader::~VertexShader() {}
 
@@ -445,8 +448,8 @@ void VertexShader::parseAttributes() {
   }
 }
 
-FragmentShader::FragmentShader(Context* context, GLuint handle)
-    : Shader(context, handle) {}
+FragmentShader::FragmentShader(ResourceManager* manager, GLuint handle)
+    : Shader(manager, handle) {}
 
 FragmentShader::~FragmentShader() {}
 
