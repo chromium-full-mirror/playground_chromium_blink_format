@@ -23,14 +23,17 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ArgumentEncoder.h"
 #include "ArgumentDecoder.h"
+#include "ArgumentEncoder.h"
 #include "ImmutableArray.h"
+#include "ImmutableDictionary.h"
+#include "WebCoreArgumentCoders.h"
 #include "WebString.h"
 
 namespace WebKit {
 
 //   - Array -> Array
+//   - Dictionary -> Dictionary
 //   - String -> String
 
 template <typename Owner>
@@ -44,6 +47,20 @@ class UserMessageEncoder {
         encoder->encode(static_cast<uint64_t>(array->size()));
         for (size_t i = 0; i < array->size(); ++i)
           encoder->encode(Owner(array->at(i)));
+        return true;
+      }
+      case APIObject::TypeDictionary: {
+        ImmutableDictionary* dictionary =
+            static_cast<ImmutableDictionary*>(m_root);
+        const ImmutableDictionary::MapType& map = dictionary->map();
+        encoder->encode(static_cast<uint64_t>(map.size()));
+
+        ImmutableDictionary::MapType::const_iterator it = map.begin();
+        ImmutableDictionary::MapType::const_iterator end = map.end();
+        for (; it != end; ++it) {
+          encoder->encode(it->first);
+          encoder->encode(Owner(it->second.get()));
+        }
         return true;
       }
       case APIObject::TypeString: {
@@ -66,6 +83,7 @@ class UserMessageEncoder {
 
 // Handles
 //   - Array -> Array
+//   - Dictionary -> Dictionary
 //   - String -> String
 
 template <typename Owner>
@@ -90,6 +108,31 @@ class UserMessageDecoder {
         }
 
         coder.m_root = ImmutableArray::adopt(vector);
+        break;
+      }
+      case APIObject::TypeDictionary: {
+        uint64_t size;
+        if (!decoder->decode(size))
+          return false;
+
+        ImmutableDictionary::MapType map;
+        for (size_t i = 0; i < size; ++i) {
+          String key;
+          if (!decoder->decode(key))
+            return false;
+
+          RefPtr<APIObject> element;
+          Owner messageCoder(coder, element);
+          if (!decoder->decode(messageCoder))
+            return false;
+
+          std::pair<ImmutableDictionary::MapType::iterator, bool> result =
+              map.set(key, element.release());
+          if (!result.second)
+            return false;
+        }
+
+        coder.m_root = ImmutableDictionary::adopt(map);
         break;
       }
       case APIObject::TypeString: {

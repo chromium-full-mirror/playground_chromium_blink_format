@@ -49,9 +49,11 @@ class ImmutableDictionary : public APIObject {
     return adoptRef(new ImmutableDictionary);
   }
   static PassRefPtr<ImmutableDictionary> adopt(MapType& map) {
-    return adoptRef(new ImmutableDictionary(map, Adopt));
+    return adoptRef(new ImmutableDictionary(map));
   }
   ~ImmutableDictionary();
+
+  virtual bool isMutable() { return false; }
 
   template <typename T>
   T* get(const String& key) {
@@ -71,12 +73,11 @@ class ImmutableDictionary : public APIObject {
 
   size_t size() { return m_map.size(); }
 
-  virtual bool isMutable() { return false; }
+  const MapType& map() { return m_map; }
 
  protected:
   ImmutableDictionary();
-  enum AdoptTag { Adopt };
-  ImmutableDictionary(MapType& map, AdoptTag);
+  ImmutableDictionary(MapType& map);
 
   virtual Type type() const { return APIType; }
 
