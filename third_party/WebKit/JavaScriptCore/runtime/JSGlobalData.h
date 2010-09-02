@@ -224,7 +224,6 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 #endif
 
   CachedTranscendentalFunction<sin> cachedSin;
-  WTF::ThreadSpecific<char*> stackGuards;
 
   void resetDateCache();
 

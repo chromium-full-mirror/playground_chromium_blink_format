@@ -69,12 +69,21 @@ class ThreadSpecific : public Noncopyable {
   T* operator->();
   operator T*();
   T& operator*();
-  ~ThreadSpecific();
 
  private:
 #if !USE(PTHREADS) && !PLATFORM(QT) && !PLATFORM(GTK) && OS(WINDOWS)
   friend void ThreadSpecificThreadExit();
 #endif
+
+  // Not implemented. It's technically possible to destroy a thread specific
+  // key, but one would need
+  // to make sure that all values have been destroyed already (usually, that all
+  // threads that used it
+  // have exited). It's unlikely that any user of this call will be in that
+  // situation - and having
+  // a destructor defined can be confusing, given that it has such strong
+  // pre-requisites to work correctly.
+  ~ThreadSpecific();
 
   T* get();
   void set(T*);
@@ -115,9 +124,6 @@ template <typename T>
 inline ThreadSpecific<T>::ThreadSpecific() : m_value(0) {}
 
 template <typename T>
-inline ThreadSpecific<T>::~ThreadSpecific() {}
-
-template <typename T>
 inline T* ThreadSpecific<T>::get() {
   return m_value;
 }
@@ -134,11 +140,6 @@ inline ThreadSpecific<T>::ThreadSpecific() {
   int error = pthread_key_create(&m_key, destroy);
   if (error)
     CRASH();
-}
-
-template <typename T>
-inline ThreadSpecific<T>::~ThreadSpecific() {
-  pthread_key_delete(m_key);  // Does not invoke destructor functions.
 }
 
 template <typename T>
@@ -159,11 +160,6 @@ template <typename T>
 inline ThreadSpecific<T>::ThreadSpecific() {}
 
 template <typename T>
-inline ThreadSpecific<T>::~ThreadSpecific() {
-  // Does not invoke destructor functions. QThreadStorage will do it
-}
-
-template <typename T>
 inline T* ThreadSpecific<T>::get() {
   Data* data = static_cast<Data*>(m_key.localData());
   return data ? data->value : 0;
@@ -181,11 +177,6 @@ inline void ThreadSpecific<T>::set(T* ptr) {
 template <typename T>
 inline ThreadSpecific<T>::ThreadSpecific() {
   g_static_private_init(&m_key);
-}
-
-template <typename T>
-inline ThreadSpecific<T>::~ThreadSpecific() {
-  g_static_private_free(&m_key);
 }
 
 template <typename T>
