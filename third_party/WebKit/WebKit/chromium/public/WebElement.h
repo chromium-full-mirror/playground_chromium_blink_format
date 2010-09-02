@@ -63,6 +63,12 @@ class WebElement : public WebNode {
   WEBKIT_API WebNamedNodeMap attributes() const;
   WEBKIT_API WebString innerText() const;
 
+  // Returns the language code specified for this element.  This attribute
+  // is inherited, so the returned value is drawn from the closest parent
+  // element that has the lang attribute set, or from the HTTP
+  // "Content-Language" header as a fallback.
+  WEBKIT_API WebString computeInheritedLanguage() const;
+
 #if WEBKIT_IMPLEMENTATION
   WebElement(const WTF::PassRefPtr<WebCore::Element>&);
   WebElement& operator=(const WTF::PassRefPtr<WebCore::Element>&);

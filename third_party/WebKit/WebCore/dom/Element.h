@@ -247,6 +247,8 @@ class Element : public ContainerNode {
 
   RenderStyle* computedStyle(PseudoId = NOPSEUDO);
 
+  AtomicString computeInheritedLanguage() const;
+
   void dispatchAttrRemovalEvent(Attribute*);
   void dispatchAttrAdditionEvent(Attribute*);
 

@@ -78,6 +78,10 @@ WebString WebElement::innerText() const {
   return constUnwrap<Element>()->innerText();
 }
 
+WebString WebElement::computeInheritedLanguage() const {
+  return WebString(constUnwrap<Element>()->computeInheritedLanguage());
+}
+
 WebElement::WebElement(const PassRefPtr<Element>& elem) : WebNode(elem) {}
 
 WebElement& WebElement::operator=(const PassRefPtr<Element>& elem) {
