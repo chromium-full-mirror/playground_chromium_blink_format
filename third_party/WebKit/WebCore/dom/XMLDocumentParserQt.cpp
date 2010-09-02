@@ -202,7 +202,7 @@ void XMLDocumentParser::doWrite(const String& parseString) {
 }
 
 void XMLDocumentParser::initializeParserContext(const char*) {
-  m_parserStopped = false;
+  DocumentParser::stopParsing();
   m_sawError = false;
   m_sawXSLTransform = false;
   m_sawFirstElement = false;
@@ -217,7 +217,7 @@ void XMLDocumentParser::doEnd() {
         false);  // Make the doc think it's done, so it will apply xsl sheets.
     document()->styleSelectorChanged(RecalcStyleImmediately);
     document()->setParsing(true);
-    m_parserStopped = true;
+    DocumentParser::startParsing();
   }
 #endif
 
@@ -356,7 +356,7 @@ static inline void handleElementAttributes(
 }
 
 void XMLDocumentParser::parse() {
-  while (!m_parserStopped && !m_parserPaused && !m_stream.atEnd()) {
+  while (!isStopped() && !m_parserPaused && !m_stream.atEnd()) {
     m_stream.readNext();
     switch (m_stream.tokenType()) {
       case QXmlStreamReader::StartDocument: {
