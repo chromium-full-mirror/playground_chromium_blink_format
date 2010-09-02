@@ -38,6 +38,7 @@
 #include "SkPath.h"
 #include "SkPoint.h"
 #include "SkRect.h"
+#include "SkUtils.h"
 
 extern "C" {
 #include "harfbuzz-shaper.h"
@@ -65,6 +66,15 @@ static HB_Bool stringToGlyphs(HB_Font hbFont,
 
   font->setupPaint(&paint);
   paint.setTextEncoding(SkPaint::kUTF16_TextEncoding);
+
+  unsigned codepoints = 0;
+  for (hb_uint32 i = 0; i < length; i++) {
+    if (!SkUTF16_IsHighSurrogate(characters[i]))
+      codepoints++;
+    if (codepoints > *glyphsSize)
+      return 0;
+  }
+
   int numGlyphs = paint.textToGlyphs(characters, length * sizeof(uint16_t),
                                      reinterpret_cast<uint16_t*>(glyphs));
 

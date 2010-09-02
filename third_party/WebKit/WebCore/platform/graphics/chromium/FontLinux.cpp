@@ -487,7 +487,11 @@ class TextRunWalker {
       // We overflowed our arrays. Resize and retry.
       // HB_ShapeItem fills in m_item.num_glyphs with the needed size.
       deleteGlyphArrays();
-      createGlyphArrays(m_item.num_glyphs);
+      // The |+ 1| here is a workaround for a bug in Harfbuzz: the Khmer
+      // shaper (at least) can fail because of insufficient glyph buffers
+      // and request 0 additional glyphs: throwing us into an infinite
+      // loop.
+      createGlyphArrays(m_item.num_glyphs + 1);
     }
   }
 
@@ -510,7 +514,10 @@ class TextRunWalker {
 
       double advance = truncateFixedPointToInteger(m_item.advances[i]);
       unsigned glyphIndex = m_item.item.pos + logClustersIndex;
-      if (isWordBreak(glyphIndex, isRTL)) {
+      // The first half of the conjuction works around the case where
+      // output glyphs aren't associated with any codepoints by the
+      // clusters log.
+      if (glyphIndex < m_item.num_glyphs && isWordBreak(glyphIndex, isRTL)) {
         advance += m_wordSpacingAdjustment;
 
         if (m_padding > 0) {
@@ -534,7 +541,7 @@ class TextRunWalker {
         while (logClustersIndex > 0 && logClusters()[logClustersIndex] == i)
           logClustersIndex--;
       } else {
-        while (logClustersIndex < m_item.num_glyphs &&
+        while (logClustersIndex < m_item.item.length &&
                logClusters()[logClustersIndex] == i)
           logClustersIndex++;
       }
