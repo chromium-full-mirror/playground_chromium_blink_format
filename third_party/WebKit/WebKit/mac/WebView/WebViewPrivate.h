@@ -44,12 +44,14 @@
 
 @class NSError;
 @class WebFrame;
+@class WebDeviceOrientation;
 @class WebGeolocationPosition;
 @class WebInspector;
 @class WebPreferences;
 @class WebScriptWorld;
 @class WebTextIterator;
 
+@protocol WebDeviceOrientationProvider;
 @protocol WebFormDelegate;
 
 extern NSString* _WebCanGoBackKey;
@@ -731,6 +733,12 @@ _removeOriginAccessWhitelistEntryWithSourceOrigin:(NSString*)sourceOrigin
 - (void)_replaceSelectionWithNode:(DOMNode*)node matchStyle:(BOOL)matchStyle;
 - (BOOL)_selectionIsCaret;
 - (BOOL)_selectionIsAll;
+@end
+
+@interface WebView (WebViewDeviceOrientation)
+- (void)_setDeviceOrientationProvider:
+    (id<WebDeviceOrientationProvider>)deviceOrientationProvider;
+- (id<WebDeviceOrientationProvider>)_deviceOrientationProvider;
 @end
 
 @protocol WebGeolocationProvider<NSObject>
