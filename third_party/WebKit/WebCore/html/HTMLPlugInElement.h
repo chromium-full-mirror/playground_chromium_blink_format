@@ -53,8 +53,6 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
     m_isCapturingMouseEvents = capturing;
   }
 
-  RenderEmbeddedObject* renderEmbeddedObject() const;
-
  protected:
   HTMLPlugInElement(const QualifiedName& tagName, Document*);
 

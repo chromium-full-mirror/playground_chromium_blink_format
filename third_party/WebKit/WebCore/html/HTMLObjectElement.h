@@ -33,10 +33,6 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
                                               Document*,
                                               bool createdByParser);
 
-  void setNeedWidgetUpdate(bool needWidgetUpdate) {
-    m_needWidgetUpdate = needWidgetUpdate;
-  }
-
   void renderFallbackContent();
 
   bool isDocNamedItem() const { return m_docNamedItem; }
@@ -81,7 +77,6 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
   AtomicString m_id;
   String m_classId;
   bool m_docNamedItem : 1;
-  bool m_needWidgetUpdate : 1;
   bool m_useFallbackContent : 1;
 };
 }

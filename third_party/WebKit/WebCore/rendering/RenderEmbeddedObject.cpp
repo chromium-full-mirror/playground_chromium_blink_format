@@ -273,7 +273,7 @@ static void parametersFromObject(HTMLObjectElement* objectElement,
 // HTMLFrameOwnerElement.
 static void updateWidgetForObjectElement(HTMLObjectElement* objectElement,
                                          bool onlyCreateNonNetscapePlugins) {
-  objectElement->setNeedWidgetUpdate(false);
+  objectElement->setNeedsWidgetUpdate(false);
   if (!objectElement->isFinishedParsingChildren())
     return;
 
@@ -335,7 +335,7 @@ static void updateWidgetForEmbedElement(HTMLEmbedElement* embedElement,
   String url = embedElement->url();
   String serviceType = embedElement->serviceType();
 
-  embedElement->setNeedWidgetUpdate(false);
+  embedElement->setNeedsWidgetUpdate(false);
 
   if (url.isEmpty() && serviceType.isEmpty())
     return;

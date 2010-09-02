@@ -46,7 +46,7 @@ class Frame;
 class FrameLoaderClient;
 class HTMLAppletElement;
 class HTMLFrameOwnerElement;
-class HTMLPlugInElement;
+class HTMLPlugInImageElement;
 class IntSize;
 class KURL;
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
@@ -67,7 +67,7 @@ class SubframeLoader : public Noncopyable {
                     const AtomicString& frameName,
                     bool lockHistory = true,
                     bool lockBackForwardList = true);
-  bool requestObject(HTMLPlugInElement*,
+  bool requestObject(HTMLPlugInImageElement*,
                      const String& url,
                      const AtomicString& frameName,
                      const String& serviceType,
@@ -103,7 +103,7 @@ class SubframeLoader : public Noncopyable {
                       const KURL&,
                       const String& name,
                       const String& referrer);
-  bool loadPlugin(HTMLPlugInElement*,
+  bool loadPlugin(HTMLPlugInImageElement*,
                   const KURL&,
                   const String& mimeType,
                   const Vector<String>& paramNames,

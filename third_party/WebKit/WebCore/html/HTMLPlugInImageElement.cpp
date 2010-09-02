@@ -26,12 +26,21 @@
 #include "FrameLoaderClient.h"
 #include "HTMLImageLoader.h"
 #include "Image.h"
+#include "RenderEmbeddedObject.h"
 
 namespace WebCore {
 
 HTMLPlugInImageElement::HTMLPlugInImageElement(const QualifiedName& tagName,
                                                Document* document)
-    : HTMLPlugInElement(tagName, document) {}
+    : HTMLPlugInElement(tagName, document), m_needsWidgetUpdate(false) {}
+
+RenderEmbeddedObject* HTMLPlugInImageElement::renderEmbeddedObject() const {
+  // HTMLObjectElement and HTMLEmbedElement may return arbitrary renderers
+  // when using fallback content.
+  if (!renderer() || !renderer()->isEmbeddedObject())
+    return 0;
+  return toRenderEmbeddedObject(renderer());
+}
 
 bool HTMLPlugInImageElement::isImageType() {
   if (m_serviceType.isEmpty() && protocolIs(m_url, "data"))

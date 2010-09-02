@@ -44,7 +44,7 @@ using namespace HTMLNames;
 
 inline HTMLEmbedElement::HTMLEmbedElement(const QualifiedName& tagName,
                                           Document* document)
-    : HTMLPlugInImageElement(tagName, document), m_needWidgetUpdate(false) {
+    : HTMLPlugInImageElement(tagName, document) {
   ASSERT(hasTagName(embedTag));
 }
 
@@ -78,7 +78,7 @@ bool HTMLEmbedElement::mapToEntry(const QualifiedName& attrName,
     return false;
   }
 
-  return HTMLPlugInElement::mapToEntry(attrName, result);
+  return HTMLPlugInImageElement::mapToEntry(attrName, result);
 }
 
 void HTMLEmbedElement::parseMappedAttribute(Attribute* attr) {
@@ -117,12 +117,12 @@ void HTMLEmbedElement::parseMappedAttribute(Attribute* attr) {
     }
     m_name = value;
   } else
-    HTMLPlugInElement::parseMappedAttribute(attr);
+    HTMLPlugInImageElement::parseMappedAttribute(attr);
 }
 
 bool HTMLEmbedElement::rendererIsNeeded(RenderStyle* style) {
   if (isImageType())
-    return HTMLPlugInElement::rendererIsNeeded(style);
+    return HTMLPlugInImageElement::rendererIsNeeded(style);
 
   Frame* frame = document()->frame();
   if (!frame)
@@ -147,7 +147,7 @@ bool HTMLEmbedElement::rendererIsNeeded(RenderStyle* style) {
   }
 #endif
 
-  return HTMLPlugInElement::rendererIsNeeded(style);
+  return HTMLPlugInImageElement::rendererIsNeeded(style);
 }
 
 RenderObject* HTMLEmbedElement::createRenderer(RenderArena* arena,
@@ -161,14 +161,15 @@ RenderObject* HTMLEmbedElement::createRenderer(RenderArena* arena,
 }
 
 void HTMLEmbedElement::attach() {
-  m_needWidgetUpdate = true;
+  setNeedsWidgetUpdate(true);
 
   bool isImage = isImageType();
 
   if (!isImage)
-    queuePostAttachCallback(&HTMLPlugInElement::updateWidgetCallback, this);
+    queuePostAttachCallback(&HTMLPlugInImageElement::updateWidgetCallback,
+                            this);
 
-  HTMLPlugInElement::attach();
+  HTMLPlugInImageElement::attach();
 
   if (isImage && renderer()) {
     if (!m_imageLoader)
@@ -184,7 +185,7 @@ void HTMLEmbedElement::attach() {
 
 void HTMLEmbedElement::updateWidget() {
   document()->updateStyleIfNeeded();
-  if (m_needWidgetUpdate && renderEmbeddedObject() && !isImageType())
+  if (needsWidgetUpdate() && renderEmbeddedObject() && !isImageType())
     renderEmbeddedObject()->updateWidget(true);
 }
 
@@ -206,18 +207,18 @@ void HTMLEmbedElement::insertedIntoDocument() {
     }
   }
 
-  HTMLPlugInElement::insertedIntoDocument();
+  HTMLPlugInImageElement::insertedIntoDocument();
 }
 
 void HTMLEmbedElement::removedFromDocument() {
   if (document()->isHTMLDocument())
     static_cast<HTMLDocument*>(document())->removeNamedItem(m_name);
 
-  HTMLPlugInElement::removedFromDocument();
+  HTMLPlugInImageElement::removedFromDocument();
 }
 
 void HTMLEmbedElement::attributeChanged(Attribute* attr, bool preserveDecls) {
-  HTMLPlugInElement::attributeChanged(attr, preserveDecls);
+  HTMLPlugInImageElement::attributeChanged(attr, preserveDecls);
 
   if ((attr->name() == widthAttr || attr->name() == heightAttr) &&
       !attr->isEmpty()) {
