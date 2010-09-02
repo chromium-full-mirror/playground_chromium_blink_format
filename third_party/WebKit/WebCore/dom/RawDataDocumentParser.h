@@ -35,7 +35,7 @@ class RawDataDocumentParser : public DocumentParser {
   RawDataDocumentParser(Document* document) : DocumentParser(document) {}
 
   virtual void finish() {
-    if (!isStopped())
+    if (!m_parserStopped && !isDetached())
       document()->finishedParsing();
   }
 
