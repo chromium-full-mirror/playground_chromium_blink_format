@@ -706,6 +706,10 @@ void ChromeClientImpl::attachRootGraphicsLayer(Frame* frame,
 void ChromeClientImpl::scheduleCompositingLayerSync() {
   m_webView->setRootLayerNeedsDisplay();
 }
+
+bool ChromeClientImpl::allowsAcceleratedCompositing() const {
+  return m_webView->allowsAcceleratedCompositing();
+}
 #endif
 
 WebCore::SharedGraphicsContext3D*
