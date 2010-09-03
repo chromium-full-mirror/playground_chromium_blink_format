@@ -37,8 +37,14 @@
 
 namespace WebCore {
 
-PassRefPtr<IDBAny> IDBAny::create() {
+PassRefPtr<IDBAny> IDBAny::createInvalid() {
   return adoptRef(new IDBAny());
+}
+
+PassRefPtr<IDBAny> IDBAny::createNull() {
+  RefPtr<IDBAny> idbAny = adoptRef(new IDBAny());
+  idbAny->setNull();
+  return idbAny.release();
 }
 
 IDBAny::IDBAny() : m_type(UndefinedType) {}
@@ -80,7 +86,7 @@ PassRefPtr<SerializedScriptValue> IDBAny::serializedScriptValue() {
   return m_serializedScriptValue;
 }
 
-void IDBAny::set() {
+void IDBAny::setNull() {
   ASSERT(m_type == UndefinedType);
   m_type = NullType;
 }

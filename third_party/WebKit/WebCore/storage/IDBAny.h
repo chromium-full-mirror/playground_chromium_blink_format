@@ -44,10 +44,17 @@ class SerializedScriptValue;
 
 class IDBAny : public RefCounted<IDBAny> {
  public:
-  static PassRefPtr<IDBAny> create();
+  static PassRefPtr<IDBAny> createInvalid();
+  static PassRefPtr<IDBAny> createNull();
   template <typename T>
   static PassRefPtr<IDBAny> create(T* idbObject) {
-    RefPtr<IDBAny> any = IDBAny::create();
+    RefPtr<IDBAny> any = IDBAny::createInvalid();
+    any->set(idbObject);
+    return any.release();
+  }
+  template <typename T>
+  static PassRefPtr<IDBAny> create(PassRefPtr<T> idbObject) {
+    RefPtr<IDBAny> any = IDBAny::createInvalid();
     any->set(idbObject);
     return any.release();
   }
@@ -76,7 +83,7 @@ class IDBAny : public RefCounted<IDBAny> {
   PassRefPtr<SerializedScriptValue> serializedScriptValue();
 
   // Set can only be called once.
-  void set();  // For "null".
+  void setNull();
   void set(PassRefPtr<IDBCursor>);
   void set(PassRefPtr<IDBDatabase>);
   void set(PassRefPtr<IDBFactory>);
