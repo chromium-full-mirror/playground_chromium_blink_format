@@ -98,7 +98,7 @@ class InspectorDOMAgent : public EventListener {
   virtual bool operator==(const EventListener& other);
 
   // Methods called from the frontend for DOM nodes inspection.
-  void getChildNodes(long nodeId);
+  void getChildNodes(long nodeId, RefPtr<InspectorArray>* nodes);
   void setAttribute(long elementId,
                     const String& name,
                     const String& value,
@@ -176,6 +176,7 @@ class InspectorDOMAgent : public EventListener {
   void copyNode(long nodeId);
 
  private:
+  PassRefPtr<InspectorArray> getChildNodesArray(long nodeId);
   static CSSStyleSheet* getParentStyleSheet(CSSStyleDeclaration*);
   void startListening(Document* document);
   void stopListening(Document* document);
