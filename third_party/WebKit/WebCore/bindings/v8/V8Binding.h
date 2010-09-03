@@ -31,6 +31,8 @@
 #ifndef V8Binding_h
 #define V8Binding_h
 
+#include "BindingFrame.h"
+#include "BindingLocation.h"
 #include "BindingSecurity.h"
 #include "MathExtras.h"
 #include "PlatformString.h"
@@ -50,6 +52,8 @@ class V8Binding {
  public:
   typedef v8::Handle<v8::Value> Value;
   typedef V8BindingDOMWindow DOMWindow;
+  typedef BindingFrame<V8Binding> Frame;
+  typedef BindingLocation<V8Binding> Location;
 
   static Value emptyScriptValue() { return v8::Local<v8::Value>(); }
 };
