@@ -35,7 +35,7 @@ WKMutableDictionaryRef WKMutableDictionaryCreate() {
   return toRef(dictionary.release().releaseRef());
 }
 
-bool WKDictionaryIsMutable(WKMutableDictionaryRef dictionaryRef) {
+bool WKDictionaryIsMutable(WKDictionaryRef dictionaryRef) {
   return toWK(dictionaryRef)->isMutable();
 }
 
