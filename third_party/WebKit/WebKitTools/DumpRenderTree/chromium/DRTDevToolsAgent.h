@@ -31,7 +31,8 @@
 #ifndef DRTDevToolsAgent_h
 #define DRTDevToolsAgent_h
 
-#include "base/task.h"  // FIXME: remove this
+#include "DRTDevToolsCallArgs.h"
+#include "Task.h"
 #include "public/WebDevToolsAgentClient.h"
 #include <wtf/HashMap.h>
 #include <wtf/Noncopyable.h>
@@ -46,7 +47,6 @@ struct WebDevToolsMessageData;
 
 }  // namespace WebKit
 
-class DRTDevToolsCallArgs;
 class DRTDevToolsClient;
 
 class DRTDevToolsAgent : public WebKit::WebDevToolsAgentClient,
@@ -75,6 +75,7 @@ class DRTDevToolsAgent : public WebKit::WebDevToolsAgentClient,
 
   bool evaluateInWebInspector(long callID, const std::string& script);
   bool setTimelineProfilingEnabled(bool enable);
+  TaskList* taskList() { return &m_taskList; }
 
  private:
   void call(const DRTDevToolsCallArgs&);
@@ -82,7 +83,23 @@ class DRTDevToolsAgent : public WebKit::WebDevToolsAgentClient,
   static void dispatchMessageLoop();
   WebKit::WebDevToolsAgent* webDevToolsAgent();
 
-  ScopedRunnableMethodFactory<DRTDevToolsAgent> m_callMethodFactory;
+  class AsyncCallTask : public MethodTask<DRTDevToolsAgent> {
+   public:
+    AsyncCallTask(DRTDevToolsAgent* object, const DRTDevToolsCallArgs& args)
+        : MethodTask<DRTDevToolsAgent>(object), m_args(args) {}
+    virtual void runIfValid() { m_object->call(m_args); }
+
+   private:
+    DRTDevToolsCallArgs m_args;
+  };
+
+  struct DelayedFrontendLoadedTask : public MethodTask<DRTDevToolsAgent> {
+    DelayedFrontendLoadedTask(DRTDevToolsAgent* object)
+        : MethodTask<DRTDevToolsAgent>(object) {}
+    virtual void runIfValid() { m_object->delayedFrontendLoaded(); }
+  };
+
+  TaskList m_taskList;
   DRTDevToolsClient* m_drtDevToolsClient;
   int m_routingID;
   WebKit::WebDevToolsAgent* m_webDevToolsAgent;
