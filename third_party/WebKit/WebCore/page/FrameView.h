@@ -311,6 +311,7 @@ class FrameView : public ScrollView {
   double adjustedDeferredRepaintDelay() const;
 
   bool updateWidgets();
+  void updateWidget(RenderEmbeddedObject*);
   void scrollToAnchor();
   void scrollPositionChanged();
 

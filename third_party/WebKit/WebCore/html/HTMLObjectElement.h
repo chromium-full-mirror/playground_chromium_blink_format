@@ -39,8 +39,6 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
 
   bool containsJavaApplet() const;
 
-  void updateWidget(bool onlyCreateNonNetscapePlugins);
-
   virtual bool useFallbackContent() const { return m_useFallbackContent; }
   void renderFallbackContent();
 
@@ -65,6 +63,7 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
 
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
+  virtual void updateWidget(bool onlyCreateNonNetscapePlugins);
   void updateDocNamedItem();
 
   bool hasFallbackContent() const;

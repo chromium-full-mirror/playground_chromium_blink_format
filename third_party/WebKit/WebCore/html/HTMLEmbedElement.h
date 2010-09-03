@@ -33,8 +33,6 @@ class HTMLEmbedElement : public HTMLPlugInImageElement {
                                              Document*,
                                              bool createdByParser);
 
-  void updateWidget(bool onlyCreateNonNetscapePlugins);
-
  private:
   HTMLEmbedElement(const QualifiedName&, Document*, bool createdByParser);
 
@@ -51,6 +49,8 @@ class HTMLEmbedElement : public HTMLPlugInImageElement {
   virtual const QualifiedName& imageSourceAttributeName() const;
 
   virtual RenderWidget* renderWidgetForJSBindings() const;
+
+  virtual void updateWidget(bool onlyCreateNonNetscapePlugins);
 
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 

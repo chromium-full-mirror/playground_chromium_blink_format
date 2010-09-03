@@ -258,6 +258,7 @@ bool HTMLObjectElement::hasFallbackContent() const {
 // FIXME: This should be unified with HTMLEmbedElement::updateWidget and
 // moved down into HTMLPluginImageElement.cpp
 void HTMLObjectElement::updateWidget(bool onlyCreateNonNetscapePlugins) {
+  ASSERT(!renderEmbeddedObject()->pluginCrashedOrWasMissing());
   // FIXME: We should ASSERT(needsWidgetUpdate()), but currently
   // FrameView::updateWidget() calls updateWidget(false) without checking if
   // the widget actually needs updating!

@@ -32,10 +32,9 @@ class FrameLoader;
 // Base class for HTMLObjectElement and HTMLEmbedElement
 class HTMLPlugInImageElement : public HTMLPlugInElement {
  public:
-  const String& serviceType() const { return m_serviceType; }
-  const String& url() const { return m_url; }
-
   RenderEmbeddedObject* renderEmbeddedObject() const;
+
+  virtual void updateWidget(bool onlyCreateNonNetscapePlugins) = 0;
 
  protected:
   HTMLPlugInImageElement(const QualifiedName& tagName,
@@ -43,6 +42,9 @@ class HTMLPlugInImageElement : public HTMLPlugInElement {
                          bool createdByParser);
 
   bool isImageType();
+
+  const String& serviceType() const { return m_serviceType; }
+  const String& url() const { return m_url; }
 
   OwnPtr<HTMLImageLoader> m_imageLoader;
   String m_serviceType;
