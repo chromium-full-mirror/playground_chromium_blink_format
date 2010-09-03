@@ -167,6 +167,8 @@ class ChromeClientImpl : public WebCore::ChromeClientChromium {
   virtual void scheduleCompositingLayerSync();
 #endif
 
+  virtual WebCore::SharedGraphicsContext3D* getSharedGraphicsContext3D();
+
   virtual bool supportsFullscreenForNode(const WebCore::Node*);
   virtual void enterFullscreenForNode(WebCore::Node*);
   virtual void exitFullscreenForNode(WebCore::Node*);

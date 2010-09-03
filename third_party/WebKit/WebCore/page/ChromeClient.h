@@ -57,6 +57,7 @@ class IntRect;
 class Node;
 class Page;
 class SecurityOrigin;
+class SharedGraphicsContext3D;
 class PopupMenuClient;
 class Widget;
 
@@ -260,6 +261,8 @@ class ChromeClient {
   // regardless of the settings.
   virtual bool allowsAcceleratedCompositing() const { return true; }
 #endif
+
+  virtual SharedGraphicsContext3D* getSharedGraphicsContext3D() { return 0; }
 
   virtual bool supportsFullscreenForNode(const Node*) { return false; }
   virtual void enterFullscreenForNode(Node*) {}

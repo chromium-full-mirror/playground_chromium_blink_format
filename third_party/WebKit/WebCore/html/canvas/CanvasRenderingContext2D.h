@@ -61,7 +61,8 @@ class KURL;
 class TextMetrics;
 
 #if ENABLE(ACCELERATED_2D_CANVAS)
-class GraphicsContext3D;
+class DrawingBuffer;
+class SharedGraphicsContext3D;
 #endif
 
 typedef int ExceptionCode;
@@ -76,6 +77,7 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
 
   virtual bool is2d() const { return true; }
   virtual bool isAccelerated() const;
+  virtual bool paintsIntoCanvasBuffer() const;
 
   CanvasStyle* strokeStyle() const;
   void setStrokeStyle(PassRefPtr<CanvasStyle>);
@@ -359,10 +361,8 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
 
   virtual void paintRenderingResultsToCanvas();
 
-#if ENABLE(ACCELERATED_2D_CANVAS)
-  virtual GraphicsContext3D* graphicsContext3D() const {
-    return m_context3D.get();
-  }
+#if ENABLE(ACCELERATED_2D_CANVAS) && USE(ACCELERATED_COMPOSITING)
+  virtual PlatformLayer* platformLayer() const;
 #endif
 
  private:
@@ -441,7 +441,8 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
 #endif
 
 #if ENABLE(ACCELERATED_2D_CANVAS)
-  OwnPtr<GraphicsContext3D> m_context3D;
+  OwnPtr<DrawingBuffer> m_drawingBuffer;
+  RefPtr<SharedGraphicsContext3D> m_context3D;
 #endif
 };
 

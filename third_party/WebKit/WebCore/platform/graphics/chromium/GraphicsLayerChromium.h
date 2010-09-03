@@ -139,7 +139,7 @@ class GraphicsLayerChromium : public GraphicsLayer {
     NoContentsLayer = 0,
     ContentsLayerForImage,
     ContentsLayerForVideo,
-    ContentsLayerForCanvas
+    ContentsLayerForCanvas,
   };
 
   ContentsLayerPurpose m_contentsLayerPurpose;

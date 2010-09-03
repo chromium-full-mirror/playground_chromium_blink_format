@@ -64,6 +64,8 @@
 
 namespace WebCore {
 
+class SharedGraphicsContext3D;
+
 class EmptyPopupMenu : public PopupMenu {
  public:
   virtual void show(const IntRect&, FrameView*, int) {}
@@ -215,9 +217,9 @@ class EmptyChromeClient : public ChromeClient {
                                                           Geolocation*) {}
 
 #if USE(ACCELERATED_COMPOSITING)
-  virtual void attachRootGraphicsLayer(Frame*, GraphicsLayer*){};
-  virtual void setNeedsOneShotDrawingSynchronization(){};
-  virtual void scheduleCompositingLayerSync(){};
+  virtual void attachRootGraphicsLayer(Frame*, GraphicsLayer*) {}
+  virtual void setNeedsOneShotDrawingSynchronization() {}
+  virtual void scheduleCompositingLayerSync() {}
 #endif
 
 #if PLATFORM(WIN)
