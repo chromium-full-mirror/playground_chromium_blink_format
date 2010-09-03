@@ -153,6 +153,8 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
     if (child->parentNode())
       break;
 
+    InspectorController::willInsertDOMNode(child, this);
+
     insertBeforeCommon(next.get(), child);
 
     // Send notification about the children change.
@@ -221,6 +223,8 @@ void ContainerNode::parserInsertBefore(PassRefPtr<Node> newChild,
   for (NodeVector::const_iterator it = targets.begin(); it != targets.end();
        ++it) {
     Node* child = it->get();
+
+    InspectorController::willInsertDOMNode(child, this);
 
     insertBeforeCommon(next.get(), child);
 
@@ -296,6 +300,8 @@ bool ContainerNode::replaceChild(PassRefPtr<Node> newChild,
 
     ASSERT(!child->nextSibling());
     ASSERT(!child->previousSibling());
+
+    InspectorController::willInsertDOMNode(child.get(), this);
 
     // Add child after "prev".
     forbidEventDispatch();
@@ -585,6 +591,8 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
         break;
     }
 
+    InspectorController::willInsertDOMNode(child, this);
+
     // Append child to the end of the list
     forbidEventDispatch();
     child->setParent(this);
@@ -622,6 +630,8 @@ void ContainerNode::parserAddChild(PassRefPtr<Node> newChild) {
   ASSERT(newChild);
   ASSERT(!newChild->parent());  // Use appendChild if you need to handle
                                 // reparenting (and want DOM mutation events).
+
+  InspectorController::willInsertDOMNode(newChild.get(), this);
 
   forbidEventDispatch();
   Node* last = m_lastChild;
@@ -992,12 +1002,7 @@ Node* ContainerNode::childNode(unsigned index) const {
 static void notifyChildInserted(Node* child) {
   ASSERT(!eventDispatchForbidden());
 
-#if ENABLE(INSPECTOR)
-  if (Page* page = child->document()->page()) {
-    if (InspectorController* inspectorController = page->inspectorController())
-      inspectorController->didInsertDOMNode(child);
-  }
-#endif
+  InspectorController::didInsertDOMNode(child);
 
   RefPtr<Node> c = child;
   RefPtr<Document> document = child->document();
@@ -1034,12 +1039,7 @@ static void dispatchChildInsertionEvents(Node* child) {
 static void dispatchChildRemovalEvents(Node* child) {
   ASSERT(!eventDispatchForbidden());
 
-#if ENABLE(INSPECTOR)
-  if (Page* page = child->document()->page()) {
-    if (InspectorController* inspectorController = page->inspectorController())
-      inspectorController->didRemoveDOMNode(child);
-  }
-#endif
+  InspectorController::willRemoveDOMNode(child);
 
   RefPtr<Node> c = child;
   RefPtr<Document> document = child->document();

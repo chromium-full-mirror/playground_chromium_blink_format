@@ -71,6 +71,7 @@ class InspectorDebuggerAgent : public ScriptDebugListener, public Noncopyable {
   void getScriptSource(const String& sourceID, String* scriptSource);
 
   void pause();
+  void breakProgram(PassRefPtr<InspectorValue> reason);
   void resume();
   void stepOverStatement();
   void stepIntoStatement();
@@ -111,6 +112,8 @@ class InspectorDebuggerAgent : public ScriptDebugListener, public Noncopyable {
   HashMap<String, SourceBreakpoints> m_stickyBreakpoints;
   HashMap<String, unsigned> m_breakpointsMapping;
   bool m_breakpointsLoaded;
+  static InspectorDebuggerAgent* s_debuggerAgentOnBreakpoint;
+  RefPtr<InspectorValue> m_breakProgramReason;
 };
 
 }  // namespace WebCore

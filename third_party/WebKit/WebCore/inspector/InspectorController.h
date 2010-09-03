@@ -31,7 +31,8 @@
 
 #include "Console.h"
 #include "Cookie.h"
-#include "InspectorDOMAgent.h"
+#include "Element.h"
+#include "Page.h"
 #include "PlatformString.h"
 #include "ScriptState.h"
 #include <wtf/HashMap.h>
@@ -58,6 +59,7 @@ class InspectorBackend;
 class InspectorBackendDispatcher;
 class InspectorClient;
 class InspectorCSSStore;
+class InspectorDOMAgent;
 class InspectorDOMStorageResource;
 class InspectorDatabaseResource;
 class InspectorDebuggerAgent;
@@ -210,9 +212,12 @@ class InspectorController : public Noncopyable {
   void mainResourceFiredLoadEvent(DocumentLoader*, const KURL&);
   void mainResourceFiredDOMContentEvent(DocumentLoader*, const KURL&);
 
-  void didInsertDOMNode(Node*);
-  void didRemoveDOMNode(Node*);
-  void didModifyDOMAttr(Element*);
+  static void willInsertDOMNode(Node* node, Node* parent);
+  static void didInsertDOMNode(Node*);
+  static void willRemoveDOMNode(Node*);
+  static void willModifyDOMAttr(Element*);
+  static void didModifyDOMAttr(Element*);
+
 #if ENABLE(WORKERS)
   enum WorkerAction { WorkerCreated, WorkerDestroyed };
 
@@ -357,6 +362,14 @@ class InspectorController : public Noncopyable {
 
   void didEvaluateForTestInFrontend(long callId, const String& jsonResult);
 
+  static InspectorController* inspectorControllerForNode(Node*);
+  void willInsertDOMNodeImpl(Node* node, Node* parent);
+  void didInsertDOMNodeImpl(Node*);
+  void willRemoveDOMNodeImpl(Node*);
+  void didRemoveDOMNodeImpl(Node*);
+  void willModifyDOMAttrImpl(Element*);
+  void didModifyDOMAttrImpl(Element*);
+
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   friend class InspectorDebuggerAgent;
   String breakpointsSettingKey();
@@ -427,25 +440,58 @@ class InspectorController : public Noncopyable {
 #endif
 };
 
-inline void InspectorController::didInsertDOMNode(Node* node) {
+inline void InspectorController::willInsertDOMNode(Node* node, Node* parent) {
 #if ENABLE(INSPECTOR)
-  if (m_domAgent)
-    m_domAgent->didInsertDOMNode(node);
+  if (InspectorController* inspectorController =
+          inspectorControllerForNode(parent))
+    inspectorController->willInsertDOMNodeImpl(node, parent);
 #endif
 }
 
-inline void InspectorController::didRemoveDOMNode(Node* node) {
+inline void InspectorController::didInsertDOMNode(Node* node) {
 #if ENABLE(INSPECTOR)
-  if (m_domAgent)
-    m_domAgent->didRemoveDOMNode(node);
+  if (InspectorController* inspectorController =
+          inspectorControllerForNode(node))
+    inspectorController->didInsertDOMNodeImpl(node);
+#endif
+}
+
+inline void InspectorController::willRemoveDOMNode(Node* node) {
+#if ENABLE(INSPECTOR)
+  if (InspectorController* inspectorController =
+          inspectorControllerForNode(node)) {
+    inspectorController->willRemoveDOMNodeImpl(node);
+    inspectorController->didRemoveDOMNodeImpl(node);
+  }
+#endif
+}
+
+inline void InspectorController::willModifyDOMAttr(Element* element) {
+#if ENABLE(INSPECTOR)
+  if (InspectorController* inspectorController =
+          inspectorControllerForNode(element))
+    inspectorController->willModifyDOMAttrImpl(element);
 #endif
 }
 
 inline void InspectorController::didModifyDOMAttr(Element* element) {
 #if ENABLE(INSPECTOR)
-  if (m_domAgent)
-    m_domAgent->didModifyDOMAttr(element);
+  if (InspectorController* inspectorController =
+          inspectorControllerForNode(element))
+    inspectorController->didModifyDOMAttrImpl(element);
 #endif
+}
+
+inline InspectorController* InspectorController::inspectorControllerForNode(
+    Node* node) {
+  if (Page* page = node->document()->page()) {
+    if (InspectorController* inspectorController =
+            page->inspectorController()) {
+      if (inspectorController->hasFrontend())
+        return inspectorController;
+    }
+  }
+  return 0;
 }
 
 }  // namespace WebCore

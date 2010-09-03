@@ -529,6 +529,11 @@ void Element::setAttribute(const AtomicString& name,
     return;
   }
 
+#if ENABLE(INSPECTOR)
+  if (!isSynchronizingStyleAttribute())
+    InspectorController::willModifyDOMAttr(this);
+#endif
+
   const AtomicString& localName =
       shouldIgnoreAttributeCase(this) ? name.lower() : name;
 
@@ -556,19 +561,19 @@ void Element::setAttribute(const AtomicString& name,
   }
 
 #if ENABLE(INSPECTOR)
-  if (Page* page = document()->page()) {
-    if (InspectorController* inspectorController =
-            page->inspectorController()) {
-      if (!isSynchronizingStyleAttribute())
-        inspectorController->didModifyDOMAttr(this);
-    }
-  }
+  if (!isSynchronizingStyleAttribute())
+    InspectorController::didModifyDOMAttr(this);
 #endif
 }
 
 void Element::setAttribute(const QualifiedName& name,
                            const AtomicString& value,
                            ExceptionCode&) {
+#if ENABLE(INSPECTOR)
+  if (!isSynchronizingStyleAttribute())
+    InspectorController::willModifyDOMAttr(this);
+#endif
+
   document()->incDOMTreeVersion();
 
   // Allocate attribute map if necessary.
@@ -587,13 +592,8 @@ void Element::setAttribute(const QualifiedName& name,
   }
 
 #if ENABLE(INSPECTOR)
-  if (Page* page = document()->page()) {
-    if (InspectorController* inspectorController =
-            page->inspectorController()) {
-      if (!isSynchronizingStyleAttribute())
-        inspectorController->didModifyDOMAttr(this);
-    }
-  }
+  if (!isSynchronizingStyleAttribute())
+    InspectorController::didModifyDOMAttr(this);
 #endif
 }
 
@@ -1294,6 +1294,8 @@ void Element::setAttributeNS(const AtomicString& namespaceURI,
 }
 
 void Element::removeAttribute(const String& name, ExceptionCode& ec) {
+  InspectorController::willModifyDOMAttr(this);
+
   String localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
 
   if (m_attributeMap) {
@@ -1302,12 +1304,7 @@ void Element::removeAttribute(const String& name, ExceptionCode& ec) {
       ec = 0;
   }
 
-#if ENABLE(INSPECTOR)
-  if (Page* page = document()->page()) {
-    if (InspectorController* inspectorController = page->inspectorController())
-      inspectorController->didModifyDOMAttr(this);
-  }
-#endif
+  InspectorController::didModifyDOMAttr(this);
 }
 
 void Element::removeAttributeNS(const String& namespaceURI,

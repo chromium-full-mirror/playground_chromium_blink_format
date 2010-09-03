@@ -66,6 +66,8 @@ class InspectorValue : public RefCounted<InspectorValue> {
 
   Type type() const { return m_type; }
 
+  bool isNull() const { return m_type == TypeNull; }
+
   virtual bool asBoolean(bool* output) const;
   virtual bool asNumber(double* output) const;
   virtual bool asNumber(long* output) const;
