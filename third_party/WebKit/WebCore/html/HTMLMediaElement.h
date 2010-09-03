@@ -172,6 +172,7 @@ class HTMLMediaElement : public HTMLElement,
                             Vector<String>& values);
   virtual void finishParsingChildren();
   void createMediaPlayerProxy();
+  void updateWidget(bool onlyCreateNonNetscapePlugins);
 #endif
 
   bool hasSingleSecurityOrigin() const {

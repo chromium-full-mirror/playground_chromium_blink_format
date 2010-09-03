@@ -33,23 +33,16 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
                                               Document*,
                                               bool createdByParser);
 
-  void renderFallbackContent();
-
   bool isDocNamedItem() const { return m_docNamedItem; }
 
   const String& classId() const { return m_classId; }
 
   bool containsJavaApplet() const;
 
-  bool hasFallbackContent() const;
-  virtual bool useFallbackContent() const { return m_useFallbackContent; }
+  void updateWidget(bool onlyCreateNonNetscapePlugins);
 
-  // FIXME: This function should not deal with url or serviceType
-  // so that we can better share code between <object> and <embed>.
-  void parametersForPlugin(Vector<String>& paramNames,
-                           Vector<String>& paramValues,
-                           String& url,
-                           String& serviceType);
+  virtual bool useFallbackContent() const { return m_useFallbackContent; }
+  void renderFallbackContent();
 
  private:
   HTMLObjectElement(const QualifiedName&, Document*, bool createdByParser);
@@ -73,6 +66,15 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
   void updateDocNamedItem();
+
+  bool hasFallbackContent() const;
+
+  // FIXME: This function should not deal with url or serviceType
+  // so that we can better share code between <object> and <embed>.
+  void parametersForPlugin(Vector<String>& paramNames,
+                           Vector<String>& paramValues,
+                           String& url,
+                           String& serviceType);
 
   AtomicString m_id;
   String m_classId;

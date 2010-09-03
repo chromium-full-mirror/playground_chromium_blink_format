@@ -35,15 +35,6 @@ class HTMLPlugInImageElement : public HTMLPlugInElement {
   const String& serviceType() const { return m_serviceType; }
   const String& url() const { return m_url; }
 
-  // These can all move to be protected once updateWidget is moved out of
-  // RenderEmbeddedObject.cpp
-  bool needsWidgetUpdate() const { return m_needsWidgetUpdate; }
-  void setNeedsWidgetUpdate(bool needsWidgetUpdate) {
-    m_needsWidgetUpdate = needsWidgetUpdate;
-  }
-  bool allowedToLoadFrameURL(const String& url);
-  bool wouldLoadAsNetscapePlugin(const String& url, const String& serviceType);
-
   RenderEmbeddedObject* renderEmbeddedObject() const;
 
  protected:
@@ -60,6 +51,14 @@ class HTMLPlugInImageElement : public HTMLPlugInElement {
   static void updateWidgetCallback(Node*);
   virtual void attach();
   virtual void detach();
+
+  bool needsWidgetUpdate() const { return m_needsWidgetUpdate; }
+  void setNeedsWidgetUpdate(bool needsWidgetUpdate) {
+    m_needsWidgetUpdate = needsWidgetUpdate;
+  }
+
+  bool allowedToLoadFrameURL(const String& url);
+  bool wouldLoadAsNetscapePlugin(const String& url, const String& serviceType);
 
  private:
   virtual bool canLazyAttach() { return false; }
