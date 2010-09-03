@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 Alex Milowski (alex@milowski.com). All rights reserved.
+ * Copyright (C) 2010 François Sausset (sausset@gmail.com). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,7 +44,7 @@ RenderMathMLOperator::RenderMathMLOperator(Node* container)
 RenderMathMLOperator::RenderMathMLOperator(Node* container, UChar operatorChar)
     : RenderMathMLBlock(container),
       m_stretchHeight(0),
-      m_operator(operatorChar) {}
+      m_operator(convertHyphenMinusToMinusSign(operatorChar)) {}
 
 bool RenderMathMLOperator::isChildAllowed(RenderObject*, RenderStyle*) const {
   return false;
@@ -218,8 +219,7 @@ void RenderMathMLOperator::updateFromElement() {
     else if (node()->nodeType() == Node::ELEMENT_NODE)
       if (Element* mo = static_cast<Element*>(node()))
         text = new (renderArena()) RenderText(
-            node(), StringImpl::create(mo->textContent().characters(),
-                                       mo->textContent().length()));
+            node(), mo->textContent().replace(hyphenMinus, minusSign).impl());
     // If we can't figure out the text, leave it blank.
     if (text) {
       RefPtr<RenderStyle> textStyle = RenderStyle::create();
