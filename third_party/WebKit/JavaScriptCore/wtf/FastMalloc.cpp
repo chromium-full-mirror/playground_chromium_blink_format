@@ -1519,7 +1519,19 @@ void TCMalloc_PageHeap::init() {
 #if !HAVE(DISPATCH_H)
 
 void TCMalloc_PageHeap::initializeScavenger() {
+// Create a non-recursive mutex.
+#if PTHREAD_MUTEX_NORMAL == PTHREAD_MUTEX_DEFAULT
   pthread_mutex_init(&m_scavengeMutex, 0);
+#else
+  pthread_mutexattr_t attr;
+  pthread_mutexattr_init(&attr);
+  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
+
+  pthread_mutex_init(&m_scavengeMutex, &attr);
+
+  pthread_mutexattr_destroy(&attr);
+#endif
+
   pthread_cond_init(&m_scavengeCondition, 0);
   m_scavengeThreadActive = true;
   pthread_t thread;
@@ -1536,6 +1548,8 @@ void* TCMalloc_PageHeap::runScavengerThread(void* context) {
 }
 
 ALWAYS_INLINE void TCMalloc_PageHeap::signalScavenger() {
+  // m_scavengeMutex should be held before accessing m_scavengeThreadActive.
+  ASSERT(pthread_mutex_trylock(m_scavengeMutex));
   if (!m_scavengeThreadActive && shouldScavenge())
     pthread_cond_signal(&m_scavengeCondition);
 }
@@ -1559,6 +1573,7 @@ void TCMalloc_PageHeap::initializeScavenger() {
 }
 
 ALWAYS_INLINE void TCMalloc_PageHeap::signalScavenger() {
+  ASSERT(IsHeld(pageheap_lock));
   if (!m_scavengingScheduled && shouldScavenge()) {
     m_scavengingScheduled = true;
     dispatch_resume(m_scavengeTimer);
@@ -2454,10 +2469,8 @@ void TCMalloc_PageHeap::scavengerThread() {
 #else
 
 void TCMalloc_PageHeap::periodicScavenge() {
-  {
-    SpinLockHolder h(&pageheap_lock);
-    pageheap->scavenge();
-  }
+  SpinLockHolder h(&pageheap_lock);
+  pageheap->scavenge();
 
   if (!shouldScavenge()) {
     m_scavengingScheduled = false;
