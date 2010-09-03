@@ -526,10 +526,13 @@ void GraphicsContext3DInternal::paintRenderingResultsToCanvas(
     canvas.drawBitmapRect(m_resizingBitmap, 0, dst);
   }
 #elif PLATFORM(CG)
-  if (m_renderOutput)
-    context->graphicsContext3D()->paintToCanvas(
+  if (m_renderOutput && context->is3d()) {
+    WebGLRenderingContext* webGLContext =
+        static_cast<WebGLRenderingContext*>(context);
+    webGLContext->graphicsContext3D()->paintToCanvas(
         m_renderOutput, m_impl->width(), m_impl->height(), canvas->width(),
         canvas->height(), imageBuffer->context()->platformContext());
+  }
 #else
 #error Must port to your platform
 #endif
