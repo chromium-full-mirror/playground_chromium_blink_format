@@ -149,7 +149,7 @@ static void stringAttrAttrSetter(v8::Local<v8::String> name,
                                  const v8::AccessorInfo& info) {
   INC_STATS("DOM.TestObj.stringAttr._set");
   TestObj* imp = V8TestObj::toNative(info.Holder());
-  V8Parameter<> v = value;
+  STRING_TO_V8PARAMETER_EXCEPTION_BLOCK_VOID(V8Parameter<>, v, value);
   imp->setStringAttr(v);
   return;
 }
@@ -225,7 +225,8 @@ static void reflectedStringAttrAttrSetter(v8::Local<v8::String> name,
                                           const v8::AccessorInfo& info) {
   INC_STATS("DOM.TestObj.reflectedStringAttr._set");
   TestObj* imp = V8TestObj::toNative(info.Holder());
-  V8Parameter<WithNullCheck> v = value;
+  STRING_TO_V8PARAMETER_EXCEPTION_BLOCK_VOID(V8Parameter<WithNullCheck>, v,
+                                             value);
   imp->setAttribute(WebCore::HTMLNames::reflectedstringattrAttr, v);
   return;
 }
@@ -282,7 +283,8 @@ static void reflectedURLAttrAttrSetter(v8::Local<v8::String> name,
                                        const v8::AccessorInfo& info) {
   INC_STATS("DOM.TestObj.reflectedURLAttr._set");
   TestObj* imp = V8TestObj::toNative(info.Holder());
-  V8Parameter<WithNullCheck> v = value;
+  STRING_TO_V8PARAMETER_EXCEPTION_BLOCK_VOID(V8Parameter<WithNullCheck>, v,
+                                             value);
   imp->setAttribute(WebCore::HTMLNames::reflectedurlattrAttr, v);
   return;
 }
@@ -301,7 +303,8 @@ static void reflectedNonEmptyURLAttrAttrSetter(v8::Local<v8::String> name,
                                                const v8::AccessorInfo& info) {
   INC_STATS("DOM.TestObj.reflectedNonEmptyURLAttr._set");
   TestObj* imp = V8TestObj::toNative(info.Holder());
-  V8Parameter<WithNullCheck> v = value;
+  STRING_TO_V8PARAMETER_EXCEPTION_BLOCK_VOID(V8Parameter<WithNullCheck>, v,
+                                             value);
   imp->setAttribute(WebCore::HTMLNames::reflectednonemptyurlattrAttr, v);
   return;
 }
@@ -320,7 +323,8 @@ static void reflectedStringAttrAttrSetter(v8::Local<v8::String> name,
                                           const v8::AccessorInfo& info) {
   INC_STATS("DOM.TestObj.reflectedStringAttr._set");
   TestObj* imp = V8TestObj::toNative(info.Holder());
-  V8Parameter<WithNullCheck> v = value;
+  STRING_TO_V8PARAMETER_EXCEPTION_BLOCK_VOID(V8Parameter<WithNullCheck>, v,
+                                             value);
   imp->setAttribute(WebCore::HTMLNames::customContentStringAttrAttr, v);
   return;
 }
@@ -379,7 +383,8 @@ static void reflectedCustomURLAttrAttrSetter(v8::Local<v8::String> name,
                                              const v8::AccessorInfo& info) {
   INC_STATS("DOM.TestObj.reflectedCustomURLAttr._set");
   TestObj* imp = V8TestObj::toNative(info.Holder());
-  V8Parameter<WithNullCheck> v = value;
+  STRING_TO_V8PARAMETER_EXCEPTION_BLOCK_VOID(V8Parameter<WithNullCheck>, v,
+                                             value);
   imp->setAttribute(WebCore::HTMLNames::customContentURLAttrAttr, v);
   return;
 }
@@ -399,7 +404,8 @@ static void reflectedCustomNonEmptyURLAttrAttrSetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.TestObj.reflectedCustomNonEmptyURLAttr._set");
   TestObj* imp = V8TestObj::toNative(info.Holder());
-  V8Parameter<WithNullCheck> v = value;
+  STRING_TO_V8PARAMETER_EXCEPTION_BLOCK_VOID(V8Parameter<WithNullCheck>, v,
+                                             value);
   imp->setAttribute(WebCore::HTMLNames::customContentNonEmptyURLAttrAttr, v);
   return;
 }
@@ -472,7 +478,7 @@ static void stringAttrWithGetterExceptionAttrSetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.TestObj.stringAttrWithGetterException._set");
   TestObj* imp = V8TestObj::toNative(info.Holder());
-  V8Parameter<> v = value;
+  STRING_TO_V8PARAMETER_EXCEPTION_BLOCK_VOID(V8Parameter<>, v, value);
   ExceptionCode ec = 0;
   imp->setStringAttrWithGetterException(v, ec);
   if (UNLIKELY(ec))
@@ -494,7 +500,7 @@ static void stringAttrWithSetterExceptionAttrSetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.TestObj.stringAttrWithSetterException._set");
   TestObj* imp = V8TestObj::toNative(info.Holder());
-  V8Parameter<> v = value;
+  STRING_TO_V8PARAMETER_EXCEPTION_BLOCK_VOID(V8Parameter<>, v, value);
   ExceptionCode ec = 0;
   imp->setStringAttrWithSetterException(v, ec);
   if (UNLIKELY(ec))
