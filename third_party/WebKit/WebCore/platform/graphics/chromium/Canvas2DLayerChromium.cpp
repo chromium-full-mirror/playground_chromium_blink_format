@@ -99,5 +99,12 @@ void Canvas2DLayerChromium::setTextureChanged() {
 unsigned Canvas2DLayerChromium::textureId() const {
   return m_textureId;
 }
+
+void Canvas2DLayerChromium::setDrawingBuffer(DrawingBuffer* drawingBuffer) {
+  if (drawingBuffer != m_drawingBuffer) {
+    m_drawingBuffer = drawingBuffer;
+    m_textureChanged = true;
+  }
+}
 }
 #endif  // USE(ACCELERATED_COMPOSITING)

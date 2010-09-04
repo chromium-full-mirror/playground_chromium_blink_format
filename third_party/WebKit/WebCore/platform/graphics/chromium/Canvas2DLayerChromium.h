@@ -50,6 +50,7 @@ class Canvas2DLayerChromium : public CanvasLayerChromium {
 
   void setTextureChanged();
   unsigned textureId() const;
+  void setDrawingBuffer(DrawingBuffer*);
 
  private:
   explicit Canvas2DLayerChromium(DrawingBuffer*, GraphicsLayerChromium* owner);
