@@ -52,7 +52,7 @@ void WebGLObject::setObject(Platform3DObject object) {
 void WebGLObject::deleteObject() {
   if (m_object) {
     if (m_context) {
-      m_context->graphicsContext3D()->ensureContext();
+      m_context->graphicsContext3D()->makeContextCurrent();
       deleteObjectImpl(m_object);
     }
     if (!m_attachmentCount)
