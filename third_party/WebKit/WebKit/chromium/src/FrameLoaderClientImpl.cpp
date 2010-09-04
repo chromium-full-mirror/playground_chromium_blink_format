@@ -37,6 +37,7 @@
 #include "FormState.h"
 #include "FrameLoader.h"
 #include "FrameLoadRequest.h"
+#include "FrameNetworkingContextImpl.h"
 #include "FrameView.h"
 #include "HTTPParsers.h"
 #include "HistoryItem.h"
@@ -1437,6 +1438,11 @@ PassOwnPtr<WebPluginLoadObserver> FrameLoaderClientImpl::pluginLoadObserver() {
     return 0;
   }
   return ds->releasePluginLoadObserver();
+}
+
+PassRefPtr<FrameNetworkingContext>
+FrameLoaderClientImpl::createNetworkingContext() {
+  return FrameNetworkingContextImpl::create(m_webFrame->frame());
 }
 
 }  // namespace WebKit

@@ -264,6 +264,8 @@ class FrameLoaderClientEfl : public FrameLoaderClient {
                         const ResourceRequest&,
                         const ResourceResponse&);
 
+  virtual PassRefPtr<WebCore::FrameNetworkingContext> createNetworkingContext();
+
  private:
   Evas_Object* m_view;
   Evas_Object* m_frame;

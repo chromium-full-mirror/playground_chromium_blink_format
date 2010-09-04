@@ -255,6 +255,8 @@ class FrameLoaderClientImpl : public WebCore::FrameLoaderClient {
   virtual void didNotAllowScript();
   virtual void didNotAllowPlugins();
 
+  virtual PassRefPtr<WebCore::FrameNetworkingContext> createNetworkingContext();
+
  private:
   void makeDocumentView();
 

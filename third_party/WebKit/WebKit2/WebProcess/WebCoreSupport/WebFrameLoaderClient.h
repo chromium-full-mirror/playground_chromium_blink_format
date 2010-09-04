@@ -293,6 +293,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                     int length,
                     const WTF::String& textEncoding);
 
+  virtual PassRefPtr<WebCore::FrameNetworkingContext> createNetworkingContext();
+
   WebFrame* m_frame;
 
   RefPtr<PluginView> m_pluginView;

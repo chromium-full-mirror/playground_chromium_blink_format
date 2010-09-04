@@ -253,6 +253,8 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
                         const WebCore::ResourceRequest&,
                         const WebCore::ResourceResponse&);
 
+  virtual PassRefPtr<WebCore::FrameNetworkingContext> createNetworkingContext();
+
  private:
   WebKitWebFrame* m_frame;
   WebCore::ResourceResponse m_response;

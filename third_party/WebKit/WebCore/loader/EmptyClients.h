@@ -40,6 +40,7 @@
 #include "FloatRect.h"
 #include "FocusDirection.h"
 #include "FrameLoaderClient.h"
+#include "FrameNetworkingContext.h"
 #include "InspectorClient.h"
 #include "PluginHalterClient.h"
 #include "PopupMenu.h"
@@ -499,6 +500,10 @@ class EmptyFrameLoaderClient : public FrameLoaderClient, public Noncopyable {
     return true;
   }
 #endif
+
+  virtual PassRefPtr<FrameNetworkingContext> createNetworkingContext() {
+    return PassRefPtr<FrameNetworkingContext>();
+  }
 };
 
 class EmptyEditorClient : public EditorClient, public Noncopyable {

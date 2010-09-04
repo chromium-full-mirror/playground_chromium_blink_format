@@ -34,6 +34,7 @@
 #include "FrameLoader.h"
 #include "FrameLoaderClient.h"
 #include "KURL.h"
+#include <wtf/OwnPtr.h>
 #include "PluginView.h"
 #include "RefCounted.h"
 #include "ResourceError.h"
@@ -50,6 +51,7 @@ class DocumentLoader;
 class Element;
 class FormState;
 class NavigationAction;
+class FrameNetworkingContext;
 class ResourceLoader;
 
 struct LoadErrorResetToken;
@@ -271,6 +273,8 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void registerForIconNotification(bool);
 
   QString chooseFile(const QString& oldFile);
+
+  virtual PassRefPtr<FrameNetworkingContext> createNetworkingContext();
 
   static bool dumpFrameLoaderCallbacks;
   static bool dumpResourceLoadCallbacks;

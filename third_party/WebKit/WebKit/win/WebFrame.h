@@ -397,6 +397,8 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
 
   virtual void registerForIconNotification(bool listen);
 
+  virtual PassRefPtr<WebCore::FrameNetworkingContext> createNetworkingContext();
+
   // WebFrame
   PassRefPtr<WebCore::Frame> init(IWebView*,
                                   WebCore::Page*,

@@ -42,6 +42,7 @@
 #include "WebDownload.h"
 #include "WebEditorClient.h"
 #include "WebError.h"
+#include "WebFrameNetworkingContext.h"
 #include "WebFramePolicyListener.h"
 #include "WebHistory.h"
 #include "WebHistoryItem.h"
@@ -2678,4 +2679,8 @@ void WebFrame::updateBackground() {
 
   coreFrame->view()->updateBackgroundRecursively(backgroundColor,
                                                  webView()->transparent());
+}
+
+PassRefPtr<FrameNetworkingContext> WebFrame::createNetworkingContext() {
+  return WebFrameNetworkingContext::create(core(this), userAgent(url()));
 }
