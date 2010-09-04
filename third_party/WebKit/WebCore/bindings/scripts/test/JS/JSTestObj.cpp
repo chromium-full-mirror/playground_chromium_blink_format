@@ -1792,6 +1792,24 @@ jsTestObjPrototypeFunctionOverloadedMethod4(ExecState* exec) {
   return JSValue::encode(jsUndefined());
 }
 
+static EncodedJSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionOverloadedMethod5(ExecState* exec) {
+  JSValue thisValue = exec->hostThisValue();
+  if (!thisValue.inherits(&JSTestObj::s_info))
+    return throwVMTypeError(exec);
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  if (exec->argumentCount() <= 0 || !exec->argument(0).isObject()) {
+    setDOMException(exec, TYPE_MISMATCH_ERR);
+    return JSValue::encode(jsUndefined());
+  }
+  RefPtr<TestCallback> callback = JSTestCallback::create(
+      asObject(exec->argument(0)), castedThis->globalObject());
+
+  imp->overloadedMethod(callback);
+  return JSValue::encode(jsUndefined());
+}
+
 EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionOverloadedMethod(ExecState* exec) {
   if ((exec->argumentCount() == 2 &&
@@ -1816,6 +1834,9 @@ jsTestObjPrototypeFunctionOverloadedMethod(ExecState* exec) {
     return jsTestObjPrototypeFunctionOverloadedMethod3(exec);
   if (exec->argumentCount() == 1)
     return jsTestObjPrototypeFunctionOverloadedMethod4(exec);
+  if ((exec->argumentCount() == 1 &&
+       (exec->argument(0).isNull() || exec->argument(0).isObject())))
+    return jsTestObjPrototypeFunctionOverloadedMethod5(exec);
   return throwVMTypeError(exec);
 }
 
