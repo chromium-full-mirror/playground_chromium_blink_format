@@ -60,6 +60,8 @@ class DrawingBuffer : public Noncopyable {
   void publishToPlatformLayer();
   IntSize size() const { return m_size; }
 
+  unsigned getRenderingResultsAsTexture();
+
   class WillPublishCallback : public Noncopyable {
    public:
     virtual void willPublish() = 0;

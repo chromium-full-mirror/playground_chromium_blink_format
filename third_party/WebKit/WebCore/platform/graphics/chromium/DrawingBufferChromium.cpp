@@ -132,4 +132,8 @@ PlatformLayer* DrawingBuffer::platformLayer() {
     m_internal->platformLayer = Canvas2DLayerChromium::create(this, 0);
   return m_internal->platformLayer.get();
 }
+
+unsigned DrawingBuffer::getRenderingResultsAsTexture() {
+  return m_internal->offscreenColorTexture;
+}
 }
