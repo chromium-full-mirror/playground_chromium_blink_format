@@ -33,6 +33,7 @@
 
 namespace WebKit {
 
+class APIObject;
 class WebPageProxy;
 class WebFrameProxy;
 class WebFormSubmissionListenerProxy;
@@ -42,11 +43,11 @@ class WebFormClient {
   WebFormClient();
   void initialize(const WKPageFormClient*);
 
-  // FIXME: Add some type of form element reference or anotated user data.
   bool willSubmitForm(WebPageProxy*,
                       WebFrameProxy*,
                       WebFrameProxy*,
                       Vector<std::pair<String, String>>& textFieldValues,
+                      APIObject* userData,
                       WebFormSubmissionListenerProxy*);
 
  private:

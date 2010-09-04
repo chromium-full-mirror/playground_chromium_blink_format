@@ -226,6 +226,7 @@ class WebPageProxy : public APIObject {
       WebFrameProxy* frame,
       WebFrameProxy* frameSource,
       Vector<std::pair<WTF::String, WTF::String>>& textFieldValues,
+      APIObject* userData,
       uint64_t listenerID);
 
   PassRefPtr<WebPageProxy> createNewPage();

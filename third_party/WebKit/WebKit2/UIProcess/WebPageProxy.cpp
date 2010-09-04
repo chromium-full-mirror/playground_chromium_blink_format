@@ -31,6 +31,7 @@
 #include "WebBackForwardList.h"
 #include "WebBackForwardListItem.h"
 #include "WebContext.h"
+#include "WebContextUserMessageCoders.h"
 #include "WebCoreArgumentCoders.h"
 #include "WebData.h"
 #include "WebEvent.h"
@@ -580,9 +581,31 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       if (!arguments->decode(CoreIPC::Out(frameID, sourceFrameID,
                                           textFieldValues, listenerID)))
         return;
+
+      APIObject* noUserData = 0;
       willSubmitForm(process()->webFrame(frameID),
                      process()->webFrame(sourceFrameID), textFieldValues,
-                     listenerID);
+                     noUserData, listenerID);
+      break;
+    }
+    case WebPageProxyMessage::WillSubmitFormWithUserData: {
+      uint64_t frameID;
+      uint64_t sourceFrameID;
+      Vector<std::pair<String, String>> textFieldValues;
+      uint64_t listenerID;
+
+      RefPtr<APIObject> userData;
+      WebContextUserMessageDecoder messageDecoder(userData,
+                                                  pageNamespace()->context());
+
+      if (!arguments->decode(CoreIPC::Out(frameID, sourceFrameID,
+                                          textFieldValues, listenerID,
+                                          messageDecoder)))
+        return;
+
+      willSubmitForm(process()->webFrame(frameID),
+                     process()->webFrame(sourceFrameID), textFieldValues,
+                     userData.get(), listenerID);
       break;
     }
 
@@ -899,11 +922,12 @@ void WebPageProxy::willSubmitForm(
     WebFrameProxy* frame,
     WebFrameProxy* sourceFrame,
     Vector<std::pair<String, String>>& textFieldValues,
+    APIObject* userData,
     uint64_t listenerID) {
   RefPtr<WebFormSubmissionListenerProxy> listener =
       frame->setUpFormSubmissionListenerProxy(listenerID);
   if (!m_formClient.willSubmitForm(this, frame, sourceFrame, textFieldValues,
-                                   listener.get()))
+                                   userData, listener.get()))
     listener->continueSubmission();
 }
 

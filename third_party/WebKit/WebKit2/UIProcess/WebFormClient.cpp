@@ -48,6 +48,7 @@ bool WebFormClient::willSubmitForm(
     WebFrameProxy* frame,
     WebFrameProxy* sourceFrame,
     Vector<std::pair<String, String>>& textFieldValues,
+    APIObject* userData,
     WebFormSubmissionListenerProxy* listener) {
   if (!m_pageFormClient.willSubmitForm)
     return false;
@@ -56,11 +57,11 @@ bool WebFormClient::willSubmitForm(
   for (size_t i = 0; i < textFieldValues.size(); ++i)
     map.set(textFieldValues[i].first,
             WebString::create(textFieldValues[i].second));
-
   RefPtr<ImmutableDictionary> textFieldsMap = ImmutableDictionary::adopt(map);
+
   m_pageFormClient.willSubmitForm(toRef(page), toRef(frame), toRef(sourceFrame),
-                                  toRef(textFieldsMap.get()), toRef(listener),
-                                  m_pageFormClient.clientInfo);
+                                  toRef(textFieldsMap.get()), toRef(userData),
+                                  toRef(listener), m_pageFormClient.clientInfo);
   return true;
 }
 

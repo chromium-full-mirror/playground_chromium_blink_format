@@ -27,14 +27,20 @@
 #define InjectedBundlePageFormClient_h
 
 #include "WKBundlePage.h"
+#include <algorithm>
+#include <wtf/Forward.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
+class HTMLFormElement;
 class HTMLInputElement;
 class HTMLTextAreaElement;
 }
 
 namespace WebKit {
 
+class APIObject;
+class ImmutableDictionary;
 class WebFrame;
 class WebPage;
 
@@ -53,6 +59,13 @@ class InjectedBundlePageFormClient {
   void textDidChangeInTextArea(WebPage*,
                                WebCore::HTMLTextAreaElement*,
                                WebFrame*);
+
+  void willSubmitForm(WebPage*,
+                      WebCore::HTMLFormElement*,
+                      WebFrame*,
+                      WebFrame* sourceFrame,
+                      const Vector<std::pair<String, String>>&,
+                      RefPtr<APIObject>& userData);
 
  private:
   WKBundlePageFormClient m_client;

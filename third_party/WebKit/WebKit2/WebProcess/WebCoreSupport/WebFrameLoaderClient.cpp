@@ -28,6 +28,7 @@
 #define DISABLE_NOT_IMPLEMENTED_WARNINGS 1
 #include "NotImplemented.h"
 
+#include "InjectedBundleUserMessageCoders.h"
 #include "NetscapePlugin.h"
 #include "PluginView.h"
 #include "WebCoreArgumentCoders.h"
@@ -546,23 +547,39 @@ void WebFrameLoaderClient::dispatchUnableToImplementPolicy(
 
 void WebFrameLoaderClient::dispatchWillSubmitForm(
     FramePolicyFunction function,
-    PassRefPtr<FormState> formState) {
+    PassRefPtr<FormState> prpFormState) {
   WebPage* webPage = m_frame->page();
   if (!webPage)
     return;
 
   // FIXME: Pass more of the form state.
+  RefPtr<FormState> formState = prpFormState;
 
-  uint64_t listenerID = m_frame->setUpPolicyListener(function);
-
+  HTMLFormElement* form = formState->form();
   WebFrame* sourceFrame = static_cast<WebFrameLoaderClient*>(
                               formState->sourceFrame()->loader()->client())
                               ->webFrame();
+  const Vector<std::pair<String, String>>& values =
+      formState->textFieldValues();
 
-  WebProcess::shared().connection()->send(
-      WebPageProxyMessage::WillSubmitForm, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID(), sourceFrame->frameID(),
-                  formState->textFieldValues(), listenerID));
+  RefPtr<APIObject> userData;
+  webPage->injectedBundleFormClient().willSubmitForm(
+      webPage, form, m_frame, sourceFrame, values, userData);
+
+  uint64_t listenerID = m_frame->setUpPolicyListener(function);
+
+  if (userData) {
+    WebProcess::shared().connection()->send(
+        WebPageProxyMessage::WillSubmitFormWithUserData, webPage->pageID(),
+        CoreIPC::In(m_frame->frameID(), sourceFrame->frameID(), values,
+                    listenerID,
+                    InjectedBundleUserMessageEncoder(userData.get())));
+  } else {
+    WebProcess::shared().connection()->send(
+        WebPageProxyMessage::WillSubmitForm, webPage->pageID(),
+        CoreIPC::In(m_frame->frameID(), sourceFrame->frameID(), values,
+                    listenerID));
+  }
 }
 
 void WebFrameLoaderClient::dispatchDidLoadMainResource(DocumentLoader*) {
