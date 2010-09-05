@@ -167,6 +167,8 @@ class WebDOMTestObj : public WebDOMObject {
   void methodWithNonOptionalArgAndTwoOptionalArgs(int nonOpt,
                                                   int opt1,
                                                   int opt2);
+  void classMethod();
+  int classMethodWithOptional(int arg);
 
   WebCore::TestObj* impl() const;
 

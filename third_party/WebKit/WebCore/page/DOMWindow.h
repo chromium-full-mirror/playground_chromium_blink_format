@@ -57,7 +57,6 @@ class FloatRect;
 class Frame;
 class History;
 class IDBFactory;
-class IDBKeyRange;
 class InspectorTimelineAgent;
 class LocalFileSystem;
 class Location;
@@ -266,7 +265,6 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
 
 #if ENABLE(INDEXED_DATABASE)
   IDBFactory* indexedDB() const;
-  IDBKeyRange* iDBKeyRange() const;
 #endif
 
 #if ENABLE(FILE_SYSTEM)
@@ -497,7 +495,6 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
 #endif
 #if ENABLE(INDEXED_DATABASE)
   mutable RefPtr<IDBFactory> m_idbFactory;
-  mutable RefPtr<IDBKeyRange> m_idbKeyRange;
 #endif
 #if ENABLE(FILE_SYSTEM)
   RefPtr<LocalFileSystem> m_localFileSystem;

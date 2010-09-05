@@ -1134,6 +1134,22 @@ static v8::Handle<v8::Value> overloadedMethodCallback(
   return notHandledByInterceptor();
 }
 
+static v8::Handle<v8::Value> classMethodCallback(const v8::Arguments& args) {
+  INC_STATS("DOM.TestObj.classMethod");
+  TestObj::classMethod();
+  return v8::Handle<v8::Value>();
+}
+
+static v8::Handle<v8::Value> classMethodWithOptionalCallback(
+    const v8::Arguments& args) {
+  INC_STATS("DOM.TestObj.classMethodWithOptional");
+  if (args.Length() <= 0) {
+    return v8::Integer::New(TestObj::classMethodWithOptional());
+  }
+  EXCEPTION_BLOCK(int, arg, toInt32(args[0]));
+  return v8::Integer::New(TestObj::classMethodWithOptional(arg));
+}
+
 }  // namespace TestObjInternal
 
 static const BatchedAttribute TestObjAttrs[] = {
@@ -1476,6 +1492,14 @@ static v8::Persistent<v8::FunctionTemplate> ConfigureV8TestObjTemplate(
              v8::FunctionTemplate::New(
                  TestObjInternal::customArgsAndExceptionCallback,
                  v8::Handle<v8::Value>(), customArgsAndExceptionSignature));
+  desc->Set(v8::String::New("classMethod"),
+            v8::FunctionTemplate::New(TestObjInternal::classMethodCallback,
+                                      v8::Handle<v8::Value>(),
+                                      v8::Local<v8::Signature>()));
+  desc->Set(v8::String::New("classMethodWithOptional"),
+            v8::FunctionTemplate::New(
+                TestObjInternal::classMethodWithOptionalCallback,
+                v8::Handle<v8::Value>(), v8::Local<v8::Signature>()));
   batchConfigureConstants(desc, proto, TestObjConsts,
                           sizeof(TestObjConsts) / sizeof(*TestObjConsts));
 

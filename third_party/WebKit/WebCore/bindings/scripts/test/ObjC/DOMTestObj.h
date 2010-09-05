@@ -163,6 +163,8 @@ enum {
 - (void)methodWithNonOptionalArgAndTwoOptionalArgs:(int)nonOpt
                                               opt1:(int)opt1
                                               opt2:(int)opt2;
+- (void)classMethod;
+- (int)classMethodWithOptional:(int)arg;
 @end
 
 #endif

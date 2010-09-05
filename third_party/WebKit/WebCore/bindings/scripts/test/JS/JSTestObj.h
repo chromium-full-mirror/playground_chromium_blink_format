@@ -178,6 +178,10 @@ JSC::EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionMethodWithCallbackAndOptionalArg(JSC::ExecState*);
 JSC::EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionOverloadedMethod(JSC::ExecState*);
+JSC::EncodedJSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionClassMethod(JSC::ExecState*);
+JSC::EncodedJSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionClassMethodWithOptional(JSC::ExecState*);
 // Attributes
 
 JSC::JSValue jsTestObjReadOnlyIntAttr(JSC::ExecState*,
