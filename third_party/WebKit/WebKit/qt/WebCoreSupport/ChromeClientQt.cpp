@@ -235,7 +235,7 @@ void ChromeClientQt::addMessageToConsole(MessageSource,
                                          const String& message,
                                          unsigned int lineNumber,
                                          const String& sourceID) {
-  QString x = QString(message.utf8().data());
+  QString x = message;
   QString y = sourceID;
   m_webPage->javaScriptConsoleMessage(x, lineNumber, y);
 }
