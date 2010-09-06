@@ -203,9 +203,12 @@ void IDBDatabaseBackendImpl::removeObjectStore(
   doDelete(sqliteDatabase(),
            "DELETE FROM ObjectStoreData WHERE objectStoreId = ?",
            objectStore->id());
+  doDelete(sqliteDatabase(),
+           "DELETE FROM IndexData WHERE indexId IN (SELECT id FROM Indexes "
+           "WHERE objectStoreId = ?)",
+           objectStore->id());
   doDelete(sqliteDatabase(), "DELETE FROM Indexes WHERE objectStoreId = ?",
            objectStore->id());
-  // FIXME: Delete index data as well.
   transaction.commit();
 
   m_objectStores.remove(name);

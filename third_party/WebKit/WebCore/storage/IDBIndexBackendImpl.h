@@ -32,6 +32,7 @@
 
 namespace WebCore {
 
+class IDBKey;
 class IDBObjectStoreBackendImpl;
 class SQLiteDatabase;
 
@@ -47,6 +48,9 @@ class IDBIndexBackendImpl : public IDBIndexBackendInterface {
         new IDBIndexBackendImpl(objectStore, id, name, keyPath, unique));
   }
   virtual ~IDBIndexBackendImpl();
+
+  int64_t id() { return m_id; }
+  bool addingKeyAllowed(IDBKey*);
 
   // Implements IDBIndexBackendInterface.
   virtual String name() { return m_name; }

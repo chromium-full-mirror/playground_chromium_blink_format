@@ -38,6 +38,7 @@
 #include "IDBKeyRange.h"
 #include "SQLiteDatabase.h"
 #include "SQLiteStatement.h"
+#include "SQLiteTransaction.h"
 
 #if ENABLE(INDEXED_DATABASE)
 
@@ -67,43 +68,13 @@ PassRefPtr<DOMStringList> IDBObjectStoreBackendImpl::indexNames() const {
   return indexNames.release();
 }
 
-static String whereClause(IDBKey::Type type) {
-  switch (type) {
-    case IDBKey::StringType:
-      return "WHERE objectStoreId = ?  AND  keyString = ?";
-    case IDBKey::NumberType:
-      return "WHERE objectStoreId = ?  AND  keyNumber = ?";
-    // FIXME: Implement date.
-    case IDBKey::NullType:
-      return "WHERE objectStoreId = ?  AND  keyString IS NULL  AND  keyDate IS "
-             "NULL  AND  keyNumber IS NULL";
-  }
-
-  ASSERT_NOT_REACHED();
-  return "";
-}
-
-// Returns number of items bound.
-static int bindKey(SQLiteStatement& query, int column, IDBKey* key) {
-  switch (key->type()) {
-    case IDBKey::StringType:
-      query.bindText(column, key->string());
-      return 1;
-    case IDBKey::NumberType:
-      query.bindInt(column, key->number());
-      return 1;
-    // FIXME: Implement date.
-    case IDBKey::NullType:
-      return 0;
-  }
-
-  ASSERT_NOT_REACHED();
-  return 0;
+static String whereClause(IDBKey* key) {
+  return "WHERE objectStoreId = ?  AND  " + key->whereSyntax();
 }
 
 static void bindWhereClause(SQLiteStatement& query, int64_t id, IDBKey* key) {
   query.bindInt64(1, id);
-  bindKey(query, 2, key);
+  key->bind(query, 2);
 }
 
 void IDBObjectStoreBackendImpl::get(PassRefPtr<IDBKey> key,
@@ -111,7 +82,7 @@ void IDBObjectStoreBackendImpl::get(PassRefPtr<IDBKey> key,
   SQLiteStatement query(
       sqliteDatabase(),
       "SELECT keyString, keyDate, keyNumber, value FROM ObjectStoreData " +
-          whereClause(key->type()));
+          whereClause(key.get()));
   bool ok = query.prepare() == SQLResultOk;
   ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
 
@@ -132,6 +103,72 @@ void IDBObjectStoreBackendImpl::get(PassRefPtr<IDBKey> key,
   ASSERT(query.step() != SQLResultRow);
 }
 
+static PassRefPtr<IDBKey> fetchKeyFromKeyPath(SerializedScriptValue* value,
+                                              const String& keyPath) {
+  Vector<RefPtr<SerializedScriptValue>> values;
+  values.append(value);
+  Vector<RefPtr<IDBKey>> keys;
+  IDBKeyPathBackendImpl::createIDBKeysFromSerializedValuesAndKeyPath(
+      values, keyPath, keys);
+  if (keys.isEmpty())
+    return 0;
+  ASSERT(keys.size() == 1);
+  return keys[0].release();
+}
+
+static void putObjectStoreData(SQLiteDatabase& db,
+                               IDBKey* key,
+                               SerializedScriptValue* value,
+                               int64_t objectStoreId,
+                               int64_t* dataRowId) {
+  String sql = *dataRowId != -1
+                   ? "UPDATE ObjectStoreData SET keyString = ?, keyDate = ?, "
+                     "keyNumber = ?, value = ? WHERE id = ?"
+                   : "INSERT INTO ObjectStoreData (keyString, keyDate, "
+                     "keyNumber, value, objectStoreId) VALUES (?, ?, ?, ?, ?)";
+  SQLiteStatement query(db, sql);
+  bool ok = query.prepare() == SQLResultOk;
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
+  key->bindWithNulls(query, 1);
+  query.bindText(4, value->toWireString());
+  if (*dataRowId != -1)
+    query.bindInt(5, *dataRowId);
+  else
+    query.bindInt64(5, objectStoreId);
+
+  ok = query.step() == SQLResultDone;
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
+
+  if (*dataRowId == -1)
+    *dataRowId = db.lastInsertRowID();
+}
+
+static void putIndexData(SQLiteDatabase& db,
+                         IDBKey* key,
+                         int64_t indexId,
+                         int64_t objectStoreDataId) {
+  SQLiteStatement deleteQuery(
+      db, "DELETE FROM IndexData WHERE objectStoreDataId = ?");
+  bool ok = deleteQuery.prepare() == SQLResultOk;
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
+  deleteQuery.bindInt64(1, objectStoreDataId);
+  ok = deleteQuery.step() == SQLResultDone;
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
+
+  SQLiteStatement putQuery(db,
+                           "INSERT INTO IndexData (keyString, keyDate, "
+                           "keyNumber, indexId, objectStoreDataId) VALUES (?, "
+                           "?, ?, ?, ?)");
+  ok = putQuery.prepare() == SQLResultOk;
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
+  key->bindWithNulls(putQuery, 1);
+  putQuery.bindInt64(4, indexId);
+  putQuery.bindInt64(5, objectStoreDataId);
+
+  ok = putQuery.step() == SQLResultDone;
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
+}
+
 void IDBObjectStoreBackendImpl::put(PassRefPtr<SerializedScriptValue> prpValue,
                                     PassRefPtr<IDBKey> prpKey,
                                     bool addOnly,
@@ -146,76 +183,65 @@ void IDBObjectStoreBackendImpl::put(PassRefPtr<SerializedScriptValue> prpValue,
           "A key was supplied for an objectStore that has a keyPath."));
       return;
     }
-    Vector<RefPtr<SerializedScriptValue>> values;
-    values.append(value);
-    Vector<RefPtr<IDBKey>> idbKeys;
-    IDBKeyPathBackendImpl::createIDBKeysFromSerializedValuesAndKeyPath(
-        values, m_keyPath, idbKeys);
-    if (idbKeys.isEmpty()) {
+    key = fetchKeyFromKeyPath(value.get(), m_keyPath);
+    if (!key) {
       callbacks->onError(IDBDatabaseError::create(
           IDBDatabaseException::UNKNOWN_ERR,
-          "An invalid keyPath was supplied for an objectStore."));
+          "The key could not be fetched from the keyPath."));
       return;
     }
-    key = idbKeys[0];
-  }
-
-  if (!key) {
+  } else if (!key) {
     callbacks->onError(IDBDatabaseError::create(IDBDatabaseException::DATA_ERR,
                                                 "No key supplied."));
     return;
   }
 
+  Vector<RefPtr<IDBKey>> indexKeys;
+  for (IndexMap::iterator it = m_indexes.begin(); it != m_indexes.end(); ++it) {
+    RefPtr<IDBKey> key =
+        fetchKeyFromKeyPath(value.get(), it->second->keyPath());
+    if (!key) {
+      callbacks->onError(IDBDatabaseError::create(
+          IDBDatabaseException::UNKNOWN_ERR,
+          "The key could not be fetched from an index's keyPath."));
+      return;
+    }
+    if (!it->second->addingKeyAllowed(key.get())) {
+      callbacks->onError(IDBDatabaseError::create(
+          IDBDatabaseException::UNKNOWN_ERR,
+          "One of the derived (from a keyPath) keys for an index does not "
+          "satisfy its uniqueness requirements."));
+      return;
+    }
+    indexKeys.append(key.release());
+  }
+
   SQLiteStatement getQuery(sqliteDatabase(), "SELECT id FROM ObjectStoreData " +
-                                                 whereClause(key->type()));
+                                                 whereClause(key.get()));
   bool ok = getQuery.prepare() == SQLResultOk;
   ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
 
   bindWhereClause(getQuery, m_id, key.get());
-  bool existingValue = getQuery.step() == SQLResultRow;
-  if (addOnly && existingValue) {
+  bool isExistingValue = getQuery.step() == SQLResultRow;
+  if (addOnly && isExistingValue) {
     callbacks->onError(
         IDBDatabaseError::create(IDBDatabaseException::CONSTRAINT_ERR,
                                  "Key already exists in the object store."));
     return;
   }
 
-  String sql = existingValue
-                   ? "UPDATE ObjectStoreData SET keyString = ?, keyDate = ?, "
-                     "keyNumber = ?, value = ? WHERE id = ?"
-                   : "INSERT INTO ObjectStoreData (keyString, keyDate, "
-                     "keyNumber, value, objectStoreId) VALUES (?, ?, ?, ?, ?)";
-  SQLiteStatement putQuery(sqliteDatabase(), sql);
-  ok = putQuery.prepare() == SQLResultOk;
-  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
-  switch (key->type()) {
-    case IDBKey::StringType:
-      putQuery.bindText(1, key->string());
-      putQuery.bindNull(2);
-      putQuery.bindNull(3);
-      break;
-    // FIXME: Implement date.
-    case IDBKey::NumberType:
-      putQuery.bindNull(1);
-      putQuery.bindNull(2);
-      putQuery.bindInt(3, key->number());
-      break;
-    case IDBKey::NullType:
-      putQuery.bindNull(1);
-      putQuery.bindNull(2);
-      putQuery.bindNull(3);
-      break;
-    default:
-      ASSERT_NOT_REACHED();
-  }
-  putQuery.bindText(4, value->toWireString());
-  if (existingValue)
-    putQuery.bindInt(5, getQuery.getColumnInt(0));
-  else
-    putQuery.bindInt64(5, m_id);
+  // Before this point, don't do any mutation.  After this point, don't error
+  // out.
 
-  ok = putQuery.step() == SQLResultDone;
-  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
+  int64_t dataRowId = isExistingValue ? getQuery.getColumnInt(0) : -1;
+  putObjectStoreData(sqliteDatabase(), key.get(), value.get(), m_id,
+                     &dataRowId);
+
+  int i = 0;
+  for (IndexMap::iterator it = m_indexes.begin(); it != m_indexes.end();
+       ++it, ++i)
+    putIndexData(sqliteDatabase(), indexKeys[i].get(), it->second->id(),
+                 dataRowId);
 
   callbacks->onSuccess(key.get());
 }
@@ -223,7 +249,7 @@ void IDBObjectStoreBackendImpl::put(PassRefPtr<SerializedScriptValue> prpValue,
 void IDBObjectStoreBackendImpl::remove(PassRefPtr<IDBKey> key,
                                        PassRefPtr<IDBCallbacks> callbacks) {
   SQLiteStatement query(sqliteDatabase(), "DELETE FROM ObjectStoreData " +
-                                              whereClause(key->type()));
+                                              whereClause(key.get()));
   bool ok = query.prepare() == SQLResultOk;
   ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
 
@@ -262,11 +288,11 @@ void IDBObjectStoreBackendImpl::createIndex(
   ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
   int64_t id = sqliteDatabase().lastInsertRowID();
 
-  RefPtr<IDBIndexBackendInterface> index =
+  RefPtr<IDBIndexBackendImpl> index =
       IDBIndexBackendImpl::create(this, id, name, keyPath, unique);
   ASSERT(index->name() == name);
   m_indexes.set(name, index);
-  callbacks->onSuccess(index.release());
+  callbacks->onSuccess(index.get());
 }
 
 PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreBackendImpl::index(
@@ -274,26 +300,31 @@ PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreBackendImpl::index(
   return m_indexes.get(name);
 }
 
+static void doDelete(SQLiteDatabase& db, const char* sql, int64_t id) {
+  SQLiteStatement deleteQuery(db, sql);
+  bool ok = deleteQuery.prepare() == SQLResultOk;
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
+  deleteQuery.bindInt64(1, id);
+  ok = deleteQuery.step() == SQLResultDone;
+  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
+}
+
 void IDBObjectStoreBackendImpl::removeIndex(
     const String& name,
     PassRefPtr<IDBCallbacks> callbacks) {
-  if (!m_indexes.contains(name)) {
+  RefPtr<IDBIndexBackendImpl> index = m_indexes.get(name);
+  if (!index) {
     callbacks->onError(IDBDatabaseError::create(
         IDBDatabaseException::NOT_FOUND_ERR, "Index name does not exist."));
     return;
   }
 
-  SQLiteStatement deleteQuery(
-      sqliteDatabase(),
-      "DELETE FROM Indexes WHERE name = ? AND objectStoreId = ?");
-  bool ok = deleteQuery.prepare() == SQLResultOk;
-  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
-  deleteQuery.bindText(1, name);
-  deleteQuery.bindInt64(2, m_id);
-  ok = deleteQuery.step() == SQLResultDone;
-  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
-
-  // FIXME: Delete index data as well.
+  SQLiteTransaction transaction(sqliteDatabase());
+  transaction.begin();
+  doDelete(sqliteDatabase(), "DELETE FROM Indexes WHERE id = ?", index->id());
+  doDelete(sqliteDatabase(), "DELETE FROM IndexData WHERE indexId = ?",
+           index->id());
+  transaction.commit();
 
   m_indexes.remove(name);
   callbacks->onSuccess();
@@ -388,10 +419,10 @@ void IDBObjectStoreBackendImpl::openCursor(PassRefPtr<IDBKeyRange> range,
   int currentColumn = 1;
   if (range->flags() & IDBKeyRange::LEFT_BOUND ||
       range->flags() == IDBKeyRange::SINGLE)
-    currentColumn += bindKey(*query, currentColumn, range->left().get());
+    currentColumn += range->left()->bind(*query, currentColumn);
   if (range->flags() & IDBKeyRange::RIGHT_BOUND ||
       range->flags() == IDBKeyRange::SINGLE)
-    currentColumn += bindKey(*query, currentColumn, range->right().get());
+    currentColumn += range->right()->bind(*query, currentColumn);
   query->bindInt64(currentColumn, m_id);
 
   if (query->step() != SQLResultRow) {
