@@ -256,6 +256,12 @@ InspectorFrontendClientQt::InspectorFrontendClientQt(
       m_destroyingInspectorView(false),
       m_inspectorClient(inspectorClient) {}
 
+InspectorFrontendClientQt::~InspectorFrontendClientQt() {
+  ASSERT(m_destroyingInspectorView);
+  if (m_inspectorClient)
+    m_inspectorClient->releaseFrontendPage();
+}
+
 void InspectorFrontendClientQt::frontendLoaded() {
   InspectorFrontendClientLocal::frontendLoaded();
   setAttachedWindow(true);
