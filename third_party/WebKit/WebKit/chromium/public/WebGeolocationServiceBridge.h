@@ -58,6 +58,10 @@ class WebGeolocationServiceBridge {
                                double speed,
                                long long timestamp) = 0;
   virtual void setLastError(int errorCode, const WebString& message) = 0;
+  virtual void onWebGeolocationServiceDestroyed() = 0;
+
+ protected:
+  virtual ~WebGeolocationServiceBridge() {}
 };
 
 }  // namespace WebKit

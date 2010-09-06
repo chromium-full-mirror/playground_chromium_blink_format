@@ -91,6 +91,7 @@ class WebGeolocationServiceBridgeImpl : public GeolocationServiceBridge,
                                double speed,
                                long long timestamp);
   virtual void setLastError(int errorCode, const WebString& message);
+  virtual void onWebGeolocationServiceDestroyed();
 
  private:
   WebViewClient* getWebViewClient();
@@ -196,6 +197,8 @@ WebViewClient* WebGeolocationServiceBridgeImpl::getWebViewClient() {
   WebKit::WebViewClient* webViewClient = chromeClientImpl->webView()->client();
   return webViewClient;
 }
+
+void WebGeolocationServiceBridgeImpl::onWebGeolocationServiceDestroyed() {}
 
 }  // namespace WebKit
 
