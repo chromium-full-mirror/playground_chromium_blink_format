@@ -1319,8 +1319,8 @@ HRESULT WebFrame::allowsFollowingLink(BSTR url, BOOL* result) {
   if (!frame)
     return E_FAIL;
 
-  *result = SecurityOrigin::canLoad(MarshallingHelpers::BSTRToKURL(url),
-                                    String(), frame->document());
+  *result = SecurityOrigin::canDisplay(MarshallingHelpers::BSTRToKURL(url),
+                                       String(), frame->document());
   return S_OK;
 }
 
