@@ -70,7 +70,7 @@ class V8DOMWindowShell : public RefCounted<V8DOMWindowShell> {
   void setContext(v8::Handle<v8::Context>);
   static bool installDOMWindow(v8::Handle<v8::Context> context, DOMWindow*);
 
-  void initContextIfNeeded();
+  bool initContextIfNeeded();
   void updateDocumentWrapper(v8::Handle<v8::Object> wrapper);
 
   void clearForNavigation();
