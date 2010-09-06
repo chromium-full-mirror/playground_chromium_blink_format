@@ -153,16 +153,20 @@ void HTMLDocumentParser::prepareToStopParsing() {
   // but we need to ensure it isn't deleted yet.
   RefPtr<HTMLDocumentParser> protect(this);
 
-  // FIXME: Set the current document readiness to "interactive".
-
   // NOTE: This pump should only ever emit buffered character tokens,
   // so ForceSynchronous vs. AllowYield should be meaningless.
   pumpTokenizerIfPossible(ForceSynchronous);
 
-  DocumentParser::prepareToStopParsing();
-  if (m_scriptRunner && !m_scriptRunner->executeScriptsWaitingForParsing())
+  if (isStopped())
     return;
-  end();
+
+  DocumentParser::prepareToStopParsing();
+
+  // We will not have a scriptRunner when parsing a DocumentFragment.
+  if (m_scriptRunner)
+    document()->setReadyState(Document::Interactive);
+
+  attemptToRunDeferredScriptsAndEnd();
 }
 
 bool HTMLDocumentParser::processingData() const {
@@ -350,6 +354,14 @@ void HTMLDocumentParser::end() {
   m_treeBuilder->finished();
 }
 
+void HTMLDocumentParser::attemptToRunDeferredScriptsAndEnd() {
+  ASSERT(isStopping());
+  ASSERT(!hasInsertionPoint());
+  if (m_scriptRunner && !m_scriptRunner->executeScriptsWaitingForParsing())
+    return;
+  end();
+}
+
 void HTMLDocumentParser::attemptToEnd() {
   // finish() indicates we will not receive any more data. If we are waiting on
   // an external script to load, we can't finish parsing quite yet.
@@ -444,17 +456,17 @@ bool HTMLDocumentParser::shouldLoadExternalScriptFromSrc(
 }
 
 void HTMLDocumentParser::notifyFinished(CachedResource* cachedResource) {
-  if (isStopping()) {
-    prepareToStopParsing();
-    return;
-  }
-
   // pumpTokenizer can cause this parser to be detached from the Document,
   // but we need to ensure it isn't deleted yet.
   RefPtr<HTMLDocumentParser> protect(this);
 
   ASSERT(m_scriptRunner);
   ASSERT(!inScriptExecution());
+  if (isStopping()) {
+    attemptToRunDeferredScriptsAndEnd();
+    return;
+  }
+
   ASSERT(m_treeBuilder->isPaused());
   // Note: We only ever wait on one script at a time, so we always know this
   // is the one we were waiting on and can un-pause the tree builder.

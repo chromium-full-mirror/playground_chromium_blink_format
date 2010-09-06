@@ -232,6 +232,9 @@ void XMLDocumentParser::end() {
     document()->styleSelectorChanged(RecalcStyleImmediately);
   }
 
+  if (isParsing())
+    prepareToStopParsing();
+  document()->setReadyState(Document::Interactive);
   clearCurrentNodeStack();
   document()->finishedParsing();
 }

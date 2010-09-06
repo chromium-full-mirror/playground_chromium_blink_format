@@ -47,8 +47,8 @@ void DocumentParser::startParsing() {
 }
 
 void DocumentParser::prepareToStopParsing() {
-  if (m_state == ParsingState)
-    m_state = StoppingState;
+  ASSERT(m_state == ParsingState);
+  m_state = StoppingState;
 }
 
 void DocumentParser::stopParsing() {
