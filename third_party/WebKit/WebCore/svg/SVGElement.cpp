@@ -292,13 +292,15 @@ void SVGElement::insertedIntoDocument() {
   if (!extensions->isPendingResource(resourceId))
     return;
 
-  OwnPtr<HashSet<SVGStyledElement*>> clients(
+  OwnPtr<SVGDocumentExtensions::SVGPendingElements> clients(
       extensions->removePendingResource(resourceId));
   if (clients->isEmpty())
     return;
 
-  const HashSet<SVGStyledElement*>::const_iterator end = clients->end();
-  for (HashSet<SVGStyledElement*>::const_iterator it = clients->begin();
+  const SVGDocumentExtensions::SVGPendingElements::const_iterator end =
+      clients->end();
+  for (SVGDocumentExtensions::SVGPendingElements::const_iterator it =
+           clients->begin();
        it != end; ++it)
     (*it)->buildPendingResource();
 }
