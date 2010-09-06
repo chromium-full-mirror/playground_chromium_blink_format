@@ -33,6 +33,7 @@
 #include "Document.h"
 #include "DocumentLoader.h"
 #include "Element.h"
+#include "FocusController.h"
 #include "FrameLoader.h"
 #include "FrameLoadRequest.h"
 #include "FrameTree.h"
@@ -313,7 +314,7 @@ void PluginView::handleKeyboardEvent(KeyboardEvent* event) {
   xEvent.xkey.time = event->timeStamp();
   xEvent.xkey.state =
       gdkEvent->state;  // GdkModifierType mirrors xlib state masks
-  xEvent.xkey.keycode = gdkEvent->hardware_keycode;
+  xEvent.xkey.keycode = gdkEvent->keyval;
   xEvent.xkey.same_screen = true;
 
   // NOTE: As the XEvents sent to the plug-in are synthesized and there is not a
@@ -438,6 +439,12 @@ void PluginView::handleMouseEvent(MouseEvent* event) {
 
   if (m_isWindowed)
     return;
+
+  if (event->type() == eventNames().mousedownEvent) {
+    if (Page* page = m_parentFrame->page())
+      page->focusController()->setActive(true);
+    focusPluginElement();
+  }
 
   NPEvent xEvent;
 #if defined(XP_UNIX)
