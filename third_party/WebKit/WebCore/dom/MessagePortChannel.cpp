@@ -41,6 +41,6 @@ PassOwnPtr<MessagePortChannel::EventData> MessagePortChannel::EventData::create(
 MessagePortChannel::EventData::EventData(
     PassRefPtr<SerializedScriptValue> message,
     PassOwnPtr<MessagePortChannelArray> channels)
-    : m_message(message->release()), m_channels(channels) {}
+    : m_message(message), m_channels(channels) {}
 
 }  // namespace WebCore

@@ -56,7 +56,7 @@ class MessageWorkerContextTask : public ScriptExecutionContext::Task {
  private:
   MessageWorkerContextTask(PassRefPtr<SerializedScriptValue> message,
                            PassOwnPtr<MessagePortChannelArray> channels)
-      : m_message(message->release()), m_channels(channels) {}
+      : m_message(message), m_channels(channels) {}
 
   virtual void performTask(ScriptExecutionContext* scriptContext) {
     ASSERT(scriptContext->isWorkerContext());
@@ -87,7 +87,7 @@ class MessageWorkerTask : public ScriptExecutionContext::Task {
   MessageWorkerTask(PassRefPtr<SerializedScriptValue> message,
                     PassOwnPtr<MessagePortChannelArray> channels,
                     WorkerMessagingProxy* messagingProxy)
-      : m_message(message->release()),
+      : m_message(message),
         m_channels(channels),
         m_messagingProxy(messagingProxy) {}
 
