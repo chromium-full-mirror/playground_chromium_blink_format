@@ -72,6 +72,8 @@ class ScrollbarThemeGtk : public ScrollbarThemeComposite {
   int m_stepperSpacing;
   int m_minThumbLength;
   bool m_troughUnderSteppers;
+  bool m_hasForwardButtonStartPart;
+  bool m_hasBackButtonEndPart;
 };
 }
 #endif
