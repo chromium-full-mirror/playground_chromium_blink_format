@@ -120,7 +120,9 @@ static JSValueRef leapForwardCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
-bool prepareMouseButtonEvent(GdkEvent* event, int eventSenderButtonNumber) {
+bool prepareMouseButtonEvent(GdkEvent* event,
+                             int eventSenderButtonNumber,
+                             guint modifiers) {
   WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
   if (!view)
     return false;
@@ -142,7 +144,7 @@ bool prepareMouseButtonEvent(GdkEvent* event, int eventSenderButtonNumber) {
   event->button.window = gtk_widget_get_window(GTK_WIDGET(view));
   g_object_ref(event->button.window);
   event->button.device = getDefaultGDKPointerDevice(event->button.window);
-  event->button.state = getStateFlags();
+  event->button.state = modifiers | getStateFlags();
   event->button.time = GDK_CURRENT_TIME;
   event->button.axes = 0;
 
@@ -163,7 +165,7 @@ static JSValueRef contextClickCallback(JSContextRef context,
                                        const JSValueRef arguments[],
                                        JSValueRef* exception) {
   GdkEvent* pressEvent = gdk_event_new(GDK_BUTTON_PRESS);
-  if (!prepareMouseButtonEvent(pressEvent, 2))
+  if (!prepareMouseButtonEvent(pressEvent, 2, 0))
     return JSValueMakeUndefined(context);
 
   GdkEvent* releaseEvent = gdk_event_copy(pressEvent);
@@ -183,6 +185,41 @@ static void updateClickCount(int button) {
     clickCount++;
 }
 
+static guint gdkModifersFromJSValue(JSContextRef context,
+                                    const JSValueRef modifiers) {
+  JSObjectRef modifiersArray = JSValueToObject(context, modifiers, 0);
+  if (!modifiersArray)
+    return 0;
+
+  guint gdkModifiers = 0;
+  int modifiersCount = JSValueToNumber(
+      context, JSObjectGetProperty(context, modifiersArray,
+                                   JSStringCreateWithUTF8CString("length"), 0),
+      0);
+  for (int i = 0; i < modifiersCount; ++i) {
+    JSValueRef value =
+        JSObjectGetPropertyAtIndex(context, modifiersArray, i, 0);
+    JSStringRef string = JSValueToStringCopy(context, value, 0);
+    if (JSStringIsEqualToUTF8CString(string, "ctrlKey") ||
+        JSStringIsEqualToUTF8CString(string, "addSelectionKey"))
+      gdkModifiers |= GDK_CONTROL_MASK;
+    else if (JSStringIsEqualToUTF8CString(string, "shiftKey") ||
+             JSStringIsEqualToUTF8CString(string, "rangeSelectionKey"))
+      gdkModifiers |= GDK_SHIFT_MASK;
+    else if (JSStringIsEqualToUTF8CString(string, "altKey"))
+      gdkModifiers |= GDK_MOD1_MASK;
+
+    // Currently the metaKey as defined in
+    // WebCore/platform/gtk/MouseEventGtk.cpp
+    // is GDK_MOD2_MASK. This code must be kept in sync with that file.
+    else if (JSStringIsEqualToUTF8CString(string, "metaKey"))
+      gdkModifiers |= GDK_MOD2_MASK;
+
+    JSStringRelease(string);
+  }
+  return gdkModifiers;
+}
+
 static JSValueRef mouseDownCallback(JSContextRef context,
                                     JSObjectRef function,
                                     JSObjectRef thisObject,
@@ -196,9 +233,11 @@ static JSValueRef mouseDownCallback(JSContextRef context,
     g_return_val_if_fail((!exception || !*exception),
                          JSValueMakeUndefined(context));
   }
+  guint modifiers =
+      argumentCount >= 2 ? gdkModifersFromJSValue(context, arguments[1]) : 0;
 
   GdkEvent* event = gdk_event_new(GDK_BUTTON_PRESS);
-  if (!prepareMouseButtonEvent(event, button))
+  if (!prepareMouseButtonEvent(event, button, modifiers))
     return JSValueMakeUndefined(context);
 
   buttonCurrentlyDown = event->button.button;
@@ -244,9 +283,11 @@ static JSValueRef mouseUpCallback(JSContextRef context,
     g_return_val_if_fail((!exception || !*exception),
                          JSValueMakeUndefined(context));
   }
+  guint modifiers =
+      argumentCount >= 2 ? gdkModifersFromJSValue(context, arguments[1]) : 0;
 
   GdkEvent* event = gdk_event_new(GDK_BUTTON_RELEASE);
-  if (!prepareMouseButtonEvent(event, button))
+  if (!prepareMouseButtonEvent(event, button, modifiers))
     return JSValueMakeUndefined(context);
 
   lastClickPositionX = lastMousePositionX;
