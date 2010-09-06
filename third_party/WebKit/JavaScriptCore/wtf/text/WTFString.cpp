@@ -319,7 +319,8 @@ String String::format(const char* format, ...) {
 
   va_end(args);
 
-  return StringImpl::create(buffer.constData(), buffer.length());
+  return StringImpl::create(buffer.toUtf8().constData(),
+                            buffer.toUtf8().length());
 
 #elif OS(WINCE)
   va_list args;
