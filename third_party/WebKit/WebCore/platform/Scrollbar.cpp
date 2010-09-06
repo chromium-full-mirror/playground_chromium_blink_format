@@ -40,7 +40,7 @@
 
 using namespace std;
 
-#if PLATFORM(CHROMIUM) && OS(LINUX)
+#if PLATFORM(CHROMIUM) && OS(LINUX) || PLATFORM(GTK)
 // The position of the scrollbar thumb affects the appearance of the steppers,
 // so
 // when the thumb moves, we have to invalidate them for painting.
@@ -49,7 +49,7 @@ using namespace std;
 
 namespace WebCore {
 
-#if !PLATFORM(GTK) && !PLATFORM(EFL)
+#if !PLATFORM(EFL)
 PassRefPtr<Scrollbar> Scrollbar::createNativeScrollbar(
     ScrollbarClient* client,
     ScrollbarOrientation orientation,
