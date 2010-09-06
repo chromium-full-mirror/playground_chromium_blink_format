@@ -95,7 +95,7 @@ class InspectorClientWebPage : public QWebPage {
 };
 
 InspectorClientQt::InspectorClientQt(QWebPage* page)
-    : m_inspectedWebPage(page), m_frontendWebPage(0) {}
+    : m_inspectedWebPage(page), m_frontendWebPage(0), m_frontendClient(0) {}
 
 void InspectorClientQt::inspectorDestroyed() {
   if (m_frontendClient)
