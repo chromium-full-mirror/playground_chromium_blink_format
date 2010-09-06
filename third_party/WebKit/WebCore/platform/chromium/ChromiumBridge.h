@@ -222,6 +222,9 @@ class ChromiumBridge {
   // That is committed size for Windows and virtual memory size for POSIX
   static int memoryUsageMB();
 
+  // Same as above, but always returns actual value, without any caches.
+  static int actualMemoryUsageMB();
+
   // MimeType -----------------------------------------------------------
   static bool isSupportedImageMIMEType(const String& mimeType);
   static bool isSupportedJavaScriptMIMEType(const String& mimeType);

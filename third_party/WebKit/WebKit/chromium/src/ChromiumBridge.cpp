@@ -801,6 +801,10 @@ int ChromiumBridge::memoryUsageMB() {
   return static_cast<int>(webKitClient()->memoryUsageMB());
 }
 
+int ChromiumBridge::actualMemoryUsageMB() {
+  return static_cast<int>(webKitClient()->actualMemoryUsageMB());
+}
+
 int ChromiumBridge::screenDepth(Widget* widget) {
   WebWidgetClient* client = toWebWidgetClient(widget);
   if (!client)
