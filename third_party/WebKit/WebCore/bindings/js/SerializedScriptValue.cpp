@@ -449,9 +449,8 @@ class CloneSerializer : CloneBase {
   }
 
   void write(unsigned long long i) { writeLittleEndian(m_buffer, i); }
-  void write(UChar ch) {
-    writeLittleEndian(m_buffer, static_cast<uint16_t>(ch));
-  }
+
+  void write(uint16_t ch) { writeLittleEndian(m_buffer, ch); }
 
   void writeStringIndex(unsigned i) {
     if (m_constantPool.size() <= 0xFF)
