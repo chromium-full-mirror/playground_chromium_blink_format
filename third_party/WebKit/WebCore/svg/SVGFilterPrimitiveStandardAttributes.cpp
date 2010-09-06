@@ -26,7 +26,6 @@
 
 #include "Attribute.h"
 #include "FilterEffect.h"
-#include "RenderSVGResourceFilterPrimitive.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
 #include "SVGStyledElement.h"
@@ -72,7 +71,7 @@ void SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(
   if (attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
       attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr ||
       attrName == SVGNames::resultAttr)
-    invalidate();
+    SVGFilterElement::invalidateFilter(this);
 }
 
 void SVGFilterPrimitiveStandardAttributes::synchronizeProperty(
@@ -109,7 +108,7 @@ void SVGFilterPrimitiveStandardAttributes::childrenChanged(
                                     childCountDelta);
 
   if (!changedByParser)
-    invalidate();
+    SVGFilterElement::invalidateFilter(this);
 }
 
 void SVGFilterPrimitiveStandardAttributes::setStandardAttributes(
@@ -138,12 +137,6 @@ void SVGFilterPrimitiveStandardAttributes::setStandardAttributes(
                            width().value(this), height().value(this));
 
   filterEffect->setEffectBoundaries(effectBBox);
-}
-
-RenderObject* SVGFilterPrimitiveStandardAttributes::createRenderer(
-    RenderArena* arena,
-    RenderStyle*) {
-  return new (arena) RenderSVGResourceFilterPrimitive(this);
 }
 }
 
