@@ -19,6 +19,7 @@
 
 #include "config.h"
 #include "GeolocationServiceGtk.h"
+#if ENABLE(GEOLOCATION)
 
 #include "GOwnPtr.h"
 #include "NotImplemented.h"
@@ -217,3 +218,4 @@ void GeolocationServiceGtk::setError(PositionError::ErrorCode errorCode,
   m_lastError = PositionError::create(errorCode, String::fromUTF8(message));
 }
 }
+#endif  // ENABLE(GEOLOCATION)

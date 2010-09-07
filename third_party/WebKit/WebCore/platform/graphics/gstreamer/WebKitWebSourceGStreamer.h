@@ -19,6 +19,7 @@
 
 #ifndef WebKitWebSourceGStreamer_h
 #define WebKitWebSourceGStreamer_h
+#if ENABLE(VIDEO)
 
 #include "Frame.h"
 #include <gst/gst.h>
@@ -54,4 +55,5 @@ void webKitWebSrcSetFrame(WebKitWebSrc* src, WebCore::Frame* frame);
 
 G_END_DECLS
 
+#endif  // ENABLE(VIDEO)
 #endif

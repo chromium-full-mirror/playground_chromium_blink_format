@@ -19,7 +19,6 @@
 
 #ifndef PlatformVideoWindow_h
 #define PlatformVideoWindow_h
-
 #if ENABLE(VIDEO)
 
 #include "Widget.h"
@@ -47,6 +46,5 @@ class PlatformVideoWindow : public RefCounted<PlatformVideoWindow> {
 };
 }
 
-#endif
-
+#endif  // ENABLE(VIDEO)
 #endif

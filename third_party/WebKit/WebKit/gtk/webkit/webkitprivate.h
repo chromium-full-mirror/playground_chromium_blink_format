@@ -169,7 +169,9 @@ struct _WebKitWebViewPrivate {
   gboolean disposing;
   gboolean usePrimaryForPaste;
 
+#if ENABLE(VIDEO)
   FullscreenVideoController* fullscreenVideoController;
+#endif
 
   // These are hosted here because the DataSource object is
   // created too late in the frame loading process.

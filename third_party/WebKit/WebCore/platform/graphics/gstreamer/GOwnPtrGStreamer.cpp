@@ -31,4 +31,4 @@ void freeOwnedGPtr<GstElement>(GstElement* ptr) {
     gst_object_unref(ptr);
 }
 }
-#endif
+#endif  // ENABLE(VIDEO)

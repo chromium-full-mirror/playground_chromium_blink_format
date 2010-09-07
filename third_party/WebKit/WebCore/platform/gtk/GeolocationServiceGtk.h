@@ -19,6 +19,7 @@
 
 #ifndef GeolocationServiceGtk_h
 #define GeolocationServiceGtk_h
+#if ENABLE(GEOLOCATION)
 
 #include "GeolocationService.h"
 #include "Geoposition.h"
@@ -85,4 +86,5 @@ class GeolocationServiceGtk : public GeolocationService {
 };
 }
 
+#endif  // ENABLE(GEOLOCATION)
 #endif

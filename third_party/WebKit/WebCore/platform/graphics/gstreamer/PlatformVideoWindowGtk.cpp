@@ -19,8 +19,10 @@
 
 #include "config.h"
 #include "PlatformVideoWindow.h"
+#if ENABLE(VIDEO)
 
 #include <gtk/gtk.h>
+
 #ifdef GDK_WINDOWING_X11
 #include <gdk/gdkx.h>  // for GDK_WINDOW_XID
 #endif
@@ -57,3 +59,4 @@ PlatformVideoWindow::~PlatformVideoWindow() {
 
   m_videoWindowId = 0;
 }
+#endif  // ENABLE(VIDEO)

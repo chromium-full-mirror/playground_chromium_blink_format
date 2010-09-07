@@ -18,11 +18,10 @@
  */
 
 #include "config.h"
-
 #include "GStreamerGWorld.h"
+#if ENABLE(VIDEO)
 
 #include "GOwnPtrGStreamer.h"
-
 #include <gst/gst.h>
 #include <gst/interfaces/xoverlay.h>
 
@@ -206,3 +205,4 @@ void GStreamerGWorld::setWindowOverlay(GstMessage* message) {
                                  m_videoWindow->videoWindowId());
 }
 }
+#endif  // ENABLE(VIDEO)
