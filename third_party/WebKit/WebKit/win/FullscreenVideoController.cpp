@@ -499,7 +499,7 @@ void FullscreenVideoController::draw() {
   HDC windowDC = GetDC(m_hudWindow);
   HDC bitmapDC = CreateCompatibleDC(windowDC);
   ::ReleaseDC(m_hudWindow, windowDC);
-  SelectObject(bitmapDC, m_bitmap.get());
+  HGDIOBJ oldBitmap = SelectObject(bitmapDC, m_bitmap.get());
 
   GraphicsContext context(bitmapDC, true);
 
@@ -583,6 +583,7 @@ void FullscreenVideoController::draw() {
 
   context.restore();
 
+  ::SelectObject(bitmapDC, oldBitmap);
   ::DeleteDC(bitmapDC);
 }
 

@@ -874,7 +874,7 @@ void WebView::scrollBackingStore(FrameView* frameView,
   // Collect our device context info and select the bitmap to scroll.
   HDC windowDC = ::GetDC(m_viewWindow);
   HDC bitmapDC = ::CreateCompatibleDC(windowDC);
-  ::SelectObject(bitmapDC, m_backingStoreBitmap->handle());
+  HGDIOBJ oldBitmap = ::SelectObject(bitmapDC, m_backingStoreBitmap->handle());
 
   // Scroll the bitmap.
   RECT scrollRectWin(scrollViewRect);
@@ -896,6 +896,7 @@ void WebView::scrollBackingStore(FrameView* frameView,
   updateBackingStore(frameView, bitmapDC, false);
 
   // Clean up.
+  ::SelectObject(bitmapDC, oldBitmap);
   ::DeleteDC(bitmapDC);
   ::ReleaseDC(m_viewWindow, windowDC);
 }
@@ -1042,7 +1043,7 @@ void WebView::paint(HDC dc, LPARAM options) {
   m_paintCount++;
 
   HDC bitmapDC = ::CreateCompatibleDC(hdc);
-  ::SelectObject(bitmapDC, m_backingStoreBitmap->handle());
+  HGDIOBJ oldBitmap = ::SelectObject(bitmapDC, m_backingStoreBitmap->handle());
 
   // Update our backing store if needed.
   updateBackingStore(frameView, bitmapDC, backingStoreCompletelyDirty,
@@ -1068,6 +1069,7 @@ void WebView::paint(HDC dc, LPARAM options) {
     updateRootLayerContents();
 #endif
 
+  ::SelectObject(bitmapDC, oldBitmap);
   ::DeleteDC(bitmapDC);
 
   if (!dc)
