@@ -4348,41 +4348,19 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
     }
 
     // Hit test contents if we don't have columns.
-    if (!hasColumns() && hitTestContents(request, result, _x, _y, scrolledX,
-                                         scrolledY, hitTestAction)) {
+    if (!hasColumns()) {
+      if (hitTestContents(request, result, _x, _y, scrolledX, scrolledY,
+                          hitTestAction)) {
+        updateHitTestResult(result, IntPoint(_x - tx, _y - ty));
+        return true;
+      }
+      if (hitTestAction == HitTestFloat &&
+          hitTestFloats(request, result, _x, _y, scrolledX, scrolledY))
+        return true;
+    } else if (hitTestColumns(request, result, _x, _y, scrolledX, scrolledY,
+                              hitTestAction)) {
       updateHitTestResult(result, IntPoint(_x - tx, _y - ty));
       return true;
-    }
-
-    // Hit test our columns if we do have them.
-    if (hasColumns() && hitTestColumns(request, result, _x, _y, scrolledX,
-                                       scrolledY, hitTestAction)) {
-      updateHitTestResult(result, IntPoint(_x - tx, _y - ty));
-      return true;
-    }
-
-    // Hit test floats.
-    if (hitTestAction == HitTestFloat && m_floatingObjects) {
-      if (isRenderView()) {
-        scrolledX += toRenderView(this)->frameView()->scrollX();
-        scrolledY += toRenderView(this)->frameView()->scrollY();
-      }
-
-      FloatingObject* o;
-      DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
-      for (it.toLast(); (o = it.current()); --it) {
-        if (o->m_shouldPaint && !o->m_renderer->hasSelfPaintingLayer()) {
-          int xoffset = scrolledX + o->m_left + o->m_renderer->marginLeft() -
-                        o->m_renderer->x();
-          int yoffset = scrolledY + o->m_top + o->m_renderer->marginTop() -
-                        o->m_renderer->y();
-          if (o->m_renderer->hitTest(request, result, IntPoint(_x, _y), xoffset,
-                                     yoffset)) {
-            updateHitTestResult(result, IntPoint(_x - xoffset, _y - yoffset));
-            return true;
-          }
-        }
-      }
     }
   }
 
@@ -4395,6 +4373,42 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
       updateHitTestResult(result, IntPoint(_x - tx, _y - ty));
       if (!result.addNodeToRectBasedTestResult(node(), _x, _y, boundsRect))
         return true;
+    }
+  }
+
+  return false;
+}
+
+bool RenderBlock::hitTestFloats(const HitTestRequest& request,
+                                HitTestResult& result,
+                                int x,
+                                int y,
+                                int tx,
+                                int ty) {
+  if (!m_floatingObjects)
+    return false;
+
+  if (isRenderView()) {
+    tx += toRenderView(this)->frameView()->scrollX();
+    ty += toRenderView(this)->frameView()->scrollY();
+  }
+
+  FloatingObject* floatingObject;
+  DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
+  for (it.toLast(); (floatingObject = it.current()); --it) {
+    if (floatingObject->m_shouldPaint &&
+        !floatingObject->m_renderer->hasSelfPaintingLayer()) {
+      int xOffset = tx + floatingObject->m_left +
+                    floatingObject->m_renderer->marginLeft() -
+                    floatingObject->m_renderer->x();
+      int yOffset = ty + floatingObject->m_top +
+                    floatingObject->m_renderer->marginTop() -
+                    floatingObject->m_renderer->y();
+      if (floatingObject->m_renderer->hitTest(request, result, IntPoint(x, y),
+                                              xOffset, yOffset)) {
+        updateHitTestResult(result, IntPoint(x - xOffset, y - yOffset));
+        return true;
+      }
     }
   }
 
@@ -4435,7 +4449,9 @@ bool RenderBlock::hitTestColumns(const HitTestRequest& request,
         hitTestContents(request, result, x, y, finalX, finalY, hitTestAction);
       else
         return hitTestContents(request, result, x, y, finalX, finalY,
-                               hitTestAction);
+                               hitTestAction) ||
+               hitTestAction == HitTestFloat &&
+                   hitTestFloats(request, result, x, y, finalX, finalY);
     }
   }
 

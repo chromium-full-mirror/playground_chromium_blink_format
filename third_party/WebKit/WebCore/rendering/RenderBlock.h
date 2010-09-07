@@ -516,6 +516,12 @@ class RenderBlock : public RenderBox {
                                int tx,
                                int ty,
                                HitTestAction);
+  bool hitTestFloats(const HitTestRequest&,
+                     HitTestResult&,
+                     int x,
+                     int y,
+                     int tx,
+                     int ty);
 
   virtual bool isPointInOverflowControl(HitTestResult&,
                                         int x,
