@@ -197,5 +197,6 @@ class TestShell {
 
 void platformInit(int*, char***);
 void openStartupDialog();
+bool checkLayoutTestSystemDependencies();
 
 #endif  // TestShell_h
