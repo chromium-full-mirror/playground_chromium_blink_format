@@ -27,8 +27,10 @@
 #define PageClientImpl_h
 
 #include "PageClient.h"
+#include <wtf/RetainPtr.h>
 
 @class WKView;
+@class WebEditorUndoTargetObjC;
 
 namespace WebKit {
 
@@ -51,12 +53,16 @@ class PageClientImpl : public PageClient {
                               const WTF::String& newToolTip);
   virtual void setCursor(const WebCore::Cursor&);
 
+  void registerEditCommand(PassRefPtr<WebEditCommandProxy>, UndoOrRedo);
+  void clearAllEditCommands();
+
 #if USE(ACCELERATED_COMPOSITING)
   void pageDidEnterAcceleratedCompositing();
   void pageDidLeaveAcceleratedCompositing();
 #endif
 
   WKView* m_wkView;
+  RetainPtr<WebEditorUndoTargetObjC> m_undoTarget;
 };
 
 }  // namespace WebKit

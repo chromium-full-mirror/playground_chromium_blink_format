@@ -77,6 +77,9 @@ enum Kind {
   BackForwardBackListCount,
   BackForwardForwardListCount,
 
+  RegisterEditCommandForUndo,
+  ClearAllEditCommands,
+
 #if USE(ACCELERATED_COMPOSITING)
   DidChangeAcceleratedCompositing,
 #endif

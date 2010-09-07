@@ -34,6 +34,7 @@
 #include "WebContextUserMessageCoders.h"
 #include "WebCoreArgumentCoders.h"
 #include "WebData.h"
+#include "WebEditCommandProxy.h"
 #include "WebEvent.h"
 #include "WebFormSubmissionListenerProxy.h"
 #include "WebFramePolicyListenerProxy.h"
@@ -184,6 +185,12 @@ void WebPageProxy::close() {
        i < size; ++i)
     renderTreeExternalRepresentationCallbacks[i]->invalidate();
   m_renderTreeExternalRepresentationCallbacks.clear();
+
+  Vector<WebEditCommandProxy*> editCommandVector;
+  copyToVector(m_editCommandSet, editCommandVector);
+  m_editCommandSet.clear();
+  for (size_t i = 0, size = editCommandVector.size(); i < size; ++i)
+    editCommandVector[i]->invalidate();
 
   m_estimatedProgress = 0.0;
 
@@ -655,6 +662,19 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       contentsSizeChanged(process()->webFrame(frameID), size);
       break;
     }
+    case WebPageProxyMessage::RegisterEditCommandForUndo: {
+      uint64_t commandID;
+      uint32_t editAction;
+      if (!arguments->decode(CoreIPC::Out(commandID, editAction)))
+        return;
+
+      registerEditCommandForUndo(commandID,
+                                 static_cast<EditAction>(editAction));
+      break;
+    }
+    case WebPageProxyMessage::ClearAllEditCommands:
+      clearAllEditCommands();
+      break;
     default:
       ASSERT_NOT_REACHED();
       break;
@@ -960,6 +980,41 @@ void WebPageProxy::goToItemInBackForwardList(WebBackForwardListItem* item) {
   m_backForwardList->goToItem(item);
 }
 
+// Undo management
+
+void WebPageProxy::registerEditCommandForUndo(uint64_t commandID,
+                                              EditAction editAction) {
+  registerEditCommandForUndo(
+      WebEditCommandProxy::create(commandID, editAction, this));
+}
+
+void WebPageProxy::clearAllEditCommands() {
+  m_pageClient->clearAllEditCommands();
+}
+
+void WebPageProxy::registerEditCommandForUndo(
+    PassRefPtr<WebEditCommandProxy> commandProxy) {
+  m_pageClient->registerEditCommand(commandProxy, PageClient::Undo);
+}
+
+void WebPageProxy::registerEditCommandForRedo(
+    PassRefPtr<WebEditCommandProxy> commandProxy) {
+  m_pageClient->registerEditCommand(commandProxy, PageClient::Redo);
+}
+
+void WebPageProxy::addEditCommand(WebEditCommandProxy* command) {
+  m_editCommandSet.add(command);
+}
+
+void WebPageProxy::removeEditCommand(WebEditCommandProxy* command) {
+  m_editCommandSet.remove(command);
+
+  if (!isValid())
+    return;
+  process()->send(WebPageMessage::DidRemoveEditCommand, m_pageID,
+                  command->commandID());
+}
+
 // Other
 
 void WebPageProxy::takeFocus(bool direction) {
@@ -1062,6 +1117,13 @@ void WebPageProxy::processDidExit() {
        i < size; ++i)
     renderTreeExternalRepresentationCallbacks[i]->invalidate();
   m_renderTreeExternalRepresentationCallbacks.clear();
+
+  Vector<WebEditCommandProxy*> editCommandVector;
+  copyToVector(m_editCommandSet, editCommandVector);
+  m_editCommandSet.clear();
+  for (size_t i = 0, size = editCommandVector.size(); i < size; ++i)
+    editCommandVector[i]->invalidate();
+  m_pageClient->clearAllEditCommands();
 
   m_estimatedProgress = 0.0;
 

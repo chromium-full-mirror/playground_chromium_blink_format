@@ -93,6 +93,7 @@ WebPage::WebPage(uint64_t pageID,
     : m_viewSize(viewSize),
       m_drawingArea(
           DrawingArea::create(drawingAreaInfo.type, drawingAreaInfo.id, this)),
+      m_isInRedo(false),
       m_pageID(pageID) {
   ASSERT(m_pageID);
 
@@ -540,6 +541,40 @@ bool WebPage::handleEditingKeyboardEvent(KeyboardEvent* evt) {
   return frame->editor()->insertText(evt->keyEvent()->text(), evt);
 }
 
+WebEditCommand* WebPage::webEditCommand(uint64_t commandID) {
+  return m_editCommandMap.get(commandID).get();
+}
+
+void WebPage::addWebEditCommand(uint64_t commandID, WebEditCommand* command) {
+  m_editCommandMap.set(commandID, command);
+}
+
+void WebPage::removeWebEditCommand(uint64_t commandID) {
+  m_editCommandMap.remove(commandID);
+}
+
+void WebPage::unapplyEditCommand(uint64_t commandID) {
+  WebEditCommand* command = webEditCommand(commandID);
+  if (!command)
+    return;
+
+  command->command()->unapply();
+}
+
+void WebPage::reapplyEditCommand(uint64_t commandID) {
+  WebEditCommand* command = webEditCommand(commandID);
+  if (!command)
+    return;
+
+  m_isInRedo = true;
+  command->command()->reapply();
+  m_isInRedo = false;
+}
+
+void WebPage::didRemoveEditCommand(uint64_t commandID) {
+  removeWebEditCommand(commandID);
+}
+
 void WebPage::didReceiveMessage(CoreIPC::Connection* connection,
                                 CoreIPC::MessageID messageID,
                                 CoreIPC::ArgumentDecoder* arguments) {
@@ -699,6 +734,27 @@ void WebPage::didReceiveMessage(CoreIPC::Connection* connection,
       if (!arguments->decode(CoreIPC::Out(customUserAgent)))
         return;
       setCustomUserAgent(customUserAgent);
+      return;
+    }
+    case WebPageMessage::UnapplyEditCommand: {
+      uint64_t commandID;
+      if (!arguments->decode(CoreIPC::Out(commandID)))
+        return;
+      unapplyEditCommand(commandID);
+      return;
+    }
+    case WebPageMessage::ReapplyEditCommand: {
+      uint64_t commandID;
+      if (!arguments->decode(CoreIPC::Out(commandID)))
+        return;
+      reapplyEditCommand(commandID);
+      return;
+    }
+    case WebPageMessage::DidRemoveEditCommand: {
+      uint64_t commandID;
+      if (!arguments->decode(CoreIPC::Out(commandID)))
+        return;
+      didRemoveEditCommand(commandID);
       return;
     }
   }
