@@ -35,8 +35,6 @@
 
 namespace WebCore {
 
-GeolocationServiceBridge::~GeolocationServiceBridge() {}
-
 GeolocationServiceChromium::GeolocationServiceChromium(
     GeolocationServiceClient* c)
     : GeolocationService(c),
