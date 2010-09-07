@@ -29,6 +29,7 @@
 #if ENABLE(VIDEO)
 
 #include "HTMLElement.h"
+#include "ActiveDOMObject.h"
 #include "MediaCanStartListener.h"
 #include "MediaPlayer.h"
 
@@ -55,7 +56,8 @@ class Widget;
 
 class HTMLMediaElement : public HTMLElement,
                          public MediaPlayerClient,
-                         private MediaCanStartListener {
+                         private MediaCanStartListener,
+                         private ActiveDOMObject {
  public:
   MediaPlayer* player() const { return m_player.get(); }
 
@@ -217,8 +219,13 @@ class HTMLMediaElement : public HTMLElement,
   float getTimeOffsetAttribute(const QualifiedName&, float valueOnError) const;
   void setTimeOffsetAttribute(const QualifiedName&, float value);
 
-  virtual void documentWillBecomeInactive();
-  virtual void documentDidBecomeActive();
+  // ActiveDOMObject functions.
+  virtual bool canSuspend() const;
+  virtual void suspend();
+  virtual void resume();
+  virtual void stop();
+  virtual bool hasPendingActivity() const;
+
   virtual void mediaVolumeDidChange();
 
   virtual void updateDisplayState() {}
