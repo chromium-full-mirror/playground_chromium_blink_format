@@ -414,6 +414,12 @@ PassRefPtr<InputFieldSpeechButtonElement> InputFieldSpeechButtonElement::create(
 }
 
 void InputFieldSpeechButtonElement::defaultEventHandler(Event* event) {
+  // For privacy reasons, only allow clicks directly coming from the user.
+  if (!event->fromUserGesture()) {
+    HTMLDivElement::defaultEventHandler(event);
+    return;
+  }
+
   // On mouse down, select the text and set focus.
   HTMLInputElement* input =
       static_cast<HTMLInputElement*>(shadowAncestorNode());
