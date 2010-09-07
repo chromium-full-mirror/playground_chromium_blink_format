@@ -33,6 +33,7 @@
 
 namespace WebCore {
 
+class ColumnInfo;
 class InlineIterator;
 class RenderInline;
 
@@ -205,7 +206,7 @@ class RenderBlock : public RenderBox {
                               bool isLineEmpty = true,
                               bool previousLineBrokeCleanly = true);
 
-  Vector<IntRect>* columnRects() const;
+  ColumnInfo* columnInfo() const;
   int columnGap() const;
 
  protected:
