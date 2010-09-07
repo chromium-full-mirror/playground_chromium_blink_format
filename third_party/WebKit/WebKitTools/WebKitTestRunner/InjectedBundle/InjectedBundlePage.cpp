@@ -35,6 +35,7 @@
 #include <WebKit2/WKBundlePagePrivate.h>
 #include <WebKit2/WKRetainPtr.h>
 #include <WebKit2/WKBundleRange.h>
+#include <WebKit2/WKBundleScriptWorld.h>
 
 using namespace std;
 
@@ -209,11 +210,10 @@ void InjectedBundlePage::didReceiveTitleForFrame(WKBundlePageRef page,
 
 void InjectedBundlePage::didClearWindowForFrame(WKBundlePageRef page,
                                                 WKBundleFrameRef frame,
-                                                JSGlobalContextRef context,
-                                                JSObjectRef window,
+                                                WKBundleScriptWorldRef world,
                                                 const void* clientInfo) {
   static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
-      ->didClearWindowForFrame(frame, context, window);
+      ->didClearWindowForFrame(frame, world);
 }
 
 void InjectedBundlePage::didCancelClientRedirectForFrame(
@@ -454,10 +454,16 @@ void InjectedBundlePage::didReceiveTitleForFrame(WKStringRef title,
 }
 
 void InjectedBundlePage::didClearWindowForFrame(WKBundleFrameRef frame,
-                                                JSGlobalContextRef context,
-                                                JSObjectRef window) {
+                                                WKBundleScriptWorldRef world) {
   if (!InjectedBundle::shared().isTestRunning())
     return;
+
+  if (WKBundleScriptWorldNormalWorld() != world)
+    return;
+
+  JSGlobalContextRef context =
+      WKBundleFrameGetJavaScriptContextForWorld(frame, world);
+  JSObjectRef window = JSContextGetGlobalObject(context);
 
   JSValueRef exception = 0;
   InjectedBundle::shared().layoutTestController()->makeWindowObject(

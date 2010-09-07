@@ -25,6 +25,7 @@
 
 #include "InjectedBundlePageLoaderClient.h"
 
+#include "InjectedBundleScriptWorld.h"
 #include "WKAPICast.h"
 #include "WKBundleAPICast.h"
 #include <wtf/text/WTFString.h>
@@ -111,11 +112,12 @@ void InjectedBundlePageLoaderClient::didReceiveTitleForFrame(
 void InjectedBundlePageLoaderClient::didClearWindowObjectForFrame(
     WebPage* page,
     WebFrame* frame,
-    JSGlobalContextRef context,
-    JSObjectRef window) {
+    DOMWrapperWorld* world) {
   if (m_client.didClearWindowObjectForFrame)
-    m_client.didClearWindowObjectForFrame(toRef(page), toRef(frame), context,
-                                          window, m_client.clientInfo);
+    m_client.didClearWindowObjectForFrame(
+        toRef(page), toRef(frame),
+        toRef(InjectedBundleScriptWorld::getOrCreate(world).get()),
+        m_client.clientInfo);
 }
 
 void InjectedBundlePageLoaderClient::didCancelClientRedirectForFrame(

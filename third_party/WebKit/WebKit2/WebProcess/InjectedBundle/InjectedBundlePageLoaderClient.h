@@ -30,6 +30,10 @@
 #include <JavaScriptCore/JSBase.h>
 #include <wtf/Forward.h>
 
+namespace WebCore {
+class DOMWrapperWorld;
+}
+
 namespace WebKit {
 
 class WebPage;
@@ -50,8 +54,7 @@ class InjectedBundlePageLoaderClient {
   void didReceiveTitleForFrame(WebPage*, const WTF::String&, WebFrame*);
   void didClearWindowObjectForFrame(WebPage*,
                                     WebFrame*,
-                                    JSGlobalContextRef,
-                                    JSObjectRef);
+                                    WebCore::DOMWrapperWorld*);
   void didCancelClientRedirectForFrame(WebPage*, WebFrame*);
   void willPerformClientRedirectForFrame(WebPage*,
                                          WebFrame*,

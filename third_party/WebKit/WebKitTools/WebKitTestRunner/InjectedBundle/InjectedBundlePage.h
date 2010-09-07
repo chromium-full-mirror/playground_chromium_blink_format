@@ -70,8 +70,7 @@ class InjectedBundlePage {
                                       const void*);
   static void didClearWindowForFrame(WKBundlePageRef,
                                      WKBundleFrameRef,
-                                     JSGlobalContextRef,
-                                     JSObjectRef window,
+                                     WKBundleScriptWorldRef,
                                      const void*);
   static void didCancelClientRedirectForFrame(WKBundlePageRef,
                                               WKBundleFrameRef,
@@ -104,9 +103,7 @@ class InjectedBundlePage {
   void didFinishLoadForFrame(WKBundleFrameRef);
   void didFailLoadWithErrorForFrame(WKBundleFrameRef);
   void didReceiveTitleForFrame(WKStringRef title, WKBundleFrameRef);
-  void didClearWindowForFrame(WKBundleFrameRef,
-                              JSGlobalContextRef,
-                              JSObjectRef window);
+  void didClearWindowForFrame(WKBundleFrameRef, WKBundleScriptWorldRef);
   void didCancelClientRedirectForFrame(WKBundleFrameRef);
   void willPerformClientRedirectForFrame(WKBundleFrameRef,
                                          WKURLRef url,
