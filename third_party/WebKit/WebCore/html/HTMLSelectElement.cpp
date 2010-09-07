@@ -87,7 +87,18 @@ void HTMLSelectElement::setSelectedIndex(int optionIndex, bool deselect) {
 
 void HTMLSelectElement::setSelectedIndexByUser(int optionIndex,
                                                bool deselect,
-                                               bool fireOnChangeNow) {
+                                               bool fireOnChangeNow,
+                                               bool allowMultipleSelection) {
+  // List box selects can fire onchange events through user interaction, such as
+  // mousedown events. This allows that same behavior programmatically.
+  if (!m_data.usesMenuList()) {
+    updateSelectedState(m_data, this, optionIndex, allowMultipleSelection,
+                        false);
+    if (fireOnChangeNow)
+      listBoxOnChange();
+    return;
+  }
+
   // Bail out if this index is already the selected one, to avoid running
   // unnecessary JavaScript that can mess up
   // autofill, when there is no actual change (see

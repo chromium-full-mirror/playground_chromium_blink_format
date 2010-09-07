@@ -75,7 +75,7 @@ _createDocumentFragmentWithMarkupString:(NSString*)markupString
 // Each one should eventually be replaced by public DOM API, and when that
 // happens Safari will switch to implementations
 // using that public API, and these will be deleted.
-@interface DOMHTMLInputElement (FormsAutoFillTransition)
+@interface DOMHTMLInputElement (FormAutoFillTransition)
 - (BOOL)_isAutofilled;
 - (BOOL)_isTextField;
 - (NSRect)
@@ -105,6 +105,8 @@ _createDocumentFragmentWithMarkupString:(NSString*)markupString
 // replaceable by public DOM API, and when that happens Safari will switch to
 // implementations using that public API,
 // and these will be deleted.
-@interface DOMHTMLSelectElement (FormsAutoFillTransition)
+@interface DOMHTMLSelectElement (FormAutoFillTransition)
 - (void)_activateItemAtIndex:(int)index;
+- (void)_activateItemAtIndex:(int)index
+      allowMultipleSelection:(BOOL)allowMultipleSelection;
 @end

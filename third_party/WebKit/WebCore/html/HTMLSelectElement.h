@@ -47,7 +47,8 @@ class HTMLSelectElement : public HTMLFormControlElementWithState,
   virtual void setSelectedIndex(int index, bool deselect = true);
   virtual void setSelectedIndexByUser(int index,
                                       bool deselect = true,
-                                      bool fireOnChangeNow = false);
+                                      bool fireOnChangeNow = false,
+                                      bool allowMultipleSelection = false);
 
   unsigned length() const;
 

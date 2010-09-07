@@ -105,7 +105,9 @@ void WMLSelectElement::setSelectedIndex(int optionIndex, bool deselect) {
 
 void WMLSelectElement::setSelectedIndexByUser(int optionIndex,
                                               bool deselect,
-                                              bool fireOnChangeNow) {
+                                              bool fireOnChangeNow,
+                                              bool allowMultipleSelection) {
+  UNUSED_PARAM(allowMultipleSelection);
   SelectElement::setSelectedIndex(m_data, this, optionIndex, deselect,
                                   fireOnChangeNow, true);
 }
