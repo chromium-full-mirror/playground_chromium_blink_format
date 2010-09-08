@@ -4454,8 +4454,8 @@ bool RenderBlock::hitTestColumns(const HitTestRequest& request,
       else
         return hitTestContents(request, result, x, y, finalX, finalY,
                                hitTestAction) ||
-               hitTestAction == HitTestFloat &&
-                   hitTestFloats(request, result, x, y, finalX, finalY);
+               (hitTestAction == HitTestFloat &&
+                hitTestFloats(request, result, x, y, finalX, finalY));
     }
   }
 
