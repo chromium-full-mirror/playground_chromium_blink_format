@@ -26,6 +26,7 @@
 #define Animation_h
 
 #include "PlatformString.h"
+#include "RenderStyleConstants.h"
 #include "TimingFunction.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -97,7 +98,9 @@ class Animation : public RefCounted<Animation> {
   const String& name() const { return m_name; }
   unsigned playState() const { return m_playState; }
   int property() const { return m_property; }
-  const TimingFunction& timingFunction() const { return m_timingFunction; }
+  const PassRefPtr<TimingFunction> timingFunction() const {
+    return m_timingFunction;
+  }
 
   void setDelay(double c) {
     m_delay = c;
@@ -132,7 +135,7 @@ class Animation : public RefCounted<Animation> {
     m_property = t;
     m_propertySet = true;
   }
-  void setTimingFunction(const TimingFunction& f) {
+  void setTimingFunction(PassRefPtr<TimingFunction> f) {
     m_timingFunction = f;
     m_timingFunctionSet = true;
   }
@@ -166,7 +169,7 @@ class Animation : public RefCounted<Animation> {
   int m_iterationCount;
   double m_delay;
   double m_duration;
-  TimingFunction m_timingFunction;
+  RefPtr<TimingFunction> m_timingFunction;
   AnimationDirection m_direction : 1;
   unsigned m_fillMode : 2;
 
@@ -195,8 +198,8 @@ class Animation : public RefCounted<Animation> {
   static String initialAnimationName() { return String("none"); }
   static unsigned initialAnimationPlayState() { return AnimPlayStatePlaying; }
   static int initialAnimationProperty() { return cAnimateAll; }
-  static TimingFunction initialAnimationTimingFunction() {
-    return TimingFunction();
+  static PassRefPtr<TimingFunction> initialAnimationTimingFunction() {
+    return CubicBezierTimingFunction::create();
   }
 };
 

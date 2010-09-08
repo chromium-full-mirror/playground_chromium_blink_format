@@ -86,17 +86,17 @@ class FloatPoint3D;
 class GraphicsContext;
 class Image;
 class TextStream;
-struct TimingFunction;
+class TimingFunction;
 
 // Base class for animation values (also used for transitions). Here to
 // represent values for properties being animated via the GraphicsLayer,
 // without pulling in style-related data from outside of the platform directory.
 class AnimationValue : public Noncopyable {
  public:
-  AnimationValue(float keyTime, const TimingFunction* timingFunction = 0)
+  AnimationValue(float keyTime, PassRefPtr<TimingFunction> timingFunction = 0)
       : m_keyTime(keyTime) {
     if (timingFunction)
-      m_timingFunction = adoptPtr(new TimingFunction(*timingFunction));
+      m_timingFunction = timingFunction;
   }
 
   virtual ~AnimationValue() {}
@@ -108,7 +108,7 @@ class AnimationValue : public Noncopyable {
 
  private:
   float m_keyTime;
-  OwnPtr<TimingFunction> m_timingFunction;
+  RefPtr<TimingFunction> m_timingFunction;
 };
 
 // Used to store one float value of an animation.
@@ -116,7 +116,7 @@ class FloatAnimationValue : public AnimationValue {
  public:
   FloatAnimationValue(float keyTime,
                       float value,
-                      const TimingFunction* timingFunction = 0)
+                      PassRefPtr<TimingFunction> timingFunction = 0)
       : AnimationValue(keyTime, timingFunction), m_value(value) {}
 
   float value() const { return m_value; }
@@ -130,7 +130,7 @@ class TransformAnimationValue : public AnimationValue {
  public:
   TransformAnimationValue(float keyTime,
                           const TransformOperations* value = 0,
-                          const TimingFunction* timingFunction = 0)
+                          PassRefPtr<TimingFunction> timingFunction = 0)
       : AnimationValue(keyTime, timingFunction) {
     if (value)
       m_value = adoptPtr(new TransformOperations(*value));

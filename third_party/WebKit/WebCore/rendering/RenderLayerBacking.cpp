@@ -1210,9 +1210,9 @@ bool RenderLayerBacking::startAnimation(double timeOffset,
       continue;
 
     // get timing function
-    const TimingFunction* tf =
+    RefPtr<TimingFunction> tf =
         keyframeStyle->hasAnimations()
-            ? &((*keyframeStyle->animations()).animation(0)->timingFunction())
+            ? (*keyframeStyle->animations()).animation(0)->timingFunction()
             : 0;
 
     if (currentKeyframe.containsProperty(CSSPropertyWebkitTransform))
