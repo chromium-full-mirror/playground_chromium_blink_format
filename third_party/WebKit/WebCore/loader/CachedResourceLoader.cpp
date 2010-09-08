@@ -26,7 +26,7 @@
 */
 
 #include "config.h"
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 
 #include "loader.h"
 #include "Cache.h"
@@ -51,17 +51,17 @@
 
 namespace WebCore {
 
-DocLoader::DocLoader(Document* doc)
+CachedResourceLoader::CachedResourceLoader(Document* doc)
     : m_cache(cache()),
       m_doc(doc),
       m_requestCount(0),
       m_autoLoadImages(true),
       m_loadInProgress(false),
       m_allowStaleResources(false) {
-  m_cache->addDocLoader(this);
+  m_cache->addCachedResourceLoader(this);
 }
 
-DocLoader::~DocLoader() {
+CachedResourceLoader::~CachedResourceLoader() {
   if (m_requestCount)
     m_cache->loader()->cancelRequests(this);
 
@@ -69,18 +69,18 @@ DocLoader::~DocLoader() {
   DocumentResourceMap::iterator end = m_documentResources.end();
   for (DocumentResourceMap::iterator it = m_documentResources.begin();
        it != end; ++it)
-    it->second->setDocLoader(0);
-  m_cache->removeDocLoader(this);
+    it->second->setCachedResourceLoader(0);
+  m_cache->removeCachedResourceLoader(this);
 
-  // Make sure no requests still point to this DocLoader
+  // Make sure no requests still point to this CachedResourceLoader
   ASSERT(m_requestCount == 0);
 }
 
-Frame* DocLoader::frame() const {
+Frame* CachedResourceLoader::frame() const {
   return m_doc->frame();
 }
 
-void DocLoader::checkForReload(const KURL& fullURL) {
+void CachedResourceLoader::checkForReload(const KURL& fullURL) {
   if (m_allowStaleResources)
     return;  // Don't reload resources while pasting
 
@@ -118,7 +118,7 @@ void DocLoader::checkForReload(const KURL& fullURL) {
   m_reloadedURLs.add(fullURL.string());
 }
 
-CachedImage* DocLoader::requestImage(const String& url) {
+CachedImage* CachedResourceLoader::requestImage(const String& url) {
   if (Frame* f = frame()) {
     Settings* settings = f->settings();
     if (!f->loader()->client()->allowImages(!settings ||
@@ -142,44 +142,47 @@ CachedImage* DocLoader::requestImage(const String& url) {
   return resource;
 }
 
-CachedFont* DocLoader::requestFont(const String& url) {
+CachedFont* CachedResourceLoader::requestFont(const String& url) {
   return static_cast<CachedFont*>(
       requestResource(CachedResource::FontResource, url, String()));
 }
 
-CachedCSSStyleSheet* DocLoader::requestCSSStyleSheet(const String& url,
-                                                     const String& charset) {
+CachedCSSStyleSheet* CachedResourceLoader::requestCSSStyleSheet(
+    const String& url,
+    const String& charset) {
   return static_cast<CachedCSSStyleSheet*>(
       requestResource(CachedResource::CSSStyleSheet, url, charset));
 }
 
-CachedCSSStyleSheet* DocLoader::requestUserCSSStyleSheet(
+CachedCSSStyleSheet* CachedResourceLoader::requestUserCSSStyleSheet(
     const String& url,
     const String& charset) {
   return cache()->requestUserCSSStyleSheet(this, url, charset);
 }
 
-CachedScript* DocLoader::requestScript(const String& url,
-                                       const String& charset) {
+CachedScript* CachedResourceLoader::requestScript(const String& url,
+                                                  const String& charset) {
   return static_cast<CachedScript*>(
       requestResource(CachedResource::Script, url, charset));
 }
 
 #if ENABLE(XSLT)
-CachedXSLStyleSheet* DocLoader::requestXSLStyleSheet(const String& url) {
+CachedXSLStyleSheet* CachedResourceLoader::requestXSLStyleSheet(
+    const String& url) {
   return static_cast<CachedXSLStyleSheet*>(
       requestResource(CachedResource::XSLStyleSheet, url, String()));
 }
 #endif
 
 #if ENABLE(LINK_PREFETCH)
-CachedResource* DocLoader::requestLinkPrefetch(const String& url) {
+CachedResource* CachedResourceLoader::requestLinkPrefetch(const String& url) {
   ASSERT(frame());
   return requestResource(CachedResource::LinkPrefetch, url, String());
 }
 #endif
 
-bool DocLoader::canRequest(CachedResource::Type type, const KURL& url) {
+bool CachedResourceLoader::canRequest(CachedResource::Type type,
+                                      const KURL& url) {
   // Some types of resources can be loaded only from the same origin.  Other
   // types of resources, like Images, Scripts, and CSS, can be loaded from
   // any URL.
@@ -247,10 +250,10 @@ bool DocLoader::canRequest(CachedResource::Type type, const KURL& url) {
   return true;
 }
 
-CachedResource* DocLoader::requestResource(CachedResource::Type type,
-                                           const String& url,
-                                           const String& charset,
-                                           bool isPreload) {
+CachedResource* CachedResourceLoader::requestResource(CachedResource::Type type,
+                                                      const String& url,
+                                                      const String& charset,
+                                                      bool isPreload) {
   KURL fullURL = m_doc->completeURL(url);
 
   if (!fullURL.isValid() || !canRequest(type, fullURL))
@@ -261,7 +264,7 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
         m_documentResources.find(fullURL.string());
 
     if (it != m_documentResources.end()) {
-      it->second->setDocLoader(0);
+      it->second->setCachedResourceLoader(0);
       m_documentResources.remove(it);
     }
   }
@@ -283,7 +286,7 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
   return resource;
 }
 
-void DocLoader::printAccessDeniedMessage(const KURL& url) const {
+void CachedResourceLoader::printAccessDeniedMessage(const KURL& url) const {
   if (url.isNull())
     return;
 
@@ -310,7 +313,7 @@ void DocLoader::printAccessDeniedMessage(const KURL& url) const {
                                               message, 1, String());
 }
 
-void DocLoader::setAutoLoadImages(bool enable) {
+void CachedResourceLoader::setAutoLoadImages(bool enable) {
   if (enable == m_autoLoadImages)
     return;
 
@@ -333,12 +336,13 @@ void DocLoader::setAutoLoadImages(bool enable) {
   }
 }
 
-CachePolicy DocLoader::cachePolicy() const {
+CachePolicy CachedResourceLoader::cachePolicy() const {
   return frame() ? frame()->loader()->subresourceCachePolicy()
                  : CachePolicyVerify;
 }
 
-void DocLoader::removeCachedResource(CachedResource* resource) const {
+void CachedResourceLoader::removeCachedResource(
+    CachedResource* resource) const {
 #ifndef NDEBUG
   DocumentResourceMap::iterator it = m_documentResources.find(resource->url());
   if (it != m_documentResources.end())
@@ -347,13 +351,13 @@ void DocLoader::removeCachedResource(CachedResource* resource) const {
   m_documentResources.remove(resource->url());
 }
 
-void DocLoader::setLoadInProgress(bool load) {
+void CachedResourceLoader::setLoadInProgress(bool load) {
   m_loadInProgress = load;
   if (!load && frame())
     frame()->loader()->loadDone();
 }
 
-void DocLoader::checkCacheObjectStatus(CachedResource* resource) {
+void CachedResourceLoader::checkCacheObjectStatus(CachedResource* resource) {
   // Return from the function for objects that we didn't load from the cache or
   // if we don't have a frame.
   if (!resource || !frame())
@@ -374,14 +378,14 @@ void DocLoader::checkCacheObjectStatus(CachedResource* resource) {
   frame()->loader()->loadedResourceFromMemoryCache(resource);
 }
 
-void DocLoader::incrementRequestCount(const CachedResource* res) {
+void CachedResourceLoader::incrementRequestCount(const CachedResource* res) {
   if (res->isPrefetch())
     return;
 
   ++m_requestCount;
 }
 
-void DocLoader::decrementRequestCount(const CachedResource* res) {
+void CachedResourceLoader::decrementRequestCount(const CachedResource* res) {
   if (res->isPrefetch())
     return;
 
@@ -389,16 +393,16 @@ void DocLoader::decrementRequestCount(const CachedResource* res) {
   ASSERT(m_requestCount > -1);
 }
 
-int DocLoader::requestCount() {
+int CachedResourceLoader::requestCount() {
   if (loadInProgress())
     return m_requestCount + 1;
   return m_requestCount;
 }
 
-void DocLoader::preload(CachedResource::Type type,
-                        const String& url,
-                        const String& charset,
-                        bool referencedFromBody) {
+void CachedResourceLoader::preload(CachedResource::Type type,
+                                   const String& url,
+                                   const String& charset,
+                                   bool referencedFromBody) {
   bool hasRendering = m_doc->body() && m_doc->body()->renderer();
   if (!hasRendering &&
       (referencedFromBody || type == CachedResource::ImageResource)) {
@@ -412,7 +416,7 @@ void DocLoader::preload(CachedResource::Type type,
   requestPreload(type, url, charset);
 }
 
-void DocLoader::checkForPendingPreloads() {
+void CachedResourceLoader::checkForPendingPreloads() {
   unsigned count = m_pendingPreloads.size();
   if (!count || !m_doc->body() || !m_doc->body()->renderer())
     return;
@@ -427,9 +431,9 @@ void DocLoader::checkForPendingPreloads() {
   m_pendingPreloads.clear();
 }
 
-void DocLoader::requestPreload(CachedResource::Type type,
-                               const String& url,
-                               const String& charset) {
+void CachedResourceLoader::requestPreload(CachedResource::Type type,
+                                          const String& url,
+                                          const String& charset) {
   String encoding;
   if (type == CachedResource::Script || type == CachedResource::CSSStyleSheet)
     encoding = charset.isEmpty()
@@ -450,7 +454,7 @@ void DocLoader::requestPreload(CachedResource::Type type,
 #endif
 }
 
-void DocLoader::clearPreloads() {
+void CachedResourceLoader::clearPreloads() {
 #if PRELOAD_DEBUG
   printPreloadStats();
 #endif
@@ -470,12 +474,12 @@ void DocLoader::clearPreloads() {
   m_preloads.clear();
 }
 
-void DocLoader::clearPendingPreloads() {
+void CachedResourceLoader::clearPendingPreloads() {
   m_pendingPreloads.clear();
 }
 
 #if PRELOAD_DEBUG
-void DocLoader::printPreloadStats() {
+void CachedResourceLoader::printPreloadStats() {
   unsigned scripts = 0;
   unsigned scriptMisses = 0;
   unsigned stylesheets = 0;

@@ -33,7 +33,7 @@
 #include "ArchiveFactory.h"
 #include "ArchiveResourceCollection.h"
 #include "CachedPage.h"
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 #include "Document.h"
 #include "DocumentParser.h"
 #include "Event.h"
@@ -383,7 +383,7 @@ bool DocumentLoader::isLoadingInAPISense() const {
     if (!m_subresourceLoaders.isEmpty())
       return true;
     Document* doc = m_frame->document();
-    if (doc->docLoader()->requestCount())
+    if (doc->cachedResourceLoader()->requestCount())
       return true;
     if (DocumentParser* parser = doc->parser())
       if (parser->processingData())
@@ -464,7 +464,7 @@ PassRefPtr<ArchiveResource> DocumentLoader::subresource(const KURL& url) const {
     return 0;
 
   CachedResource* resource =
-      m_frame->document()->docLoader()->cachedResource(url);
+      m_frame->document()->cachedResourceLoader()->cachedResource(url);
   if (!resource || !resource->isLoaded())
     return archiveResourceForURL(url);
 
@@ -487,10 +487,12 @@ void DocumentLoader::getSubresources(
 
   Document* document = m_frame->document();
 
-  const DocLoader::DocumentResourceMap& allResources =
-      document->docLoader()->allCachedResources();
-  DocLoader::DocumentResourceMap::const_iterator end = allResources.end();
-  for (DocLoader::DocumentResourceMap::const_iterator it = allResources.begin();
+  const CachedResourceLoader::DocumentResourceMap& allResources =
+      document->cachedResourceLoader()->allCachedResources();
+  CachedResourceLoader::DocumentResourceMap::const_iterator end =
+      allResources.end();
+  for (CachedResourceLoader::DocumentResourceMap::const_iterator it =
+           allResources.begin();
        it != end; ++it) {
     RefPtr<ArchiveResource> subresource =
         this->subresource(KURL(ParsedURLString, it->second->url()));

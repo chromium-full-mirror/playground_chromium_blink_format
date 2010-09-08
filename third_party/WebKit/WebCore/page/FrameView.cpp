@@ -31,7 +31,7 @@
 #include "CSSStyleSelector.h"
 #include "Chrome.h"
 #include "ChromeClient.h"
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 #include "EventHandler.h"
 #include "FloatRect.h"
 #include "FocusController.h"
@@ -1280,7 +1280,7 @@ void FrameView::checkStopDelayingDeferredRepaints() {
 
   Document* document = m_frame->document();
   if (document &&
-      (document->parsing() || document->docLoader()->requestCount()))
+      (document->parsing() || document->cachedResourceLoader()->requestCount()))
     return;
 
   m_deferredRepaintTimer.stop();
@@ -1313,8 +1313,8 @@ void FrameView::doDeferredRepaints() {
 
 void FrameView::updateDeferredRepaintDelay() {
   Document* document = m_frame->document();
-  if (!document ||
-      (!document->parsing() && !document->docLoader()->requestCount())) {
+  if (!document || (!document->parsing() &&
+                    !document->cachedResourceLoader()->requestCount())) {
     m_deferredRepaintDelay = s_deferredRepaintDelay;
     return;
   }

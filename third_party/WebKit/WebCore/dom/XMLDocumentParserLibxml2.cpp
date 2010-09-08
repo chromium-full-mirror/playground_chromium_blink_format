@@ -30,7 +30,7 @@
 #include "CDATASection.h"
 #include "CachedScript.h"
 #include "Comment.h"
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 #include "Document.h"
 #include "DocumentFragment.h"
 #include "DocumentType.h"
@@ -314,7 +314,7 @@ static int matchFunc(const char*) {
   // XMLDocumentParser to avoid
   // interfering with client applications that also use libxml2.
   // http://bugs.webkit.org/show_bug.cgi?id=17353
-  return XMLDocumentParserScope::currentDocLoader &&
+  return XMLDocumentParserScope::currentCachedResourceLoader &&
          currentThread() == libxmlLoaderThread;
 }
 
@@ -377,10 +377,11 @@ static bool shouldAllowExternalLoad(const KURL& url) {
   // retrieved content.  If we had more context, we could potentially allow
   // the parser to load a DTD.  As things stand, we take the conservative
   // route and allow same-origin requests only.
-  if (!XMLDocumentParserScope::currentDocLoader->doc()
+  if (!XMLDocumentParserScope::currentCachedResourceLoader->doc()
            ->securityOrigin()
            ->canRequest(url)) {
-    XMLDocumentParserScope::currentDocLoader->printAccessDeniedMessage(url);
+    XMLDocumentParserScope::currentCachedResourceLoader
+        ->printAccessDeniedMessage(url);
     return false;
   }
 
@@ -388,7 +389,7 @@ static bool shouldAllowExternalLoad(const KURL& url) {
 }
 
 static void* openFunc(const char* uri) {
-  ASSERT(XMLDocumentParserScope::currentDocLoader);
+  ASSERT(XMLDocumentParserScope::currentCachedResourceLoader);
   ASSERT(currentThread() == libxmlLoaderThread);
 
   KURL url(KURL(), uri);
@@ -401,12 +402,13 @@ static void* openFunc(const char* uri) {
   Vector<char> data;
 
   {
-    DocLoader* docLoader = XMLDocumentParserScope::currentDocLoader;
+    CachedResourceLoader* cachedResourceLoader =
+        XMLDocumentParserScope::currentCachedResourceLoader;
     XMLDocumentParserScope scope(0);
     // FIXME: We should restore the original global error handler as well.
 
-    if (docLoader->frame())
-      docLoader->frame()->loader()->loadResourceSynchronously(
+    if (cachedResourceLoader->frame())
+      cachedResourceLoader->frame()->loader()->loadResourceSynchronously(
           url, AllowStoredCredentials, error, response, data);
   }
 
@@ -636,7 +638,7 @@ void XMLDocumentParser::doWrite(const String& parseString) {
     RefPtr<XMLDocumentParser> protect(this);
 
     switchToUTF16(context->context());
-    XMLDocumentParserScope scope(document()->docLoader());
+    XMLDocumentParserScope scope(document()->cachedResourceLoader());
     xmlParseChunk(context->context(),
                   reinterpret_cast<const char*>(parseString.characters()),
                   sizeof(UChar) * parseString.length(), 0);
@@ -891,7 +893,7 @@ void XMLDocumentParser::endElementNs() {
       // we have a src attribute
       String scriptCharset = scriptElement->scriptCharset();
       if (element->dispatchBeforeLoadEvent(scriptHref) &&
-          (m_pendingScript = document()->docLoader()->requestScript(
+          (m_pendingScript = document()->cachedResourceLoader()->requestScript(
                scriptHref, scriptCharset))) {
         m_scriptElement = element;
         m_pendingScript->addClient(this);
@@ -1320,7 +1322,7 @@ void XMLDocumentParser::initializeParserContext(const char* chunk) {
   m_sawXSLTransform = false;
   m_sawFirstElement = false;
 
-  XMLDocumentParserScope scope(document()->docLoader());
+  XMLDocumentParserScope scope(document()->cachedResourceLoader());
   if (m_parsingFragment)
     m_context = XMLParserContext::createMemoryParser(&sax, this, chunk);
   else {
@@ -1332,7 +1334,7 @@ void XMLDocumentParser::initializeParserContext(const char* chunk) {
 void XMLDocumentParser::doEnd() {
 #if ENABLE(XSLT)
   if (m_sawXSLTransform) {
-    void* doc = xmlDocPtrForString(document()->docLoader(),
+    void* doc = xmlDocPtrForString(document()->cachedResourceLoader(),
                                    m_originalSourceForTransform,
                                    document()->url().string());
     document()->setTransformSource(new TransformSource(doc));
@@ -1351,7 +1353,7 @@ void XMLDocumentParser::doEnd() {
   if (m_context) {
     // Tell libxml we're done.
     {
-      XMLDocumentParserScope scope(document()->docLoader());
+      XMLDocumentParserScope scope(document()->cachedResourceLoader());
       xmlParseChunk(context(), 0, 0, 1);
     }
 
@@ -1360,7 +1362,7 @@ void XMLDocumentParser::doEnd() {
 }
 
 #if ENABLE(XSLT)
-void* xmlDocPtrForString(DocLoader* docLoader,
+void* xmlDocPtrForString(CachedResourceLoader* cachedResourceLoader,
                          const String& source,
                          const String& url) {
   if (source.isEmpty())
@@ -1374,7 +1376,7 @@ void* xmlDocPtrForString(DocLoader* docLoader,
   const unsigned char BOMHighByte =
       *reinterpret_cast<const unsigned char*>(&BOM);
 
-  XMLDocumentParserScope scope(docLoader, errorFunc, 0);
+  XMLDocumentParserScope scope(cachedResourceLoader, errorFunc, 0);
   xmlDocPtr sourceDoc = xmlReadMemory(
       reinterpret_cast<const char*>(source.characters()),
       source.length() * sizeof(UChar), url.latin1().data(),

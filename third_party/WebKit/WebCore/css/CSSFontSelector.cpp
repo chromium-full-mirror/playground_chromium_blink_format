@@ -39,7 +39,7 @@
 #include "CSSUnicodeRangeValue.h"
 #include "CSSValueKeywords.h"
 #include "CSSValueList.h"
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 #include "Document.h"
 #include "FontCache.h"
 #include "FontFamilyValue.h"
@@ -78,8 +78,8 @@ bool CSSFontSelector::isEmpty() const {
   return m_fonts.isEmpty();
 }
 
-DocLoader* CSSFontSelector::docLoader() const {
-  return m_document ? m_document->docLoader() : 0;
+CachedResourceLoader* CSSFontSelector::cachedResourceLoader() const {
+  return m_document ? m_document->cachedResourceLoader() : 0;
 }
 
 void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
@@ -262,7 +262,7 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
           (settings && settings->downloadableBinaryFontsEnabled());
       if (allowDownloading && item->isSupportedFormat() && m_document) {
         CachedFont* cachedFont =
-            m_document->docLoader()->requestFont(item->resource());
+            m_document->cachedResourceLoader()->requestFont(item->resource());
         if (cachedFont) {
 #if ENABLE(SVG_FONTS)
           if (foundSVGFont)

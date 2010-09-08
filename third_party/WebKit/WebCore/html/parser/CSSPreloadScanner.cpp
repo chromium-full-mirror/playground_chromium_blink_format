@@ -30,7 +30,7 @@
 
 #include "CSSHelper.h"
 #include "CachedCSSStyleSheet.h"
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 #include "Document.h"
 #include "HTMLToken.h"
 
@@ -145,8 +145,8 @@ void CSSPreloadScanner::emitRule() {
     String value(m_ruleValue.data(), m_ruleValue.size());
     String url = deprecatedParseURL(value);
     if (!url.isEmpty())
-      m_document->docLoader()->preload(CachedResource::CSSStyleSheet, url,
-                                       String(), m_scanningBody);
+      m_document->cachedResourceLoader()->preload(
+          CachedResource::CSSStyleSheet, url, String(), m_scanningBody);
   }
   m_rule.clear();
   m_ruleValue.clear();

@@ -39,7 +39,7 @@ class Cache;
 class CachedMetadata;
 class CachedResourceClient;
 class CachedResourceHandleBase;
-class DocLoader;
+class CachedResourceLoader;
 class Frame;
 class InspectorResource;
 class Request;
@@ -82,10 +82,10 @@ class CachedResource : public Noncopyable {
   CachedResource(const String& url, Type);
   virtual ~CachedResource();
 
-  virtual void load(DocLoader* docLoader) {
-    load(docLoader, false, DoSecurityCheck, true);
+  virtual void load(CachedResourceLoader* cachedResourceLoader) {
+    load(cachedResourceLoader, false, DoSecurityCheck, true);
   }
-  void load(DocLoader*,
+  void load(CachedResourceLoader*,
             bool incremental,
             SecurityCheckPolicy,
             bool sendResourceLoadCallbacks);
@@ -210,7 +210,9 @@ class CachedResource : public Noncopyable {
 
   virtual void destroyDecodedData() {}
 
-  void setDocLoader(DocLoader* docLoader) { m_docLoader = docLoader; }
+  void setCachedResourceLoader(CachedResourceLoader* cachedResourceLoader) {
+    m_cachedResourceLoader = cachedResourceLoader;
+  }
 
   bool isPreloaded() const { return m_preloadCount; }
   void increasePreloadCount() { ++m_preloadCount; }
@@ -314,7 +316,8 @@ class CachedResource : public Noncopyable {
   CachedResource* m_nextInLiveResourcesList;
   CachedResource* m_prevInLiveResourcesList;
 
-  DocLoader* m_docLoader;  // only non-0 for resources that are not in the cache
+  CachedResourceLoader* m_cachedResourceLoader;  // only non-0 for resources
+                                                 // that are not in the cache
 
   // If this field is non-null we are using the resource as a proxy for checking
   // whether an existing resource is still up to date

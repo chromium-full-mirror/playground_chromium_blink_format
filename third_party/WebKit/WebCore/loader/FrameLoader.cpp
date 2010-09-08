@@ -44,7 +44,7 @@
 #include "Chrome.h"
 #include "DOMImplementation.h"
 #include "DOMWindow.h"
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 #include "Document.h"
 #include "DocumentLoadTiming.h"
 #include "DocumentLoader.h"
@@ -161,7 +161,7 @@ static int numRequests(Document* document) {
   if (!document)
     return 0;
 
-  return document->docLoader()->requestCount();
+  return document->cachedResourceLoader()->requestCount();
 }
 
 // This is not in the FrameLoader class to emphasize that it does not depend on
@@ -486,8 +486,9 @@ void FrameLoader::stopLoading(UnloadEventPolicy unloadEventPolicy,
     // http://www.w3.org/Bugs/Public/show_bug.cgi?id=10537
     doc->setReadyState(Document::Complete);
 
-    if (DocLoader* docLoader = doc->docLoader())
-      cache()->loader()->cancelRequests(docLoader);
+    if (CachedResourceLoader* cachedResourceLoader =
+            doc->cachedResourceLoader())
+      cache()->loader()->cancelRequests(cachedResourceLoader);
 
 #if ENABLE(DATABASE)
     if (databasePolicy == DatabasePolicyStop)
@@ -728,7 +729,7 @@ void FrameLoader::didBeginDocument(bool dispatch) {
   updateFirstPartyForCookies();
 
   Settings* settings = m_frame->document()->settings();
-  m_frame->document()->docLoader()->setAutoLoadImages(
+  m_frame->document()->cachedResourceLoader()->setAutoLoadImages(
       settings && settings->loadsImagesAutomatically());
 
   if (m_documentLoader) {

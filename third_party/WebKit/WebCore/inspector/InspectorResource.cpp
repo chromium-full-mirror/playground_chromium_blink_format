@@ -35,7 +35,7 @@
 
 #include "Cache.h"
 #include "CachedResource.h"
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 #include "DocumentLoader.h"
 #include "Frame.h"
 #include "InspectorFrontend.h"
@@ -268,13 +268,14 @@ void InspectorResource::releaseScriptObject(InspectorFrontend* frontend) {
 
 CachedResource* InspectorResource::cachedResource() const {
   // Try hard to find a corresponding CachedResource. During preloading,
-  // DocLoader may not have the resource in document resources set yet,
+  // CachedResourceLoader may not have the resource in document resources set
+  // yet,
   // but Inspector will already try to fetch data that is only available via
   // CachedResource (and it won't update once the resource is added,
   // because m_changes will not have the appropriate bits set).
   const String& url = m_requestURL.string();
   CachedResource* cachedResource =
-      m_frame->document()->docLoader()->cachedResource(url);
+      m_frame->document()->cachedResourceLoader()->cachedResource(url);
   if (!cachedResource)
     cachedResource = cache()->resourceForURL(url);
   return cachedResource;

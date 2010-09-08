@@ -57,10 +57,10 @@ void XSLStyleSheet::clearDocuments() {
   notImplemented();
 }
 
-DocLoader* XSLStyleSheet::docLoader() {
+CachedResourceLoader* XSLStyleSheet::cachedResourceLoader() {
   if (!m_ownerDocument)
     return 0;
-  return m_ownerDocument->docLoader();
+  return m_ownerDocument->cachedResourceLoader();
 }
 
 bool XSLStyleSheet::parseString(const String& string, bool) {

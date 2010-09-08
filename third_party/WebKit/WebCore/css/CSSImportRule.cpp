@@ -24,7 +24,7 @@
 #include "CSSImportRule.h"
 
 #include "CachedCSSStyleSheet.h"
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 #include "Document.h"
 #include "SecurityOrigin.h"
 #include "Settings.h"
@@ -127,8 +127,9 @@ void CSSImportRule::insertedIntoParent() {
   if (!parentSheet)
     return;
 
-  DocLoader* docLoader = parentSheet->document()->docLoader();
-  if (!docLoader)
+  CachedResourceLoader* cachedResourceLoader =
+      parentSheet->document()->cachedResourceLoader();
+  if (!cachedResourceLoader)
     return;
 
   String absHref = m_strHref;
@@ -149,11 +150,11 @@ void CSSImportRule::insertedIntoParent() {
   }
 
   if (parentSheet->isUserStyleSheet())
-    m_cachedSheet =
-        docLoader->requestUserCSSStyleSheet(absHref, parentSheet->charset());
+    m_cachedSheet = cachedResourceLoader->requestUserCSSStyleSheet(
+        absHref, parentSheet->charset());
   else
-    m_cachedSheet =
-        docLoader->requestCSSStyleSheet(absHref, parentSheet->charset());
+    m_cachedSheet = cachedResourceLoader->requestCSSStyleSheet(
+        absHref, parentSheet->charset());
   if (m_cachedSheet) {
     // if the import rule is issued dynamically, the sheet may be
     // removed from the pending sheet count, so let the doc know

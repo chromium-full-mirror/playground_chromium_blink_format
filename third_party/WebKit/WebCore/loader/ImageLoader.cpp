@@ -25,7 +25,7 @@
 
 #include "CSSHelper.h"
 #include "CachedImage.h"
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 #include "Document.h"
 #include "Element.h"
 #include "HTMLNames.h"
@@ -161,15 +161,18 @@ void ImageLoader::updateFromElement() {
   if (!(attr.isNull() ||
         (attr.isEmpty() && document->baseURI().isLocalFile()))) {
     if (m_loadManually) {
-      bool autoLoadOtherImages = document->docLoader()->autoLoadImages();
-      document->docLoader()->setAutoLoadImages(false);
+      bool autoLoadOtherImages =
+          document->cachedResourceLoader()->autoLoadImages();
+      document->cachedResourceLoader()->setAutoLoadImages(false);
       newImage = new CachedImage(sourceURI(attr));
       newImage->setLoading(true);
-      newImage->setDocLoader(document->docLoader());
-      document->docLoader()->m_documentResources.set(newImage->url(), newImage);
-      document->docLoader()->setAutoLoadImages(autoLoadOtherImages);
+      newImage->setCachedResourceLoader(document->cachedResourceLoader());
+      document->cachedResourceLoader()->m_documentResources.set(newImage->url(),
+                                                                newImage);
+      document->cachedResourceLoader()->setAutoLoadImages(autoLoadOtherImages);
     } else
-      newImage = document->docLoader()->requestImage(sourceURI(attr));
+      newImage =
+          document->cachedResourceLoader()->requestImage(sourceURI(attr));
 
     // If we do not have an image here, it means that a cross-site
     // violation occurred.

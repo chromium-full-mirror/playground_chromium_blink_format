@@ -27,7 +27,7 @@
 
 #include "ResourceHandle.h"
 
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 #include "DocumentLoader.h"
 #include "Frame.h"
 #include "FrameLoader.h"
@@ -45,8 +45,8 @@ ResourceHandleInternal::~ResourceHandleInternal() {}
 ResourceHandle::~ResourceHandle() {}
 
 bool ResourceHandle::start(Frame* frame) {
-  DocumentLoader* docLoader = frame->loader()->activeDocumentLoader();
-  MainResourceLoader* mainLoader = docLoader->mainResourceLoader();
+  DocumentLoader* documentLoader = frame->loader()->activeDocumentLoader();
+  MainResourceLoader* mainLoader = documentLoader->mainResourceLoader();
   bool isMainResource = mainLoader && (mainLoader->handle() == this);
 
   PassRefPtr<ResourceLoaderAndroid> loader = ResourceLoaderAndroid::start(

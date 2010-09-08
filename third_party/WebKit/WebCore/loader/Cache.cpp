@@ -28,7 +28,7 @@
 #include "CachedImage.h"
 #include "CachedScript.h"
 #include "CachedXSLStyleSheet.h"
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 #include "Document.h"
 #include "FrameLoader.h"
 #include "FrameLoaderTypes.h"
@@ -93,11 +93,12 @@ static CachedResource* createResource(CachedResource::Type type,
   return 0;
 }
 
-CachedResource* Cache::requestResource(DocLoader* docLoader,
-                                       CachedResource::Type type,
-                                       const KURL& url,
-                                       const String& charset,
-                                       bool requestIsPreload) {
+CachedResource* Cache::requestResource(
+    CachedResourceLoader* cachedResourceLoader,
+    CachedResource::Type type,
+    const KURL& url,
+    const String& charset,
+    bool requestIsPreload) {
   // FIXME: Do we really need to special-case an empty URL?
   // Would it be better to just go on with the cache code and let it fail later?
   if (url.isEmpty())
@@ -110,8 +111,8 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
     return 0;
 
   if (SecurityOrigin::restrictAccessToLocal() &&
-      !SecurityOrigin::canDisplay(url, String(), docLoader->doc())) {
-    Document* doc = docLoader->doc();
+      !SecurityOrigin::canDisplay(url, String(), cachedResourceLoader->doc())) {
+    Document* doc = cachedResourceLoader->doc();
     if (doc && !requestIsPreload)
       FrameLoader::reportLocalLoadFailed(doc->frame(), url.string());
     return 0;
@@ -127,7 +128,7 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
     // FIXME: CachedResource should just use normal refcounting instead.
     resource->setInCache(true);
 
-    resource->load(docLoader);
+    resource->load(cachedResourceLoader);
 
     if (resource->errorOccurred()) {
       // We don't support immediate loads, but we do support immediate failure.
@@ -147,7 +148,7 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
     else {
       // Kick the resource out of the cache, because the cache is disabled.
       resource->setInCache(false);
-      resource->setDocLoader(docLoader);
+      resource->setCachedResourceLoader(cachedResourceLoader);
     }
   }
 
@@ -163,9 +164,10 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
   return resource;
 }
 
-CachedCSSStyleSheet* Cache::requestUserCSSStyleSheet(DocLoader* docLoader,
-                                                     const String& url,
-                                                     const String& charset) {
+CachedCSSStyleSheet* Cache::requestUserCSSStyleSheet(
+    CachedResourceLoader* cachedResourceLoader,
+    const String& url,
+    const String& charset) {
   CachedCSSStyleSheet* userSheet;
   if (CachedResource* existing = resourceForURL(url)) {
     if (existing->type() != CachedResource::CSSStyleSheet)
@@ -180,7 +182,7 @@ CachedCSSStyleSheet* Cache::requestUserCSSStyleSheet(DocLoader* docLoader,
     userSheet->setInCache(true);
     // Don't load incrementally, skip load checks, don't send resource load
     // callbacks.
-    userSheet->load(docLoader, false, SkipSecurityCheck, false);
+    userSheet->load(cachedResourceLoader, false, SkipSecurityCheck, false);
     if (!disabled())
       m_resources.set(url, userSheet);
     else
@@ -196,7 +198,8 @@ CachedCSSStyleSheet* Cache::requestUserCSSStyleSheet(DocLoader* docLoader,
   return userSheet;
 }
 
-void Cache::revalidateResource(CachedResource* resource, DocLoader* docLoader) {
+void Cache::revalidateResource(CachedResource* resource,
+                               CachedResourceLoader* cachedResourceLoader) {
   ASSERT(resource);
   ASSERT(resource->inCache());
   ASSERT(resource == m_resources.get(resource->url()));
@@ -215,7 +218,7 @@ void Cache::revalidateResource(CachedResource* resource, DocLoader* docLoader) {
   m_resources.set(url, newResource);
   newResource->setInCache(true);
   resourceAccessed(newResource);
-  newResource->load(docLoader);
+  newResource->load(cachedResourceLoader);
 }
 
 void Cache::revalidationSucceeded(CachedResource* revalidatingResource,
@@ -448,12 +451,14 @@ void Cache::evict(CachedResource* resource) {
     delete resource;
 }
 
-void Cache::addDocLoader(DocLoader* docLoader) {
-  m_docLoaders.add(docLoader);
+void Cache::addCachedResourceLoader(
+    CachedResourceLoader* cachedResourceLoader) {
+  m_cachedResourceLoaders.add(cachedResourceLoader);
 }
 
-void Cache::removeDocLoader(DocLoader* docLoader) {
-  m_docLoaders.remove(docLoader);
+void Cache::removeCachedResourceLoader(
+    CachedResourceLoader* cachedResourceLoader) {
+  m_cachedResourceLoaders.remove(cachedResourceLoader);
 }
 
 static inline unsigned fastLog2(unsigned i) {

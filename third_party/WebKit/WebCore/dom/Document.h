@@ -66,7 +66,7 @@ class DOMImplementation;
 class DOMSelection;
 class DOMWindow;
 class DatabaseThread;
-class DocLoader;
+class CachedResourceLoader;
 class DocumentFragment;
 class DocumentType;
 class DocumentWeakReference;
@@ -577,7 +577,9 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   static void updateStyleForAllDocuments();  // FIXME: Try to reduce the # of
                                              // calls to this function.
-  DocLoader* docLoader() { return m_docLoader.get(); }
+  CachedResourceLoader* cachedResourceLoader() {
+    return m_cachedResourceLoader.get();
+  }
 
   virtual void attach();
   virtual void detach();
@@ -1219,7 +1221,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_didCalculateStyleSelector;
 
   Frame* m_frame;
-  OwnPtr<DocLoader> m_docLoader;
+  OwnPtr<CachedResourceLoader> m_cachedResourceLoader;
   RefPtr<DocumentParser> m_parser;
   bool m_wellFormed;
 

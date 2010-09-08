@@ -28,13 +28,13 @@
 
 namespace WebCore {
 
-Request::Request(DocLoader* docLoader,
+Request::Request(CachedResourceLoader* cachedResourceLoader,
                  CachedResource* object,
                  bool incremental,
                  SecurityCheckPolicy shouldDoSecurityCheck,
                  bool sendResourceLoadCallbacks)
     : m_object(object),
-      m_docLoader(docLoader),
+      m_cachedResourceLoader(cachedResourceLoader),
       m_incremental(incremental),
       m_multipart(false),
       m_shouldDoSecurityCheck(shouldDoSecurityCheck),

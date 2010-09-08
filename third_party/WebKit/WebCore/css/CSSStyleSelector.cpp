@@ -7480,7 +7480,8 @@ void CSSStyleSelector::loadPendingImages() {
        it != end; ++it) {
     CSSPropertyID currentProperty = static_cast<CSSPropertyID>(*it);
 
-    DocLoader* docLoader = m_element->document()->docLoader();
+    CachedResourceLoader* cachedResourceLoader =
+        m_element->document()->cachedResourceLoader();
 
     switch (currentProperty) {
       case CSSPropertyBackgroundImage: {
@@ -7491,7 +7492,8 @@ void CSSStyleSelector::loadPendingImages() {
             CSSImageValue* imageValue =
                 static_cast<StylePendingImage*>(backgroundLayer->image())
                     ->cssImageValue();
-            backgroundLayer->setImage(imageValue->cachedImage(docLoader));
+            backgroundLayer->setImage(
+                imageValue->cachedImage(cachedResourceLoader));
           }
         }
         break;
@@ -7506,7 +7508,8 @@ void CSSStyleSelector::loadPendingImages() {
             CSSImageValue* imageValue =
                 static_cast<StylePendingImage*>(contentData->image())
                     ->cssImageValue();
-            contentData->setImage(imageValue->cachedImage(docLoader));
+            contentData->setImage(
+                imageValue->cachedImage(cachedResourceLoader));
           }
         }
         break;
@@ -7520,7 +7523,8 @@ void CSSStyleSelector::loadPendingImages() {
               CSSImageValue* imageValue =
                   static_cast<StylePendingImage*>(currentCursor.image())
                       ->cssImageValue();
-              currentCursor.setImage(imageValue->cachedImage(docLoader));
+              currentCursor.setImage(
+                  imageValue->cachedImage(cachedResourceLoader));
             }
           }
         }
@@ -7533,7 +7537,8 @@ void CSSStyleSelector::loadPendingImages() {
           CSSImageValue* imageValue =
               static_cast<StylePendingImage*>(m_style->listStyleImage())
                   ->cssImageValue();
-          m_style->setListStyleImage(imageValue->cachedImage(docLoader));
+          m_style->setListStyleImage(
+              imageValue->cachedImage(cachedResourceLoader));
         }
         break;
       }
@@ -7544,9 +7549,10 @@ void CSSStyleSelector::loadPendingImages() {
           CSSImageValue* imageValue =
               static_cast<StylePendingImage*>(borderImage.image())
                   ->cssImageValue();
-          m_style->setBorderImage(NinePieceImage(
-              imageValue->cachedImage(docLoader), borderImage.slices(),
-              borderImage.horizontalRule(), borderImage.verticalRule()));
+          m_style->setBorderImage(
+              NinePieceImage(imageValue->cachedImage(cachedResourceLoader),
+                             borderImage.slices(), borderImage.horizontalRule(),
+                             borderImage.verticalRule()));
         }
         break;
       }
@@ -7558,7 +7564,7 @@ void CSSStyleSelector::loadPendingImages() {
               static_cast<StylePendingImage*>(maskImage.image())
                   ->cssImageValue();
           m_style->boxReflect()->setMask(NinePieceImage(
-              imageValue->cachedImage(docLoader), maskImage.slices(),
+              imageValue->cachedImage(cachedResourceLoader), maskImage.slices(),
               maskImage.horizontalRule(), maskImage.verticalRule()));
         }
         break;
@@ -7571,8 +7577,9 @@ void CSSStyleSelector::loadPendingImages() {
               static_cast<StylePendingImage*>(maskBoxImage.image())
                   ->cssImageValue();
           m_style->setMaskBoxImage(NinePieceImage(
-              imageValue->cachedImage(docLoader), maskBoxImage.slices(),
-              maskBoxImage.horizontalRule(), maskBoxImage.verticalRule()));
+              imageValue->cachedImage(cachedResourceLoader),
+              maskBoxImage.slices(), maskBoxImage.horizontalRule(),
+              maskBoxImage.verticalRule()));
         }
         break;
       }
@@ -7584,7 +7591,7 @@ void CSSStyleSelector::loadPendingImages() {
             CSSImageValue* imageValue =
                 static_cast<StylePendingImage*>(maskLayer->image())
                     ->cssImageValue();
-            maskLayer->setImage(imageValue->cachedImage(docLoader));
+            maskLayer->setImage(imageValue->cachedImage(cachedResourceLoader));
           }
         }
         break;

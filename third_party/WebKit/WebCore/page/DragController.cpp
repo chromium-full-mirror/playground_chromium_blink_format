@@ -30,7 +30,7 @@
 #include "CSSStyleDeclaration.h"
 #include "Clipboard.h"
 #include "ClipboardAccessPolicy.h"
-#include "DocLoader.h"
+#include "CachedResourceLoader.h"
 #include "Document.h"
 #include "DocumentFragment.h"
 #include "DragActions.h"
@@ -469,8 +469,9 @@ bool DragController::concludeEditDrag(DragData* dragData) {
   // manually controlling drag behaviour
   if (!range)
     return false;
-  DocLoader* loader = range->ownerDocument()->docLoader();
-  loader->setAllowStaleResources(true);
+  CachedResourceLoader* cachedResourceLoader =
+      range->ownerDocument()->cachedResourceLoader();
+  cachedResourceLoader->setAllowStaleResources(true);
   if (dragIsMove(innerFrame->selection()) ||
       dragCaret.isContentRichlyEditable()) {
     bool chosePlainText = false;
@@ -479,7 +480,7 @@ bool DragController::concludeEditDrag(DragData* dragData) {
     if (!fragment ||
         !innerFrame->editor()->shouldInsertFragment(
             fragment, range, EditorInsertActionDropped)) {
-      loader->setAllowStaleResources(false);
+      cachedResourceLoader->setAllowStaleResources(false);
       return false;
     }
 
@@ -507,7 +508,7 @@ bool DragController::concludeEditDrag(DragData* dragData) {
     if (text.isEmpty() ||
         !innerFrame->editor()->shouldInsertText(text, range.get(),
                                                 EditorInsertActionDropped)) {
-      loader->setAllowStaleResources(false);
+      cachedResourceLoader->setAllowStaleResources(false);
       return false;
     }
 
@@ -518,7 +519,7 @@ bool DragController::concludeEditDrag(DragData* dragData) {
           m_documentUnderMouse.get(), createFragmentFromText(range.get(), text),
           true, false, true));
   }
-  loader->setAllowStaleResources(false);
+  cachedResourceLoader->setAllowStaleResources(false);
 
   return true;
 }

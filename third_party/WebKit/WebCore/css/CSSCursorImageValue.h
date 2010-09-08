@@ -42,7 +42,7 @@ class CSSCursorImageValue : public CSSImageValue {
   IntPoint hotSpot() const { return m_hotSpot; }
 
   bool updateIfSVGCursorIsUsed(Element*);
-  virtual StyleCachedImage* cachedImage(DocLoader*);
+  virtual StyleCachedImage* cachedImage(CachedResourceLoader*);
 
 #if ENABLE(SVG)
   void removeReferencedElement(SVGElement*);
