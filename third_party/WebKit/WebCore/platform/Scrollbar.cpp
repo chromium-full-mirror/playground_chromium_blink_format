@@ -106,11 +106,11 @@ Scrollbar::~Scrollbar() {
   m_theme->unregisterScrollbar(this);
 }
 
-bool Scrollbar::setValue(int v) {
+bool Scrollbar::setValue(int v, ScrollSource source) {
   v = max(min(v, m_totalSize - m_visibleSize), 0);
   if (value() == v)
     return false;  // Our value stayed the same.
-  setCurrentPos(v);
+  setCurrentPos(v, source);
   return true;
 }
 
@@ -170,10 +170,13 @@ bool Scrollbar::scroll(ScrollDirection direction,
   }
   if (direction == ScrollUp || direction == ScrollLeft)
     multiplier = -multiplier;
+  if (client())
+    return client()->scroll(m_orientation, granularity, step, multiplier);
 
   return setCurrentPos(max(min(m_currentPos + (step * multiplier),
                                static_cast<float>(m_totalSize - m_visibleSize)),
-                           0.0f));
+                           0.0f),
+                       NotFromScrollAnimator);
 }
 
 void Scrollbar::updateThumb() {
@@ -303,10 +306,14 @@ void Scrollbar::moveThumb(int pos) {
     delta = max(-thumbPos, delta);
   if (delta)
     setCurrentPos(static_cast<float>(thumbPos + delta) * maximum() /
-                  (trackLen - thumbLen));
+                      (trackLen - thumbLen),
+                  NotFromScrollAnimator);
 }
 
-bool Scrollbar::setCurrentPos(float pos) {
+bool Scrollbar::setCurrentPos(float pos, ScrollSource source) {
+  if ((source != FromScrollAnimator) && client())
+    client()->setScrollPositionAndStopAnimation(m_orientation, pos);
+
   if (pos == m_currentPos)
     return false;
 
@@ -354,7 +361,7 @@ void Scrollbar::setPressedPart(ScrollbarPart part) {
 bool Scrollbar::mouseMoved(const PlatformMouseEvent& evt) {
   if (m_pressedPart == ThumbPart) {
     if (theme()->shouldSnapBackToDragOrigin(this, evt))
-      setCurrentPos(m_dragOrigin);
+      setCurrentPos(m_dragOrigin, NotFromScrollAnimator);
     else {
       moveThumb(m_orientation == HorizontalScrollbar
                     ? convertFromContainingWindow(evt.pos()).x()
