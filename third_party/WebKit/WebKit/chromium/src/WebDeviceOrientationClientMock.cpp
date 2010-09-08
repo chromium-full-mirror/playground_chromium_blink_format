@@ -35,6 +35,7 @@ namespace WebKit {
 void WebDeviceOrientationClientMock::setController(
     WebDeviceOrientationController* controller) {
   m_clientMock->setController(controller->controller());
+  delete controller;
 }
 
 void WebDeviceOrientationClientMock::startUpdating() {
@@ -55,12 +56,11 @@ void WebDeviceOrientationClientMock::setOrientation(
 }
 
 void WebDeviceOrientationClientMock::initialize() {
-  m_clientMock = new WebCore::DeviceOrientationClientMock();
+  m_clientMock.reset(new WebCore::DeviceOrientationClientMock());
 }
 
 void WebDeviceOrientationClientMock::reset() {
-  delete m_clientMock;
-  m_clientMock = 0;
+  m_clientMock.reset(0);
 }
 
 }  // namespace WebKit
