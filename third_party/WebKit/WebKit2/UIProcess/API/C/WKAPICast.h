@@ -56,6 +56,7 @@ class WebNavigationData;
 class WebPageNamespace;
 class WebPageProxy;
 class WebPreferences;
+class WebSerializedScriptValue;
 class WebURLRequest;
 class WebURLResponse;
 
@@ -120,6 +121,10 @@ struct APITypeInfo<WKPageRef> {
 template <>
 struct APITypeInfo<WKPreferencesRef> {
   typedef WebPreferences* ImplType;
+};
+template <>
+struct APITypeInfo<WKSerializedScriptValueRef> {
+  typedef WebSerializedScriptValue* ImplType;
 };
 template <>
 struct APITypeInfo<WKStringRef> {
@@ -211,6 +216,10 @@ struct ImplTypeInfo<WebPageProxy*> {
 template <>
 struct ImplTypeInfo<WebPreferences*> {
   typedef WKPreferencesRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebSerializedScriptValue*> {
+  typedef WKSerializedScriptValueRef APIType;
 };
 template <>
 struct ImplTypeInfo<WebString*> {

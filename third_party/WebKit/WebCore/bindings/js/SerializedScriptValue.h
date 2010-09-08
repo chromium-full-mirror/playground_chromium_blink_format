@@ -45,6 +45,10 @@ class SerializedScriptValue : public RefCounted<SerializedScriptValue> {
                                                   JSValueRef value,
                                                   JSValueRef* exception);
   static PassRefPtr<SerializedScriptValue> create(String string);
+  static PassRefPtr<SerializedScriptValue> adopt(Vector<uint8_t>& buffer) {
+    return adoptRef(new SerializedScriptValue(buffer));
+  }
+
   static PassRefPtr<SerializedScriptValue> create();
   static SerializedScriptValue* nullValue();
 
@@ -52,6 +56,7 @@ class SerializedScriptValue : public RefCounted<SerializedScriptValue> {
                            JSC::JSGlobalObject* globalObject);
   String toString();
   JSValueRef deserialize(JSContextRef, JSValueRef* exception);
+  const Vector<uint8_t>& data() { return m_data; }
 
   ~SerializedScriptValue();
 

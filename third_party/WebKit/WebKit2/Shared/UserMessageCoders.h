@@ -28,6 +28,7 @@
 #include "ImmutableArray.h"
 #include "ImmutableDictionary.h"
 #include "WebCoreArgumentCoders.h"
+#include "WebSerializedScriptValue.h"
 #include "WebString.h"
 
 namespace WebKit {
@@ -36,6 +37,7 @@ namespace WebKit {
 //   - Array -> Array
 //   - Dictionary -> Dictionary
 //   - String -> String
+//   - SerializedScriptValue -> SerializedScriptValue
 
 template <typename Owner>
 class UserMessageEncoder {
@@ -75,6 +77,13 @@ class UserMessageEncoder {
       case APIObject::TypeString: {
         WebString* string = static_cast<WebString*>(m_root);
         encoder->encode(string->string());
+        return true;
+      }
+      case APIObject::TypeSerializedScriptValue: {
+        WebSerializedScriptValue* scriptValue =
+            static_cast<WebSerializedScriptValue*>(m_root);
+        encoder->encodeBytes(scriptValue->data().data(),
+                             scriptValue->data().size());
         return true;
       }
       default:
@@ -156,6 +165,13 @@ class UserMessageDecoder {
         if (!decoder->decode(string))
           return false;
         coder.m_root = WebString::create(string);
+        break;
+      }
+      case APIObject::TypeSerializedScriptValue: {
+        Vector<uint8_t> buffer;
+        if (!decoder->decodeBytes(buffer))
+          return false;
+        coder.m_root = WebSerializedScriptValue::adopt(buffer);
         break;
       }
       default:
