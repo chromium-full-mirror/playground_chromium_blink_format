@@ -38,11 +38,6 @@ using namespace WMLNames;
 WMLTaskElement::WMLTaskElement(const QualifiedName& tagName, Document* doc)
     : WMLElement(tagName, doc) {}
 
-PassRefPtr<WMLTaskElement> WMLTaskElement::create(const QualifiedName& tagName,
-                                                  Document* document) {
-  return adoptRef(new WMLTaskElement(tagName, document));
-}
-
 WMLTaskElement::~WMLTaskElement() {}
 
 void WMLTaskElement::insertedIntoDocument() {
