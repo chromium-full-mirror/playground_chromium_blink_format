@@ -1625,6 +1625,12 @@ DOMStringMap* Element::dataset() {
   return data->m_datasetDOMStringMap.get();
 }
 
+DOMStringMap* Element::optionalDataset() const {
+  if (!hasRareData())
+    return 0;
+  return rareData()->m_datasetDOMStringMap.get();
+}
+
 KURL Element::getURLAttribute(const QualifiedName& name) const {
 #if !ASSERT_DISABLED
   if (m_attributeMap) {

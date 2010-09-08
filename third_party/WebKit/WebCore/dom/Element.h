@@ -300,6 +300,7 @@ class Element : public ContainerNode {
   bool webkitMatchesSelector(const String& selectors, ExceptionCode&);
 
   DOMStringMap* dataset();
+  DOMStringMap* optionalDataset() const;
 
   virtual bool isFormControlElement() const { return false; }
   virtual bool isEnabledFormControl() const { return true; }
