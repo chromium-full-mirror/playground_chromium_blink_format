@@ -241,12 +241,12 @@ HRESULT STDMETHODCALLTYPE WebScrollBar::scroll(WebScrollDirection direction,
 // ScrollbarClient -------------------------------------------------------
 int WebScrollBar::scrollSize(ScrollbarOrientation orientation) const {
   return (orientation == m_scrollBar->orientation())
-             ? (m_scrollbar->totalSize() - m_scrollbar->visibleSize())
+             ? (m_scrollBar->totalSize() - m_scrollBar->visibleSize())
              : 0;
 }
 
 void WebScrollBar::setScrollOffsetFromAnimation(const IntPoint&) {
-  m_scrollbar->setValue((m_scrollBar->orientation() == HorizontalScrollbar)
+  m_scrollBar->setValue((m_scrollBar->orientation() == HorizontalScrollbar)
                             ? offset.x()
                             : offset.y(),
                         Scrollbar::FromScrollAnimator);
