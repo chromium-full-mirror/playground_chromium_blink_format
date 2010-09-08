@@ -51,6 +51,8 @@ class ResourceRequest : public ResourceRequestBase {
 
   ResourceRequest() : ResourceRequestBase(KURL(), UseProtocolCachePolicy) {}
 
+  ResourceRequest(CFURLRequestRef) : ResourceRequestBase() {}
+
   // Needed for compatibility.
   CFURLRequestRef cfURLRequest() const { return 0; }
 

@@ -28,6 +28,8 @@
 
 #include "ResourceResponseBase.h"
 
+typedef const struct _CFURLResponse* CFURLResponseRef;
+
 namespace WebCore {
 
 class ResourceResponse : public ResourceResponseBase {
@@ -48,6 +50,9 @@ class ResourceResponse : public ResourceResponseBase {
 
   void setResponseFired(bool fired) { m_responseFired = fired; }
   bool responseFired() { return m_responseFired; }
+
+  // Needed for compatibility.
+  CFURLResponseRef cfURLResponse() const { return 0; }
 
  private:
   bool m_responseFired;
