@@ -106,6 +106,7 @@ class Lexer : public Noncopyable {
   ALWAYS_INLINE bool parseDecimal(double& returnValue);
   ALWAYS_INLINE void parseNumberAfterDecimalPoint();
   ALWAYS_INLINE bool parseNumberAfterExponentIndicator();
+  ALWAYS_INLINE bool parseMultilineComment();
 
   static const size_t initialReadBufferCapacity = 32;
 
