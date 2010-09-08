@@ -1215,11 +1215,11 @@ bool RenderLayerBacking::startAnimation(double timeOffset,
             ? &((*keyframeStyle->animations()).animation(0)->timingFunction())
             : 0;
 
-    if (currentKeyframe.containsProperty(AnimatedPropertyWebkitTransform))
+    if (currentKeyframe.containsProperty(CSSPropertyWebkitTransform))
       transformVector.insert(
           new TransformAnimationValue(key, &(keyframeStyle->transform()), tf));
 
-    if (currentKeyframe.containsProperty(AnimatedPropertyOpacity))
+    if (currentKeyframe.containsProperty(CSSPropertyOpacity))
       opacityVector.insert(
           new FloatAnimationValue(key, keyframeStyle->opacity(), tf));
   }
