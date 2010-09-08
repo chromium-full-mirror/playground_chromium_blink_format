@@ -575,6 +575,13 @@ PlatformLayer* MediaPlayerPrivate::platformLayer() const {
 }
 #endif
 
+PlatformMedia MediaPlayerPrivate::platformMedia() const {
+  PlatformMedia pm;
+  pm.type = PlatformMedia::QtMediaPlayerType;
+  pm.media.qtMediaPlayer = const_cast<MediaPlayerPrivate*>(this);
+  return pm;
+}
+
 }  // namespace WebCore
 
 #include "moc_MediaPlayerPrivateQt.cpp"
