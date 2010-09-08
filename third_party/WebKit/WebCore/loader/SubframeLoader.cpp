@@ -89,6 +89,15 @@ bool SubframeLoader::requestFrame(HTMLFrameOwnerElement* ownerElement,
   return true;
 }
 
+bool SubframeLoader::resourceWillUsePlugin(const String& url,
+                                           const String& mimeType) {
+  KURL completedURL;
+  if (!url.isEmpty())
+    completedURL = completeURL(url);
+  bool useFallback;
+  return shouldUsePlugin(completedURL, mimeType, false, useFallback);
+}
+
 bool SubframeLoader::requestObject(HTMLPlugInImageElement* ownerElement,
                                    const String& url,
                                    const AtomicString& frameName,
