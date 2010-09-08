@@ -31,8 +31,7 @@
 
 #include "MediaQueryExp.h"
 #include "StringBuilder.h"
-
-#include <algorithm>
+#include <wtf/NonCopyingSort.h>
 
 namespace WebCore {
 
@@ -69,23 +68,25 @@ String MediaQuery::serialize() const {
   return result.toString();
 }
 
-static bool expressionCompare(const MediaQueryExp* a, const MediaQueryExp* b) {
+static bool expressionCompare(const OwnPtr<MediaQueryExp>& a,
+                              const OwnPtr<MediaQueryExp>& b) {
   return codePointCompare(a->serialize(), b->serialize()) < 0;
 }
 
 MediaQuery::MediaQuery(Restrictor r,
                        const String& mediaType,
-                       PassOwnPtr<Vector<MediaQueryExp*>> exprs)
+                       PassOwnPtr<Vector<OwnPtr<MediaQueryExp>>> exprs)
     : m_restrictor(r),
       m_mediaType(mediaType.lower()),
       m_expressions(exprs),
       m_ignored(false) {
   if (!m_expressions) {
-    m_expressions = new Vector<MediaQueryExp*>;
+    m_expressions = adoptPtr(new Vector<OwnPtr<MediaQueryExp>>);
     return;
   }
 
-  std::sort(m_expressions->begin(), m_expressions->end(), expressionCompare);
+  nonCopyingSort(m_expressions->begin(), m_expressions->end(),
+                 expressionCompare);
 
   // remove all duplicated expressions
   String key;
@@ -94,18 +95,14 @@ MediaQuery::MediaQuery(Restrictor r,
     if (!m_ignored)
       m_ignored = !m_expressions->at(i)->isValid();
 
-    if (m_expressions->at(i)->serialize() == key) {
-      MediaQueryExp* item = m_expressions->at(i);
+    if (m_expressions->at(i)->serialize() == key)
       m_expressions->remove(i);
-      delete item;
-    } else
+    else
       key = m_expressions->at(i)->serialize();
   }
 }
 
-MediaQuery::~MediaQuery() {
-  deleteAllValues(*m_expressions);
-}
+MediaQuery::~MediaQuery() {}
 
 // http://dev.w3.org/csswg/cssom/#compare-media-queries
 bool MediaQuery::operator==(const MediaQuery& other) const {

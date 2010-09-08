@@ -170,8 +170,6 @@ CSSParser::~CSSParser() {
 
   fastFree(m_data);
 
-  if (m_floatingMediaQueryExpList)
-    deleteAllValues(*m_floatingMediaQueryExpList);
   fastDeleteAllValues(m_floatingSelectors);
   deleteAllValues(m_floatingValueLists);
   deleteAllValues(m_floatingFunctions);
@@ -5603,7 +5601,7 @@ CSSParserValue& CSSParser::sinkFloatingValue(CSSParserValue& value) {
 MediaQueryExp* CSSParser::createFloatingMediaQueryExp(
     const AtomicString& mediaFeature,
     CSSParserValueList* values) {
-  m_floatingMediaQueryExp = adoptPtr(new MediaQueryExp(mediaFeature, values));
+  m_floatingMediaQueryExp = MediaQueryExp::create(mediaFeature, values);
   return m_floatingMediaQueryExp.get();
 }
 
@@ -5613,15 +5611,13 @@ PassOwnPtr<MediaQueryExp> CSSParser::sinkFloatingMediaQueryExp(
   return m_floatingMediaQueryExp.release();
 }
 
-Vector<MediaQueryExp*>* CSSParser::createFloatingMediaQueryExpList() {
-  if (m_floatingMediaQueryExpList)
-    deleteAllValues(*m_floatingMediaQueryExpList);
-  m_floatingMediaQueryExpList = adoptPtr(new Vector<MediaQueryExp*>);
+Vector<OwnPtr<MediaQueryExp>>* CSSParser::createFloatingMediaQueryExpList() {
+  m_floatingMediaQueryExpList = adoptPtr(new Vector<OwnPtr<MediaQueryExp>>);
   return m_floatingMediaQueryExpList.get();
 }
 
-PassOwnPtr<Vector<MediaQueryExp*>> CSSParser::sinkFloatingMediaQueryExpList(
-    Vector<MediaQueryExp*>* list) {
+PassOwnPtr<Vector<OwnPtr<MediaQueryExp>>>
+CSSParser::sinkFloatingMediaQueryExpList(Vector<OwnPtr<MediaQueryExp>>* list) {
   ASSERT_UNUSED(list, list == m_floatingMediaQueryExpList);
   return m_floatingMediaQueryExpList.release();
 }
@@ -5629,14 +5625,14 @@ PassOwnPtr<Vector<MediaQueryExp*>> CSSParser::sinkFloatingMediaQueryExpList(
 MediaQuery* CSSParser::createFloatingMediaQuery(
     MediaQuery::Restrictor restrictor,
     const String& mediaType,
-    PassOwnPtr<Vector<MediaQueryExp*>> expressions) {
+    PassOwnPtr<Vector<OwnPtr<MediaQueryExp>>> expressions) {
   m_floatingMediaQuery =
       adoptPtr(new MediaQuery(restrictor, mediaType, expressions));
   return m_floatingMediaQuery.get();
 }
 
 MediaQuery* CSSParser::createFloatingMediaQuery(
-    PassOwnPtr<Vector<MediaQueryExp*>> expressions) {
+    PassOwnPtr<Vector<OwnPtr<MediaQueryExp>>> expressions) {
   return createFloatingMediaQuery(MediaQuery::None, "all", expressions);
 }
 

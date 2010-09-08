@@ -234,13 +234,15 @@ class CSSParser {
   MediaQueryExp* createFloatingMediaQueryExp(const AtomicString&,
                                              CSSParserValueList*);
   PassOwnPtr<MediaQueryExp> sinkFloatingMediaQueryExp(MediaQueryExp*);
-  Vector<MediaQueryExp*>* createFloatingMediaQueryExpList();
-  PassOwnPtr<Vector<MediaQueryExp*>> sinkFloatingMediaQueryExpList(
-      Vector<MediaQueryExp*>*);
-  MediaQuery* createFloatingMediaQuery(MediaQuery::Restrictor,
-                                       const String&,
-                                       PassOwnPtr<Vector<MediaQueryExp*>>);
-  MediaQuery* createFloatingMediaQuery(PassOwnPtr<Vector<MediaQueryExp*>>);
+  Vector<OwnPtr<MediaQueryExp>>* createFloatingMediaQueryExpList();
+  PassOwnPtr<Vector<OwnPtr<MediaQueryExp>>> sinkFloatingMediaQueryExpList(
+      Vector<OwnPtr<MediaQueryExp>>*);
+  MediaQuery* createFloatingMediaQuery(
+      MediaQuery::Restrictor,
+      const String&,
+      PassOwnPtr<Vector<OwnPtr<MediaQueryExp>>>);
+  MediaQuery* createFloatingMediaQuery(
+      PassOwnPtr<Vector<OwnPtr<MediaQueryExp>>>);
   PassOwnPtr<MediaQuery> sinkFloatingMediaQuery(MediaQuery*);
 
   void addNamespace(const AtomicString& prefix, const AtomicString& uri);
@@ -349,7 +351,7 @@ class CSSParser {
 
   OwnPtr<MediaQuery> m_floatingMediaQuery;
   OwnPtr<MediaQueryExp> m_floatingMediaQueryExp;
-  OwnPtr<Vector<MediaQueryExp*>> m_floatingMediaQueryExpList;
+  OwnPtr<Vector<OwnPtr<MediaQueryExp>>> m_floatingMediaQueryExpList;
 
   Vector<CSSSelector*> m_reusableSelectorVector;
 

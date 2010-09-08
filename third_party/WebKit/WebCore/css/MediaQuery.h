@@ -43,11 +43,11 @@ class MediaQuery : public Noncopyable {
 
   MediaQuery(Restrictor,
              const String& mediaType,
-             PassOwnPtr<Vector<MediaQueryExp*>> exprs);
+             PassOwnPtr<Vector<OwnPtr<MediaQueryExp>>> exprs);
   ~MediaQuery();
 
   Restrictor restrictor() const { return m_restrictor; }
-  const Vector<MediaQueryExp*>* expressions() const {
+  const Vector<OwnPtr<MediaQueryExp>>* expressions() const {
     return m_expressions.get();
   }
   String mediaType() const { return m_mediaType; }
@@ -58,7 +58,7 @@ class MediaQuery : public Noncopyable {
  private:
   Restrictor m_restrictor;
   String m_mediaType;
-  OwnPtr<Vector<MediaQueryExp*>> m_expressions;
+  OwnPtr<Vector<OwnPtr<MediaQueryExp>>> m_expressions;
   bool m_ignored;
   String m_serializationCache;
 

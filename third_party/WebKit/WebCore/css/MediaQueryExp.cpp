@@ -36,8 +36,8 @@
 
 namespace WebCore {
 
-MediaQueryExp::MediaQueryExp(const AtomicString& mediaFeature,
-                             CSSParserValueList* valueList)
+inline MediaQueryExp::MediaQueryExp(const AtomicString& mediaFeature,
+                                    CSSParserValueList* valueList)
     : m_mediaFeature(mediaFeature), m_value(0), m_isValid(true) {
   if (valueList) {
     if (valueList->size() == 1) {
@@ -80,6 +80,12 @@ MediaQueryExp::MediaQueryExp(const AtomicString& mediaFeature,
     }
     m_isValid = m_value;
   }
+}
+
+PassOwnPtr<MediaQueryExp> MediaQueryExp::create(
+    const AtomicString& mediaFeature,
+    CSSParserValueList* values) {
+  return adoptPtr(new MediaQueryExp(mediaFeature, values));
 }
 
 MediaQueryExp::~MediaQueryExp() {}
