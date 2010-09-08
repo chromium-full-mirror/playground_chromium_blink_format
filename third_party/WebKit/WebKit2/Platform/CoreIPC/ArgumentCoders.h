@@ -81,7 +81,7 @@ struct ArgumentCoder<Vector<T>> {
 
     // Before allocating the vector, make sure that the decoder buffer is big
     // enough.
-    if (!decoder->bufferIsLargeEnoughtToContain<T>(size)) {
+    if (!decoder->bufferIsLargeEnoughToContain<T>(size)) {
       decoder->markInvalid();
       return false;
     }
