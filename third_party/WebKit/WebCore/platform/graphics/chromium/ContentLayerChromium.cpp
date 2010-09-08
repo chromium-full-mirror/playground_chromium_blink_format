@@ -42,6 +42,8 @@
 #include "PlatformContextSkia.h"
 #include "skia/ext/platform_canvas.h"
 #elif PLATFORM(CG)
+#include "LocalCurrentGraphicsContext.h"
+
 #include <CoreGraphics/CGBitmapContext.h>
 #endif
 
@@ -150,12 +152,6 @@ void ContentLayerChromium::updateContents() {
   IntSize requiredTextureSize;
   IntSize bitmapSize;
 
-#if PLATFORM(SKIA)
-  const SkBitmap* skiaBitmap = 0;
-  OwnPtr<skia::PlatformCanvas> canvas;
-  OwnPtr<PlatformContextSkia> skiaContext;
-  OwnPtr<GraphicsContext> graphicsContext;
-
   requiredTextureSize = m_bounds;
   IntRect boundsRect(IntPoint(0, 0), m_bounds);
 
@@ -168,6 +164,12 @@ void ContentLayerChromium::updateContents() {
     // the bounds of the backing texture.
     dirtyRect.intersect(boundsRect);
   }
+
+#if PLATFORM(SKIA)
+  const SkBitmap* skiaBitmap = 0;
+  OwnPtr<skia::PlatformCanvas> canvas;
+  OwnPtr<PlatformContextSkia> skiaContext;
+  OwnPtr<GraphicsContext> graphicsContext;
 
   canvas.set(
       new skia::PlatformCanvas(dirtyRect.width(), dirtyRect.height(), false));
@@ -202,19 +204,6 @@ void ContentLayerChromium::updateContents() {
     bitmapSize = IntSize(skiaBitmap->width(), skiaBitmap->height());
   }
 #elif PLATFORM(CG)
-  requiredTextureSize = m_bounds;
-  IntRect boundsRect(IntPoint(0, 0), m_bounds);
-
-  // If the texture needs to be reallocated then we must redraw the entire
-  // contents of the layer.
-  if (requiredTextureSize != m_allocatedTextureSize)
-    dirtyRect = boundsRect;
-  else {
-    // Clip the dirtyRect to the size of the layer to avoid drawing outside
-    // the bounds of the backing texture.
-    dirtyRect.intersect(boundsRect);
-  }
-
   Vector<uint8_t> tempVector;
   int rowBytes = 4 * dirtyRect.width();
   tempVector.resize(rowBytes * dirtyRect.height());
@@ -226,6 +215,7 @@ void ContentLayerChromium::updateContents() {
                    rowBytes, colorSpace.get(), kCGImageAlphaPremultipliedLast));
 
   GraphicsContext graphicsContext(contextCG.get());
+  LocalCurrentGraphicsContext scopedNSGraphicsContext(&graphicsContext);
 
   // Translate the graphics contxt into the coordinate system of the dirty rect.
   graphicsContext.translate(-dirtyRect.x(), -dirtyRect.y());
