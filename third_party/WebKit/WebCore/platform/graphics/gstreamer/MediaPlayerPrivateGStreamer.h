@@ -147,6 +147,7 @@ class MediaPlayerPrivateGStreamer : public MediaPlayerPrivateInterface {
                                                 const String& codecs);
   static bool isAvailable();
 
+  void cacheDuration();
   void updateStates();
   void cancelSeek();
   void endPointTimerFired(Timer<MediaPlayerPrivateGStreamer>*);
