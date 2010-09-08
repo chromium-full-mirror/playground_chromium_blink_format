@@ -104,8 +104,9 @@ void ImageLayerChromium::updateContents() {
   // Try to reuse the color space from the image to preserve its colors.
   // Some images use a color space (such as indexed) unsupported by the bitmap
   // context.
-  RetainPtr<CGColorSpaceRef> colorSpace(AdoptCF, CGImageGetColorSpace(cgImage));
-  CGColorSpaceModel colorSpaceModel = CGColorSpaceGetModel(colorSpace.get());
+  RetainPtr<CGColorSpaceRef> colorSpaceReleaser;
+  CGColorSpaceRef colorSpace = CGImageGetColorSpace(cgImage);
+  CGColorSpaceModel colorSpaceModel = CGColorSpaceGetModel(colorSpace);
   switch (colorSpaceModel) {
     case kCGColorSpaceModelMonochrome:
     case kCGColorSpaceModelRGB:
@@ -114,13 +115,14 @@ void ImageLayerChromium::updateContents() {
     case kCGColorSpaceModelDeviceN:
       break;
     default:
-      colorSpace.adoptCF(CGColorSpaceCreateDeviceRGB());
+      colorSpaceReleaser.adoptCF(CGColorSpaceCreateDeviceRGB());
+      colorSpace = colorSpaceReleaser.get();
       break;
   }
   RetainPtr<CGContextRef> tempContext(
       AdoptCF,
       CGBitmapContextCreate(tempVector.data(), width, height, 8, tempRowBytes,
-                            colorSpace.get(), kCGImageAlphaPremultipliedLast));
+                            colorSpace, kCGImageAlphaPremultipliedLast));
   CGContextSetBlendMode(tempContext.get(), kCGBlendModeCopy);
   CGContextDrawImage(tempContext.get(),
                      CGRectMake(0, 0, static_cast<CGFloat>(width),
