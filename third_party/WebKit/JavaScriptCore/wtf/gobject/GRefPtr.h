@@ -40,6 +40,10 @@ template <>
 GVariant* refPlatformPtr(GVariant* ptr);
 template <>
 void derefPlatformPtr(GVariant* ptr);
+template <>
+GSource* refPlatformPtr(GSource* ptr);
+template <>
+void derefPlatformPtr(GSource* ptr);
 
 template <typename T>
 inline T* refPlatformPtr(T* ptr) {
