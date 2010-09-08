@@ -121,6 +121,9 @@ class MediaPlayerClient {
   // the playback rate has changed
   virtual void mediaPlayerRateChanged(MediaPlayer*) {}
 
+  // the play/pause status changed
+  virtual void mediaPlayerPlaybackStateChanged(MediaPlayer*) {}
+
   // The MediaPlayer has found potentially problematic media content.
   // This is used internally to trigger swapping from a <video>
   // element to an <embed> in standalone documents
@@ -257,6 +260,7 @@ class MediaPlayer : public Noncopyable {
   void timeChanged();
   void sizeChanged();
   void rateChanged();
+  void playbackStateChanged();
   void durationChanged();
 
   void repaint();
