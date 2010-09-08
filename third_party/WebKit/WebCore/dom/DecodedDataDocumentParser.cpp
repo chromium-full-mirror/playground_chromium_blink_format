@@ -32,9 +32,8 @@
 
 namespace WebCore {
 
-DecodedDataDocumentParser::DecodedDataDocumentParser(Document* document,
-                                                     bool viewSourceMode)
-    : DocumentParser(document), m_inViewSourceMode(viewSourceMode) {}
+DecodedDataDocumentParser::DecodedDataDocumentParser(Document* document)
+    : DocumentParser(document) {}
 
 void DecodedDataDocumentParser::appendBytes(DocumentWriter* writer,
                                             const char* data,

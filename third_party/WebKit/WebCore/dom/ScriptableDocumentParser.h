@@ -53,7 +53,7 @@ class ScriptableDocumentParser : public DecodedDataDocumentParser {
   void setXSSAuditor(XSSAuditor* auditor) { m_xssAuditor = auditor; }
 
  protected:
-  ScriptableDocumentParser(Document*, bool viewSourceMode = false);
+  explicit ScriptableDocumentParser(Document*);
 
  private:
   virtual ScriptableDocumentParser* asScriptableDocumentParser() {

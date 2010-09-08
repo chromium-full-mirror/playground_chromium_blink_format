@@ -36,11 +36,8 @@ class DecodedDataDocumentParser : public DocumentParser {
   // XMLHttpRequest if the responseXML was well formed.
   virtual bool wellFormed() const { return true; }
 
-  bool inViewSourceMode() const { return m_inViewSourceMode; }
-  void setInViewSourceMode(bool mode) { m_inViewSourceMode = mode; }
-
  protected:
-  DecodedDataDocumentParser(Document*, bool viewSourceMode = false);
+  explicit DecodedDataDocumentParser(Document*);
 
  private:
   // append is used by DocumentWriter::replaceDocument
@@ -51,8 +48,6 @@ class DecodedDataDocumentParser : public DocumentParser {
                            const char* bytes,
                            int length,
                            bool flush);
-
-  bool m_inViewSourceMode;
 };
 }
 

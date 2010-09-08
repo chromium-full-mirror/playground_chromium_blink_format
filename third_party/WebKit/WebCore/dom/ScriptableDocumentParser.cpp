@@ -28,7 +28,6 @@
 
 namespace WebCore {
 
-ScriptableDocumentParser::ScriptableDocumentParser(Document* document,
-                                                   bool viewSourceMode)
-    : DecodedDataDocumentParser(document, viewSourceMode), m_xssAuditor(0) {}
+ScriptableDocumentParser::ScriptableDocumentParser(Document* document)
+    : DecodedDataDocumentParser(document), m_xssAuditor(0) {}
 };
