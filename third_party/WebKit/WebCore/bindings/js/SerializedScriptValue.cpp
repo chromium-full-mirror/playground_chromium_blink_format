@@ -782,7 +782,7 @@ class CloneDeserializer : CloneBase {
     if (sizeof(T) == 1)
       value = *ptr++;
     else {
-      value = *reinterpret_cast<const T*>(ptr);
+      value = *reinterpret_cast_ptr<const T*>(ptr);
       ptr += sizeof(T);
     }
     return true;
@@ -859,7 +859,7 @@ class CloneDeserializer : CloneBase {
       return false;
 
 #if ASSUME_LITTLE_ENDIAN
-    str = UString(reinterpret_cast<const UChar*>(ptr), length);
+    str = UString(reinterpret_cast_ptr<const UChar*>(ptr), length);
     ptr += length * sizeof(UChar);
 #else
     Vector<UChar> buffer;
