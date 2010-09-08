@@ -130,9 +130,12 @@ class ApplyStyleCommand : public CompositeEditCommand {
   void applyBlockStyle(CSSMutableStyleDeclaration*);
   void applyRelativeFontStyleChange(CSSMutableStyleDeclaration*);
   void applyInlineStyle(CSSMutableStyleDeclaration*);
-  void applyInlineStyleToRange(CSSMutableStyleDeclaration*,
-                               const Position& start,
-                               const Position& end);
+  void fixRangeAndApplyInlineStyle(CSSMutableStyleDeclaration*,
+                                   const Position& start,
+                                   const Position& end);
+  void applyInlineStyleToNodeRange(CSSMutableStyleDeclaration*,
+                                   Node* startNode,
+                                   Node* pastEndNode);
   void addBlockStyle(const StyleChange&, HTMLElement*);
   void addInlineStyleIfNeeded(
       CSSMutableStyleDeclaration*,
