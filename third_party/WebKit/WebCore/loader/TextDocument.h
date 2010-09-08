@@ -29,8 +29,6 @@
 
 namespace WebCore {
 
-class HTMLViewSourceDocument;
-
 class TextDocument : public HTMLDocument {
  public:
   static PassRefPtr<TextDocument> create(Frame* frame, const KURL& url) {
@@ -42,8 +40,6 @@ class TextDocument : public HTMLDocument {
 
   virtual PassRefPtr<DocumentParser> createParser();
 };
-
-PassRefPtr<DocumentParser> createTextDocumentParser(HTMLViewSourceDocument*);
 }
 
-#endif  // TextDocument_h
+#endif

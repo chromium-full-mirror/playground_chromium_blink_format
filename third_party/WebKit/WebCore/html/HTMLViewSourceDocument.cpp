@@ -57,6 +57,7 @@ HTMLViewSourceDocument::HTMLViewSourceDocument(Frame* frame,
 }
 
 PassRefPtr<DocumentParser> HTMLViewSourceDocument::createParser() {
+  RefPtr<HTMLViewSourceParser> parser = HTMLViewSourceParser::create(this);
   // Use HTMLDocumentParser if applicable, otherwise use TextDocumentParser.
   if (m_type == "text/html" || m_type == "application/xhtml+xml" ||
       m_type == "image/svg+xml" || DOMImplementation::isXMLMIMEType(m_type)
@@ -64,9 +65,10 @@ PassRefPtr<DocumentParser> HTMLViewSourceDocument::createParser() {
       || m_type == "application/vnd.wap.xhtml+xml"
 #endif
       )
-    return HTMLViewSourceParser::create(this);
+    return parser.release();
 
-  return createTextDocumentParser(this);
+  parser->forcePlaintext();
+  return parser.release();
 }
 
 void HTMLViewSourceDocument::createContainingTable() {
@@ -95,12 +97,6 @@ void HTMLViewSourceDocument::createContainingTable() {
   table->parserAddChild(m_tbody);
   m_tbody->attach();
   m_current = m_tbody;
-}
-
-void HTMLViewSourceDocument::addViewSourceText(const String& text) {
-  if (!m_current)
-    createContainingTable();
-  addText(text, "");
 }
 
 void HTMLViewSourceDocument::addSource(const String& source, HTMLToken& token) {

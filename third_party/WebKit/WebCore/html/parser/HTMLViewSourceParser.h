@@ -50,6 +50,8 @@ class HTMLViewSourceParser : public DecodedDataDocumentParser {
   }
   virtual ~HTMLViewSourceParser();
 
+  void forcePlaintext();
+
  private:
   HTMLViewSourceParser(HTMLViewSourceDocument*);
 
