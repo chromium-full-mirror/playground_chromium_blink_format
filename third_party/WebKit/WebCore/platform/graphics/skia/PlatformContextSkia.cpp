@@ -110,6 +110,9 @@ struct PlatformContextSkia::State {
   WTF::Vector<SkPath> m_antiAliasClipPaths;
   InterpolationQuality m_interpolationQuality;
 
+  // If we currently have a canvas (non-antialiased path) clip applied.
+  bool m_canvasClipApplied;
+
   PlatformContextSkia::State cloneInheritedProperties();
 
  private:
@@ -135,7 +138,8 @@ PlatformContextSkia::State::State()
       m_lineJoin(SkPaint::kDefault_Join),
       m_dash(0),
       m_textDrawingMode(cTextFill),
-      m_interpolationQuality(InterpolationHigh) {}
+      m_interpolationQuality(InterpolationHigh),
+      m_canvasClipApplied(false) {}
 
 PlatformContextSkia::State::State(const State& other)
     : m_alpha(other.m_alpha),
@@ -161,7 +165,8 @@ PlatformContextSkia::State::State(const State& other)
 #endif
       ,
       m_antiAliasClipPaths(other.m_antiAliasClipPaths),
-      m_interpolationQuality(other.m_interpolationQuality) {
+      m_interpolationQuality(other.m_interpolationQuality),
+      m_canvasClipApplied(other.m_canvasClipApplied) {
   // Up the ref count of these. saveRef does nothing if 'this' is NULL.
   m_looper->safeRef();
   m_dash->safeRef();
@@ -539,6 +544,11 @@ SkPath PlatformContextSkia::currentPathInLocalCoordinates() const {
   return localPath;
 }
 
+void PlatformContextSkia::canvasClipPath(const SkPath& path) {
+  m_state->m_canvasClipApplied = true;
+  m_canvas->clipPath(path);
+}
+
 void PlatformContextSkia::setFillRule(SkPath::FillType fr) {
   m_path.setFillType(fr);
 }
@@ -651,6 +661,14 @@ void PlatformContextSkia::applyAntiAliasedClipPaths(
   }
 
   m_canvas->restore();
+}
+
+bool PlatformContextSkia::canAccelerate() const {
+  return !m_state->m_fillShader  // Can't accelerate with a fill gradient or
+                                 // pattern.
+         && !m_state->m_looper   // Can't accelerate with a shadow.
+         && !m_state->m_canvasClipApplied;  // Can't accelerate with a clip to
+                                            // path applied.
 }
 
 class WillPublishCallbackImpl : public DrawingBuffer::WillPublishCallback {

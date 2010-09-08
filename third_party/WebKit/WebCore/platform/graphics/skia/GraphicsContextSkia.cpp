@@ -322,7 +322,7 @@ void GraphicsContext::clearRect(const FloatRect& rect) {
   if (paintingDisabled())
     return;
 
-  if (platformContext()->useGPU()) {
+  if (platformContext()->useGPU() && platformContext()->canAccelerate()) {
     platformContext()->prepareForHardwareDraw();
     platformContext()->gpuCanvas()->clearRect(rect);
     return;
@@ -372,7 +372,7 @@ void GraphicsContext::canvasClip(const Path& path) {
   if (!isPathSkiaSafe(getCTM(), p))
     return;
 
-  platformContext()->canvas()->clipPath(p);
+  platformContext()->canvasClipPath(p);
 }
 
 void GraphicsContext::clipOut(const IntRect& rect) {
@@ -742,8 +742,7 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
     ClipRectToCanvas(*platformContext()->canvas(), r, &r);
   }
 
-  if (platformContext()->useGPU() && !m_common->state.fillPattern &&
-      !m_common->state.fillGradient && !platformContext()->getDrawLooper()) {
+  if (platformContext()->useGPU() && platformContext()->canAccelerate()) {
     platformContext()->prepareForHardwareDraw();
     platformContext()->gpuCanvas()->fillRect(rect);
     return;
@@ -766,8 +765,7 @@ void GraphicsContext::fillRect(const FloatRect& rect,
   if (paintingDisabled())
     return;
 
-  if (platformContext()->useGPU() && !m_common->state.fillPattern &&
-      !m_common->state.fillGradient) {
+  if (platformContext()->useGPU() && platformContext()->canAccelerate()) {
     platformContext()->prepareForHardwareDraw();
     platformContext()->gpuCanvas()->fillRect(rect, color, colorSpace);
     return;

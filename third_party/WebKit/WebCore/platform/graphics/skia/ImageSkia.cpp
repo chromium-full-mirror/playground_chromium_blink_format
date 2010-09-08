@@ -493,7 +493,8 @@ void BitmapImage::draw(GraphicsContext* ctxt,
   if (normSrcRect.isEmpty() || normDstRect.isEmpty())
     return;  // Nothing to draw.
 
-  if (ctxt->platformContext()->useGPU()) {
+  if (ctxt->platformContext()->useGPU() &&
+      ctxt->platformContext()->canAccelerate()) {
     drawBitmapGLES2(ctxt, bm, normSrcRect, normDstRect, colorSpace,
                     compositeOp);
     return;
@@ -518,7 +519,8 @@ void BitmapImageSingleFrameSkia::draw(GraphicsContext* ctxt,
   if (normSrcRect.isEmpty() || normDstRect.isEmpty())
     return;  // Nothing to draw.
 
-  if (ctxt->platformContext()->useGPU()) {
+  if (ctxt->platformContext()->useGPU() &&
+      ctxt->platformContext()->canAccelerate()) {
     drawBitmapGLES2(ctxt, &m_nativeImage, srcRect, dstRect, styleColorSpace,
                     compositeOp);
     return;
