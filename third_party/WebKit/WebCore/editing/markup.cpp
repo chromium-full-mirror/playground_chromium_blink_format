@@ -148,73 +148,97 @@ typedef HashMap<AtomicStringImpl*, AtomicStringImpl*> Namespaces;
 
 class MarkupAccumulator {
  public:
-  enum RangeFullySelectsNode { DoesFullySelectNode, DoesNotFullySelectNode };
-
   MarkupAccumulator(Vector<Node*>* nodes,
                     EAbsoluteURLs shouldResolveURLs,
-                    EAnnotateForInterchange shouldAnnotate,
                     const Range* range = 0)
       : m_nodes(nodes),
-        m_shouldResolveURLs(shouldResolveURLs),
-        m_shouldAnnotate(shouldAnnotate),
-        m_range(range) {}
+        m_range(range),
+        m_shouldResolveURLs(shouldResolveURLs) {}
+  virtual ~MarkupAccumulator() {}
   void appendString(const String&);
   void appendStartTag(Node*, Namespaces* = 0);
   void appendEndTag(Node*);
+  virtual String takeResults();
+
+ protected:
+  void appendAttributeValue(Vector<UChar>& result,
+                            const String& attribute,
+                            bool documentIsHTML);
+  void appendQuotedURLAttributeValue(Vector<UChar>& result,
+                                     const String& urlString);
+  void appendNodeValue(Vector<UChar>& out,
+                       const Node*,
+                       const Range*,
+                       EntityMask);
+  bool shouldAddNamespaceElement(const Element*);
+  bool shouldAddNamespaceAttribute(const Attribute&, Namespaces&);
+  void appendNamespace(Vector<UChar>& result,
+                       const AtomicString& prefix,
+                       const AtomicString& namespaceURI,
+                       Namespaces&);
+  EntityMask entityMaskForText(Text* text) const;
+  virtual void appendText(Vector<UChar>& out, Text*);
+  void appendComment(Vector<UChar>& out, const String& comment);
+  void appendDocumentType(Vector<UChar>& result, const DocumentType*);
+  void appendProcessingInstruction(Vector<UChar>& out,
+                                   const String& target,
+                                   const String& data);
+  virtual void appendElement(Vector<UChar>& out, Element*, Namespaces*);
+  void appendOpenTag(Vector<UChar>& out, Element* element, Namespaces*);
+  void appendCloseTag(Vector<UChar>& out, Element* element);
+  void appendAttribute(Vector<UChar>& out,
+                       Element* element,
+                       const Attribute&,
+                       Namespaces*);
+  void appendCDATASection(Vector<UChar>& out, const String& section);
+  void appendStartMarkup(Vector<UChar>& result, const Node*, Namespaces*);
+  bool shouldSelfClose(const Node*);
+  void appendEndMarkup(Vector<UChar>& result, const Node*);
+
+  bool shouldResolveURLs() { return m_shouldResolveURLs == AbsoluteURLs; }
+
+  Vector<Node*>* const m_nodes;
+  const Range* const m_range;
+  Vector<String> m_succeedingMarkup;
+
+ private:
+  const bool m_shouldResolveURLs;
+};
+
+class StyledMarkupAccumulator : public MarkupAccumulator {
+ public:
+  enum RangeFullySelectsNode { DoesFullySelectNode, DoesNotFullySelectNode };
+
+  StyledMarkupAccumulator(Vector<Node*>* nodes,
+                          EAbsoluteURLs shouldResolveURLs,
+                          EAnnotateForInterchange shouldAnnotate,
+                          const Range* range)
+      : MarkupAccumulator(nodes, shouldResolveURLs, range),
+        m_shouldAnnotate(shouldAnnotate) {}
   void wrapWithNode(Node*,
                     bool convertBlocksToInlines = false,
                     RangeFullySelectsNode = DoesFullySelectNode);
   void wrapWithStyleNode(CSSStyleDeclaration*, Document*, bool isBlock = false);
   String takeResults();
 
- private:
-  void appendAttributeValue(Vector<UChar>& result,
-                            const String& attribute,
-                            bool documentIsHTML);
-  void appendQuotedURLAttributeValue(Vector<UChar>& result,
-                                     const String& urlString);
-  String stringValueForRange(const Node*, const Range*);
-  void appendNodeValue(Vector<UChar>& out,
-                       const Node*,
-                       const Range*,
-                       EntityMask);
+ protected:
+  virtual void appendText(Vector<UChar>& out, Text*);
   String renderedText(const Node*, const Range*);
-  bool shouldAddNamespaceElement(const Element*);
-  bool shouldAddNamespaceAttribute(const Attribute*, Namespaces&);
-  void appendNamespace(Vector<UChar>& result,
-                       const AtomicString& prefix,
-                       const AtomicString& namespaceURI,
-                       Namespaces&);
-  void appendText(Vector<UChar>& out, Text*);
-  void appendComment(Vector<UChar>& out, const String& comment);
-  void appendDocumentType(Vector<UChar>& result, const DocumentType*);
-  void appendProcessingInstruction(Vector<UChar>& out,
-                                   const String& target,
-                                   const String& data);
+  String stringValueForRange(const Node*, const Range*);
   void removeExteriorStyles(CSSMutableStyleDeclaration*);
   void appendElement(Vector<UChar>& out,
                      Element* element,
                      bool addDisplayInline,
-                     Namespaces*,
                      RangeFullySelectsNode);
-  void appendCDATASection(Vector<UChar>& out, const String& section);
-  void appendStartMarkup(Vector<UChar>& result,
-                         const Node*,
-                         bool convertBlocksToInlines,
-                         Namespaces*,
-                         RangeFullySelectsNode);
-  bool shouldSelfClose(const Node*);
-  void appendEndMarkup(Vector<UChar>& result, const Node*);
+  void appendElement(Vector<UChar>& out, Element* element, Namespaces*) {
+    appendElement(out, element, false, DoesFullySelectNode);
+  }
 
-  bool shouldResolveURLs() { return m_shouldResolveURLs == AbsoluteURLs; }
   bool shouldAnnotate() { return m_shouldAnnotate == AnnotateForInterchange; }
 
-  Vector<Node*>* const m_nodes;
-  const bool m_shouldResolveURLs;
-  const EAnnotateForInterchange m_shouldAnnotate;
-  const Range* const m_range;
+ private:
   Vector<String> m_reversedPrecedingMarkup;
-  Vector<String> m_succeedingMarkup;
+  const EAnnotateForInterchange m_shouldAnnotate;
 };
 
 void MarkupAccumulator::appendString(const String& string) {
@@ -223,7 +247,7 @@ void MarkupAccumulator::appendString(const String& string) {
 
 void MarkupAccumulator::appendStartTag(Node* node, Namespaces* namespaces) {
   Vector<UChar> markup;
-  appendStartMarkup(markup, node, false, namespaces, DoesFullySelectNode);
+  appendStartMarkup(markup, node, namespaces);
   m_succeedingMarkup.append(String::adopt(markup));
   if (m_nodes)
     m_nodes->append(node);
@@ -235,22 +259,26 @@ void MarkupAccumulator::appendEndTag(Node* node) {
   m_succeedingMarkup.append(String::adopt(markup));
 }
 
-void MarkupAccumulator::wrapWithNode(
+void StyledMarkupAccumulator::wrapWithNode(
     Node* node,
     bool convertBlocksToInlines,
     RangeFullySelectsNode rangeFullySelectsNode) {
   Vector<UChar> markup;
-  appendStartMarkup(markup, node, convertBlocksToInlines, 0,
-                    rangeFullySelectsNode);
+  if (node->isElementNode())
+    appendElement(markup, static_cast<Element*>(node),
+                  convertBlocksToInlines && isBlock(const_cast<Node*>(node)),
+                  rangeFullySelectsNode);
+  else
+    appendStartMarkup(markup, node, 0);
   m_reversedPrecedingMarkup.append(String::adopt(markup));
   appendEndTag(node);
   if (m_nodes)
     m_nodes->append(node);
 }
 
-void MarkupAccumulator::wrapWithStyleNode(CSSStyleDeclaration* style,
-                                          Document* document,
-                                          bool isBlock) {
+void StyledMarkupAccumulator::wrapWithStyleNode(CSSStyleDeclaration* style,
+                                                Document* document,
+                                                bool isBlock) {
   // All text-decoration-related elements should have been treated as special
   // ancestors
   // If we ever hit this ASSERT, we should export StyleChange in
@@ -277,6 +305,22 @@ void MarkupAccumulator::wrapWithStyleNode(CSSStyleDeclaration* style,
 // Vector<UChar> to String
 // and then back to Vector<UChar> and again to String here.
 String MarkupAccumulator::takeResults() {
+  size_t length = 0;
+
+  size_t postCount = m_succeedingMarkup.size();
+  for (size_t i = 0; i < postCount; ++i)
+    length += m_succeedingMarkup[i].length();
+
+  Vector<UChar> result;
+  result.reserveInitialCapacity(length);
+
+  for (size_t i = 0; i < postCount; ++i)
+    append(result, m_succeedingMarkup[i]);
+
+  return String::adopt(result);
+}
+
+String StyledMarkupAccumulator::takeResults() {
   size_t length = 0;
 
   size_t preCount = m_reversedPrecedingMarkup.size();
@@ -333,8 +377,8 @@ void MarkupAccumulator::appendQuotedURLAttributeValue(Vector<UChar>& result,
   result.append(quoteChar);
 }
 
-String MarkupAccumulator::stringValueForRange(const Node* node,
-                                              const Range* range) {
+String StyledMarkupAccumulator::stringValueForRange(const Node* node,
+                                                    const Range* range) {
   if (!range)
     return node->nodeValue();
 
@@ -369,7 +413,8 @@ void MarkupAccumulator::appendNodeValue(Vector<UChar>& out,
   appendCharactersReplacingEntities(out, characters, length, entityMask);
 }
 
-String MarkupAccumulator::renderedText(const Node* node, const Range* range) {
+String StyledMarkupAccumulator::renderedText(const Node* node,
+                                             const Range* range) {
   if (!node->isTextNode())
     return String();
 
@@ -434,20 +479,20 @@ bool MarkupAccumulator::shouldAddNamespaceElement(const Element* element) {
   return !element->hasAttribute(attr);
 }
 
-bool MarkupAccumulator::shouldAddNamespaceAttribute(const Attribute* attribute,
+bool MarkupAccumulator::shouldAddNamespaceAttribute(const Attribute& attribute,
                                                     Namespaces& namespaces) {
   namespaces.checkConsistency();
 
   // Don't add namespace attributes twice
-  if (attribute->name() == XMLNSNames::xmlnsAttr) {
-    namespaces.set(emptyAtom.impl(), attribute->value().impl());
+  if (attribute.name() == XMLNSNames::xmlnsAttr) {
+    namespaces.set(emptyAtom.impl(), attribute.value().impl());
     return false;
   }
 
-  QualifiedName xmlnsPrefixAttr(xmlnsAtom, attribute->localName(),
+  QualifiedName xmlnsPrefixAttr(xmlnsAtom, attribute.localName(),
                                 XMLNSNames::xmlnsNamespaceURI);
-  if (attribute->name() == xmlnsPrefixAttr) {
-    namespaces.set(attribute->localName().impl(), attribute->value().impl());
+  if (attribute.name() == xmlnsPrefixAttr) {
+    namespaces.set(attribute.localName().impl(), attribute.value().impl());
     return false;
   }
 
@@ -482,21 +527,27 @@ void MarkupAccumulator::appendNamespace(Vector<UChar>& result,
   }
 }
 
-void MarkupAccumulator::appendText(Vector<UChar>& out, Text* text) {
+EntityMask MarkupAccumulator::entityMaskForText(Text* text) const {
   const QualifiedName* parentName = 0;
   if (text->parentElement())
     parentName = &static_cast<Element*>(text->parentElement())->tagQName();
 
   if (parentName && (*parentName == scriptTag || *parentName == styleTag ||
-                     *parentName == xmpTag)) {
-    appendNodeValue(out, text, m_range, EntityMaskInCDATA);
-    return;
-  }
+                     *parentName == xmpTag))
+    return EntityMaskInCDATA;
 
-  if (!shouldAnnotate() || (parentName && *parentName == textareaTag)) {
-    appendNodeValue(out, text, m_range, text->document()->isHTMLDocument()
-                                            ? EntityMaskInHTMLPCDATA
-                                            : EntityMaskInPCDATA);
+  return text->document()->isHTMLDocument() ? EntityMaskInHTMLPCDATA
+                                            : EntityMaskInPCDATA;
+}
+
+void MarkupAccumulator::appendText(Vector<UChar>& out, Text* text) {
+  appendNodeValue(out, text, m_range, entityMaskForText(text));
+}
+
+void StyledMarkupAccumulator::appendText(Vector<UChar>& out, Text* text) {
+  if (!shouldAnnotate() || (text->parentElement() &&
+                            text->parentElement()->tagQName() == textareaTag)) {
+    MarkupAccumulator::appendText(out, text);
     return;
   }
 
@@ -559,23 +610,31 @@ void MarkupAccumulator::appendProcessingInstruction(Vector<UChar>& out,
   append(out, "?>");
 }
 
-void MarkupAccumulator::removeExteriorStyles(
+void StyledMarkupAccumulator::removeExteriorStyles(
     CSSMutableStyleDeclaration* style) {
   style->removeProperty(CSSPropertyFloat);
 }
 
-void MarkupAccumulator::appendElement(
+void MarkupAccumulator::appendElement(Vector<UChar>& out,
+                                      Element* element,
+                                      Namespaces* namespaces) {
+  appendOpenTag(out, element, namespaces);
+
+  NamedNodeMap* attributes = element->attributes();
+  unsigned length = attributes->length();
+  for (unsigned int i = 0; i < length; i++)
+    appendAttribute(out, element, *attributes->attributeItem(i), namespaces);
+
+  appendCloseTag(out, element);
+}
+
+void StyledMarkupAccumulator::appendElement(
     Vector<UChar>& out,
     Element* element,
     bool addDisplayInline,
-    Namespaces* namespaces,
     RangeFullySelectsNode rangeFullySelectsNode) {
   bool documentIsHTML = element->document()->isHTMLDocument();
-  out.append('<');
-  append(out, element->nodeNamePreservingCase());
-  if (!documentIsHTML && namespaces && shouldAddNamespaceElement(element))
-    appendNamespace(out, element->prefix(), element->namespaceURI(),
-                    *namespaces);
+  appendOpenTag(out, element, 0);
 
   NamedNodeMap* attributes = element->attributes();
   unsigned length = attributes->length();
@@ -585,34 +644,7 @@ void MarkupAccumulator::appendElement(
     if (attribute->name() == styleAttr && element->isHTMLElement() &&
         (shouldAnnotate() || addDisplayInline))
       continue;
-    out.append(' ');
-
-    if (documentIsHTML)
-      append(out, attribute->name().localName());
-    else
-      append(out, attribute->name().toString());
-
-    out.append('=');
-
-    if (element->isURLAttribute(attribute)) {
-      // We don't want to complete file:/// URLs because it may contain
-      // sensitive information
-      // about the user's system.
-      if (shouldResolveURLs() && !element->document()->url().isLocalFile())
-        appendQuotedURLAttributeValue(
-            out, element->document()->completeURL(attribute->value()).string());
-      else
-        appendQuotedURLAttributeValue(out, attribute->value().string());
-    } else {
-      out.append('\"');
-      appendAttributeValue(out, attribute->value(), documentIsHTML);
-      out.append('\"');
-    }
-
-    if (!documentIsHTML && namespaces &&
-        shouldAddNamespaceAttribute(attribute, *namespaces))
-      appendNamespace(out, attribute->prefix(), attribute->namespaceURI(),
-                      *namespaces);
+    appendAttribute(out, element, *attribute, 0);
   }
 
   if (element->isHTMLElement() && (shouldAnnotate() || addDisplayInline)) {
@@ -670,12 +702,63 @@ void MarkupAccumulator::appendElement(
     }
   }
 
+  appendCloseTag(out, element);
+}
+
+void MarkupAccumulator::appendOpenTag(Vector<UChar>& out,
+                                      Element* element,
+                                      Namespaces* namespaces) {
+  out.append('<');
+  append(out, element->nodeNamePreservingCase());
+  if (!element->document()->isHTMLDocument() && namespaces &&
+      shouldAddNamespaceElement(element))
+    appendNamespace(out, element->prefix(), element->namespaceURI(),
+                    *namespaces);
+}
+
+void MarkupAccumulator::appendCloseTag(Vector<UChar>& out, Element* element) {
   if (shouldSelfClose(element)) {
     if (element->isHTMLElement())
       out.append(' ');  // XHTML 1.0 <-> HTML compatibility.
     out.append('/');
   }
   out.append('>');
+}
+
+void MarkupAccumulator::appendAttribute(Vector<UChar>& out,
+                                        Element* element,
+                                        const Attribute& attribute,
+                                        Namespaces* namespaces) {
+  bool documentIsHTML = element->document()->isHTMLDocument();
+
+  out.append(' ');
+
+  if (documentIsHTML)
+    append(out, attribute.name().localName());
+  else
+    append(out, attribute.name().toString());
+
+  out.append('=');
+
+  if (element->isURLAttribute(const_cast<Attribute*>(&attribute))) {
+    // We don't want to complete file:/// URLs because it may contain sensitive
+    // information
+    // about the user's system.
+    if (shouldResolveURLs() && !element->document()->url().isLocalFile())
+      appendQuotedURLAttributeValue(
+          out, element->document()->completeURL(attribute.value()).string());
+    else
+      appendQuotedURLAttributeValue(out, attribute.value());
+  } else {
+    out.append('\"');
+    appendAttributeValue(out, attribute.value(), documentIsHTML);
+    out.append('\"');
+  }
+
+  if (!documentIsHTML && namespaces &&
+      shouldAddNamespaceAttribute(attribute, *namespaces))
+    appendNamespace(out, attribute.prefix(), attribute.namespaceURI(),
+                    *namespaces);
 }
 
 void MarkupAccumulator::appendCDATASection(Vector<UChar>& out,
@@ -687,12 +770,9 @@ void MarkupAccumulator::appendCDATASection(Vector<UChar>& out,
   append(out, "]]>");
 }
 
-void MarkupAccumulator::appendStartMarkup(
-    Vector<UChar>& result,
-    const Node* node,
-    bool convertBlocksToInlines,
-    Namespaces* namespaces,
-    RangeFullySelectsNode rangeFullySelectsNode) {
+void MarkupAccumulator::appendStartMarkup(Vector<UChar>& result,
+                                          const Node* node,
+                                          Namespaces* namespaces) {
   if (namespaces)
     namespaces->checkConsistency();
 
@@ -716,8 +796,7 @@ void MarkupAccumulator::appendStartMarkup(
       break;
     case Node::ELEMENT_NODE:
       appendElement(result, static_cast<Element*>(const_cast<Node*>(node)),
-                    convertBlocksToInlines && isBlock(const_cast<Node*>(node)),
-                    namespaces, rangeFullySelectsNode);
+                    namespaces);
       break;
     case Node::CDATA_SECTION_NODE:
       appendCDATASection(result,
@@ -875,7 +954,7 @@ static bool shouldIncludeWrapperForFullySelectedRoot(
          style->getPropertyCSSValue(CSSPropertyBackgroundColor);
 }
 
-static Node* serializeNodes(MarkupAccumulator& accumulator,
+static Node* serializeNodes(StyledMarkupAccumulator& accumulator,
                             Node* startNode,
                             Node* pastEnd) {
   Vector<Node*> ancestorsToClose;
@@ -1002,8 +1081,8 @@ String createMarkup(const Range* range,
 
   document->updateLayoutIgnorePendingStylesheets();
 
-  MarkupAccumulator accumulator(nodes, shouldResolveURLs, shouldAnnotate,
-                                updatedRange.get());
+  StyledMarkupAccumulator accumulator(nodes, shouldResolveURLs, shouldAnnotate,
+                                      updatedRange.get());
   Node* pastEnd = updatedRange->pastLastNode();
 
   Node* startNode = updatedRange->firstNode();
@@ -1144,8 +1223,9 @@ String createMarkup(const Range* range,
         // Since this node and all the other ancestors are not in the selection
         // we want to set RangeFullySelectsNode to DoesNotFullySelectNode
         // so that styles that affect the exterior of the node are not included.
-        accumulator.wrapWithNode(ancestor, convertBlocksToInlines,
-                                 MarkupAccumulator::DoesNotFullySelectNode);
+        accumulator.wrapWithNode(
+            ancestor, convertBlocksToInlines,
+            StyledMarkupAccumulator::DoesNotFullySelectNode);
       }
       if (nodes)
         nodes->append(ancestor);
@@ -1275,8 +1355,7 @@ String createMarkup(const Node* node,
       return "";
   }
 
-  MarkupAccumulator accumulator(nodes, shouldResolveURLs,
-                                DoNotAnnotateForInterchange);
+  MarkupAccumulator accumulator(nodes, shouldResolveURLs);
   serializeNodesWithNamespaces(accumulator, const_cast<Node*>(node),
                                deleteButtonContainerElement, childrenOnly, 0);
   return accumulator.takeResults();
