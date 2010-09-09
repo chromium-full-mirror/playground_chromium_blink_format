@@ -38,8 +38,6 @@
 #include <limits>
 #include <wtf/text/WTFString.h>
 
-using namespace std;
-
 namespace CoreIPC {
 
 template <>
@@ -57,7 +55,7 @@ struct ArgumentCoder<WTF::String> {
   static void encode(ArgumentEncoder* encoder, const WTF::String& string) {
     // Special case the null string.
     if (string.isNull()) {
-      encoder->encodeUInt32(numeric_limits<uint32_t>::max());
+      encoder->encodeUInt32(std::numeric_limits<uint32_t>::max());
       return;
     }
 
@@ -72,7 +70,7 @@ struct ArgumentCoder<WTF::String> {
     if (!decoder->decode(length))
       return false;
 
-    if (length == numeric_limits<uint32_t>::max()) {
+    if (length == std::numeric_limits<uint32_t>::max()) {
       // This is the null string.
       s = String();
       return true;
