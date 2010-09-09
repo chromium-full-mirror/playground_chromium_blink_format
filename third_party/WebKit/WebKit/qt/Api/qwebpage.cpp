@@ -2558,7 +2558,10 @@ bool QWebPage::acceptNavigationRequest(QWebFrame* frame,
 */
 QString QWebPage::selectedText() const {
   d->createMainFrame();
-  return d->page->focusController()->focusedOrMainFrame()->selectedText();
+  return d->page->focusController()
+      ->focusedOrMainFrame()
+      ->editor()
+      ->selectedText();
 }
 
 #ifndef QT_NO_ACTION
@@ -3025,7 +3028,7 @@ void QWebPage::setContentEditable(bool editable) {
     if (d->mainFrame) {
       WebCore::Frame* frame = d->mainFrame->d->frame;
       if (editable) {
-        frame->applyEditingStyleToBodyElement();
+        frame->editor()->applyEditingStyleToBodyElement();
         // FIXME: mac port calls this if there is no selectedDOMRange
         // frame->setSelectionFromNone();
       }

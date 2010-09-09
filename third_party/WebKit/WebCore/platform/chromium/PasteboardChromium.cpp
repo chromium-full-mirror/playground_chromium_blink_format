@@ -79,7 +79,7 @@ void Pasteboard::writeSelection(Range* selectedRange,
                              AbsoluteURLs);
   ExceptionCode ec = 0;
   KURL url = selectedRange->startContainer(ec)->document()->url();
-  String plainText = frame->selectedText();
+  String plainText = frame->editor()->selectedText();
 #if OS(WINDOWS)
   replaceNewlinesWithWindowsStyleNewlines(plainText);
 #endif

@@ -134,7 +134,7 @@ void Pasteboard::writeSelection(Range* selectedRange,
   }
 
   // Put plain string on the pasteboard. CF_UNICODETEXT covers CF_TEXT as well
-  String str = frame->selectedText();
+  String str = frame->editor()->selectedText();
   replaceNewlinesWithWindowsStyleNewlines(str);
   replaceNBSPWithSpace(str);
   if (::OpenClipboard(m_owner)) {

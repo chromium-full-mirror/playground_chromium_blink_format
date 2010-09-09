@@ -512,8 +512,9 @@ bool Page::findString(const String& target,
   Frame* frame = focusController()->focusedOrMainFrame();
   Frame* startFrame = frame;
   do {
-    if (frame->findString(target, direction == FindDirectionForward,
-                          caseSensitivity == TextCaseSensitive, false, true)) {
+    if (frame->editor()->findString(target, direction == FindDirectionForward,
+                                    caseSensitivity == TextCaseSensitive, false,
+                                    true)) {
       if (frame != startFrame)
         startFrame->selection()->clear();
       focusController()->setFocusedFrame(frame);
@@ -527,7 +528,7 @@ bool Page::findString(const String& target,
   // did earlier.
   // We cheat a bit and just research with wrap on
   if (shouldWrap && !startFrame->selection()->isNone()) {
-    bool found = startFrame->findString(
+    bool found = startFrame->editor()->findString(
         target, direction == FindDirectionForward,
         caseSensitivity == TextCaseSensitive, true, true);
     focusController()->setFocusedFrame(frame);
@@ -548,10 +549,10 @@ unsigned int Page::markAllMatchesForText(const String& target,
 
   Frame* frame = mainFrame();
   do {
-    frame->setMarkedTextMatchesAreHighlighted(shouldHighlight);
-    matches +=
-        frame->countMatchesForText(target, caseSensitivity == TextCaseSensitive,
-                                   (limit == 0) ? 0 : (limit - matches), true);
+    frame->editor()->setMarkedTextMatchesAreHighlighted(shouldHighlight);
+    matches += frame->editor()->countMatchesForText(
+        target, caseSensitivity == TextCaseSensitive,
+        limit ? (limit - matches) : 0, true);
     frame = incrementFrame(frame, true, false);
   } while (frame);
 

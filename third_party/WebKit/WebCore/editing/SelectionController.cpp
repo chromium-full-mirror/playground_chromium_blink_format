@@ -186,7 +186,7 @@ void SelectionController::setSelection(
   m_xPosForVerticalArrowNavigation = NoXPosForVerticalArrowNavigation;
   selectFrameElementInParentIfFullySelected();
   m_frame->notifyRendererOfSelectionChange(userTriggered);
-  m_frame->respondToChangedSelection(oldSelection, closeTyping);
+  m_frame->editor()->respondToChangedSelection(oldSelection, closeTyping);
   if (userTriggered) {
     ScrollAlignment alignment;
 

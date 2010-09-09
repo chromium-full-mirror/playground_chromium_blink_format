@@ -279,8 +279,8 @@ bool wxWebFrame::FindString(const wxString& string,
                             bool wrapSelection,
                             bool startInSelection) {
   if (m_impl->frame)
-    return m_impl->frame->findString(string, forward, caseSensitive,
-                                     wrapSelection, startInSelection);
+    return m_impl->frame->editor()->findString(string, forward, caseSensitive,
+                                               wrapSelection, startInSelection);
 
   return false;
 }

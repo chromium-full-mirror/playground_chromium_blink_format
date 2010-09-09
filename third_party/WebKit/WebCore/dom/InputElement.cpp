@@ -85,7 +85,7 @@ void InputElement::dispatchBlurEvent(InputElement* inputElement,
   if (inputElement->isPasswordField())
     document->setUseSecureKeyboardEntryWhenActive(false);
 
-  frame->textFieldDidEndEditing(element);
+  frame->editor()->textFieldDidEndEditing(element);
 }
 
 void InputElement::updateFocusAppearance(InputElementData& data,
@@ -128,7 +128,7 @@ void InputElement::aboutToUnload(InputElement* inputElement, Element* element) {
   if (!frame)
     return;
 
-  frame->textFieldDidEndEditing(element);
+  frame->editor()->textFieldDidEndEditing(element);
 }
 
 void InputElement::setValueFromRenderer(InputElementData& data,

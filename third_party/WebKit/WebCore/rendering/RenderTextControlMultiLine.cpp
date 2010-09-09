@@ -53,7 +53,7 @@ void RenderTextControlMultiLine::subtreeHasChanged() {
   node()->dispatchEvent(Event::create(eventNames().inputEvent, true, false));
 
   if (Frame* frame = this->frame())
-    frame->textDidChangeInTextArea(textArea);
+    frame->editor()->textDidChangeInTextArea(textArea);
 }
 
 bool RenderTextControlMultiLine::nodeAtPoint(const HitTestRequest& request,

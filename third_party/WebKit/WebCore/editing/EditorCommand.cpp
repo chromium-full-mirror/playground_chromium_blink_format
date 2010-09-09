@@ -150,7 +150,7 @@ static bool executeToggleStyleInList(Frame* frame,
   ExceptionCode ec = 0;
   Node* nodeToRemove = 0;
   RefPtr<CSSComputedStyleDeclaration> selectionStyle =
-      frame->selectionComputedStyle(nodeToRemove);
+      frame->editor()->selectionComputedStyle(nodeToRemove);
   if (!selectionStyle)
     return false;
 
@@ -468,7 +468,7 @@ static bool executeDeleteToMark(Frame* frame,
                                 Event*,
                                 EditorCommandSource,
                                 const String&) {
-  RefPtr<Range> mark = frame->mark().toNormalizedRange();
+  RefPtr<Range> mark = frame->editor()->mark().toNormalizedRange();
   if (mark) {
     SelectionController* selection = frame->selection();
     bool selected = selection->setSelectedRange(
@@ -480,7 +480,7 @@ static bool executeDeleteToMark(Frame* frame,
       return false;
   }
   frame->editor()->performDelete();
-  frame->setMark(frame->selection()->selection());
+  frame->editor()->setMark(frame->selection()->selection());
   return true;
 }
 
@@ -506,7 +506,7 @@ static bool executeFindString(Frame* frame,
                               Event*,
                               EditorCommandSource,
                               const String& value) {
-  return frame->findString(value, true, false, true, false);
+  return frame->editor()->findString(value, true, false, true, false);
 }
 
 static bool executeFontName(Frame* frame,
@@ -1349,7 +1349,7 @@ static bool executeSelectToMark(Frame* frame,
                                 Event*,
                                 EditorCommandSource,
                                 const String&) {
-  RefPtr<Range> mark = frame->mark().toNormalizedRange();
+  RefPtr<Range> mark = frame->editor()->mark().toNormalizedRange();
   RefPtr<Range> selection = frame->editor()->selectedRange();
   if (!mark || !selection) {
     systemBeep();
@@ -1371,7 +1371,7 @@ static bool executeSetMark(Frame* frame,
                            Event*,
                            EditorCommandSource,
                            const String&) {
-  frame->setMark(frame->selection()->selection());
+  frame->editor()->setMark(frame->selection()->selection());
   return true;
 }
 
@@ -1417,14 +1417,14 @@ static bool executeSwapWithMark(Frame* frame,
                                 Event*,
                                 EditorCommandSource,
                                 const String&) {
-  const VisibleSelection& mark = frame->mark();
+  const VisibleSelection& mark = frame->editor()->mark();
   const VisibleSelection& selection = frame->selection()->selection();
   if (mark.isNone() || selection.isNone()) {
     systemBeep();
     return false;
   }
   frame->selection()->setSelection(mark);
-  frame->setMark(selection);
+  frame->editor()->setMark(selection);
   return true;
 }
 
@@ -1606,7 +1606,7 @@ static bool enabledVisibleSelectionAndMark(Frame* frame,
       frame->editor()->selectionForCommand(event);
   return ((selection.isCaret() && selection.isContentEditable()) ||
           selection.isRange()) &&
-         frame->mark().isCaretOrRange();
+         frame->editor()->mark().isCaretOrRange();
 }
 
 static bool enableCaretInEditableText(Frame* frame,

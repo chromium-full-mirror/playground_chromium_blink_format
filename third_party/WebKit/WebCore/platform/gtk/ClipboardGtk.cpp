@@ -345,7 +345,7 @@ void ClipboardGtk::writeURL(const KURL& url, const String& label, Frame*) {
 void ClipboardGtk::writeRange(Range* range, Frame* frame) {
   ASSERT(range);
 
-  m_dataObject->setText(frame->selectedText());
+  m_dataObject->setText(frame->editor()->selectedText());
   m_dataObject->setMarkup(
       createMarkup(range, 0, AnnotateForInterchange, false, AbsoluteURLs));
 
