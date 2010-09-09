@@ -1012,7 +1012,8 @@ start:
       m_terminator = true;
       if (lastTokenWasRestrKeyword()) {
         token = SEMICOLON;
-        goto doneSemicolon;
+        m_delimited = true;
+        goto returnToken;
       }
       goto start;
     case CharacterInvalid:
@@ -1034,23 +1035,19 @@ inSingleLineComment:
   shiftLineTerminator();
   m_atLineStart = true;
   m_terminator = true;
-  if (lastTokenWasRestrKeyword())
-    goto doneSemicolon;
-  goto start;
+  if (!lastTokenWasRestrKeyword())
+    goto start;
 
-doneSemicolon:
   token = SEMICOLON;
   m_delimited = true;
 // Fall through into returnToken.
 
-returnToken : {
-  int lineNumber = m_lineNumber;
-  llocp->line = lineNumber;
+returnToken:
+  llocp->line = m_lineNumber;
   llocp->startOffset = startOffset;
   llocp->endOffset = currentOffset();
   m_lastToken = token;
   return token;
-}
 
 returnError:
   m_error = true;
