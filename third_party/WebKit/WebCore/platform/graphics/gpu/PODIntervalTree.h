@@ -48,7 +48,7 @@ class PODIntervalTree : public Noncopyable,
 
   PODIntervalTree() : PODRedBlackTree<IntervalType>() { init(); }
 
-  explicit PODIntervalTree(PODArena* arena)
+  explicit PODIntervalTree(PassRefPtr<PODArena> arena)
       : PODRedBlackTree<IntervalType>(arena) {
     init();
   }
