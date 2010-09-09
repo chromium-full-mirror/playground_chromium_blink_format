@@ -29,6 +29,7 @@
 #include "WKBase.h"
 #include "WKPage.h"
 #include "WebEvent.h"
+#include "WebNumber.h"
 #include "WebString.h"
 #include "WebURL.h"
 #include <WebCore/FrameLoaderTypes.h>
@@ -85,6 +86,10 @@ struct APITypeInfo<WKDataRef> {
 template <>
 struct APITypeInfo<WKDictionaryRef> {
   typedef ImmutableDictionary* ImplType;
+};
+template <>
+struct APITypeInfo<WKDoubleRef> {
+  typedef WebDouble* ImplType;
 };
 template <>
 struct APITypeInfo<WKFormSubmissionListenerRef> {
@@ -184,6 +189,10 @@ struct ImplTypeInfo<WebContext*> {
 template <>
 struct ImplTypeInfo<WebData*> {
   typedef WKDataRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebDouble*> {
+  typedef WKDoubleRef APIType;
 };
 template <>
 struct ImplTypeInfo<WebError*> {
