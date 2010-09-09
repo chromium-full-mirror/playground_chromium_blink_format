@@ -167,6 +167,14 @@ WebAccessibilityObject WebAccessibilityObject::previousSibling() const {
   return WebAccessibilityObject(m_private->previousSibling());
 }
 
+bool WebAccessibilityObject::canSetSelectedAttribute() const {
+  if (!m_private)
+    return 0;
+
+  m_private->updateBackingStore();
+  return m_private->canSetSelectedAttribute();
+}
+
 bool WebAccessibilityObject::isAnchor() const {
   if (!m_private)
     return 0;
@@ -181,6 +189,14 @@ bool WebAccessibilityObject::isChecked() const {
 
   m_private->updateBackingStore();
   return m_private->isChecked();
+}
+
+bool WebAccessibilityObject::isCollapsed() const {
+  if (!m_private)
+    return 0;
+
+  m_private->updateBackingStore();
+  return m_private->isCollapsed();
 }
 
 bool WebAccessibilityObject::isFocused() const {
@@ -213,6 +229,14 @@ bool WebAccessibilityObject::isIndeterminate() const {
 
   m_private->updateBackingStore();
   return m_private->isIndeterminate();
+}
+
+bool WebAccessibilityObject::isLinked() const {
+  if (!m_private)
+    return 0;
+
+  m_private->updateBackingStore();
+  return m_private->isLinked();
 }
 
 bool WebAccessibilityObject::isMultiSelectable() const {
@@ -253,6 +277,22 @@ bool WebAccessibilityObject::isReadOnly() const {
 
   m_private->updateBackingStore();
   return m_private->isReadOnly();
+}
+
+bool WebAccessibilityObject::isSelected() const {
+  if (!m_private)
+    return 0;
+
+  m_private->updateBackingStore();
+  return m_private->isSelected();
+}
+
+bool WebAccessibilityObject::isVisible() const {
+  if (!m_private)
+    return 0;
+
+  m_private->updateBackingStore();
+  return m_private->isVisible();
 }
 
 bool WebAccessibilityObject::isVisited() const {
