@@ -364,6 +364,9 @@ class Editor {
   // WebKit level.
   void pasteAsPlainTextBypassingDHTML();
 
+  void clearMisspellingsAndBadGrammar(const VisibleSelection&);
+  void markMisspellingsAndBadGrammar(const VisibleSelection&);
+
   Node* findEventTargetFrom(const VisibleSelection& selection) const;
 
  private:
