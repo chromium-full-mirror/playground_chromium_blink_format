@@ -68,9 +68,7 @@ ImageBuffer::ImageBuffer(const IntSize& size,
 
   m_data.m_platformContext.setCanvas(&m_data.m_canvas);
   m_context.set(new GraphicsContext(&m_data.m_platformContext));
-#if OS(WINDOWS)
   m_context->platformContext()->setDrawingToImageBuffer(true);
-#endif
 
   // Make the background transparent. It would be nice if this wasn't
   // required, but the canvas is currently filled with the magic transparency
@@ -96,9 +94,7 @@ PassRefPtr<Image> ImageBuffer::copyImage() const {
 }
 
 void ImageBuffer::clip(GraphicsContext* context, const FloatRect& rect) const {
-#if OS(LINUX) || OS(WINDOWS)
   context->platformContext()->beginLayerClippedToImage(rect, this);
-#endif
 }
 
 void ImageBuffer::draw(GraphicsContext* context,
