@@ -39,6 +39,8 @@
 #include "RenderStyle.h"
 #include <wtf/UnusedParam.h>
 
+using namespace std;
+
 namespace WebCore {
 
 KeyframeAnimation::KeyframeAnimation(const Animation* animation,
@@ -74,6 +76,10 @@ void KeyframeAnimation::fetchIntervalEndpointsForProperty(
     double& prog) const {
   // Find the first key
   double elapsedTime = getElapsedTime();
+  if (m_animation->duration() &&
+      m_animation->iterationCount() != Animation::IterationCountInfinite)
+    elapsedTime = min(elapsedTime,
+                      m_animation->duration() * m_animation->iterationCount());
 
   double fractionalTime =
       m_animation->duration() ? (elapsedTime / m_animation->duration()) : 1;
@@ -84,6 +90,8 @@ void KeyframeAnimation::fetchIntervalEndpointsForProperty(
 
   // FIXME: share this code with AnimationBase::progress().
   int iteration = static_cast<int>(fractionalTime);
+  if (m_animation->iterationCount() != Animation::IterationCountInfinite)
+    iteration = min(iteration, m_animation->iterationCount() - 1);
   fractionalTime -= iteration;
 
   bool reversing =
