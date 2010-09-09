@@ -104,10 +104,9 @@ class JSParser {
     bool m_oldAllowsIn;
   };
 
-  const JSToken& token() { return m_token; }
   void next(Lexer::LexType lexType = Lexer::IdentifyReservedWords) {
-    m_lastLine = token().m_info.line;
-    m_lastTokenEnd = token().m_info.endOffset;
+    m_lastLine = m_token.m_info.line;
+    m_lastTokenEnd = m_token.m_info.endOffset;
     m_lexer->setLastLineNumber(m_lastLine);
     m_token.m_type = m_lexer->lex(&m_token.m_data, &m_token.m_info, lexType);
     m_tokenCount++;
@@ -122,11 +121,11 @@ class JSParser {
 
   bool match(JSTokenType expected) { return m_token.m_type == expected; }
 
-  int tokenStart() { return token().m_info.startOffset; }
+  int tokenStart() { return m_token.m_info.startOffset; }
 
-  int tokenLine() { return token().m_info.line; }
+  int tokenLine() { return m_token.m_info.line; }
 
-  int tokenEnd() { return token().m_info.endOffset; }
+  int tokenEnd() { return m_token.m_info.endOffset; }
 
   template <class TreeBuilder>
   TreeSourceElements parseSourceElements(TreeBuilder&);
@@ -226,7 +225,7 @@ class JSParser {
   bool allowAutomaticSemicolon();
 
   bool autoSemiColon() {
-    if (token().m_type == SEMICOLON) {
+    if (m_token.m_type == SEMICOLON) {
       next();
       return true;
     }
@@ -386,7 +385,7 @@ TreeExpression JSParser::parseVarDeclarationList(
 
     int varStart = tokenStart();
     identStart = varStart;
-    const Identifier* name = token().m_data.ident;
+    const Identifier* name = m_token.m_data.ident;
     lastIdent = name;
     next();
     bool hasInitializer = match(EQUAL);
@@ -422,7 +421,7 @@ TreeConstDeclList JSParser::parseConstDeclarationList(TreeBuilder& context) {
   do {
     next();
     matchOrFail(IDENT);
-    const Identifier* name = token().m_data.ident;
+    const Identifier* name = m_token.m_data.ident;
     next();
     bool hasInitializer = match(EQUAL);
     context.addVar(
@@ -556,7 +555,7 @@ TreeStatement JSParser::parseBreakStatement(TreeBuilder& context) {
   if (autoSemiColon())
     return context.createBreakStatement(startCol, endCol, startLine, endLine);
   matchOrFail(IDENT);
-  const Identifier* ident = token().m_data.ident;
+  const Identifier* ident = m_token.m_data.ident;
   endCol = tokenEnd();
   endLine = tokenLine();
   next();
@@ -578,7 +577,7 @@ TreeStatement JSParser::parseContinueStatement(TreeBuilder& context) {
     return context.createContinueStatement(startCol, endCol, startLine,
                                            endLine);
   matchOrFail(IDENT);
-  const Identifier* ident = token().m_data.ident;
+  const Identifier* ident = m_token.m_data.ident;
   endCol = tokenEnd();
   endLine = tokenLine();
   next();
@@ -732,7 +731,7 @@ TreeStatement JSParser::parseTryStatement(TreeBuilder& context) {
     next();
     consumeOrFail(OPENPAREN);
     matchOrFail(IDENT);
-    ident = token().m_data.ident;
+    ident = m_token.m_data.ident;
     next();
     consumeOrFail(CLOSEPAREN);
     matchOrFail(OPENBRACE);
@@ -784,7 +783,7 @@ TreeStatement JSParser::parseBlockStatement(TreeBuilder& context) {
 template <class TreeBuilder>
 TreeStatement JSParser::parseStatement(TreeBuilder& context) {
   failIfStackOverflow();
-  switch (token().m_type) {
+  switch (m_token.m_type) {
     case OPENBRACE:
       return parseBlockStatement(context);
     case VAR:
@@ -838,15 +837,15 @@ TreeFormalParameterList JSParser::parseFormalParameters(TreeBuilder& context,
                                                         bool& usesArguments) {
   matchOrFail(IDENT);
   usesArguments =
-      m_globalData->propertyNames->arguments == *token().m_data.ident;
+      m_globalData->propertyNames->arguments == *m_token.m_data.ident;
   TreeFormalParameterList list =
-      context.createFormalParameterList(*token().m_data.ident);
+      context.createFormalParameterList(*m_token.m_data.ident);
   TreeFormalParameterList tail = list;
   next();
   while (match(COMMA)) {
     next();
     matchOrFail(IDENT);
-    const Identifier* ident = token().m_data.ident;
+    const Identifier* ident = m_token.m_data.ident;
     next();
     usesArguments =
         usesArguments || m_globalData->propertyNames->arguments == *ident;
@@ -873,7 +872,7 @@ bool JSParser::parseFunctionInfo(TreeBuilder& context,
                                  int& closeBracePos,
                                  int& bodyStartLine) {
   if (match(IDENT)) {
-    name = token().m_data.ident;
+    name = m_token.m_data.ident;
     next();
   } else if (requirements == FunctionNeedsName)
     return false;
@@ -886,7 +885,7 @@ bool JSParser::parseFunctionInfo(TreeBuilder& context,
   consumeOrFail(CLOSEPAREN);
   matchOrFail(OPENBRACE);
 
-  openBracePos = token().m_data.intValue;
+  openBracePos = m_token.m_data.intValue;
   bodyStartLine = tokenLine();
   next();
 
@@ -896,7 +895,7 @@ bool JSParser::parseFunctionInfo(TreeBuilder& context,
     context.setUsesArguments(body);
 
   matchOrFail(CLOSEBRACE);
-  closeBracePos = token().m_data.intValue;
+  closeBracePos = m_token.m_data.intValue;
   next();
   return true;
 }
@@ -929,7 +928,7 @@ TreeStatement JSParser::parseExpressionOrLabelStatement(TreeBuilder& context) {
    */
   int start = tokenStart();
   int startLine = tokenLine();
-  const Identifier* ident = token().m_data.ident;
+  const Identifier* ident = m_token.m_data.ident;
   int currentToken = m_tokenCount;
   TreeExpression expression = parseExpression(context);
   failIfFalse(expression);
@@ -1066,7 +1065,7 @@ TreeExpression JSParser::parseAssignmentExpression(TreeBuilder& context) {
   Operator op;
   bool hadAssignment = false;
   while (true) {
-    switch (token().m_type) {
+    switch (m_token.m_type) {
       case EQUAL:
         op = OpEqual;
         break;
@@ -1171,11 +1170,11 @@ TreeExpression JSParser::parseBinaryExpression(TreeBuilder& context) {
     context.appendBinaryExpressionInfo(operandStackDepth, current, exprStart,
                                        lastTokenEnd(), lastTokenEnd(),
                                        initialAssignments != m_assignmentCount);
-    int precedence = isBinaryOperator(token().m_type);
+    int precedence = isBinaryOperator(m_token.m_type);
     if (!precedence)
       break;
     m_nonLHSCount++;
-    int operatorToken = token().m_type;
+    int operatorToken = m_token.m_type;
     next();
 
     while (operatorStackDepth &&
@@ -1209,12 +1208,12 @@ TreeExpression JSParser::parseBinaryExpression(TreeBuilder& context) {
 template <bool complete, class TreeBuilder>
 TreeProperty JSParser::parseProperty(TreeBuilder& context) {
   bool wasIdent = false;
-  switch (token().m_type) {
+  switch (m_token.m_type) {
   namedProperty:
     case IDENT:
       wasIdent = true;
     case STRING: {
-      const Identifier* ident = token().m_data.ident;
+      const Identifier* ident = m_token.m_data.ident;
       next(Lexer::IgnoreReservedWords);
       if (match(COLON)) {
         next();
@@ -1246,7 +1245,7 @@ TreeProperty JSParser::parseProperty(TreeBuilder& context) {
           bodyStartLine, m_lastLine);
     }
     case NUMBER: {
-      double propertyName = token().m_data.doubleValue;
+      double propertyName = m_token.m_data.doubleValue;
       next();
       consumeOrFail(COLON);
       TreeExpression node = parseAssignmentExpression(context);
@@ -1255,14 +1254,14 @@ TreeProperty JSParser::parseProperty(TreeBuilder& context) {
           m_globalData, propertyName, node, PropertyNode::Constant);
     }
     default:
-      failIfFalse(token().m_type & KeywordTokenFlag);
+      failIfFalse(m_token.m_type & KeywordTokenFlag);
       goto namedProperty;
   }
 }
 
 template <class TreeBuilder>
 TreeExpression JSParser::parseObjectLiteral(TreeBuilder& context) {
-  int startOffset = token().m_data.intValue;
+  int startOffset = m_token.m_data.intValue;
   consumeOrFail(OPENBRACE);
 
   if (match(CLOSEBRACE)) {
@@ -1401,7 +1400,7 @@ TreeExpression JSParser::parseArrayLiteral(TreeBuilder& context) {
 
 template <class TreeBuilder>
 TreeExpression JSParser::parsePrimaryExpression(TreeBuilder& context) {
-  switch (token().m_type) {
+  switch (m_token.m_type) {
     case OPENBRACE:
       return parseObjectLiteral(context);
     case OPENBRACKET:
@@ -1421,17 +1420,17 @@ TreeExpression JSParser::parsePrimaryExpression(TreeBuilder& context) {
     }
     case IDENT: {
       int start = tokenStart();
-      const Identifier* ident = token().m_data.ident;
+      const Identifier* ident = m_token.m_data.ident;
       next();
       return context.createResolve(ident, start);
     }
     case STRING: {
-      const Identifier* ident = token().m_data.ident;
+      const Identifier* ident = m_token.m_data.ident;
       next();
       return context.createString(ident);
     }
     case NUMBER: {
-      double d = token().m_data.doubleValue;
+      double d = m_token.m_data.doubleValue;
       next();
       return context.createNumberExpr(d);
     }
@@ -1516,7 +1515,7 @@ TreeExpression JSParser::parseMemberExpression(TreeBuilder& context) {
 
   failIfFalse(base);
   while (true) {
-    switch (token().m_type) {
+    switch (m_token.m_type) {
       case OPENBRACKET: {
         int expressionEnd = lastTokenEnd();
         next();
@@ -1559,7 +1558,7 @@ TreeExpression JSParser::parseMemberExpression(TreeBuilder& context) {
         next(Lexer::IgnoreReservedWords);
         matchOrFail(IDENT);
         base =
-            context.createDotAccess(base, *token().m_data.ident,
+            context.createDotAccess(base, *m_token.m_data.ident,
                                     expressionStart, expressionEnd, tokenEnd());
         next();
         break;
@@ -1578,15 +1577,15 @@ template <class TreeBuilder>
 TreeExpression JSParser::parseUnaryExpression(TreeBuilder& context) {
   AllowInOverride allowInOverride(this);
   int tokenStackDepth = 0;
-  while (isUnaryOp(token().m_type)) {
+  while (isUnaryOp(m_token.m_type)) {
     m_nonLHSCount++;
-    context.appendUnaryToken(tokenStackDepth, token().m_type, tokenStart());
+    context.appendUnaryToken(tokenStackDepth, m_token.m_type, tokenStart());
     next();
   }
   int subExprStart = tokenStart();
   TreeExpression expr = parseMemberExpression(context);
   failIfFalse(expr);
-  switch (token().m_type) {
+  switch (m_token.m_type) {
     case PLUSPLUS:
       m_nonLHSCount++;
       expr = context.makePostfixNode(expr, OpPlusPlus, subExprStart,
