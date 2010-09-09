@@ -196,6 +196,7 @@ class PlatformContextSkia : public Noncopyable {
   void prepareForHardwareDraw() const;
   // Call to force the skia::PlatformCanvas to contain all rendering results.
   void syncSoftwareCanvas() const;
+  void markDirtyRect(const IntRect& rect);
 
  private:
 #if OS(LINUX) || OS(WINDOWS)
@@ -236,6 +237,7 @@ class PlatformContextSkia : public Noncopyable {
   OwnPtr<GLES2Canvas> m_gpuCanvas;
   mutable enum { None, Software, Mixed, Hardware } m_backingStoreState;
   mutable RefPtr<Texture> m_uploadTexture;
+  mutable IntRect m_softwareDirtyRect;
 };
 }
 #endif  // PlatformContextSkia_h

@@ -572,6 +572,8 @@ class GraphicsContext : public Noncopyable {
                                   DrawingBuffer*,
                                   const IntSize&);
   void syncSoftwareCanvas();
+  void markDirtyRect(
+      const IntRect&);  // Hints that a portion of the backing store is dirty.
 
  private:
   void savePlatformState();

@@ -602,6 +602,8 @@ void GraphicsContext::setSharedGraphicsContext3D(SharedGraphicsContext3D*,
                                                  const IntSize&) {}
 
 void GraphicsContext::syncSoftwareCanvas() {}
+
+void GraphicsContext::markDirtyRect(const IntRect&) {}
 #endif
 
 void GraphicsContext::adjustLineToPixelBoundaries(FloatPoint& p1,

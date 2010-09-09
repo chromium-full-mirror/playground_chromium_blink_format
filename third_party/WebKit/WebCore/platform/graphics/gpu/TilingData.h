@@ -47,6 +47,7 @@ class TilingData : public Noncopyable {
   int maxTextureSize() const { return m_maxTextureSize; }
   int totalSizeX() const { return m_totalSizeX; }
   int totalSizeY() const { return m_totalSizeY; }
+  int borderTexels() const { return m_borderTexels; }
 
   int numTiles() const { return numTilesX() * numTilesY(); }
   int numTilesX() const { return m_numTilesX; }

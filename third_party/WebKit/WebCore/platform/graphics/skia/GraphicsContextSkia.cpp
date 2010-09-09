@@ -1202,4 +1202,8 @@ void GraphicsContext::setSharedGraphicsContext3D(
   platformContext()->setSharedGraphicsContext3D(context, framebuffer, size);
 }
 
+void GraphicsContext::markDirtyRect(const IntRect& rect) {
+  platformContext()->markDirtyRect(rect);
+}
+
 }  // namespace WebCore

@@ -400,14 +400,15 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
 
   void applyShadow();
 
-  enum CanvasWillDrawOption {
-    CanvasWillDrawApplyTransform = 1,
-    CanvasWillDrawApplyShadow = 1 << 1,
-    CanvasWillDrawApplyClip = 1 << 2,
-    CanvasWillDrawApplyAll = 0xffffffff
+  enum CanvasDidDrawOption {
+    CanvasDidDrawApplyNone = 0,
+    CanvasDidDrawApplyTransform = 1,
+    CanvasDidDrawApplyShadow = 1 << 1,
+    CanvasDidDrawApplyClip = 1 << 2,
+    CanvasDidDrawApplyAll = 0xffffffff
   };
 
-  void didDraw(const FloatRect&, unsigned options = CanvasWillDrawApplyAll);
+  void didDraw(const FloatRect&, unsigned options = CanvasDidDrawApplyAll);
 
   GraphicsContext* drawingContext() const;
 

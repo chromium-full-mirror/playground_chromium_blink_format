@@ -1630,12 +1630,12 @@ void CanvasRenderingContext2D::didDraw(const FloatRect& r, unsigned options) {
     return;
 
   FloatRect dirtyRect = r;
-  if (options & CanvasWillDrawApplyTransform) {
+  if (options & CanvasDidDrawApplyTransform) {
     AffineTransform ctm = state().m_transform;
     dirtyRect = ctm.mapRect(r);
   }
 
-  if (options & CanvasWillDrawApplyShadow &&
+  if (options & CanvasDidDrawApplyShadow &&
       alphaChannel(state().m_shadowColor)) {
     // The shadow gets applied after transformation
     FloatRect shadowRect(dirtyRect);
@@ -1644,7 +1644,7 @@ void CanvasRenderingContext2D::didDraw(const FloatRect& r, unsigned options) {
     dirtyRect.unite(shadowRect);
   }
 
-  if (options & CanvasWillDrawApplyClip) {
+  if (options & CanvasDidDrawApplyClip) {
     // FIXME: apply the current clip to the rectangle. Unfortunately we can't
     // get the clip
     // back out of the GraphicsContext, so to take clip into account for
@@ -1652,6 +1652,10 @@ void CanvasRenderingContext2D::didDraw(const FloatRect& r, unsigned options) {
     // we'd have to keep the clip path around.
   }
 
+#if ENABLE(ACCELERATED_2D_CANVAS)
+  if (isAccelerated())
+    drawingContext()->markDirtyRect(enclosingIntRect(dirtyRect));
+#endif
 #if ENABLE(ACCELERATED_2D_CANVAS) && USE(ACCELERATED_COMPOSITING)
   // If we are drawing to hardware and we have a composited layer, just call
   // rendererContentChanged().
@@ -1796,7 +1800,8 @@ void CanvasRenderingContext2D::putImageData(ImageData* data,
   IntPoint destPoint(destOffset.width(), destOffset.height());
 
   buffer->putUnmultipliedImageData(data, sourceRect, destPoint);
-  didDraw(sourceRect, 0);  // ignore transform, shadow and clip
+  didDraw(sourceRect,
+          CanvasDidDrawApplyNone);  // ignore transform, shadow and clip
 }
 
 String CanvasRenderingContext2D::font() const {
@@ -2028,11 +2033,11 @@ void CanvasRenderingContext2D::drawTextInternal(const String& text,
   c->drawBidiText(font, textRun, location);
 
   if (fill)
-    canvas()->didDraw(textRect);
+    didDraw(textRect);
   else {
     // When stroking text, pointy miters can extend outside of textRect, so we
     // punt and dirty the whole canvas.
-    canvas()->didDraw(FloatRect(0, 0, canvas()->width(), canvas()->height()));
+    didDraw(FloatRect(0, 0, canvas()->width(), canvas()->height()));
   }
 
 #if PLATFORM(QT)
