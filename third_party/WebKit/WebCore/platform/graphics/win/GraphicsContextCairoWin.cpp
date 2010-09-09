@@ -91,7 +91,9 @@ void GraphicsContext::releaseWindowsContext(HDC hdc,
                                             const IntRect& dstRect,
                                             bool supportAlphaBlend,
                                             bool mayCreateBitmap) {
-  if (!mayCreateBitmap || !hdc || !inTransparencyLayer()) {
+  bool createdBitmap =
+      mayCreateBitmap && (!m_data->m_hdc || inTransparencyLayer());
+  if (!hdc || !createdBitmap) {
     m_data->restore();
     return;
   }

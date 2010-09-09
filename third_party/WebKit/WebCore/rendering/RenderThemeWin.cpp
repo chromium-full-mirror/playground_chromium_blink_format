@@ -26,6 +26,7 @@
 #include "Element.h"
 #include "Frame.h"
 #include "GraphicsContext.h"
+#include "LocalWindowsContext.h"
 #include "RenderSlider.h"
 #include "Settings.h"
 #include "SoftLinking.h"
@@ -569,12 +570,13 @@ static void drawControl(GraphicsContext* context,
   if (theme)
     alphaBlend = IsThemeBackgroundPartiallyTransparent(theme, themeData.m_part,
                                                        themeData.m_state);
-  HDC hdc = context->getWindowsContext(r, alphaBlend);
+  LocalWindowsContext windowsContext(context, r, alphaBlend);
   RECT widgetRect = r;
   if (theme)
-    DrawThemeBackground(theme, hdc, themeData.m_part, themeData.m_state,
-                        &widgetRect, NULL);
+    DrawThemeBackground(theme, windowsContext.hdc(), themeData.m_part,
+                        themeData.m_state, &widgetRect, 0);
   else {
+    HDC hdc = windowsContext.hdc();
     if (themeData.m_part == TFP_TEXTFIELD) {
       ::DrawEdge(hdc, &widgetRect, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
       if (themeData.m_state == TS_DISABLED || themeData.m_state == TFS_READONLY)
@@ -629,7 +631,6 @@ static void drawControl(GraphicsContext* context,
       ::DrawFrameControl(hdc, &widgetRect, themeData.m_part, themeData.m_state);
     }
   }
-  context->releaseWindowsContext(hdc, r, alphaBlend);
 }
 
 bool RenderThemeWin::paintButton(RenderObject* o,

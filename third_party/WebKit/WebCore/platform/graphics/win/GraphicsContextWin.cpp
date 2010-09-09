@@ -100,7 +100,7 @@ HDC GraphicsContext::getWindowsContext(const IntRect& dstRect,
                                        bool supportAlphaBlend,
                                        bool mayCreateBitmap) {
   // FIXME: Should a bitmap be created also when a shadow is set?
-  if (mayCreateBitmap && inTransparencyLayer()) {
+  if (mayCreateBitmap && (!m_data->m_hdc || inTransparencyLayer())) {
     if (dstRect.isEmpty())
       return 0;
 
