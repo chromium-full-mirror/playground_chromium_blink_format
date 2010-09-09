@@ -28,6 +28,7 @@
 #include "ImmutableArray.h"
 #include "ImmutableDictionary.h"
 #include "WebCoreArgumentCoders.h"
+#include "WebNumber.h"
 #include "WebSerializedScriptValue.h"
 #include "WebString.h"
 
@@ -38,6 +39,7 @@ namespace WebKit {
 //   - Dictionary -> Dictionary
 //   - String -> String
 //   - SerializedScriptValue -> SerializedScriptValue
+//   - WebDouble -> WebDouble
 
 template <typename Owner>
 class UserMessageEncoder {
@@ -86,6 +88,11 @@ class UserMessageEncoder {
                              scriptValue->data().size());
         return true;
       }
+      case APIObject::TypeDouble: {
+        WebDouble* doubleObject = static_cast<WebDouble*>(m_root);
+        encoder->encode(doubleObject->value());
+        return true;
+      }
       default:
         break;
     }
@@ -104,6 +111,8 @@ class UserMessageEncoder {
 //   - Array -> Array
 //   - Dictionary -> Dictionary
 //   - String -> String
+//   - SerializedScriptValue -> SerializedScriptValue
+//   - WebDouble -> WebDouble
 
 template <typename Owner>
 class UserMessageDecoder {
@@ -172,6 +181,13 @@ class UserMessageDecoder {
         if (!decoder->decodeBytes(buffer))
           return false;
         coder.m_root = WebSerializedScriptValue::adopt(buffer);
+        break;
+      }
+      case APIObject::TypeDouble: {
+        double doubleValue;
+        if (!decoder->decode(doubleValue))
+          return false;
+        coder.m_root = WebDouble::create(doubleValue);
         break;
       }
       default:
