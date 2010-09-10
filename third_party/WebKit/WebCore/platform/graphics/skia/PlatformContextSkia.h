@@ -78,6 +78,7 @@ class PlatformContextSkia : public Noncopyable {
   // to the constructor.
   void setCanvas(skia::PlatformCanvas*);
 
+#if OS(WINDOWS)
   // If false we're rendering to a GraphicsContext for a web page, if false
   // we're not (as is the case when rendering to a canvas object).
   // If this is true the contents have not been marked up with the magic
@@ -85,15 +86,18 @@ class PlatformContextSkia : public Noncopyable {
   // correctly updated.
   void setDrawingToImageBuffer(bool);
   bool isDrawingToImageBuffer() const;
+#endif
 
   void save();
   void restore();
 
-  // Begins a layer that is clipped to the image |imageBuffer| at the location
-  // |rect|. This layer is implicitly restored when the next restore is
-  // invoked.
-  // NOTE: |imageBuffer| may be deleted before the |restore| is invoked.
+// Begins a layer that is clipped to the image |imageBuffer| at the location
+// |rect|. This layer is implicitly restored when the next restore is
+// invoked.
+// NOTE: |imageBuffer| may be deleted before the |restore| is invoked.
+#if OS(LINUX) || OS(WINDOWS)
   void beginLayerClippedToImage(const FloatRect&, const ImageBuffer*);
+#endif
   void clipPathAntiAliased(const SkPath&);
 
   // Sets up the common flags on a paint for antialiasing, effects, etc.
@@ -195,10 +199,12 @@ class PlatformContextSkia : public Noncopyable {
   void markDirtyRect(const IntRect& rect);
 
  private:
+#if OS(LINUX) || OS(WINDOWS)
   // Used when restoring and the state has an image clip. Only shows the pixels
   // in
   // m_canvas that are also in imageBuffer.
   void applyClipFromImage(const FloatRect&, const SkBitmap&);
+#endif
   void applyAntiAliasedClipPaths(WTF::Vector<SkPath>& paths);
 
   void uploadSoftwareToHardware(CompositeOperator) const;
@@ -224,7 +230,9 @@ class PlatformContextSkia : public Noncopyable {
   // Values are used in ImageSkia.cpp
   IntSize m_imageResamplingHintSrcSize;
   FloatSize m_imageResamplingHintDstSize;
+#if OS(WINDOWS)
   bool m_drawingToImageBuffer;
+#endif
   bool m_useGPU;
   OwnPtr<GLES2Canvas> m_gpuCanvas;
   mutable enum { None, Software, Mixed, Hardware } m_backingStoreState;

@@ -97,11 +97,13 @@ struct PlatformContextSkia::State {
   // color to produce a new output color.
   SkColor applyAlpha(SkColor) const;
 
+#if OS(LINUX) || OS(WINDOWS)
   // If non-empty, the current State is clipped to this image.
   SkBitmap m_imageBufferClip;
   // If m_imageBufferClip is non-empty, this is the region the image is clipped
   // to.
   FloatRect m_clip;
+#endif
 
   // This is a list of clipping paths which are currently active, in the
   // order in which they were pushed.
@@ -155,9 +157,13 @@ PlatformContextSkia::State::State(const State& other)
       m_lineCap(other.m_lineCap),
       m_lineJoin(other.m_lineJoin),
       m_dash(other.m_dash),
-      m_textDrawingMode(other.m_textDrawingMode),
+      m_textDrawingMode(other.m_textDrawingMode)
+#if OS(LINUX) || OS(WINDOWS)
+      ,
       m_imageBufferClip(other.m_imageBufferClip),
-      m_clip(other.m_clip),
+      m_clip(other.m_clip)
+#endif
+      ,
       m_antiAliasClipPaths(other.m_antiAliasClipPaths),
       m_interpolationQuality(other.m_interpolationQuality),
       m_canvasClipApplied(other.m_canvasClipApplied) {
@@ -201,8 +207,12 @@ SkColor PlatformContextSkia::State::applyAlpha(SkColor c) const {
 
 // Danger: canvas can be NULL.
 PlatformContextSkia::PlatformContextSkia(skia::PlatformCanvas* canvas)
-    : m_canvas(canvas),
-      m_drawingToImageBuffer(false),
+    : m_canvas(canvas)
+#if OS(WINDOWS)
+      ,
+      m_drawingToImageBuffer(false)
+#endif
+      ,
       m_useGPU(false),
       m_gpuCanvas(0),
       m_backingStoreState(None) {
@@ -219,6 +229,7 @@ void PlatformContextSkia::setCanvas(skia::PlatformCanvas* canvas) {
   m_canvas = canvas;
 }
 
+#if OS(WINDOWS)
 void PlatformContextSkia::setDrawingToImageBuffer(bool value) {
   m_drawingToImageBuffer = value;
 }
@@ -226,6 +237,7 @@ void PlatformContextSkia::setDrawingToImageBuffer(bool value) {
 bool PlatformContextSkia::isDrawingToImageBuffer() const {
   return m_drawingToImageBuffer;
 }
+#endif
 
 void PlatformContextSkia::save() {
   ASSERT(!hasImageResamplingHint());
@@ -233,14 +245,17 @@ void PlatformContextSkia::save() {
   m_stateStack.append(m_state->cloneInheritedProperties());
   m_state = &m_stateStack.last();
 
+#if OS(LINUX) || OS(WINDOWS)
   // The clip image only needs to be applied once. Reset the image so that we
   // don't attempt to clip multiple times.
   m_state->m_imageBufferClip.reset();
+#endif
 
   // Save our native canvas.
   canvas()->save();
 }
 
+#if OS(LINUX) || OS(WINDOWS)
 void PlatformContextSkia::beginLayerClippedToImage(
     const FloatRect& rect,
     const ImageBuffer* imageBuffer) {
@@ -273,6 +288,7 @@ void PlatformContextSkia::beginLayerClippedToImage(
     m_state->m_imageBufferClip = *bitmap;
   }
 }
+#endif
 
 void PlatformContextSkia::clipPathAntiAliased(const SkPath& clipPath) {
   // If we are currently tracking any anti-alias clip paths, then we already
@@ -293,10 +309,12 @@ void PlatformContextSkia::clipPathAntiAliased(const SkPath& clipPath) {
 }
 
 void PlatformContextSkia::restore() {
+#if OS(LINUX) || OS(WINDOWS)
   if (!m_state->m_imageBufferClip.empty()) {
     applyClipFromImage(m_state->m_clip, m_state->m_imageBufferClip);
     canvas()->restore();
   }
+#endif
 
   if (!m_state->m_antiAliasClipPaths.isEmpty())
     applyAntiAliasedClipPaths(m_state->m_antiAliasClipPaths);
@@ -594,6 +612,7 @@ bool PlatformContextSkia::hasImageResamplingHint() const {
          !m_imageResamplingHintDstSize.isEmpty();
 }
 
+#if OS(LINUX) || OS(WINDOWS)
 void PlatformContextSkia::applyClipFromImage(const FloatRect& rect,
                                              const SkBitmap& imageBuffer) {
   // NOTE: this assumes the image mask contains opaque black for the portions
@@ -605,6 +624,7 @@ void PlatformContextSkia::applyClipFromImage(const FloatRect& rect,
   m_canvas->drawBitmap(imageBuffer, SkFloatToScalar(rect.x()),
                        SkFloatToScalar(rect.y()), &paint);
 }
+#endif
 
 void PlatformContextSkia::applyAntiAliasedClipPaths(
     WTF::Vector<SkPath>& paths) {
