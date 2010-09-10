@@ -45,6 +45,7 @@ class LayoutTestController;
 class TestShell;
 namespace WebKit {
 class WebFrame;
+class WebDeviceOrientationClient;
 class WebGeolocationServiceMock;
 class WebSpeechInputController;
 class WebSpeechInputListener;
@@ -161,6 +162,7 @@ class WebViewHost : public WebKit::WebViewClient,
   virtual WebKit::WebGeolocationService* geolocationService();
   virtual WebKit::WebSpeechInputController* speechInputController(
       WebKit::WebSpeechInputListener*);
+  virtual WebKit::WebDeviceOrientationClient* deviceOrientationClient();
 
   // WebKit::WebWidgetClient
   virtual void didInvalidateRect(const WebKit::WebRect&);
