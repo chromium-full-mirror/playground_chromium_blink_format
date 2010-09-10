@@ -93,6 +93,8 @@ class SubframeLoader : public Noncopyable {
 
   bool containsPlugins() const { return m_containsPlugins; }
 
+  bool resourceWillUsePlugin(const String& url, const String& mimeType);
+
  private:
   Frame* loadOrRedirectSubframe(HTMLFrameOwnerElement*,
                                 const KURL&,
