@@ -131,10 +131,7 @@ void LayerRendererChromium::setRootLayerCanvasSize(const IntSize& size) {
   m_rootLayerCanvas =
       new skia::PlatformCanvas(size.width(), size.height(), false);
   m_rootLayerSkiaContext = new PlatformContextSkia(m_rootLayerCanvas.get());
-#if OS(WINDOWS)
-  // FIXME: why is this is a windows-only call ?
   m_rootLayerSkiaContext->setDrawingToImageBuffer(true);
-#endif
   m_rootLayerGraphicsContext = new GraphicsContext(
       reinterpret_cast<PlatformGraphicsContext*>(m_rootLayerSkiaContext.get()));
 #elif PLATFORM(CG)
