@@ -58,8 +58,6 @@ class DestroyOnContextThreadTask : public ScriptExecutionContext::Task {
   OwnPtr<ActiveDOMObjectCallbackImpl> m_impl;
 };
 
-// Instances of this class are accessed only on the context thread, so we don't
-// need to use locks.
 class ActiveDOMObjectCallbackImpl : public ActiveDOMObject {
  public:
   ActiveDOMObjectCallbackImpl(ScriptExecutionContext* context)
