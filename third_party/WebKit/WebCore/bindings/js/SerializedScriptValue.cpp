@@ -1184,7 +1184,7 @@ JSValue CloneDeserializer::deserialize() {
           tickCount = ticksUntilNextCheck();
         }
 
-        CachedString* cachedString;
+        CachedString* cachedString = 0;
         bool wasTerminator = false;
         if (!readStringData(cachedString, wasTerminator)) {
           if (!wasTerminator)
