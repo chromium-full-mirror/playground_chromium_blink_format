@@ -60,6 +60,9 @@ class State<V8Binding> : public State<GenericBinding> {
 
   bool processingUserGesture();
 
+  // FIXME: This should be shared in BindingSecurity
+  bool allowsAccessFromFrame(Frame*);
+
  private:
   explicit State() {}
   ~State();

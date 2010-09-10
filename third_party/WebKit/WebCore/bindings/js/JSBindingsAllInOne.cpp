@@ -31,6 +31,7 @@
 #include "GCController.cpp"
 #include "JSAttrCustom.cpp"
 #include "JSAudioConstructor.cpp"
+#include "JSBindingState.cpp"
 #include "JSCDATASectionCustom.cpp"
 #include "JSCSSRuleCustom.cpp"
 #include "JSCSSRuleListCustom.cpp"
