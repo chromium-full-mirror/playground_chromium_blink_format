@@ -57,6 +57,9 @@ using namespace WTF;
 
 namespace JSC {
 
+static size_t committedBytesCount = 0;
+static SpinLock spinlock = SPINLOCK_INITIALIZER;
+
 // FreeListEntry describes a free chunk of memory, stored in the freeList.
 struct FreeListEntry {
   FreeListEntry(void* pointer, size_t size)
@@ -128,11 +131,13 @@ class FixedVMPoolAllocator {
 
   void release(void* position, size_t size) {
     m_allocation.decommit(position, size);
+    addToCommittedByteCount(-static_cast<long>(size));
   }
 
   void reuse(void* position, size_t size) {
     bool okay = m_allocation.commit(position, size);
     ASSERT_UNUSED(okay, okay);
+    addToCommittedByteCount(static_cast<long>(size));
   }
 
   // All addition to the free list should go through this method, rather than
@@ -439,6 +444,12 @@ class FixedVMPoolAllocator {
   }
 #endif
 
+  void addToCommittedByteCount(long byteCount) {
+    ASSERT(spinlock.IsHeld());
+    ASSERT(static_cast<long>(committedBytesCount) + byteCount > -1);
+    committedBytesCount += byteCount;
+  }
+
   // Freed space from the most common sized allocations will be held in this
   // list, ...
   const size_t m_commonSize;
@@ -454,12 +465,16 @@ class FixedVMPoolAllocator {
   PageReservation m_allocation;
 };
 
+size_t ExecutableAllocator::committedByteCount() {
+  SpinLockHolder lockHolder(&spinlock);
+  return committedBytesCount;
+}
+
 void ExecutableAllocator::intializePageSize() {
   ExecutableAllocator::pageSize = getpagesize();
 }
 
 static FixedVMPoolAllocator* allocator = 0;
-static SpinLock spinlock = SPINLOCK_INITIALIZER;
 
 bool ExecutableAllocator::isValid() const {
   SpinLockHolder lock_holder(&spinlock);

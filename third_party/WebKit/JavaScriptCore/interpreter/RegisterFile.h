@@ -146,10 +146,13 @@ class RegisterFile : public Noncopyable {
     heap->markConservatively(markStack, m_start, m_end);
   }
 
+  static size_t committedByteCount();
+  static void initializeThreading();
+
  private:
   void checkAllocatedOkay(bool okay);
-
   void releaseExcessCapacity();
+  void addToCommittedByteCount(long);
   size_t m_numGlobals;
   const size_t m_maxGlobals;
   Register* m_start;
@@ -182,6 +185,7 @@ inline RegisterFile::RegisterFile(size_t capacity, size_t maxGlobals)
   size_t committedSize =
       roundUpAllocationSize(maxGlobals * sizeof(Register), commitSize);
   checkAllocatedOkay(m_reservation.commit(base, committedSize));
+  addToCommittedByteCount(static_cast<long>(committedSize));
   m_commitEnd = reinterpret_cast_ptr<Register*>(reinterpret_cast<char*>(base) +
                                                 committedSize);
   m_start = static_cast<Register*>(base) + maxGlobals;
@@ -210,6 +214,7 @@ inline bool RegisterFile::grow(Register* newEnd) {
         reinterpret_cast<char*>(newEnd) - reinterpret_cast<char*>(m_commitEnd),
         commitSize);
     checkAllocatedOkay(m_reservation.commit(m_commitEnd, size));
+    addToCommittedByteCount(static_cast<long>(size));
     m_commitEnd = reinterpret_cast_ptr<Register*>(
         reinterpret_cast<char*>(m_commitEnd) + size);
   }

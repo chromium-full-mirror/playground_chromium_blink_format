@@ -281,6 +281,7 @@ class ExecutableAllocator {
 #else
 #error "The cacheFlush support is missing on this platform."
 #endif
+  static size_t committedByteCount();
 
  private:
 #if ENABLE(ASSEMBLER_WX_EXCLUSIVE)
