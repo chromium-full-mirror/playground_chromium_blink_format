@@ -64,6 +64,10 @@ bool ExecutableAllocator::isValid() const {
   return true;
 }
 
+size_t ExecutableAllocator::committedByteCount() {
+  return 0;
+}
+
 #endif
 
 #if ENABLE(ASSEMBLER_WX_EXCLUSIVE)
