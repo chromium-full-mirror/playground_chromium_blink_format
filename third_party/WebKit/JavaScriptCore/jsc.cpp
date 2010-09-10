@@ -447,6 +447,9 @@ static bool runWithScripts(GlobalObject* globalObject,
 #if ENABLE(SAMPLING_COUNTERS)
   AbstractSamplingCounter::dump();
 #endif
+#if ENABLE(REGEXP_TRACING)
+  globalData->dumpRegExpTrace();
+#endif
   return success;
 }
 

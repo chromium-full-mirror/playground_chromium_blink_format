@@ -52,6 +52,10 @@ class RegExp : public RefCounted<RegExp> {
   int match(const UString&, int startOffset, Vector<int, 32>* ovector = 0);
   unsigned numSubpatterns() const { return m_numSubpatterns; }
 
+#if ENABLE(REGEXP_TRACING)
+  void printTraceData();
+#endif
+
  private:
   RegExp(JSGlobalData* globalData,
          const UString& pattern,
@@ -65,6 +69,10 @@ class RegExp : public RefCounted<RegExp> {
   int m_flagBits;
   const char* m_constructionError;
   unsigned m_numSubpatterns;
+#if ENABLE(REGEXP_TRACING)
+  unsigned m_rtMatchCallCount;
+  unsigned m_rtMatchFoundCount;
+#endif
 
   OwnPtr<RegExpRepresentation> m_representation;
 };
