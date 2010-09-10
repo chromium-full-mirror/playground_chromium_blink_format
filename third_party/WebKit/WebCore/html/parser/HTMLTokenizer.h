@@ -96,7 +96,6 @@ class HTMLTokenizer : public Noncopyable {
     CommentEndDashState,
     CommentEndState,
     CommentEndBangState,
-    CommentEndSpaceState,
     DOCTYPEState,
     BeforeDOCTYPENameState,
     DOCTYPENameState,
