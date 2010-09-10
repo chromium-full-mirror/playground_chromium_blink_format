@@ -35,12 +35,13 @@
 namespace WebCore {
 
 class CachedScript;
+class Document;
 class ScriptElementData;
 
 class AsyncScriptRunner : public Noncopyable {
  public:
-  static PassOwnPtr<AsyncScriptRunner> create() {
-    return new AsyncScriptRunner();
+  static PassOwnPtr<AsyncScriptRunner> create(Document* document) {
+    return new AsyncScriptRunner(document);
   }
   ~AsyncScriptRunner();
 
@@ -51,10 +52,11 @@ class AsyncScriptRunner : public Noncopyable {
   void resume();
 
  private:
-  AsyncScriptRunner();
+  AsyncScriptRunner(Document*);
 
   void timerFired(Timer<AsyncScriptRunner>*);
 
+  Document* m_document;
   Vector<std::pair<ScriptElementData*, CachedResourceHandle<CachedScript>>>
       m_scriptsToExecuteSoon;
   Timer<AsyncScriptRunner> m_timer;
