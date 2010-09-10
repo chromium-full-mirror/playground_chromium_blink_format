@@ -249,6 +249,8 @@ void WKQTMovieDisableComponent(uint32_t[5]);
 
 CFStringRef WKCopyFoundationCacheDirectory(void);
 
+void WKSetVisibleApplicationName(CFStringRef);
+
 typedef enum {
   WKMediaUIPartFullscreenButton = 0,
   WKMediaUIPartMuteButton,
