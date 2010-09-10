@@ -108,7 +108,7 @@ class RenderText : public RenderObject {
                          int& maxW,
                          bool& stripFrontSpaces);
 
-  IntRect linesBoundingBox() const;
+  virtual IntRect linesBoundingBox() const;
 
   IntPoint firstRunOrigin() const;
   int firstRunX() const;

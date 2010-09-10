@@ -26,13 +26,19 @@
 #define RenderSVGInlineText_h
 
 #if ENABLE(SVG)
-
 #include "RenderText.h"
+#include "SVGTextLayoutAttributes.h"
 
 namespace WebCore {
+
 class RenderSVGInlineText : public RenderText {
  public:
   RenderSVGInlineText(Node*, PassRefPtr<StringImpl>);
+
+  bool characterStartsNewTextChunk(int position) const;
+  void storeLayoutAttributes(const SVGTextLayoutAttributes& attributes) {
+    m_attributes = attributes;
+  }
 
  private:
   virtual const char* renderName() const { return "RenderSVGInlineText"; }
@@ -49,8 +55,10 @@ class RenderSVGInlineText : public RenderText {
   virtual IntRect localCaretRect(InlineBox*,
                                  int caretOffset,
                                  int* extraWidthToEndOfLine = 0);
-
+  virtual IntRect linesBoundingBox() const;
   virtual InlineTextBox* createTextBox();
+
+  SVGTextLayoutAttributes m_attributes;
 };
 }
 
