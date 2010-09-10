@@ -180,7 +180,6 @@ class FrameLoader : public Noncopyable {
   const ResourceRequest& originalRequest() const;
   const ResourceRequest& initialRequest() const;
   void receivedMainResourceError(const ResourceError&, bool isComplete);
-  void receivedData(const char*, int);
 
   bool willLoadMediaElementURL(KURL&);
 

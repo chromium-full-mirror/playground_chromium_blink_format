@@ -149,7 +149,7 @@ bool MainResourceLoader::isPostOrRedirectAfterPost(
 
 void MainResourceLoader::addData(const char* data, int length, bool allAtOnce) {
   ResourceLoader::addData(data, length, allAtOnce);
-  frameLoader()->receivedData(data, length);
+  documentLoader()->receivedData(data, length);
 }
 
 void MainResourceLoader::willSendRequest(
