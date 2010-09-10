@@ -493,7 +493,7 @@ bool DragController::concludeEditDrag(DragData* dragData) {
       bool smartDelete = innerFrame->editor()->smartInsertDeleteEnabled();
       bool smartInsert =
           smartDelete &&
-          innerFrame->selectionGranularity() == WordGranularity &&
+          innerFrame->selection()->granularity() == WordGranularity &&
           dragData->canSmartReplace();
       applyCommand(MoveSelectionCommand::create(fragment, dragCaret.base(),
                                                 smartInsert, smartDelete));
@@ -702,7 +702,7 @@ static IntPoint dragLocForDHTMLDrag(const IntPoint& mouseDraggedPoint,
 }
 
 static IntPoint dragLocForSelectionDrag(Frame* src) {
-  IntRect draggingRect = enclosingIntRect(src->selectionBounds());
+  IntRect draggingRect = enclosingIntRect(src->selection()->bounds());
   int xpos = draggingRect.right();
   xpos = draggingRect.x() < xpos ? draggingRect.x() : xpos;
   int ypos = draggingRect.bottom();

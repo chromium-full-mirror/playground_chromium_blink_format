@@ -1048,7 +1048,7 @@ void ReplaceSelectionCommand::doApply() {
   // doesn't seem to be
   // any work performed after this that queries or uses the typing style.
   if (Frame* frame = document()->frame())
-    frame->clearTypingStyle();
+    frame->selection()->clearTypingStyle();
 
   bool handledStyleSpans =
       handleStyleSpansBeforeInsertion(fragment, insertionPos);

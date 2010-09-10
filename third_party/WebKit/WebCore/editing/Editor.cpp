@@ -256,7 +256,7 @@ bool Editor::smartInsertDeleteEnabled() {
 
 bool Editor::canSmartCopyOrDelete() {
   return client() && client()->smartInsertDeleteEnabled() &&
-         m_frame->selectionGranularity() == WordGranularity;
+         m_frame->selection()->granularity() == WordGranularity;
 }
 
 bool Editor::isSelectTrailingWhitespaceEnabled() {
@@ -575,7 +575,8 @@ WritingDirection Editor::textDirectionForSelection(
   }
 
   if (m_frame->selection()->isCaret()) {
-    if (CSSMutableStyleDeclaration* typingStyle = m_frame->typingStyle()) {
+    if (CSSMutableStyleDeclaration* typingStyle =
+            m_frame->selection()->typingStyle()) {
       RefPtr<CSSValue> unicodeBidi =
           typingStyle->getPropertyCSSValue(CSSPropertyUnicodeBidi);
       if (unicodeBidi) {
@@ -1082,7 +1083,7 @@ void Editor::appliedEditing(PassRefPtr<EditCommand> cmd) {
   changeSelectionAfterCommand(newSelection, false, false);
 
   if (!cmd->preservesTypingStyle())
-    m_frame->setTypingStyle(0);
+    m_frame->selection()->clearTypingStyle();
 
   // Command will be equal to last edit command only in the case of typing
   if (m_lastEditCommand.get() == cmd)
@@ -1186,8 +1187,10 @@ bool Editor::insertTextWithoutSendingTextEvent(const String& text,
       // Reveal the current selection
       if (Frame* editedFrame = document->frame())
         if (Page* page = editedFrame->page())
-          page->focusController()->focusedOrMainFrame()->revealSelection(
-              ScrollAlignment::alignToEdgeIfNeeded);
+          page->focusController()
+              ->focusedOrMainFrame()
+              ->selection()
+              ->revealSelection(ScrollAlignment::alignToEdgeIfNeeded);
     }
   }
 
@@ -2339,7 +2342,7 @@ void Editor::advanceToNextMisspelling(bool startBeforeSelection) {
         grammarDetail.length);
     frame()->selection()->setSelection(
         VisibleSelection(badGrammarRange.get(), SEL_DEFAULT_AFFINITY));
-    frame()->revealSelection();
+    frame()->selection()->revealSelection();
 
     client()->updateSpellingUIWithGrammarString(badGrammarPhrase,
                                                 grammarDetail);
@@ -2356,7 +2359,7 @@ void Editor::advanceToNextMisspelling(bool startBeforeSelection) {
         spellingSearchRange.get(), misspellingOffset, misspelledWord.length());
     frame()->selection()->setSelection(
         VisibleSelection(misspellingRange.get(), DOWNSTREAM));
-    frame()->revealSelection();
+    frame()->selection()->revealSelection();
 
     client()->updateSpellingUIWithMisspelledWord(misspelledWord);
     frame()->document()->markers()->addMarker(misspellingRange.get(),
@@ -2697,7 +2700,7 @@ void Editor::markMisspellingsAfterTypingToPosition(const VisiblePosition& p) {
   if (!autocorrectedString.isEmpty()) {
     VisibleSelection newSelection(misspellingRange.get(), DOWNSTREAM);
     if (newSelection != frame()->selection()->selection()) {
-      if (!frame()->shouldChangeSelection(newSelection))
+      if (!frame()->selection()->shouldChangeSelection(newSelection))
         return;
       frame()->selection()->setSelection(newSelection);
     }
@@ -3040,7 +3043,7 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
       }
       if (doReplacement && !shouldShowCorrectionPanel &&
           selectionToReplace != m_frame->selection()->selection()) {
-        if (m_frame->shouldChangeSelection(selectionToReplace)) {
+        if (m_frame->selection()->shouldChangeSelection(selectionToReplace)) {
           m_frame->selection()->setSelection(selectionToReplace);
           selectionChanged = true;
         } else {
@@ -3240,7 +3243,7 @@ void Editor::revealSelectionAfterEditingOperation() {
   if (m_ignoreCompositionSelectionChange)
     return;
 
-  m_frame->revealSelection(ScrollAlignment::alignToEdgeIfNeeded);
+  m_frame->selection()->revealSelection(ScrollAlignment::alignToEdgeIfNeeded);
 }
 
 void Editor::setIgnoreCompositionSelectionChange(bool ignore) {
@@ -3316,7 +3319,7 @@ void Editor::transpose() {
 
   // Select the two characters.
   if (newSelection != m_frame->selection()->selection()) {
-    if (!m_frame->shouldChangeSelection(newSelection))
+    if (!m_frame->selection()->shouldChangeSelection(newSelection))
       return;
     m_frame->selection()->setSelection(newSelection);
   }
@@ -3511,7 +3514,7 @@ void Editor::changeSelectionAfterCommand(const VisibleSelection& newSelection,
   bool selectionDidNotChangeDOMPosition =
       newSelection == m_frame->selection()->selection();
   if (selectionDidNotChangeDOMPosition ||
-      m_frame->shouldChangeSelection(newSelection))
+      m_frame->selection()->shouldChangeSelection(newSelection))
     m_frame->selection()->setSelection(newSelection, closeTyping,
                                        clearTypingStyle);
 
@@ -3601,15 +3604,15 @@ bool Editor::shouldChangeSelection(const VisibleSelection& oldSelection,
 void Editor::computeAndSetTypingStyle(CSSStyleDeclaration* style,
                                       EditAction editingAction) {
   if (!style || !style->length()) {
-    m_frame->clearTypingStyle();
+    m_frame->selection()->clearTypingStyle();
     return;
   }
 
   // Calculate the current typing style.
   RefPtr<CSSMutableStyleDeclaration> mutableStyle = style->makeMutable();
-  if (m_frame->typingStyle()) {
-    m_frame->typingStyle()->merge(mutableStyle.get());
-    mutableStyle = m_frame->typingStyle();
+  if (m_frame->selection()->typingStyle()) {
+    m_frame->selection()->typingStyle()->merge(mutableStyle.get());
+    mutableStyle = m_frame->selection()->typingStyle();
   }
 
   RefPtr<CSSValue> unicodeBidi;
@@ -3645,7 +3648,7 @@ void Editor::computeAndSetTypingStyle(CSSStyleDeclaration* style,
                                            blockStyle.get(), editingAction));
 
   // Set the remaining style as the typing style.
-  m_frame->setTypingStyle(mutableStyle.get());
+  m_frame->selection()->setTypingStyle(mutableStyle.release());
 }
 
 PassRefPtr<CSSComputedStyleDeclaration> Editor::selectionComputedStyle(
@@ -3680,11 +3683,11 @@ PassRefPtr<CSSComputedStyleDeclaration> Editor::selectionComputedStyle(
   RefPtr<Element> styleElement = element;
   ExceptionCode ec = 0;
 
-  if (m_frame->typingStyle()) {
+  if (m_frame->selection()->typingStyle()) {
     styleElement = m_frame->document()->createElement(spanTag, false);
 
-    styleElement->setAttribute(styleAttr,
-                               m_frame->typingStyle()->cssText().impl(), ec);
+    styleElement->setAttribute(
+        styleAttr, m_frame->selection()->typingStyle()->cssText(), ec);
     ASSERT(!ec);
 
     styleElement->appendChild(m_frame->document()->createEditingTextNode(""),
@@ -3779,14 +3782,15 @@ RenderStyle* Editor::styleForSelectionStart(Node*& nodeToRemove) const {
   if (!position.node())
     return 0;
 
-  if (!m_frame->typingStyle())
+  if (!m_frame->selection()->typingStyle())
     return position.node()->renderer()->style();
 
   RefPtr<Element> styleElement =
       m_frame->document()->createElement(spanTag, false);
 
   ExceptionCode ec = 0;
-  String styleText = m_frame->typingStyle()->cssText() + " display: inline";
+  String styleText =
+      m_frame->selection()->typingStyle()->cssText() + " display: inline";
   styleElement->setAttribute(styleAttr, styleText.impl(), ec);
   ASSERT(!ec);
 
@@ -3905,7 +3909,7 @@ bool Editor::findString(const String& target,
 
   m_frame->selection()->setSelection(
       VisibleSelection(resultRange.get(), DOWNSTREAM));
-  m_frame->revealSelection();
+  m_frame->selection()->revealSelection();
   return true;
 }
 

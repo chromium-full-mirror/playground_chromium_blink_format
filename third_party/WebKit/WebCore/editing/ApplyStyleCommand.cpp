@@ -513,7 +513,7 @@ ApplyStyleCommand::editingStyleAtPosition(
 
   if (shouldIncludeTypingStyle == IncludeTypingStyle) {
     CSSMutableStyleDeclaration* typingStyle =
-        pos.node()->document()->frame()->typingStyle();
+        pos.node()->document()->frame()->selection()->typingStyle();
     if (typingStyle)
       style->merge(typingStyle);
   }

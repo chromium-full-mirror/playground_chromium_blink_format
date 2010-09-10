@@ -2448,7 +2448,7 @@ void RenderBlock::paintCaret(PaintInfo& paintInfo,
                              CaretType type) {
   SelectionController* selection = type == CursorCaret
                                        ? frame()->selection()
-                                       : frame()->dragCaretController();
+                                       : frame()->page()->dragCaretController();
 
   // Paint the caret if the SelectionController says so or if caret browsing is
   // enabled
@@ -2466,7 +2466,8 @@ void RenderBlock::paintCaret(PaintInfo& paintInfo,
       frame()->selection()->paintCaret(paintInfo.context, tx, ty,
                                        paintInfo.rect);
     else
-      frame()->paintDragCaret(paintInfo.context, tx, ty, paintInfo.rect);
+      frame()->selection()->paintDragCaret(paintInfo.context, tx, ty,
+                                           paintInfo.rect);
   }
 }
 

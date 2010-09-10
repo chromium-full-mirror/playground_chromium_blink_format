@@ -385,7 +385,8 @@ static bool executeDelete(Frame* frame,
       // Doesn't scroll to make the selection visible, or modify the kill ring
       // (this time, siding with IE, not Firefox).
       TypingCommand::deleteKeyPressed(
-          frame->document(), frame->selectionGranularity() == WordGranularity);
+          frame->document(),
+          frame->selection()->granularity() == WordGranularity);
       return true;
   }
   ASSERT_NOT_REACHED();

@@ -103,7 +103,7 @@ void InputElement::updateFocusAppearance(InputElementData& data,
 
   Document* document = element->document();
   if (document && document->frame())
-    document->frame()->revealSelection();
+    document->frame()->selection()->revealSelection();
 }
 
 void InputElement::updateSelectionRange(InputElement* inputElement,

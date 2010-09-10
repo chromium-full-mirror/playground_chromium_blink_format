@@ -291,7 +291,7 @@ bool FocusController::advanceFocusInDocumentOrder(FocusDirection direction,
   if (caretBrowsing) {
     VisibleSelection newSelection(Position(node, 0), Position(node, 0),
                                   DOWNSTREAM);
-    if (frame->shouldChangeSelection(newSelection))
+    if (frame->selection()->shouldChangeSelection(newSelection))
       frame->selection()->setSelection(newSelection);
   }
 
