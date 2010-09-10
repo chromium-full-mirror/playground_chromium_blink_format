@@ -436,7 +436,7 @@ bool JSObjectSetPrivateProperty(JSContextRef ctx,
   ExecState* exec = toJS(ctx);
   APIEntryShim entryShim(exec);
   JSObject* jsObject = toJS(object);
-  JSValue jsValue = toJS(exec, value);
+  JSValue jsValue = value ? toJS(exec, value) : JSValue();
   Identifier name(propertyName->identifier(&exec->globalData()));
   if (jsObject->inherits(&JSCallbackObject<JSGlobalObject>::info)) {
     static_cast<JSCallbackObject<JSGlobalObject>*>(jsObject)
