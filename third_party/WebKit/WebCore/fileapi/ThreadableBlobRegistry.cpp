@@ -34,7 +34,6 @@
 
 #include "BlobData.h"
 #include "BlobRegistry.h"
-#include "ScriptExecutionContext.h"
 #include <wtf/MainThread.h>
 
 namespace WebCore {
@@ -62,8 +61,7 @@ static void registerBlobURLTask(void* context) {
                                  blobRegistryContext->blobData.release());
 }
 
-void ThreadableBlobRegistry::registerBlobURL(ScriptExecutionContext*,
-                                             const KURL& url,
+void ThreadableBlobRegistry::registerBlobURL(const KURL& url,
                                              PassOwnPtr<BlobData> blobData) {
   if (isMainThread())
     blobRegistry().registerBlobURL(url, blobData);
@@ -81,8 +79,7 @@ static void registerBlobURLFromTask(void* context) {
                                  blobRegistryContext->srcURL);
 }
 
-void ThreadableBlobRegistry::registerBlobURL(ScriptExecutionContext*,
-                                             const KURL& url,
+void ThreadableBlobRegistry::registerBlobURL(const KURL& url,
                                              const KURL& srcURL) {
   if (isMainThread())
     blobRegistry().registerBlobURL(url, srcURL);
@@ -99,8 +96,7 @@ static void unregisterBlobURLTask(void* context) {
   blobRegistry().unregisterBlobURL(blobRegistryContext->url);
 }
 
-void ThreadableBlobRegistry::unregisterBlobURL(ScriptExecutionContext*,
-                                               const KURL& url) {
+void ThreadableBlobRegistry::unregisterBlobURL(const KURL& url) {
   if (isMainThread())
     blobRegistry().unregisterBlobURL(url);
   else {
@@ -112,16 +108,12 @@ void ThreadableBlobRegistry::unregisterBlobURL(ScriptExecutionContext*,
 
 #else
 
-void ThreadableBlobRegistry::registerBlobURL(ScriptExecutionContext*,
-                                             const KURL&,
+void ThreadableBlobRegistry::registerBlobURL(const KURL&,
                                              PassOwnPtr<BlobData>) {}
 
-void ThreadableBlobRegistry::registerBlobURL(ScriptExecutionContext*,
-                                             const KURL&,
-                                             const KURL&) {}
+void ThreadableBlobRegistry::registerBlobURL(const KURL&, const KURL&) {}
 
-void ThreadableBlobRegistry::unregisterBlobURL(ScriptExecutionContext*,
-                                               const KURL&) {}
+void ThreadableBlobRegistry::unregisterBlobURL(const KURL&) {}
 #endif  // ENABL(BLOB)
 
 }  // namespace WebCore

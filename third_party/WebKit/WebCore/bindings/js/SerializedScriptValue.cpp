@@ -939,14 +939,10 @@ class CloneDeserializer : CloneBase {
     Identifier type;
     if (!readStringData(type))
       return 0;
-    if (m_isDOMGlobalObject) {
-      ScriptExecutionContext* scriptExecutionContext =
-          static_cast<JSDOMGlobalObject*>(m_exec->lexicalGlobalObject())
-              ->scriptExecutionContext();
-      file = File::create(scriptExecutionContext, String(path.ustring().impl()),
+    if (m_isDOMGlobalObject)
+      file = File::create(String(path.ustring().impl()),
                           KURL(KURL(), String(url.ustring().impl())),
                           String(type.ustring().impl()));
-    }
     return true;
   }
 
@@ -1046,13 +1042,8 @@ class CloneDeserializer : CloneBase {
           return JSValue();
         if (!m_isDOMGlobalObject)
           return jsNull();
-        ScriptExecutionContext* scriptExecutionContext =
-            static_cast<JSDOMGlobalObject*>(m_exec->lexicalGlobalObject())
-                ->scriptExecutionContext();
-        ASSERT(scriptExecutionContext);
         return toJS(m_exec, static_cast<JSDOMGlobalObject*>(m_globalObject),
-                    Blob::create(scriptExecutionContext,
-                                 KURL(KURL(), url.ustring().impl()),
+                    Blob::create(KURL(KURL(), url.ustring().impl()),
                                  String(type.ustring().impl()), size));
       }
       case StringTag: {

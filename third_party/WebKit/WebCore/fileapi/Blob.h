@@ -41,29 +41,23 @@
 
 namespace WebCore {
 
-class ScriptExecutionContext;
-
 class Blob : public RefCounted<Blob> {
  public:
-  static PassRefPtr<Blob> create(ScriptExecutionContext* scriptExecutionContext,
-                                 PassOwnPtr<BlobData> blobData,
+  static PassRefPtr<Blob> create(PassOwnPtr<BlobData> blobData,
                                  long long size) {
-    return adoptRef(new Blob(scriptExecutionContext, blobData, size));
+    return adoptRef(new Blob(blobData, size));
   }
 
   // For deserialization.
-  static PassRefPtr<Blob> create(ScriptExecutionContext* scriptExecutionContext,
-                                 const KURL& srcURL,
+  static PassRefPtr<Blob> create(const KURL& srcURL,
                                  const String& type,
                                  long long size) {
-    return adoptRef(new Blob(scriptExecutionContext, srcURL, type, size));
+    return adoptRef(new Blob(srcURL, type, size));
   }
 
   virtual ~Blob();
 
-  void contextDestroyed();
-
-  const KURL& url() const { return m_url; }
+  const KURL& url() const { return m_internalURL; }
   const String& type() const { return m_type; }
 
   virtual unsigned long long size() const {
@@ -72,28 +66,25 @@ class Blob : public RefCounted<Blob> {
   virtual bool isFile() const { return false; }
 
 #if ENABLE(BLOB)
-  PassRefPtr<Blob> slice(ScriptExecutionContext*,
-                         long long start,
+  PassRefPtr<Blob> slice(long long start,
                          long long length,
                          const String& contentType = String()) const;
 #endif
 
  protected:
-  Blob(ScriptExecutionContext*, PassOwnPtr<BlobData>, long long size);
+  Blob(PassOwnPtr<BlobData>, long long size);
 
   // For deserialization.
-  Blob(ScriptExecutionContext*,
-       const KURL& srcURL,
-       const String& type,
-       long long size);
+  Blob(const KURL& srcURL, const String& type, long long size);
 
   // This is an internal URL referring to the blob data associated with this
-  // object.
-  // It is only used by FileReader to read the blob data via loading from the
-  // blob URL resource.
-  KURL m_url;
+  // object. It serves
+  // as an identifier for this blob. The internal URL is never used to source
+  // the blob's content
+  // into an HTML or for FileRead'ing, public blob URLs must be used for those
+  // purposes.
+  KURL m_internalURL;
 
-  ScriptExecutionContext* m_scriptExecutionContext;
   String m_type;
   long long m_size;
 };

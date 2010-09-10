@@ -36,6 +36,7 @@
 #include "ActiveDOMObject.h"
 #include "EventTarget.h"
 #include "FileError.h"
+#include "KURL.h"
 #include "PlatformString.h"
 #include "ScriptString.h"
 #include "TextEncoding.h"
@@ -124,6 +125,7 @@ class FileReader : public RefCounted<FileReader>,
   }
 
   void terminate();
+  void cleanup();
   void readInternal(Blob*, ReadType);
   void failed(int httpStatusCode);
   void fireErrorEvent(int httpStatusCode);
@@ -135,6 +137,7 @@ class FileReader : public RefCounted<FileReader>,
   EventTargetData m_eventTargetData;
 
   RefPtr<Blob> m_blob;
+  KURL m_urlForReading;
   ReadType m_readType;
   TextEncoding m_encoding;
 

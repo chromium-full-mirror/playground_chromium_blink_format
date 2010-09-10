@@ -1438,8 +1438,7 @@ bool HTMLInputElement::appendFormData(FormDataList& encoding, bool multipart) {
       // If no filename at all is entered, return successful but empty.
       // Null would be more logical, but Netscape posts an empty file. Argh.
       if (!numFiles) {
-        encoding.appendBlob(
-            name(), File::create(document()->scriptExecutionContext(), ""));
+        encoding.appendBlob(name(), File::create(""));
         return true;
       }
 
@@ -2068,18 +2067,15 @@ void HTMLInputElement::setFileListFromRenderer(const Vector<String>& paths) {
       // script.
       String relativePath =
           paths[i].substring(1 + rootPath.length()).replace('\\', '/');
-      m_fileList->append(File::create(document()->scriptExecutionContext(),
-                                      relativePath, paths[i]));
+      m_fileList->append(File::create(relativePath, paths[i]));
     }
   } else {
     for (int i = 0; i < size; i++)
-      m_fileList->append(
-          File::create(document()->scriptExecutionContext(), paths[i]));
+      m_fileList->append(File::create(paths[i]));
   }
 #else
   for (int i = 0; i < size; i++)
-    m_fileList->append(
-        File::create(document()->scriptExecutionContext(), paths[i]));
+    m_fileList->append(File::create(paths[i]));
 #endif
 
   setFormControlValueMatchesRenderer(true);

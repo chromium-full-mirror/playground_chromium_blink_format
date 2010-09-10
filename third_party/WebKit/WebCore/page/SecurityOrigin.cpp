@@ -122,7 +122,7 @@ PassRefPtr<SecurityOrigin> SecurityOrigin::create(const KURL& url,
   if (!url.isValid())
     return adoptRef(new SecurityOrigin(KURL(), sandboxFlags));
 #if ENABLE(BLOB)
-  if (url.protocolIs("blob"))
+  if (url.protocolIs(BlobURL::blobProtocol()))
     return adoptRef(new SecurityOrigin(BlobURL::getOrigin(url), sandboxFlags));
 #endif
   return adoptRef(new SecurityOrigin(url, sandboxFlags));
@@ -231,7 +231,7 @@ bool SecurityOrigin::canRequest(const KURL& url) const {
   bool doUniqueOriginCheck = true;
 #if ENABLE(BLOB)
   // For blob scheme, we want to ignore this check.
-  doUniqueOriginCheck = !url.protocolIs("blob");
+  doUniqueOriginCheck = !url.protocolIs(BlobURL::blobProtocol());
 #endif
   if (doUniqueOriginCheck && targetOrigin->isUnique())
     return false;
@@ -278,7 +278,7 @@ bool SecurityOrigin::canDisplay(const KURL& url,
                                 const String& referrer,
                                 Document* document) {
 #if ENABLE(BLOB)
-  if (url.protocolIs("blob") && document) {
+  if (url.protocolIs(BlobURL::blobProtocol()) && document) {
     SecurityOrigin* documentOrigin = document->securityOrigin();
     RefPtr<SecurityOrigin> targetOrigin = SecurityOrigin::create(url);
     return documentOrigin->isSameSchemeHostPort(targetOrigin.get());
