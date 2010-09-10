@@ -39,6 +39,7 @@ class RenderMediaControls {
                                      const PaintInfo&,
                                      const IntRect&);
   static void adjustMediaSliderThumbSize(RenderObject*);
+  static IntPoint volumeSliderOffsetFromMuteButton(Node*, const IntSize&);
 };
 
 }  // namespace WebCore
