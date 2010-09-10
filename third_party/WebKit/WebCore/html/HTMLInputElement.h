@@ -309,6 +309,7 @@ class HTMLInputElement : public HTMLTextFormControlElement,
 
   virtual void cacheSelection(int start, int end);
 
+  virtual bool isAcceptableValue(const String&) const;
   virtual String sanitizeValue(const String&) const;
 
   virtual void documentDidBecomeActive();
