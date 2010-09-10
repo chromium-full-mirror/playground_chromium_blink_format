@@ -1851,8 +1851,8 @@ WebGLGetInfo WebGLRenderingContext::getVertexAttrib(unsigned long index,
   }
   switch (pname) {
     case GraphicsContext3D::VERTEX_ATTRIB_ARRAY_BUFFER_BINDING:
-      if (!isGLES2Compliant() && !index &&
-              m_vertexAttribState[0].bufferBinding == m_vertexAttrib0Buffer ||
+      if ((!isGLES2Compliant() && !index &&
+           m_vertexAttribState[0].bufferBinding == m_vertexAttrib0Buffer) ||
           index >= m_vertexAttribState.size() ||
           !m_vertexAttribState[index].bufferBinding ||
           !m_vertexAttribState[index].bufferBinding->object())
@@ -2041,10 +2041,10 @@ void WebGLRenderingContext::readPixels(long x,
     return;
   }
   // Validate array type against pixel type.
-  if (type == GraphicsContext3D::UNSIGNED_BYTE &&
-          !pixels->isUnsignedByteArray() ||
-      type != GraphicsContext3D::UNSIGNED_BYTE &&
-          !pixels->isUnsignedShortArray()) {
+  if ((type == GraphicsContext3D::UNSIGNED_BYTE &&
+       !pixels->isUnsignedByteArray()) ||
+      (type != GraphicsContext3D::UNSIGNED_BYTE &&
+       !pixels->isUnsignedShortArray())) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
     return;
   }
@@ -2375,12 +2375,12 @@ void WebGLRenderingContext::texParameter(unsigned long target,
       break;
     case GraphicsContext3D::TEXTURE_WRAP_S:
     case GraphicsContext3D::TEXTURE_WRAP_T:
-      if (isFloat && paramf != GraphicsContext3D::CLAMP_TO_EDGE &&
-              paramf != GraphicsContext3D::MIRRORED_REPEAT &&
-              paramf != GraphicsContext3D::REPEAT ||
-          !isFloat && parami != GraphicsContext3D::CLAMP_TO_EDGE &&
-              parami != GraphicsContext3D::MIRRORED_REPEAT &&
-              parami != GraphicsContext3D::REPEAT) {
+      if ((isFloat && paramf != GraphicsContext3D::CLAMP_TO_EDGE &&
+           paramf != GraphicsContext3D::MIRRORED_REPEAT &&
+           paramf != GraphicsContext3D::REPEAT) ||
+          (!isFloat && parami != GraphicsContext3D::CLAMP_TO_EDGE &&
+           parami != GraphicsContext3D::MIRRORED_REPEAT &&
+           parami != GraphicsContext3D::REPEAT)) {
         m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
         return;
       }
@@ -3294,11 +3294,10 @@ bool WebGLRenderingContext::isErrorGeneratedOnOutOfBoundsAccesses() {
 void WebGLRenderingContext::handleNPOTTextures(bool prepareToDraw) {
   bool resetActiveUnit = false;
   for (unsigned ii = 0; ii < m_textureUnits.size(); ++ii) {
-    if (m_textureUnits[ii].m_texture2DBinding &&
-            m_textureUnits[ii].m_texture2DBinding->needToUseBlackTexture() ||
-        m_textureUnits[ii].m_textureCubeMapBinding &&
-            m_textureUnits[ii]
-                .m_textureCubeMapBinding->needToUseBlackTexture()) {
+    if ((m_textureUnits[ii].m_texture2DBinding &&
+         m_textureUnits[ii].m_texture2DBinding->needToUseBlackTexture()) ||
+        (m_textureUnits[ii].m_textureCubeMapBinding &&
+         m_textureUnits[ii].m_textureCubeMapBinding->needToUseBlackTexture())) {
       if (ii != m_activeTextureUnit) {
         m_context->activeTexture(ii);
         resetActiveUnit = true;
