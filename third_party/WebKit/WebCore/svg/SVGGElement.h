@@ -50,7 +50,7 @@ class SVGGElement : public SVGStyledTransformableElement,
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 
-  virtual bool rendererIsNeeded(RenderStyle*) { return true; }
+  virtual bool rendererIsNeeded(RenderStyle*);
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_PROPERTY(SVGGElement,
