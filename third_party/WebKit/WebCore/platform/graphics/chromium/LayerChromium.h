@@ -138,6 +138,8 @@ class LayerChromium : public RefCounted<LayerChromium> {
 
   void setNeedsDisplay(const FloatRect& dirtyRect);
   void setNeedsDisplay();
+  const FloatRect& dirtyRect() const { return m_dirtyRect; }
+  void resetNeedsDisplay();
 
   void setNeedsDisplayOnBoundsChange(bool needsDisplay) {
     m_needsDisplayOnBoundsChange = needsDisplay;
