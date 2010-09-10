@@ -67,7 +67,7 @@ using namespace HTMLNames;
 HTMLFormElement::HTMLFormElement(const QualifiedName& tagName,
                                  Document* document)
     : HTMLElement(tagName, document),
-      m_submissionTrigger(NotSubmittedByJavaScript),
+      m_wasUserSubmitted(false),
       m_autocomplete(true),
       m_insubmit(false),
       m_doingsubmit(false),
@@ -266,7 +266,7 @@ bool HTMLFormElement::prepareSubmit(Event* event) {
   m_insubmit = false;
 
   if (m_doingsubmit)
-    submit(event, true, false, NotSubmittedByJavaScript);
+    submit(event, true, true, NotSubmittedByJavaScript);
 
   return m_doingsubmit;
 }
@@ -274,15 +274,15 @@ bool HTMLFormElement::prepareSubmit(Event* event) {
 void HTMLFormElement::submit(Frame* javaScriptActiveFrame) {
   if (javaScriptActiveFrame)
     submit(0, false,
-           !javaScriptActiveFrame->script()->anyPageIsProcessingUserGesture(),
+           javaScriptActiveFrame->script()->anyPageIsProcessingUserGesture(),
            SubmittedByJavaScript);
   else
-    submit(0, false, false, NotSubmittedByJavaScript);
+    submit(0, false, true, NotSubmittedByJavaScript);
 }
 
 void HTMLFormElement::submit(Event* event,
                              bool activateSubmitButton,
-                             bool lockHistory,
+                             bool processingUserGesture,
                              FormSubmissionTrigger formSubmissionTrigger) {
   FrameView* view = document()->view();
   Frame* frame = document()->frame();
@@ -295,7 +295,7 @@ void HTMLFormElement::submit(Event* event,
   }
 
   m_insubmit = true;
-  m_submissionTrigger = formSubmissionTrigger;
+  m_wasUserSubmitted = processingUserGesture;
 
   HTMLFormControlElement* firstSuccessfulSubmitButton = 0;
   bool needButtonActivation =
@@ -315,8 +315,9 @@ void HTMLFormElement::submit(Event* event,
   if (needButtonActivation && firstSuccessfulSubmitButton)
     firstSuccessfulSubmitButton->setActivatedSubmit(true);
 
-  frame->loader()->submitForm(FormSubmission::create(
-      this, m_attributes, event, lockHistory, formSubmissionTrigger));
+  frame->loader()->submitForm(FormSubmission::create(this, m_attributes, event,
+                                                     !processingUserGesture,
+                                                     formSubmissionTrigger));
 
   if (needButtonActivation && firstSuccessfulSubmitButton)
     firstSuccessfulSubmitButton->setActivatedSubmit(false);
@@ -479,8 +480,8 @@ String HTMLFormElement::target() const {
   return getAttribute(targetAttr);
 }
 
-FormSubmissionTrigger HTMLFormElement::submissionTrigger() const {
-  return m_submissionTrigger;
+bool HTMLFormElement::wasUserSubmitted() const {
+  return m_wasUserSubmitted;
 }
 
 HTMLFormControlElement* HTMLFormElement::defaultButton() const {

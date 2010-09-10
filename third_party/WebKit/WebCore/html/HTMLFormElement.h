@@ -100,7 +100,7 @@ class HTMLFormElement : public HTMLElement {
 
   virtual String target() const;
 
-  FormSubmissionTrigger submissionTrigger() const;
+  bool wasUserSubmitted() const;
 
   HTMLFormControlElement* defaultButton() const;
 
@@ -135,7 +135,7 @@ class HTMLFormElement : public HTMLElement {
 
   void submit(Event*,
               bool activateSubmitButton,
-              bool lockHistory,
+              bool processingUserGesture,
               FormSubmissionTrigger);
 
   unsigned formElementIndex(HTMLFormControlElement*);
@@ -159,7 +159,7 @@ class HTMLFormElement : public HTMLElement {
   Vector<HTMLFormControlElement*> m_associatedElements;
   Vector<HTMLImageElement*> m_imageElements;
 
-  FormSubmissionTrigger m_submissionTrigger;
+  bool m_wasUserSubmitted;
 
   bool m_autocomplete : 1;
   bool m_insubmit : 1;
