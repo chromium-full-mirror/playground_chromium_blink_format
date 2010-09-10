@@ -162,10 +162,10 @@ struct _WebKitWebViewPrivate {
 
   gboolean zoomFullContent;
   WebKitLoadStatus loadStatus;
-  char* encoding;
-  char* customEncoding;
+  CString encoding;
+  CString customEncoding;
 
-  char* iconURI;
+  CString iconURI;
 
   gboolean disposing;
   gboolean usePrimaryForPaste;
@@ -177,9 +177,9 @@ struct _WebKitWebViewPrivate {
   // These are hosted here because the DataSource object is
   // created too late in the frame loading process.
   WebKitWebResource* mainResource;
-  char* mainResourceIdentifier;
+  CString mainResourceIdentifier;
   GHashTable* subResources;
-  char* tooltipText;
+  CString tooltipText;
 
   int currentClickCount;
   WebCore::IntPoint* previousClickPoint;
