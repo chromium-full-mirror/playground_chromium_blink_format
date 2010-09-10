@@ -1020,7 +1020,8 @@ String AccessibilityRenderObject::textUnderElement() const {
       // catch stale WebCoreAXObject (see <rdar://problem/3960196>)
       if (frame->document() != node->document())
         return String();
-      return plainText(rangeOfContents(node).get());
+      return plainText(rangeOfContents(node).get(),
+                       TextIteratorIgnoresStyleVisibility);
     }
   }
 
@@ -1136,7 +1137,8 @@ String AccessibilityRenderObject::stringValue() const {
     if (startVisiblePosition.isNull() || endVisiblePosition.isNull())
       return String();
 
-    return plainText(makeRange(startVisiblePosition, endVisiblePosition).get());
+    return plainText(makeRange(startVisiblePosition, endVisiblePosition).get(),
+                     TextIteratorIgnoresStyleVisibility);
   }
 
   if (isTextControl())
