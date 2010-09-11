@@ -116,6 +116,10 @@ class TestShell {
     return (m_testIsPreparing || m_testIsPending) &&
            layoutTestController()->shouldDumpResourceLoadCallbacks();
   }
+  bool shouldDumpResourceResponseMIMETypes() const {
+    return (m_testIsPreparing || m_testIsPending) &&
+           layoutTestController()->shouldDumpResourceResponseMIMETypes();
+  }
   void setIsLoading(bool flag) { m_isLoading = flag; }
 
   // Called by the LayoutTestController to signal test completion.
