@@ -272,6 +272,14 @@ WK_EXPORT WKDataRef WKPageCopySessionState(WKPageRef page);
 WK_EXPORT void WKPageRestoreFromSessionState(WKPageRef page,
                                              WKDataRef sessionStateData);
 
+WK_EXPORT double WKPageGetTextZoomFactor(WKPageRef page);
+WK_EXPORT void WKPageSetTextZoomFactor(WKPageRef page, double zoomFactor);
+WK_EXPORT double WKPageGetPageZoomFactor(WKPageRef page);
+WK_EXPORT void WKPageSetPageZoomFactor(WKPageRef page, double zoomFactor);
+WK_EXPORT void WKPageSetPageAndTextZoomFactors(WKPageRef page,
+                                               double pageZoomFactor,
+                                               double textZoomFactor);
+
 WK_EXPORT void WKPageSetPageLoaderClient(WKPageRef page,
                                          const WKPageLoaderClient* client);
 WK_EXPORT void WKPageSetPagePolicyClient(WKPageRef page,

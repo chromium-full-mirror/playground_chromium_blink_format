@@ -149,6 +149,12 @@ class WebPageProxy : public APIObject {
   PassRefPtr<WebData> sessionState() const;
   void restoreFromSessionState(WebData*);
 
+  double textZoomFactor() const { return m_textZoomFactor; }
+  void setTextZoomFactor(double);
+  double pageZoomFactor() const { return m_pageZoomFactor; }
+  void setPageZoomFactor(double);
+  void setPageAndTextZoomFactors(double pageZoomFactor, double textZoomFactor);
+
   void runJavaScriptInMainFrame(const WTF::String&,
                                 PassRefPtr<ScriptReturnValueCallback>);
   void getRenderTreeExternalRepresentation(
@@ -298,6 +304,9 @@ class WebPageProxy : public APIObject {
 
   // REMOVE: For demo purposes only.
   WTF::String m_urlAtProcessExit;
+
+  double m_textZoomFactor;
+  double m_pageZoomFactor;
 
   bool m_valid;
   bool m_closed;
