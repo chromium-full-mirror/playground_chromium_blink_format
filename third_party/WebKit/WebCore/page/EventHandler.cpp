@@ -1463,19 +1463,16 @@ bool EventHandler::handleMouseDoubleClickEvent(
       dispatchMouseEvent(eventNames().mouseupEvent, mev.targetNode(), true,
                          m_clickCount, mouseEvent, false);
 
-  bool swallowClickEvent = false;
-  // Don't ever dispatch click events for right clicks
-  if (mouseEvent.button() != RightButton && mev.targetNode() == m_clickNode)
-    swallowClickEvent =
-        dispatchMouseEvent(eventNames().clickEvent, mev.targetNode(), true,
-                           m_clickCount, mouseEvent, true);
+  bool swallowClickEvent =
+      mouseEvent.button() == LeftButton && mev.targetNode() == m_clickNode &&
+      dispatchMouseEvent(eventNames().clickEvent, mev.targetNode(), true,
+                         m_clickCount, mouseEvent, true);
 
   if (m_lastScrollbarUnderMouse)
     swallowMouseUpEvent = m_lastScrollbarUnderMouse->mouseUp();
 
-  bool swallowMouseReleaseEvent = false;
-  if (!swallowMouseUpEvent)
-    swallowMouseReleaseEvent = handleMouseReleaseEvent(mev);
+  bool swallowMouseReleaseEvent =
+      !swallowMouseUpEvent && handleMouseReleaseEvent(mev);
 
   invalidateClick();
 
@@ -1692,13 +1689,11 @@ bool EventHandler::handleMouseReleaseEvent(
       dispatchMouseEvent(eventNames().mouseupEvent, mev.targetNode(), true,
                          m_clickCount, mouseEvent, false);
 
-  // Don't ever dispatch click events for right clicks
-  bool swallowClickEvent = false;
-  if (m_clickCount > 0 && mouseEvent.button() != RightButton &&
-      mev.targetNode() == m_clickNode)
-    swallowClickEvent =
-        dispatchMouseEvent(eventNames().clickEvent, mev.targetNode(), true,
-                           m_clickCount, mouseEvent, true);
+  bool swallowClickEvent =
+      m_clickCount > 0 && mouseEvent.button() == LeftButton &&
+      mev.targetNode() == m_clickNode &&
+      dispatchMouseEvent(eventNames().clickEvent, mev.targetNode(), true,
+                         m_clickCount, mouseEvent, true);
 
   if (m_resizeLayer) {
     m_resizeLayer->setInResizeMode(false);

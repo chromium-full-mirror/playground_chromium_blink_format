@@ -505,9 +505,9 @@ bool isMiddleMouseButtonEvent(Event* event) {
 }
 
 bool isLinkClick(Event* event) {
-  return event->type() == eventNames().clickEvent &&
-         (!event->isMouseEvent() ||
-          static_cast<MouseEvent*>(event)->button() != RightButton);
+  return event->type() == eventNames().clickEvent ||
+         (event->type() == eventNames().mouseupEvent &&
+          isMiddleMouseButtonEvent(event));
 }
 
 void handleLinkClick(Event* event,

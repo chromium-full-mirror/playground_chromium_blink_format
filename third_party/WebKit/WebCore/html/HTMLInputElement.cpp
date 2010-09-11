@@ -2131,11 +2131,9 @@ void* HTMLInputElement::preDispatchEventHandler(Event* evt) {
   // the action we take here.
   void* result = 0;
   if ((inputType() == CHECKBOX || inputType() == RADIO) &&
-      evt->isMouseEvent() && evt->type() == eventNames().clickEvent &&
-      static_cast<MouseEvent*>(evt)->button() == LeftButton) {
+      evt->type() == eventNames().clickEvent) {
     OwnPtr<EventHandlingState> state =
         adoptPtr(new EventHandlingState(indeterminate(), checked()));
-
     if (inputType() == CHECKBOX) {
       if (indeterminate())
         setIndeterminate(false);
@@ -2168,8 +2166,7 @@ void* HTMLInputElement::preDispatchEventHandler(Event* evt) {
 
 void HTMLInputElement::postDispatchEventHandler(Event* evt, void* data) {
   if ((inputType() == CHECKBOX || inputType() == RADIO) &&
-      evt->isMouseEvent() && evt->type() == eventNames().clickEvent &&
-      static_cast<MouseEvent*>(evt)->button() == LeftButton) {
+      evt->type() == eventNames().clickEvent) {
     if (EventHandlingState* state =
             reinterpret_cast<EventHandlingState*>(data)) {
       if (inputType() == CHECKBOX) {
@@ -2259,9 +2256,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
     return;
   }
 
-  if (inputType() == RADIO && evt->isMouseEvent() &&
-      evt->type() == eventNames().clickEvent &&
-      static_cast<MouseEvent*>(evt)->button() == LeftButton) {
+  if (inputType() == RADIO && evt->type() == eventNames().clickEvent) {
     evt->setDefaultHandled();
     return;
   }
