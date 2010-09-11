@@ -733,6 +733,14 @@ void DumpRenderTreeSupportQt::addUserStyleSheet(QWebPage* page,
       WebCore::InjectInAllFrames);
 }
 
+void DumpRenderTreeSupportQt::simulateDesktopNotificationClick(
+    const QString& title) {
+#if ENABLE(NOTIFICATIONS)
+  NotificationPresenterClientQt::notificationPresenter()->notificationClicked(
+      title);
+#endif
+}
+
 // Provide a backward compatibility with previously exported private symbols as
 // of QtWebKit 4.6 release
 

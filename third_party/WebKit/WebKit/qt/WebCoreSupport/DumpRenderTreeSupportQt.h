@@ -168,6 +168,7 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
                               const QString& propertyName,
                               int pageNumber);
   static void addUserStyleSheet(QWebPage* page, const QString& sourceCode);
+  static void simulateDesktopNotificationClick(const QString& title);
 };
 
 #endif

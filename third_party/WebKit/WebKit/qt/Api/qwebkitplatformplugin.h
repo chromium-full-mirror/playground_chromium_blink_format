@@ -27,6 +27,7 @@
 */
 
 #include <QObject>
+#include <QUrl>
 
 class QWebSelectData {
  public:
@@ -63,6 +64,7 @@ class QWebNotificationData {
   virtual const QString title() const = 0;
   virtual const QString message() const = 0;
   virtual const QByteArray iconData() const = 0;
+  virtual const QUrl openerPageUrl() const = 0;
 };
 
 class QWebNotificationPresenter : public QObject {
@@ -75,6 +77,7 @@ class QWebNotificationPresenter : public QObject {
 
  Q_SIGNALS:
   void notificationClosed();
+  void notificationClicked();
 };
 
 class QWebHapticFeedbackPlayer {
@@ -101,6 +104,6 @@ class QWebKitPlatformPlugin {
 };
 
 Q_DECLARE_INTERFACE(QWebKitPlatformPlugin,
-                    "com.nokia.Qt.WebKit.PlatformPlugin/1.3");
+                    "com.nokia.Qt.WebKit.PlatformPlugin/1.4");
 
 #endif  // QWEBKITPLATFORMPLUGIN_H

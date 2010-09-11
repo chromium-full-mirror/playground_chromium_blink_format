@@ -203,6 +203,11 @@ bool LayoutTestController::checkDesktopNotificationPermission(
          m_desktopNotificationAllowedOrigins.contains(origin);
 }
 
+void LayoutTestController::simulateDesktopNotificationClick(
+    const QString& title) {
+  DumpRenderTreeSupportQt::simulateDesktopNotificationClick(title);
+}
+
 void LayoutTestController::display() {
   emit showPage();
 }
