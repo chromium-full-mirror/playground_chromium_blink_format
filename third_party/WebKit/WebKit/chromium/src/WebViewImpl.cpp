@@ -1467,7 +1467,7 @@ int WebViewImpl::setZoomLevel(bool textOnly, int zoomLevel) {
     return m_zoomLevel;
 
   float oldZoomFactor =
-      m_zoomTextOnly ? view->textZoomFactor() : page->textZoomFactor();
+      m_zoomTextOnly ? view->textZoomFactor() : m_page->textZoomFactor();
 
   if (textOnly)
     view->setPageAndTextZoomFactors(1, zoomFactor);
