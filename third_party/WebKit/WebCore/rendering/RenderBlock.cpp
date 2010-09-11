@@ -5881,10 +5881,6 @@ void RenderBlock::updateFirstLetter() {
     // determined.
     RenderStyle* pseudoStyle = firstLetterBlock->getCachedPseudoStyle(
         FIRST_LETTER, firstLetterContainer->firstLineStyle());
-    if (!pseudoStyle) {
-      view()->enableLayoutState();
-      return;
-    }
 
     // Force inline display (except for floating first-letters)
     pseudoStyle->setDisplay(pseudoStyle->isFloating() ? BLOCK : INLINE);
