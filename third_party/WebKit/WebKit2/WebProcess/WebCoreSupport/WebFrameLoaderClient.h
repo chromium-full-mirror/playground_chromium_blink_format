@@ -289,10 +289,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual bool shouldUsePluginDocument(const WTF::String& /*mimeType*/) const;
 
-  void receivedData(const char* data,
-                    int length,
-                    const WTF::String& textEncoding);
-
   virtual PassRefPtr<WebCore::FrameNetworkingContext> createNetworkingContext();
 
   WebFrame* m_frame;

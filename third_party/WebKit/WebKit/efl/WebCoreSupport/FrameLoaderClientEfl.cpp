@@ -67,7 +67,6 @@ namespace WebCore {
 FrameLoaderClientEfl::FrameLoaderClientEfl(Evas_Object* view)
     : m_view(view),
       m_frame(0),
-      m_firstData(false),
       m_userAgent(""),
       m_customUserAgent(""),
       m_pluginView(0),
@@ -179,21 +178,11 @@ void FrameLoaderClientEfl::dispatchWillSubmitForm(FramePolicyFunction function,
   callPolicyFunction(function, PolicyUse);
 }
 
-// FIXME: This function should be moved into WebCore.
 void FrameLoaderClientEfl::committedLoad(DocumentLoader* loader,
                                          const char* data,
                                          int length) {
-  if (!m_pluginView) {
-    if (!m_frame)
-      return;
-
-    FrameLoader* fl = loader->frameLoader();
-    if (m_firstData) {
-      fl->writer()->setEncoding(m_response.textEncodingName(), false);
-      m_firstData = false;
-    }
-    fl->documentLoader()->addData(data, length);
-  }
+  if (!m_pluginView)
+    loader->commitData(data, length);
 
   // We re-check here as the plugin can have been created
   if (m_pluginView) {
@@ -325,7 +314,6 @@ void FrameLoaderClientEfl::dispatchDidReceiveResponse(
     unsigned long,
     const ResourceResponse& response) {
   m_response = response;
-  m_firstData = true;
 }
 
 void FrameLoaderClientEfl::dispatchDecidePolicyForMIMEType(
@@ -700,17 +688,11 @@ String FrameLoaderClientEfl::generatedMIMETypeForURLScheme(
 }
 
 void FrameLoaderClientEfl::finishedLoading(DocumentLoader* loader) {
-  if (!m_pluginView) {
-    if (m_firstData) {
-      FrameLoader* fl = loader->frameLoader();
-      fl->writer()->setEncoding(m_response.textEncodingName(), false);
-      m_firstData = false;
-    }
-  } else {
-    m_pluginView->didFinishLoading();
-    m_pluginView = 0;
-    m_hasSentResponseToPlugin = false;
-  }
+  if (!m_pluginView)
+    return;
+  m_pluginView->didFinishLoading();
+  m_pluginView = 0;
+  m_hasSentResponseToPlugin = false;
 }
 
 void FrameLoaderClientEfl::provisionalLoadStarted() {
@@ -744,14 +726,7 @@ void FrameLoaderClientEfl::dispatchDidFinishLoading(DocumentLoader*,
 void FrameLoaderClientEfl::dispatchDidFailLoading(DocumentLoader* loader,
                                                   unsigned long identifier,
                                                   const ResourceError& err) {
-  if (!shouldFallBack(err))
-    return;
-
-  if (m_firstData) {
-    FrameLoader* fl = loader->frameLoader();
-    fl->writer()->setEncoding(m_response.textEncodingName(), false);
-    m_firstData = false;
-  }
+  notImplemented();
 }
 
 bool FrameLoaderClientEfl::dispatchDidLoadResourceFromMemoryCache(
@@ -886,17 +861,11 @@ void FrameLoaderClientEfl::dispatchUnableToImplementPolicy(
 
 void FrameLoaderClientEfl::setMainDocumentError(DocumentLoader* loader,
                                                 const ResourceError& error) {
-  if (!m_pluginView) {
-    if (m_firstData) {
-      loader->frameLoader()->writer()->setEncoding(
-          m_response.textEncodingName(), false);
-      m_firstData = false;
-    }
-  } else {
-    m_pluginView->didFail(error);
-    m_pluginView = 0;
-    m_hasSentResponseToPlugin = false;
-  }
+  if (!m_pluginView)
+    return;
+  m_pluginView->didFail(error);
+  m_pluginView = 0;
+  m_hasSentResponseToPlugin = false;
 }
 
 void FrameLoaderClientEfl::startDownload(const ResourceRequest&) {

@@ -1015,8 +1015,7 @@ void FrameLoaderClientImpl::committedLoad(DocumentLoader* loader,
 
   // If we are sending data to MediaDocument, we should stop here
   // and cancel the request.
-  if (m_webFrame->frame()->document() &&
-      m_webFrame->frame()->document()->isMediaDocument())
+  if (m_webFrame->frame()->document()->isMediaDocument())
     loader->cancelMainResourceLoad(
         pluginWillHandleLoadError(loader->response()));
 

@@ -198,7 +198,6 @@ static const char* navigationTypeToString(NavigationType type) {
 FrameLoaderClientQt::FrameLoaderClientQt()
     : m_frame(0),
       m_webFrame(0),
-      m_firstData(false),
       m_pluginView(0),
       m_hasSentResponseToPlugin(false),
       m_loadError(ResourceError()) {}
@@ -537,18 +536,12 @@ void FrameLoaderClientQt::didChangeTitle(DocumentLoader*) {
 }
 
 void FrameLoaderClientQt::finishedLoading(DocumentLoader* loader) {
-  if (!m_pluginView) {
-    if (m_firstData) {
-      FrameLoader* fl = loader->frameLoader();
-      fl->writer()->setEncoding(m_response.textEncodingName(), false);
-      m_firstData = false;
-    }
-  } else {
-    if (m_pluginView->isPluginView())
-      m_pluginView->didFinishLoading();
-    m_pluginView = 0;
-    m_hasSentResponseToPlugin = false;
-  }
+  if (!m_pluginView)
+    return;
+  if (m_pluginView->isPluginView())
+    m_pluginView->didFinishLoading();
+  m_pluginView = 0;
+  m_hasSentResponseToPlugin = false;
 }
 
 bool FrameLoaderClientQt::canShowMIMEType(const String& MIMEType) const {
@@ -699,34 +692,20 @@ bool FrameLoaderClientQt::canCachePage() const {
 void FrameLoaderClientQt::setMainDocumentError(
     WebCore::DocumentLoader* loader,
     const WebCore::ResourceError& error) {
-  if (!m_pluginView) {
-    if (m_firstData) {
-      loader->frameLoader()->writer()->setEncoding(
-          m_response.textEncodingName(), false);
-      m_firstData = false;
-    }
-  } else {
-    if (m_pluginView->isPluginView())
-      m_pluginView->didFail(error);
-    m_pluginView = 0;
-    m_hasSentResponseToPlugin = false;
-  }
+  if (!m_pluginView)
+    return;
+  if (m_pluginView->isPluginView())
+    m_pluginView->didFail(error);
+  m_pluginView = 0;
+  m_hasSentResponseToPlugin = false;
 }
 
 // FIXME: This function should be moved into WebCore.
 void FrameLoaderClientQt::committedLoad(WebCore::DocumentLoader* loader,
                                         const char* data,
                                         int length) {
-  if (!m_pluginView) {
-    if (!m_frame)
-      return;
-    FrameLoader* fl = loader->frameLoader();
-    if (m_firstData) {
-      fl->writer()->setEncoding(m_response.textEncodingName(), false);
-      m_firstData = false;
-    }
-    fl->documentLoader()->addData(data, length);
-  }
+  if (!m_pluginView)
+    loader->commitData(data, length);
 
   // We re-check here as the plugin can have been created
   if (m_pluginView && m_pluginView->isPluginView()) {
@@ -927,7 +906,6 @@ void FrameLoaderClientQt::dispatchDidReceiveResponse(
     unsigned long identifier,
     const WebCore::ResourceResponse& response) {
   m_response = response;
-  m_firstData = true;
   if (dumpResourceLoadCallbacks)
     printf("%s - didReceiveResponse %s\n",
            qPrintable(dumpAssignedUrls[identifier]),
@@ -966,12 +944,6 @@ void FrameLoaderClientQt::dispatchDidFailLoading(
                 ? qPrintable(dumpAssignedUrls[identifier])
                 : "<unknown>"),
            qPrintable(drtDescriptionSuitableForTestResult(error)));
-
-  if (m_firstData) {
-    FrameLoader* fl = loader->frameLoader();
-    fl->writer()->setEncoding(m_response.textEncodingName(), false);
-    m_firstData = false;
-  }
 }
 
 bool FrameLoaderClientQt::dispatchDidLoadResourceFromMemoryCache(

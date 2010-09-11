@@ -439,16 +439,10 @@ void FrameLoaderClientHaiku::setMainDocumentError(
   notImplemented();
 }
 
-// FIXME: This function should be moved into WebCore.
 void FrameLoaderClientHaiku::committedLoad(WebCore::DocumentLoader* loader,
                                            const char* data,
                                            int length) {
-  if (!m_frame)
-    return;
-
-  FrameLoader* frameLoader = loader->frameLoader();
-  frameLoader->writer()->setEncoding(m_response.textEncodingName(), false);
-  frameLoader->documentLoader()->addData(data, length);
+  loader->commitData(data, length);
 }
 
 WebCore::ResourceError FrameLoaderClientHaiku::cancelledError(

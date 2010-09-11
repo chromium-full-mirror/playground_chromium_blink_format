@@ -172,7 +172,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                                          const WTF::String& name,
                                          WebCore::HTMLFrameOwnerElement*,
                                          const WTF::String& referrer);
-  void receivedData(const char*, int, const WTF::String&);
   WebHistory* webHistory() const;
 
   WebFrame* m_webFrame;
