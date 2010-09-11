@@ -200,6 +200,7 @@ FrameLoaderClientQt::FrameLoaderClientQt()
       m_webFrame(0),
       m_pluginView(0),
       m_hasSentResponseToPlugin(false),
+      m_hasRepresentation(false),
       m_loadError(ResourceError()) {}
 
 FrameLoaderClientQt::~FrameLoaderClientQt() {}
@@ -272,7 +273,7 @@ void FrameLoaderClientQt::transitionToCommittedForNewPage() {
 }
 
 void FrameLoaderClientQt::makeRepresentation(DocumentLoader*) {
-  // don't need this for now I think.
+  m_hasRepresentation = true;
 }
 
 void FrameLoaderClientQt::forceLayout() {
@@ -481,7 +482,7 @@ void FrameLoaderClientQt::dispatchWillSubmitForm(FramePolicyFunction function,
 void FrameLoaderClientQt::dispatchDidLoadMainResource(DocumentLoader*) {}
 
 void FrameLoaderClientQt::revertToProvisionalState(DocumentLoader*) {
-  notImplemented();
+  m_hasRepresentation = true;
 }
 
 void FrameLoaderClientQt::postProgressStartedNotification() {
@@ -536,8 +537,15 @@ void FrameLoaderClientQt::didChangeTitle(DocumentLoader*) {
 }
 
 void FrameLoaderClientQt::finishedLoading(DocumentLoader* loader) {
-  if (!m_pluginView)
+  if (!m_pluginView) {
+    // This is necessary to create an empty document. See bug 634004.
+    // However, we only want to do this if makeRepresentation has been called,
+    // to
+    // match the behavior on the Mac.
+    if (m_hasRepresentation)
+      loader->frameLoader()->writer()->setEncoding("", false);
     return;
+  }
   if (m_pluginView->isPluginView())
     m_pluginView->didFinishLoading();
   m_pluginView = 0;

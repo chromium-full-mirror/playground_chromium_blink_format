@@ -296,6 +296,11 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   WebCore::PluginView* m_pluginView;
   bool m_hasSentResponseToPlugin;
 
+  // True if makeRepresentation was called.  We don't actually have a concept
+  // of a "representation", but we need to know when we're expected to have one.
+  // See finishedLoading().
+  bool m_hasRepresentation;
+
   ResourceError m_loadError;
 };
 }
