@@ -35,7 +35,6 @@
 #include "WebEditCommand.h"
 #include <WebCore/FrameLoaderTypes.h>
 #include <WebCore/IntRect.h>
-#include <WebCore/ZoomMode.h>
 #include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
@@ -139,9 +138,10 @@ class WebPage : public APIObject {
   void clearMainFrameName();
   void sendClose();
 
-  float zoomFactor() const;
-  void setZoomFactor(float);
-  void setZoomMode(WebCore::ZoomMode);
+  float textZoomFactor() const;
+  void setTextZoomFactor(float);
+  float pageZoomFactor() const;
+  void setPageZoomFactor(float);
 
   void stopLoading();
 

@@ -4577,10 +4577,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       else if (CSSPrimitiveValue::isUnitTypeLength(type)) {
         double multiplier = zoomFactor;
         if (m_style->textSizeAdjust()) {
-          if (FrameView* view = m_checker.m_document->view()) {
-            if (view->shouldApplyTextZoom())
-              multiplier *= view->textZoomFactor();
-          }
+          if (FrameView* view = m_checker.m_document->view())
+            multiplier *= view->textZoomFactor();
         }
         lineHeight = Length(primitiveValue->computeLengthIntForLength(
                                 style(), m_rootElementStyle, multiplier),
@@ -6897,7 +6895,7 @@ float CSSStyleSelector::getComputedSizeFromSpecifiedSize(Document* document,
   float zoomFactor = 1.0f;
   if (!useSVGZoomRules) {
     zoomFactor = style->effectiveZoom();
-    if (document->view() && document->view()->shouldApplyTextZoom())
+    if (document->view())
       zoomFactor *= document->view()->textZoomFactor();
   }
 

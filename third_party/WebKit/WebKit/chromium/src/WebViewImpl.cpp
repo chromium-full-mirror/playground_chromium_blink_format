@@ -247,6 +247,7 @@ WebViewImpl::WebViewImpl(WebViewClient* client,
 #endif
       ,
       m_zoomLevel(0),
+      m_zoomTextOnly(false),
       m_contextMenuAllowed(false),
       m_doingDragAndDrop(false),
       m_ignoreInputEvents(false),
@@ -1464,14 +1465,25 @@ int WebViewImpl::setZoomLevel(bool textOnly, int zoomLevel) {
   FrameView* view = frame->view();
   if (!view)
     return m_zoomLevel;
-  if (zoomFactor != view->zoomFactor()) {
-    view->setZoomFactor(zoomFactor, textOnly ? ZoomTextOnly : ZoomPage);
+
+  float oldZoomFactor =
+      m_zoomTextOnly ? view->textZoomFactor() : page->textZoomFactor();
+
+  if (textOnly)
+    view->setPageAndTextZoomFactors(1, zoomFactor);
+  else
+    view->setPageAndTextZoomFactors(zoomFactor, 1);
+
+  if (oldZoomFactor != zoomFactor || textOnly != m_zoomTextOnly) {
     WebPluginContainerImpl* pluginContainer =
         WebFrameImpl::pluginContainerFromFrame(frame);
     if (pluginContainer)
       pluginContainer->plugin()->setZoomFactor(zoomFactor, textOnly);
-    m_zoomLevel = zoomLevel;
   }
+
+  m_zoomLevel = zoomLevel;
+  m_zoomTextOnly = textOnly;
+
   return m_zoomLevel;
 }
 

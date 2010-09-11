@@ -1069,6 +1069,7 @@ class WebView : public IWebView,
   WTF::String m_userAgentCustom;
   WTF::String m_userAgentStandard;
   float m_zoomMultiplier;
+  bool m_zoomsTextOnly;
   WTF::String m_overrideEncoding;
   WTF::String m_applicationName;
   bool m_mouseActivated;

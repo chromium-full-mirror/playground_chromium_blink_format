@@ -1128,7 +1128,9 @@ void QWebFrame::setTextSizeMultiplier(qreal factor) {
   if (!view)
     return;
 
-  view->setZoomFactor(factor, ZoomTextOnly);
+  page()->settings()->setAttribute(QWebSettings::ZoomTextOnly, true);
+
+  view->setPageAndTextZoomFactors(1, factor);
 }
 
 /*!
@@ -1139,7 +1141,7 @@ qreal QWebFrame::textSizeMultiplier() const {
   if (!view)
     return 1;
 
-  return view->zoomFactor();
+  return d->zoomTextOnly ? view->textZoomFactor() : view->pageZoomFactor();
 }
 
 /*!
@@ -1157,7 +1159,10 @@ void QWebFrame::setZoomFactor(qreal factor) {
   if (!view)
     return;
 
-  view->setZoomFactor(factor, page->settings()->zoomMode());
+  if (d->zoomTextOnly)
+    view->setTextZoomFactor(factor);
+  else
+    view->setPageZoomFactor(factor);
 }
 
 qreal QWebFrame::zoomFactor() const {
@@ -1165,7 +1170,7 @@ qreal QWebFrame::zoomFactor() const {
   if (!view)
     return 1;
 
-  return view->zoomFactor();
+  return d->zoomTextOnly ? view->textZoomFactor() : view->pageZoomFactor();
 }
 
 /*!

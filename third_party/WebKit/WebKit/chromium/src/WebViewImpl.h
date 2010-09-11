@@ -320,6 +320,8 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
 
   WebCore::PopupContainer* selectPopup() const { return m_selectPopup.get(); }
 
+  bool zoomTextOnly() const { return m_zoomTextOnly; }
+
   // Returns true if the event leads to scrolling.
   static bool mapKeyCodeForScroll(
       int keyCode,
@@ -414,6 +416,8 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   // Keeps track of the current zoom level. 0 means no zoom, positive numbers
   // mean zoom in, negative numbers mean zoom out.
   int m_zoomLevel;
+
+  bool m_zoomTextOnly;
 
   bool m_contextMenuAllowed;
 

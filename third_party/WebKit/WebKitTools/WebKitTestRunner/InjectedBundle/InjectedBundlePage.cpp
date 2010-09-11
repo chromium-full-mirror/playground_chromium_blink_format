@@ -149,8 +149,8 @@ void InjectedBundlePage::stopLoading() {
 void InjectedBundlePage::reset() {
   WKBundlePageClearMainFrameName(m_page);
 
-  WKBundlePageSetZoomFactor(m_page, 1.0f);
-  WKBundlePageSetZoomMode(m_page, kWKBundlePageZoomModePage);
+  WKBundlePageSetPageZoomFactor(m_page, 1);
+  WKBundlePageSetTextZoomFactor(m_page, 1);
 }
 
 // Loader Client Callbacks
