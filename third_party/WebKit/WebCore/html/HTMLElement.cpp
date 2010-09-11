@@ -300,10 +300,6 @@ String HTMLElement::outerHTML() const {
   return createMarkup(this);
 }
 
-static bool useLegacyTreeBuilder(Document*) {
-  return false;
-}
-
 // FIXME: This logic should move into Range::createContextualFragment
 PassRefPtr<DocumentFragment> HTMLElement::deprecatedCreateContextualFragment(
     const String& markup,
@@ -380,13 +376,6 @@ static PassRefPtr<DocumentFragment> createFragmentFromSource(
   Document* document = contextElement->document();
   RefPtr<DocumentFragment> fragment;
 
-  if (useLegacyTreeBuilder(document)) {
-    fragment = contextElement->deprecatedCreateContextualFragment(markup);
-    if (!fragment)
-      ec = NO_MODIFICATION_ALLOWED_ERR;
-    return fragment;
-  }
-
   fragment = DocumentFragment::create(document);
   if (document->isHTMLDocument()) {
     fragment->parseHTML(markup, contextElement);
@@ -402,16 +391,6 @@ static PassRefPtr<DocumentFragment> createFragmentFromSource(
 }
 
 void HTMLElement::setInnerHTML(const String& html, ExceptionCode& ec) {
-  // FIXME: This code can be removed, it's handled by the HTMLDocumentParser
-  // correctly.
-  if (useLegacyTreeBuilder(document()) &&
-      (hasLocalName(scriptTag) || hasLocalName(styleTag))) {
-    // Script and CSS source shouldn't be parsed as HTML.
-    removeChildren();
-    appendChild(document()->createTextNode(html), ec);
-    return;
-  }
-
   RefPtr<DocumentFragment> fragment = createFragmentFromSource(html, this, ec);
   if (fragment)
     replaceChildrenWithFragment(this, fragment.release(), ec);

@@ -318,7 +318,8 @@ HTMLTreeBuilder::FragmentParsingContext::FragmentParsingContext(
     DocumentFragment* fragment,
     Element* contextElement,
     FragmentScriptingPermission scriptingPermission)
-    : m_dummyDocumentForFragmentParsing(HTMLDocument::create(0, KURL())),
+    : m_dummyDocumentForFragmentParsing(
+          HTMLDocument::create(0, KURL(), fragment->document()->baseURI())),
       m_fragment(fragment),
       m_contextElement(contextElement),
       m_scriptingPermission(scriptingPermission) {
