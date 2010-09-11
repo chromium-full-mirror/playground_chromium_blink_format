@@ -64,8 +64,10 @@ WebProcessProxy::WebProcessProxy(WebContext* context)
   // here, we should just send a
   // single "Initialize" messages with a struct that has all the needed
   // information.
-  send(WebProcessMessage::SetApplicationCacheDirectory, 0,
-       CoreIPC::In(m_context->applicationCacheDirectory()));
+  String applicationCacheDirectory = m_context->applicationCacheDirectory();
+  if (!applicationCacheDirectory.isEmpty())
+    send(WebProcessMessage::SetApplicationCacheDirectory, 0,
+         CoreIPC::In(applicationCacheDirectory));
 
   // FIXME: We could instead send the bundle path as part of the arguments to
   // process creation?
