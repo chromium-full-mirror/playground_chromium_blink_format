@@ -209,13 +209,13 @@ MediaPlayerPrivateQuickTimeVisualContext::
       m_layerClient(
           new MediaPlayerPrivateQuickTimeVisualContext::LayerClient(this)),
       m_layoutClient(
-          new MediaPlayerPrivateQuickTimeVisualContext::LayoutClient(this))
+          new MediaPlayerPrivateQuickTimeVisualContext::LayoutClient(this)),
+      m_movieTransform(CGAffineTransformIdentity)
 #endif
       ,
       m_visualContextClient(
           new MediaPlayerPrivateQuickTimeVisualContext::VisualContextClient(
-              this)),
-      m_movieTransform(CGAffineTransformIdentity) {
+              this)) {
 }
 
 MediaPlayerPrivateQuickTimeVisualContext::
@@ -480,10 +480,14 @@ IntSize MediaPlayerPrivateQuickTimeVisualContext::naturalSize() const {
   int width;
   int height;
   m_movie->getNaturalSize(width, height);
+#if USE(ACCELERATED_COMPOSITING)
   CGSize originalSize = {width, height};
   CGSize transformedSize =
       CGSizeApplyAffineTransform(originalSize, m_movieTransform);
   return IntSize(abs(transformedSize.width), abs(transformedSize.height));
+#else
+  return IntSize(width, height);
+#endif
 }
 
 bool MediaPlayerPrivateQuickTimeVisualContext::hasVideo() const {
@@ -1131,6 +1135,7 @@ bool MediaPlayerPrivateQuickTimeVisualContext::hasSetUpVideoRendering() const {
 
 void MediaPlayerPrivateQuickTimeVisualContext::
     retrieveAndResetMovieTransform() {
+#if USE(ACCELERATED_COMPOSITING)
   // First things first, reset the total movie transform so that
   // we can bail out early:
   m_movieTransform = CGAffineTransformIdentity;
@@ -1161,6 +1166,7 @@ void MediaPlayerPrivateQuickTimeVisualContext::
   // Multiply the two transforms together, taking care to
   // do so in the correct order, track * movie = final:
   m_movieTransform = CGAffineTransformConcat(trackTransform, movieTransform);
+#endif
 }
 
 void MediaPlayerPrivateQuickTimeVisualContext::createLayerForMovie() {
