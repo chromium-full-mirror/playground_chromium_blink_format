@@ -21,6 +21,7 @@
 #define WebFrameNetworkingContext_h
 
 #include <WebCore/FrameNetworkingContext.h>
+#include <WebCore/ResourceError.h>
 
 class WebFrameNetworkingContext : public WebCore::FrameNetworkingContext {
  public:
@@ -34,6 +35,8 @@ class WebFrameNetworkingContext : public WebCore::FrameNetworkingContext {
 
   virtual WTF::String userAgent() const;
   virtual WTF::String referrer() const;
+  virtual WebCore::ResourceError blockedError(
+      const WebCore::ResourceRequest&) const;
 
   WTF::String m_userAgent;
 };

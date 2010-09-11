@@ -61,9 +61,9 @@ ResourceHandle::ResourceHandle(const ResourceRequest& request,
 }
 
 PassRefPtr<ResourceHandle> ResourceHandle::create(
+    NetworkingContext* context,
     const ResourceRequest& request,
     ResourceHandleClient* client,
-    Frame* frame,
     bool defersLoading,
     bool shouldContentSniff) {
 #if ENABLE(BLOB)
@@ -81,7 +81,7 @@ PassRefPtr<ResourceHandle> ResourceHandle::create(
   if (newHandle->d->m_scheduledFailureType != NoFailure)
     return newHandle.release();
 
-  if (newHandle->start(frame))
+  if (newHandle->start(context))
     return newHandle.release();
 
   return 0;

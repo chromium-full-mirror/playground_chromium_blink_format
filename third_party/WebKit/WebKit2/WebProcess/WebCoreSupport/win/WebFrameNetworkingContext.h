@@ -21,11 +21,13 @@
 #define WebFrameNetworkingContext_h
 
 #include <WebCore/FrameNetworkingContext.h>
+#include <WebCore/ResourceError.h>
+#include <WebCore/ResourceRequest.h>
 
 class WebFrameNetworkingContext : public WebCore::FrameNetworkingContext {
  public:
-  static PassRefPtr<WebFrameNetworkingContext> create(WebCore::Frame*) {
-    return 0;
+  static PassRefPtr<WebFrameNetworkingContext> create(WebCore::Frame* frame) {
+    return adoptRef(new WebFrameNetworkingContext(frame));
   }
 
  private:
@@ -34,6 +36,8 @@ class WebFrameNetworkingContext : public WebCore::FrameNetworkingContext {
 
   virtual WTF::String userAgent() const;
   virtual WTF::String referrer() const;
+  virtual WebCore::ResourceError blockedError(
+      const WebCore::ResourceRequest&) const;
 
   WTF::String m_userAgent;
 };

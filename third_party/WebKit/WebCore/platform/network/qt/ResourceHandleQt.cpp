@@ -33,6 +33,7 @@
 #include "ChromeClientQt.h"
 #include "CachedResourceLoader.h"
 #include "Frame.h"
+#include "FrameNetworkingContext.h"
 #include "FrameLoaderClientQt.h"
 #include "NotImplemented.h"
 #include "Page.h"
@@ -115,15 +116,11 @@ ResourceHandle::~ResourceHandle() {
     cancel();
 }
 
-bool ResourceHandle::start(Frame* frame) {
-  if (!frame)
-    return false;
-
-  Page* page = frame->page();
-  // If we are no longer attached to a Page, this must be an attempted load from
-  // an
-  // onUnload handler, so let's just block it.
-  if (!page)
+bool ResourceHandle::start(NetworkingContext* context) {
+  // If NetworkingContext is invalid then we are no longer attached to a Page,
+  // this must be an attempted load from an unload event handler, so let's just
+  // block it.
+  if (context && !context->isValid())
     return false;
 
   if (!(d->m_user.isEmpty() || d->m_pass.isEmpty())) {
@@ -135,8 +132,7 @@ bool ResourceHandle::start(Frame* frame) {
     d->m_firstRequest.setURL(urlWithCredentials);
   }
 
-  getInternal()->m_frame =
-      static_cast<FrameLoaderClientQt*>(frame->loader()->client())->webFrame();
+  getInternal()->m_context = context;
   ResourceHandleInternal* d = getInternal();
   d->m_job = new QNetworkReplyHandler(
       this, QNetworkReplyHandler::LoadMode(d->m_defersLoading));
@@ -158,9 +154,12 @@ bool ResourceHandle::willLoadFromCache(ResourceRequest& request, Frame* frame) {
   if (!frame)
     return false;
 
-  QNetworkAccessManager* manager =
-      QWebFramePrivate::kit(frame)->page()->networkAccessManager();
-  QAbstractNetworkCache* cache = manager->cache();
+  QNetworkAccessManager* manager = 0;
+  QAbstractNetworkCache* cache = 0;
+  if (frame->loader()->networkingContext()) {
+    manager = frame->loader()->networkingContext()->networkAccessManager();
+    cache = manager->cache();
+  }
 
   if (!cache)
     return false;
@@ -184,12 +183,12 @@ PassRefPtr<SharedBuffer> ResourceHandle::bufferedData() {
 }
 
 void ResourceHandle::loadResourceSynchronously(
+    NetworkingContext* context,
     const ResourceRequest& request,
     StoredCredentials /*storedCredentials*/,
     ResourceError& error,
     ResourceResponse& response,
-    Vector<char>& data,
-    Frame* frame) {
+    Vector<char>& data) {
   WebCoreSynchronousLoader syncLoader;
   RefPtr<ResourceHandle> handle =
       adoptRef(new ResourceHandle(request, &syncLoader, true, false));
@@ -203,8 +202,7 @@ void ResourceHandle::loadResourceSynchronously(
     urlWithCredentials.setPass(d->m_pass);
     d->m_firstRequest.setURL(urlWithCredentials);
   }
-  d->m_frame =
-      static_cast<FrameLoaderClientQt*>(frame->loader()->client())->webFrame();
+  d->m_context = context;
   d->m_job =
       new QNetworkReplyHandler(handle.get(), QNetworkReplyHandler::LoadNormal);
 

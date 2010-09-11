@@ -27,6 +27,7 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameLoaderClientGtk.h"
+#include "FrameNetworkingContextGtk.h"
 #include "GtkVersioning.h"
 #include "HTMLMediaElement.h"
 #include "HTMLNames.h"
@@ -194,12 +195,16 @@ static GtkWidget* currentToplevelCallback(WebKitSoupAuthDialog* feature,
   if (!d)
     return NULL;
 
-  WebCore::Frame* frame = d->m_frame;
-  if (!frame)
+  WebKit::FrameNetworkingContextGtk* context =
+      static_cast<WebKit::FrameNetworkingContextGtk*>(d->m_context.get());
+  if (!context)
+    return NULL;
+
+  if (!context->coreFrame())
     return NULL;
 
   GtkWidget* toplevel = gtk_widget_get_toplevel(
-      GTK_WIDGET(frame->page()->chrome()->platformPageClient()));
+      GTK_WIDGET(context->coreFrame()->page()->chrome()->platformPageClient()));
   if (gtk_widget_is_toplevel(toplevel))
     return toplevel;
   else
