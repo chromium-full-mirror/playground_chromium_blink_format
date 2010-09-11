@@ -32,11 +32,19 @@ class Element;
 class Node;
 }
 
+#if defined(WTF_USE_V8) && WTF_USE_V8
+namespace V8 {
+namespace Bindings {
+class QtWebElementRuntime;
+}
+}
+#else
 namespace JSC {
 namespace Bindings {
 class QtWebElementRuntime;
 }
 }
+#endif
 
 QT_BEGIN_NAMESPACE
 class QPainter;
@@ -166,7 +174,12 @@ class QWEBKIT_EXPORT QWebElement {
   friend class QWebHitTestResult;
   friend class QWebHitTestResultPrivate;
   friend class QWebPage;
+
+#if defined(WTF_USE_V8) && WTF_USE_V8
+  friend class V8::Bindings::QtWebElementRuntime;
+#else
   friend class JSC::Bindings::QtWebElementRuntime;
+#endif
 
   QWebElementPrivate* d;
   WebCore::Element* m_element;
