@@ -50,6 +50,7 @@ class IntSize;
 class IntRect;
 
 #if USE(ACCELERATED_COMPOSITING)
+class WKCACFLayer;
 class WKCAImageQueue;
 #endif
 
@@ -161,16 +162,23 @@ class MediaPlayerPrivateQuickTimeVisualContext
   class LayerClient;
   friend class LayerClient;
   OwnPtr<LayerClient> m_layerClient;
+
+  class LayoutClient;
+  friend class LayoutClient;
+  OwnPtr<LayoutClient> m_layoutClient;
 #endif
 
   class VisualContextClient;
   friend class VisualContextClient;
   OwnPtr<VisualContextClient> m_visualContextClient;
 
+  void retrieveAndResetMovieTransform();
+
   MediaPlayer* m_player;
   RefPtr<QTMovie> m_movie;
 #if USE(ACCELERATED_COMPOSITING)
-  OwnPtr<GraphicsLayer> m_qtVideoLayer;
+  RefPtr<WKCACFLayer> m_qtVideoLayer;
+  OwnPtr<GraphicsLayer> m_transformLayer;
   OwnPtr<WKCAImageQueue> m_imageQueue;
 #endif
   RefPtr<QTMovieVisualContext> m_visualContext;
@@ -192,6 +200,7 @@ class MediaPlayerPrivateQuickTimeVisualContext
   double m_timeStartedPlaying;
   double m_timeStoppedPlaying;
 #endif
+  CGAffineTransform m_movieTransform;
 };
 }
 
