@@ -245,11 +245,6 @@ void QWebSettingsPrivate::apply() {
                               : global->localStoragePath;
     settings->setLocalStorageDatabasePath(storagePath);
 
-    value =
-        attributes.value(QWebSettings::ZoomTextOnly,
-                         global->attributes.value(QWebSettings::ZoomTextOnly));
-    settings->setZoomMode(value ? WebCore::ZoomTextOnly : WebCore::ZoomPage);
-
     value = attributes.value(
         QWebSettings::PrintElementBackgrounds,
         global->attributes.value(QWebSettings::PrintElementBackgrounds));
