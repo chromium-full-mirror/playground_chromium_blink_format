@@ -273,7 +273,8 @@ void WebChromeClient::setStatusbarText(const String& statusbarText) {
   // Notify the bundle client.
   m_page->injectedBundleUIClient().willSetStatusbarText(m_page, statusbarText);
 
-  notImplemented();
+  WebProcess::shared().connection()->send(WebPageProxyMessage::SetStatusText,
+                                          m_page->pageID(), statusbarText);
 }
 
 bool WebChromeClient::shouldInterruptJavaScript() {

@@ -726,6 +726,13 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       contentsSizeChanged(process()->webFrame(frameID), size);
       break;
     }
+    case WebPageProxyMessage::SetStatusText: {
+      String text;
+      if (!arguments->decode(CoreIPC::Out(text)))
+        return;
+      setStatusText(text);
+      break;
+    }
     case WebPageProxyMessage::RegisterEditCommandForUndo: {
       uint64_t commandID;
       uint32_t editAction;
@@ -1027,6 +1034,10 @@ String WebPageProxy::runJavaScriptPrompt(WebFrameProxy* frame,
                                          const String& message,
                                          const String& defaultValue) {
   return m_uiClient.runJavaScriptPrompt(this, message, defaultValue, frame);
+}
+
+void WebPageProxy::setStatusText(const String& text) {
+  m_uiClient.setStatusText(this, text);
 }
 
 void WebPageProxy::contentsSizeChanged(WebFrameProxy* frame,

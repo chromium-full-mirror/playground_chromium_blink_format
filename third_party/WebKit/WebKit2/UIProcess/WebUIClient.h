@@ -53,6 +53,7 @@ class WebUIClient {
                                   const WTF::String&,
                                   const WTF::String&,
                                   WebFrameProxy*);
+  void setStatusText(WebPageProxy*, const String&);
   void contentsSizeChanged(WebPageProxy*,
                            const WebCore::IntSize&,
                            WebFrameProxy*);

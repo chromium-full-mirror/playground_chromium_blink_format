@@ -54,6 +54,27 @@ static void runJavaScriptAlert(WKPageRef page,
                                WKFrameRef frame,
                                const void* clientInfo) {}
 
+static bool runJavaScriptConfirm(WKPageRef page,
+                                 WKStringRef message,
+                                 WKFrameRef frame,
+                                 const void* clientInfo) {}
+
+static WKStringRef runJavaScriptPrompt(WKPageRef page,
+                                       WKStringRef message,
+                                       WKStringRef defaultValue,
+                                       WKFrameRef frame,
+                                       const void* clientInfo) {}
+
+static void setStatusText(WKPageRef page,
+                          WKStringRef text,
+                          const void* clientInfo) {}
+
+static void contentsSizeChanged(WKPageRef page,
+                                int width,
+                                int height,
+                                WKFrameRef frame,
+                                const void* clientInfo) {}
+
 void BrowserView::create(RECT webViewRect, BrowserWindow* parentWindow) {
   assert(!m_webView);
 
@@ -69,15 +90,17 @@ void BrowserView::create(RECT webViewRect, BrowserWindow* parentWindow) {
 
   m_webView = WKViewCreate(webViewRect, pageNamespace, parentWindow->window());
 
-  WKPageUIClient uiClient = {
-      0,            /* version */
-      parentWindow, /* clientInfo */
-      createNewPage,
-      showPage,
-      closePage,
-      runJavaScriptAlert,
-      0 /* contentsSizeChanged */
-  };
+  WKPageUIClient uiClient = {0,            /* version */
+                             parentWindow, /* clientInfo */
+                             createNewPage,
+                             showPage,
+                             closePage,
+                             runJavaScriptAlert,
+                             runJavaScriptConfirm,
+                             runJavaScriptPrompt,
+                             setStatusText,
+                             contentsSizeChanged};
+
   WKPageSetPageUIClient(WKViewGetPage(m_webView), &uiClient);
 }
 

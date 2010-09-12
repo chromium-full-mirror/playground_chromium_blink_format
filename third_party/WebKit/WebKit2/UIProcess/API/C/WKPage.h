@@ -217,6 +217,9 @@ typedef WKStringRef (*WKPageRunJavaScriptPromptCallback)(
     WKStringRef defaultValue,
     WKFrameRef frame,
     const void* clientInfo);
+typedef void (*WKPageSetStatusTextCallback)(WKPageRef page,
+                                            WKStringRef text,
+                                            const void* clientInfo);
 typedef void (*WKPageContentsSizeChangedCallback)(WKPageRef page,
                                                   int width,
                                                   int height,
@@ -232,6 +235,7 @@ struct WKPageUIClient {
   WKPageRunJavaScriptAlertCallback runJavaScriptAlert;
   WKPageRunJavaScriptConfirmCallback runJavaScriptConfirm;
   WKPageRunJavaScriptPromptCallback runJavaScriptPrompt;
+  WKPageSetStatusTextCallback setStatusText;
   WKPageContentsSizeChangedCallback contentsSizeChanged;
 };
 typedef struct WKPageUIClient WKPageUIClient;
