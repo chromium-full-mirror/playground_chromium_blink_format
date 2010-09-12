@@ -110,11 +110,10 @@ CachedResource* Cache::requestResource(
   if (resource && requestIsPreload && !resource->isPreloaded())
     return 0;
 
-  if (SecurityOrigin::restrictAccessToLocal() &&
-      !SecurityOrigin::canDisplay(url, String(), cachedResourceLoader->doc())) {
-    Document* doc = cachedResourceLoader->doc();
-    if (doc && !requestIsPreload)
-      FrameLoader::reportLocalLoadFailed(doc->frame(), url.string());
+  if (!cachedResourceLoader->doc()->securityOrigin()->canDisplay(url)) {
+    if (!requestIsPreload)
+      FrameLoader::reportLocalLoadFailed(cachedResourceLoader->doc()->frame(),
+                                         url.string());
     return 0;
   }
 
