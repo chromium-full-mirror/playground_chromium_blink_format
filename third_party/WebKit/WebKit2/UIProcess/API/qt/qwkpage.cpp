@@ -234,11 +234,14 @@ QWKPage::QWKPage(WKPageNamespaceRef namespaceRef)
   WKPageUIClient uiClient = {
       0,    /* version */
       this, /* clientInfo */
-      qt_wk_createNewPage, qt_wk_showPage, qt_wk_close,
-      qt_wk_runJavaScriptAlert, 0, /* runJavaScriptConfirm */
-      0,                           /* runJavaScriptPrompt */
-      0                            /* setStatusText */
-      0                            /* contentsSizeChanged */
+      qt_wk_createNewPage,
+      qt_wk_showPage,
+      qt_wk_close,
+      qt_wk_runJavaScriptAlert,
+      0, /* runJavaScriptConfirm */
+      0, /* runJavaScriptPrompt */
+      0, /* setStatusText */
+      0  /* contentsSizeChanged */
   };
   WKPageSetPageUIClient(pageRef(), &uiClient);
 }
