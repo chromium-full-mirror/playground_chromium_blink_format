@@ -59,7 +59,7 @@ class WebCoreStringResource : public v8::String::ExternalStringResource {
   }
 
   explicit WebCoreStringResource(const AtomicString& string)
-      : m_plainString(string), m_atomicString(string) {
+      : m_plainString(string.string()), m_atomicString(string) {
 #ifndef NDEBUG
     m_threadId = WTF::currentThread();
 #endif
