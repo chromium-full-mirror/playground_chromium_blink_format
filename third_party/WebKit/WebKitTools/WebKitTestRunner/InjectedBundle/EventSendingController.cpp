@@ -131,7 +131,7 @@ void EventSendingController::zoomPageIn() {
   double zoomFactor =
       WKBundlePageGetPageZoomFactor(InjectedBundle::shared().page()->page());
   WKBundlePageSetPageZoomFactor(InjectedBundle::shared().page()->page(),
-                                zoomFactor / ZoomMultiplierRatio);
+                                zoomFactor * ZoomMultiplierRatio);
 }
 
 void EventSendingController::zoomPageOut() {
