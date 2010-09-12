@@ -51,7 +51,7 @@ class ScriptCachedFrameData {
 
 }  // namespace WebCore
 
-#elif PLATFORM(ANDROID)
+#elif PLATFORM(ANDROID) || PLATFORM(QT)
 // FIXME: the right guard should be ENABLE(PAGE_CACHE). Replace with the right
 // guard, once
 // https://bugs.webkit.org/show_bug.cgi?id=35061 is fixed.
