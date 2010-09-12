@@ -84,7 +84,6 @@ GraphicsWebView::GraphicsWebView(QDeclarativeWebView* parent)
     : QGraphicsWebView(parent), parent(parent), pressTime(400) {}
 
 void GraphicsWebView::mousePressEvent(QGraphicsSceneMouseEvent* event) {
-  setFocus();
   pressPoint = event->pos();
   if (pressTime) {
     pressTimer.start(pressTime, this);
@@ -94,6 +93,12 @@ void GraphicsWebView::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     parent->setKeepMouseGrab(true);
   }
   QGraphicsWebView::mousePressEvent(event);
+
+  QWebHitTestResult hit =
+      page()->mainFrame()->hitTestContent(pressPoint.toPoint());
+  if (hit.isContentEditable())
+    parent->forceActiveFocus();
+  setFocus();
 }
 
 void GraphicsWebView::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
