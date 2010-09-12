@@ -31,7 +31,9 @@ using namespace WebCore;
     Constructs a security origin from \a other.
 */
 QWebScriptWorld::QWebScriptWorld() {
+#if USE(JSC)
   d = new QWebScriptWorldPrivate(ScriptController::createWorld());
+#endif
 }
 
 QWebScriptWorld::QWebScriptWorld(const QWebScriptWorld& other) : d(other.d) {}
