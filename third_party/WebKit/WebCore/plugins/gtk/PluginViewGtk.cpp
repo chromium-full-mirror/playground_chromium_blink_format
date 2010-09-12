@@ -144,7 +144,7 @@ void PluginView::updatePluginWidget() {
                       m_windowRect.width(), m_windowRect.height(),
                       ((NPSetWindowCallbackStruct*)m_npWindow.ws_info)->depth);
     XSync(GDK_DISPLAY(),
-          False);  // make sure that the server knows about the Drawable
+          false);  // make sure that the server knows about the Drawable
   }
 #endif
 
@@ -267,7 +267,7 @@ void PluginView::paint(GraphicsContext* context, const IntRect& rect) {
   dispatchNPEvent(xevent);
 
   if (syncX)
-    XSync(m_pluginDisplay, False);  // sync changes by plugin
+    XSync(m_pluginDisplay, false);  // sync changes by plugin
 
   cairo_t* cr = context->platformContext();
   cairo_save(cr);
