@@ -516,6 +516,15 @@ void WebPage::getRenderTreeExternalRepresentation(uint64_t callbackID) {
       CoreIPC::In(resultString, callbackID));
 }
 
+void WebPage::getSourceForFrame(WebFrame* frame, uint64_t callbackID) {
+  String resultString;
+  if (frame)
+    resultString = frame->source();
+  WebProcess::shared().connection()->send(
+      WebPageProxyMessage::DidGetSourceForFrame, m_pageID,
+      CoreIPC::In(resultString, callbackID));
+}
+
 void WebPage::preferencesDidChange(const WebPreferencesStore& store) {
   WebPreferencesStore::removeTestRunnerOverrides();
 
@@ -740,6 +749,14 @@ void WebPage::didReceiveMessage(CoreIPC::Connection* connection,
       if (!arguments->decode(callbackID))
         return;
       getRenderTreeExternalRepresentation(callbackID);
+      return;
+    }
+    case WebPageMessage::GetSourceForFrame: {
+      uint64_t frameID;
+      uint64_t callbackID;
+      if (!arguments->decode(CoreIPC::Out(frameID, callbackID)))
+        return;
+      getSourceForFrame(WebProcess::shared().webFrame(frameID), callbackID);
       return;
     }
     case WebPageMessage::Close: {

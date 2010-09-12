@@ -188,6 +188,12 @@ void WebPageProxy::close() {
     renderTreeExternalRepresentationCallbacks[i]->invalidate();
   m_renderTreeExternalRepresentationCallbacks.clear();
 
+  Vector<RefPtr<FrameSourceCallback>> frameSourceCallbacks;
+  copyValuesToVector(m_frameSourceCallbacks, frameSourceCallbacks);
+  m_frameSourceCallbacks.clear();
+  for (size_t i = 0, size = frameSourceCallbacks.size(); i < size; ++i)
+    frameSourceCallbacks[i]->invalidate();
+
   Vector<WebEditCommandProxy*> editCommandVector;
   copyToVector(m_editCommandSet, editCommandVector);
   m_editCommandSet.clear();
@@ -437,6 +443,16 @@ void WebPageProxy::getRenderTreeExternalRepresentation(
                   callbackID);
 }
 
+void WebPageProxy::getSourceForFrame(
+    WebFrameProxy* frame,
+    PassRefPtr<FrameSourceCallback> prpCallback) {
+  RefPtr<FrameSourceCallback> callback = prpCallback;
+  uint64_t callbackID = callback->callbackID();
+  m_frameSourceCallbacks.set(callbackID, callback.get());
+  process()->send(WebPageMessage::GetSourceForFrame, m_pageID,
+                  CoreIPC::In(frame->frameID(), callbackID));
+}
+
 void WebPageProxy::preferencesDidChange() {
   if (!isValid())
     return;
@@ -654,6 +670,14 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       if (!arguments->decode(CoreIPC::Out(resultString, callbackID)))
         return;
       didGetRenderTreeExternalRepresentation(resultString, callbackID);
+      break;
+    }
+    case WebPageProxyMessage::DidGetSourceForFrame: {
+      String resultString;
+      uint64_t callbackID;
+      if (!arguments->decode(CoreIPC::Out(resultString, callbackID)))
+        return;
+      didGetSourceForFrame(resultString, callbackID);
       break;
     }
     case WebPageProxyMessage::SetToolTip: {
@@ -1113,6 +1137,18 @@ void WebPageProxy::didGetRenderTreeExternalRepresentation(
   callback->performCallbackWithReturnValue(resultString.impl());
 }
 
+void WebPageProxy::didGetSourceForFrame(const String& resultString,
+                                        uint64_t callbackID) {
+  RefPtr<FrameSourceCallback> callback =
+      m_frameSourceCallbacks.take(callbackID);
+  if (!callback) {
+    // FIXME: Log error or assert.
+    return;
+  }
+
+  callback->performCallbackWithReturnValue(resultString.impl());
+}
+
 #if USE(ACCELERATED_COMPOSITING)
 void WebPageProxy::didChangeAcceleratedCompositing(bool compositing) {
   if (compositing)
@@ -1157,6 +1193,12 @@ void WebPageProxy::processDidExit() {
        i < size; ++i)
     renderTreeExternalRepresentationCallbacks[i]->invalidate();
   m_renderTreeExternalRepresentationCallbacks.clear();
+
+  Vector<RefPtr<FrameSourceCallback>> frameSourceCallbacks;
+  copyValuesToVector(m_frameSourceCallbacks, frameSourceCallbacks);
+  m_frameSourceCallbacks.clear();
+  for (size_t i = 0, size = frameSourceCallbacks.size(); i < size; ++i)
+    frameSourceCallbacks[i]->invalidate();
 
   Vector<WebEditCommandProxy*> editCommandVector;
   copyToVector(m_editCommandSet, editCommandVector);

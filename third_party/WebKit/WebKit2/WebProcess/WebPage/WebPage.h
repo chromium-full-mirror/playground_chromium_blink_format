@@ -166,6 +166,8 @@ class WebPage : public APIObject {
   static const char* interpretKeyEvent(const WebCore::KeyboardEvent*);
   bool performDefaultBehaviorForKeyEvent(const WebKeyboardEvent&);
 
+  String sourceForFrame(WebFrame*);
+
   // Actions
   void tryClose();
   void loadURL(const String&);
@@ -185,6 +187,7 @@ class WebPage : public APIObject {
 #endif
   void runJavaScriptInMainFrame(const WTF::String&, uint64_t callbackID);
   void getRenderTreeExternalRepresentation(uint64_t callbackID);
+  void getSourceForFrame(WebFrame*, uint64_t callbackID);
   void preferencesDidChange(const WebPreferencesStore&);
   void platformPreferencesDidChange(const WebPreferencesStore&);
   void didReceivePolicyDecision(WebFrame*,
