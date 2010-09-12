@@ -113,6 +113,7 @@ static NPClass V8NPObjectClass = {NP_CLASS_STRUCT_VERSION,
                                   0,
                                   0,
                                   0,
+                                  0,
                                   0};
 
 // NPAPI's npruntime functions.
