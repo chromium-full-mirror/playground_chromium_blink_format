@@ -1568,10 +1568,18 @@ static void tryHyphenating(RenderText* text,
   int hyphenWidth =
       font.width(TextRun(hyphenString.characters(), hyphenString.length()));
 
+  int maxPrefixWidth =
+      availableWidth - xPos - hyphenWidth - lastSpaceWordSpacing;
+  // If the maximum width available for the prefix before the hyphen is small,
+  // then it is very unlikely
+  // that an hyphenation opportunity exists, so do not bother to look for it.
+  if (maxPrefixWidth <= font.pixelSize() * 5 / 4)
+    return;
+
   unsigned prefixLength = font.offsetForPosition(
       TextRun(text->characters() + lastSpace, pos - lastSpace,
               !collapseWhiteSpace, xPos + lastSpaceWordSpacing),
-      availableWidth - xPos - hyphenWidth - lastSpaceWordSpacing, false);
+      maxPrefixWidth, false);
   if (!prefixLength)
     return;
 
