@@ -57,13 +57,17 @@ static void runJavaScriptAlert(WKPageRef page,
 static bool runJavaScriptConfirm(WKPageRef page,
                                  WKStringRef message,
                                  WKFrameRef frame,
-                                 const void* clientInfo) {}
+                                 const void* clientInfo) {
+  return false;
+}
 
 static WKStringRef runJavaScriptPrompt(WKPageRef page,
                                        WKStringRef message,
                                        WKStringRef defaultValue,
                                        WKFrameRef frame,
-                                       const void* clientInfo) {}
+                                       const void* clientInfo) {
+  return 0;
+}
 
 static void setStatusText(WKPageRef page,
                           WKStringRef text,
