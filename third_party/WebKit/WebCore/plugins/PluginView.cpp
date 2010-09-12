@@ -28,7 +28,9 @@
 #include "config.h"
 #include "PluginView.h"
 
+#if USE(JSC)
 #include "Bridge.h"
+#endif
 #include "Chrome.h"
 #include "Document.h"
 #include "DocumentLoader.h"
@@ -767,7 +769,9 @@ PassRefPtr<JSC::Bindings::Instance> PluginView::bindingInstance() {
   NPError npErr;
   {
     PluginView::setCurrentPluginView(this);
+#if USE(JSC)
     JSC::JSLock::DropAllLocks dropAllLocks(JSC::SilenceAssertionsOnly);
+#endif
     setCallingPlugin(true);
     npErr = m_plugin->pluginFuncs()->getvalue(
         m_instance, NPPVpluginScriptableNPObject, &object);
@@ -1440,7 +1444,9 @@ void PluginView::privateBrowsingStateChanged(bool privateBrowsingEnabled) {
     return;
 
   PluginView::setCurrentPluginView(this);
+#if USE(JSC)
   JSC::JSLock::DropAllLocks dropAllLocks(JSC::SilenceAssertionsOnly);
+#endif
   setCallingPlugin(true);
   NPBool value = privateBrowsingEnabled;
   setValue(m_instance, NPNVprivateModeBool, &value);
