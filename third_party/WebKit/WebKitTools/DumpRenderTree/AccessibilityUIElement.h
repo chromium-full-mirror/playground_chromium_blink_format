@@ -200,6 +200,7 @@ class AccessibilityUIElement {
       AccessibilityTextMarkerRange*);
   AccessibilityTextMarker endTextMarkerForTextMarkerRange(
       AccessibilityTextMarkerRange*);
+  AccessibilityTextMarker textMarkerForPoint(int x, int y);
   AccessibilityUIElement accessibilityElementForTextMarker(
       AccessibilityTextMarker*);
   int textMarkerRangeLength(AccessibilityTextMarkerRange*);
