@@ -58,7 +58,14 @@ class WebGeolocationServiceBridge {
                                double speed,
                                long long timestamp) = 0;
   virtual void setLastError(int errorCode, const WebString& message) = 0;
-  virtual void onWebGeolocationServiceDestroyed() = 0;
+  // Called when the WebGeolocationService to which this bridge is attached is
+  // going out of scope. On receiving
+  // this call the bridge implementation must not make any further access to the
+  // service.
+  virtual void didDestroyGeolocationService() = 0;
+  // FIXME: Remove this badly named method when all callers are using
+  // didDestroyGeolocationService directly.
+  void onWebGeolocationServiceDestroyed() { didDestroyGeolocationService(); }
 
  protected:
   virtual ~WebGeolocationServiceBridge() {}

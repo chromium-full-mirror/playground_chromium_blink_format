@@ -48,9 +48,6 @@ class WebGeolocationServiceMock : public WebGeolocationService {
                                                     double accuracy);
   WEBKIT_API static void setMockGeolocationError(int errorCode,
                                                  const WebString& message);
-
- protected:
-  static bool s_mockGeolocationPermission;
 };
 
 }  // namespace WebKit
