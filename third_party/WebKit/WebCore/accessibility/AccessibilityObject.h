@@ -611,8 +611,10 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
 
 #if PLATFORM(GTK)
   bool allowsTextRanges() const;
+  unsigned getLengthForTextRange() const;
 #else
   bool allowsTextRanges() const { return isTextControl(); }
+  unsigned getLengthForTextRange() const { return text().length(); }
 #endif
 
 #if PLATFORM(MAC)
