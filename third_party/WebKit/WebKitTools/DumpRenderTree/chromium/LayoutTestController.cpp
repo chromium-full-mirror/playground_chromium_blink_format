@@ -1538,7 +1538,7 @@ void LayoutTestController::setMockDeviceOrientation(
       !arguments[5].isNumber())
     return;
 
-  WebKit::WebDeviceOrientation orientation(
+  WebDeviceOrientation orientation(
       arguments[0].toBoolean(), arguments[1].toDouble(),
       arguments[2].toBoolean(), arguments[3].toDouble(),
       arguments[4].toBoolean(), arguments[5].toDouble());
@@ -1614,10 +1614,8 @@ void LayoutTestController::markerTextForListItem(const CppArgumentList& args,
         element.document().frame()->markerTextForListItem(element).utf8());
 }
 
-WebKit::WebDeviceOrientationClient*
-LayoutTestController::deviceOrientationClient() {
+WebDeviceOrientationClient* LayoutTestController::deviceOrientationClient() {
   if (!m_deviceOrientationClientMock.get())
-    m_deviceOrientationClientMock.set(
-        new WebKit::WebDeviceOrientationClientMock());
+    m_deviceOrientationClientMock.set(WebDeviceOrientationClientMock::create());
   return m_deviceOrientationClientMock.get();
 }
