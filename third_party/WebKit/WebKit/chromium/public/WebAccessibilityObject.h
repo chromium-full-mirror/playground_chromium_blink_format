@@ -76,6 +76,7 @@ class WebAccessibilityObject {
   WEBKIT_API WebString actionVerb() const;
   WEBKIT_API bool canSetFocusAttribute() const;
   WEBKIT_API bool canSetValueAttribute() const;
+  WEBKIT_API bool isValid() const;
 
   WEBKIT_API unsigned childCount() const;
 
