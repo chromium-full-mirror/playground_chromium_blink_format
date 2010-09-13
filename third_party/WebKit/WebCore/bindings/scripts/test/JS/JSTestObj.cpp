@@ -84,7 +84,7 @@ static const HashTableValue JSTestObjTableValues[34] = {
     {"XMLObjAttr", DontDelete,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(jsTestObjXMLObjAttr),
      (intptr_t)setJSTestObjXMLObjAttr THUNK_GENERATOR(0)},
-    {"CREATE", DontDelete,
+    {"create", DontDelete,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(jsTestObjCreate),
      (intptr_t)setJSTestObjCreate THUNK_GENERATOR(0)},
     {"reflectedStringAttr", DontDelete,
