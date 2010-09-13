@@ -599,6 +599,11 @@ bool AccessibilityUIElement::isCollapsed() const {
   return false;
 }
 
+bool AccessibilityUIElement::isIgnored() const {
+  // FIXME: implement
+  return false;
+}
+
 bool AccessibilityUIElement::hasPopup() const {
   // FIXME: implement
   return false;

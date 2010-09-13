@@ -535,6 +535,11 @@ bool AccessibilityUIElement::isCollapsed() const {
   return (state & STATE_SYSTEM_COLLAPSED) == STATE_SYSTEM_COLLAPSED;
 }
 
+bool AccessibilityUIElement::isIgnored() const {
+  // FIXME: implement
+  return false;
+}
+
 bool AccessibilityUIElement::hasPopup() const {
   DWORD state = accessibilityState(m_element);
   return (state & STATE_SYSTEM_HASPOPUP) == STATE_SYSTEM_HASPOPUP;
