@@ -29,6 +29,9 @@
  */
 
 #include "config.h"
+
+#if ENABLE(SMOOTH_SCROLLING)
+
 #include "ScrollAnimatorWin.h"
 
 #include "ScrollbarClient.h"
@@ -306,3 +309,5 @@ void ScrollAnimatorWin::animateScroll(PerAxisData* data) {
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(SMOOTH_SCROLLING)

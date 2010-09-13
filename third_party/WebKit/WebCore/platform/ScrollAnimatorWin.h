@@ -31,6 +31,8 @@
 #ifndef ScrollAnimatorWin_h
 #define ScrollAnimatorWin_h
 
+#if ENABLE(SMOOTH_SCROLLING)
+
 #include "ScrollAnimator.h"
 #include "Timer.h"
 
@@ -70,4 +72,7 @@ class ScrollAnimatorWin : public ScrollAnimator {
   PerAxisData m_verticalData;
 };
 }
+
+#endif  // ENABLE(SMOOTH_SCROLLING)
+
 #endif
