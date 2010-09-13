@@ -48,7 +48,7 @@ class QWebHitTestResult;
 class QWebNetworkInterface;
 class QWebPagePrivate;
 class QWebPluginFactory;
-class QtViewportHintsPrivate;
+class QtViewportConfigurationPrivate;
 
 namespace WebCore {
 class ChromeClientQt;
@@ -208,34 +208,36 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
     GeolocationPermissionDomain
   };
 
-  class ViewportHints {
+  class ViewportConfiguration {
    public:
-    ViewportHints();
-    ViewportHints(const QWebPage::ViewportHints& other);
+    ViewportConfiguration();
+    ViewportConfiguration(const QWebPage::ViewportConfiguration& other);
 
-    ~ViewportHints();
+    ~ViewportConfiguration();
 
-    QWebPage::ViewportHints& operator=(const QWebPage::ViewportHints& other);
+    QWebPage::ViewportConfiguration& operator=(
+        const QWebPage::ViewportConfiguration& other);
 
     inline qreal initialScaleFactor() const { return m_initialScaleFactor; };
     inline qreal minimumScaleFactor() const { return m_minimumScaleFactor; };
     inline qreal maximumScaleFactor() const { return m_maximumScaleFactor; };
-    inline int targetDensityDpi() const { return m_targetDensityDpi; };
+    inline qreal devicePixelRatio() const { return m_devicePixelRatio; };
     inline bool isUserScalable() const { return m_isUserScalable; };
     inline bool isValid() const { return m_isValid; };
     inline QSize size() const { return m_size; };
 
    private:
-    QSharedDataPointer<QtViewportHintsPrivate> d;
+    QSharedDataPointer<QtViewportConfigurationPrivate> d;
     qreal m_initialScaleFactor;
     qreal m_minimumScaleFactor;
     qreal m_maximumScaleFactor;
-    int m_targetDensityDpi;
+    qreal m_devicePixelRatio;
     bool m_isUserScalable;
     bool m_isValid;
     QSize m_size;
 
     friend class WebCore::ChromeClientQt;
+    friend class QWebPage;
   };
 
   explicit QWebPage(QObject* parent = 0);
@@ -274,6 +276,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
   QSize viewportSize() const;
   void setViewportSize(const QSize& size) const;
+  ViewportConfiguration viewportConfigurationForSize(QSize availableSize) const;
 
   QSize preferredContentsSize() const;
   void setPreferredContentsSize(const QSize& size) const;
@@ -386,7 +389,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   void saveFrameStateRequested(QWebFrame* frame, QWebHistoryItem* item);
   void restoreFrameStateRequested(QWebFrame* frame);
 
-  void viewportChangeRequested(const QWebPage::ViewportHints& hints);
+  void viewportChangeRequested();
 
   void requestPermissionFromUser(QWebFrame* frame,
                                  QWebPage::PermissionDomain domain);

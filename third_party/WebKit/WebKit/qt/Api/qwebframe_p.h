@@ -31,6 +31,7 @@
 #include "qwebelement.h"
 #include "wtf/RefPtr.h"
 #include "Frame.h"
+#include "ViewportArguments.h"
 
 namespace WebCore {
 class FrameLoaderClientQt;
@@ -72,7 +73,6 @@ class QWebFramePrivate {
         allowsScrolling(true),
         marginWidth(-1),
         marginHeight(-1),
-        initialLayoutComplete(false),
         zoomTextOnly(false) {}
   void init(QWebFrame* qframe, QWebFrameData* frameData);
   void setPage(QWebPage*);
@@ -105,8 +105,8 @@ class QWebFramePrivate {
   bool allowsScrolling;
   int marginWidth;
   int marginHeight;
-  bool initialLayoutComplete;
   bool zoomTextOnly;
+  WebCore::ViewportArguments viewportArguments;
 };
 
 class QWebHitTestResultPrivate {

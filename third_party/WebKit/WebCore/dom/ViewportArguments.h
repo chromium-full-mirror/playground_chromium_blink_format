@@ -6,6 +6,7 @@
  * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -27,6 +28,7 @@
 #ifndef ViewportArguments_h
 #define ViewportArguments_h
 
+#include "IntSize.h"
 #include <wtf/Forward.h>
 
 namespace WebCore {
@@ -41,17 +43,36 @@ enum ViewportErrorCode {
   TargetDensityDpiTooSmallOrLargeError
 };
 
+struct ViewportConfiguration {
+  IntSize layoutViewport;
+
+  float devicePixelRatio;
+
+  float initialScale;
+  float minimumScale;
+  float maximumScale;
+};
+
 struct ViewportArguments {
-  enum { ValueUndefined = -1 };
+  enum {
+    ValueAuto = -1,
+    ValueDesktopWidth = -2,
+    ValueDeviceWidth = -3,
+    ValueDeviceHeight = -4,
+    ValueDeviceDPI = -5,
+    ValueLowDPI = -6,
+    ValueMediumDPI = -7,
+    ValueHighDPI = -8
+  };
 
   ViewportArguments()
-      : initialScale(ValueUndefined),
-        minimumScale(ValueUndefined),
-        maximumScale(ValueUndefined),
-        width(ValueUndefined),
-        height(ValueUndefined),
-        targetDensityDpi(ValueUndefined),
-        userScalable(ValueUndefined) {}
+      : initialScale(ValueAuto),
+        minimumScale(ValueAuto),
+        maximumScale(ValueAuto),
+        width(ValueAuto),
+        height(ValueAuto),
+        targetDensityDpi(ValueAuto),
+        userScalable(ValueAuto) {}
 
   float initialScale;
   float minimumScale;
@@ -63,12 +84,19 @@ struct ViewportArguments {
   float userScalable;
 
   bool hasCustomArgument() const {
-    return initialScale != ValueUndefined || minimumScale != ValueUndefined ||
-           maximumScale != ValueUndefined || width != ValueUndefined ||
-           height != ValueUndefined || userScalable != ValueUndefined ||
-           targetDensityDpi != ValueUndefined;
+    return initialScale != ValueAuto || minimumScale != ValueAuto ||
+           maximumScale != ValueAuto || width != ValueAuto ||
+           height != ValueAuto || userScalable != ValueAuto ||
+           targetDensityDpi != ValueAuto;
   }
 };
+
+ViewportConfiguration findConfigurationForViewportData(ViewportArguments args,
+                                                       int desktopWidth,
+                                                       int deviceWidth,
+                                                       int deviceHeight,
+                                                       int deviceDPI,
+                                                       IntSize visibleViewport);
 
 void setViewportFeature(const String& keyString,
                         const String& valueString,
