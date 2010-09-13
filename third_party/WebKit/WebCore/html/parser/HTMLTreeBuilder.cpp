@@ -2457,8 +2457,7 @@ void HTMLTreeBuilder::processEndOfFile(AtomicHTMLToken& token) {
     case AfterAfterBodyMode:
       ASSERT(insertionMode() == AfterBodyMode ||
              insertionMode() == AfterAfterBodyMode);
-      notImplemented();
-      break;
+      return;
     case InHeadNoscriptMode:
       ASSERT(insertionMode() == InHeadNoscriptMode);
       defaultForInHeadNoscript();
