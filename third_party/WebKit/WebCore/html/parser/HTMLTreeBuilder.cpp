@@ -1857,10 +1857,6 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomicHTMLToken& token) {
     m_tree.openElements()->popUntilNumberedHeaderElementPopped();
     return;
   }
-  if (token.name() == "sarcasm") {
-    notImplemented();  // Take a deep breath.
-    return;
-  }
   if (isFormattingTag(token.name())) {
     callTheAdoptionAgency(token);
     return;
