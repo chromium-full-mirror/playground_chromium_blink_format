@@ -323,6 +323,7 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   virtual void didChangeIcons(WebCore::DocumentLoader*);
   virtual bool canHandleRequest(const WebCore::ResourceRequest&) const;
   virtual bool canShowMIMEType(const WTF::String& MIMEType) const;
+  virtual bool canShowMIMETypeAsHTML(const WTF::String& MIMEType) const;
   virtual bool representationExistsForURLScheme(
       const WTF::String& URLScheme) const;
   virtual WTF::String generatedMIMETypeForURLScheme(
