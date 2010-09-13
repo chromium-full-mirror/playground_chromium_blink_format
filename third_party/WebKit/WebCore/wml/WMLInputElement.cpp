@@ -256,7 +256,7 @@ void WMLInputElement::defaultEventHandler(Event* evt) {
 
   if (evt->type() == eventNames().keydownEvent && evt->isKeyboardEvent() &&
       focused() && document()->frame() &&
-      document()->frame()->doTextFieldCommandFromEvent(
+      document()->frame()->editor()->doTextFieldCommandFromEvent(
           this, static_cast<KeyboardEvent*>(evt))) {
     evt->setDefaultHandled();
     return;
