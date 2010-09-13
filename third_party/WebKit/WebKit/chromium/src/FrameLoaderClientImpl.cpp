@@ -1155,6 +1155,12 @@ bool FrameLoaderClientImpl::canHandleRequest(
       m_webFrame, WrappedResourceRequest(request));
 }
 
+bool FrameLoaderClientImpl::canShowMIMETypeAsHTML(
+    const String& MIMEType) const {
+  notImplemented();
+  return false;
+}
+
 bool FrameLoaderClientImpl::canShowMIMEType(const String& mimeType) const {
   // This method is called to determine if the media type can be shown
   // "internally" (i.e. inside the browser) regardless of whether or not the

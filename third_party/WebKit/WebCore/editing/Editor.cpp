@@ -350,6 +350,7 @@ void Editor::pasteAsPlainTextWithPasteboard(Pasteboard* pasteboard) {
     pasteAsPlainText(text, canSmartReplaceWithPasteboard(pasteboard));
 }
 
+#if !PLATFORM(MAC)
 void Editor::pasteWithPasteboard(Pasteboard* pasteboard, bool allowPlainText) {
   RefPtr<Range> range = selectedRange();
   bool chosePlainText;
@@ -360,6 +361,7 @@ void Editor::pasteWithPasteboard(Pasteboard* pasteboard, bool allowPlainText) {
     pasteAsFragment(fragment, canSmartReplaceWithPasteboard(pasteboard),
                     chosePlainText);
 }
+#endif
 
 bool Editor::canSmartReplaceWithPasteboard(Pasteboard* pasteboard) {
   return client() && client()->smartInsertDeleteEnabled() &&
@@ -372,11 +374,13 @@ bool Editor::shouldInsertFragment(PassRefPtr<DocumentFragment> fragment,
   if (!client())
     return false;
 
-  Node* child = fragment->firstChild();
-  if (child && fragment->lastChild() == child && child->isCharacterDataNode())
-    return client()->shouldInsertText(
-        static_cast<CharacterData*>(child)->data(), replacingDOMRange.get(),
-        givenAction);
+  if (fragment) {
+    Node* child = fragment->firstChild();
+    if (child && fragment->lastChild() == child && child->isCharacterDataNode())
+      return client()->shouldInsertText(
+          static_cast<CharacterData*>(child)->data(), replacingDOMRange.get(),
+          givenAction);
+  }
 
   return client()->shouldInsertNode(fragment.get(), replacingDOMRange.get(),
                                     givenAction);
@@ -1269,8 +1273,6 @@ void Editor::copy() {
   didWriteSelectionToPasteboard();
 }
 
-#if !PLATFORM(MAC)
-
 void Editor::paste() {
   ASSERT(m_frame->document());
   if (tryDHTMLPaste())
@@ -1285,8 +1287,6 @@ void Editor::paste() {
     pasteAsPlainTextWithPasteboard(Pasteboard::generalPasteboard());
   loader->setAllowStaleResources(false);
 }
-
-#endif
 
 void Editor::pasteAsPlainText() {
   if (tryDHTMLPaste())

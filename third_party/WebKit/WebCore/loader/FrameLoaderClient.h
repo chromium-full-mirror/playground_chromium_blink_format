@@ -247,6 +247,7 @@ class FrameLoaderClient {
 
   virtual bool canHandleRequest(const ResourceRequest&) const = 0;
   virtual bool canShowMIMEType(const String& MIMEType) const = 0;
+  virtual bool canShowMIMETypeAsHTML(const String& MIMEType) const = 0;
   virtual bool representationExistsForURLScheme(
       const String& URLScheme) const = 0;
   virtual String generatedMIMETypeForURLScheme(

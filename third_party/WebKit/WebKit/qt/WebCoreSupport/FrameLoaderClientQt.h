@@ -211,6 +211,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
 
   virtual bool canHandleRequest(const WebCore::ResourceRequest&) const;
   virtual bool canShowMIMEType(const String& MIMEType) const;
+  virtual bool canShowMIMETypeAsHTML(const String& MIMEType) const;
   virtual bool representationExistsForURLScheme(const String& URLScheme) const;
   virtual String generatedMIMETypeForURLScheme(const String& URLScheme) const;
 

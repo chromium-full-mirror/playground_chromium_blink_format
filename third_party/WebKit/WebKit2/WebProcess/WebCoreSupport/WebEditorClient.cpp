@@ -32,6 +32,8 @@
 #include "WebPage.h"
 #include "WebPageProxyMessageKinds.h"
 #include "WebProcess.h"
+#include <WebCore/ArchiveResource.h>
+#include <WebCore/DocumentFragment.h>
 #include <WebCore/EditCommand.h>
 #include <WebCore/Frame.h>
 #include <WebCore/HTMLInputElement.h>
@@ -309,6 +311,16 @@ NSString* WebEditorClient::userVisibleString(NSURL*) {
   notImplemented();
   return nil;
 }
+
+DocumentFragment* WebEditorClient::documentFragmentFromAttributedString(
+    NSAttributedString*,
+    Vector<ArchiveResource*>&) {
+  // FIXME: add code here to create fake WebView and load WebKit 1
+  notImplemented();
+  return 0;
+}
+
+void WebEditorClient::setInsertionPasteboard(NSPasteboard*) {}
 
 #ifdef BUILDING_ON_TIGER
 NSArray* WebEditorClient::pasteboardTypesForSelection(Frame*) {

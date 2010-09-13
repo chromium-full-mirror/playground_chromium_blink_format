@@ -201,6 +201,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual bool canHandleRequest(const WebCore::ResourceRequest&) const;
   virtual bool canShowMIMEType(const WTF::String& MIMEType) const;
+  virtual bool canShowMIMETypeAsHTML(const String& MIMEType) const;
   virtual bool representationExistsForURLScheme(
       const WTF::String& URLScheme) const;
   virtual WTF::String generatedMIMETypeForURLScheme(

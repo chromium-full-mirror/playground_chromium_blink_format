@@ -661,6 +661,12 @@ bool FrameLoaderClientEfl::canHandleRequest(const ResourceRequest&) const {
   return true;
 }
 
+virtual bool FrameLoaderClientEfl::canShowMIMETypeAsHTML(
+    const String& MIMEType) const {
+  notImplemented();
+  return false;
+}
+
 bool FrameLoaderClientEfl::canShowMIMEType(const String& MIMEType) const {
   if (MIMETypeRegistry::isSupportedImageMIMEType(MIMEType))
     return true;
