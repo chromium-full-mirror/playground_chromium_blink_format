@@ -44,7 +44,7 @@ class ProcessLauncher : public ThreadSafeShared<ProcessLauncher> {
     virtual ~Client() {}
 
     virtual void didFinishLaunching(ProcessLauncher*,
-                                    const CoreIPC::Connection::Identifier&) = 0;
+                                    CoreIPC::Connection::Identifier) = 0;
   };
 
   static PassRefPtr<ProcessLauncher> create(Client* client) {
@@ -58,8 +58,6 @@ class ProcessLauncher : public ThreadSafeShared<ProcessLauncher> {
 
   void terminateProcess();
   void invalidate();
-
-  static CoreIPC::Connection::Identifier createWebThread();
 
 #if PLATFORM(QT)
   friend class ProcessLauncherHelper;

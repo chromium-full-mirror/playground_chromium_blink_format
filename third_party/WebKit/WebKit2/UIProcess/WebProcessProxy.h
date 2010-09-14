@@ -32,9 +32,10 @@
 #include "ProcessLauncher.h"
 #include "ProcessModel.h"
 #include "ResponsivenessTimer.h"
+#include "ThreadLauncher.h"
 #include "WebPageProxy.h"
-#include <wtf/Forward.h>
 #include <WebCore/LinkHash.h>
+#include <wtf/Forward.h>
 #include <wtf/HashMap.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -52,7 +53,8 @@ class WebPageNamespace;
 class WebProcessProxy : public RefCounted<WebProcessProxy>,
                         CoreIPC::Connection::Client,
                         ResponsivenessTimer::Client,
-                        ProcessLauncher::Client {
+                        ProcessLauncher::Client,
+                        ThreadLauncher::Client {
  public:
   typedef HashMap<uint64_t, RefPtr<WebPageProxy>> WebPageProxyMap;
   typedef WebPageProxyMap::const_iterator::Values pages_const_iterator;
@@ -91,9 +93,7 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   ResponsivenessTimer* responsivenessTimer() { return &m_responsivenessTimer; }
 
   bool isValid() const { return m_connection; }
-  bool isLaunching() const {
-    return m_processLauncher && m_processLauncher->isLaunching();
-  }
+  bool isLaunching() const;
 
   WebFrameProxy* webFrame(uint64_t) const;
   void frameCreated(uint64_t, WebFrameProxy*);
@@ -139,13 +139,20 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
 
   // ProcessLauncher::Client
   virtual void didFinishLaunching(ProcessLauncher*,
-                                  const CoreIPC::Connection::Identifier&);
+                                  CoreIPC::Connection::Identifier);
+
+  // ThreadLauncher::Client
+  virtual void didFinishLaunching(ThreadLauncher*,
+                                  CoreIPC::Connection::Identifier);
+
+  void didFinishLaunching(CoreIPC::Connection::Identifier);
 
   ResponsivenessTimer m_responsivenessTimer;
   RefPtr<CoreIPC::Connection> m_connection;
 
   Vector<CoreIPC::Connection::OutgoingMessage> m_pendingMessages;
   RefPtr<ProcessLauncher> m_processLauncher;
+  RefPtr<ThreadLauncher> m_threadLauncher;
 
   WebContext* m_context;
 
