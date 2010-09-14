@@ -128,10 +128,6 @@ void HTMLDocument::setDesignMode(const String& value) {
   Document::setDesignMode(mode);
 }
 
-String HTMLDocument::compatMode() const {
-  return inQuirksMode() ? "BackCompat" : "CSS1Compat";
-}
-
 Element* HTMLDocument::activeElement() {
   if (Node* node = focusedNode())
     if (node->isElementNode())

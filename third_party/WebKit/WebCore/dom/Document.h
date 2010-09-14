@@ -649,6 +649,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void lockCompatibilityMode() { m_compatibilityModeLocked = true; }
   CompatibilityMode compatibilityMode() const { return m_compatibilityMode; }
 
+  String compatMode() const;
+
   bool inQuirksMode() const { return m_compatibilityMode == QuirksMode; }
   bool inLimitedQuirksMode() const {
     return m_compatibilityMode == LimitedQuirksMode;

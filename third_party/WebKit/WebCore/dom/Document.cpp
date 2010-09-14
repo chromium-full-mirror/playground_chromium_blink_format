@@ -628,6 +628,10 @@ void Document::setCompatibilityMode(CompatibilityMode mode) {
   }
 }
 
+String Document::compatMode() const {
+  return inQuirksMode() ? "BackCompat" : "CSS1Compat";
+}
+
 void Document::resetLinkColor() {
   m_linkColor = Color(0, 0, 238);
 }

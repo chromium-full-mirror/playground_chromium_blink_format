@@ -51,7 +51,6 @@ class HTMLDocument : public Document, public CachedResourceClient {
   String designMode() const;
   void setDesignMode(const String&);
 
-  String compatMode() const;
   virtual void setCompatibilityModeFromDoctype();
 
   Element* activeElement();
