@@ -1194,21 +1194,6 @@ void ApplyStyleCommand::fixRangeAndApplyInlineStyle(
   applyInlineStyleToNodeRange(style, startNode, pastEndNode);
 }
 
-static bool containsNonEditableRegion(Node* node) {
-  if (!node->isContentEditable())
-    return true;
-
-  Node* sibling = node->traverseNextSibling();
-  for (Node* descendent = node->firstChild();
-       descendent && descendent != sibling;
-       descendent = descendent->traverseNextNode()) {
-    if (!descendent->isContentEditable())
-      return true;
-  }
-
-  return false;
-}
-
 void ApplyStyleCommand::applyInlineStyleToNodeRange(
     CSSMutableStyleDeclaration* style,
     Node* node,
@@ -1240,63 +1225,26 @@ void ApplyStyleCommand::applyInlineStyleToNodeRange(
       continue;
 
     if (node->childNodeCount()) {
-      if (node->contains(pastEndNode) || containsNonEditableRegion(node) ||
-          !node->parentNode()->isContentEditable())
-        continue;
-      if (editingIgnoresContent(node)) {
+      if (editingIgnoresContent(node))
         next = node->traverseNextSibling();
-        continue;
-      }
+      continue;
     }
 
     Node* runEnd = node;
     Node* sibling = node->nextSibling();
+    StyleChange startChange(style, Position(node, 0));
     while (sibling && sibling != pastEndNode &&
            !sibling->contains(pastEndNode) &&
            (!isBlock(sibling) || sibling->hasTagName(brTag)) &&
-           !containsNonEditableRegion(sibling)) {
+           StyleChange(style, Position(sibling, 0)) == startChange) {
       runEnd = sibling;
       sibling = runEnd->nextSibling();
     }
     next = runEnd->traverseNextSibling();
-
-    if (!removeStyleFromRunBeforeApplyingStyle(style, node, runEnd))
-      continue;
     addInlineStyleIfNeeded(style, node, runEnd, m_removeOnly
                                                     ? DoNotAddStyledElement
                                                     : AddStyledElement);
   }
-}
-
-bool ApplyStyleCommand::removeStyleFromRunBeforeApplyingStyle(
-    CSSMutableStyleDeclaration* style,
-    Node*& runStart,
-    Node*& runEnd) {
-  Node* pastEndNode = runEnd->traverseNextSibling();
-  Node* next;
-  for (Node* node = runStart; node && node != pastEndNode; node = next) {
-    next = node->traverseNextNode();
-    if (!node->isHTMLElement())
-      continue;
-
-    Node* previousSibling = node->previousSibling();
-    Node* nextSibling = node->nextSibling();
-    Node* parent = node->parentNode();
-    removeInlineStyleFromElement(style, static_cast<HTMLElement*>(node),
-                                 RemoveAlways);
-    if (!node->inDocument()) {
-      // FIXME: We might need to update the start and the end of current
-      // selection here but need a test.
-      if (runStart == node)
-        runStart = previousSibling ? previousSibling->nextSibling()
-                                   : parent->firstChild();
-      if (runEnd == node)
-        runEnd =
-            nextSibling ? nextSibling->previousSibling() : parent->lastChild();
-    }
-  }
-
-  return true;
 }
 
 bool ApplyStyleCommand::removeInlineStyleFromElement(
@@ -1308,7 +1256,7 @@ bool ApplyStyleCommand::removeInlineStyleFromElement(
 
   if (m_styledInlineElement &&
       element->hasTagName(m_styledInlineElement->tagQName())) {
-    if (mode != RemoveNone)
+    if (mode == RemoveAttributesAndElements)
       removeNodePreservingChildren(element);
     return true;
   }
@@ -1431,15 +1379,12 @@ bool ApplyStyleCommand::removeImplicitlyStyledElement(
       mapValue =
           CSSPrimitiveValue::createIdentifier(equivalent.primitiveId).get();
 
-    if (mode != RemoveAlways) {
-      if (equivalent.isValueList && styleValue->isValueList() &&
-          static_cast<CSSValueList*>(styleValue.get())
-              ->hasValue(mapValue.get()))
-        continue;  // If CSS value assumes CSSValueList, then only skip if the
-                   // value was present in style to apply.
-      else if (mapValue && styleValue->cssText() == mapValue->cssText())
-        continue;  // If CSS value is primitive, then skip if they are equal.
-    }
+    if (equivalent.isValueList && styleValue->isValueList() &&
+        static_cast<CSSValueList*>(styleValue.get())->hasValue(mapValue.get()))
+      continue;  // If CSS value assumes CSSValueList, then only skip if the
+                 // value was present in style to apply.
+    else if (mapValue && styleValue->cssText() == mapValue->cssText())
+      continue;  // If CSS value is primitive, then skip if they are equal.
 
     if (extractedStyle)
       extractedStyle->setProperty(equivalent.propertyID, mapValue->cssText());
@@ -1572,8 +1517,8 @@ ApplyStyleCommand::extractInlineStyleToPushDown(
 
   if (!style) {
     style = CSSMutableStyleDeclaration::create();
-    removeImplicitlyStyledElement(styleToApply, element, RemoveIfNeeded,
-                                  style.get());
+    removeImplicitlyStyledElement(styleToApply, element,
+                                  RemoveAttributesAndElements, style.get());
     return style.release();
   }
 
@@ -1596,8 +1541,8 @@ ApplyStyleCommand::extractInlineStyleToPushDown(
   if (isSpanWithoutAttributesOrUnstyleStyleSpan(element))
     removeNodePreservingChildren(element);
 
-  removeImplicitlyStyledElement(styleToApply, element, RemoveIfNeeded,
-                                style.get());
+  removeImplicitlyStyledElement(styleToApply, element,
+                                RemoveAttributesAndElements, style.get());
 
   return style.release();
 }

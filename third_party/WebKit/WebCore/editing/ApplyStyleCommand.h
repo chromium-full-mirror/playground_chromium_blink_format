@@ -39,7 +39,7 @@ enum ShouldIncludeTypingStyle { IncludeTypingStyle, IgnoreTypingStyle };
 class ApplyStyleCommand : public CompositeEditCommand {
  public:
   enum EPropertyLevel { PropertyDefault, ForceBlockProperties };
-  enum InlineStyleRemovalMode { RemoveIfNeeded, RemoveAlways, RemoveNone };
+  enum InlineStyleRemovalMode { RemoveAttributesAndElements, RemoveNone };
   enum EAddStyledElement { AddStyledElement, DoNotAddStyledElement };
 
   static PassRefPtr<ApplyStyleCommand> create(
@@ -89,12 +89,10 @@ class ApplyStyleCommand : public CompositeEditCommand {
   CSSMutableStyleDeclaration* style() const { return m_style.get(); }
 
   // style-removal helpers
-  bool removeStyleFromRunBeforeApplyingStyle(CSSMutableStyleDeclaration* style,
-                                             Node*& runStart,
-                                             Node*& runEnd);
-  bool removeInlineStyleFromElement(CSSMutableStyleDeclaration*,
-                                    HTMLElement*,
-                                    InlineStyleRemovalMode = RemoveIfNeeded);
+  bool removeInlineStyleFromElement(
+      CSSMutableStyleDeclaration*,
+      HTMLElement*,
+      InlineStyleRemovalMode = RemoveAttributesAndElements);
   inline bool shouldRemoveInlineStyleFromElement(
       CSSMutableStyleDeclaration* style,
       HTMLElement* element) {
@@ -108,7 +106,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
   void replaceWithSpanOrRemoveIfWithoutAttributes(HTMLElement*&);
   bool removeCSSStyle(CSSMutableStyleDeclaration*,
                       HTMLElement*,
-                      InlineStyleRemovalMode = RemoveIfNeeded);
+                      InlineStyleRemovalMode = RemoveAttributesAndElements);
   HTMLElement* highestAncestorWithConflictingInlineStyle(
       CSSMutableStyleDeclaration*,
       Node*);
