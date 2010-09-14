@@ -31,6 +31,7 @@
 #ifndef ChromeClientChromium_h
 #define ChromeClientChromium_h
 
+#include "AXObjectCache.h"
 #include "ChromeClient.h"
 #include <wtf/Forward.h>
 
@@ -59,6 +60,10 @@ class ChromeClientChromium : public ChromeClient {
 
   // Notified embedder that the children of an accessibility object has changed.
   virtual void didChangeAccessibilityObjectChildren(AccessibilityObject*) = 0;
+
+  // Notifies embedder about an accessibility notification.
+  virtual void postAccessibilityNotification(AccessibilityObject*,
+                                             AXObjectCache::AXNotification) = 0;
 };
 
 }  // namespace WebCore
