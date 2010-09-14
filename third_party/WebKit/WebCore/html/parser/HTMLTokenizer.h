@@ -36,6 +36,7 @@
 namespace WebCore {
 
 class Element;
+class Frame;
 class HTMLToken;
 
 class HTMLTokenizer : public Noncopyable {
@@ -125,7 +126,7 @@ class HTMLTokenizer : public Noncopyable {
 
   void reset();
 
-  // This function returns true if it emits a token.  Otherwise, callers
+  // This function returns true if it emits a token. Otherwise, callers
   // must provide the same (in progress) token on the next call (unless
   // they call reset() first).
   bool nextToken(SegmentedString&, HTMLToken&);
@@ -137,6 +138,22 @@ class HTMLTokenizer : public Noncopyable {
 
   State state() const { return m_state; }
   void setState(State state) { m_state = state; }
+
+  // Updates the tokenizer's state according to the given tag name. This is
+  // an approximation of how the tree builder would update the tokenizer's
+  // state. This method is useful for approximating HTML tokenization. To
+  // get exactly the correct tokenization, you need the real tree builder.
+  //
+  // The main failures in the approximation are as follows:
+  //
+  //  * The first set of character tokens emitted for a <pre> element might
+  //    contain an extra leading newline.
+  //  * The replacement of U+0000 with U+FFFD will not be sensitive to the
+  //    tree builder's insertion mode.
+  //  * CDATA sections in foreign content will be tokenized as bogus comments
+  //    instead of as character tokens.
+  //
+  void updateStateFor(const AtomicString& tagName, Frame*);
 
   // Hack to skip leading newline in <pre>/<listing> for authoring ease.
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#parsing-main-inbody
@@ -180,8 +197,8 @@ class HTMLTokenizer : public Noncopyable {
 
       // Every branch in this function is expensive, so we have a
       // fast-reject branch for characters that don't require special
-      // handling.  Please run the parser benchmark whenever you touch
-      // this function.  It's very hot.
+      // handling. Please run the parser benchmark whenever you touch
+      // this function. It's very hot.
       static const UChar specialCharacterMask = '\n' | '\r' | '\0';
       if (m_nextInputCharacter & ~specialCharacterMask) {
         m_skipNextNewLine = false;
@@ -262,7 +279,7 @@ class HTMLTokenizer : public Noncopyable {
   inline bool temporaryBufferIs(const String&);
 
   // Sometimes we speculatively consume input characters and we don't
-  // know whether they represent end tags or RCDATA, etc.  These
+  // know whether they represent end tags or RCDATA, etc. These
   // functions help manage these state.
   inline void addToPossibleEndTag(UChar cc);
   inline void saveEndTagNameIfNeeded();
@@ -274,7 +291,7 @@ class HTMLTokenizer : public Noncopyable {
 
   Vector<UChar, 32> m_appropriateEndTagName;
 
-  // m_token is owned by the caller.  If nextToken is not on the stack,
+  // m_token is owned by the caller. If nextToken is not on the stack,
   // this member might be pointing to unallocated memory.
   HTMLToken* m_token;
   int m_lineNumber;
@@ -287,7 +304,7 @@ class HTMLTokenizer : public Noncopyable {
   Vector<UChar, 32> m_temporaryBuffer;
 
   // We occationally want to emit both a character token and an end tag
-  // token (e.g., when lexing script).  We buffer the name of the end tag
+  // token (e.g., when lexing script). We buffer the name of the end tag
   // token here so we remember it next time we re-enter the tokenizer.
   Vector<UChar, 32> m_bufferedEndTagName;
 

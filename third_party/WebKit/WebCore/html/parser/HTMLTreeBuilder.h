@@ -81,10 +81,6 @@ class HTMLTreeBuilder : public Noncopyable {
   // Done, close any open tags, etc.
   void finished();
 
-  static HTMLTokenizer::State adjustedLexerState(HTMLTokenizer::State,
-                                                 const AtomicString& tagName,
-                                                 Frame*);
-
   static bool scriptEnabled(Frame*);
   static bool pluginsEnabled(Frame*);
 
