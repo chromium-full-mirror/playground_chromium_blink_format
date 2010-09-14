@@ -2307,6 +2307,8 @@ SharedGraphicsContext3D* WebViewImpl::getSharedGraphicsContext3D() {
     GraphicsContext3D::Attributes attr;
     OwnPtr<GraphicsContext3D> context =
         GraphicsContext3D::create(attr, m_page->chrome());
+    if (!context)
+      return 0;
     m_sharedContext3D = SharedGraphicsContext3D::create(context.release());
   }
 
