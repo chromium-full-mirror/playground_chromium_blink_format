@@ -57,7 +57,7 @@ class ImageLayerChromium : public ContentLayerChromium {
 
 #if PLATFORM(CG)
   RetainPtr<CGImageRef> m_contents;
-#elif
+#else
   // FIXME: This needs to be an owning type.
   NativeImagePtr m_contents;
 #endif
