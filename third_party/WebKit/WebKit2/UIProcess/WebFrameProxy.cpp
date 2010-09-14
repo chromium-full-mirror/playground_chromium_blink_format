@@ -60,6 +60,11 @@ void WebFrameProxy::didStartProvisionalLoad(const String& url) {
   m_provisionalURL = url;
 }
 
+void WebFrameProxy::didReceiveServerRedirectForProvisionalLoad(
+    const String& url) {
+  m_provisionalURL = url;
+}
+
 void WebFrameProxy::didCommitLoad() {
   // FIXME: Add assertions.
   m_loadState = LoadStateCommitted;
