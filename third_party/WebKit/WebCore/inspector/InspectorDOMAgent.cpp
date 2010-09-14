@@ -1204,7 +1204,7 @@ void InspectorDOMAgent::getStyles(long nodeId,
 
   CSSStyleSelector* selector = element->ownerDocument()->styleSelector();
   RefPtr<CSSRuleList> matchedRules =
-      selector->styleRulesForElement(element, authorOnly);
+      selector->styleRulesForElement(element, authorOnly, true);
   result->setArray(
       "matchedCSSRules",
       buildArrayForCSSRules(node->ownerDocument(), matchedRules.get()));
@@ -1225,7 +1225,7 @@ void InspectorDOMAgent::getStyles(long nodeId,
     CSSStyleSelector* parentSelector =
         parentElement->ownerDocument()->styleSelector();
     RefPtr<CSSRuleList> parentMatchedRules =
-        parentSelector->styleRulesForElement(parentElement, authorOnly);
+        parentSelector->styleRulesForElement(parentElement, authorOnly, true);
     parentStyle->setArray("matchedCSSRules",
                           buildArrayForCSSRules(parentElement->ownerDocument(),
                                                 parentMatchedRules.get()));
@@ -1343,8 +1343,8 @@ PassRefPtr<InspectorArray> InspectorDOMAgent::buildArrayForPseudoElements(
   for (PseudoId pseudoId = FIRST_PUBLIC_PSEUDOID;
        pseudoId < AFTER_LAST_INTERNAL_PSEUDOID;
        pseudoId = static_cast<PseudoId>(pseudoId + 1)) {
-    RefPtr<CSSRuleList> matchedRules =
-        selector->pseudoStyleRulesForElement(element, pseudoId, authorOnly);
+    RefPtr<CSSRuleList> matchedRules = selector->pseudoStyleRulesForElement(
+        element, pseudoId, authorOnly, true);
     if (matchedRules && matchedRules->length()) {
       RefPtr<InspectorObject> pseudoStyles = InspectorObject::create();
       pseudoStyles->setNumber("pseudoId", static_cast<int>(pseudoId));
