@@ -39,9 +39,6 @@ namespace WebKit {
 class WebDeviceOrientationClientMock : public WebDeviceOrientationClient {
  public:
   WEBKIT_API static WebDeviceOrientationClientMock* create();
-  WebDeviceOrientationClientMock() {
-    initialize();
-  }  // FIXME: Make constructor private once downstream has been fixed.
   ~WebDeviceOrientationClientMock() { reset(); }
 
   virtual void setController(WebDeviceOrientationController*);
@@ -52,6 +49,7 @@ class WebDeviceOrientationClientMock : public WebDeviceOrientationClient {
   WEBKIT_API void setOrientation(WebDeviceOrientation&);
 
  private:
+  WebDeviceOrientationClientMock() { initialize(); }
   WEBKIT_API void initialize();
   WEBKIT_API void reset();
 
