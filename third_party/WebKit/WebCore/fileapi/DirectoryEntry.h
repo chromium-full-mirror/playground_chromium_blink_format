@@ -55,13 +55,13 @@ class DirectoryEntry : public Entry {
 
   PassRefPtr<DirectoryReader> createReader();
   void getFile(const String& path,
-               PassRefPtr<Flags> options = 0,
-               PassRefPtr<EntryCallback> successCallback = 0,
-               PassRefPtr<ErrorCallback> errorCallback = 0);
+               PassRefPtr<Flags> = 0,
+               PassRefPtr<EntryCallback> = 0,
+               PassRefPtr<ErrorCallback> = 0);
   void getDirectory(const String& path,
-                    PassRefPtr<Flags> options = 0,
-                    PassRefPtr<EntryCallback> successCallback = 0,
-                    PassRefPtr<ErrorCallback> errorCallback = 0);
+                    PassRefPtr<Flags> = 0,
+                    PassRefPtr<EntryCallback> = 0,
+                    PassRefPtr<ErrorCallback> = 0);
 
  private:
   DirectoryEntry(DOMFileSystem* fileSystem, const String& fullPath);
