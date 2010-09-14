@@ -165,6 +165,7 @@ class WebEditorClient : public WebCore::EditorClient {
       const WTF::String& replacementString,
       WebCore::Editor*);
   virtual void dismissCorrectionPanel(bool correctionAccepted);
+  virtual bool isShowingCorrectionPanel();
 #endif
   WebPage* m_page;
 };

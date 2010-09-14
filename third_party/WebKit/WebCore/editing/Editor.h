@@ -359,6 +359,7 @@ class Editor {
   void handleCancelOperation();
   void startCorrectionPanelTimer();
   void handleRejectedCorrection();
+  bool isShowingCorrectionPanel();
 
   void pasteAsFragment(PassRefPtr<DocumentFragment>,
                        bool smartReplace,
