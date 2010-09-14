@@ -269,7 +269,7 @@ static bool findUserScalableValue(const String& keyString,
     return false;
   }
 
-  if (abs(value) < 0)
+  if (fabs(value) < 1)
     return false;
 
   return true;
