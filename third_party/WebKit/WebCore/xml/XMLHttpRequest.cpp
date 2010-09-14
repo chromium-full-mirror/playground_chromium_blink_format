@@ -1109,7 +1109,7 @@ bool XMLHttpRequest::canSuspend() const {
   return !m_loader;
 }
 
-void XMLHttpRequest::suspend() {
+void XMLHttpRequest::suspend(ReasonForSuspension) {
   m_progressEventThrottle.suspend();
 }
 

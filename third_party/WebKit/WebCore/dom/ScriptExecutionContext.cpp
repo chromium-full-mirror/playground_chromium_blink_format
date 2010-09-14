@@ -191,7 +191,8 @@ bool ScriptExecutionContext::canSuspendActiveDOMObjects() {
   return true;
 }
 
-void ScriptExecutionContext::suspendActiveDOMObjects() {
+void ScriptExecutionContext::suspendActiveDOMObjects(
+    ActiveDOMObject::ReasonForSuspension why) {
   // No protection against m_activeDOMObjects changing during iteration:
   // suspend() shouldn't execute arbitrary JS.
   HashMap<ActiveDOMObject*, void*>::iterator activeObjectsEnd =
@@ -200,7 +201,7 @@ void ScriptExecutionContext::suspendActiveDOMObjects() {
            m_activeDOMObjects.begin();
        iter != activeObjectsEnd; ++iter) {
     ASSERT(iter->first->scriptExecutionContext() == this);
-    iter->first->suspend();
+    iter->first->suspend(why);
   }
 }
 

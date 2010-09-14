@@ -124,7 +124,8 @@ CachedFrame::CachedFrame(Frame* frame) : CachedFrameBase(frame) {
   ASSERT(m_view);
 
   // Active DOM objects must be suspended before we cached the frame script data
-  m_document->suspendActiveDOMObjects();
+  m_document->suspendActiveDOMObjects(
+      ActiveDOMObject::DocumentWillBecomeInactive);
   m_cachedFrameScriptData = adoptPtr(new ScriptCachedFrameData(frame));
 
   // Custom scrollbar renderers will get reattached when the document comes out

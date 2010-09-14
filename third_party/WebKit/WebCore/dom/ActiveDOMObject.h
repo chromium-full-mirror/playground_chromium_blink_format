@@ -54,8 +54,13 @@ class ActiveDOMObject {
   // happens in step-by-step JS debugging for example - in this case it would be
   // incorrect
   // to stop the object. Exact semantics of suspend is up to the object then.
+  enum ReasonForSuspension {
+    JavaScriptDebuggerPaused,
+    WillShowDialog,
+    DocumentWillBecomeInactive
+  };
   virtual bool canSuspend() const;
-  virtual void suspend();
+  virtual void suspend(ReasonForSuspension);
   virtual void resume();
   virtual void stop();
 

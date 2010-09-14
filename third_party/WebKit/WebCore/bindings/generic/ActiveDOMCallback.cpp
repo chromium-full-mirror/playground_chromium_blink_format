@@ -68,7 +68,7 @@ class ActiveDOMObjectCallbackImpl : public ActiveDOMObject {
     ActiveDOMObject::contextDestroyed();
   }
   virtual bool canSuspend() const { return false; }
-  virtual void suspend() {
+  virtual void suspend(ReasonForSuspension) {
     MutexLocker locker(m_mutex);
     m_suspended = true;
   }
