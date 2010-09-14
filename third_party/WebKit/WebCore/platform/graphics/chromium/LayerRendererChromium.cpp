@@ -145,6 +145,8 @@ void LayerRendererChromium::setRootLayerCanvasSize(const IntSize& size) {
   m_rootLayerCGContext.adoptCF(CGBitmapContextCreate(
       m_rootLayerBackingStore.data(), size.width(), size.height(), 8, rowBytes,
       colorSpace.get(), kCGImageAlphaPremultipliedLast));
+  CGContextTranslateCTM(m_rootLayerCGContext.get(), 0, size.height());
+  CGContextScaleCTM(m_rootLayerCGContext.get(), 1, -1);
   m_rootLayerGraphicsContext = new GraphicsContext(m_rootLayerCGContext.get());
 #else
 #error "Need to implement for your platform."
@@ -221,20 +223,10 @@ void LayerRendererChromium::prepareToDrawLayers(
     // root layer texture. The newly exposed area will be filled by a subsequent
     // drawLayersIntoRect call
     TransformationMatrix scrolledLayerMatrix;
-#if PLATFORM(SKIA)
-    float scaleFactor = 1.0f;
-#elif PLATFORM(CG)
-    // Because the contents of the OpenGL texture are inverted
-    // vertically compared to the Skia backend, we need to move
-    // the backing store in the opposite direction.
-    float scaleFactor = -1.0f;
-#else
-#error "Need to implement for your platform."
-#endif
 
     scrolledLayerMatrix.translate3d(
         0.5 * visibleRect.width() - scrollDelta.x(),
-        0.5 * visibleRect.height() + scaleFactor * scrollDelta.y(), 0);
+        0.5 * visibleRect.height() + scrollDelta.y(), 0);
     scrolledLayerMatrix.scale3d(1, -1, 1);
 
     useShader(m_scrollShaderProgram);
@@ -287,10 +279,6 @@ void LayerRendererChromium::updateRootLayerTextureRect(
   ASSERT(bitmapWidth == updateRect.width() &&
          bitmapHeight == updateRect.height());
   void* pixels = bitmap.getPixels();
-  // Copy the contents of the updated rect to the root layer texture.
-  GLC(glTexSubImage2D(GL_TEXTURE_2D, 0, updateRect.x(), updateRect.y(),
-                      updateRect.width(), updateRect.height(), GL_RGBA,
-                      GL_UNSIGNED_BYTE, pixels));
 #elif PLATFORM(CG)
   // Get the contents of the updated rect.
   ASSERT(
@@ -299,18 +287,13 @@ void LayerRendererChromium::updateRootLayerTextureRect(
       static_cast<int>(CGBitmapContextGetHeight(m_rootLayerCGContext.get())) ==
           updateRect.height());
   void* pixels = m_rootLayerBackingStore.data();
-
-  // Copy the contents of the updated rect to the root layer texture.
-  // The origin is at the lower left in Core Graphics' coordinate system. We
-  // need to correct for this here.
-  GLC(glTexSubImage2D(
-      GL_TEXTURE_2D, 0, updateRect.x(),
-      m_rootLayerTextureHeight - updateRect.y() - updateRect.height(),
-      updateRect.width(), updateRect.height(), GL_RGBA, GL_UNSIGNED_BYTE,
-      pixels));
 #else
 #error "Need to implement for your platform."
 #endif
+  // Copy the contents of the updated rect to the root layer texture.
+  GLC(glTexSubImage2D(GL_TEXTURE_2D, 0, updateRect.x(), updateRect.y(),
+                      updateRect.width(), updateRect.height(), GL_RGBA,
+                      GL_UNSIGNED_BYTE, pixels));
 }
 
 void LayerRendererChromium::drawLayers(const IntRect& visibleRect,
