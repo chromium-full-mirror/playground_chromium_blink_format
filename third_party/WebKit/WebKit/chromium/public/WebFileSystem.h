@@ -37,6 +37,8 @@
 namespace WebKit {
 
 class WebFileSystemCallbacks;
+class WebFileWriter;
+class WebFileWriterClient;
 
 class WebFileSystem {
  public:
@@ -134,6 +136,14 @@ class WebFileSystem {
   // WebFileSystemCallbacks::didFail() must be called otherwise.
   virtual void readDirectory(const WebString& path, WebFileSystemCallbacks*) {
     WEBKIT_ASSERT_NOT_REACHED();
+  }
+
+  // Creates a WebFileWriter that can be used to write to the given file.
+  // This is a fast, synchronous call, and should not stat the filesystem.
+  virtual WebFileWriter* createFileWriter(const WebString& path,
+                                          WebFileWriterClient*) {
+    WEBKIT_ASSERT_NOT_REACHED();
+    return 0;
   }
 
  protected:
