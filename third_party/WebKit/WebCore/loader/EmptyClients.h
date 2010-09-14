@@ -637,7 +637,6 @@ class EmptyEditorClient : public EditorClient, public Noncopyable {
                                    const String&,
                                    Editor*) {}
   virtual void dismissCorrectionPanel(bool) {}
-  virtual bool isShowingCorrectionPanel() { return false; }
 #endif
   virtual void updateSpellingUIWithGrammarString(const String&,
                                                  const GrammarDetail&) {}

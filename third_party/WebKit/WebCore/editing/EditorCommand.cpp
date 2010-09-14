@@ -1567,15 +1567,6 @@ static bool supportedPaste(Frame* frame, EditorCommandSource source) {
   return false;
 }
 
-#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
-    !defined(BUILDING_ON_LEOPARD) && !defined(BUILDING_ON_SNOW_LEOPARD)
-static bool supportedDismissCorrectionPanel(Frame* frame,
-                                            EditorCommandSource source) {
-  return supportedFromMenuOrKeyBinding(frame, source) &&
-         frame->editor()->isShowingCorrectionPanel();
-}
-#endif
-
 // Enabled functions
 
 static bool enabled(Frame*, Event*, EditorCommandSource) {
@@ -2258,7 +2249,7 @@ static const CommandMap& createCommandMap() {
 #if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
     !defined(BUILDING_ON_LEOPARD) && !defined(BUILDING_ON_SNOW_LEOPARD)
     {"CancelOperation",
-     {executeCancelOperation, supportedDismissCorrectionPanel,
+     {executeCancelOperation, supportedFromMenuOrKeyBinding,
       enabledInEditableText, stateNone, valueNull, notTextInsertion,
       doNotAllowExecutionWhenDisabled}},
 #endif
