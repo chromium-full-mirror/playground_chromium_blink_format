@@ -947,13 +947,13 @@ class CloneDeserializer : CloneBase {
   }
 
   bool readFile(RefPtr<File>& file) {
-    CachedString* path;
+    CachedString* path = 0;
     if (!readStringData(path))
       return 0;
-    CachedString* url;
+    CachedString* url = 0;
     if (!readStringData(url))
       return 0;
-    CachedString* type;
+    CachedString* type = 0;
     if (!readStringData(type))
       return 0;
     if (m_isDOMGlobalObject)
@@ -1048,10 +1048,10 @@ class CloneDeserializer : CloneBase {
                     result.get());
       }
       case BlobTag: {
-        CachedString* url;
+        CachedString* url = 0;
         if (!readStringData(url))
           return JSValue();
-        CachedString* type;
+        CachedString* type = 0;
         if (!readStringData(type))
           return JSValue();
         unsigned long long size = 0;
@@ -1064,7 +1064,7 @@ class CloneDeserializer : CloneBase {
                                  String(type->ustring().impl()), size));
       }
       case StringTag: {
-        CachedString* cachedString;
+        CachedString* cachedString = 0;
         if (!readStringData(cachedString))
           return JSValue();
         return cachedString->jsString(m_exec);
@@ -1072,10 +1072,10 @@ class CloneDeserializer : CloneBase {
       case EmptyStringTag:
         return jsEmptyString(&m_exec->globalData());
       case RegExpTag: {
-        CachedString* pattern;
+        CachedString* pattern = 0;
         if (!readStringData(pattern))
           return JSValue();
-        CachedString* flags;
+        CachedString* flags = 0;
         if (!readStringData(flags))
           return JSValue();
         RefPtr<RegExp> regExp = RegExp::create(
