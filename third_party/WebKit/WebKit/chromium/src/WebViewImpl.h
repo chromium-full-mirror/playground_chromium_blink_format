@@ -46,6 +46,7 @@
 #include "EditorClientImpl.h"
 #include "GraphicsLayer.h"
 #include "InspectorClientImpl.h"
+#include "IntRect.h"
 #include "LayerRendererChromium.h"
 #include "NotificationPresenterImpl.h"
 #include "SpeechInputClientImpl.h"
@@ -371,6 +372,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   void setIsAcceleratedCompositingActive(bool);
   void updateRootLayerContents(const WebCore::IntRect&);
   void doComposite();
+  void doPixelReadbackToCanvas(WebCanvas*, const WebCore::IntRect&);
 #endif
 
   WebViewClient* m_client;
