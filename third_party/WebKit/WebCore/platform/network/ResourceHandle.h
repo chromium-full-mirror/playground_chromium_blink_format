@@ -172,7 +172,7 @@ class ResourceHandle : public RefCounted<ResourceHandle>
 #endif
 
   PassRefPtr<SharedBuffer> bufferedData();
-  static bool supportsBufferedData();
+  virtual bool supportsBufferedData();
 
   bool shouldContentSniff() const;
   static bool shouldContentSniffURL(const KURL&);

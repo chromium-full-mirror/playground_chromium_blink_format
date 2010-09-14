@@ -71,6 +71,7 @@ class BlobResourceHandle : public FileStreamClient, public ResourceHandle {
 
   // ResourceHandle methods.
   virtual void cancel();
+  virtual bool supportsBufferedData();
 
   void start();
   int readSync(char*, int);
