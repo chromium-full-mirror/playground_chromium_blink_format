@@ -1567,11 +1567,14 @@ static bool supportedPaste(Frame* frame, EditorCommandSource source) {
   return false;
 }
 
+#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
+    !defined(BUILDING_ON_LEOPARD) && !defined(BUILDING_ON_SNOW_LEOPARD)
 static bool supportedDismissCorrectionPanel(Frame* frame,
                                             EditorCommandSource source) {
   return supportedFromMenuOrKeyBinding(frame, source) &&
          frame->editor()->isShowingCorrectionPanel();
 }
+#endif
 
 // Enabled functions
 
