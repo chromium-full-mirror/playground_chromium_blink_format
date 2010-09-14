@@ -31,15 +31,100 @@
 #include <WebKit2/WKArray.h>
 #include <WebKit2/WKBundleFrame.h>
 #include <WebKit2/WKBundleFramePrivate.h>
-#include <WebKit2/WKBundleNode.h>
 #include <WebKit2/WKBundlePagePrivate.h>
-#include <WebKit2/WKRetainPtr.h>
 #include <WebKit2/WKBundleRange.h>
-#include <WebKit2/WKBundleScriptWorld.h>
 
 using namespace std;
 
 namespace WTR {
+
+static JSValueRef propertyValue(JSContextRef context,
+                                JSObjectRef object,
+                                const char* propertyName) {
+  if (!object)
+    return 0;
+  JSRetainPtr<JSStringRef> propertyNameString(
+      Adopt, JSStringCreateWithUTF8CString(propertyName));
+  JSValueRef exception;
+  return JSObjectGetProperty(context, object, propertyNameString.get(),
+                             &exception);
+}
+
+static double numericWindowPropertyValue(WKBundleFrameRef frame,
+                                         const char* propertyName) {
+  JSGlobalContextRef context = WKBundleFrameGetJavaScriptContext(frame);
+  JSValueRef value =
+      propertyValue(context, JSContextGetGlobalObject(context), propertyName);
+  if (!value)
+    return 0;
+  JSValueRef exception;
+  return JSValueToNumber(context, value, &exception);
+}
+
+static string dumpPath(JSGlobalContextRef context, JSObjectRef nodeValue) {
+  JSValueRef nodeNameValue = propertyValue(context, nodeValue, "nodeName");
+  JSRetainPtr<JSStringRef> jsStringNodeName(
+      Adopt, JSValueToStringCopy(context, nodeNameValue, 0));
+  WKRetainPtr<WKStringRef> nodeName = toWK(jsStringNodeName);
+
+  JSValueRef parentNode = propertyValue(context, nodeValue, "parentNode");
+
+  ostringstream out;
+  out << nodeName;
+
+  if (parentNode && JSValueIsObject(context, parentNode))
+    out << " > " << dumpPath(context, (JSObjectRef)parentNode);
+
+  return out.str();
+}
+
+static string dumpPath(WKBundlePageRef page,
+                       WKBundleScriptWorldRef world,
+                       WKBundleNodeHandleRef node) {
+  if (!node)
+    return "(null)";
+
+  WKBundleFrameRef frame = WKBundlePageGetMainFrame(page);
+
+  JSGlobalContextRef context =
+      WKBundleFrameGetJavaScriptContextForWorld(frame, world);
+  JSValueRef nodeValue =
+      WKBundleFrameGetJavaScriptWrapperForNodeForWorld(frame, node, world);
+  ASSERT(JSValueIsObject(context, nodeValue));
+  JSObjectRef nodeObject = (JSObjectRef)nodeValue;
+
+  return dumpPath(context, nodeObject);
+}
+
+static string toStr(WKBundlePageRef page,
+                    WKBundleScriptWorldRef world,
+                    WKBundleRangeRef rangeRef) {
+  if (!rangeRef)
+    return "(null)";
+
+  WKRetainPtr<WKBundleNodeHandleRef> startNode(
+      AdoptWK, WKBundleRangeCopyStartContainer(rangeRef));
+  WKRetainPtr<WKBundleNodeHandleRef> endNode(
+      AdoptWK, WKBundleRangeCopyEndContainer(rangeRef));
+
+  ostringstream out;
+  out << "range from " << WKBundleRangeGetStartOffset(rangeRef) << " of "
+      << dumpPath(page, world, startNode.get()) << " to "
+      << WKBundleRangeGetEndOffset(rangeRef) << " of "
+      << dumpPath(page, world, endNode.get());
+  return out.str();
+}
+
+static ostream& operator<<(ostream& out, WKBundleCSSStyleDeclarationRef style) {
+  // DumpRenderTree calls -[DOMCSSStyleDeclaration description], which just
+  // dumps class name and object address.
+  // No existing tests actually hit this code path at the time of this writing,
+  // because WebCore doesn't call
+  // the editing client if the styling operation source is CommandFromDOM or
+  // CommandFromDOMWithUserInterface.
+  out << "<DOMCSSStyleDeclaration ADDRESS>";
+  return out;
+}
 
 static ostream& operator<<(ostream& out, WKBundleFrameRef frame) {
   WKRetainPtr<WKStringRef> name(AdoptWK, WKBundleFrameCopyName(frame));
@@ -58,42 +143,10 @@ static ostream& operator<<(ostream& out, WKBundleFrameRef frame) {
   return out;
 }
 
-static string dumpPath(WKBundleNodeRef node) {
-  if (!node)
-    return "(null)";
-  WKRetainPtr<WKStringRef> nodeName(AdoptWK, WKBundleNodeCopyNodeName(node));
-  ostringstream out;
-  out << nodeName;
-  if (WKBundleNodeRef parent = WKBundleNodeGetParent(node))
-    out << " > " << dumpPath(parent);
-  return out.str();
-}
-
-static ostream& operator<<(ostream& out, WKBundleRangeRef rangeRef) {
-  if (rangeRef)
-    out << "range from " << WKBundleRangeGetStartOffset(rangeRef) << " of "
-        << dumpPath(WKBundleRangeGetStartContainer(rangeRef)) << " to "
-        << WKBundleRangeGetEndOffset(rangeRef) << " of "
-        << dumpPath(WKBundleRangeGetEndContainer(rangeRef));
-  else
-    out << "(null)";
-
-  return out;
-}
-
-static ostream& operator<<(ostream& out, WKBundleCSSStyleDeclarationRef style) {
-  // DumpRenderTree calls -[DOMCSSStyleDeclaration description], which just
-  // dumps class name and object address.
-  // No existing tests actually hit this code path at the time of this writing,
-  // because WebCore doesn't call
-  // the editing client if the styling operation source is CommandFromDOM or
-  // CommandFromDOMWithUserInterface.
-  out << "<DOMCSSStyleDeclaration ADDRESS>";
-  return out;
-}
-
 InjectedBundlePage::InjectedBundlePage(WKBundlePageRef page)
-    : m_page(page), m_isLoading(false) {
+    : m_page(page),
+      m_world(AdoptWK, WKBundleScriptWorldCreateWorld()),
+      m_isLoading(false) {
   WKBundlePageLoaderClient loaderClient = {
       0,
       this,
@@ -288,29 +341,6 @@ void InjectedBundlePage::didFailProvisionalLoadWithErrorForFrame(
     WKBundleFrameRef frame) {}
 
 void InjectedBundlePage::didCommitLoadForFrame(WKBundleFrameRef frame) {}
-
-static JSValueRef propertyValue(JSContextRef context,
-                                JSObjectRef object,
-                                const char* propertyName) {
-  if (!object)
-    return 0;
-  JSRetainPtr<JSStringRef> propertyNameString(
-      Adopt, JSStringCreateWithUTF8CString(propertyName));
-  JSValueRef exception;
-  return JSObjectGetProperty(context, object, propertyNameString.get(),
-                             &exception);
-}
-
-static double numericWindowPropertyValue(WKBundleFrameRef frame,
-                                         const char* propertyName) {
-  JSGlobalContextRef context = WKBundleFrameGetJavaScriptContext(frame);
-  JSValueRef value =
-      propertyValue(context, JSContextGetGlobalObject(context), propertyName);
-  if (!value)
-    return 0;
-  JSValueRef exception;
-  return JSValueToNumber(context, value, &exception);
-}
 
 enum FrameNamePolicy { ShouldNotIncludeFrameName, ShouldIncludeFrameName };
 
@@ -611,7 +641,7 @@ bool InjectedBundlePage::shouldEndEditing(WKBundlePageRef page,
 }
 
 bool InjectedBundlePage::shouldInsertNode(WKBundlePageRef page,
-                                          WKBundleNodeRef node,
+                                          WKBundleNodeHandleRef node,
                                           WKBundleRangeRef rangeToReplace,
                                           WKInsertActionType action,
                                           const void* clientInfo) {
@@ -689,7 +719,8 @@ bool InjectedBundlePage::shouldBeginEditing(WKBundleRangeRef range) {
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
     InjectedBundle::shared().os()
-        << "EDITING DELEGATE: shouldBeginEditingInDOMRange:" << range << "\n";
+        << "EDITING DELEGATE: shouldBeginEditingInDOMRange:"
+        << toStr(m_page, m_world.get(), range) << "\n";
   return InjectedBundle::shared().layoutTestController()->shouldAllowEditing();
 }
 
@@ -701,11 +732,12 @@ bool InjectedBundlePage::shouldEndEditing(WKBundleRangeRef range) {
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
     InjectedBundle::shared().os()
-        << "EDITING DELEGATE: shouldEndEditingInDOMRange:" << range << "\n";
+        << "EDITING DELEGATE: shouldEndEditingInDOMRange:"
+        << toStr(m_page, m_world.get(), range) << "\n";
   return InjectedBundle::shared().layoutTestController()->shouldAllowEditing();
 }
 
-bool InjectedBundlePage::shouldInsertNode(WKBundleNodeRef node,
+bool InjectedBundlePage::shouldInsertNode(WKBundleNodeHandleRef node,
                                           WKBundleRangeRef rangeToReplace,
                                           WKInsertActionType action) {
   if (!InjectedBundle::shared().isTestRunning())
@@ -720,8 +752,9 @@ bool InjectedBundlePage::shouldInsertNode(WKBundleNodeRef node,
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
     InjectedBundle::shared().os()
-        << "EDITING DELEGATE: shouldInsertNode:" << dumpPath(node)
-        << " replacingDOMRange:" << rangeToReplace
+        << "EDITING DELEGATE: shouldInsertNode:"
+        << dumpPath(m_page, m_world.get(), node)
+        << " replacingDOMRange:" << toStr(m_page, m_world.get(), rangeToReplace)
         << " givenAction:" << insertactionstring[action] << "\n";
   return InjectedBundle::shared().layoutTestController()->shouldAllowEditing();
 }
@@ -742,7 +775,7 @@ bool InjectedBundlePage::shouldInsertText(WKStringRef text,
           ->shouldDumpEditingCallbacks())
     InjectedBundle::shared().os()
         << "EDITING DELEGATE: shouldInsertText:" << text
-        << " replacingDOMRange:" << rangeToReplace
+        << " replacingDOMRange:" << toStr(m_page, m_world.get(), rangeToReplace)
         << " givenAction:" << insertactionstring[action] << "\n";
   return InjectedBundle::shared().layoutTestController()->shouldAllowEditing();
 }
@@ -754,8 +787,9 @@ bool InjectedBundlePage::shouldDeleteRange(WKBundleRangeRef range) {
   if (InjectedBundle::shared()
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
-    InjectedBundle::shared().os()
-        << "EDITING DELEGATE: shouldDeleteDOMRange:" << range << "\n";
+    InjectedBundle::shared().os() << "EDITING DELEGATE: shouldDeleteDOMRange:"
+                                  << toStr(m_page, m_world.get(), range)
+                                  << "\n";
   return InjectedBundle::shared().layoutTestController()->shouldAllowEditing();
 }
 
@@ -774,8 +808,10 @@ bool InjectedBundlePage::shouldChangeSelectedRange(WKBundleRangeRef fromRange,
           .layoutTestController()
           ->shouldDumpEditingCallbacks())
     InjectedBundle::shared().os()
-        << "EDITING DELEGATE: shouldChangeSelectedDOMRange:" << fromRange
-        << " toDOMRange:" << toRange << " affinity:" << affinitystring[affinity]
+        << "EDITING DELEGATE: shouldChangeSelectedDOMRange:"
+        << toStr(m_page, m_world.get(), fromRange)
+        << " toDOMRange:" << toStr(m_page, m_world.get(), toRange)
+        << " affinity:" << affinitystring[affinity]
         << " stillSelecting:" << boolstring[stillSelecting] << "\n";
   return InjectedBundle::shared().layoutTestController()->shouldAllowEditing();
 }
@@ -790,7 +826,8 @@ bool InjectedBundlePage::shouldApplyStyle(WKBundleCSSStyleDeclarationRef style,
           ->shouldDumpEditingCallbacks())
     InjectedBundle::shared().os()
         << "EDITING DELEGATE: shouldApplyStyle:" << style
-        << " toElementsInDOMRange:" << range << "\n";
+        << " toElementsInDOMRange:" << toStr(m_page, m_world.get(), range)
+        << "\n";
   return InjectedBundle::shared().layoutTestController()->shouldAllowEditing();
 }
 

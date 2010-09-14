@@ -27,6 +27,8 @@
 #define InjectedBundlePage_h
 
 #include <WebKit2/WKBundlePage.h>
+#include <WebKit2/WKBundleScriptWorld.h>
+#include <WebKit2/WKRetainPtr.h>
 
 namespace WTR {
 
@@ -152,7 +154,7 @@ class InjectedBundlePage {
                                WKBundleRangeRef,
                                const void* clientInfo);
   static bool shouldInsertNode(WKBundlePageRef,
-                               WKBundleNodeRef,
+                               WKBundleNodeHandleRef,
                                WKBundleRangeRef rangeToReplace,
                                WKInsertActionType,
                                const void* clientInfo);
@@ -188,7 +190,7 @@ class InjectedBundlePage {
                                  const void* clientInfo);
   bool shouldBeginEditing(WKBundleRangeRef);
   bool shouldEndEditing(WKBundleRangeRef);
-  bool shouldInsertNode(WKBundleNodeRef,
+  bool shouldInsertNode(WKBundleNodeHandleRef,
                         WKBundleRangeRef rangeToReplace,
                         WKInsertActionType);
   bool shouldInsertText(WKStringRef,
@@ -210,6 +212,7 @@ class InjectedBundlePage {
   void dumpAllFrameScrollPositions();
 
   WKBundlePageRef m_page;
+  WKRetainPtr<WKBundleScriptWorldRef> m_world;
   bool m_isLoading;
 };
 
