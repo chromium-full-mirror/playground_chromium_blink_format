@@ -89,6 +89,11 @@ class StorageArea;
 class InspectorApplicationCacheAgent;
 #endif
 
+#if ENABLE(WEB_SOCKETS)
+class WebSocketHandshakeRequest;
+class WebSocketHandshakeResponse;
+#endif
+
 class InspectorController : public Noncopyable {
  public:
   typedef HashMap<unsigned long, RefPtr<InspectorResource>> ResourcesMap;
@@ -244,6 +249,16 @@ class InspectorController : public Noncopyable {
                          const String& value,
                          bool* success);
   void removeDOMStorageItem(long storageId, const String& key, bool* success);
+#endif
+#if ENABLE(WEB_SOCKETS)
+  void didCreateWebSocket(unsigned long identifier,
+                          const KURL& requestURL,
+                          const KURL& documentURL);
+  void willSendWebSocketHandshakeRequest(unsigned long identifier,
+                                         const WebSocketHandshakeRequest&);
+  void didReceiveWebSocketHandshakeResponse(unsigned long identifier,
+                                            const WebSocketHandshakeResponse&);
+  void didCloseWebSocket(unsigned long identifier);
 #endif
 
   const ResourcesMap& resources() const { return m_resources; }

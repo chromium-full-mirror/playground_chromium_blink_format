@@ -36,8 +36,11 @@
 
 #include "CookieJar.h"
 #include "Document.h"
+#include "InspectorController.h"
 #include "Logging.h"
+#include "Page.h"
 #include "PlatformString.h"
+#include "ProgressTracker.h"
 #include "ScriptExecutionContext.h"
 #include "SocketStreamError.h"
 #include "SocketStreamHandle.h"
@@ -65,7 +68,17 @@ WebSocketChannel::WebSocketChannel(ScriptExecutionContext* context,
       m_suspended(false),
       m_closed(false),
       m_shouldDiscardReceivedData(false),
-      m_unhandledBufferedAmount(0) {}
+      m_unhandledBufferedAmount(0)
+#if ENABLE(INSPECTOR)
+      ,
+      m_identifier(0)
+#endif
+{
+#if ENABLE(INSPECTOR)
+  if (InspectorController* controller = m_context->inspectorController())
+    controller->didCreateWebSocket(identifier(), url, m_context->url());
+#endif
+}
 
 WebSocketChannel::~WebSocketChannel() {
   fastFree(m_buffer);
@@ -108,6 +121,11 @@ void WebSocketChannel::close() {
 
 void WebSocketChannel::disconnect() {
   LOG(Network, "WebSocketChannel %p disconnect", this);
+#if ENABLE(INSPECTOR)
+  if (m_context)
+    if (InspectorController* controller = m_context->inspectorController())
+      controller->didCloseWebSocket(identifier());
+#endif
   m_handshake.clearScriptExecutionContext();
   m_client = 0;
   m_context = 0;
@@ -130,6 +148,11 @@ void WebSocketChannel::didOpen(SocketStreamHandle* handle) {
   ASSERT(handle == m_handle);
   if (!m_context)
     return;
+#if ENABLE(INSPECTOR)
+  if (InspectorController* controller = m_context->inspectorController())
+    controller->willSendWebSocketHandshakeRequest(
+        identifier(), m_handshake.clientHandshakeRequest());
+#endif
   const CString& handshakeMessage = m_handshake.clientHandshakeMessage();
   if (!handle->send(handshakeMessage.data(), handshakeMessage.length())) {
     m_context->addMessage(JSMessageSource, LogMessageType, ErrorMessageLevel,
@@ -141,6 +164,11 @@ void WebSocketChannel::didOpen(SocketStreamHandle* handle) {
 
 void WebSocketChannel::didClose(SocketStreamHandle* handle) {
   LOG(Network, "WebSocketChannel %p didClose", this);
+#if ENABLE(INSPECTOR)
+  if (m_context)
+    if (InspectorController* controller = m_context->inspectorController())
+      controller->didCloseWebSocket(identifier());
+#endif
   ASSERT_UNUSED(handle, handle == m_handle || !m_handle);
   m_closed = true;
   if (m_handle) {
@@ -250,6 +278,11 @@ bool WebSocketChannel::processBuffer() {
     if (headerLength <= 0)
       return false;
     if (m_handshake.mode() == WebSocketHandshake::Connected) {
+#if ENABLE(INSPECTOR)
+      if (InspectorController* controller = m_context->inspectorController())
+        controller->didReceiveWebSocketHandshakeResponse(
+            identifier(), m_handshake.serverHandshakeResponse());
+#endif
       if (!m_handshake.serverSetCookie().isEmpty()) {
         if (m_context->isDocument()) {
           Document* document = static_cast<Document*>(m_context);
@@ -373,6 +406,20 @@ void WebSocketChannel::resumeTimerFired(Timer<WebSocketChannel>* timer) {
   if (!m_suspended && m_client && m_closed && m_handle)
     didClose(m_handle.get());
 }
+
+#if ENABLE(INSPECTOR)
+unsigned long WebSocketChannel::identifier() {
+  if (m_identifier)
+    return m_identifier;
+
+  if (InspectorController* controller = m_context->inspectorController())
+    if (Page* page = controller->inspectedPage())
+      m_identifier = page->progress()->createUniqueIdentifier();
+
+  ASSERT(m_identifier);
+  return m_identifier;
+}
+#endif  // ENABLE(INSPECTOR)
 
 }  // namespace WebCore
 
