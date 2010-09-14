@@ -178,6 +178,8 @@ LayoutTestController::LayoutTestController(TestShell* shell)
              &LayoutTestController::grantDesktopNotificationPermission);
   bindMethod("simulateDesktopNotificationClick",
              &LayoutTestController::simulateDesktopNotificationClick);
+  bindMethod("setDomainRelaxationForbiddenForURLScheme",
+             &LayoutTestController::setDomainRelaxationForbiddenForURLScheme);
 
   // The following are stubs.
   bindMethod("dumpAsWebArchive", &LayoutTestController::dumpAsWebArchive);
@@ -1053,6 +1055,16 @@ void LayoutTestController::simulateDesktopNotificationClick(
     result->set(true);
   else
     result->set(false);
+}
+
+void LayoutTestController::setDomainRelaxationForbiddenForURLScheme(
+    const CppArgumentList& arguments,
+    CppVariant* result) {
+  if (arguments.size() != 2 || !arguments[0].isBool() ||
+      !arguments[1].isString())
+    return;
+  m_shell->webView()->setDomainRelaxationForbidden(
+      cppVariantToBool(arguments[0]), cppVariantToWebString(arguments[1]));
 }
 
 //

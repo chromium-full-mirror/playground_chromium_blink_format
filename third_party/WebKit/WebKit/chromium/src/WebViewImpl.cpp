@@ -1925,6 +1925,12 @@ bool WebViewImpl::isActive() const {
              : false;
 }
 
+void WebViewImpl::setDomainRelaxationForbidden(bool forbidden,
+                                               const WebString& scheme) {
+  SecurityOrigin::setDomainRelaxationForbiddenForURLScheme(forbidden,
+                                                           String(scheme));
+}
+
 void WebViewImpl::setScrollbarColors(unsigned inactiveColor,
                                      unsigned activeColor,
                                      unsigned trackColor) {

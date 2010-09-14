@@ -226,11 +226,8 @@ class LayoutTestController : public CppBoundClass {
   void numberOfActiveAnimations(const CppArgumentList&, CppVariant*);
   void suspendAnimations(const CppArgumentList&, CppVariant*);
   void resumeAnimations(const CppArgumentList&, CppVariant*);
-
   void disableImageLoading(const CppArgumentList&, CppVariant*);
-
   void setIconDatabaseEnabled(const CppArgumentList&, CppVariant*);
-
   void dumpSelectionRect(const CppArgumentList&, CppVariant*);
 
   // Grants permission for desktop notifications to an origin
@@ -238,6 +235,8 @@ class LayoutTestController : public CppBoundClass {
   // Simulates a click on a desktop notification.
   void simulateDesktopNotificationClick(const CppArgumentList&, CppVariant*);
 
+  void setDomainRelaxationForbiddenForURLScheme(const CppArgumentList&,
+                                                CppVariant*);
   void setEditingBehavior(const CppArgumentList&, CppVariant*);
 
   // The following are only stubs.  TODO(pamg): Implement any of these that

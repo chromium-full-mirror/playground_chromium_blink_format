@@ -108,6 +108,9 @@ class WebView : public WebWidget {
   virtual bool isActive() const = 0;
   virtual void setIsActive(bool) = 0;
 
+  // Allows disabling domain relaxation.
+  virtual void setDomainRelaxationForbidden(bool, const WebString& scheme);
+
   // Closing -------------------------------------------------------------
 
   // Runs beforeunload handlers for the current page, returning false if
