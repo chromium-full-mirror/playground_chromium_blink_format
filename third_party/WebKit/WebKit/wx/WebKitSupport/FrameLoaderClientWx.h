@@ -280,6 +280,8 @@ class FrameLoaderClientWx : public FrameLoaderClient {
 
   virtual bool shouldUsePluginDocument(const String& mimeType) const;
 
+  virtual PassRefPtr<FrameNetworkingContext> createNetworkingContext();
+
  private:
   wxWebFrame* m_webFrame;
   Frame* m_frame;
