@@ -68,6 +68,7 @@ PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(
               IFILE_Read(file.get(), result->m_buffer.data() + totalBytesRead,
                          fileSize - totalBytesRead)) > 0)
     totalBytesRead += bytesRead;
+  result->m_size = totalBytesRead;
 
   if (totalBytesRead != fileSize) {
     LOG_ERROR("Failed to fully read contents of file %s - errno(%i)",
