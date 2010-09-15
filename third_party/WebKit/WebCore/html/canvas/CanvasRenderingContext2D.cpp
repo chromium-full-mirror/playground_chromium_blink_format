@@ -54,6 +54,7 @@
 #include "KURL.h"
 #include "Page.h"
 #include "RenderHTMLCanvas.h"
+#include "RenderTheme.h"
 #include "SecurityOrigin.h"
 #include "Settings.h"
 #include "StrokeStyleApplier.h"
@@ -549,7 +550,7 @@ void CanvasRenderingContext2D::setTransform(float m11,
 void CanvasRenderingContext2D::setStrokeColor(const String& color) {
   if (color == state().m_unparsedStrokeColor)
     return;
-  setStrokeStyle(CanvasStyle::createFromString(color));
+  setStrokeStyle(CanvasStyle::createFromString(color, canvas()->document()));
   state().m_unparsedStrokeColor = color;
 }
 
@@ -598,7 +599,7 @@ void CanvasRenderingContext2D::setStrokeColor(float c,
 void CanvasRenderingContext2D::setFillColor(const String& color) {
   if (color == state().m_unparsedFillColor)
     return;
-  setFillStyle(CanvasStyle::createFromString(color));
+  setFillStyle(CanvasStyle::createFromString(color, canvas()->document()));
   state().m_unparsedFillColor = color;
 }
 
