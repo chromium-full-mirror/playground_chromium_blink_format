@@ -69,6 +69,9 @@ class RenderText : public RenderObject {
                              unsigned endOffset = UINT_MAX,
                              bool useSelectionHeight = false);
 
+  enum ClippingOption { NoClipping, ClipToEllipsis };
+  void absoluteQuads(Vector<FloatQuad>&, ClippingOption option = NoClipping);
+
   virtual VisiblePosition positionForPoint(const IntPoint&);
 
   const UChar* characters() const { return m_text.characters(); }
