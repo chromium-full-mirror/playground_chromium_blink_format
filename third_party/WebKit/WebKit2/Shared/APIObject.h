@@ -45,8 +45,9 @@ class APIObject : public RefCounted<APIObject> {
     TypeURLRequest,
     TypeURLResponse,
 
-    // Base numberic types
+    // Base numeric types
     TypeDouble,
+    TypeUInt64,
 
     // UIProcess types
     TypeBackForwardList,

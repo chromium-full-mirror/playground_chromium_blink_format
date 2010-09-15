@@ -140,6 +140,10 @@ struct APITypeInfo<WKTypeRef> {
   typedef APIObject* ImplType;
 };
 template <>
+struct APITypeInfo<WKUInt64Ref> {
+  typedef WebUInt64* ImplType;
+};
+template <>
 struct APITypeInfo<WKURLRef> {
   typedef WebURL* ImplType;
 };
@@ -233,6 +237,10 @@ struct ImplTypeInfo<WebSerializedScriptValue*> {
 template <>
 struct ImplTypeInfo<WebString*> {
   typedef WKStringRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebUInt64*> {
+  typedef WKUInt64Ref APIType;
 };
 template <>
 struct ImplTypeInfo<WebURL*> {

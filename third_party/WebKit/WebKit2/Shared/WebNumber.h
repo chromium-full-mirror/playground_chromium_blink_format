@@ -52,6 +52,7 @@ class WebNumber : public APIObject {
 };
 
 typedef WebNumber<double, APIObject::TypeDouble> WebDouble;
+typedef WebNumber<uint64_t, APIObject::TypeUInt64> WebUInt64;
 
 }  // namespace WebKit
 
