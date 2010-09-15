@@ -26,6 +26,7 @@
 #ifndef ResourceHandleClient_h
 #define ResourceHandleClient_h
 
+#include <wtf/CurrentTime.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
 
@@ -79,7 +80,7 @@ class ResourceHandleClient {
                               int,
                               int /*lengthReceived*/) {}
   virtual void didReceiveCachedMetadata(ResourceHandle*, const char*, int) {}
-  virtual void didFinishLoading(ResourceHandle*) {}
+  virtual void didFinishLoading(ResourceHandle*, double /*finishTime*/) {}
   virtual void didFail(ResourceHandle*, const ResourceError&) {}
   virtual void wasBlocked(ResourceHandle*) {}
   virtual void cannotShowURL(ResourceHandle*) {}

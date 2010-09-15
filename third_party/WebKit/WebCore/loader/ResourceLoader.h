@@ -88,7 +88,7 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
                               bool allAtOnce);
   virtual void didReceiveCachedMetadata(const char*, int) {}
   void willStopBufferingData(const char*, int);
-  virtual void didFinishLoading();
+  virtual void didFinishLoading(double finishTime);
   virtual void didFail(const ResourceError&);
 
   virtual bool shouldUseCredentialStorage();
@@ -117,7 +117,7 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
                                         int length) {
     didReceiveCachedMetadata(data, length);
   }
-  virtual void didFinishLoading(ResourceHandle*);
+  virtual void didFinishLoading(ResourceHandle*, double finishTime);
   virtual void didFail(ResourceHandle*, const ResourceError&);
   virtual void wasBlocked(ResourceHandle*);
   virtual void cannotShowURL(ResourceHandle*);
@@ -177,7 +177,7 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
 #endif
 
   virtual void didCancel(const ResourceError&);
-  void didFinishLoadingOnePart();
+  void didFinishLoadingOnePart(double finishTime);
 
   const ResourceRequest& request() const { return m_request; }
   bool reachedTerminalState() const { return m_reachedTerminalState; }

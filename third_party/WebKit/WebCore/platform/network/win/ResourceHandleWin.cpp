@@ -38,6 +38,7 @@
 #include "ResourceHandleWin.h"
 #include "Timer.h"
 #include "WebCoreInstanceHandle.h"
+
 #include <wtf/text/CString.h>
 #include <windows.h>
 #include <wininet.h>
@@ -146,7 +147,7 @@ class WebCoreSynchronousLoader : public ResourceHandleClient,
                               const char*,
                               int,
                               int lengthReceived);
-  virtual void didFinishLoading(ResourceHandle*);
+  virtual void didFinishLoading(ResourceHandle*, double /*finishTime*/);
   virtual void didFail(ResourceHandle*, const ResourceError&);
 
  private:
@@ -174,7 +175,7 @@ void WebCoreSynchronousLoader::didReceiveData(ResourceHandle*,
   m_data.append(data, length);
 }
 
-void WebCoreSynchronousLoader::didFinishLoading(ResourceHandle*) {}
+void WebCoreSynchronousLoader::didFinishLoading(ResourceHandle*, double) {}
 
 void WebCoreSynchronousLoader::didFail(ResourceHandle*,
                                        const ResourceError& error) {
@@ -355,7 +356,7 @@ void ResourceHandle::onRequestComplete(LPARAM lParam) {
     InternetCloseHandle(d->m_secondaryHandle);
   InternetCloseHandle(d->m_resourceHandle);
 
-  client()->didFinishLoading(this);
+  client()->didFinishLoading(this, 0);
   delete this;
 }
 
@@ -517,7 +518,7 @@ void ResourceHandle::fileLoadTimer(Timer<ResourceHandle>*) {
 
   CloseHandle(fileHandle);
 
-  client()->didFinishLoading(this);
+  client()->didFinishLoading(this, 0);
 }
 
 void ResourceHandle::cancel() {
@@ -526,7 +527,7 @@ void ResourceHandle::cancel() {
   else
     d->m_fileLoadTimer.stop();
 
-  client()->didFinishLoading(this);
+  client()->didFinishLoading(this, 0);
 
   if (!d->m_resourceHandle)
     // Async load canceled before we have a handle -- mark ourselves as in

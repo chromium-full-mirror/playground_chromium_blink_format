@@ -50,7 +50,7 @@ class WebCoreSynchronousLoader : public ResourceHandleClient {
                               const char*,
                               int,
                               int lengthReceived);
-  virtual void didFinishLoading(ResourceHandle*);
+  virtual void didFinishLoading(ResourceHandle*, double /*finishTime*/);
   virtual void didFail(ResourceHandle*, const ResourceError&);
 
   ResourceResponse resourceResponse() const { return m_response; }
@@ -78,7 +78,7 @@ void WebCoreSynchronousLoader::didReceiveData(ResourceHandle*,
   m_data.append(data, length);
 }
 
-void WebCoreSynchronousLoader::didFinishLoading(ResourceHandle*) {}
+void WebCoreSynchronousLoader::didFinishLoading(ResourceHandle*, double) {}
 
 void WebCoreSynchronousLoader::didFail(ResourceHandle*,
                                        const ResourceError& error) {

@@ -78,7 +78,7 @@ class ResourceHandleInternal : public WebURLLoaderClient {
   virtual void didReceiveCachedMetadata(WebURLLoader*,
                                         const char* data,
                                         int dataLength);
-  virtual void didFinishLoading(WebURLLoader*);
+  virtual void didFinishLoading(WebURLLoader*, double finishTime);
   virtual void didFail(WebURLLoader*, const WebURLError&);
 
   enum ConnectionState {
@@ -190,13 +190,14 @@ void ResourceHandleInternal::didReceiveCachedMetadata(WebURLLoader*,
   m_client->didReceiveCachedMetadata(m_owner, data, dataLength);
 }
 
-void ResourceHandleInternal::didFinishLoading(WebURLLoader*) {
+void ResourceHandleInternal::didFinishLoading(WebURLLoader*,
+                                              double finishTime) {
   ASSERT(m_client);
   if (m_state != ConnectionStateReceivedResponse &&
       m_state != ConnectionStateReceivingData)
     CRASH();
   m_state = ConnectionStateFinishedLoading;
-  m_client->didFinishLoading(m_owner);
+  m_client->didFinishLoading(m_owner, finishTime);
 }
 
 void ResourceHandleInternal::didFail(WebURLLoader*, const WebURLError& error) {

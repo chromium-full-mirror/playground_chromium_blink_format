@@ -62,7 +62,7 @@ class MainResourceLoader : public ResourceLoader {
                               int,
                               long long lengthReceived,
                               bool allAtOnce);
-  virtual void didFinishLoading();
+  virtual void didFinishLoading(double finishTime);
   virtual void didFail(const ResourceError&);
 
 #if HAVE(RUNLOOP_TIMER)

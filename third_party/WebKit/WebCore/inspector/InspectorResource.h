@@ -128,7 +128,7 @@ class InspectorResource : public RefCounted<InspectorResource> {
   void startTiming();
   void markLoadEventTime();
   void markDOMContentEventTime();
-  void endTiming();
+  void endTiming(double actualEndTime);
 
   void markFailed();
   void addLength(int lengthReceived);

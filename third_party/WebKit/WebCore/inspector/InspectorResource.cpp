@@ -479,8 +479,8 @@ void InspectorResource::startTiming() {
   m_changes.set(TimingChange);
 }
 
-void InspectorResource::endTiming() {
-  m_endTime = currentTime();
+void InspectorResource::endTiming(double actualEndTime) {
+  m_endTime = actualEndTime ? actualEndTime : currentTime();
   m_finished = true;
   m_changes.set(TimingChange);
   m_changes.set(CompletionChange);
