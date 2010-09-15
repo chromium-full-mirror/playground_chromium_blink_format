@@ -362,6 +362,7 @@ void RenderThemeQt::computeSizeBasedOnStyle(RenderStyle* renderStyle) const {
       styleOption.state |= QStyle::State_Small;
       int checkBoxWidth =
           style->pixelMetric(QStyle::PM_IndicatorWidth, &styleOption);
+      checkBoxWidth *= renderStyle->effectiveZoom();
       size = QSize(checkBoxWidth, checkBoxWidth);
       break;
     }
@@ -370,6 +371,7 @@ void RenderThemeQt::computeSizeBasedOnStyle(RenderStyle* renderStyle) const {
       styleOption.state |= QStyle::State_Small;
       int radioWidth =
           style->pixelMetric(QStyle::PM_ExclusiveIndicatorWidth, &styleOption);
+      radioWidth *= renderStyle->effectiveZoom();
       size = QSize(radioWidth, radioWidth);
       break;
     }
