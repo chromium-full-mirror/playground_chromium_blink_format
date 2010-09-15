@@ -989,7 +989,7 @@ void InspectorController::willSendRequest(
     // HashMap entry.
     // See http/tests/misc/will-send-request-returns-null-on-redirect.html
     if (!request.url().isEmpty()) {
-      resource->endTiming();
+      resource->endTiming(0);
       resource->updateResponse(redirectResponse);
 
       // We always store last redirect by the original id key. Rest of the
@@ -1054,7 +1054,8 @@ void InspectorController::didReceiveContentLength(unsigned long identifier,
     resource->updateScriptObject(m_frontend.get());
 }
 
-void InspectorController::didFinishLoading(unsigned long identifier) {
+void InspectorController::didFinishLoading(unsigned long identifier,
+                                           double finishTime) {
   if (!enabled())
     return;
 
@@ -1065,7 +1066,7 @@ void InspectorController::didFinishLoading(unsigned long identifier) {
   if (!resource)
     return;
 
-  resource->endTiming();
+  resource->endTiming(finishTime);
 
   // No need to mute this event for main resource since it happens after did
   // commit load.
@@ -1092,7 +1093,7 @@ void InspectorController::didFailLoading(unsigned long identifier,
     return;
 
   resource->markFailed();
-  resource->endTiming();
+  resource->endTiming(0);
 
   // No need to mute this event for main resource since it happens after did
   // commit load.
@@ -1562,7 +1563,7 @@ void InspectorController::didCloseWebSocket(unsigned long identifier) {
   if (!resource)
     return;
 
-  resource->endTiming();
+  resource->endTiming(0);
   if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 }

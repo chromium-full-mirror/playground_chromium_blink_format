@@ -186,7 +186,7 @@ class InspectorController : public Noncopyable {
                        const ResourceResponse& redirectResponse);
   void didReceiveResponse(unsigned long identifier, const ResourceResponse&);
   void didReceiveContentLength(unsigned long identifier, int lengthReceived);
-  void didFinishLoading(unsigned long identifier);
+  void didFinishLoading(unsigned long identifier, double finishTime);
   void didFailLoading(unsigned long identifier, const ResourceError&);
   void resourceRetrievedByXMLHttpRequest(unsigned long identifier,
                                          const ScriptString& sourceString,

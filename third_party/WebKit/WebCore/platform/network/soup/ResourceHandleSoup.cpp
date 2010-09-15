@@ -69,7 +69,7 @@ class WebCoreSynchronousLoader : public ResourceHandleClient,
                               const char*,
                               int,
                               int lengthReceived);
-  virtual void didFinishLoading(ResourceHandle*);
+  virtual void didFinishLoading(ResourceHandle*, double /*finishTime*/);
   virtual void didFail(ResourceHandle*, const ResourceError&);
 
   void run();
@@ -106,7 +106,7 @@ void WebCoreSynchronousLoader::didReceiveData(ResourceHandle*,
   m_data.append(data, length);
 }
 
-void WebCoreSynchronousLoader::didFinishLoading(ResourceHandle*) {
+void WebCoreSynchronousLoader::didFinishLoading(ResourceHandle*, double) {
   g_main_loop_quit(m_mainLoop);
   m_finished = true;
 }
@@ -114,7 +114,7 @@ void WebCoreSynchronousLoader::didFinishLoading(ResourceHandle*) {
 void WebCoreSynchronousLoader::didFail(ResourceHandle* handle,
                                        const ResourceError& error) {
   m_error = error;
-  didFinishLoading(handle);
+  didFinishLoading(handle, 0);
 }
 
 void WebCoreSynchronousLoader::run() {
@@ -343,7 +343,7 @@ static void finishedCallback(SoupSession* session,
                              msg->response_body->length, true);
   }
 
-  client->didFinishLoading(handle.get());
+  client->didFinishLoading(handle.get(), 0);
 }
 
 // parseDataUrl() is taken from the CURL http backend.
@@ -424,7 +424,7 @@ static gboolean parseDataUrl(gpointer callbackData) {
   if (d->m_cancelled || !handle->client())
     return false;
 
-  client->didFinishLoading(handle);
+  client->didFinishLoading(handle, 0);
 
   return false;
 }
@@ -738,7 +738,7 @@ static void closeCallback(GObject* source, GAsyncResult* res, gpointer) {
   if (d->m_cancelled || !client)
     return;
 
-  client->didFinishLoading(handle.get());
+  client->didFinishLoading(handle.get(), 0);
 }
 
 static void readCallback(GObject* source, GAsyncResult* res, gpointer) {

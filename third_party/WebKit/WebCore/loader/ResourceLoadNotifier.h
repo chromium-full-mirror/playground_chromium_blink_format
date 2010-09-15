@@ -58,7 +58,7 @@ class ResourceLoadNotifier : public Noncopyable {
                        const ResourceResponse& redirectResponse);
   void didReceiveResponse(ResourceLoader*, const ResourceResponse&);
   void didReceiveData(ResourceLoader*, const char*, int, int lengthReceived);
-  void didFinishLoad(ResourceLoader*);
+  void didFinishLoad(ResourceLoader*, double finishTime);
   void didFailToLoad(ResourceLoader*, const ResourceError&);
 
   void assignIdentifierToInitialRequest(unsigned long identifier,
@@ -74,7 +74,9 @@ class ResourceLoadNotifier : public Noncopyable {
   void dispatchDidReceiveContentLength(DocumentLoader*,
                                        unsigned long identifier,
                                        int length);
-  void dispatchDidFinishLoading(DocumentLoader*, unsigned long identifier);
+  void dispatchDidFinishLoading(DocumentLoader*,
+                                unsigned long identifier,
+                                double finishTime);
 
   void sendRemainingDelegateMessages(DocumentLoader*,
                                      unsigned long identifier,
