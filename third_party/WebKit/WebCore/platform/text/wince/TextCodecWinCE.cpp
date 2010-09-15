@@ -369,12 +369,13 @@ CString TextCodecWinCE::encode(const UChar* characters,
   if (resultLength <= 0)
     return "?";
 
-  Vector<char> result(resultLength);
+  char* characterBuffer;
+  CString result = CString::newUninitialized(resultLength, characterBuffer);
 
-  WideCharToMultiByte(m_codePage, flags, characters, length, result.data(),
+  WideCharToMultiByte(m_codePage, flags, characters, length, characterBuffer,
                       resultLength, 0, 0);
 
-  return CString(result.data(), result.size());
+  return result;
 }
 
 void TextCodecWinCE::enumerateSupportedEncodings(EncodingReceiver& receiver) {
