@@ -86,7 +86,7 @@ class BlobResourceSynchronousLoader : public ResourceHandleClient {
                               const char*,
                               int,
                               int /*lengthReceived*/);
-  virtual void didFinishLoading(ResourceHandle*, double /*finishTime*/);
+  virtual void didFinishLoading(ResourceHandle*);
   virtual void didFail(ResourceHandle*, const ResourceError&);
 
  private:
@@ -125,7 +125,7 @@ void BlobResourceSynchronousLoader::didReceiveData(ResourceHandle*,
                                                    int,
                                                    int) {}
 
-void BlobResourceSynchronousLoader::didFinishLoading(ResourceHandle*, double) {}
+void BlobResourceSynchronousLoader::didFinishLoading(ResourceHandle*) {}
 
 void BlobResourceSynchronousLoader::didFail(ResourceHandle*,
                                             const ResourceError& error) {
@@ -594,7 +594,7 @@ void BlobResourceHandle::notifyFail(int errorCode) {
 
 void BlobResourceHandle::notifyFinish() {
   if (client())
-    client()->didFinishLoading(this, 0);
+    client()->didFinishLoading(this);
 }
 
 }  // namespace WebCore

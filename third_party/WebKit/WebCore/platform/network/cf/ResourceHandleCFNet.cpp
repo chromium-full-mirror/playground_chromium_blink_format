@@ -102,7 +102,7 @@ class WebCoreSynchronousLoaderClient : public ResourceHandleClient {
                               const char*,
                               int,
                               int /*lengthReceived*/);
-  virtual void didFinishLoading(ResourceHandle*, double /*finishTime*/);
+  virtual void didFinishLoading(ResourceHandle*);
   virtual void didFail(ResourceHandle*, const ResourceError&);
 
   bool m_allowStoredCredentials;
@@ -286,7 +286,7 @@ void didFinishLoading(CFURLConnectionRef conn, const void* clientInfo) {
       handle, handle->firstRequest().url().string().utf8().data());
 
   if (handle->client())
-    handle->client()->didFinishLoading(handle, 0);
+    handle->client()->didFinishLoading(handle);
 }
 
 void didFail(CFURLConnectionRef conn,
@@ -902,7 +902,7 @@ void WebCoreSynchronousLoaderClient::didReceiveData(ResourceHandle*,
   CFDataAppendBytes(m_data.get(), reinterpret_cast<const UInt8*>(data), length);
 }
 
-void WebCoreSynchronousLoaderClient::didFinishLoading(ResourceHandle*, double) {
+void WebCoreSynchronousLoaderClient::didFinishLoading(ResourceHandle*) {
   m_isDone = true;
 }
 

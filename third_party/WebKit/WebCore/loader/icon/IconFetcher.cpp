@@ -193,7 +193,7 @@ void IconFetcher::didReceiveData(ResourceHandle* handle,
   m_entries[m_currentEntry].buffer()->append(data, length);
 }
 
-void IconFetcher::didFinishLoading(ResourceHandle* handle, double) {
+void IconFetcher::didFinishLoading(ResourceHandle* handle) {
   ASSERT_UNUSED(handle, m_handle == handle);
 
   if (m_currentEntry == m_entries.size() - 1) {

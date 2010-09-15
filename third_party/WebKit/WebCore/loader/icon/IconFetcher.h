@@ -65,7 +65,7 @@ class IconFetcher : public RefCounted<IconFetcher>, ResourceHandleClient {
                               const char*,
                               int,
                               int lengthReceived);
-  virtual void didFinishLoading(ResourceHandle*, double /*finishTime*/);
+  virtual void didFinishLoading(ResourceHandle*);
   virtual void didFail(ResourceHandle*, const ResourceError&);
 
   Frame* m_frame;

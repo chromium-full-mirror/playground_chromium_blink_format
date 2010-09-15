@@ -411,7 +411,7 @@ void ResourceHandleManager::downloadTimerCallback(
       }
 
       if (d->client())
-        d->client()->didFinishLoading(job, 0);
+        d->client()->didFinishLoading(job);
     } else {
       char* url = 0;
       curl_easy_getinfo(d->m_handle, CURLINFO_EFFECTIVE_URL, &url);
@@ -642,7 +642,7 @@ static void parseDataUrl(ResourceHandle* handle) {
                              data.length() * sizeof(UChar), 0);
   }
 
-  client->didFinishLoading(handle, 0);
+  client->didFinishLoading(handle);
 }
 
 void ResourceHandleManager::dispatchSynchronousJob(ResourceHandle* job) {
