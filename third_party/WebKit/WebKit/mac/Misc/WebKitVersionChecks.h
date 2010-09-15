@@ -34,10 +34,10 @@
     For example the version 1.2.3 is returned as 0x00010203 and version 200.3.5
    is returned as 0x00C80305
     A version of -1 is returned if the main executable did not link against
-   WebKit (should never happen).
+   WebKit.
 
     Please use the current WebKit version number, available in
-   WebKit/Configurations/Version.xcconfig,
+   WebKit/mac/Configurations/Version.xcconfig,
     when adding a new version constant.
 */
 
@@ -77,8 +77,7 @@ extern "C" {
 #endif
 
 BOOL WebKitLinkedOnOrAfter(int version);
-int WebKitLinkTimeVersion(void);
-int WebKitRunTimeVersion(void);
+void setWebKitLinkTimeVersion(int);
 
 #ifdef __cplusplus
 }
