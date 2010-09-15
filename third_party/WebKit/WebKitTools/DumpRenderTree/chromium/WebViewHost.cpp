@@ -481,10 +481,10 @@ void WebViewHost::focusAccessibilityObject(
 void WebViewHost::postAccessibilityNotification(
     const WebAccessibilityObject& obj,
     WebAccessibilityNotification notification) {
-  printf("AccessibilityNotification - ");
-
   if (m_shell->accessibilityController()
           ->shouldDumpAccessibilityNotifications()) {
+    printf("AccessibilityNotification - ");
+
     switch (notification) {
       case WebAccessibilityNotificationActiveDescendantChanged:
         printf("ActiveDescendantChanged");
