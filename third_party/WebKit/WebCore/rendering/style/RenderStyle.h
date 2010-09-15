@@ -1908,6 +1908,18 @@ class RenderStyle : public RefCounted<RenderStyle> {
   ContentData* prepareToSetContent(StringImpl*, bool add);
 };
 
+inline int adjustForAbsoluteZoom(int value, const RenderStyle* style) {
+  double zoomFactor = style->effectiveZoom();
+  if (zoomFactor == 1)
+    return value;
+  // Needed because computeLengthInt truncates (rather than rounds) when scaling
+  // up.
+  if (zoomFactor > 1)
+    value++;
+
+  return roundForImpreciseConversion<int, INT_MAX, INT_MIN>(value / zoomFactor);
+}
+
 }  // namespace WebCore
 
 #endif  // RenderStyle_h

@@ -83,7 +83,9 @@ class CSSComputedStyleDeclaration : public CSSStyleDeclaration {
                            bool important,
                            ExceptionCode&);
 
-  PassRefPtr<CSSValue> valueForShadow(const ShadowData*, int) const;
+  PassRefPtr<CSSValue> valueForShadow(const ShadowData*,
+                                      int,
+                                      RenderStyle*) const;
   PassRefPtr<CSSPrimitiveValue> currentColorOrValidColor(RenderStyle*,
                                                          const Color&) const;
 
