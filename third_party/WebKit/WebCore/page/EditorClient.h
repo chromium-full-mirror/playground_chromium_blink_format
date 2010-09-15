@@ -214,6 +214,7 @@ class EditorClient {
                                    const String& replacmentString,
                                    Editor*) = 0;
   virtual void dismissCorrectionPanel(bool correctionAccepted) = 0;
+  virtual bool isShowingCorrectionPanel() = 0;
 #endif
 
   virtual void updateSpellingUIWithGrammarString(

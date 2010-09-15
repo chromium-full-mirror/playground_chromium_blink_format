@@ -470,8 +470,8 @@ void WebEditorClient::setInputMethodState(bool) {
   notImplemented();
 }
 
-#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD) && \
-    !defined(BUILDING_ON_SNOW_LEOPARD)
+#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
+    !defined(BUILDING_ON_LEOPARD) && !defined(BUILDING_ON_SNOW_LEOPARD)
 void WebEditorClient::showCorrectionPanel(
     const WebCore::FloatRect& boundingBoxOfReplacedString,
     const WTF::String& replacedString,
@@ -482,6 +482,11 @@ void WebEditorClient::showCorrectionPanel(
 
 void WebEditorClient::dismissCorrectionPanel(bool correctionAccepted) {
   notImplemented();
+}
+
+bool WebEditorClient::isShowingCorrectionPanel() {
+  notImplemented();
+  return false;
 }
 #endif
 
