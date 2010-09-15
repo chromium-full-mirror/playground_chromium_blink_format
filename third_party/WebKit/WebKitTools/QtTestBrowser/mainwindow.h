@@ -65,6 +65,7 @@ class MainWindow : public QMainWindow {
   QStringList urlList;
   LocationEdit* urlEdit;
 
+ protected:
   WebPage* m_page;
 };
 
