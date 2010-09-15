@@ -59,10 +59,6 @@ LayerBackedDrawingArea::LayerBackedDrawingArea(DrawingAreaID identifier,
 #endif
   m_backingLayer->syncCompositingStateForThisLayerOnly();
 
-  // Do geometry flipping on this layer.
-  m_backingLayer->setGeometryOrientation(
-      GraphicsLayer::CompositingCoordinatesBottomUp);
-
   platformInit();
 }
 

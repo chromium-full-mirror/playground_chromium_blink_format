@@ -94,8 +94,6 @@ class GraphicsLayerChromium : public GraphicsLayer {
   virtual void setDebugBackgroundColor(const Color&);
   virtual void setDebugBorder(const Color&, float borderWidth);
 
-  virtual void setGeometryOrientation(CompositingCoordinatesOrientation);
-
   void notifySyncRequired() {
     if (m_client)
       m_client->notifySyncRequired(this);
@@ -126,7 +124,6 @@ class GraphicsLayerChromium : public GraphicsLayer {
   void updateContentsImage();
   void updateContentsVideo();
   void updateContentsRect();
-  void updateGeometryOrientation();
 
   void setupContentsLayer(LayerChromium*);
   LayerChromium* contentsLayer() const { return m_contentsLayer.get(); }

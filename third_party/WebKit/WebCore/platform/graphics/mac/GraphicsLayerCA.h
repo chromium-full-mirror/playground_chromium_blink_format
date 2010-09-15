@@ -115,8 +115,6 @@ class GraphicsLayerCA : public GraphicsLayer {
   virtual void setDebugBackgroundColor(const Color&);
   virtual void setDebugBorder(const Color&, float borderWidth);
 
-  virtual void setGeometryOrientation(CompositingCoordinatesOrientation);
-
   virtual void didDisplay(PlatformLayer*);
 
   void recursiveCommitChanges();
@@ -300,7 +298,6 @@ class GraphicsLayerCA : public GraphicsLayer {
   void updateContentsMediaLayer();
   void updateContentsCanvasLayer();
   void updateContentsRect();
-  void updateGeometryOrientation();
   void updateMaskLayer();
   void updateReplicatedLayers();
 
@@ -362,10 +359,9 @@ class GraphicsLayerCA : public GraphicsLayer {
     ContentsMediaLayerChanged = 1 << 18,
     ContentsCanvasLayerChanged = 1 << 19,
     ContentsRectChanged = 1 << 20,
-    GeometryOrientationChanged = 1 << 21,
-    MaskLayerChanged = 1 << 22,
-    ReplicatedLayerChanged = 1 << 23,
-    ContentsNeedsDisplay = 1 << 24
+    MaskLayerChanged = 1 << 21,
+    ReplicatedLayerChanged = 1 << 22,
+    ContentsNeedsDisplay = 1 << 23
   };
   typedef unsigned LayerChangeFlags;
   void noteLayerPropertyChanged(LayerChangeFlags flags);

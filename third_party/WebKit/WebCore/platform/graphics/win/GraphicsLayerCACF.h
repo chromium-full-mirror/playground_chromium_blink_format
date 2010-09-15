@@ -88,8 +88,6 @@ class GraphicsLayerCACF : public GraphicsLayer {
   virtual void setDebugBackgroundColor(const Color&);
   virtual void setDebugBorder(const Color&, float borderWidth);
 
-  virtual void setGeometryOrientation(CompositingCoordinatesOrientation);
-
  private:
   void updateOpacityOnLayer();
 
@@ -119,7 +117,6 @@ class GraphicsLayerCACF : public GraphicsLayer {
   void updateContentsImage();
   void updateContentsMedia();
   void updateContentsRect();
-  void updateGeometryOrientation();
 
   void setupContentsLayer(WKCACFLayer*);
   WKCACFLayer* contentsLayer() const { return m_contentsLayer.get(); }
