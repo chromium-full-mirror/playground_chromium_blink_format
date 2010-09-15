@@ -34,7 +34,6 @@ namespace WebCore {
 
 class CanvasGradient;
 class CanvasPattern;
-class Document;
 class GraphicsContext;
 
 class CanvasStyle : public RefCounted<CanvasStyle> {
@@ -42,8 +41,7 @@ class CanvasStyle : public RefCounted<CanvasStyle> {
   static PassRefPtr<CanvasStyle> createFromRGBA(RGBA32 rgba) {
     return adoptRef(new CanvasStyle(rgba));
   }
-  static PassRefPtr<CanvasStyle> createFromString(const String& color,
-                                                  Document* = 0);
+  static PassRefPtr<CanvasStyle> createFromString(const String& color);
   static PassRefPtr<CanvasStyle> createFromStringWithOverrideAlpha(
       const String& color,
       float alpha);

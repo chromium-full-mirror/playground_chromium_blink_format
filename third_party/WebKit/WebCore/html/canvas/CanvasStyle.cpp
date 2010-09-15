@@ -69,16 +69,11 @@ CanvasStyle::CanvasStyle(PassRefPtr<CanvasGradient> gradient)
 CanvasStyle::CanvasStyle(PassRefPtr<CanvasPattern> pattern)
     : m_type(ImagePattern), m_pattern(pattern) {}
 
-PassRefPtr<CanvasStyle> CanvasStyle::createFromString(const String& color,
-                                                      Document* document) {
+PassRefPtr<CanvasStyle> CanvasStyle::createFromString(const String& color) {
   RGBA32 rgba;
-  if (CSSParser::parseColor(rgba, color))
-    return adoptRef(new CanvasStyle(rgba));
-
-  if (CSSParser::parseSystemColor(rgba, color, document))
-    return adoptRef(new CanvasStyle(rgba));
-
-  return 0;
+  if (!CSSParser::parseColor(rgba, color))
+    return 0;
+  return adoptRef(new CanvasStyle(rgba));
 }
 
 PassRefPtr<CanvasStyle> CanvasStyle::createFromStringWithOverrideAlpha(
