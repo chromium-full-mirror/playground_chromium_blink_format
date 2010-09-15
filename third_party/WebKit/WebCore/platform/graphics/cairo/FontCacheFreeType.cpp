@@ -38,7 +38,6 @@ const SimpleFontData* FontCache::getFontDataForCharacters(
     const Font& font,
     const UChar* characters,
     int length) {
-#if defined(USE_FREETYPE)
   FcResult fresult;
   FontPlatformData* prim =
       const_cast<FontPlatformData*>(&font.primaryFont()->platformData());
@@ -65,7 +64,6 @@ const SimpleFontData* FontCache::getFontDataForCharacters(
     if (sfd->containsCharacters(characters, length))
       return sfd;
   }
-#endif
 
   return 0;
 }
@@ -112,7 +110,6 @@ static bool isWellKnownFontName(const AtomicString family) {
 FontPlatformData* FontCache::createFontPlatformData(
     const FontDescription& fontDescription,
     const AtomicString& family) {
-#if defined(USE_FREETYPE)
   // Handle generic family types specially, because fontconfig does not know
   // them, but we have
   // code to fallback correctly in our platform data implementation.
@@ -141,7 +138,6 @@ FontPlatformData* FontCache::createFontPlatformData(
 
   if (!fontSet->fonts)
     return 0;
-#endif
 
   return new FontPlatformData(fontDescription, family);
 }
