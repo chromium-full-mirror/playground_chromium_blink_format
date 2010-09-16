@@ -78,6 +78,8 @@ void LayoutTestController::reset() {
   DumpRenderTreeSupportQt::setWillSendRequestClearHeaders(QStringList());
   DumpRenderTreeSupportQt::clearScriptWorlds();
   DumpRenderTreeSupportQt::setCustomPolicyDelegate(false, false);
+  DumpRenderTreeSupportQt::dumpHistoryCallbacks(false);
+  DumpRenderTreeSupportQt::dumpVisitedLinksCallbacks(false);
   setIconDatabaseEnabled(false);
 
   emit hidePage();
@@ -243,6 +245,10 @@ void LayoutTestController::dumpResourceLoadCallbacks() {
 
 void LayoutTestController::dumpResourceResponseMIMETypes() {
   DumpRenderTreeSupportQt::dumpResourceResponseMIMETypes(true);
+}
+
+void LayoutTestController::dumpHistoryCallbacks() {
+  DumpRenderTreeSupportQt::dumpHistoryCallbacks(true);
 }
 
 void LayoutTestController::setWillSendRequestReturnsNullOnRedirect(
@@ -781,6 +787,12 @@ QString LayoutTestController::pageProperty(const QString& propertyName,
 
 void LayoutTestController::addUserStyleSheet(const QString& sourceCode) {
   DumpRenderTreeSupportQt::addUserStyleSheet(m_drt->webPage(), sourceCode);
+}
+
+void LayoutTestController::removeAllVisitedLinks() {
+  QWebHistory* history = m_drt->webPage()->history();
+  history->clear();
+  DumpRenderTreeSupportQt::dumpVisitedLinksCallbacks(true);
 }
 
 const unsigned LayoutTestController::maxViewWidth = 800;

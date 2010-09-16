@@ -112,6 +112,7 @@ class LayoutTestController : public QObject {
   void dumpFrameLoadCallbacks();
   void dumpResourceLoadCallbacks();
   void dumpResourceResponseMIMETypes();
+  void dumpHistoryCallbacks();
   void dumpConfigurationForViewport(int availableWidth, int availableHeight);
   void setWillSendRequestReturnsNullOnRedirect(bool enabled);
   void setWillSendRequestReturnsNull(bool enabled);
@@ -142,6 +143,7 @@ class LayoutTestController : public QObject {
   void showWebInspector();
   void closeWebInspector();
   void evaluateInWebInspector(long callId, const QString& script);
+  void removeAllVisitedLinks();
 
   void setMediaType(const QString& type);
   void setFrameFlatteningEnabled(bool enable);
