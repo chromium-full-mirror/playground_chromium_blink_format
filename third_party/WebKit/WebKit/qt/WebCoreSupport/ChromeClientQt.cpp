@@ -44,6 +44,7 @@
 #include "GeolocationPermissionClientQt.h"
 #include "HitTestResult.h"
 #include "Icon.h"
+#include "NetworkingContext.h"
 #include "NotImplemented.h"
 #include "NotificationPresenterClientQt.h"
 #include "PageClientQt.h"
@@ -260,16 +261,16 @@ void ChromeClientQt::closeWindowSoon() {
 
 void ChromeClientQt::runJavaScriptAlert(Frame* f, const String& msg) {
   QString x = msg;
-  FrameLoaderClientQt* fl =
-      static_cast<FrameLoaderClientQt*>(f->loader()->client());
-  m_webPage->javaScriptAlert(fl->webFrame(), x);
+  QWebFrame* webFrame = qobject_cast<QWebFrame*>(
+      f->loader()->networkingContext()->originatingObject());
+  m_webPage->javaScriptAlert(webFrame, x);
 }
 
 bool ChromeClientQt::runJavaScriptConfirm(Frame* f, const String& msg) {
   QString x = msg;
-  FrameLoaderClientQt* fl =
-      static_cast<FrameLoaderClientQt*>(f->loader()->client());
-  return m_webPage->javaScriptConfirm(fl->webFrame(), x);
+  QWebFrame* webFrame = qobject_cast<QWebFrame*>(
+      f->loader()->networkingContext()->originatingObject());
+  return m_webPage->javaScriptConfirm(webFrame, x);
 }
 
 bool ChromeClientQt::runJavaScriptPrompt(Frame* f,
@@ -277,9 +278,9 @@ bool ChromeClientQt::runJavaScriptPrompt(Frame* f,
                                          const String& defaultValue,
                                          String& result) {
   QString x = result;
-  FrameLoaderClientQt* fl =
-      static_cast<FrameLoaderClientQt*>(f->loader()->client());
-  bool rc = m_webPage->javaScriptPrompt(fl->webFrame(), (QString)message,
+  QWebFrame* webFrame = qobject_cast<QWebFrame*>(
+      f->loader()->networkingContext()->originatingObject());
+  bool rc = m_webPage->javaScriptPrompt(webFrame, (QString)message,
                                         (QString)defaultValue, &x);
 
   // Fix up a quirk in the QInputDialog class. If no input happened the string
@@ -417,7 +418,8 @@ PlatformPageClient ChromeClientQt::platformPageClient() const {
 
 void ChromeClientQt::contentsSizeChanged(Frame* frame,
                                          const IntSize& size) const {
-  emit QWebFramePrivate::kit(frame)->contentsSizeChanged(size);
+  if (frame->loader()->networkingContext())
+    QWebFramePrivate::kit(frame)->contentsSizeChanged(size);
 }
 
 void ChromeClientQt::mouseDidMoveOverElement(const HitTestResult& result,
