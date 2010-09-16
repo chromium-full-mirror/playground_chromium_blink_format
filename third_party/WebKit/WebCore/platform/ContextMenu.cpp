@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Christian Dywan <christian@imendio.com>
- * Copyright (C) 2010 Igalia S.L
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -332,25 +331,6 @@ void ContextMenu::populate() {
   ContextMenuItem CopyImageItem(ActionType,
                                 ContextMenuItemTagCopyImageToClipboard,
                                 contextMenuItemTagCopyImageToClipboard());
-  ContextMenuItem OpenMediaInNewWindowItem(
-      ActionType, ContextMenuItemTagOpenMediaInNewWindow,
-      contextMenuItemTagOpenMediaInNewWindow());
-  ContextMenuItem CopyMediaLinkItem(
-      ActionType, ContextMenuItemTagCopyMediaLinkToClipboard,
-      contextMenuItemTagCopyMediaLinkToClipboard());
-  ContextMenuItem MediaPlayPause(ActionType, ContextMenuItemTagMediaPlayPause,
-                                 contextMenuItemTagMediaPlay());
-  ContextMenuItem MediaMute(ActionType, ContextMenuItemTagMediaMute,
-                            contextMenuItemTagMediaMute());
-  ContextMenuItem ToggleMediaControls(CheckableActionType,
-                                      ContextMenuItemTagToggleMediaControls,
-                                      contextMenuItemTagToggleMediaControls());
-  ContextMenuItem ToggleMediaLoop(CheckableActionType,
-                                  ContextMenuItemTagToggleMediaLoop,
-                                  contextMenuItemTagToggleMediaLoop());
-  ContextMenuItem EnterVideoFullscreen(
-      ActionType, ContextMenuItemTagEnterVideoFullscreen,
-      contextMenuItemTagEnterVideoFullscreen());
 #if PLATFORM(MAC)
   ContextMenuItem SearchSpotlightItem(ActionType,
                                       ContextMenuItemTagSearchInSpotlight,
@@ -434,22 +414,6 @@ void ContextMenu::populate() {
         appendItem(CopyImageItem);
     }
 
-    KURL mediaURL = result.absoluteMediaURL();
-    if (!mediaURL.isEmpty()) {
-      if (!linkURL.isEmpty() || !imageURL.isEmpty())
-        appendItem(*separatorItem());
-
-      appendItem(MediaPlayPause);
-      appendItem(MediaMute);
-      appendItem(ToggleMediaControls);
-      appendItem(ToggleMediaLoop);
-      appendItem(EnterVideoFullscreen);
-
-      appendItem(*separatorItem());
-      appendItem(CopyMediaLinkItem);
-      appendItem(OpenMediaInNewWindowItem);
-    }
-
     if (imageURL.isEmpty() && linkURL.isEmpty()) {
       if (result.isSelected()) {
         if (selectionContainsPossibleWord(frame)) {
@@ -481,20 +445,26 @@ void ContextMenu::populate() {
                   ->inspectorController()
                   ->hasInspectorFrontendClient())) {
 #endif
-          if (frame->page() && frame->page()->canGoBackOrForward(-1))
-            appendItem(BackItem);
+#if PLATFORM(GTK)
+          appendItem(BackItem);
+          appendItem(ForwardItem);
+          appendItem(StopItem);
+          appendItem(ReloadItem);
+#else
+        if (frame->page() && frame->page()->canGoBackOrForward(-1))
+          appendItem(BackItem);
 
-          if (frame->page() && frame->page()->canGoBackOrForward(1))
-            appendItem(ForwardItem);
+        if (frame->page() && frame->page()->canGoBackOrForward(1))
+          appendItem(ForwardItem);
 
-          // use isLoadingInAPISense rather than isLoading because Stop/Reload
-          // are
-          // intended to match WebKit's API, not WebCore's internal notion of
-          // loading status
-          if (loader->documentLoader()->isLoadingInAPISense())
-            appendItem(StopItem);
-          else
-            appendItem(ReloadItem);
+        // use isLoadingInAPISense rather than isLoading because Stop/Reload are
+        // intended to match WebKit's API, not WebCore's internal notion of
+        // loading status
+        if (loader->documentLoader()->isLoadingInAPISense())
+          appendItem(StopItem);
+        else
+          appendItem(ReloadItem);
+#endif
 #if ENABLE(INSPECTOR)
         }
 #endif
@@ -935,17 +905,6 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
     case ContextMenuItemTagOpenImageInNewWindow:
     case ContextMenuItemTagDownloadImageToDisk:
     case ContextMenuItemTagCopyImageToClipboard:
-    case ContextMenuItemTagOpenMediaInNewWindow:
-    case ContextMenuItemTagCopyMediaLinkToClipboard:
-    case ContextMenuItemTagToggleMediaControls:
-      shouldCheck = m_hitTestResult.mediaControlsEnabled();
-      break;
-    case ContextMenuItemTagToggleMediaLoop:
-      shouldCheck = m_hitTestResult.mediaLoopEnabled();
-      break;
-    case ContextMenuItemTagEnterVideoFullscreen:
-      shouldEnable = m_hitTestResult.mediaSupportsFullscreen();
-      break;
     case ContextMenuItemTagOpenFrameInNewWindow:
     case ContextMenuItemTagSpellingGuess:
     case ContextMenuItemTagOther:
@@ -980,19 +939,6 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
     case ContextMenuItemCustomTagNoAction:
     case ContextMenuItemLastCustomTag:
     case ContextMenuItemBaseApplicationTag:
-      break;
-    case ContextMenuItemTagMediaPlayPause:
-      if (m_hitTestResult.mediaPlaying())
-        item.setTitle(contextMenuItemTagMediaPause());
-      else
-        item.setTitle(contextMenuItemTagMediaPlay());
-      break;
-    case ContextMenuItemTagMediaMute:
-      shouldEnable = m_hitTestResult.mediaHasAudio();
-      if (!shouldEnable || !m_hitTestResult.mediaMuted())
-        item.setTitle(contextMenuItemTagMediaMute());
-      else
-        item.setTitle(contextMenuItemTagMediaUnMute());
       break;
   }
 
