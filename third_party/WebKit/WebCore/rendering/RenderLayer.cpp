@@ -481,7 +481,7 @@ TransformationMatrix RenderLayer::renderableTransform(
 
 void RenderLayer::updatePagination() {
   m_isPaginated = false;
-  if (isComposited() || !parent() || renderer()->isPositioned())
+  if (isComposited() || !parent())
     return;  // FIXME: We will have to deal with paginated compositing layers
              // someday.
   // FIXME: For now the RenderView can't be paginated.  Eventually printing will
@@ -2815,11 +2815,11 @@ void RenderLayer::paintChildLayerIntoColumns(
   columnBlock->layer()->convertToLayerCoords(rootLayer, layerX, layerY);
 
   ColumnInfo* colInfo = columnBlock->columnInfo();
-  unsigned colCount = colInfo->columnCount();
+  unsigned colCount = columnBlock->columnCount(colInfo);
   int currYOffset = 0;
   for (unsigned i = 0; i < colCount; i++) {
     // For each rect, we clip to the rect, and then we adjust our coords.
-    IntRect colRect = colInfo->columnRectAt(i);
+    IntRect colRect = columnBlock->columnRectAt(colInfo, i);
     int currXOffset =
         colRect.x() - (columnBlock->borderLeft() + columnBlock->paddingLeft());
     colRect.move(layerX, layerY);
@@ -3388,17 +3388,17 @@ RenderLayer* RenderLayer::hitTestChildLayerColumns(
   columnBlock->layer()->convertToLayerCoords(rootLayer, layerX, layerY);
 
   ColumnInfo* colInfo = columnBlock->columnInfo();
-  int colCount = colInfo->columnCount();
+  int colCount = columnBlock->columnCount(colInfo);
 
   // We have to go backwards from the last column to the first.
   int left = columnBlock->borderLeft() + columnBlock->paddingLeft();
   int currYOffset = 0;
   int i;
   for (i = 0; i < colCount; i++)
-    currYOffset -= colInfo->columnRectAt(i).height();
+    currYOffset -= columnBlock->columnRectAt(colInfo, i).height();
   for (i = colCount - 1; i >= 0; i--) {
     // For each rect, we clip to the rect, and then we adjust our coords.
-    IntRect colRect = colInfo->columnRectAt(i);
+    IntRect colRect = columnBlock->columnRectAt(colInfo, i);
     int currXOffset = colRect.x() - left;
     currYOffset += colRect.height();
     colRect.move(layerX, layerY);

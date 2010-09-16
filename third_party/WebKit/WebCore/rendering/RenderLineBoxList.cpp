@@ -35,7 +35,6 @@
 #include "RenderInline.h"
 #include "RenderView.h"
 #include "RootInlineBox.h"
-#include "Settings.h"  // FIXME: This include can be removed when paginateDuringLayoutEnabled is taken out.
 
 using namespace std;
 
@@ -165,9 +164,7 @@ void RenderLineBoxList::paint(RenderBoxModelObject* renderer,
     return;
 
   RenderView* v = renderer->view();
-  bool usePrintRect =
-      !v->printRect().isEmpty() &&
-      !renderer->document()->settings()->paginateDuringLayoutEnabled();
+  bool usePrintRect = !v->printRect().isEmpty();
 
   // We can check the first box and last box and avoid painting if we don't
   // intersect.  This is a quick short-circuit that we can take to avoid walking
@@ -231,7 +228,6 @@ void RenderLineBoxList::paint(RenderBoxModelObject* renderer,
                  renderer->maximalOutlineSize(info.phase);
     h = bottom - top;
     yPos = ty + top;
-    v->setMinimumColumnHeight(h);
     if (yPos < info.rect.bottom() && yPos + h > info.rect.y())
       curr->paint(info, tx, ty);
   }

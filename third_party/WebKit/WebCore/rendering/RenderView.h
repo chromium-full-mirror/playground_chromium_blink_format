@@ -97,15 +97,12 @@ class RenderView : public RenderBlock {
   void setTruncatedAt(int y) {
     m_truncatedAt = y;
     m_bestTruncatedAt = m_truncatorWidth = 0;
-    m_minimumColumnHeight = 0;
     m_forcedPageBreak = false;
   }
   void setBestTruncatedAt(int y,
                           RenderBoxModelObject* forRenderer,
                           bool forcedBreak = false);
-  void setMinimumColumnHeight(int height) { m_minimumColumnHeight = height; }
   int bestTruncatedAt() const { return m_bestTruncatedAt; }
-  int minimumColumnHeight() const { return m_minimumColumnHeight; }
 
   int truncatedAt() const { return m_truncatedAt; }
 
@@ -140,21 +137,24 @@ class RenderView : public RenderBlock {
 
   bool doingFullRepaint() const { return m_frameView->needsFullRepaint(); }
 
-  void pushLayoutState(RenderBox* renderer, const IntSize& offset) {
-    if (doingFullRepaint())
-      return;
+  void pushLayoutState(RenderBox* renderer,
+                       const IntSize& offset,
+                       int pageHeight = 0,
+                       ColumnInfo* colInfo = 0) {
     // We push LayoutState even if layoutState is disabled because it stores
     // layoutDelta too.
-    m_layoutState =
-        new (renderArena()) LayoutState(m_layoutState, renderer, offset);
+    if (!doingFullRepaint() || renderer->hasColumns() ||
+        m_layoutState->isPaginated())
+      m_layoutState = new (renderArena())
+          LayoutState(m_layoutState, renderer, offset, pageHeight, colInfo);
   }
 
   void pushLayoutState(RenderObject*);
 
   void popLayoutState() {
-    if (doingFullRepaint())
-      return;
     LayoutState* state = m_layoutState;
+    if (doingFullRepaint() && !m_layoutState->isPaginated())
+      return;
     m_layoutState = state->m_next;
     state->destroy(renderArena());
   }
@@ -231,7 +231,6 @@ class RenderView : public RenderBlock {
  private:
   int m_bestTruncatedAt;
   int m_truncatorWidth;
-  int m_minimumColumnHeight;
   bool m_forcedPageBreak;
   LayoutState* m_layoutState;
   unsigned m_layoutStateDisableCount;
@@ -260,12 +259,14 @@ class LayoutStateMaintainer : public Noncopyable {
   LayoutStateMaintainer(RenderView* view,
                         RenderBox* root,
                         IntSize offset,
-                        bool disableState = false)
+                        bool disableState = false,
+                        int pageHeight = 0,
+                        ColumnInfo* colInfo = 0)
       : m_view(view),
         m_disabled(disableState),
         m_didStart(false),
         m_didEnd(false) {
-    push(root, offset);
+    push(root, offset, pageHeight, colInfo);
   }
 
   // ctor to maybe push later
@@ -277,11 +278,14 @@ class LayoutStateMaintainer : public Noncopyable {
                                      // a push(), but forgot to pop().
   }
 
-  void push(RenderBox* root, IntSize offset) {
+  void push(RenderBox* root,
+            IntSize offset,
+            int pageHeight = 0,
+            ColumnInfo* colInfo = 0) {
     ASSERT(!m_didStart);
     // We push state even if disabled, because we still need to store
     // layoutDelta
-    m_view->pushLayoutState(root, offset);
+    m_view->pushLayoutState(root, offset, pageHeight, colInfo);
     if (m_disabled)
       m_view->disableLayoutState();
     m_didStart = true;

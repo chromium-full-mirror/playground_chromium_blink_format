@@ -26,6 +26,7 @@
 #include "config.h"
 #include "LayoutState.h"
 
+#include "ColumnInfo.h"
 #include "RenderArena.h"
 #include "RenderInline.h"
 #include "RenderLayer.h"
@@ -35,8 +36,11 @@ namespace WebCore {
 
 LayoutState::LayoutState(LayoutState* prev,
                          RenderBox* renderer,
-                         const IntSize& offset)
-    : m_next(prev)
+                         const IntSize& offset,
+                         int pageHeight,
+                         ColumnInfo* columnInfo)
+    : m_columnInfo(columnInfo),
+      m_next(prev)
 #ifndef NDEBUG
       ,
       m_renderer(renderer)
@@ -50,20 +54,22 @@ LayoutState::LayoutState(LayoutState* prev,
     // FIXME: This doesn't work correctly with transforms.
     FloatPoint fixedOffset =
         renderer->view()->localToAbsolute(FloatPoint(), true);
-    m_offset = IntSize(fixedOffset.x(), fixedOffset.y()) + offset;
+    m_paintOffset = IntSize(fixedOffset.x(), fixedOffset.y()) + offset;
   } else
-    m_offset = prev->m_offset + offset;
+    m_paintOffset = prev->m_paintOffset + offset;
 
-  if (renderer->isRelPositioned()) {
-    if (renderer->hasLayer())
-      m_offset += renderer->layer()->relativePositionOffset();
-  } else if (renderer->isPositioned() && !fixed) {
+  if (renderer->isPositioned() && !fixed) {
     if (RenderObject* container = renderer->container()) {
       if (container->isRelPositioned() && container->isRenderInline())
-        m_offset +=
+        m_paintOffset +=
             toRenderInline(container)->relativePositionedInlineOffset(renderer);
     }
   }
+
+  m_layoutOffset = m_paintOffset;
+
+  if (renderer->isRelPositioned() && renderer->hasLayer())
+    m_paintOffset += renderer->layer()->relativePositionOffset();
 
   m_clipped = !fixed && prev->m_clipped;
   if (m_clipped)
@@ -71,7 +77,7 @@ LayoutState::LayoutState(LayoutState* prev,
 
   if (renderer->hasOverflowClip()) {
     RenderLayer* layer = renderer->layer();
-    IntRect clipRect(toPoint(m_offset) + renderer->view()->layoutDelta(),
+    IntRect clipRect(toPoint(m_paintOffset) + renderer->view()->layoutDelta(),
                      layer->size());
     if (m_clipped)
       m_clipRect.intersect(clipRect);
@@ -79,8 +85,34 @@ LayoutState::LayoutState(LayoutState* prev,
       m_clipRect = clipRect;
       m_clipped = true;
     }
-    m_offset -= layer->scrolledContentOffset();
+
+    m_paintOffset -= layer->scrolledContentOffset();
   }
+
+  // If we establish a new page height, then cache the offset to the top of the
+  // first page.
+  // We can compare this later on to figure out what part of the page we're
+  // actually on,
+  if (pageHeight || m_columnInfo) {
+    m_pageHeight = pageHeight;
+    m_pageOffset = IntSize(m_layoutOffset.width() + renderer->borderLeft() +
+                               renderer->paddingLeft(),
+                           m_layoutOffset.height() + renderer->borderTop() +
+                               renderer->paddingTop());
+  } else {
+    // If we don't establish a new page height, then propagate the old page
+    // height and offset down.
+    m_pageHeight = m_next->m_pageHeight;
+    m_pageOffset = m_next->m_pageOffset;
+
+    // Disable pagination for objects we don't support.  For now this includes
+    // overflow:scroll/auto and inline blocks.
+    if (renderer->isReplaced() || renderer->scrollsOverflow())
+      m_pageHeight = 0;
+  }
+
+  if (!m_columnInfo)
+    m_columnInfo = m_next->m_columnInfo;
 
   m_layoutDelta = m_next->m_layoutDelta;
 
@@ -90,6 +122,8 @@ LayoutState::LayoutState(LayoutState* prev,
 
 LayoutState::LayoutState(RenderObject* root)
     : m_clipped(false),
+      m_pageHeight(0),
+      m_columnInfo(0),
       m_next(0)
 #ifndef NDEBUG
       ,
@@ -99,13 +133,13 @@ LayoutState::LayoutState(RenderObject* root)
   RenderObject* container = root->container();
   FloatPoint absContentPoint =
       container->localToAbsolute(FloatPoint(), false, true);
-  m_offset = IntSize(absContentPoint.x(), absContentPoint.y());
+  m_paintOffset = IntSize(absContentPoint.x(), absContentPoint.y());
 
   if (container->hasOverflowClip()) {
     RenderLayer* layer = toRenderBoxModelObject(container)->layer();
     m_clipped = true;
-    m_clipRect = IntRect(toPoint(m_offset), layer->size());
-    m_offset -= layer->scrolledContentOffset();
+    m_clipRect = IntRect(toPoint(m_paintOffset), layer->size());
+    m_paintOffset -= layer->scrolledContentOffset();
   }
 }
 
@@ -131,6 +165,22 @@ void* LayoutState::operator new(size_t sz, RenderArena* renderArena) throw() {
 void LayoutState::operator delete(void* ptr, size_t sz) {
   ASSERT(inLayoutStateDestroy);
   *(size_t*)ptr = sz;
+}
+
+void LayoutState::clearPaginationInformation() {
+  m_pageHeight = m_next->m_pageHeight;
+  m_pageOffset = m_next->m_pageOffset;
+  m_columnInfo = m_next->m_columnInfo;
+}
+
+int LayoutState::pageY(int childY) const {
+  return m_layoutOffset.height() + childY - m_pageOffset.height();
+}
+
+void LayoutState::addForcedColumnBreak(int childY) {
+  if (!m_columnInfo || m_columnInfo->columnHeight())
+    return;
+  m_columnInfo->addForcedBreak(pageY(childY));
 }
 
 }  // namespace WebCore
