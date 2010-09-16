@@ -1271,6 +1271,9 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
   if (!relayoutChildren && layoutOnlyPositionedObjects())
     return;
 
+  LayoutRepainter repainter(*this,
+                            m_everHadLayout && checkForRepaintDuringLayout());
+
   int oldWidth = width();
   int oldColumnWidth = desiredColumnWidth();
 
@@ -1313,8 +1316,6 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
       colInfo->clearForcedBreaks();
   }
 
-  LayoutRepainter repainter(*this,
-                            m_everHadLayout && checkForRepaintDuringLayout());
   LayoutStateMaintainer statePusher(
       view(), this, IntSize(x(), y()),
       hasColumns() || hasTransform() || hasReflection(), pageHeight, colInfo);
