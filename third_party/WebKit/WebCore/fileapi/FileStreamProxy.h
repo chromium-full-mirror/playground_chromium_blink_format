@@ -32,7 +32,7 @@
 #ifndef FileStreamProxy_h
 #define FileStreamProxy_h
 
-#if ENABLE(BLOB) || ENABLE(FILE_WRITER)
+#if ENABLE(BLOB) || ENABLE(FILE_SYSTEM)
 
 #include "AsyncFileStream.h"
 #include <wtf/Forward.h>
@@ -96,6 +96,6 @@ class FileStreamProxy : public AsyncFileStream {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(BLOB) || ENABLE(FILE_WRITER)
+#endif  // ENABLE(BLOB) || ENABLE(FILE_SYSTEM)
 
 #endif  // FileStreamProxy_h

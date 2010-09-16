@@ -30,7 +30,7 @@
 
 #include "config.h"
 
-#if ENABLE(FILE_WRITER)
+#if ENABLE(FILE_SYSTEM)
 
 #include "FileWriter.h"
 
@@ -186,4 +186,4 @@ void FileWriter::fireEvent(const AtomicString& type) {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(FILE_WRITER)
+#endif  // ENABLE(FILE_SYSTEM)

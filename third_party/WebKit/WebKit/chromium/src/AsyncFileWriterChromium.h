@@ -31,7 +31,7 @@
 #ifndef AsyncFileWriterChromium_h
 #define AsyncFileWriterChromium_h
 
-#if ENABLE(FILE_WRITER)
+#if ENABLE(FILE_SYSTEM)
 
 #include "AsyncFileWriter.h"
 #include "WebFileError.h"
@@ -71,6 +71,6 @@ class AsyncFileWriterChromium : public WebCore::AsyncFileWriter,
 
 }  // namespace
 
-#endif  // ENABLE(FILE_WRITER)
+#endif  // ENABLE(FILE_SYSTEM)
 
 #endif  // AsyncFileWriterChromium_h

@@ -31,7 +31,7 @@
 #ifndef FileThread_h
 #define FileThread_h
 
-#if ENABLE(BLOB) || ENABLE(FILE_WRITER)
+#if ENABLE(BLOB) || ENABLE(FILE_SYSTEM)
 
 #include <wtf/MessageQueue.h>
 #include <wtf/PassOwnPtr.h>
@@ -81,6 +81,6 @@ class FileThread : public ThreadSafeShared<FileThread> {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(BLOB) || ENABLE(FILE_WRITER)
+#endif  // ENABLE(BLOB) || ENABLE(FILE_SYSTEM)
 
 #endif  // FileThread_h

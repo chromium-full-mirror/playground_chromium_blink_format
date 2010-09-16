@@ -31,7 +31,7 @@
 #ifndef FileException_h
 #define FileException_h
 
-#if ENABLE(BLOB) || ENABLE(FILE_WRITER)
+#if ENABLE(BLOB) || ENABLE(FILE_SYSTEM)
 
 #include "ExceptionBase.h"
 
@@ -56,6 +56,6 @@ class FileException : public ExceptionBase {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(BLOB) || ENABLE(FILE_WRITER)
+#endif  // ENABLE(BLOB) || ENABLE(FILE_SYSTEM)
 
 #endif  // FileException_h

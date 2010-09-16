@@ -122,7 +122,7 @@ class EventTarget {
 #if ENABLE(BLOB)
   virtual FileReader* toFileReader();
 #endif
-#if ENABLE(FILE_WRITER)
+#if ENABLE(FILE_SYSTEM)
   virtual FileWriter* toFileWriter();
 #endif
 

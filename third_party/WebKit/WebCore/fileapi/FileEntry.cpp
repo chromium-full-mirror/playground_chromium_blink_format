@@ -42,12 +42,10 @@ namespace WebCore {
 FileEntry::FileEntry(DOMFileSystem* fileSystem, const String& fullPath)
     : Entry(fileSystem, fullPath) {}
 
-#if ENABLE(FILE_WRITER)
 void FileEntry::createWriter(PassRefPtr<FileWriterCallback>,
                              PassRefPtr<ErrorCallback>) {
   // FIXME: to be implemented.
 }
-#endif
 
 void FileEntry::file(PassRefPtr<FileCallback>, PassRefPtr<ErrorCallback>) {
   // FIXME: to be implemented.
