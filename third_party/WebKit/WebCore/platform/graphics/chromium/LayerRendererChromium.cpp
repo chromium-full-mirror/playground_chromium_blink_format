@@ -366,6 +366,10 @@ void LayerRendererChromium::drawLayers(const IntRect& visibleRect,
   GLC(glDisable(GL_SCISSOR_TEST));
 }
 
+void LayerRendererChromium::finish() {
+  glFinish();
+}
+
 void LayerRendererChromium::present() {
   // We're done! Time to swapbuffers!
   m_gles2Context->swapBuffers();
