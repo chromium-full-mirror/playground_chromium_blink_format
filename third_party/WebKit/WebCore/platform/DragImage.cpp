@@ -72,7 +72,7 @@ DragImageRef fitDragImageToMaxSize(DragImageRef image,
 DragImageRef createDragImageForSelection(Frame* frame) {
   DragImageRef image = frame->dragImageForSelection();
   if (image)
-    dissolveDragImageToFraction(image, DragController::DragImageAlpha);
+    image = dissolveDragImageToFraction(image, DragController::DragImageAlpha);
   return image;
 }
 
