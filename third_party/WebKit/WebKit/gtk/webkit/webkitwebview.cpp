@@ -3031,7 +3031,7 @@ static void webkit_web_view_init(WebKitWebView* webView) {
   priv->editable = false;
 
   priv->backForwardList =
-      webkit_web_back_forward_list_new_with_web_view(webView);
+      adoptPlatformRef(webkit_web_back_forward_list_new_with_web_view(webView));
 
   priv->zoomFullContent = FALSE;
 
