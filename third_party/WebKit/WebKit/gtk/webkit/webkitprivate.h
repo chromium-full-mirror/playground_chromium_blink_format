@@ -295,6 +295,8 @@ GList* webkit_web_view_get_subresources(WebKitWebView*);
 
 void webkit_web_view_set_tooltip_text(WebKitWebView*, const char*);
 
+GtkMenu* webkit_web_view_get_context_menu(WebKitWebView*);
+
 WEBKIT_API void webkit_web_view_execute_core_command_by_name(
     WebKitWebView* webView,
     const gchar* name,
