@@ -40,6 +40,7 @@ namespace WebKit {
 //   - String -> String
 //   - SerializedScriptValue -> SerializedScriptValue
 //   - WebDouble -> WebDouble
+//   - WebUInt64 -> WebUInt64
 
 template <typename Owner>
 class UserMessageEncoder {
@@ -93,6 +94,11 @@ class UserMessageEncoder {
         encoder->encode(doubleObject->value());
         return true;
       }
+      case APIObject::TypeUInt64: {
+        WebUInt64* uint64Object = static_cast<WebUInt64*>(m_root);
+        encoder->encode(uint64Object->value());
+        return true;
+      }
       default:
         break;
     }
@@ -113,6 +119,7 @@ class UserMessageEncoder {
 //   - String -> String
 //   - SerializedScriptValue -> SerializedScriptValue
 //   - WebDouble -> WebDouble
+//   - WebUInt64 -> WebUInt64
 
 template <typename Owner>
 class UserMessageDecoder {
@@ -184,10 +191,17 @@ class UserMessageDecoder {
         break;
       }
       case APIObject::TypeDouble: {
-        double doubleValue;
-        if (!decoder->decode(doubleValue))
+        double value;
+        if (!decoder->decode(value))
           return false;
-        coder.m_root = WebDouble::create(doubleValue);
+        coder.m_root = WebDouble::create(value);
+        break;
+      }
+      case APIObject::TypeUInt64: {
+        uint64_t value;
+        if (!decoder->decode(value))
+          return false;
+        coder.m_root = WebUInt64::create(value);
         break;
       }
       default:
