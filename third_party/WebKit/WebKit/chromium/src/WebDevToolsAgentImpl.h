@@ -107,6 +107,7 @@ class WebDevToolsAgentImpl : public WebDevToolsAgentPrivate,
 
  private:
   void setApuAgentEnabled(bool enabled);
+  void connectFrontend(bool afterNavigation);
 
   WebCore::InspectorController* inspectorController();
 

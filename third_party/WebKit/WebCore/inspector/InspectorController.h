@@ -147,6 +147,7 @@ class InspectorController : public Noncopyable {
   // should
   // be removed.
   void connectFrontend();
+  void reuseFrontend();
   void disconnectFrontend();
 
   void addMessageToConsole(MessageSource,
@@ -332,6 +333,8 @@ class InspectorController : public Noncopyable {
   friend class InjectedScriptHost;
 
   void populateScriptObjects();
+  void restoreDebugger();
+  void restoreProfiler();
   void unbindAllResources();
 
   // Following are used from InspectorBackend and internally.
