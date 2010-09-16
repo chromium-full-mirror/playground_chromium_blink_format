@@ -36,6 +36,8 @@
 
 namespace WebCore {
 
+class IDBDatabaseBackendImpl;
+class IDBIndexBackendImpl;
 class IDBKeyRange;
 class IDBObjectStoreBackendImpl;
 class SQLiteStatement;
@@ -51,11 +53,20 @@ class IDBCursorBackendImpl : public IDBCursorBackendInterface {
     return adoptRef(
         new IDBCursorBackendImpl(objectStore, keyRange, direction, query));
   }
+  static PassRefPtr<IDBCursorBackendImpl> create(
+      PassRefPtr<IDBIndexBackendImpl> index,
+      PassRefPtr<IDBKeyRange> keyRange,
+      IDBCursor::Direction direction,
+      PassOwnPtr<SQLiteStatement> query,
+      bool isSerializedScriptValueCursor) {
+    return adoptRef(new IDBCursorBackendImpl(index, keyRange, direction, query,
+                                             isSerializedScriptValueCursor));
+  }
   virtual ~IDBCursorBackendImpl();
 
   virtual unsigned short direction() const;
   virtual PassRefPtr<IDBKey> key() const;
-  virtual PassRefPtr<SerializedScriptValue> value() const;
+  virtual PassRefPtr<IDBAny> value() const;
   virtual void update(PassRefPtr<SerializedScriptValue>,
                       PassRefPtr<IDBCallbacks>);
   virtual void continueFunction(PassRefPtr<IDBKey>, PassRefPtr<IDBCallbacks>);
@@ -66,18 +77,32 @@ class IDBCursorBackendImpl : public IDBCursorBackendInterface {
                        PassRefPtr<IDBKeyRange>,
                        IDBCursor::Direction,
                        PassOwnPtr<SQLiteStatement> query);
+  IDBCursorBackendImpl(PassRefPtr<IDBIndexBackendImpl>,
+                       PassRefPtr<IDBKeyRange>,
+                       IDBCursor::Direction,
+                       PassOwnPtr<SQLiteStatement> query,
+                       bool isSerializedScriptValueCursor);
 
   void loadCurrentRow();
+  IDBDatabaseBackendImpl* database() const;
 
   static const int64_t InvalidId = -1;
 
+  // Only one or the other should be used.
   RefPtr<IDBObjectStoreBackendImpl> m_idbObjectStore;
+  RefPtr<IDBIndexBackendImpl> m_idbIndex;
+
   RefPtr<IDBKeyRange> m_keyRange;
   IDBCursor::Direction m_direction;
   OwnPtr<SQLiteStatement> m_query;
+  bool m_isSerializedScriptValueCursor;
   int64_t m_currentId;
   RefPtr<IDBKey> m_currentKey;
-  RefPtr<SerializedScriptValue> m_currentValue;
+
+  // Only one of these will ever be used for each instance. Which depends on
+  // m_isSerializedScriptValueCursor.
+  RefPtr<SerializedScriptValue> m_currentSerializedScriptValue;
+  RefPtr<IDBKey> m_currentIDBKeyValue;
 };
 
 }  // namespace WebCore

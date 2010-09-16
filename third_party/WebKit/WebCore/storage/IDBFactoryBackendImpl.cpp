@@ -118,14 +118,13 @@ static bool createTables(SQLiteDatabase* sqliteDatabase) {
       "INTEGER, keyNumber INTEGER, objectStoreDataId INTEGER NOT NULL UNIQUE "
       "REFERENCES ObjectStoreData(id))",
       "DROP INDEX IF EXISTS IndexData_composit",
-      "CREATE UNIQUE INDEX IF NOT EXISTS IndexData_composit ON "
-      "IndexData(keyString, keyDate, keyNumber, indexId)",
+      "CREATE INDEX IF NOT EXISTS IndexData_composit ON IndexData(keyString, "
+      "keyDate, keyNumber, indexId)",
       "DROP INDEX IF EXISTS IndexData_objectStoreDataId",
-      "CREATE UNIQUE INDEX IF NOT EXISTS IndexData_objectStoreDataId ON "
+      "CREATE INDEX IF NOT EXISTS IndexData_objectStoreDataId ON "
       "IndexData(objectStoreDataId)",
       "DROP INDEX IF EXISTS IndexData_indexId",
-      "CREATE UNIQUE INDEX IF NOT EXISTS IndexData_indexId ON "
-      "IndexData(indexId)"};
+      "CREATE INDEX IF NOT EXISTS IndexData_indexId ON IndexData(indexId)"};
 
   for (size_t i = 0; i < arraysize(commands); ++i) {
     if (!sqliteDatabase->executeCommand(commands[i])) {

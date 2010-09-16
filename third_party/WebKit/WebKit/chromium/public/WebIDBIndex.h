@@ -30,12 +30,20 @@
 
 namespace WebKit {
 
+class WebIDBCallbacks;
+class WebIDBKey;
+class WebIDBKeyRange;
+
 // See comment in WebIndexedDatabase for a high level overview of these classes.
 class WebIDBIndex {
  public:
   virtual ~WebIDBIndex() {}
 
   virtual WebString name() const {
+    WEBKIT_ASSERT_NOT_REACHED();
+    return WebString();
+  }
+  virtual WebString storeName() const {
     WEBKIT_ASSERT_NOT_REACHED();
     return WebString();
   }
@@ -46,6 +54,23 @@ class WebIDBIndex {
   virtual bool unique() const {
     WEBKIT_ASSERT_NOT_REACHED();
     return false;
+  }
+
+  virtual void openObjectCursor(const WebIDBKeyRange&,
+                                unsigned short direction,
+                                WebIDBCallbacks*) {
+    WEBKIT_ASSERT_NOT_REACHED();
+  }
+  virtual void openCursor(const WebIDBKeyRange&,
+                          unsigned short direction,
+                          WebIDBCallbacks*) {
+    WEBKIT_ASSERT_NOT_REACHED();
+  }
+  virtual void getObject(const WebIDBKey&, WebIDBCallbacks*) {
+    WEBKIT_ASSERT_NOT_REACHED();
+  }
+  virtual void get(const WebIDBKey&, WebIDBCallbacks*) {
+    WEBKIT_ASSERT_NOT_REACHED();
   }
 };
 

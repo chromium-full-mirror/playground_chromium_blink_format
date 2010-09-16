@@ -70,6 +70,34 @@ PassRefPtr<IDBKeyRange> IDBKeyRange::bound(PassRefPtr<IDBKey> left,
   return IDBKeyRange::create(left, right, flags);
 }
 
+String IDBKeyRange::leftWhereClauseComparisonOperator() const {
+  if (m_flags & LEFT_OPEN)
+    return "<";
+
+  if (m_flags & LEFT_BOUND)
+    return "<=";
+
+  if (m_flags == SINGLE)
+    return "=";
+
+  ASSERT_NOT_REACHED();
+  return "";
+}
+
+String IDBKeyRange::rightWhereClauseComparisonOperator() const {
+  if (m_flags & RIGHT_OPEN)
+    return "<";
+
+  if (m_flags & RIGHT_BOUND)
+    return "<=";
+
+  if (m_flags == SINGLE)
+    return "=";
+
+  ASSERT_NOT_REACHED();
+  return "";
+}
+
 }  // namespace WebCore
 
 #endif  // ENABLE(INDEXED_DATABASE)

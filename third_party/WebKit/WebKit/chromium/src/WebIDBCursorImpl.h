@@ -45,7 +45,7 @@ class WebIDBCursorImpl : public WebIDBCursor {
 
   virtual unsigned short direction() const;
   virtual WebIDBKey key() const;
-  virtual WebSerializedScriptValue value() const;
+  virtual void value(WebSerializedScriptValue&, WebIDBKey&) const;
   virtual void update(const WebSerializedScriptValue&, WebIDBCallbacks*);
   virtual void continueFunction(const WebIDBKey&, WebIDBCallbacks*);
   virtual void remove(WebIDBCallbacks*);

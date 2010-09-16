@@ -62,8 +62,14 @@ class IDBKey : public RefCounted<IDBKey> {
     return m_number;
   }
 
+  static PassRefPtr<IDBKey> fromQuery(SQLiteStatement& query, int baseColumn);
+
   bool isEqual(IDBKey* other);
-  String whereSyntax() const;
+  String whereSyntax(String qualifiedTableName = "") const;
+  String leftCursorWhereFragment(String comparisonOperator,
+                                 String qualifiedTableName = "");
+  String rightCursorWhereFragment(String comparisonOperator,
+                                  String qualifiedTableName = "");
   int bind(SQLiteStatement& query, int column) const;
   void bindWithNulls(SQLiteStatement& query, int baseColumn) const;
 

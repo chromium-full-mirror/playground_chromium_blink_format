@@ -28,12 +28,53 @@
 
 #if ENABLE(INDEXED_DATABASE)
 
+#include "IDBCursorBackendInterface.h"
+#include "IDBIndexBackendInterface.h"
+#include "IDBKey.h"
+#include "IDBKeyRange.h"
+#include "IDBRequest.h"
+
 namespace WebCore {
 
 IDBIndex::IDBIndex(PassRefPtr<IDBIndexBackendInterface> backend)
     : m_backend(backend) {}
 
 IDBIndex::~IDBIndex() {}
+
+PassRefPtr<IDBRequest> IDBIndex::openObjectCursor(
+    ScriptExecutionContext* context,
+    PassRefPtr<IDBKeyRange> keyRange,
+    unsigned short direction) {
+  RefPtr<IDBRequest> request =
+      IDBRequest::create(context, IDBAny::create(this));
+  m_backend->openObjectCursor(keyRange, direction, request);
+  return request;
+}
+
+PassRefPtr<IDBRequest> IDBIndex::openCursor(ScriptExecutionContext* context,
+                                            PassRefPtr<IDBKeyRange> keyRange,
+                                            unsigned short direction) {
+  RefPtr<IDBRequest> request =
+      IDBRequest::create(context, IDBAny::create(this));
+  m_backend->openCursor(keyRange, direction, request);
+  return request;
+}
+
+PassRefPtr<IDBRequest> IDBIndex::getObject(ScriptExecutionContext* context,
+                                           PassRefPtr<IDBKey> key) {
+  RefPtr<IDBRequest> request =
+      IDBRequest::create(context, IDBAny::create(this));
+  m_backend->getObject(key, request);
+  return request;
+}
+
+PassRefPtr<IDBRequest> IDBIndex::get(ScriptExecutionContext* context,
+                                     PassRefPtr<IDBKey> key) {
+  RefPtr<IDBRequest> request =
+      IDBRequest::create(context, IDBAny::create(this));
+  m_backend->get(key, request);
+  return request;
+}
 
 }  // namespace WebCore
 

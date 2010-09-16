@@ -50,8 +50,19 @@ WebIDBKey WebIDBCursorImpl::key() const {
   return WebIDBKey(m_idbCursorBackend->key());
 }
 
-WebSerializedScriptValue WebIDBCursorImpl::value() const {
-  return m_idbCursorBackend->value();
+void WebIDBCursorImpl::value(WebSerializedScriptValue& serializedScriptValue,
+                             WebIDBKey& idbKey) const {
+  // Verify we're starting off with blank slates.
+  ASSERT(serializedScriptValue.isNull());
+  ASSERT(idbKey.type() == WebIDBKey::InvalidType);
+
+  RefPtr<IDBAny> any = m_idbCursorBackend->value();
+  if (any->type() == IDBAny::SerializedScriptValueType)
+    serializedScriptValue.assign(any->serializedScriptValue());
+  else if (any->type() == IDBAny::IDBKeyType)
+    idbKey.assign(any->idbKey());
+  else
+    ASSERT_NOT_REACHED();
 }
 
 void WebIDBCursorImpl::update(const WebSerializedScriptValue& value,
