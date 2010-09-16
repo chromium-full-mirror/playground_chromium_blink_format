@@ -131,6 +131,11 @@ class WebPageProxy : public APIObject {
   void setActive(bool active);
   void setIsInWindow(bool isInWindow);
 
+  void selectAll();
+  void copy();
+  void cut();
+  void paste();
+
   void mouseEvent(const WebMouseEvent&);
   void wheelEvent(const WebWheelEvent&);
   void keyEvent(const WebKeyboardEvent&);

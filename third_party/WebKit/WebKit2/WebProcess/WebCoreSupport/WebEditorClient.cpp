@@ -316,11 +316,14 @@ DocumentFragment* WebEditorClient::documentFragmentFromAttributedString(
     NSAttributedString*,
     Vector<ArchiveResource*>&) {
   // FIXME: add code here to create fake WebView and load WebKit 1
-  notImplemented();
+  // This is needed to support RTF and RTFD in the pasteboard
   return 0;
 }
 
-void WebEditorClient::setInsertionPasteboard(NSPasteboard*) {}
+void WebEditorClient::setInsertionPasteboard(NSPasteboard*) {
+  // This is used only by Mail, no need to implement it now.
+  notImplemented();
+}
 
 #ifdef BUILDING_ON_TIGER
 NSArray* WebEditorClient::pasteboardTypesForSelection(Frame*) {

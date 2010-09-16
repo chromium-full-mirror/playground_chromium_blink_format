@@ -182,6 +182,10 @@ class WebPage : public APIObject {
   void mouseEvent(const WebMouseEvent&);
   void wheelEvent(const WebWheelEvent&);
   void keyEvent(const WebKeyboardEvent&);
+  void selectAll();
+  void copy();
+  void cut();
+  void paste();
 #if ENABLE(TOUCH_EVENTS)
   void touchEvent(const WebTouchEvent&);
 #endif

@@ -429,6 +429,26 @@ void WebPage::keyEvent(const WebKeyboardEvent& keyboardEvent) {
   (void)handled;
 }
 
+void WebPage::selectAll() {
+  if (m_page->focusController()->focusedOrMainFrame())
+    m_page->focusController()->focusedOrMainFrame()->selection()->selectAll();
+}
+
+void WebPage::copy() {
+  if (m_page->focusController()->focusedOrMainFrame())
+    m_page->focusController()->focusedOrMainFrame()->editor()->copy();
+}
+
+void WebPage::cut() {
+  if (m_page->focusController()->focusedOrMainFrame())
+    m_page->focusController()->focusedOrMainFrame()->editor()->cut();
+}
+
+void WebPage::paste() {
+  if (m_page->focusController()->focusedOrMainFrame())
+    m_page->focusController()->focusedOrMainFrame()->editor()->paste();
+}
+
 #if ENABLE(TOUCH_EVENTS)
 void WebPage::touchEvent(const WebTouchEvent& touchEvent) {
   CurrentEvent currentEvent(touchEvent);
@@ -668,6 +688,22 @@ void WebPage::didReceiveMessage(CoreIPC::Connection* connection,
         return;
 
       keyEvent(event);
+      return;
+    }
+    case WebPageMessage::SelectAll: {
+      selectAll();
+      return;
+    }
+    case WebPageMessage::Copy: {
+      copy();
+      return;
+    }
+    case WebPageMessage::Cut: {
+      cut();
+      return;
+    }
+    case WebPageMessage::Paste: {
+      paste();
       return;
     }
 #if ENABLE(TOUCH_EVENTS)
