@@ -158,6 +158,8 @@ class Range : public RefCounted<Range> {
         PassRefPtr<Node> endContainer,
         int endOffset);
 
+  void setDocument(Document*);
+
   Node* checkNodeWOffset(Node*, int offset, ExceptionCode&) const;
   void checkNodeBA(Node*, ExceptionCode&) const;
   void checkDeleteExtract(ExceptionCode&);
