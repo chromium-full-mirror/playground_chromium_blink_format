@@ -230,6 +230,14 @@ void WebContext::didReceiveMessageFromInjectedBundle(const String& messageName,
                                                              messageBody);
 }
 
+void WebContext::didReceiveSynchronousMessageFromInjectedBundle(
+    const String& messageName,
+    APIObject* messageBody,
+    RefPtr<APIObject>& returnData) {
+  m_injectedBundleClient.didReceiveSynchronousMessageFromInjectedBundle(
+      this, messageName, messageBody, returnData);
+}
+
 // HistoryClient
 
 void WebContext::didNavigateWithNavigationData(
@@ -308,7 +316,7 @@ void WebContext::addVisitedLink(LinkHash linkHash) {
   m_visitedLinkProvider.addVisitedLink(linkHash);
 }
 
-void WebContext::didReceiveMessage(CoreIPC::Connection* connection,
+void WebContext::didReceiveMessage(CoreIPC::Connection*,
                                    CoreIPC::MessageID messageID,
                                    CoreIPC::ArgumentDecoder* arguments) {
   switch (messageID.get<WebContextMessage::Kind>()) {
@@ -322,9 +330,38 @@ void WebContext::didReceiveMessage(CoreIPC::Connection* connection,
       didReceiveMessageFromInjectedBundle(messageName, messageBody.get());
       return;
     }
+    case WebContextMessage::PostSynchronousMessage:
+      ASSERT_NOT_REACHED();
   }
 
   ASSERT_NOT_REACHED();
+}
+
+void WebContext::didReceiveSyncMessage(CoreIPC::Connection*,
+                                       CoreIPC::MessageID messageID,
+                                       CoreIPC::ArgumentDecoder* arguments,
+                                       CoreIPC::ArgumentEncoder* reply) {
+  switch (messageID.get<WebContextMessage::Kind>()) {
+    case WebContextMessage::PostSynchronousMessage: {
+      // FIXME: We should probably encode something in the case that the
+      // arguments do not decode correctly.
+
+      String messageName;
+      RefPtr<APIObject> messageBody;
+      WebContextUserMessageDecoder messageDecoder(messageBody, this);
+      if (!arguments->decode(CoreIPC::Out(messageName, messageDecoder)))
+        return;
+
+      RefPtr<APIObject> returnData;
+      didReceiveSynchronousMessageFromInjectedBundle(
+          messageName, messageBody.get(), returnData);
+      reply->encode(
+          CoreIPC::In(WebContextUserMessageEncoder(returnData.get())));
+      return;
+    }
+    case WebContextMessage::PostMessage:
+      ASSERT_NOT_REACHED();
+  }
 }
 
 }  // namespace WebKit

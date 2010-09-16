@@ -126,7 +126,7 @@ void TestController::initialize(int argc, const char* argv[]) {
   platformInitializeContext();
 
   WKContextInjectedBundleClient injectedBundleClient = {
-      0, this, didReceiveMessageFromInjectedBundle};
+      0, this, didReceiveMessageFromInjectedBundle, 0};
   WKContextSetInjectedBundleClient(m_context.get(), &injectedBundleClient);
 
   _WKContextSetAdditionalPluginsDirectory(m_context.get(),

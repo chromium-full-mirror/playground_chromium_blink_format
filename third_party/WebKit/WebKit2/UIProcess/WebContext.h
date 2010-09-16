@@ -84,7 +84,11 @@ class WebContext : public APIObject {
   void postMessageToInjectedBundle(const WTF::String&, APIObject*);
 
   // InjectedBundle client
-  void didReceiveMessageFromInjectedBundle(const WTF::String&, APIObject*);
+  void didReceiveMessageFromInjectedBundle(const String&, APIObject*);
+  void didReceiveSynchronousMessageFromInjectedBundle(
+      const String&,
+      APIObject*,
+      RefPtr<APIObject>& returnData);
 
   // History client
   void didNavigateWithNavigationData(WebFrameProxy*,
@@ -114,6 +118,10 @@ class WebContext : public APIObject {
   void didReceiveMessage(CoreIPC::Connection*,
                          CoreIPC::MessageID,
                          CoreIPC::ArgumentDecoder*);
+  void didReceiveSyncMessage(CoreIPC::Connection*,
+                             CoreIPC::MessageID,
+                             CoreIPC::ArgumentDecoder*,
+                             CoreIPC::ArgumentEncoder*);
 
 #if PLATFORM(WIN)
   void setShouldPaintNativeControls(bool);

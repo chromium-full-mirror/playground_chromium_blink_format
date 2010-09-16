@@ -76,7 +76,12 @@ class InjectedBundle : public APIObject {
 
   // API
   void initializeClient(WKBundleClient*);
-  void postMessage(const WTF::String&, APIObject*);
+  void postMessage(const String&, APIObject*);
+  void postSynchronousMessage(const String&,
+                              APIObject*,
+                              RefPtr<APIObject>& returnData);
+
+  // TestRunner only SPI
   void setShouldTrackVisitedLinks(bool);
   void removeAllVisitedLinks();
   void activateMacFontAscentHack();

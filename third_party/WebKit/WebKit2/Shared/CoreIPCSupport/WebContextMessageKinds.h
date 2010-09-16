@@ -32,7 +32,7 @@
 
 namespace WebContextMessage {
 
-enum Kind { PostMessage };
+enum Kind { PostMessage, PostSynchronousMessage };
 }
 
 namespace CoreIPC {
