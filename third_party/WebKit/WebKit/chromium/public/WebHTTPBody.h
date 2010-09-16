@@ -59,7 +59,10 @@ class WebHTTPBody {
     WebString filePath;
     long long fileStart;
     long long fileLength;  // -1 means to the end of the file.
+    // FIXME: remove this field once all users of Element have been switched to
+    // use 'modificationTime'.
     WebFileInfo fileInfo;
+    double modificationTime;
     WebURL blobURL;
   };
 
@@ -89,6 +92,12 @@ class WebHTTPBody {
   WEBKIT_API void appendData(const WebData&);
   WEBKIT_API void appendFile(const WebString&);
   // Passing -1 to fileLength means to the end of the file.
+  WEBKIT_API void appendFileRange(const WebString&,
+                                  long long fileStart,
+                                  long long fileLength,
+                                  double modificationTime);
+  // FIXME: Remove this method once all callers have been switched to use the
+  // method above.
   WEBKIT_API void appendFileRange(const WebString&,
                                   long long fileStart,
                                   long long fileLength,
