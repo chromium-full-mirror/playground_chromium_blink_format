@@ -39,6 +39,8 @@ class FrameNetworkingContextWinCE : public WebCore::FrameNetworkingContext {
 
   virtual WTF::String userAgent() const;
   virtual WTF::String referrer() const;
+  virtual WebCore::ResourceError blockedError(
+      const WebCore::ResourceRequest&) const;
 
  private:
   FrameNetworkingContextWinCE(WebCore::Frame* frame,
