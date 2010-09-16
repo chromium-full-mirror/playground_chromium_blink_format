@@ -196,8 +196,8 @@ class InspectorController : public Noncopyable {
                                          unsigned sendLineNumber);
   void scriptImported(unsigned long identifier, const String& sourceString);
 
-  void enableResourceTracking(bool always = false, bool reload = true);
-  void disableResourceTracking(bool always = false);
+  void setResourceTracking(bool enable);
+  void setResourceTracking(bool enable, bool always, bool* newState);
   bool resourceTrackingEnabled() const { return m_resourceTrackingEnabled; }
 
   void ensureSettingsLoaded();
