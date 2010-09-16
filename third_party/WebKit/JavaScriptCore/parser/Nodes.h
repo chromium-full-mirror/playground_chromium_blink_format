@@ -81,6 +81,8 @@ enum Operator {
 
 enum LogicalOperator { OpLogicalAnd, OpLogicalOr };
 
+typedef HashSet<RefPtr<StringImpl>, IdentifierRepHash> IdentifierSet;
+
 namespace DeclarationStacks {
 enum VarAttrs { IsConstant = 1, HasInitializer = 2 };
 typedef Vector<std::pair<const Identifier*, unsigned>> VarStack;
@@ -1700,6 +1702,7 @@ struct ScopeNodeData : FastAllocBase {
                 SourceElements*,
                 VarStack*,
                 FunctionStack*,
+                IdentifierSet&,
                 int numConstants);
 
   ParserArena m_arena;
@@ -1707,6 +1710,7 @@ struct ScopeNodeData : FastAllocBase {
   FunctionStack m_functionStack;
   int m_numConstants;
   SourceElements* m_statements;
+  IdentifierSet m_capturedVariables;
 };
 
 class ScopeNode : public StatementNode, public ParserArenaRefCounted {
@@ -1720,6 +1724,7 @@ class ScopeNode : public StatementNode, public ParserArenaRefCounted {
             SourceElements*,
             VarStack*,
             FunctionStack*,
+            IdentifierSet&,
             CodeFeatures,
             int numConstants);
 
@@ -1740,8 +1745,12 @@ class ScopeNode : public StatementNode, public ParserArenaRefCounted {
   void setUsesArguments() { m_features |= ArgumentsFeature; }
   bool usesThis() const { return m_features & ThisFeature; }
   bool needsActivation() const {
-    return m_features &
-           (EvalFeature | ClosureFeature | WithFeature | CatchFeature);
+    ASSERT(m_data);
+    return (hasCapturedVariables()) ||
+           (m_features & (EvalFeature | WithFeature | CatchFeature));
+  }
+  bool hasCapturedVariables() const {
+    return !!m_data->m_capturedVariables.size();
   }
 
   VarStack& varStack() {
@@ -1779,6 +1788,7 @@ class ProgramNode : public ScopeNode {
                                         SourceElements*,
                                         VarStack*,
                                         FunctionStack*,
+                                        IdentifierSet&,
                                         const SourceCode&,
                                         CodeFeatures,
                                         int numConstants);
@@ -1790,6 +1800,7 @@ class ProgramNode : public ScopeNode {
               SourceElements*,
               VarStack*,
               FunctionStack*,
+              IdentifierSet&,
               const SourceCode&,
               CodeFeatures,
               int numConstants);
@@ -1803,6 +1814,7 @@ class EvalNode : public ScopeNode {
                                      SourceElements*,
                                      VarStack*,
                                      FunctionStack*,
+                                     IdentifierSet&,
                                      const SourceCode&,
                                      CodeFeatures,
                                      int numConstants);
@@ -1814,6 +1826,7 @@ class EvalNode : public ScopeNode {
            SourceElements*,
            VarStack*,
            FunctionStack*,
+           IdentifierSet&,
            const SourceCode&,
            CodeFeatures,
            int numConstants);
@@ -1839,6 +1852,7 @@ class FunctionBodyNode : public ScopeNode {
                                              SourceElements*,
                                              VarStack*,
                                              FunctionStack*,
+                                             IdentifierSet&,
                                              const SourceCode&,
                                              CodeFeatures,
                                              int numConstants);
@@ -1861,6 +1875,7 @@ class FunctionBodyNode : public ScopeNode {
                    SourceElements*,
                    VarStack*,
                    FunctionStack*,
+                   IdentifierSet&,
                    const SourceCode&,
                    CodeFeatures,
                    int numConstants);

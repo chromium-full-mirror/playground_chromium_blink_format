@@ -58,6 +58,7 @@ class SyntaxChecker {
   typedef int BinaryOperand;
 
   static const bool CreatesAST = false;
+  static const bool NeedsFreeVariableInfo = false;
 
   int createSourceElements() { return 1; }
   int makeFunctionCallNode(int, int, int, int, int) { return 1; }

@@ -92,6 +92,7 @@ class ASTBuilder {
   typedef std::pair<ExpressionNode*, BinaryOpInfo> BinaryOperand;
 
   static const bool CreatesAST = true;
+  static const bool NeedsFreeVariableInfo = true;
 
   ExpressionNode* makeBinaryNode(int token,
                                  std::pair<ExpressionNode*, BinaryOpInfo>,

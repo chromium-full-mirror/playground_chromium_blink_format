@@ -70,10 +70,12 @@ void Parser::didFinishParsing(
     ParserArenaData<DeclarationStacks::FunctionStack>* funcStack,
     CodeFeatures features,
     int lastLine,
-    int numConstants) {
+    int numConstants,
+    IdentifierSet& capturedVars) {
   m_sourceElements = sourceElements;
   m_varDeclarations = varStack;
   m_funcDeclarations = funcStack;
+  m_capturedVariables.swap(capturedVars);
   m_features = features;
   m_lastLine = lastLine;
   m_numConstants = numConstants;

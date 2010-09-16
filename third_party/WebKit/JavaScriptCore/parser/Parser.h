@@ -63,7 +63,8 @@ class Parser : public Noncopyable {
                         ParserArenaData<DeclarationStacks::FunctionStack>*,
                         CodeFeatures features,
                         int lastLine,
-                        int numConstants);
+                        int numConstants,
+                        IdentifierSet&);
 
   ParserArena& arena() { return m_arena; }
 
@@ -79,6 +80,7 @@ class Parser : public Noncopyable {
   SourceElements* m_sourceElements;
   ParserArenaData<DeclarationStacks::VarStack>* m_varDeclarations;
   ParserArenaData<DeclarationStacks::FunctionStack>* m_funcDeclarations;
+  IdentifierSet m_capturedVariables;
   CodeFeatures m_features;
   int m_lastLine;
   int m_numConstants;
@@ -102,11 +104,11 @@ PassRefPtr<ParsedNode> Parser::parse(JSGlobalData* globalData,
 
   RefPtr<ParsedNode> result;
   if (m_sourceElements) {
-    result =
-        ParsedNode::create(globalData, m_sourceElements,
-                           m_varDeclarations ? &m_varDeclarations->data : 0,
-                           m_funcDeclarations ? &m_funcDeclarations->data : 0,
-                           source, m_features, m_numConstants);
+    result = ParsedNode::create(
+        globalData, m_sourceElements,
+        m_varDeclarations ? &m_varDeclarations->data : 0,
+        m_funcDeclarations ? &m_funcDeclarations->data : 0, m_capturedVariables,
+        source, m_features, m_numConstants);
     result->setLoc(m_source->firstLine(), m_lastLine);
   } else if (lexicalGlobalObject) {
     // We can never see a syntax error when reparsing a function, since we

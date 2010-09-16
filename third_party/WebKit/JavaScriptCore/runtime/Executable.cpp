@@ -99,7 +99,8 @@ JSObject* EvalExecutable::compileInternal(ExecState* exec,
     ASSERT(exception);
     return exception;
   }
-  recordParse(evalNode->features(), evalNode->lineNo(), evalNode->lastLine());
+  recordParse(evalNode->features(), evalNode->hasCapturedVariables(),
+              evalNode->lineNo(), evalNode->lastLine());
 
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
@@ -155,8 +156,8 @@ JSObject* ProgramExecutable::compileInternal(ExecState* exec,
     ASSERT(exception);
     return exception;
   }
-  recordParse(programNode->features(), programNode->lineNo(),
-              programNode->lastLine());
+  recordParse(programNode->features(), programNode->hasCapturedVariables(),
+              programNode->lineNo(), programNode->lastLine());
 
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
@@ -198,7 +199,8 @@ JSObject* FunctionExecutable::compileForCallInternal(
   if (m_forceUsesArguments)
     body->setUsesArguments();
   body->finishParsing(m_parameters, m_name);
-  recordParse(body->features(), body->lineNo(), body->lastLine());
+  recordParse(body->features(), body->hasCapturedVariables(), body->lineNo(),
+              body->lastLine());
 
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
@@ -247,7 +249,8 @@ JSObject* FunctionExecutable::compileForConstructInternal(
   if (m_forceUsesArguments)
     body->setUsesArguments();
   body->finishParsing(m_parameters, m_name);
-  recordParse(body->features(), body->lineNo(), body->lastLine());
+  recordParse(body->features(), body->hasCapturedVariables(), body->lineNo(),
+              body->lastLine());
 
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
