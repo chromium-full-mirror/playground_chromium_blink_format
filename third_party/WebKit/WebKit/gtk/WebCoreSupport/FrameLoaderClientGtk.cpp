@@ -1296,15 +1296,13 @@ static void postCommitFrameViewSetup(WebKitWebFrame* frame,
                                      bool resetValues) {
   WebKitWebView* containingWindow = getViewFromFrame(frame);
   WebKitWebViewPrivate* priv = WEBKIT_WEB_VIEW_GET_PRIVATE(containingWindow);
-  view->setGtkAdjustments(priv->horizontalAdjustment, priv->verticalAdjustment,
-                          resetValues);
+  view->setGtkAdjustments(priv->horizontalAdjustment.get(),
+                          priv->verticalAdjustment.get(), resetValues);
 
   if (priv->currentMenu) {
-    GtkMenu* menu = priv->currentMenu;
-    priv->currentMenu = 0;
-
-    gtk_menu_popdown(menu);
-    g_object_unref(menu);
+    PlatformRefPtr<GtkMenu> menu(priv->currentMenu);
+    priv->currentMenu.clear();
+    gtk_menu_popdown(menu.get());
   }
 
   // Do not allow click counting between main frame loads.
