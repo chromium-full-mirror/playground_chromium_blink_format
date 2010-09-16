@@ -97,20 +97,20 @@ static const int computedProperties[] = {
     CSSPropertyWebkitAnimationTimingFunction, CSSPropertyWebkitAppearance,
     CSSPropertyWebkitBackfaceVisibility, CSSPropertyWebkitBackgroundClip,
     CSSPropertyWebkitBackgroundComposite, CSSPropertyWebkitBackgroundOrigin,
-    CSSPropertyWebkitBackgroundSize, CSSPropertyWebkitBorderFit,
-    CSSPropertyWebkitBorderHorizontalSpacing, CSSPropertyWebkitBorderImage,
-    CSSPropertyWebkitBorderVerticalSpacing, CSSPropertyWebkitBoxAlign,
-    CSSPropertyWebkitBoxDirection, CSSPropertyWebkitBoxFlex,
-    CSSPropertyWebkitBoxFlexGroup, CSSPropertyWebkitBoxLines,
-    CSSPropertyWebkitBoxOrdinalGroup, CSSPropertyWebkitBoxOrient,
-    CSSPropertyWebkitBoxPack, CSSPropertyWebkitBoxReflect,
-    CSSPropertyWebkitBoxShadow, CSSPropertyWebkitBoxSizing,
-    CSSPropertyWebkitColorCorrection, CSSPropertyWebkitColumnBreakAfter,
-    CSSPropertyWebkitColumnBreakBefore, CSSPropertyWebkitColumnBreakInside,
-    CSSPropertyWebkitColumnCount, CSSPropertyWebkitColumnGap,
-    CSSPropertyWebkitColumnRuleColor, CSSPropertyWebkitColumnRuleStyle,
-    CSSPropertyWebkitColumnRuleWidth, CSSPropertyWebkitColumnSpan,
-    CSSPropertyWebkitColumnWidth,
+    CSSPropertyWebkitBackgroundSize, CSSPropertyWebkitBlockFlow,
+    CSSPropertyWebkitBorderFit, CSSPropertyWebkitBorderHorizontalSpacing,
+    CSSPropertyWebkitBorderImage, CSSPropertyWebkitBorderVerticalSpacing,
+    CSSPropertyWebkitBoxAlign, CSSPropertyWebkitBoxDirection,
+    CSSPropertyWebkitBoxFlex, CSSPropertyWebkitBoxFlexGroup,
+    CSSPropertyWebkitBoxLines, CSSPropertyWebkitBoxOrdinalGroup,
+    CSSPropertyWebkitBoxOrient, CSSPropertyWebkitBoxPack,
+    CSSPropertyWebkitBoxReflect, CSSPropertyWebkitBoxShadow,
+    CSSPropertyWebkitBoxSizing, CSSPropertyWebkitColorCorrection,
+    CSSPropertyWebkitColumnBreakAfter, CSSPropertyWebkitColumnBreakBefore,
+    CSSPropertyWebkitColumnBreakInside, CSSPropertyWebkitColumnCount,
+    CSSPropertyWebkitColumnGap, CSSPropertyWebkitColumnRuleColor,
+    CSSPropertyWebkitColumnRuleStyle, CSSPropertyWebkitColumnRuleWidth,
+    CSSPropertyWebkitColumnSpan, CSSPropertyWebkitColumnWidth,
 #if ENABLE(DASHBOARD_SUPPORT)
     CSSPropertyWebkitDashboardRegion,
 #endif
@@ -1420,6 +1420,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
           (style->backfaceVisibility() == BackfaceVisibilityHidden)
               ? CSSValueHidden
               : CSSValueVisible);
+    case CSSPropertyWebkitBlockFlow:
+      return CSSPrimitiveValue::create(style->blockFlow());
     case CSSPropertyWebkitBorderImage:
       return valueForNinePieceImage(style->borderImage());
     case CSSPropertyWebkitMaskBoxImage:
@@ -1561,6 +1563,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyListStyle:
     case CSSPropertyMargin:
     case CSSPropertyPadding:
+    case CSSPropertyWebkitWritingMode:
       break;
 
     /* Unimplemented CSS 3 properties (including CSS3 shorthand properties) */
