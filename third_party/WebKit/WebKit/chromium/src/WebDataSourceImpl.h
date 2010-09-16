@@ -68,6 +68,7 @@ class WebDataSourceImpl : public WebCore::DocumentLoader, public WebDataSource {
   virtual ExtraData* extraData() const;
   virtual void setExtraData(ExtraData*);
   virtual WebApplicationCacheHost* applicationCacheHost();
+  virtual void setDeferMainResourceDataLoad(bool);
 
   static WebNavigationType toWebNavigationType(WebCore::NavigationType type);
 

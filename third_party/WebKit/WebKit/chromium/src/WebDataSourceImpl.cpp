@@ -108,6 +108,10 @@ WebApplicationCacheHost* WebDataSourceImpl::applicationCacheHost() {
 #endif
 }
 
+void WebDataSourceImpl::setDeferMainResourceDataLoad(bool defer) {
+  DocumentLoader::setDeferMainResourceDataLoad(defer);
+}
+
 WebNavigationType WebDataSourceImpl::toWebNavigationType(NavigationType type) {
   switch (type) {
     case NavigationTypeLinkClicked:
