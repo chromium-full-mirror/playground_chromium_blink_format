@@ -1494,10 +1494,7 @@ void Editor::setBaseWritingDirection(WritingDirection direction) {
   if (focusedNode &&
       (focusedNode->hasTagName(textareaTag) ||
        (focusedNode->hasTagName(inputTag) &&
-        (static_cast<HTMLInputElement*>(focusedNode)->inputType() ==
-             HTMLInputElement::TEXT ||
-         static_cast<HTMLInputElement*>(focusedNode)->inputType() ==
-             HTMLInputElement::SEARCH)))) {
+        static_cast<HTMLInputElement*>(focusedNode)->isTextField()))) {
     if (direction == NaturalWritingDirection)
       return;
     static_cast<HTMLElement*>(focusedNode)

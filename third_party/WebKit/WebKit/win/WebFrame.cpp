@@ -1144,8 +1144,7 @@ HRESULT WebFrame::elementDoesAutoComplete(IDOMElement* element, BOOL* result) {
   if (!inputElement)
     *result = false;
   else
-    *result = inputElement->isTextField() &&
-              inputElement->inputType() != HTMLInputElement::PASSWORD &&
+    *result = inputElement->isTextField() && !inputElement->isPasswordField() &&
               inputElement->autoComplete();
 
   return S_OK;
@@ -1360,8 +1359,7 @@ HRESULT WebFrame::controlsInForm(IDOMElement* form,
 
 HRESULT WebFrame::elementIsPassword(IDOMElement* element, bool* result) {
   HTMLInputElement* inputElement = inputElementFromDOMElement(element);
-  *result = inputElement != 0 &&
-            inputElement->inputType() == HTMLInputElement::PASSWORD;
+  *result = inputElement && inputElement->isPasswordField();
   return S_OK;
 }
 

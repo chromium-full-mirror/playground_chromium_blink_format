@@ -1988,8 +1988,7 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
     // so we have to treat all image buttons as though they were explicitly
     // sized.
     if (!e->hasTagName(inputTag) ||
-        static_cast<HTMLInputElement*>(e)->inputType() !=
-            HTMLInputElement::IMAGE)
+        !static_cast<HTMLInputElement*>(e)->isImageButton())
       addIntrinsicMargins(style);
   }
 
