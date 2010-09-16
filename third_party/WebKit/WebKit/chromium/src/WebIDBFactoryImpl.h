@@ -48,7 +48,8 @@ class WebIDBFactoryImpl : public WebIDBFactory {
                     const WebString& description,
                     WebIDBCallbacks*,
                     const WebSecurityOrigin&,
-                    WebFrame*);
+                    WebFrame*,
+                    const WebString& dataDir);
   virtual void abortPendingTransactions(const WebVector<int>& pendingIDs);
 
  private:

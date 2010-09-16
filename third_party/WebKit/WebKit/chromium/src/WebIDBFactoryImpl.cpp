@@ -57,9 +57,11 @@ void WebIDBFactoryImpl::open(const WebString& name,
                              const WebString& description,
                              WebIDBCallbacks* callbacks,
                              const WebSecurityOrigin& origin,
-                             WebFrame*) {
+                             WebFrame*,
+                             const WebString& dataDir) {
   m_idbFactoryBackend->open(name, description,
-                            IDBCallbacksProxy::create(callbacks), origin, 0);
+                            IDBCallbacksProxy::create(callbacks), origin, 0,
+                            dataDir);
 }
 
 void WebIDBFactoryImpl::abortPendingTransactions(

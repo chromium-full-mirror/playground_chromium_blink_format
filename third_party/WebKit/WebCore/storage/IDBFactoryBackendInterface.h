@@ -58,7 +58,8 @@ class IDBFactoryBackendInterface
                     const String& description,
                     PassRefPtr<IDBCallbacks>,
                     PassRefPtr<SecurityOrigin>,
-                    Frame*) = 0;
+                    Frame*,
+                    const String& dataDir) = 0;
   virtual void abortPendingTransactions(const Vector<int>& ids) = 0;
 };
 

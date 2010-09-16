@@ -50,23 +50,23 @@ IDBFactoryBackendImpl::~IDBFactoryBackendImpl() {}
 
 static PassOwnPtr<SQLiteDatabase> openSQLiteDatabase(
     SecurityOrigin* securityOrigin,
-    String name) {
-  String pathBase = "/tmp/temporary-indexed-db-files";  // FIXME: Write a
-                                                        // PageGroupSettings
-                                                        // class and have this
-                                                        // value come from that.
-  if (!makeAllDirectories(pathBase)) {
-    // FIXME: Is there any other thing we could possibly do to recover at this
-    // point? If so, do it rather than just erroring out.
-    LOG_ERROR("Unabled to create LocalStorage database path %s",
-              pathBase.utf8().data());
-    return 0;
-  }
+    String name,
+    const String& pathBase) {
+  String path = ":memory:";
+  if (!pathBase.isEmpty()) {
+    if (!makeAllDirectories(pathBase)) {
+      // FIXME: Is there any other thing we could possibly do to recover at this
+      // point? If so, do it rather than just erroring out.
+      LOG_ERROR("Unabled to create LocalStorage database path %s",
+                pathBase.utf8().data());
+      return 0;
+    }
 
-  String databaseIdentifier = securityOrigin->databaseIdentifier();
-  String santizedName = encodeForFileName(name);
-  String path = pathByAppendingComponent(
-      pathBase, databaseIdentifier + "_" + santizedName + ".indexeddb");
+    String databaseIdentifier = securityOrigin->databaseIdentifier();
+    String santizedName = encodeForFileName(name);
+    path = pathByAppendingComponent(
+        pathBase, databaseIdentifier + "_" + santizedName + ".indexeddb");
+  }
 
   OwnPtr<SQLiteDatabase> sqliteDatabase = adoptPtr(new SQLiteDatabase());
   if (!sqliteDatabase->open(path)) {
@@ -114,7 +114,7 @@ static bool createTables(SQLiteDatabase* sqliteDatabase) {
 
       "DROP TABLE IF EXISTS IndexData",
       "CREATE TABLE IF NOT EXISTS IndexData (id INTEGER PRIMARY KEY, indexId "
-      "INTEGER NOT NULL REFERENCES Indexs(id), keyString TEXT, keyDate "
+      "INTEGER NOT NULL REFERENCES Indexes(id), keyString TEXT, keyDate "
       "INTEGER, keyNumber INTEGER, objectStoreDataId INTEGER NOT NULL UNIQUE "
       "REFERENCES ObjectStoreData(id))",
       "DROP INDEX IF EXISTS IndexData_composit",
@@ -142,7 +142,8 @@ void IDBFactoryBackendImpl::open(const String& name,
                                  const String& description,
                                  PassRefPtr<IDBCallbacks> callbacks,
                                  PassRefPtr<SecurityOrigin> securityOrigin,
-                                 Frame*) {
+                                 Frame*,
+                                 const String& dataDir) {
   IDBDatabaseBackendMap::iterator it = m_databaseBackendMap.find(name);
   if (it != m_databaseBackendMap.end()) {
     if (!description.isNull())
@@ -155,7 +156,7 @@ void IDBFactoryBackendImpl::open(const String& name,
   // FIXME: Everything from now on should be done on another thread.
 
   OwnPtr<SQLiteDatabase> sqliteDatabase =
-      openSQLiteDatabase(securityOrigin.get(), name);
+      openSQLiteDatabase(securityOrigin.get(), name, dataDir);
   if (!sqliteDatabase || !createTables(sqliteDatabase.get())) {
     callbacks->onError(IDBDatabaseError::create(
         IDBDatabaseException::UNKNOWN_ERR, "Internal error."));
