@@ -48,6 +48,7 @@
 #include "TextIterator.h"
 #include "markup.h"
 #include <wtf/StdLibExtras.h>
+#include <wtf/text/CString.h>
 
 namespace WebCore {
 
