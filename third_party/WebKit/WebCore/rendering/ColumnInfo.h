@@ -29,8 +29,6 @@
 #include <wtf/Vector.h>
 #include "IntRect.h"
 
-using namespace std;
-
 namespace WebCore {
 
 class ColumnInfo : public Noncopyable {
@@ -64,7 +62,7 @@ class ColumnInfo : public Noncopyable {
   void setColumnHeight(int height) { m_columnHeight = height; }
 
   void updateMinimumColumnHeight(int height) {
-    m_minimumColumnHeight = max(height, m_minimumColumnHeight);
+    m_minimumColumnHeight = std::max(height, m_minimumColumnHeight);
   }
   int minimumColumnHeight() const { return m_minimumColumnHeight; }
 
@@ -85,7 +83,7 @@ class ColumnInfo : public Noncopyable {
       return;
     m_forcedBreaks++;
     m_maximumDistanceBetweenForcedBreaks =
-        max(m_maximumDistanceBetweenForcedBreaks, distanceFromLastBreak);
+        std::max(m_maximumDistanceBetweenForcedBreaks, distanceFromLastBreak);
     m_forcedBreakOffset = offsetFromFirstPage;
   }
 
