@@ -74,9 +74,11 @@ class WebViewGraphicsBased : public QGraphicsView {
   void setPage(QWebPage* page);
 
   void setItemCacheMode(QGraphicsItem::CacheMode mode) {
-    m_item->setCacheMode(mode);
+    graphicsWebView()->setCacheMode(mode);
   }
-  QGraphicsItem::CacheMode itemCacheMode() { return m_item->cacheMode(); }
+  QGraphicsItem::CacheMode itemCacheMode() {
+    return graphicsWebView()->cacheMode();
+  }
 
   void setFrameRateMeasurementEnabled(bool enabled);
   bool frameRateMeasurementEnabled() const { return m_measureFps; }
