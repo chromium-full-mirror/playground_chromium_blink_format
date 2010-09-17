@@ -35,7 +35,7 @@
 #include "locationedit.h"
 #include "utils.h"
 
-MainWindow::MainWindow(const QString& url) : m_page(new WebPage(this)) {
+MainWindow::MainWindow() : m_page(new WebPage(this)) {
   setAttribute(Qt::WA_DeleteOnClose);
   if (qgetenv("QTTESTBROWSER_USE_ARGB_VISUALS").toInt() == 1)
     setAttribute(Qt::WA_TranslucentBackground);
