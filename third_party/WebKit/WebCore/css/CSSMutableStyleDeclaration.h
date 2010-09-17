@@ -96,6 +96,8 @@ class CSSMutableStyleDeclaration : public CSSStyleDeclaration {
 
   void setNode(Node* node) { m_node = node; }
 
+  Node* node() const { return m_node; }
+
   virtual bool isMutableStyleDeclaration() const { return true; }
 
   virtual String cssText() const;

@@ -133,7 +133,7 @@ class InspectorDOMAgent : public EventListener {
   void getComputedStyle(long nodeId, RefPtr<InspectorValue>* styles);
   void getStyleSheet(long styleSheetId,
                      RefPtr<InspectorObject>* styleSheetObject);
-  void getRuleRanges(long styleSheetId, RefPtr<InspectorValue>* ruleRange);
+  void getStyleSourceData(long styleId, RefPtr<InspectorObject>* dataObject);
   void applyStyleText(long styleId,
                       const String& styleText,
                       const String& propertyName,
@@ -176,7 +176,6 @@ class InspectorDOMAgent : public EventListener {
   void copyNode(long nodeId);
 
  private:
-  static CSSStyleSheet* getParentStyleSheet(CSSStyleDeclaration*);
   void startListening(Document* document);
   void stopListening(Document* document);
 
