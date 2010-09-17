@@ -592,13 +592,20 @@ void* GraphicsContext3DInternal::getProcAddress(const String& proc) {
 
 PassOwnPtr<GraphicsContext3D> GraphicsContext3D::create(
     GraphicsContext3D::Attributes attrs,
-    HostWindow* hostWindow) {
-  OwnPtr<GraphicsContext3D> context(new GraphicsContext3D(attrs, hostWindow));
+    HostWindow* hostWindow,
+    GraphicsContext3D::RenderStyle renderStyle) {
+  // This implementation doesn't currently support rendering directly to the
+  // HostWindow.
+  if (renderStyle == RenderDirectlyToHostWindow)
+    return 0;
+  OwnPtr<GraphicsContext3D> context(
+      new GraphicsContext3D(attrs, hostWindow, false));
   return context->m_internal ? context.release() : 0;
 }
 
 GraphicsContext3D::GraphicsContext3D(GraphicsContext3D::Attributes attrs,
-                                     HostWindow* hostWindow)
+                                     HostWindow* hostWindow,
+                                     bool)
     : m_internal(new GraphicsContext3DInternal(attrs, hostWindow)) {
   if (!m_internal->isContextValid())
     m_internal = 0;
