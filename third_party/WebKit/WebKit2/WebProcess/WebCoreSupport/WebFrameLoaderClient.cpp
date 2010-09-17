@@ -953,6 +953,8 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
     const Vector<String>& paramValues,
     const String& mimeType,
     bool loadManually) {
+  ASSERT(paramNames.size() == paramValues.size());
+
   String pluginPath;
 
   // FIXME: In the future, this should return a real CoreIPC connection to the
@@ -978,6 +980,14 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
   parameters.values = paramValues;
   parameters.mimeType = mimeType;
   parameters.loadManually = loadManually;
+
+  // <rdar://problem/8440903>: AppleConnect has a bug where it does not
+  // understand the parameter names specified in the <object> element that
+  // embeds its plug-in. This hack works around the issue by converting the
+  // parameter names to lowercase before passing them to the plug-in.
+  if (equalIgnoringCase(mimeType, "application/x-snkp"))
+    for (size_t i = 0; i < paramNames.size(); ++i)
+      parameters.names[i] = paramNames[i].lower();
 
   RefPtr<Plugin> plugin = NetscapePlugin::create(pluginModule.release());
   return PluginView::create(pluginElement, plugin.release(), parameters);
