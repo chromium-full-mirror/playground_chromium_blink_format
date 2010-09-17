@@ -75,6 +75,8 @@ void AsyncScriptRunner::resume() {
 void AsyncScriptRunner::timerFired(Timer<AsyncScriptRunner>* timer) {
   ASSERT_UNUSED(timer, timer == &m_timer);
 
+  RefPtr<Document> protect(m_document);
+
   Vector<pair<ScriptElementData*, CachedResourceHandle<CachedScript>>> scripts;
   scripts.swap(m_scriptsToExecuteSoon);
   size_t size = scripts.size();
