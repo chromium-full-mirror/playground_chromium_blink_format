@@ -34,6 +34,7 @@
 #include "RedirectScheduler.h"
 
 #include "BackForwardList.h"
+#include "DOMWindow.h"
 #include "DocumentLoader.h"
 #include "Event.h"
 #include "FormState.h"
@@ -42,9 +43,9 @@
 #include "FrameLoadRequest.h"
 #include "FrameLoader.h"
 #include "FrameLoaderStateMachine.h"
-#include "HistoryItem.h"
 #include "HTMLFormElement.h"
 #include "HTMLFrameOwnerElement.h"
+#include "HistoryItem.h"
 #include "Page.h"
 #include "UserGestureIndicator.h"
 #include <wtf/CurrentTime.h>
@@ -57,12 +58,14 @@ class ScheduledNavigation : public Noncopyable {
                       bool lockHistory,
                       bool lockBackForwardList,
                       bool wasDuringLoad,
-                      bool isLocationChange)
+                      bool isLocationChange,
+                      bool wasUserGesture)
       : m_delay(delay),
         m_lockHistory(lockHistory),
         m_lockBackForwardList(lockBackForwardList),
         m_wasDuringLoad(wasDuringLoad),
-        m_isLocationChange(isLocationChange) {}
+        m_isLocationChange(isLocationChange),
+        m_wasUserGesture(wasUserGesture) {}
   virtual ~ScheduledNavigation() {}
 
   virtual void fire(Frame*) = 0;
@@ -76,6 +79,7 @@ class ScheduledNavigation : public Noncopyable {
   bool lockBackForwardList() const { return m_lockBackForwardList; }
   bool wasDuringLoad() const { return m_wasDuringLoad; }
   bool isLocationChange() const { return m_isLocationChange; }
+  bool wasUserGesture() const { return m_wasUserGesture; }
 
  private:
   double m_delay;
@@ -83,6 +87,7 @@ class ScheduledNavigation : public Noncopyable {
   bool m_lockBackForwardList;
   bool m_wasDuringLoad;
   bool m_isLocationChange;
+  bool m_wasUserGesture;
 };
 
 class ScheduledURLNavigation : public ScheduledNavigation {
@@ -99,16 +104,16 @@ class ScheduledURLNavigation : public ScheduledNavigation {
                             lockHistory,
                             lockBackForwardList,
                             duringLoad,
-                            isLocationChange),
+                            isLocationChange,
+                            wasUserGesture),
         m_url(url),
         m_referrer(referrer),
-        m_wasUserGesture(wasUserGesture),
         m_haveToldClient(false) {}
 
   virtual void fire(Frame* frame) {
     frame->loader()->changeLocation(KURL(ParsedURLString, m_url), m_referrer,
                                     lockHistory(), lockBackForwardList(),
-                                    m_wasUserGesture, false);
+                                    wasUserGesture(), false);
   }
 
   virtual void didStartTimer(Frame* frame, Timer<RedirectScheduler>* timer) {
@@ -128,12 +133,10 @@ class ScheduledURLNavigation : public ScheduledNavigation {
 
   String url() const { return m_url; }
   String referrer() const { return m_referrer; }
-  bool wasUserGesture() const { return m_wasUserGesture; }
 
  private:
   String m_url;
   String m_referrer;
-  bool m_wasUserGesture;
   bool m_haveToldClient;
 };
 
@@ -199,16 +202,23 @@ class ScheduledRefresh : public ScheduledURLNavigation {
 
 class ScheduledHistoryNavigation : public ScheduledNavigation {
  public:
-  explicit ScheduledHistoryNavigation(int historySteps)
-      : ScheduledNavigation(0, false, false, false, true),
+  explicit ScheduledHistoryNavigation(int historySteps, bool wasUserGesture)
+      : ScheduledNavigation(0, false, false, false, true, wasUserGesture),
         m_historySteps(historySteps) {}
 
   virtual void fire(Frame* frame) {
+    UserGestureIndicator gestureIndicator(
+        wasUserGesture() ? DefinitelyProcessingUserGesture
+                         : DefinitelyNotProcessingUserGesture);
+
     FrameLoader* loader = frame->loader();
     if (!m_historySteps) {
       // Special case for go(0) from a frame -> reload only the frame
-      loader->urlSelected(loader->url(), "", 0, lockHistory(),
-                          lockBackForwardList(), false, SendReferrer);
+      // To follow Firefox and IE's behavior, history reload can only navigate
+      // the self frame.
+      loader->urlSelected(loader->url(), "_self", 0, lockHistory(),
+                          lockBackForwardList(), wasUserGesture(),
+                          SendReferrer);
       return;
     }
     // go(i!=0) from a frame navigates into the history of the frame only,
@@ -230,16 +240,16 @@ class ScheduledFormSubmission : public ScheduledNavigation {
                             submission->lockHistory(),
                             lockBackForwardList,
                             duringLoad,
-                            true),
+                            true,
+                            wasUserGesture),
         m_submission(submission),
-        m_haveToldClient(false),
-        m_wasUserGesture(wasUserGesture) {
+        m_haveToldClient(false) {
     ASSERT(m_submission->state());
   }
 
   virtual void fire(Frame* frame) {
     UserGestureIndicator gestureIndicator(
-        m_wasUserGesture ? DefinitelyProcessingUserGesture
+        wasUserGesture() ? DefinitelyProcessingUserGesture
                          : DefinitelyNotProcessingUserGesture);
 
     // The submitForm function will find a target frame before using the
@@ -278,7 +288,6 @@ class ScheduledFormSubmission : public ScheduledNavigation {
  private:
   RefPtr<FormSubmission> m_submission;
   bool m_haveToldClient;
-  bool m_wasUserGesture;
 };
 
 RedirectScheduler::RedirectScheduler(Frame* frame)
@@ -429,7 +438,8 @@ void RedirectScheduler::scheduleHistoryNavigation(int steps) {
   }
 
   // In all other cases, schedule the history traversal to occur asynchronously.
-  schedule(adoptPtr(new ScheduledHistoryNavigation(steps)));
+  schedule(adoptPtr(new ScheduledHistoryNavigation(
+      steps, m_frame->loader()->isProcessingUserGesture())));
 }
 
 void RedirectScheduler::timerFired(Timer<RedirectScheduler>*) {
