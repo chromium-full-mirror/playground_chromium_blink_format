@@ -49,7 +49,7 @@ class MainWindow : public QMainWindow {
   void load(const QString& url);
   void load(const QUrl& url);
 
-  WebPage* page();
+  WebPage* page() const;
 
  protected slots:
   void setAddressUrl(const QString& url);
