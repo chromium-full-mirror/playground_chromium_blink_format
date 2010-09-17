@@ -87,16 +87,7 @@ class WebViewGraphicsBased : public QGraphicsView {
   void setResizesToContents(bool b);
   bool resizesToContents() const { return m_resizesToContents; }
 
-  void setYRotation(qreal angle) {
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
-    QRectF r = m_item->boundingRect();
-    m_item->setTransform(QTransform()
-                             .translate(r.width() / 2, r.height() / 2)
-                             .rotate(angle, Qt::YAxis)
-                             .translate(-r.width() / 2, -r.height() / 2));
-#endif
-    m_yRotation = angle;
-  }
+  void setYRotation(qreal angle);
   qreal yRotation() const { return m_yRotation; }
 
   GraphicsWebView* graphicsWebView() const { return m_item; }
@@ -123,5 +114,17 @@ class WebViewGraphicsBased : public QGraphicsView {
   QStateMachine* m_machine;
   FpsTimer m_fpsTimer;
 };
+
+inline void WebViewGraphicsBased::setYRotation(qreal angle) {
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+  QRectF r = graphicsWebView()->boundingRect();
+  graphicsWebView()->setTransform(
+      QTransform()
+          .translate(r.width() / 2, r.height() / 2)
+          .rotate(angle, Qt::YAxis)
+          .translate(-r.width() / 2, -r.height() / 2));
+#endif
+  m_yRotation = angle;
+}
 
 #endif
