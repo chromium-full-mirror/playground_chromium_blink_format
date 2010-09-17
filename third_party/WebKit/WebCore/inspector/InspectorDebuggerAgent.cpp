@@ -318,7 +318,7 @@ void InspectorDebuggerAgent::didPause(ScriptState* scriptState) {
   m_pausedScriptState = scriptState;
   RefPtr<InspectorObject> details = InspectorObject::create();
   details->setValue("callFrames", currentCallFrames());
-  details->setValue("reason", m_breakProgramReason);
+  details->setValue("status", m_breakProgramReason);
   m_frontend->pausedScript(details);
 }
 
