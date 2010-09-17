@@ -667,6 +667,12 @@ static void drawBorderlessRectShadow(GraphicsContext* context,
                                      const FloatRect& rect,
                                      const Color& rectColor) {
 #if ENABLE(FILTERS)
+  FloatSize shadowOffset;
+  float shadowBlur;
+  Color shadowColor;
+  if (!context->getShadow(shadowOffset, shadowBlur, shadowColor))
+    return;
+
   AffineTransform transform = context->getCTM();
   // drawTiledShadow still does not work with rotations.
   if ((transform.isIdentityOrTranslationOrFlipped())) {
@@ -681,13 +687,6 @@ static void drawBorderlessRectShadow(GraphicsContext* context,
 
     return;
   }
-
-  FloatSize shadowOffset;
-  float shadowBlur;
-  Color shadowColor;
-
-  if (!context->getShadow(shadowOffset, shadowBlur, shadowColor))
-    return;
 
   IntSize shadowBufferSize;
   FloatRect shadowRect;
