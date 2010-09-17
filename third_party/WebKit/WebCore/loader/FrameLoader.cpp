@@ -3363,6 +3363,9 @@ void FrameLoader::loadedResourceFromMemoryCache(
   unsigned long identifier;
   ResourceError error;
   requestFromDelegate(request, identifier, error);
+#if ENABLE(INSPECTOR)
+  page->inspectorController()->markResourceAsCached(identifier);
+#endif
   notifier()->sendRemainingDelegateMessages(m_documentLoader.get(), identifier,
                                             resource->response(),
                                             resource->encodedSize(), error);
