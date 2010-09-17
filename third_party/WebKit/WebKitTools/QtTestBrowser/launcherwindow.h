@@ -152,8 +152,6 @@ class LauncherWindow : public MainWindow {
   /* void dumpPlugins() */
   void dumpHtml();
 
-  void initializeView();
-
   void setTouchMocking(bool on);
   void toggleWebView(bool graphicsBased);
   void toggleAcceleratedCompositing(bool toggle);
@@ -187,10 +185,12 @@ class LauncherWindow : public MainWindow {
 
  private:
   void init();
-  bool isGraphicsBased() const;
+  void initializeView();
   void createChrome();
   void applyPrefs();
   void applyZoom();
+
+  bool isGraphicsBased() const;
 
  private:
   static QVector<int> m_zoomLevels;
