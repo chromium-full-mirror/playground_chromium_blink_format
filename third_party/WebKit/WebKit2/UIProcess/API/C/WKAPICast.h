@@ -76,6 +76,10 @@ struct APITypeInfo<WKBackForwardListRef> {
   typedef WebBackForwardList* ImplType;
 };
 template <>
+struct APITypeInfo<WKBooleanRef> {
+  typedef WebBoolean* ImplType;
+};
+template <>
 struct APITypeInfo<WKContextRef> {
   typedef WebContext* ImplType;
 };
@@ -185,6 +189,10 @@ struct ImplTypeInfo<WebBackForwardList*> {
 template <>
 struct ImplTypeInfo<WebBackForwardListItem*> {
   typedef WKBackForwardListItemRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebBoolean*> {
+  typedef WKBooleanRef APIType;
 };
 template <>
 struct ImplTypeInfo<WebContext*> {

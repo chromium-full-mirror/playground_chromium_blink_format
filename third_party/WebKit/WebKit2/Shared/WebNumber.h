@@ -51,6 +51,7 @@ class WebNumber : public APIObject {
   NumberType m_value;
 };
 
+typedef WebNumber<bool, APIObject::TypeBoolean> WebBoolean;
 typedef WebNumber<double, APIObject::TypeDouble> WebDouble;
 typedef WebNumber<uint64_t, APIObject::TypeUInt64> WebUInt64;
 
