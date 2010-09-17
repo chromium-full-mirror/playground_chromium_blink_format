@@ -24,6 +24,7 @@
 #define PlatformRefPtr_h
 
 #include "AlwaysInline.h"
+#include "RefPtr.h"
 #include <algorithm>
 
 namespace WTF {
@@ -69,6 +70,13 @@ class PlatformRefPtr {
     m_ptr = 0;
     if (ptr)
       derefPlatformPtr(ptr);
+  }
+
+  // Hash table deleted values, which are only constructed and never copied or
+  // destroyed.
+  PlatformRefPtr(HashTableDeletedValueType) : m_ptr(hashTableDeletedValue()) {}
+  bool isHashTableDeletedValue() const {
+    return m_ptr == hashTableDeletedValue();
   }
 
   T* get() const { return m_ptr; }

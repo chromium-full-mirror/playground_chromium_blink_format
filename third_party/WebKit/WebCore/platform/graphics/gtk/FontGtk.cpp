@@ -145,7 +145,7 @@ static void setPangoAttributes(const Font* font,
 #if defined(USE_FREETYPE)
   if (font->primaryFont()->platformData().m_pattern) {
     PangoFontDescription* desc = pango_fc_font_description_from_pattern(
-        font->primaryFont()->platformData().m_pattern, FALSE);
+        font->primaryFont()->platformData().m_pattern.get(), FALSE);
     pango_layout_set_font_description(layout, desc);
     pango_font_description_free(desc);
   }
