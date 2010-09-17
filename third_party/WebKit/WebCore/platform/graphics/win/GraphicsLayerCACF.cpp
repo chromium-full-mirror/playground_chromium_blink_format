@@ -404,15 +404,6 @@ void GraphicsLayerCACF::swapFromOrToTiledLayer(bool useTiledLayer) {
 
   m_usingTiledLayer = useTiledLayer;
 
-  // FIXME: need this?
-  //    if (useTiledLayer) {
-  //        if (GraphicsLayer::compositingCoordinatesOrientation() ==
-  //        GraphicsLayer::CompositingCoordinatesBottomUp)
-  //            m_layer->setContentsGravity(WKCACFLayer::BottomLeft);
-  //        else
-  //            m_layer->setContentsGravity(WKCACFLayer::TopLeft);
-  //    }
-
   m_layer->adoptSublayers(oldLayer.get());
   if (oldLayer->superlayer())
     oldLayer->superlayer()->replaceSublayer(oldLayer.get(), m_layer.get());

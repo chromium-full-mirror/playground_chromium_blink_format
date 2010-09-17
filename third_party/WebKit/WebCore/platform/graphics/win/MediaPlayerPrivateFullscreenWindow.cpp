@@ -108,8 +108,6 @@ void MediaPlayerPrivateFullscreenWindow::setRootChildLayer(
   WKCACFLayer* rootLayer = m_rootChild->rootLayer();
   CGRect rootBounds = m_rootChild->rootLayer()->bounds();
   m_rootChild->setFrame(rootBounds);
-  m_layerRenderer->setScrollFrame(IntPoint(rootBounds.origin),
-                                  IntSize(rootBounds.size));
   m_rootChild->setBackgroundColor(CGColorGetConstantColor(kCGColorBlack));
 #ifndef NDEBUG
   RetainPtr<CGColorRef> redColor(AdoptCF, CGColorCreateGenericRGB(1, 0, 0, 1));
@@ -171,8 +169,6 @@ LRESULT MediaPlayerPrivateFullscreenWindow::wndProc(HWND hWnd,
       CGRect rootBounds = m_rootChild->rootLayer()->bounds();
       m_rootChild->setFrame(rootBounds);
       m_rootChild->setNeedsLayout();
-      m_layerRenderer->setScrollFrame(IntPoint(rootBounds.origin),
-                                      IntSize(rootBounds.size));
 #endif
     } break;
     case WM_PAINT:

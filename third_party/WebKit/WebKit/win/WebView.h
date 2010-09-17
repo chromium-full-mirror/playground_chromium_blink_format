@@ -983,6 +983,8 @@ class WebView : public IWebView,
   HRESULT resetZoom(bool isTextOnly);
   bool active();
 
+  void sizeChanged(const WebCore::IntSize&);
+
   enum WindowsToPaint { PaintWebViewOnly, PaintWebViewAndChildren };
   void paintIntoBackingStore(WebCore::FrameView*,
                              HDC bitmapDC,
@@ -1116,8 +1118,7 @@ class WebView : public IWebView,
   bool isAcceleratedCompositing() const { return m_isAcceleratedCompositing; }
   void setAcceleratedCompositing(bool);
   void updateRootLayerContents();
-  void resizeLayerRenderer() { m_layerRenderer->resize(); }
-  void layerRendererBecameVisible() { m_layerRenderer->createRenderer(); }
+  void layerRendererBecameVisible();
 
   OwnPtr<WebCore::WKCACFLayerRenderer> m_layerRenderer;
   bool m_isAcceleratedCompositing;

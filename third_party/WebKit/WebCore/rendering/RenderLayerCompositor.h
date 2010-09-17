@@ -200,6 +200,8 @@ class RenderLayerCompositor {
   void frameViewDidChangeSize(const IntPoint& contentsOffset = IntPoint());
   void frameViewDidScroll(const IntPoint& = IntPoint());
 
+  String layerTreeAsText();
+
  private:
   // Whether the given RL needs a compositing layer.
   bool needsToBeComposited(const RenderLayer*) const;

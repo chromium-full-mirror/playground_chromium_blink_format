@@ -225,16 +225,12 @@ WKCACFLayerRenderer::WKCACFLayerRenderer(WKCACFLayerRendererClient* client)
     : m_client(client),
       m_mightBeAbleToCreateDeviceLater(true),
       m_rootLayer(WKCACFRootLayer::create(this)),
-      m_scrollLayer(WKCACFLayer::create(WKCACFLayer::Layer)),
-      m_clipLayer(WKCACFLayer::create(WKCACFLayer::Layer)),
       m_context(AdoptCF, CACFContextCreate(0)),
       m_renderContext(static_cast<CARenderContext*>(
           CACFContextGetRenderContext(m_context.get()))),
       m_renderer(0),
       m_hostWindow(0),
       m_renderTimer(this, &WKCACFLayerRenderer::renderTimerFired),
-      m_scrollPosition(0, 0),
-      m_scrollSize(1, 1),
       m_backingStoreDirty(false),
       m_mustResetLostDeviceBeforeRendering(false) {
   windowsForContexts().set(m_context.get(), this);
@@ -252,15 +248,8 @@ WKCACFLayerRenderer::WKCACFLayerRenderer(WKCACFLayerRendererClient* client)
   // affecting the bounds.
 
   m_rootLayer->setName("WKCACFLayerRenderer rootLayer");
-  m_clipLayer->setName("WKCACFLayerRenderer clipLayer");
-  m_scrollLayer->setName("WKCACFLayerRenderer scrollLayer");
-
-  m_rootLayer->addSublayer(m_clipLayer);
-  m_clipLayer->addSublayer(m_scrollLayer);
-  m_clipLayer->setMasksToBounds(true);
   m_rootLayer->setAnchorPoint(CGPointMake(0, 0));
-  m_scrollLayer->setAnchorPoint(CGPointMake(0, 1));
-  m_clipLayer->setAnchorPoint(CGPointMake(0, 1));
+  m_rootLayer->setGeometryFlipped(true);
 
 #ifndef NDEBUG
   CGColorRef debugColor = createCGColor(Color(255, 0, 0, 204));
@@ -285,27 +274,6 @@ WKCACFLayer* WKCACFLayerRenderer::rootLayer() const {
   return m_rootLayer.get();
 }
 
-void WKCACFLayerRenderer::setScrollFrame(const IntPoint& position,
-                                         const IntSize& size) {
-  m_scrollSize = size;
-  m_scrollPosition = position;
-
-  updateScrollFrame();
-}
-
-void WKCACFLayerRenderer::updateScrollFrame() {
-  CGRect frameBounds = bounds();
-  m_clipLayer->setBounds(
-      CGRectMake(0, 0, m_scrollSize.width(), m_scrollSize.height()));
-  m_clipLayer->setPosition(CGPointMake(0, frameBounds.size.height));
-  if (m_rootChildLayer) {
-    CGRect rootBounds = m_rootChildLayer->bounds();
-    m_scrollLayer->setBounds(rootBounds);
-  }
-  m_scrollLayer->setPosition(CGPointMake(
-      -m_scrollPosition.x(), m_scrollPosition.y() + m_scrollSize.height()));
-}
-
 void WKCACFLayerRenderer::setRootContents(CGImageRef image) {
   ASSERT(m_rootLayer);
   m_rootLayer->setContents(image);
@@ -319,17 +287,10 @@ void WKCACFLayerRenderer::setRootContentsAndDisplay(CGImageRef image) {
 }
 
 void WKCACFLayerRenderer::setRootChildLayer(WKCACFLayer* layer) {
-  if (!m_scrollLayer)
-    return;
-
-  m_scrollLayer->removeAllSublayers();
+  m_rootLayer->removeAllSublayers();
   m_rootChildLayer = layer;
-  if (layer) {
-    layer->setGeometryFlipped(true);
-    m_scrollLayer->addSublayer(layer);
-    // Adjust the scroll frame accordingly
-    updateScrollFrame();
-  }
+  if (m_rootChildLayer)
+    m_rootLayer->addSublayer(m_rootChildLayer);
 }
 
 void WKCACFLayerRenderer::layerTreeDidChange() {
@@ -441,8 +402,6 @@ void WKCACFLayerRenderer::destroyRenderer() {
 
   s_d3d = 0;
   m_rootLayer = 0;
-  m_clipLayer = 0;
-  m_scrollLayer = 0;
   m_rootChildLayer = 0;
 
   m_mightBeAbleToCreateDeviceLater = true;
@@ -460,7 +419,6 @@ void WKCACFLayerRenderer::resize() {
   if (m_rootLayer) {
     m_rootLayer->setBounds(bounds());
     WKCACFContextFlusher::shared().flushAllContexts();
-    updateScrollFrame();
   }
 }
 
