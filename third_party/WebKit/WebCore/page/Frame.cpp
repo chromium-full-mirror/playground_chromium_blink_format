@@ -134,14 +134,14 @@ static inline float parentPageZoomFactor(Frame* frame) {
   Frame* parent = frame->tree()->parent();
   if (!parent)
     return 1;
-  return frame->pageZoomFactor();
+  return parent->pageZoomFactor();
 }
 
 static inline float parentTextZoomFactor(Frame* frame) {
   Frame* parent = frame->tree()->parent();
   if (!parent)
     return 1;
-  return frame->textZoomFactor();
+  return parent->textZoomFactor();
 }
 
 inline Frame::Frame(Page* page,
