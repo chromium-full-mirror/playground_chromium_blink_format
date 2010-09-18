@@ -78,6 +78,10 @@ RenderEmbeddedObject::RenderEmbeddedObject(Element* element)
       m_missingPluginIndicatorIsPressed(false),
       m_mouseDownWasInMissingPluginIndicator(false) {
   view()->frameView()->setIsVisuallyNonEmpty();
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  if (element->hasTagName(videoTag) || element->hasTagName(audioTag))
+    setHasIntrinsicSize();
+#endif
 }
 
 RenderEmbeddedObject::~RenderEmbeddedObject() {
