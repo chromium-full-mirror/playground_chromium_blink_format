@@ -1094,7 +1094,7 @@ PassRefPtr<NodeList> Document::nodesFromRect(int centerX,
   if (!frameView)
     return 0;
 
-  float zoomFactor = frameView->pageZoomFactor();
+  float zoomFactor = frame->pageZoomFactor();
   IntPoint point =
       roundedIntPoint(FloatPoint(centerX * zoomFactor + view()->scrollX(),
                                  centerY * zoomFactor + view()->scrollY()));
@@ -1150,7 +1150,7 @@ Element* Document::elementFromPoint(int x, int y) const {
   if (!frameView)
     return 0;
 
-  float zoomFactor = frameView->pageZoomFactor();
+  float zoomFactor = frame->pageZoomFactor();
   IntPoint point = roundedIntPoint(FloatPoint(
       x * zoomFactor + view()->scrollX(), y * zoomFactor + view()->scrollY()));
 
@@ -1180,7 +1180,7 @@ PassRefPtr<Range> Document::caretRangeFromPoint(int x, int y) {
   if (!frameView)
     return 0;
 
-  float zoomFactor = frameView->pageZoomFactor();
+  float zoomFactor = frame->pageZoomFactor();
   IntPoint point = roundedIntPoint(FloatPoint(
       x * zoomFactor + view()->scrollX(), y * zoomFactor + view()->scrollY()));
 

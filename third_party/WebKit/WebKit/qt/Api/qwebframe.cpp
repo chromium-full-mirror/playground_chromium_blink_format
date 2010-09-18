@@ -1151,24 +1151,17 @@ void QWebFrame::render(QPainter* painter) {
     the \a factor specified.
 */
 void QWebFrame::setTextSizeMultiplier(qreal factor) {
-  FrameView* view = d->frame->view();
-  if (!view)
-    return;
-
   page()->settings()->setAttribute(QWebSettings::ZoomTextOnly, true);
 
-  view->setPageAndTextZoomFactors(1, factor);
+  d->frame->setPageAndTextZoomFactors(1, factor);
 }
 
 /*!
     Returns the value of the multiplier used to scale the text in a Web frame.
 */
 qreal QWebFrame::textSizeMultiplier() const {
-  FrameView* view = d->frame->view();
-  if (!view)
-    return 1;
-
-  return d->zoomTextOnly ? view->textZoomFactor() : view->pageZoomFactor();
+  return d->zoomTextOnly ? d->frame->textZoomFactor()
+                         : d->frame->pageZoomFactor();
 }
 
 /*!
@@ -1178,26 +1171,15 @@ qreal QWebFrame::textSizeMultiplier() const {
 */
 
 void QWebFrame::setZoomFactor(qreal factor) {
-  Page* page = d->frame->page();
-  if (!page)
-    return;
-
-  FrameView* view = d->frame->view();
-  if (!view)
-    return;
-
   if (d->zoomTextOnly)
-    view->setTextZoomFactor(factor);
+    d->frame->setTextZoomFactor(factor);
   else
-    view->setPageZoomFactor(factor);
+    d->frame->setPageZoomFactor(factor);
 }
 
 qreal QWebFrame::zoomFactor() const {
-  FrameView* view = d->frame->view();
-  if (!view)
-    return 1;
-
-  return d->zoomTextOnly ? view->textZoomFactor() : view->pageZoomFactor();
+  return d->zoomTextOnly ? d->frame->textZoomFactor()
+                         : d->frame->pageZoomFactor();
 }
 
 /*!

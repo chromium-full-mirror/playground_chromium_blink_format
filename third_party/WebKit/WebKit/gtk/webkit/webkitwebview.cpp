@@ -3968,13 +3968,9 @@ gfloat webkit_web_view_get_zoom_level(WebKitWebView* webView) {
   if (!frame)
     return 1.0f;
 
-  FrameView* view = frame->view();
-  if (!view)
-    return 1;
-
   WebKitWebViewPrivate* priv = webView->priv;
-  return priv->zoomFullContent ? view->pageZoomFactor()
-                               : view->textZoomFactor();
+  return priv->zoomFullContent ? frame->pageZoomFactor()
+                               : frame->textZoomFactor();
 }
 
 static void webkit_web_view_apply_zoom_level(WebKitWebView* webView,
@@ -3983,15 +3979,11 @@ static void webkit_web_view_apply_zoom_level(WebKitWebView* webView,
   if (!frame)
     return;
 
-  FrameView* view = frame->view();
-  if (!view)
-    return;
-
   WebKitWebViewPrivate* priv = webView->priv;
   if (priv->zoomFullContent)
-    view->setPageZoomFactor(zoomLevel);
+    frame->setPageZoomFactor(zoomLevel);
   else
-    view->setTextZoomFactor(zoomLevel);
+    frame->setTextZoomFactor(zoomLevel);
 }
 
 /**
@@ -4098,18 +4090,14 @@ void webkit_web_view_set_full_content_zoom(WebKitWebView* webView,
   if (!frame)
     return;
 
-  FrameView* view = frame->view();
-  if (!view)
-    return;
-
   gfloat zoomLevel =
-      priv->zoomFullContent ? view->pageZoomFactor() : view->textZoomFactor();
+      priv->zoomFullContent ? frame->pageZoomFactor() : frame->textZoomFactor();
 
   priv->zoomFullContent = zoomFullContent;
   if (priv->zoomFullContent)
-    view->setPageAndTextZoomFactors(zoomLevel, 1);
+    frame->setPageAndTextZoomFactors(zoomLevel, 1);
   else
-    view->setPageAndTextZoomFactors(1, zoomLevel);
+    frame->setPageAndTextZoomFactors(1, zoomLevel);
 
   g_object_notify(G_OBJECT(webView), "full-content-zoom");
 }

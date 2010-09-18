@@ -156,6 +156,12 @@ class Frame : public RefCounted<Frame>, public TiledBackingStoreClient {
 
   void setDocument(PassRefPtr<Document>);
 
+  void setPageZoomFactor(float factor);
+  float pageZoomFactor() const { return m_pageZoomFactor; }
+  void setTextZoomFactor(float factor);
+  float textZoomFactor() const { return m_textZoomFactor; }
+  void setPageAndTextZoomFactors(float pageZoomFactor, float textZoomFactor);
+
 #if ENABLE(ORIENTATION_EVENTS)
   // Orientation is the interface orientation in degrees. Some examples are:
   //  0 is straight up; -90 is when the device is rotated 90 clockwise;
@@ -234,6 +240,9 @@ class Frame : public RefCounted<Frame>, public TiledBackingStoreClient {
   mutable AnimationController m_animationController;
 
   Timer<Frame> m_lifeSupportTimer;
+
+  float m_pageZoomFactor;
+  float m_textZoomFactor;
 
 #if ENABLE(ORIENTATION_EVENTS)
   int m_orientation;

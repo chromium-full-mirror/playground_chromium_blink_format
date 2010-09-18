@@ -271,8 +271,8 @@ void HTMLBodyElement::setVLink(const String& value) {
   setAttribute(vlinkAttr, value);
 }
 
-static int adjustForZoom(int value, FrameView* frameView) {
-  float zoomFactor = frameView->pageZoomFactor();
+static int adjustForZoom(int value, Document* document) {
+  float zoomFactor = document->frame()->pageZoomFactor();
   if (zoomFactor == 1)
     return value;
   // Needed because of truncation (rather than rounding) when scaling up.
@@ -283,54 +283,60 @@ static int adjustForZoom(int value, FrameView* frameView) {
 
 int HTMLBodyElement::scrollLeft() const {
   // Update the document's layout.
-  Document* doc = document();
-  doc->updateLayoutIgnorePendingStylesheets();
-  FrameView* view = doc->view();
-  return view ? adjustForZoom(view->scrollX(), view) : 0;
+  Document* document = this->document();
+  document->updateLayoutIgnorePendingStylesheets();
+  FrameView* view = document->view();
+  return view ? adjustForZoom(view->scrollX(), document) : 0;
 }
 
 void HTMLBodyElement::setScrollLeft(int scrollLeft) {
   Document* document = this->document();
   document->updateLayoutIgnorePendingStylesheets();
-  FrameView* view = document->view();
+  Frame* frame = document->frame();
+  if (!frame)
+    return;
+  FrameView* view = frame->view();
   if (!view)
     return;
   view->setScrollPosition(IntPoint(
-      static_cast<int>(scrollLeft * view->pageZoomFactor()), view->scrollY()));
+      static_cast<int>(scrollLeft * frame->pageZoomFactor()), view->scrollY()));
 }
 
 int HTMLBodyElement::scrollTop() const {
   // Update the document's layout.
-  Document* doc = document();
-  doc->updateLayoutIgnorePendingStylesheets();
-  FrameView* view = doc->view();
-  return view ? adjustForZoom(view->scrollY(), view) : 0;
+  Document* document = this->document();
+  document->updateLayoutIgnorePendingStylesheets();
+  FrameView* view = document->view();
+  return view ? adjustForZoom(view->scrollY(), document) : 0;
 }
 
 void HTMLBodyElement::setScrollTop(int scrollTop) {
   Document* document = this->document();
   document->updateLayoutIgnorePendingStylesheets();
-  FrameView* view = document->view();
+  Frame* frame = document->frame();
+  if (!frame)
+    return;
+  FrameView* view = frame->view();
   if (!view)
     return;
   view->setScrollPosition(IntPoint(
-      view->scrollX(), static_cast<int>(scrollTop * view->pageZoomFactor())));
+      view->scrollX(), static_cast<int>(scrollTop * frame->pageZoomFactor())));
 }
 
 int HTMLBodyElement::scrollHeight() const {
   // Update the document's layout.
-  Document* doc = document();
-  doc->updateLayoutIgnorePendingStylesheets();
-  FrameView* view = doc->view();
-  return view ? adjustForZoom(view->contentsHeight(), view) : 0;
+  Document* document = this->document();
+  document->updateLayoutIgnorePendingStylesheets();
+  FrameView* view = document->view();
+  return view ? adjustForZoom(view->contentsHeight(), document) : 0;
 }
 
 int HTMLBodyElement::scrollWidth() const {
   // Update the document's layout.
-  Document* doc = document();
-  doc->updateLayoutIgnorePendingStylesheets();
-  FrameView* view = doc->view();
-  return view ? adjustForZoom(view->contentsWidth(), view) : 0;
+  Document* document = this->document();
+  document->updateLayoutIgnorePendingStylesheets();
+  FrameView* view = document->view();
+  return view ? adjustForZoom(view->contentsWidth(), document) : 0;
 }
 
 void HTMLBodyElement::addSubresourceAttributeURLs(
