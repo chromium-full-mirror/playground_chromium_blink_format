@@ -243,7 +243,9 @@ class CharacterClassConstructor {
 class RegexPatternConstructor {
  public:
   RegexPatternConstructor(RegexPattern& pattern)
-      : m_pattern(pattern), m_characterClassConstructor(pattern.m_ignoreCase) {}
+      : m_pattern(pattern),
+        m_characterClassConstructor(pattern.m_ignoreCase),
+        m_invertParentheticalAssertion(false) {}
 
   ~RegexPatternConstructor() {}
 
@@ -252,7 +254,14 @@ class RegexPatternConstructor {
     m_characterClassConstructor.reset();
   }
 
-  void assertionBOL() { m_alternative->m_terms.append(PatternTerm::BOL()); }
+  void assertionBOL() {
+    if (!m_alternative->m_terms.size() & !m_invertParentheticalAssertion) {
+      m_alternative->m_startsWithBOL = true;
+      m_alternative->m_containsBOL = true;
+      m_pattern.m_containsBOL = true;
+    }
+    m_alternative->m_terms.append(PatternTerm::BOL());
+  }
   void assertionEOL() { m_alternative->m_terms.append(PatternTerm::EOL()); }
   void assertionWordBoundary(bool invert) {
     m_alternative->m_terms.append(PatternTerm::WordBoundary(invert));
@@ -360,15 +369,36 @@ class RegexPatternConstructor {
         PatternTerm::TypeParentheticalAssertion, m_pattern.m_numSubpatterns + 1,
         parenthesesDisjunction, invert));
     m_alternative = parenthesesDisjunction->addNewAlternative();
+    m_invertParentheticalAssertion = invert;
   }
 
   void atomParenthesesEnd() {
     ASSERT(m_alternative->m_parent);
     ASSERT(m_alternative->m_parent->m_parent);
+
+    PatternDisjunction* parenthesisDisjunction = m_alternative->m_parent;
     m_alternative = m_alternative->m_parent->m_parent;
 
-    m_alternative->lastTerm().parentheses.lastSubpatternId =
-        m_pattern.m_numSubpatterns;
+    PatternTerm lastTerm = m_alternative->lastTerm();
+
+    unsigned numParenAlternatives =
+        parenthesisDisjunction->m_alternatives.size();
+    unsigned numBOLAnchoredAlts = 0;
+    // Bubble up BOL flags
+    for (unsigned i = 0; i < numParenAlternatives; i++) {
+      if (parenthesisDisjunction->m_alternatives[i]->m_startsWithBOL)
+        numBOLAnchoredAlts++;
+    }
+
+    if (numBOLAnchoredAlts) {
+      m_alternative->m_containsBOL = true;
+      // If all the alternatives in parens start with BOL, then so does this one
+      if (numBOLAnchoredAlts == numParenAlternatives)
+        m_alternative->m_startsWithBOL = true;
+    }
+
+    lastTerm.parentheses.lastSubpatternId = m_pattern.m_numSubpatterns;
+    m_invertParentheticalAssertion = false;
   }
 
   void atomBackReference(unsigned subpatternId) {
@@ -402,29 +432,39 @@ class RegexPatternConstructor {
     m_alternative->m_terms.append(PatternTerm(subpatternId));
   }
 
-  PatternDisjunction* copyDisjunction(PatternDisjunction* disjunction) {
-    PatternDisjunction* newDisjunction = new PatternDisjunction();
-
-    newDisjunction->m_parent = disjunction->m_parent;
+  // deep copy the argument disjunction.  If filterStartsWithBOL is true,
+  // skip alternatives with m_startsWithBOL set true.
+  PatternDisjunction* copyDisjunction(PatternDisjunction* disjunction,
+                                      bool filterStartsWithBOL = false) {
+    PatternDisjunction* newDisjunction = 0;
     for (unsigned alt = 0; alt < disjunction->m_alternatives.size(); ++alt) {
       PatternAlternative* alternative = disjunction->m_alternatives[alt];
-      PatternAlternative* newAlternative = newDisjunction->addNewAlternative();
-      for (unsigned i = 0; i < alternative->m_terms.size(); ++i)
-        newAlternative->m_terms.append(copyTerm(alternative->m_terms[i]));
+      if (!filterStartsWithBOL || !alternative->m_startsWithBOL) {
+        if (!newDisjunction) {
+          newDisjunction = new PatternDisjunction();
+          newDisjunction->m_parent = disjunction->m_parent;
+        }
+        PatternAlternative* newAlternative =
+            newDisjunction->addNewAlternative();
+        for (unsigned i = 0; i < alternative->m_terms.size(); ++i)
+          newAlternative->m_terms.append(
+              copyTerm(alternative->m_terms[i], filterStartsWithBOL));
+      }
     }
 
-    m_pattern.m_disjunctions.append(newDisjunction);
+    if (newDisjunction)
+      m_pattern.m_disjunctions.append(newDisjunction);
     return newDisjunction;
   }
 
-  PatternTerm copyTerm(PatternTerm& term) {
+  PatternTerm copyTerm(PatternTerm& term, bool filterStartsWithBOL = false) {
     if ((term.type != PatternTerm::TypeParenthesesSubpattern) &&
         (term.type != PatternTerm::TypeParentheticalAssertion))
       return PatternTerm(term);
 
     PatternTerm termCopy = term;
     termCopy.parentheses.disjunction =
-        copyDisjunction(termCopy.parentheses.disjunction);
+        copyDisjunction(termCopy.parentheses.disjunction, filterStartsWithBOL);
     return termCopy;
   }
 
@@ -612,11 +652,43 @@ class RegexPatternConstructor {
 
   void setupOffsets() { setupDisjunctionOffsets(m_pattern.m_body, 0, 0); }
 
+  void optimizeBOL() {
+    // Look for expressions containing beginning of line (^) anchoring and
+    // unroll them.
+    // e.g. /^a|^b|c/ becomes /^a|^b|c/ which is executed once followed by /c/
+    // which loops
+    // This code relies on the parsing code tagging alternatives with
+    // m_containsBOL and
+    // m_startsWithBOL and rolling those up to containing alternatives.
+    // At this point, this is only valid for non-multiline expressions.
+    PatternDisjunction* disjunction = m_pattern.m_body;
+
+    if (!m_pattern.m_containsBOL || m_pattern.m_multiline)
+      return;
+
+    PatternDisjunction* loopDisjunction = copyDisjunction(disjunction, true);
+
+    // Set alternatives in disjunction to "onceThrough"
+    for (unsigned alt = 0; alt < disjunction->m_alternatives.size(); ++alt)
+      disjunction->m_alternatives[alt]->setOnceThrough();
+
+    if (loopDisjunction) {
+      // Move alternatives from loopDisjunction to disjunction
+      for (unsigned alt = 0; alt < loopDisjunction->m_alternatives.size();
+           ++alt)
+        disjunction->m_alternatives.append(
+            loopDisjunction->m_alternatives[alt]);
+
+      loopDisjunction->m_alternatives.clear();
+    }
+  }
+
  private:
   RegexPattern& m_pattern;
   PatternAlternative* m_alternative;
   CharacterClassConstructor m_characterClassConstructor;
   bool m_invertCharacterClass;
+  bool m_invertParentheticalAssertion;
 };
 
 const char* compileRegex(const UString& patternString, RegexPattern& pattern) {
@@ -643,6 +715,8 @@ const char* compileRegex(const UString& patternString, RegexPattern& pattern) {
     ASSERT(!error);
     ASSERT(numSubpatterns == pattern.m_numSubpatterns);
   }
+
+  constructor.optimizeBOL();
 
   constructor.setupOffsets();
 
