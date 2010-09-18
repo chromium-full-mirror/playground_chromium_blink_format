@@ -275,40 +275,6 @@ bool GraphicsContext::paintingDisabled() const {
   return m_common->state.paintingDisabled;
 }
 
-void GraphicsContext::drawImage(Image* image,
-                                ColorSpace styleColorSpace,
-                                const IntPoint& p,
-                                CompositeOperator op) {
-  drawImage(image, styleColorSpace, p, IntRect(0, 0, -1, -1), op);
-}
-
-void GraphicsContext::drawImage(Image* image,
-                                ColorSpace styleColorSpace,
-                                const IntRect& r,
-                                CompositeOperator op,
-                                bool useLowQualityScale) {
-  drawImage(image, styleColorSpace, r, IntRect(0, 0, -1, -1), op,
-            useLowQualityScale);
-}
-
-void GraphicsContext::drawImage(Image* image,
-                                ColorSpace styleColorSpace,
-                                const IntPoint& dest,
-                                const IntRect& srcRect,
-                                CompositeOperator op) {
-  drawImage(image, styleColorSpace, IntRect(dest, srcRect.size()), srcRect, op);
-}
-
-void GraphicsContext::drawImage(Image* image,
-                                ColorSpace styleColorSpace,
-                                const IntRect& dest,
-                                const IntRect& srcRect,
-                                CompositeOperator op,
-                                bool useLowQualityScale) {
-  drawImage(image, styleColorSpace, FloatRect(dest), srcRect, op,
-            useLowQualityScale);
-}
-
 #if !OS(WINCE) || PLATFORM(QT)
 void GraphicsContext::drawText(const Font& font,
                                const TextRun& run,
@@ -381,6 +347,46 @@ void GraphicsContext::drawHighlightForText(const Font& font,
 
 void GraphicsContext::drawImage(Image* image,
                                 ColorSpace styleColorSpace,
+                                const IntPoint& p,
+                                CompositeOperator op) {
+  if (!image)
+    return;
+  drawImage(image, styleColorSpace, p,
+            IntRect(0, 0, image->width(), image->height()), op);
+}
+
+void GraphicsContext::drawImage(Image* image,
+                                ColorSpace styleColorSpace,
+                                const IntRect& r,
+                                CompositeOperator op,
+                                bool useLowQualityScale) {
+  if (!image)
+    return;
+  drawImage(image, styleColorSpace, r,
+            IntRect(0, 0, image->width(), image->height()), op,
+            useLowQualityScale);
+}
+
+void GraphicsContext::drawImage(Image* image,
+                                ColorSpace styleColorSpace,
+                                const IntPoint& dest,
+                                const IntRect& srcRect,
+                                CompositeOperator op) {
+  drawImage(image, styleColorSpace, IntRect(dest, srcRect.size()), srcRect, op);
+}
+
+void GraphicsContext::drawImage(Image* image,
+                                ColorSpace styleColorSpace,
+                                const IntRect& dest,
+                                const IntRect& srcRect,
+                                CompositeOperator op,
+                                bool useLowQualityScale) {
+  drawImage(image, styleColorSpace, FloatRect(dest), srcRect, op,
+            useLowQualityScale);
+}
+
+void GraphicsContext::drawImage(Image* image,
+                                ColorSpace styleColorSpace,
                                 const FloatRect& dest,
                                 const FloatRect& src,
                                 CompositeOperator op,
@@ -392,16 +398,6 @@ void GraphicsContext::drawImage(Image* image,
   float tsh = src.height();
   float tw = dest.width();
   float th = dest.height();
-
-  if (tsw == -1)
-    tsw = image->width();
-  if (tsh == -1)
-    tsh = image->height();
-
-  if (tw == -1)
-    tw = image->width();
-  if (th == -1)
-    th = image->height();
 
   if (useLowQualityScale) {
     save();
@@ -460,7 +456,10 @@ void GraphicsContext::drawImageBuffer(ImageBuffer* image,
                                       ColorSpace styleColorSpace,
                                       const IntPoint& p,
                                       CompositeOperator op) {
-  drawImageBuffer(image, styleColorSpace, p, IntRect(0, 0, -1, -1), op);
+  if (!image)
+    return;
+  drawImageBuffer(image, styleColorSpace, p,
+                  IntRect(0, 0, image->width(), image->height()), op);
 }
 
 void GraphicsContext::drawImageBuffer(ImageBuffer* image,
@@ -468,7 +467,10 @@ void GraphicsContext::drawImageBuffer(ImageBuffer* image,
                                       const IntRect& r,
                                       CompositeOperator op,
                                       bool useLowQualityScale) {
-  drawImageBuffer(image, styleColorSpace, r, IntRect(0, 0, -1, -1), op,
+  if (!image)
+    return;
+  drawImageBuffer(image, styleColorSpace, r,
+                  IntRect(0, 0, image->width(), image->height()), op,
                   useLowQualityScale);
 }
 
@@ -499,21 +501,6 @@ void GraphicsContext::drawImageBuffer(ImageBuffer* image,
                                       bool useLowQualityScale) {
   if (paintingDisabled() || !image)
     return;
-
-  float tsw = src.width();
-  float tsh = src.height();
-  float tw = dest.width();
-  float th = dest.height();
-
-  if (tsw == -1)
-    tsw = image->width();
-  if (tsh == -1)
-    tsh = image->height();
-
-  if (tw == -1)
-    tw = image->width();
-  if (th == -1)
-    th = image->height();
 
   if (useLowQualityScale) {
     save();

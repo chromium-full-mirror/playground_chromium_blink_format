@@ -258,9 +258,10 @@ class GraphicsContext : public Noncopyable {
   void drawImage(Image*,
                  ColorSpace styleColorSpace,
                  const FloatRect& destRect,
-                 const FloatRect& srcRect = FloatRect(0, 0, -1, -1),
+                 const FloatRect& srcRect,
                  CompositeOperator = CompositeSourceOver,
                  bool useLowQualityScale = false);
+
   void drawTiledImage(Image*,
                       ColorSpace styleColorSpace,
                       const IntRect& destRect,
