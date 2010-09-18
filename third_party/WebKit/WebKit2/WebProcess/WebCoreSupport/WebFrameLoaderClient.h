@@ -293,7 +293,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual PassRefPtr<WebCore::FrameNetworkingContext> createNetworkingContext();
 
   WebFrame* m_frame;
-
   RefPtr<PluginView> m_pluginView;
   bool m_hasSentResponseToPluginView;
 };

@@ -41,9 +41,11 @@ class MessageID;
 
 namespace WebKit {
 
-class WebPageProxy;
-class WebFramePolicyListenerProxy;
+class PlatformCertificateInfo;
+class WebCertificateInfo;
 class WebFormSubmissionListenerProxy;
+class WebFramePolicyListenerProxy;
+class WebPageProxy;
 
 class WebFrameProxy : public APIObject {
  public:
@@ -72,6 +74,11 @@ class WebFrameProxy : public APIObject {
   const WTF::String& url() const { return m_url; }
   const WTF::String& provisionalURL() const { return m_provisionalURL; }
 
+  void setCertificateInfo(PassRefPtr<WebCertificateInfo>);
+  WebCertificateInfo* certificateInfo() const {
+    return m_certificateInfo.get();
+  }
+
   void didStartProvisionalLoad(const String& url);
   void didReceiveServerRedirectForProvisionalLoad(const String& url);
   void didCommitLoad();
@@ -92,6 +99,7 @@ class WebFrameProxy : public APIObject {
   LoadState m_loadState;
   WTF::String m_url;
   WTF::String m_provisionalURL;
+  RefPtr<WebCertificateInfo> m_certificateInfo;
   RefPtr<WebFrameListenerProxy> m_activeListener;
   uint64_t m_frameID;
 };

@@ -47,6 +47,7 @@ class MutableArray;
 class MutableDictionary;
 class WebBackForwardList;
 class WebBackForwardListItem;
+class WebCertificateInfo;
 class WebContext;
 class WebData;
 class WebError;
@@ -78,6 +79,10 @@ struct APITypeInfo<WKBackForwardListRef> {
 template <>
 struct APITypeInfo<WKBooleanRef> {
   typedef WebBoolean* ImplType;
+};
+template <>
+struct APITypeInfo<WKCertificateInfoRef> {
+  typedef WebCertificateInfo* ImplType;
 };
 template <>
 struct APITypeInfo<WKContextRef> {
@@ -193,6 +198,10 @@ struct ImplTypeInfo<WebBackForwardListItem*> {
 template <>
 struct ImplTypeInfo<WebBoolean*> {
   typedef WKBooleanRef APIType;
+};
+template <>
+struct ImplTypeInfo<WebCertificateInfo*> {
+  typedef WKCertificateInfoRef APIType;
 };
 template <>
 struct ImplTypeInfo<WebContext*> {

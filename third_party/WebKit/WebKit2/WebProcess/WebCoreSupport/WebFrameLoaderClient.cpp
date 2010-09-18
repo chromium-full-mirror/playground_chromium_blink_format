@@ -30,6 +30,7 @@
 
 #include "InjectedBundleUserMessageCoders.h"
 #include "NetscapePlugin.h"
+#include "PlatformCertificateInfo.h"
 #include "PluginView.h"
 #include "WebCoreArgumentCoders.h"
 #include "WebErrors.h"
@@ -319,13 +320,16 @@ void WebFrameLoaderClient::dispatchDidCommitLoad() {
   if (!webPage)
     return;
 
+  const ResourceResponse& response =
+      m_frame->coreFrame()->loader()->documentLoader()->response();
+
   // Notify the bundle client.
   webPage->injectedBundleLoaderClient().didCommitLoadForFrame(webPage, m_frame);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidCommitLoadForFrame, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID()));
+      CoreIPC::In(m_frame->frameID(), PlatformCertificateInfo(response)));
 }
 
 void WebFrameLoaderClient::dispatchDidFailProvisionalLoad(

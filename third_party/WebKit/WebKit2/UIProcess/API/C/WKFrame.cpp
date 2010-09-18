@@ -64,3 +64,7 @@ WKURLRef WKFrameCopyURL(WKFrameRef frameRef) {
 WKPageRef WKFrameGetPage(WKFrameRef frameRef) {
   return toRef(toWK(frameRef)->page());
 }
+
+WKCertificateInfoRef WKFrameGetCertificateInfo(WKFrameRef frameRef) {
+  return toRef(toWK(frameRef)->certificateInfo());
+}
