@@ -68,4 +68,5 @@ PassRefPtr<DocumentFragment> DragData::asFragment(Document* doc) const {
 Color DragData::asColor() const {
   return Color();
 }
-}
+
+}  // namespace WebCore

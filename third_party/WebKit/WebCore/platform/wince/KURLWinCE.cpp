@@ -18,32 +18,12 @@
  */
 
 #include "config.h"
-#include "SearchPopupMenu.h"
-
-#include "NotImplemented.h"
-#include <wtf/text/AtomicString.h>
+#include "KURL.h"
 
 namespace WebCore {
 
-SearchPopupMenu::SearchPopupMenu(PopupMenuClient* client) : PopupMenu(client) {}
-
-bool SearchPopupMenu::enabled() {
-  return false;
+String KURL::fileSystemPath() const {
+  return path();
 }
 
-void SearchPopupMenu::saveRecentSearches(const AtomicString& name,
-                                         const Vector<String>& searchItems) {
-  if (name.isEmpty())
-    return;
-
-  notImplemented();
-}
-
-void SearchPopupMenu::loadRecentSearches(const AtomicString& name,
-                                         Vector<String>& searchItems) {
-  if (name.isEmpty())
-    return;
-
-  notImplemented();
-}
-}
+}  // namespace WebCore

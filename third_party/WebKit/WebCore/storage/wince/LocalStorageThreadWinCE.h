@@ -21,8 +21,8 @@
  *  Boston, MA 02110-1301, USA.
  */
 
-#ifndef LocalStorageThreadWince_h
-#define LocalStorageThreadWince_h
+#ifndef LocalStorageThreadWinCE_h
+#define LocalStorageThreadWinCE_h
 
 #include <wtf/Deque.h>
 #include <wtf/PassRefPtr.h>
@@ -56,4 +56,4 @@ class LocalStorageThread : public RefCounted<LocalStorageThread> {
 
 }  // namespace WebCore
 
-#endif  // LocalStorageThreadWince_h
+#endif  // LocalStorageThreadWinCE_h

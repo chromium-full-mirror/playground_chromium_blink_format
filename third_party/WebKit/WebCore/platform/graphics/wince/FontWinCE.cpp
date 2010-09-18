@@ -358,4 +358,5 @@ FloatRect Font::selectionRectForComplexText(const TextRun& run,
 bool Font::canReturnFallbackFontsForComplexText() {
   return false;
 }
-}
+
+}  // namespace WebCore

@@ -24,8 +24,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MediaPlayerPrivateWince_h
-#define MediaPlayerPrivateWince_h
+#ifndef MediaPlayerPrivateWinCE_h
+#define MediaPlayerPrivateWinCE_h
 
 #if ENABLE(VIDEO)
 
@@ -120,6 +120,6 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
 };
 }
 
-#endif
+#endif  // ENABLE(VIDEO)
 
-#endif
+#endif  // MediaPlayerPrivateWinCE_h

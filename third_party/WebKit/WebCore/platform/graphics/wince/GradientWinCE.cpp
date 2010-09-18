@@ -43,4 +43,5 @@ const Vector<Gradient::ColorStop>& Gradient::getStops() const {
 void Gradient::fill(GraphicsContext* c, const FloatRect& r) {
   c->fillRect(r, this);
 }
-}
+
+}  // namespace WebCore

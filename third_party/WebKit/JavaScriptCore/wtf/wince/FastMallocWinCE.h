@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef FastMallocWince_h
-#define FastMallocWince_h
+#ifndef WTF_FastMallocWinCE_h
+#define WTF_FastMallocWinCE_h
 
 #include <new.h>
 
@@ -188,4 +188,4 @@ inline void fastMallocMatchValidateFree(void*, Internal::AllocType) {}
 
 #endif
 
-#endif  // FastMallocWince_h
+#endif  // WTF_FastMallocWinCE_h

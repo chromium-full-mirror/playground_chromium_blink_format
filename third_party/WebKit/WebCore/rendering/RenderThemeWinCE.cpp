@@ -22,7 +22,7 @@
  */
 
 #include "config.h"
-#include "RenderThemeWince.h"
+#include "RenderThemeWinCE.h"
 
 #include "CSSStyleSheet.h"
 #include "CSSValueKeywords.h"
@@ -103,39 +103,39 @@ namespace WebCore {
 static const int dropDownButtonWidth = 17;
 static const int trackWidth = 4;
 
-PassRefPtr<RenderTheme> RenderThemeWince::create() {
-  return adoptRef(new RenderThemeWince);
+PassRefPtr<RenderTheme> RenderThemeWinCE::create() {
+  return adoptRef(new RenderThemeWinCE);
 }
 
 PassRefPtr<RenderTheme> RenderTheme::themeForPage(Page* page) {
-  static RenderTheme* winceTheme = RenderThemeWince::create().releaseRef();
+  static RenderTheme* winceTheme = RenderThemeWinCE::create().releaseRef();
   return winceTheme;
 }
 
-RenderThemeWince::RenderThemeWince() {}
+RenderThemeWinCE::RenderThemeWinCE() {}
 
-RenderThemeWince::~RenderThemeWince() {}
+RenderThemeWinCE::~RenderThemeWinCE() {}
 
-Color RenderThemeWince::platformActiveSelectionBackgroundColor() const {
+Color RenderThemeWinCE::platformActiveSelectionBackgroundColor() const {
   COLORREF color = GetSysColor(COLOR_HIGHLIGHT);
   return Color(GetRValue(color), GetGValue(color), GetBValue(color), 255);
 }
 
-Color RenderThemeWince::platformInactiveSelectionBackgroundColor() const {
+Color RenderThemeWinCE::platformInactiveSelectionBackgroundColor() const {
   COLORREF color = GetSysColor(COLOR_GRAYTEXT);
   return Color(GetRValue(color), GetGValue(color), GetBValue(color), 255);
 }
 
-Color RenderThemeWince::platformActiveSelectionForegroundColor() const {
+Color RenderThemeWinCE::platformActiveSelectionForegroundColor() const {
   COLORREF color = GetSysColor(COLOR_HIGHLIGHTTEXT);
   return Color(GetRValue(color), GetGValue(color), GetBValue(color), 255);
 }
 
-Color RenderThemeWince::platformInactiveSelectionForegroundColor() const {
+Color RenderThemeWinCE::platformInactiveSelectionForegroundColor() const {
   return Color::white;
 }
 
-bool RenderThemeWince::supportsFocus(ControlPart appearance) const {
+bool RenderThemeWinCE::supportsFocus(ControlPart appearance) const {
   switch (appearance) {
     case PushButtonPart:
     case ButtonPart:
@@ -149,11 +149,11 @@ bool RenderThemeWince::supportsFocus(ControlPart appearance) const {
   return false;
 }
 
-bool RenderThemeWince::supportsFocusRing(const RenderStyle* style) const {
+bool RenderThemeWinCE::supportsFocusRing(const RenderStyle* style) const {
   return supportsFocus(style->appearance());
 }
 
-unsigned RenderThemeWince::determineClassicState(RenderObject* o) {
+unsigned RenderThemeWinCE::determineClassicState(RenderObject* o) {
   unsigned result = 0;
   if (!isEnabled(o) || isReadOnlyControl(o))
     result = DFCS_INACTIVE;
@@ -165,7 +165,7 @@ unsigned RenderThemeWince::determineClassicState(RenderObject* o) {
   return result;
 }
 
-ThemeData RenderThemeWince::getThemeData(RenderObject* o) {
+ThemeData RenderThemeWinCE::getThemeData(RenderObject* o) {
   ThemeData result;
   switch (o->style()->appearance()) {
     case PushButtonPart:
@@ -194,7 +194,7 @@ ThemeData RenderThemeWince::getThemeData(RenderObject* o) {
   return result;
 }
 
-bool RenderThemeWince::paintButton(RenderObject* o,
+bool RenderThemeWinCE::paintButton(RenderObject* o,
                                    const PaintInfo& i,
                                    const IntRect& r) {
   // Get the correct theme data for a button
@@ -214,7 +214,7 @@ bool RenderThemeWince::paintButton(RenderObject* o,
   return false;
 }
 
-void RenderThemeWince::setCheckboxSize(RenderStyle* style) const {
+void RenderThemeWinCE::setCheckboxSize(RenderStyle* style) const {
   // If the width and height are both specified, then we have nothing to do.
   if (!style->width().isIntrinsicOrAuto() && !style->height().isAuto())
     return;
@@ -232,7 +232,7 @@ void RenderThemeWince::setCheckboxSize(RenderStyle* style) const {
     style->setHeight(Length(13, Fixed));
 }
 
-bool RenderThemeWince::paintTextField(RenderObject* o,
+bool RenderThemeWinCE::paintTextField(RenderObject* o,
                                       const PaintInfo& i,
                                       const IntRect& r) {
   // Get the correct theme data for a textfield
@@ -244,14 +244,14 @@ bool RenderThemeWince::paintTextField(RenderObject* o,
   return false;
 }
 
-void RenderThemeWince::adjustMenuListStyle(CSSStyleSelector* selector,
+void RenderThemeWinCE::adjustMenuListStyle(CSSStyleSelector* selector,
                                            RenderStyle* style,
                                            Element* e) const {
   style->resetBorder();
   adjustMenuListButtonStyle(selector, style, e);
 }
 
-bool RenderThemeWince::paintMenuList(RenderObject* o,
+bool RenderThemeWinCE::paintMenuList(RenderObject* o,
                                      const PaintInfo& i,
                                      const IntRect& r) {
   paintTextField(o, i, r);
@@ -259,7 +259,7 @@ bool RenderThemeWince::paintMenuList(RenderObject* o,
   return true;
 }
 
-bool RenderThemeWince::paintMenuListButton(RenderObject* o,
+bool RenderThemeWinCE::paintMenuListButton(RenderObject* o,
                                            const PaintInfo& i,
                                            const IntRect& r) {
   IntRect buttonRect(r.right() - dropDownButtonWidth - 1, r.y(),
@@ -270,24 +270,24 @@ bool RenderThemeWince::paintMenuListButton(RenderObject* o,
   return true;
 }
 
-void RenderThemeWince::systemFont(int propId,
+void RenderThemeWinCE::systemFont(int propId,
                                   FontDescription& fontDescription) const {
   notImplemented();
 }
 
-void RenderThemeWince::themeChanged() {}
+void RenderThemeWinCE::themeChanged() {}
 
-String RenderThemeWince::extraDefaultStyleSheet() {
+String RenderThemeWinCE::extraDefaultStyleSheet() {
   notImplemented();
   return String();
 }
 
-String RenderThemeWince::extraQuirksStyleSheet() {
+String RenderThemeWinCE::extraQuirksStyleSheet() {
   notImplemented();
   return String();
 }
 
-bool RenderThemeWince::supportsHover(const RenderStyle*) const {
+bool RenderThemeWinCE::supportsHover(const RenderStyle*) const {
   return false;
 }
 
@@ -355,7 +355,7 @@ static int cssValueIdToSysColorIndex(int cssValueId) {
   }
 }
 
-Color RenderThemeWince::systemColor(int cssValueId) const {
+Color RenderThemeWinCE::systemColor(int cssValueId) const {
   int sysColorIndex = cssValueIdToSysColorIndex(cssValueId);
   if (sysColorIndex == -1)
     return RenderTheme::systemColor(cssValueId);
@@ -367,7 +367,7 @@ Color RenderThemeWince::systemColor(int cssValueId) const {
 const int sliderThumbWidth = 7;
 const int sliderThumbHeight = 15;
 
-void RenderThemeWince::adjustSliderThumbSize(RenderObject* o) const {
+void RenderThemeWinCE::adjustSliderThumbSize(RenderObject* o) const {
   if (o->style()->appearance() == SliderThumbVerticalPart) {
     o->style()->setWidth(Length(sliderThumbHeight, Fixed));
     o->style()->setHeight(Length(sliderThumbWidth, Fixed));
@@ -378,7 +378,7 @@ void RenderThemeWince::adjustSliderThumbSize(RenderObject* o) const {
 }
 
 #if 0
-void RenderThemeWince::adjustButtonInnerStyle(RenderStyle* style) const
+void RenderThemeWinCE::adjustButtonInnerStyle(RenderStyle* style) const
 {
     // This inner padding matches Firefox.
     style->setPaddingTop(Length(1, Fixed));
@@ -387,7 +387,7 @@ void RenderThemeWince::adjustButtonInnerStyle(RenderStyle* style) const
     style->setPaddingLeft(Length(3, Fixed));
 }
 
-void RenderThemeWince::adjustSearchFieldStyle(CSSStyleSelector* selector, RenderStyle* style, Element* e) const
+void RenderThemeWinCE::adjustSearchFieldStyle(CSSStyleSelector* selector, RenderStyle* style, Element* e) const
 {
     // Override padding size to match AppKit text positioning.
     const int padding = 1;
@@ -398,13 +398,13 @@ void RenderThemeWince::adjustSearchFieldStyle(CSSStyleSelector* selector, Render
 }
 #endif
 
-bool RenderThemeWince::paintSearchField(RenderObject* o,
+bool RenderThemeWinCE::paintSearchField(RenderObject* o,
                                         const PaintInfo& i,
                                         const IntRect& r) {
   return paintTextField(o, i, r);
 }
 
-bool RenderThemeWince::paintSearchFieldCancelButton(RenderObject* o,
+bool RenderThemeWinCE::paintSearchFieldCancelButton(RenderObject* o,
                                                     const PaintInfo& paintInfo,
                                                     const IntRect& r) {
   Color buttonColor = (o->node() && o->node()->active()) ? Color(138, 138, 138)
@@ -433,7 +433,7 @@ bool RenderThemeWince::paintSearchFieldCancelButton(RenderObject* o,
   return false;
 }
 
-void RenderThemeWince::adjustSearchFieldCancelButtonStyle(
+void RenderThemeWinCE::adjustSearchFieldCancelButtonStyle(
     CSSStyleSelector* selector,
     RenderStyle* style,
     Element* e) const {
@@ -442,7 +442,7 @@ void RenderThemeWince::adjustSearchFieldCancelButtonStyle(
   style->setHeight(Length(cancelSize.height(), Fixed));
 }
 
-void RenderThemeWince::adjustSearchFieldDecorationStyle(
+void RenderThemeWinCE::adjustSearchFieldDecorationStyle(
     CSSStyleSelector* selector,
     RenderStyle* style,
     Element* e) const {
@@ -451,7 +451,7 @@ void RenderThemeWince::adjustSearchFieldDecorationStyle(
   style->setHeight(Length(emptySize.height(), Fixed));
 }
 
-void RenderThemeWince::adjustSearchFieldResultsDecorationStyle(
+void RenderThemeWinCE::adjustSearchFieldResultsDecorationStyle(
     CSSStyleSelector* selector,
     RenderStyle* style,
     Element* e) const {
@@ -460,7 +460,7 @@ void RenderThemeWince::adjustSearchFieldResultsDecorationStyle(
   style->setHeight(Length(magnifierSize.height(), Fixed));
 }
 
-bool RenderThemeWince::paintSearchFieldResultsDecoration(
+bool RenderThemeWinCE::paintSearchFieldResultsDecoration(
     RenderObject* o,
     const PaintInfo& paintInfo,
     const IntRect& r) {
@@ -468,7 +468,7 @@ bool RenderThemeWince::paintSearchFieldResultsDecoration(
   return false;
 }
 
-void RenderThemeWince::adjustSearchFieldResultsButtonStyle(
+void RenderThemeWinCE::adjustSearchFieldResultsButtonStyle(
     CSSStyleSelector* selector,
     RenderStyle* style,
     Element* e) const {
@@ -477,14 +477,14 @@ void RenderThemeWince::adjustSearchFieldResultsButtonStyle(
   style->setHeight(Length(magnifierSize.height(), Fixed));
 }
 
-bool RenderThemeWince::paintSearchFieldResultsButton(RenderObject* o,
+bool RenderThemeWinCE::paintSearchFieldResultsButton(RenderObject* o,
                                                      const PaintInfo& paintInfo,
                                                      const IntRect& r) {
   paintSearchFieldResultsDecoration(o, paintInfo, r);
   return false;
 }
 
-void RenderThemeWince::adjustMenuListButtonStyle(CSSStyleSelector* selector,
+void RenderThemeWinCE::adjustMenuListButtonStyle(CSSStyleSelector* selector,
                                                  RenderStyle* style,
                                                  Element* e) const {
   // These are the paddings needed to place the text correctly in the <select>
@@ -547,7 +547,7 @@ static HTMLMediaElement* mediaElementParent(Node* node) {
 }
 #endif
 
-bool RenderThemeWince::paintSliderTrack(RenderObject* o,
+bool RenderThemeWinCE::paintSliderTrack(RenderObject* o,
                                         const PaintInfo& i,
                                         const IntRect& r) {
   bool rc = RenderTheme::paintSliderTrack(o, i, r);
@@ -573,7 +573,7 @@ bool RenderThemeWince::paintSliderTrack(RenderObject* o,
   return rc;
 }
 
-bool RenderThemeWince::paintSliderThumb(RenderObject* o,
+bool RenderThemeWinCE::paintSliderThumb(RenderObject* o,
                                         const PaintInfo& i,
                                         const IntRect& r) {
   bool rc = RenderTheme::paintSliderThumb(o, i, r);
@@ -595,7 +595,7 @@ bool RenderThemeWince::paintSliderThumb(RenderObject* o,
   return rc;
 }
 
-void RenderThemeWince::adjustSearchFieldStyle(CSSStyleSelector* selector,
+void RenderThemeWinCE::adjustSearchFieldStyle(CSSStyleSelector* selector,
                                               RenderStyle* style,
                                               Element* e) const {
   const int padding = 1;
@@ -607,7 +607,7 @@ void RenderThemeWince::adjustSearchFieldStyle(CSSStyleSelector* selector,
 
 #if ENABLE(VIDEO)
 
-bool RenderThemeWince::paintMediaFullscreenButton(RenderObject* o,
+bool RenderThemeWinCE::paintMediaFullscreenButton(RenderObject* o,
                                                   const PaintInfo& paintInfo,
                                                   const IntRect& r) {
   bool rc = paintButton(o, paintInfo, r);
@@ -621,7 +621,7 @@ bool RenderThemeWince::paintMediaFullscreenButton(RenderObject* o,
   return rc;
 }
 
-bool RenderThemeWince::paintMediaMuteButton(RenderObject* o,
+bool RenderThemeWinCE::paintMediaMuteButton(RenderObject* o,
                                             const PaintInfo& paintInfo,
                                             const IntRect& r) {
   bool rc = paintButton(o, paintInfo, r);
@@ -649,7 +649,7 @@ bool RenderThemeWince::paintMediaMuteButton(RenderObject* o,
   return rc;
 }
 
-bool RenderThemeWince::paintMediaPlayButton(RenderObject* o,
+bool RenderThemeWinCE::paintMediaPlayButton(RenderObject* o,
                                             const PaintInfo& paintInfo,
                                             const IntRect& r) {
   bool rc = paintButton(o, paintInfo, r);
@@ -677,7 +677,7 @@ bool RenderThemeWince::paintMediaPlayButton(RenderObject* o,
   return rc;
 }
 
-bool RenderThemeWince::paintMediaSeekBackButton(RenderObject* o,
+bool RenderThemeWinCE::paintMediaSeekBackButton(RenderObject* o,
                                                 const PaintInfo& paintInfo,
                                                 const IntRect& r) {
   bool rc = paintButton(o, paintInfo, r);
@@ -700,7 +700,7 @@ bool RenderThemeWince::paintMediaSeekBackButton(RenderObject* o,
   return rc;
 }
 
-bool RenderThemeWince::paintMediaSeekForwardButton(RenderObject* o,
+bool RenderThemeWinCE::paintMediaSeekForwardButton(RenderObject* o,
                                                    const PaintInfo& paintInfo,
                                                    const IntRect& r) {
   bool rc = paintButton(o, paintInfo, r);
@@ -723,16 +723,17 @@ bool RenderThemeWince::paintMediaSeekForwardButton(RenderObject* o,
   return rc;
 }
 
-bool RenderThemeWince::paintMediaSliderTrack(RenderObject* o,
+bool RenderThemeWinCE::paintMediaSliderTrack(RenderObject* o,
                                              const PaintInfo& paintInfo,
                                              const IntRect& r) {
   return paintSliderTrack(o, paintInfo, r);
 }
 
-bool RenderThemeWince::paintMediaSliderThumb(RenderObject* o,
+bool RenderThemeWinCE::paintMediaSliderThumb(RenderObject* o,
                                              const PaintInfo& paintInfo,
                                              const IntRect& r) {
   return paintSliderThumb(o, paintInfo, r);
 }
 #endif
-}
+
+}  // namespace WebCore

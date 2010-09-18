@@ -53,4 +53,5 @@ DragImageRef createDragImageFromImage(Image*) {
 DragImageRef createDragImageIconForCachedImage(CachedImage*) {
   return 0;
 }
-}
+
+}  // namespace WebCore

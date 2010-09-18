@@ -384,4 +384,5 @@ void FontCache::getTraitsInFamily(const AtomicString& familyName,
                      reinterpret_cast<LPARAM>(&procData), 0);
   copyToVector(procData.m_traitsMasks, traitsMasks);
 }
-}
+
+}  // namespace WebCore

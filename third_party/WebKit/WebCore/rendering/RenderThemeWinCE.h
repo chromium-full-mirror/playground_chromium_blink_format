@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef RenderThemeWince_h
-#define RenderThemeWince_h
+#ifndef RenderThemeWinCE_h
+#define RenderThemeWinCE_h
 
 #include "RenderTheme.h"
 
@@ -42,10 +42,10 @@ struct ThemeData {
   unsigned m_classicState;
 };
 
-class RenderThemeWince : public RenderTheme {
+class RenderThemeWinCE : public RenderTheme {
  public:
   static PassRefPtr<RenderTheme> create();
-  ~RenderThemeWince();
+  ~RenderThemeWinCE();
 
   virtual String extraDefaultStyleSheet();
   virtual String extraQuirksStyleSheet();
@@ -189,7 +189,7 @@ class RenderThemeWince : public RenderTheme {
 #endif
 
  private:
-  RenderThemeWince();
+  RenderThemeWinCE();
 
   unsigned determineClassicState(RenderObject*);
   bool supportsFocus(ControlPart) const;
@@ -198,4 +198,4 @@ class RenderThemeWince : public RenderTheme {
 };
 };
 
-#endif
+#endif  // RenderThemeWinCE_h

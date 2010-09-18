@@ -278,4 +278,5 @@ String ImageBuffer::toDataURL(const String& mimeType, const double*) const {
   notImplemented();
   return String();
 }
-}
+
+}  // namespace WebCore

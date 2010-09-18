@@ -159,4 +159,5 @@ void SimpleFontData::platformCharWidthInit() {
   m_avgCharWidth = (tm.tmAveCharWidth * m_platformData.size() + 36) / 72;
   m_maxCharWidth = (tm.tmMaxCharWidth * m_platformData.size() + 36) / 72;
 }
-}
+
+}  // namespace WebCore

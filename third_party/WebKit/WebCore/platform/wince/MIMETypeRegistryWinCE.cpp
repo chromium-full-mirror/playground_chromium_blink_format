@@ -139,4 +139,5 @@ String MIMETypeRegistry::getMIMETypeForExtension(const String& ext) {
 bool MIMETypeRegistry::isApplicationPluginMIMEType(const String&) {
   return false;
 }
-}
+
+}  // namespace WebCore

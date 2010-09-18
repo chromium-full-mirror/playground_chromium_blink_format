@@ -179,4 +179,5 @@ const Cursor& grabbingCursor() {
 const Cursor& grabCursor() {
   return moveCursor();
 }
-}
+
+}  // namespace WebCore
