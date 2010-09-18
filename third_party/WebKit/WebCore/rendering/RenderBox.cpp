@@ -1693,7 +1693,7 @@ void RenderBox::calcHeight() {
   // without this quirk, the
   // height has nothing to be a percentage of, and it ends up being 0. That is
   // bad.
-  bool paginatedContentNeedsBaseHeight = document()->paginated() &&
+  bool paginatedContentNeedsBaseHeight = document()->printing() &&
                                          h.isPercent() &&
                                          (isRoot() || (isBody() &&
                                                        document()
@@ -1704,8 +1704,8 @@ void RenderBox::calcHeight() {
                                                            .isPercent()));
   if (stretchesToViewHeight() || paginatedContentNeedsBaseHeight) {
     int margins = collapsedMarginTop() + collapsedMarginBottom();
-    int visHeight = document()->printing() ? view()->frameView()->pageHeight()
-                                           : view()->viewHeight();
+    int visHeight =
+        document()->printing() ? view()->pageHeight() : view()->viewHeight();
     if (isRoot())
       setHeight(max(height(), visHeight - margins));
     else {
