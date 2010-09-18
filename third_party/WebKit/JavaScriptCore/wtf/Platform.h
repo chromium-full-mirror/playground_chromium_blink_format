@@ -1109,7 +1109,7 @@
 
 /* FIXME: Eventually we should enable this for all platforms and get rid of the
  * define. */
-#if PLATFORM(MAC) || PLATFORM(WIN)
+#if PLATFORM(MAC) || PLATFORM(WIN) || PLATFORM(QT)
 #define WTF_USE_PLATFORM_STRATEGIES 1
 #endif
 
