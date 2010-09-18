@@ -74,7 +74,7 @@ class NPRuntimeObjectMap {
                                          JSC::JSGlobalObject*,
                                          const NPVariant&);
 
-  bool evaluate(NPObject*, const WTF::String& scriptString, NPVariant* result);
+  bool evaluate(NPObject*, const String& scriptString, NPVariant* result);
 
   // Called when the plug-in is destroyed. Will invalidate all the NPObjects.
   void invalidate();
@@ -82,7 +82,7 @@ class NPRuntimeObjectMap {
   JSC::JSGlobalObject* globalObject() const;
   JSC::ExecState* globalExec() const;
 
-  static void setGlobalException(const WTF::String& exceptionString);
+  static void setGlobalException(const String& exceptionString);
   static void moveGlobalExceptionToExecState(JSC::ExecState*);
 
  private:

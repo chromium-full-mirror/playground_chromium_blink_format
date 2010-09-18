@@ -114,11 +114,11 @@ class PluginView : public WebCore::PluginViewBase,
 
   // PluginController
   virtual void invalidate(const WebCore::IntRect&);
-  virtual WTF::String userAgent(const WebCore::KURL&);
+  virtual String userAgent(const WebCore::KURL&);
   virtual void loadURL(uint64_t requestID,
-                       const WTF::String& method,
-                       const WTF::String& urlString,
-                       const WTF::String& target,
+                       const String& method,
+                       const String& urlString,
+                       const String& target,
                        const WebCore::HTTPHeaderMap& headerFields,
                        const Vector<char>& httpBody,
                        bool allowPopups);
@@ -127,10 +127,10 @@ class PluginView : public WebCore::PluginViewBase,
   virtual NPObject* windowScriptNPObject();
   virtual NPObject* pluginElementNPObject();
   virtual bool evaluate(NPObject*,
-                        const WTF::String& scriptString,
+                        const String& scriptString,
                         NPVariant* result,
                         bool allowPopups);
-  virtual void setStatusbarText(const WTF::String&);
+  virtual void setStatusbarText(const String&);
   virtual bool isAcceleratedCompositingEnabled();
 
   // WebFrame::LoadListener

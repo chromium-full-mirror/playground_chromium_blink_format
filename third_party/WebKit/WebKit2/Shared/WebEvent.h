@@ -240,9 +240,9 @@ class WebKeyboardEvent : public WebEvent {
   WebKeyboardEvent() {}
 
   WebKeyboardEvent(Type type,
-                   const WTF::String& text,
-                   const WTF::String& unmodifiedText,
-                   const WTF::String& keyIdentifier,
+                   const String& text,
+                   const String& unmodifiedText,
+                   const String& keyIdentifier,
                    int windowsVirtualKeyCode,
                    int nativeVirtualKeyCode,
                    bool isAutoRepeat,
@@ -262,9 +262,9 @@ class WebKeyboardEvent : public WebEvent {
     ASSERT(isKeyboardEventType(type));
   }
 
-  const WTF::String& text() const { return m_text; }
-  const WTF::String& unmodifiedText() const { return m_unmodifiedText; }
-  const WTF::String& keyIdentifier() const { return m_keyIdentifier; }
+  const String& text() const { return m_text; }
+  const String& unmodifiedText() const { return m_unmodifiedText; }
+  const String& keyIdentifier() const { return m_keyIdentifier; }
   int32_t windowsVirtualKeyCode() const { return m_windowsVirtualKeyCode; }
   int32_t nativeVirtualKeyCode() const { return m_nativeVirtualKeyCode; }
   bool isAutoRepeat() const { return m_isAutoRepeat; }
@@ -288,17 +288,17 @@ class WebKeyboardEvent : public WebEvent {
     if (!WebEvent::decode(decoder, t))
       return false;
 
-    WTF::String text;
+    String text;
     if (!decoder->decode(text))
       return false;
     t.m_text = text;
 
-    WTF::String unmodifiedText;
+    String unmodifiedText;
     if (!decoder->decode(unmodifiedText))
       return false;
     t.m_unmodifiedText = unmodifiedText;
 
-    WTF::String keyIdentifier;
+    String keyIdentifier;
     if (!decoder->decode(keyIdentifier))
       return false;
     t.m_keyIdentifier = keyIdentifier;
@@ -322,9 +322,9 @@ class WebKeyboardEvent : public WebEvent {
            type == Char;
   }
 
-  WTF::String m_text;
-  WTF::String m_unmodifiedText;
-  WTF::String m_keyIdentifier;
+  String m_text;
+  String m_unmodifiedText;
+  String m_keyIdentifier;
   int32_t m_windowsVirtualKeyCode;
   int32_t m_nativeVirtualKeyCode;
   bool m_isAutoRepeat;

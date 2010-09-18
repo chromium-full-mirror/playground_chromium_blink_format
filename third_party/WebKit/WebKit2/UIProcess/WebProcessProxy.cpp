@@ -199,7 +199,7 @@ void WebProcessProxy::getPlugins(bool refresh, Vector<PluginInfo>& plugins) {
 
 void WebProcessProxy::getPluginHostConnection(const String& mimeType,
                                               const KURL& url,
-                                              WTF::String& pluginPath) {
+                                              String& pluginPath) {
   String newMimeType = mimeType.lower();
 
   PluginInfoStore::Plugin plugin =

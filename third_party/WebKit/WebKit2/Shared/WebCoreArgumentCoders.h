@@ -51,8 +51,8 @@ struct ArgumentCoder<WebCore::IntRect> : SimpleArgumentCoder<WebCore::IntRect> {
 };
 
 template <>
-struct ArgumentCoder<WTF::String> {
-  static void encode(ArgumentEncoder* encoder, const WTF::String& string) {
+struct ArgumentCoder<String> {
+  static void encode(ArgumentEncoder* encoder, const String& string) {
     // Special case the null string.
     if (string.isNull()) {
       encoder->encodeUInt32(std::numeric_limits<uint32_t>::max());
@@ -65,7 +65,7 @@ struct ArgumentCoder<WTF::String> {
                          length * sizeof(UChar));
   }
 
-  static bool decode(ArgumentDecoder* decoder, WTF::String& s) {
+  static bool decode(ArgumentDecoder* decoder, String& s) {
     uint32_t length;
     if (!decoder->decode(length))
       return false;
@@ -84,7 +84,7 @@ struct ArgumentCoder<WTF::String> {
     }
 
     UChar* buffer;
-    WTF::String string = WTF::String::createUninitialized(length, buffer);
+    String string = String::createUninitialized(length, buffer);
     if (!decoder->decodeBytes(reinterpret_cast<uint8_t*>(buffer),
                               length * sizeof(UChar)))
       return false;

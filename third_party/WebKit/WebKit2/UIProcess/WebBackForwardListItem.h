@@ -38,11 +38,10 @@ class WebBackForwardListItem : public APIObject {
  public:
   static const Type APIType = TypeBackForwardListItem;
 
-  static PassRefPtr<WebBackForwardListItem> create(
-      const WTF::String& originalURL,
-      const WTF::String& url,
-      const WTF::String& title,
-      uint64_t itemID) {
+  static PassRefPtr<WebBackForwardListItem> create(const String& originalURL,
+                                                   const String& url,
+                                                   const String& title,
+                                                   uint64_t itemID) {
     return adoptRef(
         new WebBackForwardListItem(originalURL, url, title, itemID));
   }
@@ -50,28 +49,28 @@ class WebBackForwardListItem : public APIObject {
 
   uint64_t itemID() const { return m_itemID; }
 
-  void setOriginalURL(const WTF::String& originalURL) {
+  void setOriginalURL(const String& originalURL) {
     m_originalURL = originalURL;
   }
-  const WTF::String& originalURL() const { return m_originalURL; }
+  const String& originalURL() const { return m_originalURL; }
 
-  void setURL(const WTF::String& url) { m_url = url; }
-  const WTF::String& url() const { return m_url; }
+  void setURL(const String& url) { m_url = url; }
+  const String& url() const { return m_url; }
 
-  void setTitle(const WTF::String& title) { m_title = title; }
-  const WTF::String& title() const { return m_title; }
+  void setTitle(const String& title) { m_title = title; }
+  const String& title() const { return m_title; }
 
  private:
-  WebBackForwardListItem(const WTF::String& originalURL,
-                         const WTF::String& url,
-                         const WTF::String& title,
+  WebBackForwardListItem(const String& originalURL,
+                         const String& url,
+                         const String& title,
                          uint64_t itemID);
 
   virtual Type type() const { return APIType; }
 
-  WTF::String m_originalURL;
-  WTF::String m_url;
-  WTF::String m_title;
+  String m_originalURL;
+  String m_url;
+  String m_title;
   uint64_t m_itemID;
 };
 

@@ -38,7 +38,7 @@ namespace WebKit {
 PluginInfoStore::PluginInfoStore() : m_pluginListIsUpToDate(false) {}
 
 void PluginInfoStore::setAdditionalPluginsDirectories(
-    const Vector<WTF::String>& directories) {
+    const Vector<String>& directories) {
   m_additionalPluginsDirectories = directories;
   refresh();
 }

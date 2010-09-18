@@ -49,9 +49,9 @@ class Plugin : public RefCounted<Plugin> {
  public:
   struct Parameters {
     WebCore::KURL url;
-    Vector<WTF::String> names;
-    Vector<WTF::String> values;
-    WTF::String mimeType;
+    Vector<String> names;
+    Vector<String> values;
+    String mimeType;
     bool loadManually;
   };
 
@@ -94,16 +94,16 @@ class Plugin : public RefCounted<Plugin> {
   // PluginController::loadURL) has been fulfilled and passes
   // back the result. If evaluating the script failed, result will be null.
   virtual void didEvaluateJavaScript(uint64_t requestID,
-                                     const WTF::String& requestURLString,
-                                     const WTF::String& result) = 0;
+                                     const String& requestURLString,
+                                     const String& result) = 0;
 
   // Tells the plug-in that a stream has received its HTTP response.
   virtual void streamDidReceiveResponse(uint64_t streamID,
                                         const WebCore::KURL& responseURL,
                                         uint32_t streamLength,
                                         uint32_t lastModifiedTime,
-                                        const WTF::String& mimeType,
-                                        const WTF::String& headers) = 0;
+                                        const String& mimeType,
+                                        const String& headers) = 0;
 
   // Tells the plug-in that a stream did receive data.
   virtual void streamDidReceiveData(uint64_t streamID,
@@ -121,8 +121,8 @@ class Plugin : public RefCounted<Plugin> {
   virtual void manualStreamDidReceiveResponse(const WebCore::KURL& responseURL,
                                               uint32_t streamLength,
                                               uint32_t lastModifiedTime,
-                                              const WTF::String& mimeType,
-                                              const WTF::String& headers) = 0;
+                                              const String& mimeType,
+                                              const String& headers) = 0;
 
   // Tells the plug-in that the manual stream did receive data.
   virtual void manualStreamDidReceiveData(const char* bytes, int length) = 0;

@@ -54,7 +54,7 @@ class InjectedBundlePageEditorClient {
                         WebCore::Range* rangeToReplace,
                         WebCore::EditorInsertAction);
   bool shouldInsertText(WebPage*,
-                        WTF::StringImpl*,
+                        StringImpl*,
                         WebCore::Range* rangeToReplace,
                         WebCore::EditorInsertAction);
   bool shouldDeleteRange(WebPage*, WebCore::Range*);
@@ -66,10 +66,10 @@ class InjectedBundlePageEditorClient {
   bool shouldApplyStyle(WebPage*,
                         WebCore::CSSStyleDeclaration*,
                         WebCore::Range*);
-  void didBeginEditing(WebPage*, WTF::StringImpl* notificationName);
-  void didEndEditing(WebPage*, WTF::StringImpl* notificationName);
-  void didChange(WebPage*, WTF::StringImpl* notificationName);
-  void didChangeSelection(WebPage*, WTF::StringImpl* notificationName);
+  void didBeginEditing(WebPage*, StringImpl* notificationName);
+  void didEndEditing(WebPage*, StringImpl* notificationName);
+  void didChange(WebPage*, StringImpl* notificationName);
+  void didChangeSelection(WebPage*, StringImpl* notificationName);
 
  private:
   WKBundlePageEditorClient m_client;

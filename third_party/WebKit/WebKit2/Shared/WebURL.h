@@ -38,21 +38,21 @@ class WebURL : public APIObject {
  public:
   static const Type APIType = TypeURL;
 
-  static PassRefPtr<WebURL> create(const WTF::String& string) {
+  static PassRefPtr<WebURL> create(const String& string) {
     return adoptRef(new WebURL(string));
   }
 
   bool isNull() const { return m_string.isNull(); }
   bool isEmpty() const { return m_string.isEmpty(); }
 
-  const WTF::String& string() const { return m_string; }
+  const String& string() const { return m_string; }
 
  private:
-  WebURL(const WTF::String& string) : m_string(string) {}
+  WebURL(const String& string) : m_string(string) {}
 
   virtual Type type() const { return APIType; }
 
-  WTF::String m_string;
+  String m_string;
 };
 
 }  // namespace WebKit

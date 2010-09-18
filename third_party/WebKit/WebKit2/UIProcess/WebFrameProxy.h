@@ -71,8 +71,8 @@ class WebFrameProxy : public APIObject {
   bool isMainFrame() const;
   LoadState loadState() const { return m_loadState; }
 
-  const WTF::String& url() const { return m_url; }
-  const WTF::String& provisionalURL() const { return m_provisionalURL; }
+  const String& url() const { return m_url; }
+  const String& provisionalURL() const { return m_provisionalURL; }
 
   void setCertificateInfo(PassRefPtr<WebCertificateInfo>);
   WebCertificateInfo* certificateInfo() const {
@@ -83,7 +83,7 @@ class WebFrameProxy : public APIObject {
   void didReceiveServerRedirectForProvisionalLoad(const String& url);
   void didCommitLoad();
   void didFinishLoad();
-  void didReceiveTitle(const WTF::String&);
+  void didReceiveTitle(const String&);
 
   void receivedPolicyDecision(WebCore::PolicyAction, uint64_t listenerID);
   WebFramePolicyListenerProxy* setUpPolicyListenerProxy(uint64_t listenerID);
@@ -97,8 +97,8 @@ class WebFrameProxy : public APIObject {
 
   WebPageProxy* m_page;
   LoadState m_loadState;
-  WTF::String m_url;
-  WTF::String m_provisionalURL;
+  String m_url;
+  String m_provisionalURL;
   RefPtr<WebCertificateInfo> m_certificateInfo;
   RefPtr<WebFrameListenerProxy> m_activeListener;
   uint64_t m_frameID;

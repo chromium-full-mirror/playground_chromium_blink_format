@@ -40,14 +40,14 @@ class InjectedBundlePageUIClient {
   void initialize(WKBundlePageUIClient*);
 
   void willAddMessageToConsole(WebPage*,
-                               const WTF::String& message,
+                               const String& message,
                                int32_t lineNumber);
-  void willSetStatusbarText(WebPage*, const WTF::String&);
-  void willRunJavaScriptAlert(WebPage*, const WTF::String&, WebFrame*);
-  void willRunJavaScriptConfirm(WebPage*, const WTF::String&, WebFrame*);
+  void willSetStatusbarText(WebPage*, const String&);
+  void willRunJavaScriptAlert(WebPage*, const String&, WebFrame*);
+  void willRunJavaScriptConfirm(WebPage*, const String&, WebFrame*);
   void willRunJavaScriptPrompt(WebPage*,
-                               const WTF::String&,
-                               const WTF::String&,
+                               const String&,
+                               const String&,
                                WebFrame*);
 
  private:

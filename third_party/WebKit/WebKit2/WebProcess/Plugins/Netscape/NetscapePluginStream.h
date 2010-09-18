@@ -61,14 +61,14 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
   void didReceiveResponse(const WebCore::KURL& responseURL,
                           uint32_t streamLength,
                           uint32_t lastModifiedTime,
-                          const WTF::String& mimeType,
-                          const WTF::String& headers);
+                          const String& mimeType,
+                          const String& headers);
   void didReceiveData(const char* bytes, int length);
   void didFinishLoading();
   void didFail(bool wasCancelled);
 
-  void sendJavaScriptStream(const WTF::String& requestURLString,
-                            const WTF::String& result);
+  void sendJavaScriptStream(const String& requestURLString,
+                            const String& result);
 
   void stop(NPReason);
   NPError destroy(NPReason);
@@ -79,11 +79,11 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
                        bool sendNotification,
                        void* notificationData);
 
-  bool start(const WTF::String& responseURLString,
+  bool start(const String& responseURLString,
              uint32_t streamLength,
              uint32_t lastModifiedTime,
-             const WTF::String& mimeType,
-             const WTF::String& headers);
+             const String& mimeType,
+             const String& headers);
 
   void cancel();
   void notifyAndDestroyStream(NPReason);

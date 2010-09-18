@@ -114,7 +114,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void dispatchWillClose();
   virtual void dispatchDidReceiveIcon();
   virtual void dispatchDidStartProvisionalLoad();
-  virtual void dispatchDidReceiveTitle(const WTF::String& title);
+  virtual void dispatchDidReceiveTitle(const String& title);
   virtual void dispatchDidChangeIcons();
   virtual void dispatchDidCommitLoad();
   virtual void dispatchDidFailProvisionalLoad(const WebCore::ResourceError&);
@@ -128,14 +128,14 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void dispatchShow();
 
   virtual void dispatchDecidePolicyForMIMEType(WebCore::FramePolicyFunction,
-                                               const WTF::String& MIMEType,
+                                               const String& MIMEType,
                                                const WebCore::ResourceRequest&);
   virtual void dispatchDecidePolicyForNewWindowAction(
       WebCore::FramePolicyFunction,
       const WebCore::NavigationAction&,
       const WebCore::ResourceRequest&,
       PassRefPtr<WebCore::FormState>,
-      const WTF::String& frameName);
+      const String& frameName);
   virtual void dispatchDecidePolicyForNavigationAction(
       WebCore::FramePolicyFunction,
       const WebCore::NavigationAction&,
@@ -200,12 +200,10 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual bool shouldFallBack(const WebCore::ResourceError&);
 
   virtual bool canHandleRequest(const WebCore::ResourceRequest&) const;
-  virtual bool canShowMIMEType(const WTF::String& MIMEType) const;
+  virtual bool canShowMIMEType(const String& MIMEType) const;
   virtual bool canShowMIMETypeAsHTML(const String& MIMEType) const;
-  virtual bool representationExistsForURLScheme(
-      const WTF::String& URLScheme) const;
-  virtual WTF::String generatedMIMETypeForURLScheme(
-      const WTF::String& URLScheme) const;
+  virtual bool representationExistsForURLScheme(const String& URLScheme) const;
+  virtual String generatedMIMETypeForURLScheme(const String& URLScheme) const;
 
   virtual void frameLoadCompleted();
   virtual void saveViewStateToItem(WebCore::HistoryItem*);
@@ -217,9 +215,9 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual PassRefPtr<WebCore::DocumentLoader> createDocumentLoader(
       const WebCore::ResourceRequest&,
       const WebCore::SubstituteData&);
-  virtual void setTitle(const WTF::String& title, const WebCore::KURL&);
+  virtual void setTitle(const String& title, const WebCore::KURL&);
 
-  virtual WTF::String userAgent(const WebCore::KURL&);
+  virtual String userAgent(const WebCore::KURL&);
 
   virtual void savePlatformDataToCachedFrame(WebCore::CachedFrame*);
   virtual void transitionToCommittedFromCachedFrame(WebCore::CachedFrame*);
@@ -233,9 +231,9 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual PassRefPtr<WebCore::Frame> createFrame(
       const WebCore::KURL& url,
-      const WTF::String& name,
+      const String& name,
       WebCore::HTMLFrameOwnerElement* ownerElement,
-      const WTF::String& referrer,
+      const String& referrer,
       bool allowsScrolling,
       int marginWidth,
       int marginHeight);
@@ -244,9 +242,9 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual PassRefPtr<WebCore::Widget> createPlugin(const WebCore::IntSize&,
                                                    WebCore::HTMLPlugInElement*,
                                                    const WebCore::KURL&,
-                                                   const Vector<WTF::String>&,
-                                                   const Vector<WTF::String>&,
-                                                   const WTF::String&,
+                                                   const Vector<String>&,
+                                                   const Vector<String>&,
+                                                   const String&,
                                                    bool loadManually);
   virtual void redirectDataToPlugin(WebCore::Widget* pluginWidget);
 
@@ -254,13 +252,12 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       const WebCore::IntSize&,
       WebCore::HTMLAppletElement*,
       const WebCore::KURL& baseURL,
-      const Vector<WTF::String>& paramNames,
-      const Vector<WTF::String>& paramValues);
+      const Vector<String>& paramNames,
+      const Vector<String>& paramValues);
 
-  virtual WebCore::ObjectContentType objectContentType(
-      const WebCore::KURL& url,
-      const WTF::String& mimeType);
-  virtual WTF::String overrideMediaType() const;
+  virtual WebCore::ObjectContentType objectContentType(const WebCore::KURL& url,
+                                                       const String& mimeType);
+  virtual String overrideMediaType() const;
 
   virtual void dispatchDidClearWindowObjectInWorld(WebCore::DOMWrapperWorld*);
 
@@ -288,7 +285,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                                    unsigned long long length);
 #endif
 
-  virtual bool shouldUsePluginDocument(const WTF::String& /*mimeType*/) const;
+  virtual bool shouldUsePluginDocument(const String& /*mimeType*/) const;
 
   virtual PassRefPtr<WebCore::FrameNetworkingContext> createNetworkingContext();
 

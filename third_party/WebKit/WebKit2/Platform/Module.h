@@ -41,7 +41,7 @@ namespace WebKit {
 
 class Module : public Noncopyable {
  public:
-  Module(const WTF::String& path);
+  Module(const String& path);
   ~Module();
 
   bool load();
@@ -56,7 +56,7 @@ class Module : public Noncopyable {
  private:
   void* platformFunctionPointer(const char* functionName) const;
 
-  WTF::String m_path;
+  String m_path;
 #if PLATFORM(MAC)
   RetainPtr<CFBundleRef> m_bundle;
 #elif PLATFORM(WIN)

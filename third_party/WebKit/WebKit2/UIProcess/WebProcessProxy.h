@@ -112,14 +112,14 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   bool sendMessage(CoreIPC::MessageID, PassOwnPtr<CoreIPC::ArgumentEncoder>);
 
   void getPlugins(bool refresh, Vector<WebCore::PluginInfo>&);
-  void getPluginHostConnection(const WTF::String& mimeType,
+  void getPluginHostConnection(const String& mimeType,
                                const WebCore::KURL& url,
-                               WTF::String& pluginPath);
+                               String& pluginPath);
 
   void addOrUpdateBackForwardListItem(uint64_t itemID,
-                                      const WTF::String& originalURLString,
-                                      const WTF::String& urlString,
-                                      const WTF::String& title);
+                                      const String& originalURLString,
+                                      const String& urlString,
+                                      const String& title);
   void addVisitedLink(WebCore::LinkHash);
 
   // CoreIPC::Connection::Client

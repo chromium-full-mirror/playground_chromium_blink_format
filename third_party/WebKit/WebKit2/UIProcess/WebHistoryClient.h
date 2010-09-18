@@ -47,18 +47,18 @@ class WebHistoryClient {
                                      WebFrameProxy*);
   void didPerformClientRedirect(WebContext*,
                                 WebPageProxy*,
-                                const WTF::String& sourceURL,
-                                const WTF::String& destinationURL,
+                                const String& sourceURL,
+                                const String& destinationURL,
                                 WebFrameProxy*);
   void didPerformServerRedirect(WebContext*,
                                 WebPageProxy*,
-                                const WTF::String& sourceURL,
-                                const WTF::String& destinationURL,
+                                const String& sourceURL,
+                                const String& destinationURL,
                                 WebFrameProxy*);
   void didUpdateHistoryTitle(WebContext*,
                              WebPageProxy*,
-                             const WTF::String& title,
-                             const WTF::String& url,
+                             const String& title,
+                             const String& url,
                              WebFrameProxy*);
   void populateVisitedLinks(WebContext*);
 

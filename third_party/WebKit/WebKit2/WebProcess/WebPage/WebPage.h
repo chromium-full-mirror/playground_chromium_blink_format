@@ -133,9 +133,8 @@ class WebPage : public APIObject {
   WebFrame* mainFrame() const { return m_mainFrame.get(); }
 
   String renderTreeExternalRepresentation() const;
-  void executeEditingCommand(const WTF::String& commandName,
-                             const WTF::String& argument);
-  bool isEditingCommandEnabled(const WTF::String& commandName);
+  void executeEditingCommand(const String& commandName, const String& argument);
+  bool isEditingCommandEnabled(const String& commandName);
   void clearMainFrameName();
   void sendClose();
 
@@ -190,7 +189,7 @@ class WebPage : public APIObject {
 #if ENABLE(TOUCH_EVENTS)
   void touchEvent(const WebTouchEvent&);
 #endif
-  void runJavaScriptInMainFrame(const WTF::String&, uint64_t callbackID);
+  void runJavaScriptInMainFrame(const String&, uint64_t callbackID);
   void getRenderTreeExternalRepresentation(uint64_t callbackID);
   void getSourceForFrame(WebFrame*, uint64_t callbackID);
   void preferencesDidChange(const WebPreferencesStore&);
@@ -198,7 +197,7 @@ class WebPage : public APIObject {
   void didReceivePolicyDecision(WebFrame*,
                                 uint64_t listenerID,
                                 WebCore::PolicyAction policyAction);
-  void setCustomUserAgent(const WTF::String&);
+  void setCustomUserAgent(const String&);
 
   void unapplyEditCommand(uint64_t commandID);
   void reapplyEditCommand(uint64_t commandID);

@@ -45,18 +45,18 @@ class WebPolicyClient {
   bool decidePolicyForNavigationAction(WebPageProxy*,
                                        WebCore::NavigationType,
                                        WebEvent::Modifiers,
-                                       const WTF::String& url,
+                                       const String& url,
                                        WebFrameProxy*,
                                        WebFramePolicyListenerProxy*);
   bool decidePolicyForNewWindowAction(WebPageProxy*,
                                       WebCore::NavigationType,
                                       WebEvent::Modifiers,
-                                      const WTF::String& url,
+                                      const String& url,
                                       WebFrameProxy*,
                                       WebFramePolicyListenerProxy*);
   bool decidePolicyForMIMEType(WebPageProxy*,
-                               const WTF::String&,
-                               const WTF::String& url,
+                               const String&,
+                               const String& url,
                                WebFrameProxy*,
                                WebFramePolicyListenerProxy*);
 

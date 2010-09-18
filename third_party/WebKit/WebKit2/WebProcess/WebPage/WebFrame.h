@@ -54,7 +54,7 @@ class WebFrame : public APIObject {
 
   static PassRefPtr<WebFrame> createMainFrame(WebPage*);
   static PassRefPtr<WebFrame> createSubframe(WebPage*,
-                                             const WTF::String& frameName,
+                                             const String& frameName,
                                              WebCore::HTMLFrameOwnerElement*);
   ~WebFrame();
 
@@ -75,9 +75,9 @@ class WebFrame : public APIObject {
 
   // WKBundleFrame API and SPI functions
   bool isMainFrame() const;
-  WTF::String name() const;
-  WTF::String url() const;
-  WTF::String innerText() const;
+  String name() const;
+  String url() const;
+  String innerText() const;
   PassRefPtr<ImmutableArray> childFrames();
   JSValueRef computedStyleIncludingVisitedInfo(JSObjectRef element);
   JSGlobalContextRef jsContext();
@@ -86,12 +86,12 @@ class WebFrame : public APIObject {
   JSValueRef jsWrapperForWorld(InjectedBundleNodeHandle*,
                                InjectedBundleScriptWorld*);
 
-  static WTF::String counterValue(JSObjectRef element);
-  static WTF::String markerText(JSObjectRef element);
+  static String counterValue(JSObjectRef element);
+  static String markerText(JSObjectRef element);
 
   unsigned numberOfActiveAnimations();
-  bool pauseAnimationOnElementWithId(const WTF::String& animationName,
-                                     const WTF::String& elementID,
+  bool pauseAnimationOnElementWithId(const String& animationName,
+                                     const String& elementID,
                                      double time);
 
   unsigned pendingUnloadCount();
@@ -112,11 +112,9 @@ class WebFrame : public APIObject {
 
  private:
   static PassRefPtr<WebFrame> create(WebPage*,
-                                     const WTF::String& frameName,
+                                     const String& frameName,
                                      WebCore::HTMLFrameOwnerElement*);
-  WebFrame(WebPage*,
-           const WTF::String& frameName,
-           WebCore::HTMLFrameOwnerElement*);
+  WebFrame(WebPage*, const String& frameName, WebCore::HTMLFrameOwnerElement*);
 
   virtual Type type() const { return APIType; }
 
