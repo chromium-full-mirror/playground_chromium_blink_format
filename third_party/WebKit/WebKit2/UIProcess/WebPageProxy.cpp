@@ -240,6 +240,14 @@ void WebPageProxy::loadURLRequest(WebURLRequest* urlRequest) {
                   CoreIPC::In(urlRequest->resourceRequest()));
 }
 
+void WebPageProxy::loadHTMLString(const String& htmlString,
+                                  const String& baseURL) {
+  if (!isValid())
+    return;
+  process()->send(WebPageMessage::LoadHTMLString, m_pageID,
+                  CoreIPC::In(htmlString, baseURL));
+}
+
 void WebPageProxy::stopLoading() {
   if (!isValid())
     return;
