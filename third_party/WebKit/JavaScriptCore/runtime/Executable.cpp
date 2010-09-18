@@ -94,7 +94,7 @@ JSObject* EvalExecutable::compileInternal(ExecState* exec,
   JSGlobalObject* lexicalGlobalObject = exec->lexicalGlobalObject();
   RefPtr<EvalNode> evalNode = globalData->parser->parse<EvalNode>(
       globalData, lexicalGlobalObject, lexicalGlobalObject->debugger(), exec,
-      m_source, &exception);
+      m_source, 0, &exception);
   if (!evalNode) {
     ASSERT(exception);
     return exception;
@@ -135,7 +135,7 @@ JSObject* ProgramExecutable::checkSyntax(ExecState* exec) {
   JSGlobalObject* lexicalGlobalObject = exec->lexicalGlobalObject();
   RefPtr<ProgramNode> programNode = globalData->parser->parse<ProgramNode>(
       globalData, lexicalGlobalObject, lexicalGlobalObject->debugger(), exec,
-      m_source, &exception);
+      m_source, 0, &exception);
   if (programNode)
     return 0;
   ASSERT(exception);
@@ -151,7 +151,7 @@ JSObject* ProgramExecutable::compileInternal(ExecState* exec,
   JSGlobalObject* lexicalGlobalObject = exec->lexicalGlobalObject();
   RefPtr<ProgramNode> programNode = globalData->parser->parse<ProgramNode>(
       globalData, lexicalGlobalObject, lexicalGlobalObject->debugger(), exec,
-      m_source, &exception);
+      m_source, 0, &exception);
   if (!programNode) {
     ASSERT(exception);
     return exception;
@@ -191,7 +191,8 @@ JSObject* FunctionExecutable::compileForCallInternal(
   JSObject* exception = 0;
   JSGlobalData* globalData = scopeChainNode->globalData;
   RefPtr<FunctionBodyNode> body = globalData->parser->parse<FunctionBodyNode>(
-      globalData, exec->lexicalGlobalObject(), 0, 0, m_source, &exception);
+      globalData, exec->lexicalGlobalObject(), 0, 0, m_source,
+      m_parameters.get(), &exception);
   if (!body) {
     ASSERT(exception);
     return exception;
@@ -241,7 +242,8 @@ JSObject* FunctionExecutable::compileForConstructInternal(
   JSObject* exception = 0;
   JSGlobalData* globalData = scopeChainNode->globalData;
   RefPtr<FunctionBodyNode> body = globalData->parser->parse<FunctionBodyNode>(
-      globalData, exec->lexicalGlobalObject(), 0, 0, m_source, &exception);
+      globalData, exec->lexicalGlobalObject(), 0, 0, m_source,
+      m_parameters.get(), &exception);
   if (!body) {
     ASSERT(exception);
     return exception;
@@ -298,8 +300,8 @@ PassOwnPtr<ExceptionInfo> FunctionExecutable::reparseExceptionInfo(
     CodeBlock* codeBlock) {
   JSObject* exception = 0;
   RefPtr<FunctionBodyNode> newFunctionBody =
-      globalData->parser->parse<FunctionBodyNode>(globalData, 0, 0, 0, m_source,
-                                                  &exception);
+      globalData->parser->parse<FunctionBodyNode>(
+          globalData, 0, 0, 0, m_source, m_parameters.get(), &exception);
   if (!newFunctionBody)
     return PassOwnPtr<ExceptionInfo>();
   if (m_forceUsesArguments)
@@ -346,7 +348,7 @@ PassOwnPtr<ExceptionInfo> EvalExecutable::reparseExceptionInfo(
     CodeBlock* codeBlock) {
   JSObject* exception = 0;
   RefPtr<EvalNode> newEvalBody = globalData->parser->parse<EvalNode>(
-      globalData, 0, 0, 0, m_source, &exception);
+      globalData, 0, 0, 0, m_source, 0, &exception);
   if (!newEvalBody)
     return PassOwnPtr<ExceptionInfo>();
 
@@ -395,7 +397,7 @@ PassRefPtr<FunctionExecutable> FunctionExecutable::fromGlobalCode(
     JSObject** exception) {
   JSGlobalObject* lexicalGlobalObject = exec->lexicalGlobalObject();
   RefPtr<ProgramNode> program = exec->globalData().parser->parse<ProgramNode>(
-      &exec->globalData(), lexicalGlobalObject, debugger, exec, source,
+      &exec->globalData(), lexicalGlobalObject, debugger, exec, source, 0,
       exception);
   if (!program) {
     ASSERT(*exception);

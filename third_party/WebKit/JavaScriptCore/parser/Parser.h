@@ -56,6 +56,7 @@ class Parser : public Noncopyable {
                                Debugger*,
                                ExecState*,
                                const SourceCode& source,
+                               FunctionParameters*,
                                JSObject** exception);
 
   void didFinishParsing(SourceElements*,
@@ -69,7 +70,7 @@ class Parser : public Noncopyable {
   ParserArena& arena() { return m_arena; }
 
  private:
-  void parse(JSGlobalData*, int* errLine, UString* errMsg);
+  void parse(JSGlobalData*, FunctionParameters*, int* errLine, UString* errMsg);
 
   // Used to determine type of error to report.
   bool isFunctionBodyNode(ScopeNode*) { return false; }
@@ -92,6 +93,7 @@ PassRefPtr<ParsedNode> Parser::parse(JSGlobalData* globalData,
                                      Debugger* debugger,
                                      ExecState* debuggerExecState,
                                      const SourceCode& source,
+                                     FunctionParameters* parameters,
                                      JSObject** exception) {
   ASSERT(exception && !*exception);
   int errLine;
@@ -100,7 +102,7 @@ PassRefPtr<ParsedNode> Parser::parse(JSGlobalData* globalData,
   m_source = &source;
   if (ParsedNode::scopeIsFunction)
     globalData->lexer->setIsReparsing();
-  parse(globalData, &errLine, &errMsg);
+  parse(globalData, parameters, &errLine, &errMsg);
 
   RefPtr<ParsedNode> result;
   if (m_sourceElements) {
