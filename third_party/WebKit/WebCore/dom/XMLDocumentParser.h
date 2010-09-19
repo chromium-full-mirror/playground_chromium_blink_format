@@ -235,9 +235,9 @@ class XMLDocumentParser : public ScriptableDocumentParser,
   int m_scriptStartLine;
 
   bool m_parsingFragment;
-  String m_defaultNamespaceURI;
+  AtomicString m_defaultNamespaceURI;
 
-  typedef HashMap<String, String> PrefixForNamespaceMap;
+  typedef HashMap<AtomicString, AtomicString> PrefixForNamespaceMap;
   PrefixForNamespaceMap m_prefixToNamespaceMap;
   SegmentedString m_pendingSrc;
   FragmentScriptingPermission m_scriptingPermission;
