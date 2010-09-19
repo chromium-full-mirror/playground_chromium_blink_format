@@ -171,7 +171,7 @@ class GraphicsContextPlatformPrivate : public Noncopyable {
   GraphicsContextPlatformPrivate(QPainter* painter);
   ~GraphicsContextPlatformPrivate();
 
-  inline QPainter* p() {
+  inline QPainter* p() const {
     if (layers.isEmpty())
       return painter;
     return &layers.top()->painter;
@@ -199,9 +199,9 @@ class GraphicsContextPlatformPrivate : public Noncopyable {
 
   QRectF clipBoundingRect() const {
 #if QT_VERSION >= QT_VERSION_CHECK(4, 8, 0)
-    return painter->clipBoundingRect();
+    return p()->clipBoundingRect();
 #else
-    return painter->clipRegion().boundingRect();
+    return p()->clipRegion().boundingRect();
 #endif
   }
 
