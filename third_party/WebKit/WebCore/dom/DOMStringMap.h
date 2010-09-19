@@ -32,6 +32,7 @@
 
 namespace WebCore {
 
+class Element;
 typedef int ExceptionCode;
 
 class DOMStringMap : public Noncopyable {
@@ -48,6 +49,8 @@ class DOMStringMap : public Noncopyable {
                        const String& value,
                        ExceptionCode&) = 0;
   virtual void deleteItem(const String& name, ExceptionCode&) = 0;
+
+  virtual Element* element() = 0;
 
  protected:
   DOMStringMap() {}

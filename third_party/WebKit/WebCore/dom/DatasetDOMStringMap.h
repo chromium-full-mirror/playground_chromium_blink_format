@@ -48,6 +48,8 @@ class DatasetDOMStringMap : public DOMStringMap {
   virtual void setItem(const String& name, const String& value, ExceptionCode&);
   virtual void deleteItem(const String& name, ExceptionCode&);
 
+  virtual Element* element() { return m_element; }
+
  private:
   DatasetDOMStringMap(Element* element) : m_element(element) {}
 
