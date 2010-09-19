@@ -214,15 +214,19 @@ void WebFrameLoaderClient::
   DocumentLoader* provisionalLoader =
       m_frame->coreFrame()->loader()->provisionalDocumentLoader();
   const String& url = provisionalLoader->url().string();
+  RefPtr<APIObject> userData;
 
   // Notify the bundle client.
   webPage->injectedBundleLoaderClient()
-      .didReceiveServerRedirectForProvisionalLoadForFrame(webPage, m_frame);
+      .didReceiveServerRedirectForProvisionalLoadForFrame(webPage, m_frame,
+                                                          userData);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidReceiveServerRedirectForProvisionalLoadForFrame,
-      webPage->pageID(), CoreIPC::In(m_frame->frameID(), url));
+      webPage->pageID(),
+      CoreIPC::In(m_frame->frameID(), url,
+                  InjectedBundleUserMessageEncoder(userData.get())));
 }
 
 void WebFrameLoaderClient::dispatchDidCancelClientRedirect() {
@@ -285,15 +289,17 @@ void WebFrameLoaderClient::dispatchDidStartProvisionalLoad() {
   DocumentLoader* provisionalLoader =
       m_frame->coreFrame()->loader()->provisionalDocumentLoader();
   const String& url = provisionalLoader->url().string();
+  RefPtr<APIObject> userData;
 
   // Notify the bundle client.
   webPage->injectedBundleLoaderClient().didStartProvisionalLoadForFrame(
-      webPage, m_frame);
+      webPage, m_frame, userData);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidStartProvisionalLoadForFrame, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID(), url));
+      CoreIPC::In(m_frame->frameID(), url,
+                  InjectedBundleUserMessageEncoder(userData.get())));
 }
 
 void WebFrameLoaderClient::dispatchDidReceiveTitle(const String& title) {
@@ -301,14 +307,17 @@ void WebFrameLoaderClient::dispatchDidReceiveTitle(const String& title) {
   if (!webPage)
     return;
 
+  RefPtr<APIObject> userData;
+
   // Notify the bundle client.
-  webPage->injectedBundleLoaderClient().didReceiveTitleForFrame(webPage, title,
-                                                                m_frame);
+  webPage->injectedBundleLoaderClient().didReceiveTitleForFrame(
+      webPage, title, m_frame, userData);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidReceiveTitleForFrame, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID(), title));
+      CoreIPC::In(m_frame->frameID(), title,
+                  InjectedBundleUserMessageEncoder(userData.get())));
 }
 
 void WebFrameLoaderClient::dispatchDidChangeIcons() {
@@ -322,14 +331,17 @@ void WebFrameLoaderClient::dispatchDidCommitLoad() {
 
   const ResourceResponse& response =
       m_frame->coreFrame()->loader()->documentLoader()->response();
+  RefPtr<APIObject> userData;
 
   // Notify the bundle client.
-  webPage->injectedBundleLoaderClient().didCommitLoadForFrame(webPage, m_frame);
+  webPage->injectedBundleLoaderClient().didCommitLoadForFrame(webPage, m_frame,
+                                                              userData);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidCommitLoadForFrame, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID(), PlatformCertificateInfo(response)));
+      CoreIPC::In(m_frame->frameID(), PlatformCertificateInfo(response),
+                  InjectedBundleUserMessageEncoder(userData.get())));
 }
 
 void WebFrameLoaderClient::dispatchDidFailProvisionalLoad(
@@ -338,14 +350,17 @@ void WebFrameLoaderClient::dispatchDidFailProvisionalLoad(
   if (!webPage)
     return;
 
+  RefPtr<APIObject> userData;
+
   // Notify the bundle client.
   webPage->injectedBundleLoaderClient().didFailProvisionalLoadWithErrorForFrame(
-      webPage, m_frame);
+      webPage, m_frame, userData);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidFailProvisionalLoadForFrame, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID()));
+      CoreIPC::In(m_frame->frameID(),
+                  InjectedBundleUserMessageEncoder(userData.get())));
 
   // If we have a load listener, notify it.
   if (WebFrame::LoadListener* loadListener = m_frame->loadListener())
@@ -357,14 +372,17 @@ void WebFrameLoaderClient::dispatchDidFailLoad(const ResourceError& error) {
   if (!webPage)
     return;
 
+  RefPtr<APIObject> userData;
+
   // Notify the bundle client.
-  webPage->injectedBundleLoaderClient().didFailLoadWithErrorForFrame(webPage,
-                                                                     m_frame);
+  webPage->injectedBundleLoaderClient().didFailLoadWithErrorForFrame(
+      webPage, m_frame, userData);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidFailLoadForFrame, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID()));
+      CoreIPC::In(m_frame->frameID(),
+                  InjectedBundleUserMessageEncoder(userData.get())));
 
   // If we have a load listener, notify it.
   if (WebFrame::LoadListener* loadListener = m_frame->loadListener())
@@ -376,14 +394,17 @@ void WebFrameLoaderClient::dispatchDidFinishDocumentLoad() {
   if (!webPage)
     return;
 
+  RefPtr<APIObject> userData;
+
   // Notify the bundle client.
-  webPage->injectedBundleLoaderClient().didFinishDocumentLoadForFrame(webPage,
-                                                                      m_frame);
+  webPage->injectedBundleLoaderClient().didFinishDocumentLoadForFrame(
+      webPage, m_frame, userData);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidFinishDocumentLoadForFrame, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID()));
+      CoreIPC::In(m_frame->frameID(),
+                  InjectedBundleUserMessageEncoder(userData.get())));
 }
 
 void WebFrameLoaderClient::dispatchDidFinishLoad() {
@@ -391,13 +412,17 @@ void WebFrameLoaderClient::dispatchDidFinishLoad() {
   if (!webPage)
     return;
 
+  RefPtr<APIObject> userData;
+
   // Notify the bundle client.
-  webPage->injectedBundleLoaderClient().didFinishLoadForFrame(webPage, m_frame);
+  webPage->injectedBundleLoaderClient().didFinishLoadForFrame(webPage, m_frame,
+                                                              userData);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidFinishLoadForFrame, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID()));
+      CoreIPC::In(m_frame->frameID(),
+                  InjectedBundleUserMessageEncoder(userData.get())));
 
   // If we have a load listener, notify it.
   if (WebFrame::LoadListener* loadListener = m_frame->loadListener())
@@ -409,9 +434,17 @@ void WebFrameLoaderClient::dispatchDidFirstLayout() {
   if (!webPage)
     return;
 
+  RefPtr<APIObject> userData;
+
+  // Notify the bundle client.
+  webPage->injectedBundleLoaderClient().didFirstLayoutForFrame(webPage, m_frame,
+                                                               userData);
+
+  // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidFirstLayoutForFrame, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID()));
+      CoreIPC::In(m_frame->frameID(),
+                  InjectedBundleUserMessageEncoder(userData.get())));
 }
 
 void WebFrameLoaderClient::dispatchDidFirstVisuallyNonEmptyLayout() {
@@ -419,9 +452,18 @@ void WebFrameLoaderClient::dispatchDidFirstVisuallyNonEmptyLayout() {
   if (!webPage)
     return;
 
+  RefPtr<APIObject> userData;
+
+  // Notify the bundle client.
+  webPage->injectedBundleLoaderClient().didFirstVisuallyNonEmptyLayoutForFrame(
+      webPage, m_frame, userData);
+
+  // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidFirstVisuallyNonEmptyLayoutForFrame,
-      webPage->pageID(), CoreIPC::In(m_frame->frameID()));
+      webPage->pageID(),
+      CoreIPC::In(m_frame->frameID(),
+                  InjectedBundleUserMessageEncoder(userData.get())));
 }
 
 Frame* WebFrameLoaderClient::dispatchCreatePage() {

@@ -49,26 +49,37 @@ class InjectedBundlePage {
   // Loader Client
   static void didStartProvisionalLoadForFrame(WKBundlePageRef,
                                               WKBundleFrameRef,
+                                              WKTypeRef*,
                                               const void*);
   static void didReceiveServerRedirectForProvisionalLoadForFrame(
       WKBundlePageRef,
       WKBundleFrameRef,
+      WKTypeRef*,
       const void*);
   static void didFailProvisionalLoadWithErrorForFrame(WKBundlePageRef,
                                                       WKBundleFrameRef,
+                                                      WKTypeRef*,
                                                       const void*);
   static void didCommitLoadForFrame(WKBundlePageRef,
                                     WKBundleFrameRef,
+                                    WKTypeRef*,
                                     const void*);
   static void didFinishLoadForFrame(WKBundlePageRef,
                                     WKBundleFrameRef,
+                                    WKTypeRef*,
                                     const void*);
+  static void didFinishDocumentLoadForFrame(WKBundlePageRef,
+                                            WKBundleFrameRef,
+                                            WKTypeRef*,
+                                            const void*);
   static void didFailLoadWithErrorForFrame(WKBundlePageRef,
                                            WKBundleFrameRef,
+                                           WKTypeRef*,
                                            const void*);
   static void didReceiveTitleForFrame(WKBundlePageRef,
                                       WKStringRef title,
                                       WKBundleFrameRef,
+                                      WKTypeRef*,
                                       const void*);
   static void didClearWindowForFrame(WKBundlePageRef,
                                      WKBundleFrameRef,
@@ -86,9 +97,6 @@ class InjectedBundlePage {
   static void didChangeLocationWithinPageForFrame(WKBundlePageRef,
                                                   WKBundleFrameRef,
                                                   const void*);
-  static void didFinishDocumentLoadForFrame(WKBundlePageRef,
-                                            WKBundleFrameRef,
-                                            const void*);
   static void didHandleOnloadEventsForFrame(WKBundlePageRef,
                                             WKBundleFrameRef,
                                             const void*);

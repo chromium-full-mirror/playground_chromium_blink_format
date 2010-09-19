@@ -158,6 +158,8 @@ InjectedBundlePage::InjectedBundlePage(WKBundlePageRef page)
       didFinishLoadForFrame,
       didFailLoadWithErrorForFrame,
       didReceiveTitleForFrame,
+      0,
+      0,
       didClearWindowForFrame,
       didCancelClientRedirectForFrame,
       willPerformClientRedirectForFrame,
@@ -211,6 +213,7 @@ void InjectedBundlePage::reset() {
 void InjectedBundlePage::didStartProvisionalLoadForFrame(
     WKBundlePageRef page,
     WKBundleFrameRef frame,
+    WKTypeRef*,
     const void* clientInfo) {
   static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
       ->didStartProvisionalLoadForFrame(frame);
@@ -219,6 +222,7 @@ void InjectedBundlePage::didStartProvisionalLoadForFrame(
 void InjectedBundlePage::didReceiveServerRedirectForProvisionalLoadForFrame(
     WKBundlePageRef page,
     WKBundleFrameRef frame,
+    WKTypeRef*,
     const void* clientInfo) {
   static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
       ->didReceiveServerRedirectForProvisionalLoadForFrame(frame);
@@ -227,6 +231,7 @@ void InjectedBundlePage::didReceiveServerRedirectForProvisionalLoadForFrame(
 void InjectedBundlePage::didFailProvisionalLoadWithErrorForFrame(
     WKBundlePageRef page,
     WKBundleFrameRef frame,
+    WKTypeRef*,
     const void* clientInfo) {
   static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
       ->didFailProvisionalLoadWithErrorForFrame(frame);
@@ -234,6 +239,7 @@ void InjectedBundlePage::didFailProvisionalLoadWithErrorForFrame(
 
 void InjectedBundlePage::didCommitLoadForFrame(WKBundlePageRef page,
                                                WKBundleFrameRef frame,
+                                               WKTypeRef*,
                                                const void* clientInfo) {
   static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
       ->didCommitLoadForFrame(frame);
@@ -241,13 +247,23 @@ void InjectedBundlePage::didCommitLoadForFrame(WKBundlePageRef page,
 
 void InjectedBundlePage::didFinishLoadForFrame(WKBundlePageRef page,
                                                WKBundleFrameRef frame,
+                                               WKTypeRef*,
                                                const void* clientInfo) {
   static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
       ->didFinishLoadForFrame(frame);
 }
 
+void InjectedBundlePage::didFinishDocumentLoadForFrame(WKBundlePageRef page,
+                                                       WKBundleFrameRef frame,
+                                                       WKTypeRef*,
+                                                       const void* clientInfo) {
+  static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
+      ->didFinishDocumentLoadForFrame(frame);
+}
+
 void InjectedBundlePage::didFailLoadWithErrorForFrame(WKBundlePageRef page,
                                                       WKBundleFrameRef frame,
+                                                      WKTypeRef*,
                                                       const void* clientInfo) {
   static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
       ->didFailLoadWithErrorForFrame(frame);
@@ -256,6 +272,7 @@ void InjectedBundlePage::didFailLoadWithErrorForFrame(WKBundlePageRef page,
 void InjectedBundlePage::didReceiveTitleForFrame(WKBundlePageRef page,
                                                  WKStringRef title,
                                                  WKBundleFrameRef frame,
+                                                 WKTypeRef*,
                                                  const void* clientInfo) {
   static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
       ->didReceiveTitleForFrame(title, frame);
@@ -294,13 +311,6 @@ void InjectedBundlePage::didChangeLocationWithinPageForFrame(
     const void* clientInfo) {
   static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
       ->didChangeLocationWithinPageForFrame(frame);
-}
-
-void InjectedBundlePage::didFinishDocumentLoadForFrame(WKBundlePageRef page,
-                                                       WKBundleFrameRef frame,
-                                                       const void* clientInfo) {
-  static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
-      ->didFinishDocumentLoadForFrame(frame);
 }
 
 void InjectedBundlePage::didHandleOnloadEventsForFrame(WKBundlePageRef page,

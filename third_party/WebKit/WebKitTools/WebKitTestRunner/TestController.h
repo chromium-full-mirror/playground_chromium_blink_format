@@ -81,6 +81,7 @@ class TestController {
   // WKPageLoaderClient
   static void didFinishLoadForFrame(WKPageRef page,
                                     WKFrameRef frame,
+                                    WKTypeRef userData,
                                     const void*);
   void didFinishLoadForFrame(WKPageRef page, WKFrameRef frame);
 

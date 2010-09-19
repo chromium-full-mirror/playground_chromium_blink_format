@@ -37,6 +37,7 @@ static QWKPage* toQWKPage(const void* clientInfo) {
 
 void qt_wk_didStartProvisionalLoadForFrame(WKPageRef page,
                                            WKFrameRef frame,
+                                           WKTypeRef userData,
                                            const void* clientInfo) {
   if (!WKFrameIsMainFrame(frame))
     return;
@@ -47,14 +48,17 @@ void qt_wk_didStartProvisionalLoadForFrame(WKPageRef page,
 void qt_wk_didReceiveServerRedirectForProvisionalLoadForFrame(
     WKPageRef page,
     WKFrameRef frame,
+    WKTypeRef userData,
     const void* clientInfo) {}
 
 void qt_wk_didFailProvisionalLoadWithErrorForFrame(WKPageRef page,
                                                    WKFrameRef frame,
+                                                   WKTypeRef userData,
                                                    const void* clientInfo) {}
 
 void qt_wk_didCommitLoadForFrame(WKPageRef page,
                                  WKFrameRef frame,
+                                 WKTypeRef userData,
                                  const void* clientInfo) {
   if (!WKFrameIsMainFrame(frame))
     return;
@@ -67,12 +71,14 @@ void qt_wk_didCommitLoadForFrame(WKPageRef page,
 
 void qt_wk_didFinishDocumentLoadForFrame(WKPageRef page,
                                          WKFrameRef frame,
+                                         WKTypeRef userData,
                                          const void* clientInfo) {
   // FIXME: Implement (bug #44934)
 }
 
 void qt_wk_didFinishLoadForFrame(WKPageRef page,
                                  WKFrameRef frame,
+                                 WKTypeRef userData,
                                  const void* clientInfo) {
   if (!WKFrameIsMainFrame(frame))
     return;
@@ -82,6 +88,7 @@ void qt_wk_didFinishLoadForFrame(WKPageRef page,
 
 void qt_wk_didFailLoadWithErrorForFrame(WKPageRef page,
                                         WKFrameRef frame,
+                                        WKTypeRef userData,
                                         const void* clientInfo) {
   if (!WKFrameIsMainFrame(frame))
     return;
@@ -92,6 +99,7 @@ void qt_wk_didFailLoadWithErrorForFrame(WKPageRef page,
 void qt_wk_didReceiveTitleForFrame(WKPageRef page,
                                    WKStringRef title,
                                    WKFrameRef frame,
+                                   WKTypeRef userData,
                                    const void* clientInfo) {
   if (!WKFrameIsMainFrame(frame))
     return;
@@ -101,6 +109,7 @@ void qt_wk_didReceiveTitleForFrame(WKPageRef page,
 
 void qt_wk_didFirstLayoutForFrame(WKPageRef page,
                                   WKFrameRef frame,
+                                  WKTypeRef userData,
                                   const void* clientInfo) {
   if (!WKFrameIsMainFrame(frame))
     return;
@@ -109,6 +118,7 @@ void qt_wk_didFirstLayoutForFrame(WKPageRef page,
 
 void qt_wk_didFirstVisuallyNonEmptyLayoutForFrame(WKPageRef page,
                                                   WKFrameRef frame,
+                                                  WKTypeRef userData,
                                                   const void* clientInfo) {
   if (!WKFrameIsMainFrame(frame))
     return;
