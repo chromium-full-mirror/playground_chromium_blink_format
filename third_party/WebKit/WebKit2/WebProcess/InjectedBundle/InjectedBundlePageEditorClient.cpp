@@ -25,9 +25,10 @@
 
 #include "InjectedBundlePageEditorClient.h"
 
+#include "InjectedBundleNodeHandle.h"
+#include "InjectedBundleRangeHandle.h"
 #include "WKAPICast.h"
 #include "WKBundleAPICast.h"
-#include "InjectedBundleNodeHandle.h"
 #include <wtf/text/WTFString.h>
 
 using namespace WebCore;
@@ -48,17 +49,23 @@ void InjectedBundlePageEditorClient::initialize(
 
 bool InjectedBundlePageEditorClient::shouldBeginEditing(WebPage* page,
                                                         Range* range) {
-  if (m_client.shouldBeginEditing)
-    return m_client.shouldBeginEditing(toRef(page), toRef(range),
+  if (m_client.shouldBeginEditing) {
+    RefPtr<InjectedBundleRangeHandle> rangeHandle =
+        InjectedBundleRangeHandle::getOrCreate(range);
+    return m_client.shouldBeginEditing(toRef(page), toRef(rangeHandle.get()),
                                        m_client.clientInfo);
+  }
   return true;
 }
 
 bool InjectedBundlePageEditorClient::shouldEndEditing(WebPage* page,
                                                       Range* range) {
-  if (m_client.shouldEndEditing)
-    return m_client.shouldEndEditing(toRef(page), toRef(range),
+  if (m_client.shouldEndEditing) {
+    RefPtr<InjectedBundleRangeHandle> rangeHandle =
+        InjectedBundleRangeHandle::getOrCreate(range);
+    return m_client.shouldEndEditing(toRef(page), toRef(rangeHandle.get()),
                                      m_client.clientInfo);
+  }
   return true;
 }
 
@@ -70,9 +77,11 @@ bool InjectedBundlePageEditorClient::shouldInsertNode(
   if (m_client.shouldInsertNode) {
     RefPtr<InjectedBundleNodeHandle> nodeHandle =
         InjectedBundleNodeHandle::getOrCreate(node);
+    RefPtr<InjectedBundleRangeHandle> rangeToReplaceHandle =
+        InjectedBundleRangeHandle::getOrCreate(rangeToReplace);
     return m_client.shouldInsertNode(toRef(page), toRef(nodeHandle.get()),
-                                     toRef(rangeToReplace), toWK(action),
-                                     m_client.clientInfo);
+                                     toRef(rangeToReplaceHandle.get()),
+                                     toWK(action), m_client.clientInfo);
   }
   return true;
 }
@@ -82,18 +91,24 @@ bool InjectedBundlePageEditorClient::shouldInsertText(
     StringImpl* text,
     Range* rangeToReplace,
     EditorInsertAction action) {
-  if (m_client.shouldInsertText)
+  if (m_client.shouldInsertText) {
+    RefPtr<InjectedBundleRangeHandle> rangeToReplaceHandle =
+        InjectedBundleRangeHandle::getOrCreate(rangeToReplace);
     return m_client.shouldInsertText(toRef(page), toRef(text),
-                                     toRef(rangeToReplace), toWK(action),
-                                     m_client.clientInfo);
+                                     toRef(rangeToReplaceHandle.get()),
+                                     toWK(action), m_client.clientInfo);
+  }
   return true;
 }
 
 bool InjectedBundlePageEditorClient::shouldDeleteRange(WebPage* page,
                                                        Range* range) {
-  if (m_client.shouldDeleteRange)
-    return m_client.shouldDeleteRange(toRef(page), toRef(range),
+  if (m_client.shouldDeleteRange) {
+    RefPtr<InjectedBundleRangeHandle> rangeHandle =
+        InjectedBundleRangeHandle::getOrCreate(range);
+    return m_client.shouldDeleteRange(toRef(page), toRef(rangeHandle.get()),
                                       m_client.clientInfo);
+  }
   return true;
 }
 
@@ -103,10 +118,15 @@ bool InjectedBundlePageEditorClient::shouldChangeSelectedRange(
     Range* toRange,
     EAffinity affinity,
     bool stillSelecting) {
-  if (m_client.shouldChangeSelectedRange)
+  if (m_client.shouldChangeSelectedRange) {
+    RefPtr<InjectedBundleRangeHandle> fromRangeHandle =
+        InjectedBundleRangeHandle::getOrCreate(fromRange);
+    RefPtr<InjectedBundleRangeHandle> toRangeHandle =
+        InjectedBundleRangeHandle::getOrCreate(toRange);
     return m_client.shouldChangeSelectedRange(
-        toRef(page), toRef(fromRange), toRef(toRange), toWK(affinity),
-        stillSelecting, m_client.clientInfo);
+        toRef(page), toRef(fromRangeHandle.get()), toRef(toRangeHandle.get()),
+        toWK(affinity), stillSelecting, m_client.clientInfo);
+  }
   return true;
 }
 
@@ -114,9 +134,13 @@ bool InjectedBundlePageEditorClient::shouldApplyStyle(
     WebPage* page,
     CSSStyleDeclaration* style,
     Range* range) {
-  if (m_client.shouldApplyStyle)
-    return m_client.shouldApplyStyle(toRef(page), toRef(style), toRef(range),
+  if (m_client.shouldApplyStyle) {
+    RefPtr<InjectedBundleRangeHandle> rangeHandle =
+        InjectedBundleRangeHandle::getOrCreate(range);
+    return m_client.shouldApplyStyle(toRef(page), toRef(style),
+                                     toRef(rangeHandle.get()),
                                      m_client.clientInfo);
+  }
   return true;
 }
 

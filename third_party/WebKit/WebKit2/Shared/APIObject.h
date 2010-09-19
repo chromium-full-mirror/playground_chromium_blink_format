@@ -66,9 +66,10 @@ class APIObject : public RefCounted<APIObject> {
     // Bundle types
     TypeBundle,
     TypeBundleFrame,
-    TypeBundlePage,
-    TypeBundleScriptWorld,
     TypeBundleNodeHandle,
+    TypeBundlePage,
+    TypeBundleRangeHandle,
+    TypeBundleScriptWorld,
 
     // Platform specific
     TypeView

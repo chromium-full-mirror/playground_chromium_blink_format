@@ -156,33 +156,33 @@ class InjectedBundlePage {
 
   // Editor client
   static bool shouldBeginEditing(WKBundlePageRef,
-                                 WKBundleRangeRef,
+                                 WKBundleRangeHandleRef,
                                  const void* clientInfo);
   static bool shouldEndEditing(WKBundlePageRef,
-                               WKBundleRangeRef,
+                               WKBundleRangeHandleRef,
                                const void* clientInfo);
   static bool shouldInsertNode(WKBundlePageRef,
                                WKBundleNodeHandleRef,
-                               WKBundleRangeRef rangeToReplace,
+                               WKBundleRangeHandleRef rangeToReplace,
                                WKInsertActionType,
                                const void* clientInfo);
   static bool shouldInsertText(WKBundlePageRef,
                                WKStringRef,
-                               WKBundleRangeRef rangeToReplace,
+                               WKBundleRangeHandleRef rangeToReplace,
                                WKInsertActionType,
                                const void* clientInfo);
   static bool shouldDeleteRange(WKBundlePageRef,
-                                WKBundleRangeRef,
+                                WKBundleRangeHandleRef,
                                 const void* clientInfo);
   static bool shouldChangeSelectedRange(WKBundlePageRef,
-                                        WKBundleRangeRef fromRange,
-                                        WKBundleRangeRef toRange,
+                                        WKBundleRangeHandleRef fromRange,
+                                        WKBundleRangeHandleRef toRange,
                                         WKAffinityType,
                                         bool stillSelecting,
                                         const void* clientInfo);
   static bool shouldApplyStyle(WKBundlePageRef,
                                WKBundleCSSStyleDeclarationRef style,
-                               WKBundleRangeRef range,
+                               WKBundleRangeHandleRef range,
                                const void* clientInfo);
   static void didBeginEditing(WKBundlePageRef,
                               WKStringRef notificationName,
@@ -196,21 +196,21 @@ class InjectedBundlePage {
   static void didChangeSelection(WKBundlePageRef,
                                  WKStringRef notificationName,
                                  const void* clientInfo);
-  bool shouldBeginEditing(WKBundleRangeRef);
-  bool shouldEndEditing(WKBundleRangeRef);
+  bool shouldBeginEditing(WKBundleRangeHandleRef);
+  bool shouldEndEditing(WKBundleRangeHandleRef);
   bool shouldInsertNode(WKBundleNodeHandleRef,
-                        WKBundleRangeRef rangeToReplace,
+                        WKBundleRangeHandleRef rangeToReplace,
                         WKInsertActionType);
   bool shouldInsertText(WKStringRef,
-                        WKBundleRangeRef rangeToReplace,
+                        WKBundleRangeHandleRef rangeToReplace,
                         WKInsertActionType);
-  bool shouldDeleteRange(WKBundleRangeRef);
-  bool shouldChangeSelectedRange(WKBundleRangeRef fromRange,
-                                 WKBundleRangeRef toRange,
+  bool shouldDeleteRange(WKBundleRangeHandleRef);
+  bool shouldChangeSelectedRange(WKBundleRangeHandleRef fromRange,
+                                 WKBundleRangeHandleRef toRange,
                                  WKAffinityType,
                                  bool stillSelecting);
   bool shouldApplyStyle(WKBundleCSSStyleDeclarationRef style,
-                        WKBundleRangeRef range);
+                        WKBundleRangeHandleRef range);
   void didBeginEditing(WKStringRef notificationName);
   void didEndEditing(WKStringRef notificationName);
   void didChange(WKStringRef notificationName);
