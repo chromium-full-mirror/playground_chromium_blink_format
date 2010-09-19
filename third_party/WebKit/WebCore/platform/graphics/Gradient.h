@@ -102,7 +102,7 @@ class Gradient : public Generator {
   const FloatPoint& p1() const { return m_p1; }
   float r0() const { return m_r0; }
   float r1() const { return m_r1; }
-  const Vector<ColorStop>& getStops() const;
+  const Vector<ColorStop, 2>& getStops() const;
 #else
   PlatformGradient platformGradient();
 #endif

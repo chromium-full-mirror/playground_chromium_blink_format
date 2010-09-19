@@ -31,7 +31,7 @@ static inline bool compareStops(const Gradient::ColorStop& a,
   return a.stop < b.stop;
 }
 
-const Vector<Gradient::ColorStop>& Gradient::getStops() const {
+const Vector<Gradient::ColorStop, 2>& Gradient::getStops() const {
   if (!m_stopsSorted) {
     if (m_stops.size())
       std::stable_sort(m_stops.begin(), m_stops.end(), compareStops);
