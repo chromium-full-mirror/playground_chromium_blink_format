@@ -121,6 +121,7 @@ void WebPreferences::applyTo(WebView* webView) {
   settings->setAuthorAndUserStylesEnabled(authorAndUserStylesEnabled);
   settings->setDefaultTextEncodingName(defaultTextEncodingName);
   settings->setDeveloperExtrasEnabled(developerExtrasEnabled);
+  settings->setExperimentalWebGLEnabled(experimentalWebGLEnabled);
   settings->setJavaEnabled(javaEnabled);
   settings->setJavaScriptCanAccessClipboard(javaScriptCanAccessClipboard);
   settings->setJavaScriptCanOpenWindowsAutomatically(
