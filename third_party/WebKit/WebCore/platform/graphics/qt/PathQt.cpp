@@ -50,16 +50,14 @@
 
 namespace WebCore {
 
-Path::Path() : m_lastMoveToIndex(0) {}
+Path::Path() {}
 
 Path::~Path() {}
 
-Path::Path(const Path& other)
-    : m_path(other.m_path), m_lastMoveToIndex(other.m_lastMoveToIndex) {}
+Path::Path(const Path& other) : m_path(other.m_path) {}
 
 Path& Path::operator=(const Path& other) {
   m_path = other.m_path;
-  m_lastMoveToIndex = other.m_lastMoveToIndex;
   return *this;
 }
 
@@ -170,7 +168,6 @@ FloatRect Path::strokeBoundingRect(StrokeStyleApplier* applier) {
 }
 
 void Path::moveTo(const FloatPoint& point) {
-  m_lastMoveToIndex = m_path.elementCount();
   m_path.moveTo(point);
 }
 
