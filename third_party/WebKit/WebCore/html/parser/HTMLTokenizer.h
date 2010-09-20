@@ -119,8 +119,8 @@ class HTMLTokenizer : public Noncopyable {
     CDATASectionDoubleRightSquareBracketState,
   };
 
-  static PassOwnPtr<HTMLTokenizer> create() {
-    return adoptPtr(new HTMLTokenizer);
+  static PassOwnPtr<HTMLTokenizer> create(bool usePreHTML5ParserQuirks) {
+    return adoptPtr(new HTMLTokenizer(usePreHTML5ParserQuirks));
   }
   ~HTMLTokenizer();
 
@@ -260,7 +260,7 @@ class HTMLTokenizer : public Noncopyable {
     bool m_skipNextNewLine;
   };
 
-  HTMLTokenizer();
+  HTMLTokenizer(bool usePreHTML5ParserQuirks);
 
   inline bool processEntity(SegmentedString&);
 
@@ -313,6 +313,8 @@ class HTMLTokenizer : public Noncopyable {
 
   // http://www.whatwg.org/specs/web-apps/current-work/#preprocessing-the-input-stream
   InputStreamPreprocessor m_inputStreamPreprocessor;
+
+  bool m_usePreHTML5ParserQuirks;
 };
 }
 

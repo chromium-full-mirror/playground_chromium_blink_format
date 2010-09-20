@@ -76,6 +76,8 @@ class HTMLDocumentParser : public ScriptableDocumentParser,
       Element* contextElement,
       FragmentScriptingPermission = FragmentScriptingAllowed);
 
+  static bool usePreHTML5ParserQuirks(Document*);
+
  protected:
   virtual void insert(const SegmentedString&);
   virtual void append(const SegmentedString&);

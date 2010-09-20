@@ -151,6 +151,7 @@
 #define WebKitTextDirectionSubmenuInclusionBehaviorPreferenceKey \
   @"WebKitTextDirectionSubmenuInclusionBehaviorPreferenceKey"
 #define WebKitEditingBehaviorPreferenceKey @"WebKitEditingBehavior"
+#define WebKitUsePreHTML5ParserQuirksKey @"WebKitUsePreHTML5ParserQuirks"
 
 // CoreGraphics deferred updates are disabled if
 // WebKitEnableCoalescedUpdatesPreferenceKey is set
