@@ -100,9 +100,10 @@ PassRefPtr<FilterEffect> SVGFEMorphologyElement::build(
   if (xRadius < 0 || yRadius < 0)
     return 0;
 
-  return FEMorphology::create(input1,
-                              static_cast<MorphologyOperatorType>(_operator()),
-                              xRadius, yRadius);
+  RefPtr<FilterEffect> effect = FEMorphology::create(
+      static_cast<MorphologyOperatorType>(_operator()), xRadius, yRadius);
+  effect->inputEffects().append(input1);
+  return effect.release();
 }
 
 }  // namespace WebCore

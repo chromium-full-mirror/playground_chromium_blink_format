@@ -60,7 +60,9 @@ PassRefPtr<FilterEffect> SVGFETileElement::build(
   if (!input1)
     return 0;
 
-  return FETile::create(input1);
+  RefPtr<FilterEffect> effect = FETile::create();
+  effect->inputEffects().append(input1);
+  return effect.release();
 }
 }
 

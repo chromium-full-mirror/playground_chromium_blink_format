@@ -29,8 +29,7 @@ namespace WebCore {
 
 class FESpecularLighting : public FELighting {
  public:
-  static PassRefPtr<FESpecularLighting> create(FilterEffect*,
-                                               const Color&,
+  static PassRefPtr<FESpecularLighting> create(const Color&,
                                                float,
                                                float,
                                                float,
@@ -64,8 +63,7 @@ class FESpecularLighting : public FELighting {
   TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
-  FESpecularLighting(FilterEffect*,
-                     const Color&,
+  FESpecularLighting(const Color&,
                      float,
                      float,
                      float,

@@ -54,7 +54,7 @@ void FEImage::apply(Filter*) {
     return;
 
   FloatRect srcRect(FloatPoint(), m_image->size());
-  FloatRect destRect(FloatPoint(), subRegion().size());
+  FloatRect destRect(FloatPoint(), filterPrimitiveSubregion().size());
 
   m_preserveAspectRatio.transformRect(destRect, srcRect);
 

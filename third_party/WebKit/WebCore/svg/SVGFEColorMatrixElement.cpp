@@ -122,7 +122,9 @@ PassRefPtr<FilterEffect> SVGFEColorMatrixElement::build(
       return 0;
   }
 
-  return FEColorMatrix::create(input1, filterType, filterValues);
+  RefPtr<FilterEffect> effect = FEColorMatrix::create(filterType, filterValues);
+  effect->inputEffects().append(input1);
+  return effect.release();
 }
 
 }  // namespace WebCore

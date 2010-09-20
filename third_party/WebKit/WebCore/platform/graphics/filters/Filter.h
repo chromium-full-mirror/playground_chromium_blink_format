@@ -52,7 +52,8 @@ class Filter : public RefCounted<Filter> {
   virtual FloatRect filterRegion() const = 0;
 
   // SVG specific
-  virtual void calculateEffectSubRegion(FilterEffect*) {}
+  virtual void determineFilterPrimitiveSubregion(FilterEffect*,
+                                                 const FloatRect&) {}
 
   virtual FloatSize maxImageSize() const = 0;
   virtual bool effectBoundingBoxMode() const = 0;

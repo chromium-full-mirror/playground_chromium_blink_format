@@ -44,8 +44,7 @@ class CanvasPixelArray;
 
 class FEConvolveMatrix : public FilterEffect {
  public:
-  static PassRefPtr<FEConvolveMatrix> create(FilterEffect*,
-                                             const IntSize&,
+  static PassRefPtr<FEConvolveMatrix> create(const IntSize&,
                                              float,
                                              float,
                                              const IntPoint&,
@@ -78,16 +77,12 @@ class FEConvolveMatrix : public FilterEffect {
   bool preserveAlpha() const;
   void setPreserveAlpha(bool);
 
-  virtual FloatRect uniteChildEffectSubregions(Filter* filter) {
-    return calculateUnionOfChildEffectSubregions(filter, m_in.get());
-  }
   void apply(Filter*);
   void dump();
   TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
-  FEConvolveMatrix(FilterEffect*,
-                   const IntSize&,
+  FEConvolveMatrix(const IntSize&,
                    float,
                    float,
                    const IntPoint&,
@@ -124,7 +119,6 @@ class FEConvolveMatrix : public FilterEffect {
                                     int x2,
                                     int y2);
 
-  RefPtr<FilterEffect> m_in;
   IntSize m_kernelSize;
   float m_divisor;
   float m_bias;

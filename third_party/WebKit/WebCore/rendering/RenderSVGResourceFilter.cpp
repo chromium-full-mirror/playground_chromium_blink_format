@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
- *               2004, 2005 Rob Buis <buis@kde.org>
- *               2005 Eric Seidel <eric@webkit.org>
- *               2009 Dirk Schulze <krit@webkit.org>
+ * Copyright (C) 2004, 2005 Rob Buis <buis@kde.org>
+ * Copyright (C) 2005 Eric Seidel <eric@webkit.org>
+ * Copyright (C) 2009 Dirk Schulze <krit@webkit.org>
  * Copyright (C) Research In Motion Limited 2010. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -19,7 +19,6 @@
  * along with this library; see the file COPYING.LIB.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
- *
  */
 
 #include "config.h"
@@ -206,12 +205,12 @@ bool RenderSVGResourceFilter::applyResource(RenderObject* object,
   if (!lastEffect)
     return false;
 
-  lastEffect->calculateEffectRect(filterData->filter.get());
+  lastEffect->determineFilterPrimitiveSubregion(filterData->filter.get());
   // At least one FilterEffect has a too big image size,
   // recalculate the effect sizes with new scale factors.
   if (!fitsInMaximumImageSize(filterData->filter->maxImageSize(), scale)) {
     filterData->filter->setFilterResolution(scale);
-    lastEffect->calculateEffectRect(filterData->filter.get());
+    lastEffect->determineFilterPrimitiveSubregion(filterData->filter.get());
   }
 
   clippedSourceRect.scale(scale.width(), scale.height());
@@ -273,7 +272,7 @@ void RenderSVGResourceFilter::postApplyResource(RenderObject* object,
   FilterEffect* lastEffect = filterData->builder->lastEffect();
 
   if (lastEffect && !filterData->boundaries.isEmpty() &&
-      !lastEffect->subRegion().isEmpty()) {
+      !lastEffect->filterPrimitiveSubregion().isEmpty()) {
     // This is the real filtering of the object. It just needs to be called on
     // the
     // initial filtering process. We just take the stored filter result on a
@@ -293,7 +292,7 @@ void RenderSVGResourceFilter::postApplyResource(RenderObject* object,
     ImageBuffer* resultImage = lastEffect->resultImage();
     if (resultImage)
       context->drawImageBuffer(resultImage, object->style()->colorSpace(),
-                               lastEffect->subRegion());
+                               lastEffect->filterPrimitiveSubregion());
   }
 
   filterData->sourceGraphicBuffer.clear();

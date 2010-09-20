@@ -29,33 +29,30 @@
 
 namespace WebCore {
 
-FEDiffuseLighting::FEDiffuseLighting(FilterEffect* in,
-                                     const Color& lightingColor,
+FEDiffuseLighting::FEDiffuseLighting(const Color& lightingColor,
                                      float surfaceScale,
                                      float diffuseConstant,
                                      float kernelUnitLengthX,
                                      float kernelUnitLengthY,
                                      PassRefPtr<LightSource> lightSource)
     : FELighting(DiffuseLighting,
-                 in,
                  lightingColor,
                  surfaceScale,
                  diffuseConstant,
-                 0.0f,
-                 0.0f,
+                 0,
+                 0,
                  kernelUnitLengthX,
                  kernelUnitLengthY,
                  lightSource) {}
 
 PassRefPtr<FEDiffuseLighting> FEDiffuseLighting::create(
-    FilterEffect* in,
     const Color& lightingColor,
     float surfaceScale,
     float diffuseConstant,
     float kernelUnitLengthX,
     float kernelUnitLengthY,
     PassRefPtr<LightSource> lightSource) {
-  return adoptRef(new FEDiffuseLighting(in, lightingColor, surfaceScale,
+  return adoptRef(new FEDiffuseLighting(lightingColor, surfaceScale,
                                         diffuseConstant, kernelUnitLengthX,
                                         kernelUnitLengthY, lightSource));
 }
@@ -121,7 +118,7 @@ TextStream& FEDiffuseLighting::externalRepresentation(TextStream& ts,
      << "diffuseConstant=\"" << m_diffuseConstant << "\" "
      << "kernelUnitLength=\"" << m_kernelUnitLengthX << ", "
      << m_kernelUnitLengthY << "\"]\n";
-  m_in->externalRepresentation(ts, indent + 1);
+  inputEffect(0)->externalRepresentation(ts, indent + 1);
   return ts;
 }
 

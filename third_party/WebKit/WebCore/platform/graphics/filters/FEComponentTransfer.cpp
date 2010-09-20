@@ -37,26 +37,23 @@ namespace WebCore {
 typedef void (*TransferType)(unsigned char*, const ComponentTransferFunction&);
 
 FEComponentTransfer::FEComponentTransfer(
-    FilterEffect* in,
     const ComponentTransferFunction& redFunc,
     const ComponentTransferFunction& greenFunc,
     const ComponentTransferFunction& blueFunc,
     const ComponentTransferFunction& alphaFunc)
     : FilterEffect(),
-      m_in(in),
       m_redFunc(redFunc),
       m_greenFunc(greenFunc),
       m_blueFunc(blueFunc),
       m_alphaFunc(alphaFunc) {}
 
 PassRefPtr<FEComponentTransfer> FEComponentTransfer::create(
-    FilterEffect* in,
     const ComponentTransferFunction& redFunc,
     const ComponentTransferFunction& greenFunc,
     const ComponentTransferFunction& blueFunc,
     const ComponentTransferFunction& alphaFunc) {
   return adoptRef(
-      new FEComponentTransfer(in, redFunc, greenFunc, blueFunc, alphaFunc));
+      new FEComponentTransfer(redFunc, greenFunc, blueFunc, alphaFunc));
 }
 
 ComponentTransferFunction FEComponentTransfer::redFunction() const {
@@ -153,8 +150,9 @@ static void gamma(unsigned char* values,
 }
 
 void FEComponentTransfer::apply(Filter* filter) {
-  m_in->apply(filter);
-  if (!m_in->resultImage())
+  FilterEffect* in = inputEffect(0);
+  in->apply(filter);
+  if (!in->resultImage())
     return;
 
   if (!getEffectContext())
@@ -173,9 +171,10 @@ void FEComponentTransfer::apply(Filter* filter) {
     (*callEffect[transferFunction[channel].type])(tables[channel],
                                                   transferFunction[channel]);
 
-  IntRect drawingRect = calculateDrawingIntRect(m_in->scaledSubRegion());
+  IntRect drawingRect =
+      calculateDrawingIntRect(in->repaintRectInLocalCoordinates());
   RefPtr<ImageData> imageData(
-      m_in->resultImage()->getUnmultipliedImageData(drawingRect));
+      in->resultImage()->getUnmultipliedImageData(drawingRect));
   CanvasPixelArray* srcPixelArray(imageData->data());
 
   for (unsigned pixelOffset = 0; pixelOffset < srcPixelArray->length();
@@ -240,7 +239,7 @@ TextStream& FEComponentTransfer::externalRepresentation(TextStream& ts,
   ts << "{blue: " << m_blueFunc << "}\n";
   writeIndent(ts, indent + 2);
   ts << "{alpha: " << m_alphaFunc << "}]\n";
-  m_in->externalRepresentation(ts, indent + 1);
+  inputEffect(0)->externalRepresentation(ts, indent + 1);
   return ts;
 }
 

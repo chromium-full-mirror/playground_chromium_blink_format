@@ -42,9 +42,6 @@ class CanvasPixelArray;
 
 class FELighting : public FilterEffect {
  public:
-  virtual FloatRect uniteChildEffectSubregions(Filter* filter) {
-    return calculateUnionOfChildEffectSubregions(filter, m_in.get());
-  }
   void apply(Filter*);
 
  protected:
@@ -72,7 +69,6 @@ class FELighting : public FilterEffect {
   };
 
   FELighting(LightingType,
-             FilterEffect*,
              const Color&,
              float,
              float,
@@ -93,7 +89,6 @@ class FELighting : public FilterEffect {
                               int normalY);
 
   LightingType m_lightingType;
-  RefPtr<FilterEffect> m_in;
   RefPtr<LightSource> m_lightSource;
 
   Color m_lightingColor;

@@ -62,7 +62,6 @@ struct ComponentTransferFunction {
 class FEComponentTransfer : public FilterEffect {
  public:
   static PassRefPtr<FEComponentTransfer> create(
-      FilterEffect*,
       const ComponentTransferFunction&,
       const ComponentTransferFunction&,
       const ComponentTransferFunction&,
@@ -80,21 +79,16 @@ class FEComponentTransfer : public FilterEffect {
   ComponentTransferFunction alphaFunction() const;
   void setAlphaFunction(const ComponentTransferFunction&);
 
-  virtual FloatRect uniteChildEffectSubregions(Filter* filter) {
-    return calculateUnionOfChildEffectSubregions(filter, m_in.get());
-  }
   void apply(Filter*);
   void dump();
   TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
-  FEComponentTransfer(FilterEffect*,
-                      const ComponentTransferFunction&,
+  FEComponentTransfer(const ComponentTransferFunction&,
                       const ComponentTransferFunction&,
                       const ComponentTransferFunction&,
                       const ComponentTransferFunction&);
 
-  RefPtr<FilterEffect> m_in;
   ComponentTransferFunction m_redFunc;
   ComponentTransferFunction m_greenFunc;
   ComponentTransferFunction m_blueFunc;

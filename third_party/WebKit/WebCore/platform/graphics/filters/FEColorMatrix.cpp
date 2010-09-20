@@ -34,15 +34,12 @@
 
 namespace WebCore {
 
-FEColorMatrix::FEColorMatrix(FilterEffect* in,
-                             ColorMatrixType type,
-                             const Vector<float>& values)
-    : FilterEffect(), m_in(in), m_type(type), m_values(values) {}
+FEColorMatrix::FEColorMatrix(ColorMatrixType type, const Vector<float>& values)
+    : FilterEffect(), m_type(type), m_values(values) {}
 
-PassRefPtr<FEColorMatrix> FEColorMatrix::create(FilterEffect* in,
-                                                ColorMatrixType type,
+PassRefPtr<FEColorMatrix> FEColorMatrix::create(ColorMatrixType type,
                                                 const Vector<float>& values) {
-  return adoptRef(new FEColorMatrix(in, type, values));
+  return adoptRef(new FEColorMatrix(type, values));
 }
 
 ColorMatrixType FEColorMatrix::type() const {
@@ -161,16 +158,18 @@ void effectType(const PassRefPtr<CanvasPixelArray>& srcPixelArray,
 }
 
 void FEColorMatrix::apply(Filter* filter) {
-  m_in->apply(filter);
-  if (!m_in->resultImage())
+  FilterEffect* in = inputEffect(0);
+  in->apply(filter);
+  if (!in->resultImage())
     return;
 
   GraphicsContext* filterContext = getEffectContext();
   if (!filterContext)
     return;
 
-  filterContext->drawImageBuffer(m_in->resultImage(), DeviceColorSpace,
-                                 calculateDrawingRect(m_in->scaledSubRegion()));
+  filterContext->drawImageBuffer(
+      in->resultImage(), DeviceColorSpace,
+      calculateDrawingRect(in->repaintRectInLocalCoordinates()));
 
   IntRect imageRect(IntPoint(), resultImage()->size());
   PassRefPtr<ImageData> imageData(
@@ -244,7 +243,7 @@ TextStream& FEColorMatrix::externalRepresentation(TextStream& ts,
     ts << "\"";
   }
   ts << "]\n";
-  m_in->externalRepresentation(ts, indent + 1);
+  inputEffect(0)->externalRepresentation(ts, indent + 1);
   return ts;
 }
 
