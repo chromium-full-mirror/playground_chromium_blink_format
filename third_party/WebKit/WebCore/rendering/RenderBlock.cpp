@@ -4959,7 +4959,15 @@ int RenderBlock::availableWidth() const {
   // column width.
   if (hasColumns())
     return desiredColumnWidth();
-  return contentWidth();
+  return RenderBox::availableWidth();
+}
+
+int RenderBlock::availableLogicalWidth() const {
+  // If we have multiple columns, then the available logical width is reduced to
+  // our column width.
+  if (hasColumns())
+    return desiredColumnWidth();
+  return RenderBox::availableLogicalWidth();
 }
 
 int RenderBlock::columnGap() const {

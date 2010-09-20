@@ -132,7 +132,10 @@ class RenderBlock : public RenderBox {
 
   // Block flows subclass availableWidth to handle multi column layout
   // (shrinking the width available to children when laying out.)
-  virtual int availableWidth() const;
+  virtual int availableWidth()
+      const;  // FIXME: Should be possible to remove this. See
+              // https://bugs.webkit.org/show_bug.cgi?id=46127
+  virtual int availableLogicalWidth() const;
 
   RootInlineBox* firstRootBox() const {
     return static_cast<RootInlineBox*>(firstLineBox());
