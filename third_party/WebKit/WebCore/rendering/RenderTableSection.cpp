@@ -637,6 +637,8 @@ int RenderTableSection::layoutRows(int toAdd) {
       else
         cell->setLocation(table()->columnPositions()[c] + hspacing,
                           m_rowPos[rindx]);
+      view()->addLayoutDelta(
+          IntSize(oldCellRect.x() - cell->x(), oldCellRect.y() - cell->y()));
 
       if (te != oldTe || be != oldBe)
         cell->setNeedsLayout(true, false);
@@ -652,17 +654,19 @@ int RenderTableSection::layoutRows(int toAdd) {
                                    // change size.  For now just shrink or grow
                                    // the cell to fit without doing a relayout.
 
-      if ((te != oldTe || be > oldBe) && !table()->selfNeedsLayout() &&
-          cell->checkForRepaintDuringLayout())
-        cell->repaint();
+      IntSize childOffset(cell->x() - oldCellRect.x(),
+                          cell->y() - oldCellRect.y());
+      if (childOffset.width() || childOffset.height()) {
+        view()->addLayoutDelta(childOffset);
 
-      // If the cell moved, we have to repaint it as well as any
-      // floating/positioned
-      // descendants.  An exception is if we need a layout.  In this case, we
-      // know we're going to
-      // repaint ourselves (and the cell) anyway.
-      if (!table()->selfNeedsLayout() && cell->checkForRepaintDuringLayout())
-        cell->repaintDuringLayoutIfMoved(oldCellRect);
+        // If the child moved, we have to repaint it as well as any
+        // floating/positioned
+        // descendants.  An exception is if we need a layout.  In this case, we
+        // know we're going to
+        // repaint ourselves (and the child) anyway.
+        if (!table()->selfNeedsLayout() && cell->checkForRepaintDuringLayout())
+          cell->repaintDuringLayoutIfMoved(oldCellRect);
+      }
     }
   }
 
