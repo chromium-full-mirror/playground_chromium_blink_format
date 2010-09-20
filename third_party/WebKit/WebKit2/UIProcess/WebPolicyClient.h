@@ -45,12 +45,14 @@ class WebPolicyClient {
   bool decidePolicyForNavigationAction(WebPageProxy*,
                                        WebCore::NavigationType,
                                        WebEvent::Modifiers,
+                                       WebMouseEvent::Button,
                                        const String& url,
                                        WebFrameProxy*,
                                        WebFramePolicyListenerProxy*);
   bool decidePolicyForNewWindowAction(WebPageProxy*,
                                       WebCore::NavigationType,
                                       WebEvent::Modifiers,
+                                      WebMouseEvent::Button,
                                       const String& url,
                                       WebFrameProxy*,
                                       WebFramePolicyListenerProxy*);

@@ -236,13 +236,15 @@ class WebPageProxy : public APIObject {
   void didFinishProgress();
 
   void decidePolicyForNavigationAction(WebFrameProxy*,
-                                       WebCore::NavigationType navigationType,
-                                       WebEvent::Modifiers modifiers,
+                                       WebCore::NavigationType,
+                                       WebEvent::Modifiers,
+                                       WebMouseEvent::Button,
                                        const String& url,
                                        uint64_t listenerID);
   void decidePolicyForNewWindowAction(WebFrameProxy*,
-                                      WebCore::NavigationType navigationType,
-                                      WebEvent::Modifiers modifiers,
+                                      WebCore::NavigationType,
+                                      WebEvent::Modifiers,
+                                      WebMouseEvent::Button,
                                       const String& url,
                                       uint64_t listenerID);
   void decidePolicyForMIMEType(WebFrameProxy*,

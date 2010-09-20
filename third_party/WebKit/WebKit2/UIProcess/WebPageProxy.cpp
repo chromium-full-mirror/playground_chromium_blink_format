@@ -705,30 +705,34 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       uint64_t frameID;
       uint32_t navigationType;
       uint32_t modifiers;
+      int32_t mouseButton;
       String url;
       uint64_t listenerID;
       if (!arguments->decode(CoreIPC::Out(frameID, navigationType, modifiers,
-                                          url, listenerID)))
+                                          mouseButton, url, listenerID)))
         return;
       decidePolicyForNavigationAction(
           process()->webFrame(frameID),
           static_cast<NavigationType>(navigationType),
-          static_cast<WebEvent::Modifiers>(modifiers), url, listenerID);
+          static_cast<WebEvent::Modifiers>(modifiers),
+          static_cast<WebMouseEvent::Button>(mouseButton), url, listenerID);
       break;
     }
     case WebPageProxyMessage::DecidePolicyForNewWindowAction: {
       uint64_t frameID;
       uint32_t navigationType;
       uint32_t modifiers;
+      int32_t mouseButton;
       String url;
       uint64_t listenerID;
       if (!arguments->decode(CoreIPC::Out(frameID, navigationType, modifiers,
-                                          url, listenerID)))
+                                          url, mouseButton, listenerID)))
         return;
       decidePolicyForNewWindowAction(
           process()->webFrame(frameID),
           static_cast<NavigationType>(navigationType),
-          static_cast<WebEvent::Modifiers>(modifiers), url, listenerID);
+          static_cast<WebEvent::Modifiers>(modifiers),
+          static_cast<WebMouseEvent::Button>(mouseButton), url, listenerID);
       break;
     }
     case WebPageProxyMessage::DecidePolicyForMIMEType: {
@@ -1079,24 +1083,29 @@ void WebPageProxy::decidePolicyForNavigationAction(
     WebFrameProxy* frame,
     NavigationType navigationType,
     WebEvent::Modifiers modifiers,
+    WebMouseEvent::Button mouseButton,
     const String& url,
     uint64_t listenerID) {
   RefPtr<WebFramePolicyListenerProxy> listener =
       frame->setUpPolicyListenerProxy(listenerID);
   if (!m_policyClient.decidePolicyForNavigationAction(
-          this, navigationType, modifiers, url, frame, listener.get()))
+          this, navigationType, modifiers, mouseButton, url, frame,
+          listener.get()))
     listener->use();
 }
 
-void WebPageProxy::decidePolicyForNewWindowAction(WebFrameProxy* frame,
-                                                  NavigationType navigationType,
-                                                  WebEvent::Modifiers modifiers,
-                                                  const String& url,
-                                                  uint64_t listenerID) {
+void WebPageProxy::decidePolicyForNewWindowAction(
+    WebFrameProxy* frame,
+    NavigationType navigationType,
+    WebEvent::Modifiers modifiers,
+    WebMouseEvent::Button mouseButton,
+    const String& url,
+    uint64_t listenerID) {
   RefPtr<WebFramePolicyListenerProxy> listener =
       frame->setUpPolicyListenerProxy(listenerID);
   if (!m_policyClient.decidePolicyForNewWindowAction(
-          this, navigationType, modifiers, url, frame, listener.get()))
+          this, navigationType, modifiers, mouseButton, url, frame,
+          listener.get()))
     listener->use();
 }
 

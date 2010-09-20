@@ -53,6 +53,7 @@
 #include <WebCore/FrameView.h>
 #include <WebCore/HTMLFormElement.h>
 #include <WebCore/MIMETypeRegistry.h>
+#include <WebCore/MouseEvent.h>
 #include <WebCore/Page.h>
 #include <WebCore/PluginData.h>
 #include <WebCore/ProgressTracker.h>
@@ -506,6 +507,26 @@ static uint32_t modifiersForNavigationAction(
   return modifiers;
 }
 
+static const MouseEvent* findMouseEvent(const Event* event) {
+  for (const Event* e = event; e; e = e->underlyingEvent()) {
+    if (e->isMouseEvent())
+      return static_cast<const MouseEvent*>(e);
+  }
+  return 0;
+}
+
+static int32_t mouseButtonForNavigationAction(
+    const NavigationAction& navigationAction) {
+  const MouseEvent* mouseEvent = findMouseEvent(navigationAction.event());
+  if (!mouseEvent)
+    return -1;
+
+  if (!mouseEvent->buttonDown())
+    return -1;
+
+  return mouseEvent->button();
+}
+
 void WebFrameLoaderClient::dispatchDecidePolicyForMIMEType(
     FramePolicyFunction function,
     const String& MIMEType,
@@ -550,12 +571,14 @@ void WebFrameLoaderClient::dispatchDecidePolicyForNewWindowAction(
   // FIXME: Pass the frame name.
   const String& url = request.url().string();  // FIXME: Pass entire request.
 
+  uint32_t navigationType = static_cast<uint32_t>(navigationAction.type());
   uint32_t modifiers = modifiersForNavigationAction(navigationAction);
+  int32_t mouseButton = mouseButtonForNavigationAction(navigationAction);
 
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DecidePolicyForNewWindowAction, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID(), (uint32_t)navigationAction.type(),
-                  modifiers, url, listenerID));
+      CoreIPC::In(m_frame->frameID(), navigationType, modifiers, mouseButton,
+                  url, listenerID));
 }
 
 void WebFrameLoaderClient::dispatchDecidePolicyForNavigationAction(
@@ -584,12 +607,14 @@ void WebFrameLoaderClient::dispatchDecidePolicyForNavigationAction(
   // FIXME: Pass more than just the navigation action type.
   const String& url = request.url().string();  // FIXME: Pass entire request.
 
+  uint32_t navigationType = static_cast<uint32_t>(navigationAction.type());
   uint32_t modifiers = modifiersForNavigationAction(navigationAction);
+  int32_t mouseButton = mouseButtonForNavigationAction(navigationAction);
 
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DecidePolicyForNavigationAction, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID(), (uint32_t)navigationAction.type(),
-                  modifiers, url, listenerID));
+      CoreIPC::In(m_frame->frameID(), navigationType, modifiers, mouseButton,
+                  url, listenerID));
 }
 
 void WebFrameLoaderClient::cancelPolicyCheck() {

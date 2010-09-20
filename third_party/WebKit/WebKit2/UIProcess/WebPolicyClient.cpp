@@ -47,6 +47,7 @@ bool WebPolicyClient::decidePolicyForNavigationAction(
     WebPageProxy* page,
     NavigationType type,
     WebEvent::Modifiers modifiers,
+    WebMouseEvent::Button mouseButton,
     const String& url,
     WebFrameProxy* frame,
     WebFramePolicyListenerProxy* listener) {
@@ -54,8 +55,9 @@ bool WebPolicyClient::decidePolicyForNavigationAction(
     return false;
 
   m_pagePolicyClient.decidePolicyForNavigationAction(
-      toRef(page), toRef(type), toRef(modifiers), toURLRef(url.impl()),
-      toRef(frame), toRef(listener), m_pagePolicyClient.clientInfo);
+      toRef(page), toRef(type), toRef(modifiers), toRef(mouseButton),
+      toURLRef(url.impl()), toRef(frame), toRef(listener),
+      m_pagePolicyClient.clientInfo);
   return true;
 }
 
@@ -63,6 +65,7 @@ bool WebPolicyClient::decidePolicyForNewWindowAction(
     WebPageProxy* page,
     NavigationType type,
     WebEvent::Modifiers modifiers,
+    WebMouseEvent::Button mouseButton,
     const String& url,
     WebFrameProxy* frame,
     WebFramePolicyListenerProxy* listener) {
@@ -70,8 +73,9 @@ bool WebPolicyClient::decidePolicyForNewWindowAction(
     return false;
 
   m_pagePolicyClient.decidePolicyForNewWindowAction(
-      toRef(page), toRef(type), toRef(modifiers), toURLRef(url.impl()),
-      toRef(frame), toRef(listener), m_pagePolicyClient.clientInfo);
+      toRef(page), toRef(type), toRef(modifiers), toRef(mouseButton),
+      toURLRef(url.impl()), toRef(frame), toRef(listener),
+      m_pagePolicyClient.clientInfo);
   return true;
 }
 
