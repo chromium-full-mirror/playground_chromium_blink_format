@@ -106,6 +106,10 @@ void SharedGraphicsContext3D::getIntegerv(unsigned long pname, int* value) {
   m_context->getIntegerv(pname, value);
 }
 
+void SharedGraphicsContext3D::flush() {
+  m_context->flush();
+}
+
 unsigned SharedGraphicsContext3D::createFramebuffer() {
   return m_context->createFramebuffer();
 }
@@ -175,6 +179,18 @@ void SharedGraphicsContext3D::readPixels(long x,
 
 bool SharedGraphicsContext3D::supportsBGRA() {
   return m_context->supportsBGRA();
+}
+
+bool SharedGraphicsContext3D::supportsCopyTextureToParentTextureCHROMIUM()
+
+{
+  return m_context->supportsCopyTextureToParentTextureCHROMIUM();
+}
+
+void SharedGraphicsContext3D::copyTextureToParentTextureCHROMIUM(
+    unsigned texture,
+    unsigned parentTexture) {
+  return m_context->copyTextureToParentTextureCHROMIUM(texture, parentTexture);
 }
 
 Texture* SharedGraphicsContext3D::createTexture(NativeImagePtr ptr,

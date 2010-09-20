@@ -33,13 +33,10 @@
 #if USE(ACCELERATED_COMPOSITING)
 #include "VideoLayerChromium.h"
 
+#include "GraphicsContext3D.h"
 #include "LayerRendererChromium.h"
 #include "RenderLayerBacking.h"
 #include "skia/ext/platform_canvas.h"
-
-#include <GLES2/gl2.h>
-#define GL_GLEXT_PROTOTYPES
-#include <GLES2/gl2ext.h>
 
 #if PLATFORM(SKIA)
 #include "NativeImageSkia.h"
@@ -159,11 +156,13 @@ void VideoLayerChromium::createTextureRect(const IntSize& requiredTextureSize,
   if (!pixels)
     return;
 
-  glBindTexture(GL_TEXTURE_2D, textureId);
+  GraphicsContext3D* context = layerRendererContext();
+  context->bindTexture(GraphicsContext3D::TEXTURE_2D, textureId);
   ASSERT(bitmapSize == requiredTextureSize);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, requiredTextureSize.width(),
-               requiredTextureSize.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
-               pixels);
+  context->texImage2D(GraphicsContext3D::TEXTURE_2D, 0, GraphicsContext3D::RGBA,
+                      requiredTextureSize.width(), requiredTextureSize.height(),
+                      0, GraphicsContext3D::RGBA,
+                      GraphicsContext3D::UNSIGNED_BYTE, pixels);
 
   m_contentsTexture = textureId;
   m_allocatedTextureSize = requiredTextureSize;
@@ -182,13 +181,16 @@ void VideoLayerChromium::updateTextureRect(const IntRect& updateRect,
   SkBitmap::Config skiaConfig = skiaBitmap->config();
 
   if (skiaConfig == SkBitmap::kARGB_8888_Config) {
-    glBindTexture(GL_TEXTURE_2D, textureId);
-    void* mem = glMapTexSubImage2D(
-        GL_TEXTURE_2D, 0, updateRect.x(), updateRect.y(), updateRect.width(),
-        updateRect.height(), GL_RGBA, GL_UNSIGNED_BYTE, GL_WRITE_ONLY);
+    GraphicsContext3D* context = layerRendererContext();
+    context->bindTexture(GraphicsContext3D::TEXTURE_2D, textureId);
+    ASSERT(context->supportsMapSubCHROMIUM());
+    void* mem = context->mapTexSubImage2DCHROMIUM(
+        GraphicsContext3D::TEXTURE_2D, 0, updateRect.x(), updateRect.y(),
+        updateRect.width(), updateRect.height(), GraphicsContext3D::RGBA,
+        GraphicsContext3D::UNSIGNED_BYTE, GraphicsContext3D::WRITE_ONLY);
     skiaBitmap->setPixels(mem);
     m_owner->paintGraphicsLayerContents(*m_graphicsContext, updateRect);
-    glUnmapTexSubImage2D(mem);
+    context->unmapTexSubImage2DCHROMIUM(mem);
   }
 
   updateCompleted();

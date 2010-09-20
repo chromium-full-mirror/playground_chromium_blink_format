@@ -46,7 +46,7 @@ class CanvasLayerChromium : public LayerChromium {
 
   class SharedValues {
    public:
-    SharedValues();
+    explicit SharedValues(GraphicsContext3D*);
     ~SharedValues();
 
     unsigned canvasShaderProgram() const { return m_canvasShaderProgram; }
@@ -56,6 +56,7 @@ class CanvasLayerChromium : public LayerChromium {
     bool initialized() const { return m_initialized; }
 
    private:
+    GraphicsContext3D* m_context;
     unsigned m_canvasShaderProgram;
     int m_shaderSamplerLocation;
     int m_shaderMatrixLocation;

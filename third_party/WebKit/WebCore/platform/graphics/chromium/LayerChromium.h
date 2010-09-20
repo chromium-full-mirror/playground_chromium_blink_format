@@ -225,9 +225,10 @@ class LayerChromium : public RefCounted<LayerChromium> {
   // context).
   class SharedValues {
    public:
-    SharedValues();
+    explicit SharedValues(GraphicsContext3D*);
     ~SharedValues();
 
+    GraphicsContext3D* context() const { return m_context; }
     unsigned quadVerticesVbo() const { return m_quadVerticesVbo; }
     unsigned quadElementsVbo() const { return m_quadElementsVbo; }
     int maxTextureSize() const { return m_maxTextureSize; }
@@ -241,6 +242,7 @@ class LayerChromium : public RefCounted<LayerChromium> {
     bool initialized() const { return m_initialized; }
 
    private:
+    GraphicsContext3D* m_context;
     unsigned m_quadVerticesVbo;
     unsigned m_quadElementsVbo;
     int m_maxTextureSize;
@@ -257,8 +259,10 @@ class LayerChromium : public RefCounted<LayerChromium> {
   LayerChromium(GraphicsLayerChromium* owner);
 
   LayerRendererChromium* layerRenderer() const { return m_layerRenderer; }
+  GraphicsContext3D* layerRendererContext() const;
 
-  static void drawTexturedQuad(const TransformationMatrix& projectionMatrix,
+  static void drawTexturedQuad(GraphicsContext3D*,
+                               const TransformationMatrix& projectionMatrix,
                                const TransformationMatrix& layerMatrix,
                                float width,
                                float height,
@@ -268,7 +272,8 @@ class LayerChromium : public RefCounted<LayerChromium> {
 
   static void toGLMatrix(float*, const TransformationMatrix&);
 
-  static unsigned createShaderProgram(const char* vertexShaderSource,
+  static unsigned createShaderProgram(GraphicsContext3D*,
+                                      const char* vertexShaderSource,
                                       const char* fragmentShaderSource);
 
   IntSize m_bounds;
