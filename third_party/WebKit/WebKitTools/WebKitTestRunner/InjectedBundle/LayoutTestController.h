@@ -110,7 +110,7 @@ class LayoutTestController : public JSWrappable {
 
   bool waitToDump() const { return m_waitToDump; }
   void waitToDumpWatchdogTimerFired();
-  void invalidateWaitToDumpWatchdog();
+  void invalidateWaitToDumpWatchdogTimer();
 
   bool shouldAllowEditing() const { return m_shouldAllowEditing; }
 
@@ -119,7 +119,12 @@ class LayoutTestController : public JSWrappable {
   }
 
  private:
+  static const double waitToDumpWatchdogTimerInterval;
+
   LayoutTestController();
+
+  void platformInitialize();
+  void initializeWaitToDumpWatchdogTimerIfNeeded();
 
   WhatToDump m_whatToDump;
   bool m_shouldDumpAllFrameScrollPositions;
@@ -135,7 +140,11 @@ class LayoutTestController : public JSWrappable {
   bool m_testRepaint;
   bool m_testRepaintSweepHorizontally;
 
-  RetainPtr<CFRunLoopTimerRef> m_waitToDumpWatchdog;
+#if PLATFORM(MAC)
+  RetainPtr<CFRunLoopTimerRef> m_waitToDumpWatchdogTimer;
+#elif PLATFORM(WIN)
+  UINT_PTR m_waitToDumpWatchdogTimer;
+#endif
 };
 
 }  // namespace WTR
