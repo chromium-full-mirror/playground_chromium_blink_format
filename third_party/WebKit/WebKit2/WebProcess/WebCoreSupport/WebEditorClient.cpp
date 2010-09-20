@@ -324,7 +324,7 @@ bool WebEditorClient::doTextFieldCommandFromEvent(Element* element,
   if (!element->hasTagName(inputTag))
     return false;
 
-  WKInputFieldActionType actionType;
+  WKInputFieldActionType actionType = static_cast<WKInputFieldActionType>(0);
   if (!getActionTypeForKeyEvent(event, actionType))
     return false;
 
