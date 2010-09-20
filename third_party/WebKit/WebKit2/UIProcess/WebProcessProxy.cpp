@@ -339,23 +339,24 @@ void WebProcessProxy::didReceiveMessage(CoreIPC::Connection* connection,
   pageProxy->didReceiveMessage(connection, messageID, arguments);
 }
 
-void WebProcessProxy::didReceiveSyncMessage(CoreIPC::Connection* connection,
-                                            CoreIPC::MessageID messageID,
-                                            CoreIPC::ArgumentDecoder* arguments,
-                                            CoreIPC::ArgumentEncoder* reply) {
+CoreIPC::SyncReplyMode WebProcessProxy::didReceiveSyncMessage(
+    CoreIPC::Connection* connection,
+    CoreIPC::MessageID messageID,
+    CoreIPC::ArgumentDecoder* arguments,
+    CoreIPC::ArgumentEncoder* reply) {
   if (messageID.is<CoreIPC::MessageClassWebProcessProxy>()) {
     switch (messageID.get<WebProcessProxyMessage::Kind>()) {
       case WebProcessProxyMessage::GetPlugins: {
         bool refresh;
         if (!arguments->decode(refresh))
-          return;
+          return CoreIPC::AutomaticReply;
 
         // FIXME: We should not do this on the main thread!
         Vector<PluginInfo> plugins;
         getPlugins(refresh, plugins);
 
         reply->encode(plugins);
-        return;
+        return CoreIPC::AutomaticReply;
       }
 
       case WebProcessProxyMessage::GetPluginHostConnection: {
@@ -363,13 +364,13 @@ void WebProcessProxy::didReceiveSyncMessage(CoreIPC::Connection* connection,
         String urlString;
 
         if (!arguments->decode(CoreIPC::Out(mimeType, urlString)))
-          return;
+          return CoreIPC::AutomaticReply;
 
         String pluginPath;
         getPluginHostConnection(mimeType, KURL(ParsedURLString, urlString),
                                 pluginPath);
         reply->encode(CoreIPC::In(pluginPath));
-        return;
+        return CoreIPC::AutomaticReply;
       }
 
       // These are asynchronous messages and should never be handled here.
@@ -381,24 +382,25 @@ void WebProcessProxy::didReceiveSyncMessage(CoreIPC::Connection* connection,
       case WebProcessProxyMessage::AddVisitedLink:
       case WebProcessProxyMessage::DidDestroyFrame:
         ASSERT_NOT_REACHED();
-        return;
+        return CoreIPC::AutomaticReply;
     }
   }
 
   if (messageID.is<CoreIPC::MessageClassWebContext>()) {
     m_context->didReceiveSyncMessage(connection, messageID, arguments, reply);
-    return;
+    return CoreIPC::AutomaticReply;
   }
 
   uint64_t pageID = arguments->destinationID();
   if (!pageID)
-    return;
+    return CoreIPC::AutomaticReply;
 
   WebPageProxy* pageProxy = webPage(pageID);
   if (!pageProxy)
-    return;
+    return CoreIPC::AutomaticReply;
 
   pageProxy->didReceiveSyncMessage(connection, messageID, arguments, reply);
+  return CoreIPC::AutomaticReply;
 }
 
 void WebProcessProxy::didClose(CoreIPC::Connection*) {
