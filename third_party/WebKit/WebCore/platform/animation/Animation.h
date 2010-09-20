@@ -87,7 +87,9 @@ class Animation : public RefCounted<Animation> {
     AnimationDirectionNormal,
     AnimationDirectionAlternate
   };
-  AnimationDirection direction() const { return m_direction; }
+  AnimationDirection direction() const {
+    return static_cast<AnimationDirection>(m_direction);
+  }
 
   unsigned fillMode() const { return m_fillMode; }
 
@@ -170,7 +172,7 @@ class Animation : public RefCounted<Animation> {
   double m_delay;
   double m_duration;
   RefPtr<TimingFunction> m_timingFunction;
-  AnimationDirection m_direction : 1;
+  unsigned m_direction : 1;  // AnimationDirection
   unsigned m_fillMode : 2;
 
   unsigned m_playState : 2;
