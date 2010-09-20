@@ -159,7 +159,7 @@ class EditorClient {
   virtual NSString* userVisibleString(NSURL*) = 0;
   virtual DocumentFragment* documentFragmentFromAttributedString(
       NSAttributedString*,
-      Vector<ArchiveResource*>&) = 0;
+      Vector<RefPtr<ArchiveResource>>&) = 0;
   virtual void setInsertionPasteboard(NSPasteboard*) = 0;
 #ifdef BUILDING_ON_TIGER
   virtual NSArray* pasteboardTypesForSelection(Frame*) = 0;

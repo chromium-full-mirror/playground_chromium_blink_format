@@ -585,7 +585,7 @@ class EmptyEditorClient : public EditorClient, public Noncopyable {
   virtual NSString* userVisibleString(NSURL*) { return 0; }
   virtual DocumentFragment* documentFragmentFromAttributedString(
       NSAttributedString*,
-      Vector<ArchiveResource*>&) {
+      Vector<RefPtr<ArchiveResource>>&) {
     return 0;
   };
   virtual void setInsertionPasteboard(NSPasteboard*){};
