@@ -3254,7 +3254,7 @@ void CSSStyleSelector::applyDeclarations(bool isImportant,
         if (applyFirst) {
           COMPILE_ASSERT(firstCSSProperty == CSSPropertyColor,
                          CSS_color_is_first_property);
-          COMPILE_ASSERT(CSSPropertyZoom == CSSPropertyColor + 12,
+          COMPILE_ASSERT(CSSPropertyZoom == CSSPropertyColor + 14,
                          CSS_zoom_is_end_of_first_prop_range);
           COMPILE_ASSERT(CSSPropertyLineHeight == CSSPropertyZoom + 1,
                          CSS_line_height_is_after_zoom);
@@ -3460,7 +3460,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
   bool isInitial = valueType == CSSValue::CSS_INITIAL ||
                    (!m_parentNode && valueType == CSSValue::CSS_INHERIT);
 
-  id = CSSProperty::resolveDirectionAwareProperty(id, m_style->direction());
+  id = CSSProperty::resolveDirectionAwareProperty(id, m_style->direction(),
+                                                  m_style->blockFlow());
 
   if (m_checker.m_matchVisitedPseudoClass && !isValidVisitedLinkProperty(id)) {
     // Limit the properties that can be applied to only the ones honored by
@@ -6084,10 +6085,28 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
     case CSSPropertyWebkitBorderStartColor:
     case CSSPropertyWebkitBorderStartStyle:
     case CSSPropertyWebkitBorderStartWidth:
+    case CSSPropertyWebkitBorderBefore:
+    case CSSPropertyWebkitBorderBeforeColor:
+    case CSSPropertyWebkitBorderBeforeStyle:
+    case CSSPropertyWebkitBorderBeforeWidth:
+    case CSSPropertyWebkitBorderAfter:
+    case CSSPropertyWebkitBorderAfterColor:
+    case CSSPropertyWebkitBorderAfterStyle:
+    case CSSPropertyWebkitBorderAfterWidth:
     case CSSPropertyWebkitMarginEnd:
     case CSSPropertyWebkitMarginStart:
+    case CSSPropertyWebkitMarginBefore:
+    case CSSPropertyWebkitMarginAfter:
     case CSSPropertyWebkitPaddingEnd:
     case CSSPropertyWebkitPaddingStart:
+    case CSSPropertyWebkitPaddingBefore:
+    case CSSPropertyWebkitPaddingAfter:
+    case CSSPropertyWebkitLogicalWidth:
+    case CSSPropertyWebkitLogicalHeight:
+    case CSSPropertyWebkitMinLogicalWidth:
+    case CSSPropertyWebkitMinLogicalHeight:
+    case CSSPropertyWebkitMaxLogicalWidth:
+    case CSSPropertyWebkitMaxLogicalHeight:
       ASSERT_NOT_REACHED();
       break;
 
