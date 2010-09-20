@@ -100,6 +100,21 @@ void InjectedBundlePageFormClient::textDidChangeInTextArea(
                                    toRef(frame), m_client.clientInfo);
 }
 
+bool InjectedBundlePageFormClient::shouldPerformActionInTextField(
+    WebPage* page,
+    HTMLInputElement* inputElement,
+    WKInputFieldActionType actionType,
+    WebFrame* frame) {
+  if (!m_client.shouldPerformActionInTextField)
+    return false;
+
+  RefPtr<InjectedBundleNodeHandle> nodeHandle =
+      InjectedBundleNodeHandle::getOrCreate(inputElement);
+  return m_client.shouldPerformActionInTextField(
+      toRef(page), toRef(nodeHandle.get()), actionType, toRef(frame),
+      m_client.clientInfo);
+}
+
 void InjectedBundlePageFormClient::willSubmitForm(
     WebPage* page,
     HTMLFormElement* formElement,

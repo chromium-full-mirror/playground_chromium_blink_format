@@ -59,7 +59,10 @@ class InjectedBundlePageFormClient {
   void textDidChangeInTextArea(WebPage*,
                                WebCore::HTMLTextAreaElement*,
                                WebFrame*);
-
+  bool shouldPerformActionInTextField(WebPage*,
+                                      WebCore::HTMLInputElement*,
+                                      WKInputFieldActionType,
+                                      WebFrame*);
   void willSubmitForm(WebPage*,
                       WebCore::HTMLFormElement*,
                       WebFrame*,
