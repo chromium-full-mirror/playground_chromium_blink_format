@@ -269,6 +269,8 @@ WK_EXPORT void WKPageLoadURLRequest(WKPageRef page, WKURLRequestRef urlRequest);
 WK_EXPORT void WKPageLoadHTMLString(WKPageRef page,
                                     WKStringRef htmlString,
                                     WKURLRef baseURL);
+WK_EXPORT void WKPageLoadPlainTextString(WKPageRef page,
+                                         WKStringRef plainTextString);
 
 WK_EXPORT void WKPageStopLoading(WKPageRef page);
 WK_EXPORT void WKPageReload(WKPageRef page);
