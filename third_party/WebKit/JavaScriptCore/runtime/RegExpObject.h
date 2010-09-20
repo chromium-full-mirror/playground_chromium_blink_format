@@ -55,7 +55,7 @@ class RegExpObject : public JSObjectWithGlobalObject {
                    PutPropertySlot&);
 
   virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
+  static JS_EXPORTDATA const ClassInfo info;
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags),
