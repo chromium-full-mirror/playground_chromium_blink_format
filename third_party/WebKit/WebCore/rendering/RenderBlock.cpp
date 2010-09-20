@@ -2104,7 +2104,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
   if (!child->needsLayout() && paginated &&
       view()->layoutState()->m_pageHeight && childRenderBlock &&
       view()->layoutState()->pageY(child->y()) != childRenderBlock->pageY())
-    childRenderBlock->setChildNeedsLayout(true, false);
+    childRenderBlock->markForPaginationRelayout();
 
   bool childHadLayout = child->m_everHadLayout;
   bool childNeededLayout = child->needsLayout();
@@ -2186,7 +2186,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
       if (paginated && !child->needsLayout() &&
           view()->layoutState()->m_pageHeight &&
           view()->layoutState()->pageY(child->y()) != childRenderBlock->pageY())
-        child->setChildNeedsLayout(true, false);
+        childRenderBlock->markForPaginationRelayout();
     }
 
     // Our guess was wrong. Make the child lay itself out again.
@@ -2313,7 +2313,7 @@ void RenderBlock::layoutPositionedObjects(bool relayoutChildren) {
         if (childRenderBlock &&
             view()->layoutState()->pageY(childRenderBlock->y()) !=
                 childRenderBlock->pageY())
-          childRenderBlock->setChildNeedsLayout(true, false);
+          childRenderBlock->markForPaginationRelayout();
       }
 
       // We don't have to do a full layout.  We just have to update our
@@ -3534,7 +3534,7 @@ bool RenderBlock::positionNewFloats() {
 
       if (childBlock && view()->layoutState()->m_pageHeight &&
           view()->layoutState()->pageY(o->y()) != childBlock->pageY())
-        childBlock->setChildNeedsLayout(true, false);
+        childBlock->markForPaginationRelayout();
       o->layoutIfNeeded();
 
       // If we are unsplittable and don't fit, then we need to move down.

@@ -384,7 +384,7 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
         if (childRenderBlock &&
             view()->layoutState()->pageY(child->y()) !=
                 childRenderBlock->pageY())
-          childRenderBlock->setChildNeedsLayout(true, false);
+          childRenderBlock->markForPaginationRelayout();
       }
 
       // Now do the layout.
@@ -466,7 +466,7 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
         if (childRenderBlock &&
             view()->layoutState()->pageY(child->y()) !=
                 childRenderBlock->pageY())
-          childRenderBlock->setChildNeedsLayout(true, false);
+          childRenderBlock->markForPaginationRelayout();
       }
 
       child->layoutIfNeeded();
@@ -767,7 +767,7 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
         if (childRenderBlock &&
             view()->layoutState()->pageY(child->y()) !=
                 childRenderBlock->pageY())
-          childRenderBlock->setChildNeedsLayout(true, false);
+          childRenderBlock->markForPaginationRelayout();
       }
 
       // Now do a layout.
