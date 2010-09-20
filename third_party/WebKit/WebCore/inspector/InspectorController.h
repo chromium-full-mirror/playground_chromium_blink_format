@@ -134,6 +134,8 @@ class InspectorController : public Noncopyable {
   void saveSessionSettings(const String&);
   void getSettings(RefPtr<InspectorObject>*);
 
+  void restoreInspectorStateFromCookie(const String& inspectorState);
+
   void inspect(Node*);
   void highlight(Node*);
   void hideHighlight();
@@ -199,8 +201,8 @@ class InspectorController : public Noncopyable {
                                          unsigned sendLineNumber);
   void scriptImported(unsigned long identifier, const String& sourceString);
 
-  void setResourceTracking(bool enable);
-  void setResourceTracking(bool enable, bool always, bool* newState);
+  void setResourceTrackingEnabled(bool enabled);
+  void setResourceTrackingEnabled(bool enabled, bool always, bool* newState);
   bool resourceTrackingEnabled() const { return m_resourceTrackingEnabled; }
 
   void ensureSettingsLoaded();
@@ -335,8 +337,8 @@ class InspectorController : public Noncopyable {
   static const String& inspectorStartsAttachedSettingName();
 
  private:
-  static const String& frontendSettingsSettingName();
-  String getBackendSettings();
+  void updateInspectorStateCookie();
+  void getInspectorState(RefPtr<InspectorObject>* state);
 
   friend class InspectorBackend;
   friend class InspectorBackendDispatcher;
@@ -352,7 +354,7 @@ class InspectorController : public Noncopyable {
   void enableSearchingForNode() { setSearchingForNode(true); }
   void disableSearchingForNode() { setSearchingForNode(false); }
 
-  void setMonitoringXHR(bool enabled, bool* newState);
+  void setMonitoringXHREnabled(bool enabled, bool* newState);
   void storeLastActivePanel(const String& panelName);
   InspectorDOMAgent* domAgent() { return m_domAgent.get(); }
   void releaseFrontendLifetimeAgents();

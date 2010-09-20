@@ -57,10 +57,7 @@ class InspectorClient {
   // navigation (such as tracking resources
   // or recording timeline). Following callbacks allow embedders to track these
   // states.
-  virtual void resourceTrackingWasEnabled(){};
-  virtual void resourceTrackingWasDisabled(){};
-  virtual void timelineProfilerWasStarted(){};
-  virtual void timelineProfilerWasStopped(){};
+  virtual void updateInspectorStateCookie(const String&){};
 };
 
 }  // namespace WebCore

@@ -97,10 +97,7 @@ class WebDevToolsAgentImpl : public WebDevToolsAgentPrivate,
   virtual void hideHighlight();
   virtual void populateSetting(const WTF::String& key, WTF::String* value);
   virtual void storeSetting(const WTF::String& key, const WTF::String& value);
-  virtual void resourceTrackingWasEnabled();
-  virtual void resourceTrackingWasDisabled();
-  virtual void timelineProfilerWasStarted();
-  virtual void timelineProfilerWasStopped();
+  virtual void updateInspectorStateCookie(const WTF::String&);
   virtual bool sendMessageToFrontend(const WTF::String&);
 
   int hostId() { return m_hostId; }
