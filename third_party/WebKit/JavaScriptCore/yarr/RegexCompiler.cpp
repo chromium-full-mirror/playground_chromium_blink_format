@@ -379,7 +379,7 @@ class RegexPatternConstructor {
     PatternDisjunction* parenthesisDisjunction = m_alternative->m_parent;
     m_alternative = m_alternative->m_parent->m_parent;
 
-    PatternTerm lastTerm = m_alternative->lastTerm();
+    PatternTerm& lastTerm = m_alternative->lastTerm();
 
     unsigned numParenAlternatives =
         parenthesisDisjunction->m_alternatives.size();
