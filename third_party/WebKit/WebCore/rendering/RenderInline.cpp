@@ -488,26 +488,47 @@ int RenderInline::offsetTop() const {
   return y;
 }
 
-int RenderInline::marginLeft() const {
-  Length margin = style()->marginLeft();
+static int computeMargin(const RenderInline* renderer, const Length& margin) {
   if (margin.isAuto())
     return 0;
   if (margin.isFixed())
     return margin.value();
   if (margin.isPercent())
-    return margin.calcMinValue(max(0, containingBlock()->availableWidth()));
+    return margin.calcMinValue(
+        max(0, renderer->containingBlock()->availableLogicalWidth()));
   return 0;
 }
 
-int RenderInline::marginRight() const {
-  Length margin = style()->marginRight();
-  if (margin.isAuto())
+int RenderInline::marginLeft() const {
+  if (!style()->isVerticalBlockFlow())
     return 0;
-  if (margin.isFixed())
-    return margin.value();
-  if (margin.isPercent())
-    return margin.calcMinValue(max(0, containingBlock()->availableWidth()));
-  return 0;
+  return computeMargin(this, style()->marginLeft());
+}
+
+int RenderInline::marginRight() const {
+  if (!style()->isVerticalBlockFlow())
+    return 0;
+  return computeMargin(this, style()->marginRight());
+}
+
+int RenderInline::marginTop() const {
+  if (style()->isVerticalBlockFlow())
+    return 0;
+  return computeMargin(this, style()->marginTop());
+}
+
+int RenderInline::marginBottom() const {
+  if (style()->isVerticalBlockFlow())
+    return 0;
+  return computeMargin(this, style()->marginBottom());
+}
+
+int RenderInline::marginStart() const {
+  return computeMargin(this, style()->marginStart());
+}
+
+int RenderInline::marginEnd() const {
+  return computeMargin(this, style()->marginEnd());
 }
 
 const char* RenderInline::renderName() const {
