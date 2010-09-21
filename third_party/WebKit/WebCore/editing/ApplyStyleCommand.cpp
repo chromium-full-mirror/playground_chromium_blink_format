@@ -234,9 +234,9 @@ void StyleChange::extractTextStyles(Document* document,
   // not be -webkit-text-decorations-in-effect
   // Furthermore, text-decoration: none has been trimmed so that text-decoration
   // property is always a CSSValueList.
-  if (RefPtr<CSSValue> textDecoration =
-          style->getPropertyCSSValue(CSSPropertyTextDecoration)) {
-    ASSERT(textDecoration->isValueList());
+  RefPtr<CSSValue> textDecoration =
+      style->getPropertyCSSValue(CSSPropertyTextDecoration);
+  if (textDecoration && textDecoration->isValueList()) {
     DEFINE_STATIC_LOCAL(
         RefPtr<CSSPrimitiveValue>, underline,
         (CSSPrimitiveValue::createIdentifier(CSSValueUnderline)));
@@ -1628,12 +1628,11 @@ void ApplyStyleCommand::applyInlineStyleToPushDown(
                                       it->isImportant(), ec);
 
         // text-decorations adds up
-        if (it->id() == CSSPropertyTextDecoration) {
-          ASSERT(it->value()->isValueList());
+        if (it->id() == CSSPropertyTextDecoration &&
+            it->value()->isValueList()) {
           RefPtr<CSSValue> textDecoration =
               newInlineStyle->getPropertyCSSValue(CSSPropertyTextDecoration);
-          if (textDecoration) {
-            ASSERT(textDecoration->isValueList());
+          if (textDecoration && textDecoration->isValueList()) {
             CSSValueList* textDecorationOfInlineStyle =
                 static_cast<CSSValueList*>(textDecoration.get());
             CSSValueList* textDecorationOfStyleApplied =
