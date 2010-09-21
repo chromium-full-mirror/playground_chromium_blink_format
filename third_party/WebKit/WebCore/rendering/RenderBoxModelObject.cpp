@@ -1901,6 +1901,21 @@ void RenderBoxModelObject::clipBorderSidePolygon(
   graphicsContext->clipConvexPolygon(4, secondQuad, !secondEdgeMatches);
 }
 
+static inline void uniformlyExpandBorderRadii(int delta,
+                                              IntSize& topLeft,
+                                              IntSize& topRight,
+                                              IntSize& bottomLeft,
+                                              IntSize& bottomRight) {
+  topLeft.expand(delta, delta);
+  topLeft.clampNegativeToZero();
+  topRight.expand(delta, delta);
+  topRight.clampNegativeToZero();
+  bottomLeft.expand(delta, delta);
+  bottomLeft.clampNegativeToZero();
+  bottomRight.expand(delta, delta);
+  bottomRight.clampNegativeToZero();
+}
+
 void RenderBoxModelObject::paintBoxShadow(GraphicsContext* context,
                                           int tx,
                                           int ty,
@@ -2001,19 +2016,9 @@ void RenderBoxModelObject::paintBoxShadow(GraphicsContext* context,
         IntSize bottomLeftToClipOut = bottomLeft;
         IntSize bottomRightToClipOut = bottomRight;
 
-        if (shadowSpread < 0) {
-          topLeft.expand(shadowSpread, shadowSpread);
-          topLeft.clampNegativeToZero();
-
-          topRight.expand(shadowSpread, shadowSpread);
-          topRight.clampNegativeToZero();
-
-          bottomLeft.expand(shadowSpread, shadowSpread);
-          bottomLeft.clampNegativeToZero();
-
-          bottomRight.expand(shadowSpread, shadowSpread);
-          bottomRight.clampNegativeToZero();
-        }
+        if (shadowSpread < 0)
+          uniformlyExpandBorderRadii(shadowSpread, topLeft, topRight,
+                                     bottomLeft, bottomRight);
 
         // If the box is opaque, it is unnecessary to clip it out. However,
         // doing so saves time
@@ -2023,18 +2028,8 @@ void RenderBoxModelObject::paintBoxShadow(GraphicsContext* context,
         // pixel.
         if (hasOpaqueBackground) {
           rectToClipOut.inflate(-1);
-
-          topLeftToClipOut.expand(-1, -1);
-          topLeftToClipOut.clampNegativeToZero();
-
-          topRightToClipOut.expand(-1, -1);
-          topRightToClipOut.clampNegativeToZero();
-
-          bottomLeftToClipOut.expand(-1, -1);
-          bottomLeftToClipOut.clampNegativeToZero();
-
-          bottomRightToClipOut.expand(-1, -1);
-          bottomRightToClipOut.clampNegativeToZero();
+          uniformlyExpandBorderRadii(-1, topLeftToClipOut, topRightToClipOut,
+                                     bottomLeftToClipOut, bottomRightToClipOut);
         }
 
         if (!rectToClipOut.isEmpty())
@@ -2115,19 +2110,9 @@ void RenderBoxModelObject::paintBoxShadow(GraphicsContext* context,
       context->addPath(Path::createRectangle(outerRect));
 
       if (hasBorderRadius) {
-        if (shadowSpread > 0) {
-          topLeft.expand(-shadowSpread, -shadowSpread);
-          topLeft.clampNegativeToZero();
-
-          topRight.expand(-shadowSpread, -shadowSpread);
-          topRight.clampNegativeToZero();
-
-          bottomLeft.expand(-shadowSpread, -shadowSpread);
-          bottomLeft.clampNegativeToZero();
-
-          bottomRight.expand(-shadowSpread, -shadowSpread);
-          bottomRight.clampNegativeToZero();
-        }
+        if (shadowSpread > 0)
+          uniformlyExpandBorderRadii(-shadowSpread, topLeft, topRight,
+                                     bottomLeft, bottomRight);
         context->addPath(Path::createRoundedRectangle(
             holeRect, topLeft, topRight, bottomLeft, bottomRight));
       } else
