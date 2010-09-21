@@ -56,6 +56,8 @@ class IDBFactoryBackendImpl : public IDBFactoryBackendInterface {
                     const String& dataDir);
   virtual void abortPendingTransactions(const Vector<int>& pendingIDs);
 
+  static String databaseFileName(const String& name, SecurityOrigin*);
+
  private:
   IDBFactoryBackendImpl();
 

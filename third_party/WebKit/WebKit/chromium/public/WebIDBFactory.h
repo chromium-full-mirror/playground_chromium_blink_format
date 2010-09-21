@@ -74,6 +74,11 @@ class WebIDBFactory {
   virtual void abortPendingTransactions(const WebVector<int>& pendingIDs) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
+
+  // The file name that would be used for persisting a given indexed database on
+  // the file system.
+  WEBKIT_API static WebString databaseFileName(const WebString& name,
+                                               const WebSecurityOrigin&);
 };
 
 }  // namespace WebKit
