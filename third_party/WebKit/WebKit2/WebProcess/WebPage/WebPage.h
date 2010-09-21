@@ -157,6 +157,10 @@ class WebPage : public APIObject {
 #if PLATFORM(MAC)
   void addPluginView(PluginView*);
   void removePluginView(PluginView*);
+
+  bool windowIsVisible() const { return m_windowIsVisible; }
+  const WebCore::IntRect& windowFrame() const { return m_windowFrame; }
+  bool windowIsFocused() const;
 #endif
 
   static const WebEvent* currentEvent();

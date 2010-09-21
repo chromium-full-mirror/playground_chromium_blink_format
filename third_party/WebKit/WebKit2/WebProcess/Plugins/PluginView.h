@@ -68,6 +68,7 @@ class PluginView : public WebCore::PluginViewBase,
 
 #if PLATFORM(MAC)
   void setWindowIsVisible(bool);
+  void setWindowIsFocused(bool);
   void setWindowFrame(const WebCore::IntRect&);
 #endif
 
@@ -76,6 +77,8 @@ class PluginView : public WebCore::PluginViewBase,
              PassRefPtr<Plugin>,
              const Plugin::Parameters& parameters);
   virtual ~PluginView();
+
+  WebPage* webPage();
 
   void initializePlugin();
   void destroyPlugin();
