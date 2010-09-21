@@ -124,6 +124,7 @@ class Event : public RefCounted<Event> {
   virtual bool isWebKitAnimationEvent() const;
   virtual bool isWebKitTransitionEvent() const;
   virtual bool isBeforeLoadEvent() const;
+  virtual bool isHashChangeEvent() const;
 #if ENABLE(SVG)
   virtual bool isSVGZoomEvent() const;
 #endif
