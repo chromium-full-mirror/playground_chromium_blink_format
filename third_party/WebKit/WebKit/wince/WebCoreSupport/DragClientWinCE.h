@@ -29,7 +29,7 @@
 
 namespace WebKit {
 
-class DragClient : public WebCore::DragClient {
+class DragClientWinCE : public WebCore::DragClient {
  public:
   virtual void willPerformDragDestinationAction(WebCore::DragDestinationAction,
                                                 WebCore::DragData*);
