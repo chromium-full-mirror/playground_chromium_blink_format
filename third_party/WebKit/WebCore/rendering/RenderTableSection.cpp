@@ -343,11 +343,12 @@ int RenderTableSection::calcRowHeight() {
         cell->layoutIfNeeded();
       }
 
-      int adjustedPaddingTop = cell->paddingTop() - cell->intrinsicPaddingTop();
+      int adjustedPaddingTop =
+          cell->paddingTop() - cell->intrinsicPaddingBefore();
       int adjustedPaddingBottom =
-          cell->paddingBottom() - cell->intrinsicPaddingBottom();
-      int adjustedHeight = cell->height() - (cell->intrinsicPaddingTop() +
-                                             cell->intrinsicPaddingBottom());
+          cell->paddingBottom() - cell->intrinsicPaddingAfter();
+      int adjustedHeight = cell->height() - (cell->intrinsicPaddingBefore() +
+                                             cell->intrinsicPaddingAfter());
 
       // Explicit heights use the border box in quirks mode.  In strict mode do
       // the right
@@ -369,9 +370,9 @@ int RenderTableSection::calcRowHeight() {
           va == SUPER || va == SUB) {
         int b = cell->baselinePosition();
         if (b > cell->borderTop() + cell->paddingTop()) {
-          baseline = max(baseline, b - cell->intrinsicPaddingTop());
-          bdesc = max(bdesc,
-                      m_rowPos[indx] + ch - (b - cell->intrinsicPaddingTop()));
+          baseline = max(baseline, b - cell->intrinsicPaddingBefore());
+          bdesc = max(bdesc, m_rowPos[indx] + ch -
+                                 (b - cell->intrinsicPaddingBefore()));
         }
       }
     }
@@ -593,8 +594,8 @@ int RenderTableSection::layoutRows(int toAdd) {
         }
       }
 
-      int oldTe = cell->intrinsicPaddingTop();
-      int oldBe = cell->intrinsicPaddingBottom();
+      int oldTe = cell->intrinsicPaddingBefore();
+      int oldBe = cell->intrinsicPaddingAfter();
       int heightWithoutIntrinsicPadding = cell->height() - oldTe - oldBe;
 
       int te = 0;
@@ -623,8 +624,8 @@ int RenderTableSection::layoutRows(int toAdd) {
       }
 
       int be = rHeight - heightWithoutIntrinsicPadding - te;
-      cell->setIntrinsicPaddingTop(te);
-      cell->setIntrinsicPaddingBottom(be);
+      cell->setIntrinsicPaddingBefore(te);
+      cell->setIntrinsicPaddingAfter(be);
 
       IntRect oldCellRect(cell->x(), cell->y(), cell->width(), cell->height());
 

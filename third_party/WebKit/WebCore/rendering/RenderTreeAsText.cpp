@@ -265,16 +265,17 @@ void RenderTreeAsText::writeRenderObject(TextStream& ts,
     // padding so that both bits of information are
     // captured by the results.
     const RenderTableCell& cell = *toRenderTableCell(&o);
-    r = IntRect(cell.x(), cell.y() + cell.intrinsicPaddingTop(), cell.width(),
-                cell.height() - cell.intrinsicPaddingTop() -
-                    cell.intrinsicPaddingBottom());
+    r = IntRect(cell.x(), cell.y() + cell.intrinsicPaddingBefore(),
+                cell.width(), cell.height() - cell.intrinsicPaddingBefore() -
+                                  cell.intrinsicPaddingAfter());
   } else if (o.isBox())
     r = toRenderBox(&o)->frameRect();
 
   // FIXME: Temporary in order to ensure compatibility with existing layout test
   // results.
   if (adjustForTableCells)
-    r.move(0, -toRenderTableCell(o.containingBlock())->intrinsicPaddingTop());
+    r.move(0,
+           -toRenderTableCell(o.containingBlock())->intrinsicPaddingBefore());
 
   ts << " " << r;
 
@@ -455,7 +456,7 @@ static void writeTextRun(TextStream& ts,
   // FIXME: Table cell adjustment is temporary until results can be updated.
   int y = run.m_y;
   if (o.containingBlock()->isTableCell())
-    y -= toRenderTableCell(o.containingBlock())->intrinsicPaddingTop();
+    y -= toRenderTableCell(o.containingBlock())->intrinsicPaddingBefore();
   ts << "text run at (" << run.m_x << "," << y << ") width " << run.m_width;
   if (run.direction() == RTL || run.m_dirOverride) {
     ts << (run.direction() == RTL ? " RTL" : " LTR");
