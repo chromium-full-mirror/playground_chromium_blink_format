@@ -23,9 +23,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CairoUtilities_h
-#define CairoUtilities_h
+#ifndef GdkCairoUtilities_h
+#define GdkCairoUtilities_h
 
 GdkPixbuf* cairoImageSurfaceToGdkPixbuf(cairo_surface_t* surface);
 
-#endif  // CairoUtilities_h
+#endif  // GdkCairoUtilities_h
