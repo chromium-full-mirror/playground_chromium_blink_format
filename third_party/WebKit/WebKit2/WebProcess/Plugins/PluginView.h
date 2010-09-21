@@ -66,6 +66,11 @@ class PluginView : public WebCore::PluginViewBase,
   void manualLoadDidFinishLoading();
   void manualLoadDidFail(const WebCore::ResourceError&);
 
+#if PLATFORM(MAC)
+  void setWindowIsVisible(bool);
+  void setWindowFrame(const WebCore::IntRect&);
+#endif
+
  private:
   PluginView(WebCore::HTMLPlugInElement*,
              PassRefPtr<Plugin>,
