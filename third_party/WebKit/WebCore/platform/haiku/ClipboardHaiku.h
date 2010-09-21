@@ -37,8 +37,8 @@ class CachedImage;
 class ClipboardHaiku : public Clipboard {
  public:
   static PassRefPtr<ClipboardHaiku> create(ClipboardAccessPolicy policy,
-                                           bool forDragging) {
-    return adoptRef(new ClipboardHaiku(policy, forDragging));
+                                           ClipboardType clipboardType) {
+    return adoptRef(new ClipboardHaiku(policy, clipboardType));
   }
   ~ClipboardHaiku() {}
 
@@ -69,7 +69,7 @@ class ClipboardHaiku : public Clipboard {
   virtual bool hasData();
 
  private:
-  ClipboardHaiku(ClipboardAccessPolicy, bool forDragging);
+  ClipboardHaiku(ClipboardAccessPolicy, ClipboardType);
 };
 }  // namespace WebCore
 

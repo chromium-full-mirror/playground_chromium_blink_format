@@ -75,14 +75,15 @@ PassRefPtr<Clipboard> Clipboard::create(ClipboardAccessPolicy policy,
 
 ClipboardQt::ClipboardQt(ClipboardAccessPolicy policy,
                          const QMimeData* readableClipboard)
-    : Clipboard(policy, true),
+    : Clipboard(policy, DragAndDrop),
       m_readableData(readableClipboard),
       m_writableData(0) {
   Q_ASSERT(policy == ClipboardReadable || policy == ClipboardTypesReadable);
 }
 
-ClipboardQt::ClipboardQt(ClipboardAccessPolicy policy, bool forDragging)
-    : Clipboard(policy, forDragging), m_readableData(0), m_writableData(0) {
+ClipboardQt::ClipboardQt(ClipboardAccessPolicy policy,
+                         ClipboardType clipboardType)
+    : Clipboard(policy, clipboardType), m_readableData(0), m_writableData(0) {
   Q_ASSERT(policy == ClipboardReadable || policy == ClipboardWritable ||
            policy == ClipboardNumb);
 
@@ -95,7 +96,7 @@ ClipboardQt::ClipboardQt(ClipboardAccessPolicy policy, bool forDragging)
 }
 
 ClipboardQt::~ClipboardQt() {
-  if (m_writableData && !isForDragging())
+  if (m_writableData && isForCopyAndPaste())
     m_writableData = 0;
   else
     delete m_writableData;
@@ -109,13 +110,13 @@ void ClipboardQt::clearData(const String& type) {
   if (m_writableData) {
     m_writableData->removeFormat(type);
     if (m_writableData->formats().isEmpty()) {
-      if (isForDragging())
+      if (isForDragAndDrop())
         delete m_writableData;
       m_writableData = 0;
     }
   }
 #ifndef QT_NO_CLIPBOARD
-  if (!isForDragging())
+  if (isForCopyAndPaste())
     QApplication::clipboard()->setMimeData(m_writableData);
 #endif
 }
@@ -125,7 +126,7 @@ void ClipboardQt::clearAllData() {
     return;
 
 #ifndef QT_NO_CLIPBOARD
-  if (!isForDragging())
+  if (isForCopyAndPaste())
     QApplication::clipboard()->setMimeData(0);
   else
 #endif
@@ -174,7 +175,7 @@ bool ClipboardQt::setData(const String& type, const String& data) {
   }
 
 #ifndef QT_NO_CLIPBOARD
-  if (!isForDragging())
+  if (isForCopyAndPaste())
     QApplication::clipboard()->setMimeData(m_writableData);
 #endif
   return true;
@@ -275,7 +276,7 @@ void ClipboardQt::declareAndWriteDragImage(Element* element,
   m_writableData->setText(title);
   m_writableData->setUrls(urls);
 #ifndef QT_NO_CLIPBOARD
-  if (!isForDragging())
+  if (isForCopyAndPaste())
     QApplication::clipboard()->setMimeData(m_writableData);
 #endif
 }
@@ -290,7 +291,7 @@ void ClipboardQt::writeURL(const KURL& url, const String& title, Frame* frame) {
   m_writableData->setUrls(urls);
   m_writableData->setText(title);
 #ifndef QT_NO_CLIPBOARD
-  if (!isForDragging())
+  if (isForCopyAndPaste())
     QApplication::clipboard()->setMimeData(m_writableData);
 #endif
 }
@@ -307,7 +308,7 @@ void ClipboardQt::writeRange(Range* range, Frame* frame) {
   m_writableData->setHtml(
       createMarkup(range, 0, AnnotateForInterchange, false, AbsoluteURLs));
 #ifndef QT_NO_CLIPBOARD
-  if (!isForDragging())
+  if (isForCopyAndPaste())
     QApplication::clipboard()->setMimeData(m_writableData);
 #endif
 }
@@ -319,7 +320,7 @@ void ClipboardQt::writePlainText(const String& str) {
   text.replace(QChar(0xa0), QLatin1Char(' '));
   m_writableData->setText(text);
 #ifndef QT_NO_CLIPBOARD
-  if (!isForDragging())
+  if (isForCopyAndPaste())
     QApplication::clipboard()->setMimeData(m_writableData);
 #endif
 }

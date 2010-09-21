@@ -29,9 +29,10 @@ class CachedImage;
 
 class ClipboardEfl : public Clipboard {
  public:
-  static PassRefPtr<ClipboardEfl> create(ClipboardAccessPolicy policy,
-                                         bool forDragging = false) {
-    return adoptRef(new ClipboardEfl(policy, forDragging));
+  static PassRefPtr<ClipboardEfl> create(
+      ClipboardAccessPolicy policy,
+      ClipboardType clipboardType = CopyAndPaste) {
+    return adoptRef(new ClipboardEfl(policy, clipboardType));
   }
   ~ClipboardEfl();
 
@@ -62,7 +63,7 @@ class ClipboardEfl : public Clipboard {
   virtual void writePlainText(const WTF::String&);
 
  private:
-  ClipboardEfl(ClipboardAccessPolicy, bool);
+  ClipboardEfl(ClipboardAccessPolicy, ClipboardType);
 };
 }
 

@@ -104,7 +104,7 @@ v8::Handle<v8::Value> V8Clipboard::setDragImageCallback(
   INC_STATS("DOM.Clipboard.setDragImage()");
   Clipboard* clipboard = V8Clipboard::toNative(args.Holder());
 
-  if (!clipboard->isForDragging())
+  if (!clipboard->isForDragAndDrop())
     return v8::Undefined();
 
   if (args.Length() != 3)

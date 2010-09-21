@@ -44,9 +44,10 @@ class ClipboardQt : public Clipboard, public CachedResourceClient {
                                         const QMimeData* readableClipboard) {
     return adoptRef(new ClipboardQt(policy, readableClipboard));
   }
-  static PassRefPtr<ClipboardQt> create(ClipboardAccessPolicy policy,
-                                        bool forDragging = false) {
-    return adoptRef(new ClipboardQt(policy, forDragging));
+  static PassRefPtr<ClipboardQt> create(
+      ClipboardAccessPolicy policy,
+      ClipboardType clipboardType = CopyAndPaste) {
+    return adoptRef(new ClipboardQt(policy, clipboardType));
   }
   virtual ~ClipboardQt();
 
@@ -80,7 +81,7 @@ class ClipboardQt : public Clipboard, public CachedResourceClient {
   ClipboardQt(ClipboardAccessPolicy, const QMimeData* readableClipboard);
 
   // Clipboard is writable so it will create its own QMimeData object
-  ClipboardQt(ClipboardAccessPolicy, bool forDragging);
+  ClipboardQt(ClipboardAccessPolicy, ClipboardType);
 
   void setDragImage(CachedImage*, Node*, const IntPoint& loc);
 

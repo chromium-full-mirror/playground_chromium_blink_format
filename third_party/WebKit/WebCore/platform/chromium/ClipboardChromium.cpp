@@ -95,25 +95,25 @@ static ClipboardDataType clipboardTypeFromMIMEType(const String& type) {
 PassRefPtr<Clipboard> Clipboard::create(ClipboardAccessPolicy policy,
                                         DragData* dragData,
                                         Frame* frame) {
-  return ClipboardChromium::create(true, dragData->platformData(), policy,
-                                   frame);
+  return ClipboardChromium::create(DragAndDrop, dragData->platformData(),
+                                   policy, frame);
 }
 
-ClipboardChromium::ClipboardChromium(bool isForDragging,
+ClipboardChromium::ClipboardChromium(ClipboardType clipboardType,
                                      PassRefPtr<ChromiumDataObject> dataObject,
                                      ClipboardAccessPolicy policy,
                                      Frame* frame)
-    : Clipboard(policy, isForDragging),
+    : Clipboard(policy, clipboardType),
       m_dataObject(dataObject),
       m_frame(frame) {}
 
 PassRefPtr<ClipboardChromium> ClipboardChromium::create(
-    bool isForDragging,
+    ClipboardType clipboardType,
     PassRefPtr<ChromiumDataObject> dataObject,
     ClipboardAccessPolicy policy,
     Frame* frame) {
   return adoptRef(
-      new ClipboardChromium(isForDragging, dataObject, policy, frame));
+      new ClipboardChromium(clipboardType, dataObject, policy, frame));
 }
 
 void ClipboardChromium::clearData(const String& type) {
@@ -205,9 +205,7 @@ String ClipboardChromium::getData(const String& type, bool& success) const {
       return m_dataObject->downloadMetadata;
 
     case ClipboardDataTypePlainText:
-      if (!isForDragging()) {
-        // If this isn't for a drag, it's for a cut/paste event handler.
-        // In this case, we need to check the clipboard.
+      if (isForCopyAndPaste()) {
         PasteboardPrivate::ClipboardBuffer buffer =
             Pasteboard::generalPasteboard()->isSelectionMode()
                 ? PasteboardPrivate::SelectionBuffer
@@ -221,9 +219,7 @@ String ClipboardChromium::getData(const String& type, bool& success) const {
       return m_dataObject->plainText;
 
     case ClipboardDataTypeHTML:
-      if (!isForDragging()) {
-        // If this isn't for a drag, it's for a cut/paste event handler.
-        // In this case, we need to check the clipboard.
+      if (isForCopyAndPaste()) {
         PasteboardPrivate::ClipboardBuffer buffer =
             Pasteboard::generalPasteboard()->isSelectionMode()
                 ? PasteboardPrivate::SelectionBuffer

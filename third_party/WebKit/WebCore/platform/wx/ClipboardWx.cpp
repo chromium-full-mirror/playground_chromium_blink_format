@@ -42,8 +42,9 @@ PassRefPtr<Clipboard> Clipboard::create(ClipboardAccessPolicy,
   return 0;
 }
 
-ClipboardWx::ClipboardWx(ClipboardAccessPolicy policy, bool forDragging)
-    : Clipboard(policy, forDragging) {}
+ClipboardWx::ClipboardWx(ClipboardAccessPolicy policy,
+                         ClipboardType clipboardType)
+    : Clipboard(policy, clipboardType) {}
 
 void ClipboardWx::clearData(const String& type) {
   notImplemented();

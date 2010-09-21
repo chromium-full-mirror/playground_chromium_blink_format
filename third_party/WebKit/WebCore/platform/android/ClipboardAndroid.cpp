@@ -42,17 +42,17 @@ PassRefPtr<Clipboard> Clipboard::create(ClipboardAccessPolicy,
 }
 
 ClipboardAndroid::ClipboardAndroid(ClipboardAccessPolicy policy,
-                                   bool isForDragging)
-    : Clipboard(policy, isForDragging) {}
+                                   ClipboardType clipboardType)
+    : Clipboard(policy, clipboardType) {}
 
 ClipboardAndroid::~ClipboardAndroid() {}
 
 void ClipboardAndroid::clearData(const String&) {
-  ASSERT(isForDragging());
+  ASSERT(isForDragAndDrop());
 }
 
 void ClipboardAndroid::clearAllData() {
-  ASSERT(isForDragging());
+  ASSERT(isForDragAndDrop());
 }
 
 String ClipboardAndroid::getData(const String&, bool& success) const {
@@ -61,7 +61,7 @@ String ClipboardAndroid::getData(const String&, bool& success) const {
 }
 
 bool ClipboardAndroid::setData(const String&, const String&) {
-  ASSERT(isForDragging());
+  ASSERT(isForDragAndDrop());
   return false;
 }
 

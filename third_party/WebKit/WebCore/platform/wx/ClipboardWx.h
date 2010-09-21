@@ -36,8 +36,8 @@ class CachedImage;
 class ClipboardWx : public Clipboard {
  public:
   static PassRefPtr<ClipboardWx> create(ClipboardAccessPolicy policy,
-                                        bool forDragging) {
-    return adoptRef(new ClipboardWx(policy, forDragging));
+                                        ClipboardType clipboardType) {
+    return adoptRef(new ClipboardWx(policy, clipboardType));
   }
 
   void clearData(const String& type);
@@ -67,7 +67,7 @@ class ClipboardWx : public Clipboard {
   virtual bool hasData();
 
  private:
-  ClipboardWx(ClipboardAccessPolicy, bool forDragging);
+  ClipboardWx(ClipboardAccessPolicy, ClipboardType);
 };
 }
 

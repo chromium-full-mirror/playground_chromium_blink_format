@@ -45,7 +45,7 @@ class ClipboardChromium : public Clipboard, public CachedResourceClient {
  public:
   ~ClipboardChromium() {}
 
-  static PassRefPtr<ClipboardChromium> create(bool isForDragging,
+  static PassRefPtr<ClipboardChromium> create(ClipboardType,
                                               PassRefPtr<ChromiumDataObject>,
                                               ClipboardAccessPolicy,
                                               Frame*);
@@ -83,7 +83,7 @@ class ClipboardChromium : public Clipboard, public CachedResourceClient {
   virtual bool hasData();
 
  private:
-  ClipboardChromium(bool,
+  ClipboardChromium(ClipboardType,
                     PassRefPtr<ChromiumDataObject>,
                     ClipboardAccessPolicy,
                     Frame*);
