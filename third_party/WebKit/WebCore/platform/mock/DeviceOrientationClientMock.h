@@ -51,6 +51,7 @@ class DeviceOrientationClientMock : public DeviceOrientationClient {
   virtual DeviceOrientation* lastOrientation() const {
     return m_orientation.get();
   }
+  virtual void deviceOrientationControllerDestroyed() {}
 
   void setOrientation(PassRefPtr<DeviceOrientation>);
 

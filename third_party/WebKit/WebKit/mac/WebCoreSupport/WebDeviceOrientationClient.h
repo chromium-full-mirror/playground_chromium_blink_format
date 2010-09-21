@@ -47,6 +47,7 @@ class WebDeviceOrientationClient : public WebCore::DeviceOrientationClient {
   virtual void startUpdating();
   virtual void stopUpdating();
   virtual WebCore::DeviceOrientation* lastOrientation() const;
+  virtual void deviceOrientationControllerDestroyed();
 
  private:
   id<WebDeviceOrientationProvider> getProvider() const;

@@ -42,6 +42,10 @@ DeviceOrientationController::DeviceOrientationController(
   m_client->setController(this);
 }
 
+DeviceOrientationController::~DeviceOrientationController() {
+  m_client->deviceOrientationControllerDestroyed();
+}
+
 void DeviceOrientationController::timerFired(
     Timer<DeviceOrientationController>* timer) {
   ASSERT_UNUSED(timer, timer == &m_timer);

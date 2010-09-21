@@ -724,6 +724,7 @@ class EmptyDeviceMotionClient : public DeviceMotionClient {
   virtual void startUpdating() {}
   virtual void stopUpdating() {}
   virtual DeviceMotionData* currentDeviceMotion() const { return 0; }
+  virtual void deviceMotionControllerDestroyed() {}
 };
 
 class EmptyDeviceOrientationClient : public DeviceOrientationClient {
@@ -732,6 +733,7 @@ class EmptyDeviceOrientationClient : public DeviceOrientationClient {
   virtual void startUpdating() {}
   virtual void stopUpdating() {}
   virtual DeviceOrientation* lastOrientation() const { return 0; }
+  virtual void deviceOrientationControllerDestroyed() {}
 };
 }
 
