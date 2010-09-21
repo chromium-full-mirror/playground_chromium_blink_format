@@ -2109,7 +2109,7 @@ void Document::implicitClose() {
       view()->layout();
   }
 
-#if PLATFORM(MAC)
+#if PLATFORM(MAC) || PLATFORM(CHROMIUM)
   if (f && renderObject && this == topDocument() &&
       AXObjectCache::accessibilityEnabled()) {
     // The AX cache may have been cleared at this point, but we need to make
@@ -3258,7 +3258,7 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
     }
   }
 
-#if ((PLATFORM(MAC) || PLATFORM(WIN)) && !PLATFORM(CHROMIUM)) || PLATFORM(GTK)
+#if PLATFORM(MAC) || PLATFORM(WIN) || PLATFORM(GTK) || PLATFORM(CHROMIUM)
   if (!focusChangeBlocked && m_focusedNode &&
       AXObjectCache::accessibilityEnabled()) {
     RenderObject* oldFocusedRenderer = 0;
