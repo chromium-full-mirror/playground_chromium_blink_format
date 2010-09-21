@@ -53,13 +53,13 @@ inline void adopted(const void*) {}
 
 template <typename T>
 REF_DEREF_INLINE void refIfNotNull(T* ptr) {
-  if (UNLIKELY(ptr != 0))
+  if (LIKELY(ptr != 0))
     ptr->ref();
 }
 
 template <typename T>
 REF_DEREF_INLINE void derefIfNotNull(T* ptr) {
-  if (UNLIKELY(ptr != 0))
+  if (LIKELY(ptr != 0))
     ptr->deref();
 }
 
