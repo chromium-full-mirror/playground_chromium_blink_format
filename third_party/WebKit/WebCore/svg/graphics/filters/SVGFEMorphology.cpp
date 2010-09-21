@@ -28,7 +28,6 @@
 #include "CanvasPixelArray.h"
 #include "Filter.h"
 #include "ImageData.h"
-#include "SVGRenderTreeAsText.h"
 
 #include <wtf/Vector.h>
 
@@ -78,7 +77,7 @@ void FEMorphology::apply(Filter* filter) {
   if (!in->resultImage())
     return;
 
-  if (!getEffectContext())
+  if (!effectContext())
     return;
 
   setIsAlphaImage(in->isAlphaImage());
@@ -92,7 +91,7 @@ void FEMorphology::apply(Filter* filter) {
 
   IntRect imageRect(IntPoint(), resultImage()->size());
   IntRect effectDrawingRect =
-      calculateDrawingIntRect(in->repaintRectInLocalCoordinates());
+      requestedRegionOfInputImageData(in->repaintRectInLocalCoordinates());
   RefPtr<CanvasPixelArray> srcPixelArray(
       in->resultImage()->getPremultipliedImageData(effectDrawingRect)->data());
   RefPtr<ImageData> imageData =

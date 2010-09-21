@@ -31,14 +31,16 @@ namespace WebCore {
 
 class FEImage : public FilterEffect {
  public:
-  static PassRefPtr<FEImage> create(RefPtr<Image>, SVGPreserveAspectRatio);
+  static PassRefPtr<FEImage> create(RefPtr<Image>,
+                                    const SVGPreserveAspectRatio&);
 
-  void apply(Filter*);
-  void dump();
-  TextStream& externalRepresentation(TextStream&, int indent) const;
+  virtual void apply(Filter*);
+  virtual void dump();
+
+  virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
-  FEImage(RefPtr<Image>, SVGPreserveAspectRatio);
+  FEImage(RefPtr<Image>, const SVGPreserveAspectRatio&);
 
   RefPtr<Image> m_image;
   SVGPreserveAspectRatio m_preserveAspectRatio;

@@ -29,7 +29,6 @@
 #include "CanvasPixelArray.h"
 #include "Filter.h"
 #include "ImageData.h"
-#include "SVGRenderTreeAsText.h"
 
 namespace WebCore {
 
@@ -407,12 +406,12 @@ void FEConvolveMatrix::apply(Filter* filter) {
   if (!in->resultImage())
     return;
 
-  if (!getEffectContext())
+  if (!effectContext())
     return;
 
   IntRect imageRect(IntPoint(), resultImage()->size());
   IntRect effectDrawingRect =
-      calculateDrawingIntRect(in->filterPrimitiveSubregion());
+      requestedRegionOfInputImageData(in->filterPrimitiveSubregion());
 
   RefPtr<CanvasPixelArray> srcPixelArray;
   if (m_preserveAlpha)

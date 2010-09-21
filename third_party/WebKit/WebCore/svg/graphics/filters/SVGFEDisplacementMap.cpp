@@ -29,7 +29,6 @@
 #include "Filter.h"
 #include "GraphicsContext.h"
 #include "ImageData.h"
-#include "SVGRenderTreeAsText.h"
 
 namespace WebCore {
 
@@ -87,16 +86,16 @@ void FEDisplacementMap::apply(Filter* filter) {
       m_yChannelSelector == CHANNEL_UNKNOWN)
     return;
 
-  if (!getEffectContext())
+  if (!effectContext())
     return;
 
   IntRect effectADrawingRect =
-      calculateDrawingIntRect(in->repaintRectInLocalCoordinates());
+      requestedRegionOfInputImageData(in->repaintRectInLocalCoordinates());
   RefPtr<CanvasPixelArray> srcPixelArrayA(
       in->resultImage()->getPremultipliedImageData(effectADrawingRect)->data());
 
   IntRect effectBDrawingRect =
-      calculateDrawingIntRect(in2->repaintRectInLocalCoordinates());
+      requestedRegionOfInputImageData(in2->repaintRectInLocalCoordinates());
   RefPtr<CanvasPixelArray> srcPixelArrayB(
       in2->resultImage()->getUnmultipliedImageData(effectBDrawingRect)->data());
 

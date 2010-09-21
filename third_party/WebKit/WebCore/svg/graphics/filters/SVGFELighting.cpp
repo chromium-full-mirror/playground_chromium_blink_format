@@ -310,13 +310,13 @@ void FELighting::apply(Filter* filter) {
   if (!in->resultImage())
     return;
 
-  if (!getEffectContext())
+  if (!effectContext())
     return;
 
   setIsAlphaImage(false);
 
   IntRect effectDrawingRect =
-      calculateDrawingIntRect(in->repaintRectInLocalCoordinates());
+      requestedRegionOfInputImageData(in->repaintRectInLocalCoordinates());
   RefPtr<ImageData> srcImageData(
       in->resultImage()->getUnmultipliedImageData(effectDrawingRect));
   CanvasPixelArray* srcPixelArray(srcImageData->data());

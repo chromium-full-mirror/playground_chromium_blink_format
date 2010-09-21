@@ -48,9 +48,10 @@ class FEMorphology : public FilterEffect {
   float radiusY() const;
   void setRadiusY(float);
 
-  void apply(Filter*);
-  void dump();
-  TextStream& externalRepresentation(TextStream&, int indent) const;
+  virtual void apply(Filter*);
+  virtual void dump();
+
+  virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
   FEMorphology(MorphologyOperatorType, float radiusX, float radiusY);

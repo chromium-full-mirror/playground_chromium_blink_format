@@ -29,19 +29,18 @@
 #include "Filter.h"
 #include "GraphicsContext.h"
 #include "SVGPreserveAspectRatio.h"
-#include "SVGRenderTreeAsText.h"
 
 namespace WebCore {
 
 FEImage::FEImage(RefPtr<Image> image,
-                 SVGPreserveAspectRatio preserveAspectRatio)
+                 const SVGPreserveAspectRatio& preserveAspectRatio)
     : FilterEffect(),
       m_image(image),
       m_preserveAspectRatio(preserveAspectRatio) {}
 
 PassRefPtr<FEImage> FEImage::create(
     RefPtr<Image> image,
-    SVGPreserveAspectRatio preserveAspectRatio) {
+    const SVGPreserveAspectRatio& preserveAspectRatio) {
   return adoptRef(new FEImage(image, preserveAspectRatio));
 }
 
@@ -49,7 +48,7 @@ void FEImage::apply(Filter*) {
   if (!m_image.get())
     return;
 
-  GraphicsContext* filterContext = getEffectContext();
+  GraphicsContext* filterContext = effectContext();
   if (!filterContext)
     return;
 

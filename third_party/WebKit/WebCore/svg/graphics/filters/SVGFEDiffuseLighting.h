@@ -57,8 +57,9 @@ class FEDiffuseLighting : public FELighting {
   const LightSource* lightSource() const;
   void setLightSource(PassRefPtr<LightSource>);
 
-  void dump();
-  TextStream& externalRepresentation(TextStream&, int indent) const;
+  virtual void dump();
+
+  virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
   FEDiffuseLighting(const Color&,
