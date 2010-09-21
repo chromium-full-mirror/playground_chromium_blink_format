@@ -89,12 +89,22 @@ class RenderBoxModelObject : public RenderObject {
   virtual int borderBottom() const { return style()->borderBottomWidth(); }
   virtual int borderLeft() const { return style()->borderLeftWidth(); }
   virtual int borderRight() const { return style()->borderRightWidth(); }
+  virtual int borderBefore() const { return style()->borderBeforeWidth(); }
+  virtual int borderAfter() const { return style()->borderAfterWidth(); }
+  virtual int borderStart() const { return style()->borderStartWidth(); }
+  virtual int borderEnd() const { return style()->borderEndWidth(); }
 
   int borderAndPaddingHeight() const {
     return borderTop() + borderBottom() + paddingTop() + paddingBottom();
   }
   int borderAndPaddingWidth() const {
     return borderLeft() + borderRight() + paddingLeft() + paddingRight();
+  }
+  int borderAndPaddingLogicalHeight() const {
+    return borderBefore() + borderAfter() + paddingBefore() + paddingAfter();
+  }
+  int borderAndPaddingLogicalWidth() const {
+    return borderStart() + borderEnd() + paddingStart() + paddingEnd();
   }
 
   virtual int marginTop() const = 0;
