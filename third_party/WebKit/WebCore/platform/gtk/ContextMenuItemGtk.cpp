@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2007 Holger Hans Peter Freyther
+ *  Copyright (C) 2010 Igalia S.L
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -34,11 +35,13 @@ static const char* gtkStockIDFromContextMenuAction(
   switch (action) {
     case ContextMenuItemTagCopyLinkToClipboard:
     case ContextMenuItemTagCopyImageToClipboard:
+    case ContextMenuItemTagCopyMediaLinkToClipboard:
     case ContextMenuItemTagCopy:
       return GTK_STOCK_COPY;
     case ContextMenuItemTagOpenLinkInNewWindow:
     case ContextMenuItemTagOpenImageInNewWindow:
     case ContextMenuItemTagOpenFrameInNewWindow:
+    case ContextMenuItemTagOpenMediaInNewWindow:
       return GTK_STOCK_OPEN;
     case ContextMenuItemTagDownloadLinkToDisk:
     case ContextMenuItemTagDownloadImageToDisk:
@@ -60,7 +63,7 @@ static const char* gtkStockIDFromContextMenuAction(
     case ContextMenuItemTagSelectAll:
       return GTK_STOCK_SELECT_ALL;
     case ContextMenuItemTagSpellingGuess:
-      return NULL;
+      return 0;
     case ContextMenuItemTagIgnoreSpelling:
       return GTK_STOCK_NO;
     case ContextMenuItemTagLearnSpelling:
@@ -100,8 +103,14 @@ static const char* gtkStockIDFromContextMenuAction(
       return GTK_STOCK_UNDERLINE;
     case ContextMenuItemTagShowColors:
       return GTK_STOCK_SELECT_COLOR;
+    case ContextMenuItemTagToggleMediaControls:
+    case ContextMenuItemTagToggleMediaLoop:
+      // No icon for this.
+      return 0;
+    case ContextMenuItemTagEnterVideoFullscreen:
+      return GTK_STOCK_FULLSCREEN;
     default:
-      return NULL;
+      return 0;
   }
 }
 
