@@ -1704,8 +1704,9 @@ void RenderBox::calcHeight() {
                                                            .isPercent()));
   if (stretchesToViewHeight() || paginatedContentNeedsBaseHeight) {
     int margins = collapsedMarginTop() + collapsedMarginBottom();
-    int visHeight =
-        document()->printing() ? view()->pageHeight() : view()->viewHeight();
+    int visHeight = document()->printing()
+                        ? static_cast<int>(view()->pageHeight())
+                        : view()->viewHeight();
     if (isRoot())
       setHeight(max(height(), visHeight - margins));
     else {
