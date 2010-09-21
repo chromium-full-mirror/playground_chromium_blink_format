@@ -60,19 +60,28 @@ WebDOMStringList WebIDBObjectStoreImpl::indexNames() const {
 }
 
 void WebIDBObjectStoreImpl::get(const WebIDBKey& key,
-                                WebIDBCallbacks* callbacks) {
+                                WebIDBCallbacks* callbacks,
+                                int transactionId) {
+  ASSERT_UNUSED(transactionId,
+                !transactionId);  // FIXME: Pass the transaction in.
   m_objectStore->get(key, IDBCallbacksProxy::create(callbacks));
 }
 
 void WebIDBObjectStoreImpl::put(const WebSerializedScriptValue& value,
                                 const WebIDBKey& key,
                                 bool addOnly,
-                                WebIDBCallbacks* callbacks) {
+                                WebIDBCallbacks* callbacks,
+                                int transactionId) {
+  ASSERT_UNUSED(transactionId,
+                !transactionId);  // FIXME: Pass the transaction in.
   m_objectStore->put(value, key, addOnly, IDBCallbacksProxy::create(callbacks));
 }
 
 void WebIDBObjectStoreImpl::remove(const WebIDBKey& key,
-                                   WebIDBCallbacks* callbacks) {
+                                   WebIDBCallbacks* callbacks,
+                                   int transactionId) {
+  ASSERT_UNUSED(transactionId,
+                !transactionId);  // FIXME: Pass the transaction in.
   m_objectStore->remove(key, IDBCallbacksProxy::create(callbacks));
 }
 
@@ -98,7 +107,10 @@ void WebIDBObjectStoreImpl::removeIndex(const WebString& name,
 
 void WebIDBObjectStoreImpl::openCursor(const WebIDBKeyRange& keyRange,
                                        unsigned short direction,
-                                       WebIDBCallbacks* callbacks) {
+                                       WebIDBCallbacks* callbacks,
+                                       int transactionId) {
+  ASSERT_UNUSED(transactionId,
+                !transactionId);  // FIXME: Pass the transaction in.
   m_objectStore->openCursor(
       IDBKeyRange::create(keyRange.left(), keyRange.right(), keyRange.flags()),
       direction, IDBCallbacksProxy::create(callbacks));

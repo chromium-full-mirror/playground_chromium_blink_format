@@ -56,20 +56,25 @@ class WebIDBIndex {
     return false;
   }
 
+  // FIXME: Remove the default parameters for transactionIds.
   virtual void openObjectCursor(const WebIDBKeyRange&,
                                 unsigned short direction,
-                                WebIDBCallbacks*) {
+                                WebIDBCallbacks*,
+                                int transactionId = 0) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
   virtual void openCursor(const WebIDBKeyRange&,
                           unsigned short direction,
-                          WebIDBCallbacks*) {
+                          WebIDBCallbacks*,
+                          int transactionId = 0) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
-  virtual void getObject(const WebIDBKey&, WebIDBCallbacks*) {
+  virtual void getObject(const WebIDBKey&,
+                         WebIDBCallbacks*,
+                         int transactionId = 0) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
-  virtual void get(const WebIDBKey&, WebIDBCallbacks*) {
+  virtual void get(const WebIDBKey&, WebIDBCallbacks*, int transactionId = 0) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
 };

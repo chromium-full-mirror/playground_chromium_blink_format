@@ -52,16 +52,23 @@ class WebIDBObjectStore {
     WEBKIT_ASSERT_NOT_REACHED();
     return WebDOMStringList();
   }
-  virtual void get(const WebIDBKey& key, WebIDBCallbacks*) {
+
+  // FIXME: Remove the default parameters for transactionIds.
+  virtual void get(const WebIDBKey& key,
+                   WebIDBCallbacks*,
+                   int transactionId = 0) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
   virtual void put(const WebSerializedScriptValue& value,
                    const WebIDBKey& key,
                    bool addOnly,
-                   WebIDBCallbacks*) {
+                   WebIDBCallbacks*,
+                   int transactionId = 0) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
-  virtual void remove(const WebIDBKey& key, WebIDBCallbacks*) {
+  virtual void remove(const WebIDBKey& key,
+                      WebIDBCallbacks*,
+                      int transactionId = 0) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
   virtual void createIndex(const WebString& name,
@@ -80,7 +87,8 @@ class WebIDBObjectStore {
   }
   virtual void openCursor(const WebIDBKeyRange&,
                           unsigned short direction,
-                          WebIDBCallbacks*) {
+                          WebIDBCallbacks*,
+                          int transactionId = 0) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
   // FIXME: finish.

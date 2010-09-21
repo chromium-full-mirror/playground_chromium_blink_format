@@ -47,20 +47,10 @@ class WebIDBCursor {
     WEBKIT_ASSERT_NOT_REACHED();
     return WebIDBKey::createInvalid();
   }
-  // FIXME: Remove the legacy version of value() (the first version) as soon as
-  // a WebKit roll happens.
-  virtual WebSerializedScriptValue value() const {
-    WebSerializedScriptValue serializedScriptValue;
-    WebIDBKey idbKey;
-    value(serializedScriptValue, idbKey);
-    WEBKIT_ASSERT(!serializedScriptValue.isNull());
-    WEBKIT_ASSERT(idbKey.type() == WebIDBKey::InvalidType);
-    return serializedScriptValue;
-  }
   // One or the other will set, depending on what type of cursor this is.
   virtual void value(WebSerializedScriptValue& serializedScriptValue,
                      WebIDBKey& idbKey) const {
-    serializedScriptValue = value();
+    WEBKIT_ASSERT_NOT_REACHED();
   }
 
   virtual void update(const WebSerializedScriptValue&, WebIDBCallbacks*) {
