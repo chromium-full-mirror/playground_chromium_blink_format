@@ -92,9 +92,11 @@ class ApplyStyleCommand : public CompositeEditCommand {
   bool removeStyleFromRunBeforeApplyingStyle(CSSMutableStyleDeclaration* style,
                                              Node*& runStart,
                                              Node*& runEnd);
-  bool removeInlineStyleFromElement(CSSMutableStyleDeclaration*,
-                                    HTMLElement*,
-                                    InlineStyleRemovalMode = RemoveIfNeeded);
+  bool removeInlineStyleFromElement(
+      CSSMutableStyleDeclaration*,
+      HTMLElement*,
+      InlineStyleRemovalMode = RemoveIfNeeded,
+      CSSMutableStyleDeclaration* extractedStyle = 0);
   inline bool shouldRemoveInlineStyleFromElement(
       CSSMutableStyleDeclaration* style,
       HTMLElement* element) {
@@ -104,18 +106,15 @@ class ApplyStyleCommand : public CompositeEditCommand {
       CSSMutableStyleDeclaration*,
       HTMLElement*,
       InlineStyleRemovalMode,
-      CSSMutableStyleDeclaration* extractedStyle = 0);
+      CSSMutableStyleDeclaration* extractedStyle);
   void replaceWithSpanOrRemoveIfWithoutAttributes(HTMLElement*&);
   bool removeCSSStyle(CSSMutableStyleDeclaration*,
                       HTMLElement*,
-                      InlineStyleRemovalMode = RemoveIfNeeded);
+                      InlineStyleRemovalMode = RemoveIfNeeded,
+                      CSSMutableStyleDeclaration* extractedStyle = 0);
   HTMLElement* highestAncestorWithConflictingInlineStyle(
       CSSMutableStyleDeclaration*,
       Node*);
-  PassRefPtr<CSSMutableStyleDeclaration> extractInlineStyleToPushDown(
-      CSSMutableStyleDeclaration*,
-      Node*,
-      bool isStyledElement);
   void applyInlineStyleToPushDown(Node*, CSSMutableStyleDeclaration* style);
   void pushDownInlineStyleAroundNode(CSSMutableStyleDeclaration*, Node*);
   void removeInlineStyle(PassRefPtr<CSSMutableStyleDeclaration>,
