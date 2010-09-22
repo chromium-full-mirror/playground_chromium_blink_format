@@ -185,6 +185,30 @@ void QWebInspectorPrivate::setFrontend(QWidget* newFrontend) {
   }
 }
 
+/*!
+ * \internal
+ */
+void QWebInspectorPrivate::attachAndReplaceRemoteFrontend(
+    QObject* newRemoteFrontend) {
+  if (remoteFrontend)
+    remoteFrontend->setParent(0);
+
+  remoteFrontend = newRemoteFrontend;
+
+  if (remoteFrontend)
+    remoteFrontend->setParent(q);
+}
+
+/*!
+ * \internal
+ */
+void QWebInspectorPrivate::detachRemoteFrontend() {
+  if (remoteFrontend) {
+    remoteFrontend->deleteLater();
+    remoteFrontend = 0;
+  }
+}
+
 void QWebInspectorPrivate::adjustFrontendSize(const QSize& size) {
   if (frontend)
     frontend->resize(size);

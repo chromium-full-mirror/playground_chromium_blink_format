@@ -29,14 +29,18 @@ class QWebPage;
 
 class QWebInspectorPrivate {
  public:
-  QWebInspectorPrivate(QWebInspector* qq) : q(qq), page(0), frontend(0) {}
+  QWebInspectorPrivate(QWebInspector* qq)
+      : q(qq), page(0), frontend(0), remoteFrontend(0) {}
 
   void setFrontend(QWidget* newFrontend);
+  void attachAndReplaceRemoteFrontend(QObject* newRemoteFrontend);
+  void detachRemoteFrontend();
   void adjustFrontendSize(const QSize& size);
 
   QWebInspector* q;
   QWebPage* page;
   QWidget* frontend;
+  QObject* remoteFrontend;
 };
 
 #endif
