@@ -147,6 +147,7 @@ class ScriptExecutable : public ExecutableBase {
         m_source(source),
         m_features(0) {
 #if ENABLE(CODEBLOCK_SAMPLING)
+    relaxAdoptionRequirement();
     if (SamplingTool* sampler = globalData->interpreter->sampler())
       sampler->notifyOfScope(this);
 #else
@@ -159,6 +160,7 @@ class ScriptExecutable : public ExecutableBase {
         m_source(source),
         m_features(0) {
 #if ENABLE(CODEBLOCK_SAMPLING)
+    relaxAdoptionRequirement();
     if (SamplingTool* sampler = exec->globalData().interpreter->sampler())
       sampler->notifyOfScope(this);
 #else
