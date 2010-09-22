@@ -374,6 +374,7 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   void updateCheckedRadioButtons();
 
   void handleBeforeTextInsertedEvent(Event*);
+  void handleKeyEventForRange(KeyboardEvent*);
   PassRefPtr<HTMLFormElement> createTemporaryFormForIsIndex();
   // Helper for getAllowedValueStep();
   bool getStepParameters(double* defaultStep, double* stepScaleFactor) const;
