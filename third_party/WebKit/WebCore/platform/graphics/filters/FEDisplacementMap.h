@@ -19,34 +19,39 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef SVGFEMorphology_h
-#define SVGFEMorphology_h
+#ifndef FEDisplacementMap_h
+#define FEDisplacementMap_h
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
+#if ENABLE(FILTERS)
+#include "PlatformString.h"
 #include "FilterEffect.h"
 #include "Filter.h"
 
 namespace WebCore {
 
-enum MorphologyOperatorType {
-  FEMORPHOLOGY_OPERATOR_UNKNOWN = 0,
-  FEMORPHOLOGY_OPERATOR_ERODE = 1,
-  FEMORPHOLOGY_OPERATOR_DILATE = 2
+enum ChannelSelectorType {
+  CHANNEL_UNKNOWN = 0,
+  CHANNEL_R = 1,
+  CHANNEL_G = 2,
+  CHANNEL_B = 3,
+  CHANNEL_A = 4
 };
 
-class FEMorphology : public FilterEffect {
+class FEDisplacementMap : public FilterEffect {
  public:
-  static PassRefPtr<FEMorphology> create(MorphologyOperatorType,
-                                         float radiusX,
-                                         float radiusY);
-  MorphologyOperatorType morphologyOperator() const;
-  void setMorphologyOperator(MorphologyOperatorType);
+  static PassRefPtr<FEDisplacementMap> create(
+      ChannelSelectorType xChannelSelector,
+      ChannelSelectorType yChannelSelector,
+      float);
 
-  float radiusX() const;
-  void setRadiusX(float);
+  ChannelSelectorType xChannelSelector() const;
+  void setXChannelSelector(const ChannelSelectorType);
 
-  float radiusY() const;
-  void setRadiusY(float);
+  ChannelSelectorType yChannelSelector() const;
+  void setYChannelSelector(const ChannelSelectorType);
+
+  float scale() const;
+  void setScale(float scale);
 
   virtual void apply(Filter*);
   virtual void dump();
@@ -54,15 +59,17 @@ class FEMorphology : public FilterEffect {
   virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
-  FEMorphology(MorphologyOperatorType, float radiusX, float radiusY);
+  FEDisplacementMap(ChannelSelectorType xChannelSelector,
+                    ChannelSelectorType yChannelSelector,
+                    float);
 
-  MorphologyOperatorType m_type;
-  float m_radiusX;
-  float m_radiusY;
+  ChannelSelectorType m_xChannelSelector;
+  ChannelSelectorType m_yChannelSelector;
+  float m_scale;
 };
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)
 
-#endif  // SVGFEMorphology_h
+#endif  // FEDisplacementMap_h

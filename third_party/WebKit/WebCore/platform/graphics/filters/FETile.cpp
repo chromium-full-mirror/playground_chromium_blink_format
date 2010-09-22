@@ -20,8 +20,8 @@
 
 #include "config.h"
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
-#include "SVGFETile.h"
+#if ENABLE(FILTERS)
+#include "FETile.h"
 
 #include "AffineTransform.h"
 #include "Filter.h"
@@ -100,4 +100,4 @@ TextStream& FETile::externalRepresentation(TextStream& ts, int indent) const {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)

@@ -21,8 +21,8 @@
 
 #include "config.h"
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
-#include "SVGFEMerge.h"
+#if ENABLE(FILTERS)
+#include "FEMerge.h"
 
 #include "Filter.h"
 #include "GraphicsContext.h"
@@ -73,4 +73,4 @@ TextStream& FEMerge::externalRepresentation(TextStream& ts, int indent) const {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)

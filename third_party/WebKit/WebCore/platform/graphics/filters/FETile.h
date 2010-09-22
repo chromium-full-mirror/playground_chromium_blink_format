@@ -19,10 +19,10 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef SVGFETile_h
-#define SVGFETile_h
+#ifndef FETile_h
+#define FETile_h
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
+#if ENABLE(FILTERS)
 #include "FilterEffect.h"
 #include "Filter.h"
 
@@ -45,6 +45,6 @@ class FETile : public FilterEffect {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)
 
-#endif  // SVGFETile_h
+#endif  // FETile_h

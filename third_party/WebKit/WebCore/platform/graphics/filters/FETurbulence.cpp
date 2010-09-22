@@ -23,8 +23,8 @@
 
 #include "config.h"
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
-#include "SVGFETurbulence.h"
+#if ENABLE(FILTERS)
+#include "FETurbulence.h"
 
 #include "CanvasPixelArray.h"
 #include "Filter.h"
@@ -408,4 +408,4 @@ TextStream& FETurbulence::externalRepresentation(TextStream& ts,
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)

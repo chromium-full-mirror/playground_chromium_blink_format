@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2008 Alex Mathews <possessedpenguinbob@gmail.com>
  * Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
  * Copyright (C) 2004, 2005 Rob Buis <buis@kde.org>
  * Copyright (C) 2005 Eric Seidel <eric@webkit.org>
@@ -20,38 +19,31 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef SVGDistantLightSource_h
-#define SVGDistantLightSource_h
+#ifndef FEMerge_h
+#define EMerge_h
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
-#include "SVGLightSource.h"
+#if ENABLE(FILTERS)
+#include "FilterEffect.h"
+#include "Filter.h"
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
-class DistantLightSource : public LightSource {
+class FEMerge : public FilterEffect {
  public:
-  static PassRefPtr<DistantLightSource> create(float azimuth, float elevation) {
-    return adoptRef(new DistantLightSource(azimuth, elevation));
-  }
+  static PassRefPtr<FEMerge> create();
 
-  float azimuth() const { return m_azimuth; }
-  float elevation() const { return m_elevation; }
+  virtual void apply(Filter*);
+  virtual void dump();
 
-  virtual void initPaintingData(PaintingData&);
-  virtual void updatePaintingData(PaintingData&, int x, int y, float z);
-
-  virtual TextStream& externalRepresentation(TextStream&) const;
+  virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
-  DistantLightSource(float azimuth, float elevation)
-      : LightSource(LS_DISTANT), m_azimuth(azimuth), m_elevation(elevation) {}
-
-  float m_azimuth;
-  float m_elevation;
+  FEMerge();
 };
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)
 
-#endif  // SVGDistantLightSource_h
+#endif  // FEMerge_h

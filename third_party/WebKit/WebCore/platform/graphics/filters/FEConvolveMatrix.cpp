@@ -23,8 +23,8 @@
 
 #include "config.h"
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
-#include "SVGFEConvolveMatrix.h"
+#if ENABLE(FILTERS)
+#include "FEConvolveMatrix.h"
 
 #include "CanvasPixelArray.h"
 #include "Filter.h"
@@ -503,4 +503,4 @@ TextStream& FEConvolveMatrix::externalRepresentation(TextStream& ts,
 
 };  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)

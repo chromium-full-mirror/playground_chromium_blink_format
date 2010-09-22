@@ -19,39 +19,25 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef SVGFEDisplacementMap_h
-#define SVGFEDisplacementMap_h
+#ifndef FEFlood_h
+#define FEFlood_h
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
-#include "PlatformString.h"
-#include "FilterEffect.h"
+#if ENABLE(FILTERS)
+#include "Color.h"
 #include "Filter.h"
+#include "FilterEffect.h"
 
 namespace WebCore {
 
-enum ChannelSelectorType {
-  CHANNEL_UNKNOWN = 0,
-  CHANNEL_R = 1,
-  CHANNEL_G = 2,
-  CHANNEL_B = 3,
-  CHANNEL_A = 4
-};
-
-class FEDisplacementMap : public FilterEffect {
+class FEFlood : public FilterEffect {
  public:
-  static PassRefPtr<FEDisplacementMap> create(
-      ChannelSelectorType xChannelSelector,
-      ChannelSelectorType yChannelSelector,
-      float);
+  static PassRefPtr<FEFlood> create(const Color&, float);
 
-  ChannelSelectorType xChannelSelector() const;
-  void setXChannelSelector(const ChannelSelectorType);
+  Color floodColor() const;
+  void setFloodColor(const Color&);
 
-  ChannelSelectorType yChannelSelector() const;
-  void setYChannelSelector(const ChannelSelectorType);
-
-  float scale() const;
-  void setScale(float scale);
+  float floodOpacity() const;
+  void setFloodOpacity(float);
 
   virtual void apply(Filter*);
   virtual void dump();
@@ -59,17 +45,14 @@ class FEDisplacementMap : public FilterEffect {
   virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
-  FEDisplacementMap(ChannelSelectorType xChannelSelector,
-                    ChannelSelectorType yChannelSelector,
-                    float);
+  FEFlood(const Color&, float);
 
-  ChannelSelectorType m_xChannelSelector;
-  ChannelSelectorType m_yChannelSelector;
-  float m_scale;
+  Color m_floodColor;
+  float m_floodOpacity;
 };
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)
 
-#endif  // SVGFEDisplacementMap_h
+#endif  // FEFlood_h

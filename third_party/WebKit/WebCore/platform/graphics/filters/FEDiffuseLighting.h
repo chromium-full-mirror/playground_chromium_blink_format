@@ -19,24 +19,25 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef SVGFESpecularLighting_h
-#define SVGFESpecularLighting_h
+#ifndef FEDiffuseLighting_h
+#define FEDiffuseLighting_h
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
-#include "SVGFELighting.h"
+#if ENABLE(FILTERS)
+#include "FELighting.h"
 
 namespace WebCore {
 
-class FESpecularLighting : public FELighting {
+class LightSource;
+
+class FEDiffuseLighting : public FELighting {
  public:
-  static PassRefPtr<FESpecularLighting> create(const Color&,
-                                               float,
-                                               float,
-                                               float,
-                                               float,
-                                               float,
-                                               PassRefPtr<LightSource>);
-  virtual ~FESpecularLighting();
+  static PassRefPtr<FEDiffuseLighting> create(const Color&,
+                                              float,
+                                              float,
+                                              float,
+                                              float,
+                                              PassRefPtr<LightSource>);
+  virtual ~FEDiffuseLighting();
 
   Color lightingColor() const;
   void setLightingColor(const Color&);
@@ -44,11 +45,8 @@ class FESpecularLighting : public FELighting {
   float surfaceScale() const;
   void setSurfaceScale(float);
 
-  float specularConstant() const;
-  void setSpecularConstant(float);
-
-  float specularExponent() const;
-  void setSpecularExponent(float);
+  float diffuseConstant() const;
+  void setDiffuseConstant(float);
 
   float kernelUnitLengthX() const;
   void setKernelUnitLengthX(float);
@@ -64,17 +62,16 @@ class FESpecularLighting : public FELighting {
   virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
-  FESpecularLighting(const Color&,
-                     float,
-                     float,
-                     float,
-                     float,
-                     float,
-                     PassRefPtr<LightSource>);
+  FEDiffuseLighting(const Color&,
+                    float,
+                    float,
+                    float,
+                    float,
+                    PassRefPtr<LightSource>);
 };
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)
 
-#endif  // SVGFESpecularLighting_h
+#endif  // FEDiffuseLighting_h

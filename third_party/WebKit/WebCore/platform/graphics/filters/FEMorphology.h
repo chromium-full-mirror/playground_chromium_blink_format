@@ -19,24 +19,34 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef SVGFEOffset_h
-#define SVGFEOffset_h
+#ifndef FEMorphology_h
+#define FEMorphology_h
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
+#if ENABLE(FILTERS)
 #include "FilterEffect.h"
 #include "Filter.h"
 
 namespace WebCore {
 
-class FEOffset : public FilterEffect {
+enum MorphologyOperatorType {
+  FEMORPHOLOGY_OPERATOR_UNKNOWN = 0,
+  FEMORPHOLOGY_OPERATOR_ERODE = 1,
+  FEMORPHOLOGY_OPERATOR_DILATE = 2
+};
+
+class FEMorphology : public FilterEffect {
  public:
-  static PassRefPtr<FEOffset> create(float dx, float dy);
+  static PassRefPtr<FEMorphology> create(MorphologyOperatorType,
+                                         float radiusX,
+                                         float radiusY);
+  MorphologyOperatorType morphologyOperator() const;
+  void setMorphologyOperator(MorphologyOperatorType);
 
-  float dx() const;
-  void setDx(float);
+  float radiusX() const;
+  void setRadiusX(float);
 
-  float dy() const;
-  void setDy(float);
+  float radiusY() const;
+  void setRadiusY(float);
 
   virtual void apply(Filter*);
   virtual void dump();
@@ -44,14 +54,15 @@ class FEOffset : public FilterEffect {
   virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
-  FEOffset(float dx, float dy);
+  FEMorphology(MorphologyOperatorType, float radiusX, float radiusY);
 
-  float m_dx;
-  float m_dy;
+  MorphologyOperatorType m_type;
+  float m_radiusX;
+  float m_radiusY;
 };
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)
 
-#endif  // SVGFEOffset_h
+#endif  // FEMorphology_h

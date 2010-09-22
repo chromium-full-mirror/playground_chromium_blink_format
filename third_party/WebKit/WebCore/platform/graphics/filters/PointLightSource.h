@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2008 Alex Mathews <possessedpenguinbob@gmail.com>
  * Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
  * Copyright (C) 2004, 2005 Rob Buis <buis@kde.org>
  * Copyright (C) 2005 Eric Seidel <eric@webkit.org>
@@ -19,40 +20,36 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef SVGFEFlood_h
-#define SVGFEFlood_h
+#ifndef PointLightSource_h
+#define PointLightSource_h
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
-#include "Color.h"
-#include "Filter.h"
-#include "FilterEffect.h"
+#if ENABLE(FILTERS)
+#include "LightSource.h"
 
 namespace WebCore {
 
-class FEFlood : public FilterEffect {
+class PointLightSource : public LightSource {
  public:
-  static PassRefPtr<FEFlood> create(const Color&, float);
+  static PassRefPtr<PointLightSource> create(const FloatPoint3D& position) {
+    return adoptRef(new PointLightSource(position));
+  }
 
-  Color floodColor() const;
-  void setFloodColor(const Color&);
+  const FloatPoint3D& position() const { return m_position; }
 
-  float floodOpacity() const;
-  void setFloodOpacity(float);
+  virtual void initPaintingData(PaintingData&);
+  virtual void updatePaintingData(PaintingData&, int x, int y, float z);
 
-  virtual void apply(Filter*);
-  virtual void dump();
-
-  virtual TextStream& externalRepresentation(TextStream&, int indention) const;
+  virtual TextStream& externalRepresentation(TextStream&) const;
 
  private:
-  FEFlood(const Color&, float);
+  PointLightSource(const FloatPoint3D& position)
+      : LightSource(LS_POINT), m_position(position) {}
 
-  Color m_floodColor;
-  float m_floodOpacity;
+  FloatPoint3D m_position;
 };
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)
 
-#endif  // SVGFEFlood_h
+#endif  // PointLightSource_h

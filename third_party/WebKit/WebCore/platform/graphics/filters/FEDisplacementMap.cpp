@@ -22,8 +22,8 @@
 
 #include "config.h"
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
-#include "SVGFEDisplacementMap.h"
+#if ENABLE(FILTERS)
+#include "FEDisplacementMap.h"
 
 #include "CanvasPixelArray.h"
 #include "Filter.h"
@@ -181,4 +181,4 @@ TextStream& FEDisplacementMap::externalRepresentation(TextStream& ts,
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)
