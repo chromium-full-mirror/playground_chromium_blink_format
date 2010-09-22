@@ -29,6 +29,7 @@
 #ifndef InspectorController_h
 #define InspectorController_h
 
+#include "CharacterData.h"
 #include "Console.h"
 #include "Cookie.h"
 #include "Element.h"
@@ -45,6 +46,7 @@
 namespace WebCore {
 
 class CachedResource;
+class CharacterData;
 class ConsoleMessage;
 class Database;
 class Document;
@@ -228,6 +230,7 @@ class InspectorController : public Noncopyable {
   static void willRemoveDOMNode(Node*);
   static void willModifyDOMAttr(Element*);
   static void didModifyDOMAttr(Element*);
+  static void characterDataModified(CharacterData*);
 
 #if ENABLE(WORKERS)
   enum WorkerAction { WorkerCreated, WorkerDestroyed };
@@ -398,6 +401,7 @@ class InspectorController : public Noncopyable {
   void didRemoveDOMNodeImpl(Node*);
   void willModifyDOMAttrImpl(Element*);
   void didModifyDOMAttrImpl(Element*);
+  void characterDataModifiedImpl(CharacterData*);
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   friend class InspectorDebuggerAgent;
@@ -508,6 +512,15 @@ inline void InspectorController::didModifyDOMAttr(Element* element) {
   if (InspectorController* inspectorController =
           inspectorControllerForNode(element))
     inspectorController->didModifyDOMAttrImpl(element);
+#endif
+}
+
+inline void InspectorController::characterDataModified(
+    CharacterData* characterData) {
+#if ENABLE(INSPECTOR)
+  if (InspectorController* inspectorController =
+          inspectorControllerForNode(characterData))
+    inspectorController->characterDataModifiedImpl(characterData);
 #endif
 }
 

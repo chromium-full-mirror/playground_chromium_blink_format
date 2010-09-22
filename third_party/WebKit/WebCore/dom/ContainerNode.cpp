@@ -157,7 +157,9 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
     if (child->parentNode())
       break;
 
+#if ENABLE(INSPECTOR)
     InspectorController::willInsertDOMNode(child, this);
+#endif
 
     insertBeforeCommon(next.get(), child);
 
@@ -228,7 +230,9 @@ void ContainerNode::parserInsertBefore(PassRefPtr<Node> newChild,
        ++it) {
     Node* child = it->get();
 
+#if ENABLE(INSPECTOR)
     InspectorController::willInsertDOMNode(child, this);
+#endif
 
     insertBeforeCommon(next.get(), child);
 
@@ -305,7 +309,9 @@ bool ContainerNode::replaceChild(PassRefPtr<Node> newChild,
     ASSERT(!child->nextSibling());
     ASSERT(!child->previousSibling());
 
+#if ENABLE(INSPECTOR)
     InspectorController::willInsertDOMNode(child.get(), this);
+#endif
 
     // Add child after "prev".
     forbidEventDispatch();
@@ -591,7 +597,9 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
         break;
     }
 
+#if ENABLE(INSPECTOR)
     InspectorController::willInsertDOMNode(child, this);
+#endif
 
     // Append child to the end of the list
     forbidEventDispatch();
@@ -631,7 +639,9 @@ void ContainerNode::parserAddChild(PassRefPtr<Node> newChild) {
   ASSERT(!newChild->parent());  // Use appendChild if you need to handle
                                 // reparenting (and want DOM mutation events).
 
+#if ENABLE(INSPECTOR)
   InspectorController::willInsertDOMNode(newChild.get(), this);
+#endif
 
   forbidEventDispatch();
   Node* last = m_lastChild;
@@ -1002,7 +1012,9 @@ Node* ContainerNode::childNode(unsigned index) const {
 static void notifyChildInserted(Node* child) {
   ASSERT(!eventDispatchForbidden());
 
+#if ENABLE(INSPECTOR)
   InspectorController::didInsertDOMNode(child);
+#endif
 
   RefPtr<Node> c = child;
   RefPtr<Document> document = child->document();
@@ -1039,7 +1051,9 @@ static void dispatchChildInsertionEvents(Node* child) {
 static void dispatchChildRemovalEvents(Node* child) {
   ASSERT(!eventDispatchForbidden());
 
+#if ENABLE(INSPECTOR)
   InspectorController::willRemoveDOMNode(child);
+#endif
 
   RefPtr<Node> c = child;
   RefPtr<Document> document = child->document();

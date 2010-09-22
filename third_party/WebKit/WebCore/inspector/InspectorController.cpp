@@ -2237,6 +2237,12 @@ void InspectorController::didModifyDOMAttrImpl(Element* element) {
     m_domAgent->didModifyDOMAttr(element);
 }
 
+void InspectorController::characterDataModifiedImpl(
+    CharacterData* characterData) {
+  if (m_domAgent)
+    m_domAgent->characterDataModified(characterData);
+}
+
 }  // namespace WebCore
 
 #endif  // ENABLE(INSPECTOR)

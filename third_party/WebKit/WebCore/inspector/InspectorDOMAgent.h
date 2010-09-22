@@ -53,6 +53,7 @@ class CSSRuleList;
 class CSSStyleDeclaration;
 class CSSStyleRule;
 class CSSStyleSheet;
+class CharacterData;
 class Element;
 class Event;
 class InspectorDOMAgent;
@@ -167,6 +168,7 @@ class InspectorDOMAgent : public EventListener {
   void didInsertDOMNode(Node*);
   void didRemoveDOMNode(Node*);
   void didModifyDOMAttr(Element*);
+  void characterDataModified(CharacterData*);
 
   Node* nodeForId(long nodeId);
   long pushNodePathToFrontend(Node* node);
