@@ -1252,8 +1252,11 @@ void Document::removeElementById(const AtomicString& elementId,
 
   if (m_elementsById.get(elementId.impl()) == element)
     m_elementsById.remove(elementId.impl());
-  else
+  else {
+    ASSERT(m_inRemovedLastRefFunction ||
+           m_duplicateIds.contains(elementId.impl()));
     m_duplicateIds.remove(elementId.impl());
+  }
 }
 
 Element* Document::getElementByAccessKey(const String& key) const {
