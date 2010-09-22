@@ -200,7 +200,7 @@ static NPError parsePostBuffer(bool isFile,
                                uint32_t length,
                                bool parseHeaders,
                                HTTPHeaderMap& headerFields,
-                               Vector<char>& bodyData) {
+                               Vector<uint8_t>& bodyData) {
   RefPtr<SharedBuffer> fileContents;
   const char* postBuffer = 0;
   uint32_t postBufferSize = 0;
@@ -270,7 +270,7 @@ static NPError NPN_GetURL(NPP npp, const char* url, const char* target) {
 
   RefPtr<NetscapePlugin> plugin = NetscapePlugin::fromNPP(npp);
   plugin->loadURL("GET", makeURLString(url), target, HTTPHeaderMap(),
-                  Vector<char>(), false, 0);
+                  Vector<uint8_t>(), false, 0);
 
   return NPERR_GENERIC_ERROR;
 }
@@ -282,7 +282,7 @@ static NPError NPN_PostURL(NPP npp,
                            const char* buf,
                            NPBool file) {
   HTTPHeaderMap headerFields;
-  Vector<char> postData;
+  Vector<uint8_t> postData;
 
   // NPN_PostURL only allows headers if the post buffer points to a file.
   bool parseHeaders = file;
@@ -386,7 +386,7 @@ static NPError NPN_GetURLNotify(NPP npp,
 
   RefPtr<NetscapePlugin> plugin = NetscapePlugin::fromNPP(npp);
   plugin->loadURL("GET", makeURLString(url), target, HTTPHeaderMap(),
-                  Vector<char>(), true, notifyData);
+                  Vector<uint8_t>(), true, notifyData);
 
   return NPERR_NO_ERROR;
 }
@@ -399,7 +399,7 @@ static NPError NPN_PostURLNotify(NPP npp,
                                  NPBool file,
                                  void* notifyData) {
   HTTPHeaderMap headerFields;
-  Vector<char> postData;
+  Vector<uint8_t> postData;
   NPError error = parsePostBuffer(file, buf, len, true, headerFields, postData);
   if (error != NPERR_NO_ERROR)
     return error;

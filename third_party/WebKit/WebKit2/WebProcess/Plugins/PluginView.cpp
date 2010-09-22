@@ -734,7 +734,7 @@ void PluginView::loadURL(uint64_t requestID,
                          const String& urlString,
                          const String& target,
                          const HTTPHeaderMap& headerFields,
-                         const Vector<char>& httpBody,
+                         const Vector<uint8_t>& httpBody,
                          bool allowPopups) {
   FrameLoadRequest frameLoadRequest;
   frameLoadRequest.setFrameName(target);

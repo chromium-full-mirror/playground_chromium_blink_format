@@ -128,7 +128,7 @@ class PluginView : public WebCore::PluginViewBase,
                        const String& urlString,
                        const String& target,
                        const WebCore::HTTPHeaderMap& headerFields,
-                       const Vector<char>& httpBody,
+                       const Vector<uint8_t>& httpBody,
                        bool allowPopups);
   virtual void cancelStreamLoad(uint64_t streamID);
   virtual void cancelManualStreamLoad();
