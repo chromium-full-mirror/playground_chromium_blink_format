@@ -41,7 +41,7 @@ PassRefPtr<Clipboard> Clipboard::create(ClipboardAccessPolicy,
 
 ClipboardEfl::ClipboardEfl(ClipboardAccessPolicy policy,
                            ClipboardType clipboardType)
-    : Clipboard(clipboardType, forDragging) {
+    : Clipboard(policy, clipboardType) {
   notImplemented();
 }
 
