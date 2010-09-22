@@ -23,7 +23,9 @@
 
 #include "ClientImpl.h"
 #include "LocalizedStrings.h"
+#include "WebContext.h"
 #include "WebEventFactoryQt.h"
+#include "WebPlatformStrategies.h"
 #include "WKStringQt.h"
 #include "WKURLQt.h"
 #include <QAction>
@@ -43,6 +45,10 @@ using namespace WebCore;
 
 QWKPagePrivate::QWKPagePrivate(QWKPage* qq, WKPageNamespaceRef namespaceRef)
     : q(qq), createNewPageFn(0) {
+  // We want to use the LocalizationStrategy at the UI side as well.
+  // FIXME: this should be avoided.
+  WebPlatformStrategies::initialize();
+
   memset(actions, 0, sizeof(actions));
   page = toWK(namespaceRef)->createWebPage();
   page->setPageClient(this);

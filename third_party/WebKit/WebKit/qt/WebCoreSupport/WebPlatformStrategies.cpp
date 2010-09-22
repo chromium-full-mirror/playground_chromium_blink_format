@@ -30,8 +30,10 @@
 #include "config.h"
 #include "WebPlatformStrategies.h"
 
-#include "NotImplemented.h"
+#include "Chrome.h"
+#include "ChromeClientQt.h"
 #include <IntSize.h>
+#include "NotImplemented.h"
 #include <Page.h>
 #include <PageGroup.h>
 #include <PluginDatabase.h>
@@ -43,13 +45,12 @@
 
 using namespace WebCore;
 
-void WebPlatformStrategies::initialize(QWebPage* webPage) {
-  DEFINE_STATIC_LOCAL(WebPlatformStrategies, platformStrategies, (webPage));
+void WebPlatformStrategies::initialize() {
+  DEFINE_STATIC_LOCAL(WebPlatformStrategies, platformStrategies, ());
   Q_UNUSED(platformStrategies);
 }
 
-WebPlatformStrategies::WebPlatformStrategies(QWebPage* webPage)
-    : m_page(webPage) {
+WebPlatformStrategies::WebPlatformStrategies() {
   setPlatformStrategies(this);
 }
 
@@ -72,9 +73,12 @@ void WebPlatformStrategies::refreshPlugins() {
 }
 
 void WebPlatformStrategies::getPluginInfo(
+    const WebCore::Page* page,
     Vector<WebCore::PluginInfo>& outPlugins) {
-  QWebPluginFactory* factory = m_page->pluginFactory();
-  if (factory) {
+  QWebPage* qPage =
+      static_cast<ChromeClientQt*>(page->chrome()->client())->m_webPage;
+  QWebPluginFactory* factory;
+  if (qPage && (factory = qPage->pluginFactory())) {
     QList<QWebPluginFactory::Plugin> qplugins = factory->plugins();
     for (int i = 0; i < qplugins.count(); ++i) {
       const QWebPluginFactory::Plugin& qplugin = qplugins.at(i);
