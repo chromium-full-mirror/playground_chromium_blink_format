@@ -913,12 +913,11 @@ static const int textOnlyProperties[] = {
     CSSPropertyColor,
 };
 
-static TriState triStateOfStyleInComputedStyle(
-    CSSStyleDeclaration* desiredStyle,
-    CSSComputedStyleDeclaration* computedStyle,
-    bool ignoreTextOnlyProperties = false) {
+static TriState triStateOfStyle(CSSStyleDeclaration* desiredStyle,
+                                CSSStyleDeclaration* styleToCompare,
+                                bool ignoreTextOnlyProperties = false) {
   RefPtr<CSSMutableStyleDeclaration> diff =
-      getPropertiesNotInComputedStyle(desiredStyle, computedStyle);
+      getPropertiesNotIn(desiredStyle, styleToCompare);
 
   if (ignoreTextOnlyProperties)
     diff->removePropertiesInSet(
@@ -933,42 +932,31 @@ static TriState triStateOfStyleInComputedStyle(
 }
 
 bool Editor::selectionStartHasStyle(CSSStyleDeclaration* style) const {
-  Node* nodeToRemove;
-  RefPtr<CSSComputedStyleDeclaration> selectionStyle =
-      selectionComputedStyle(nodeToRemove);
+  bool shouldUseFixedFontDefaultSize;
+  RefPtr<CSSMutableStyleDeclaration> selectionStyle =
+      selectionComputedStyle(shouldUseFixedFontDefaultSize);
   if (!selectionStyle)
     return false;
-  TriState state = triStateOfStyleInComputedStyle(style, selectionStyle.get());
-  if (nodeToRemove) {
-    ExceptionCode ec = 0;
-    nodeToRemove->remove(ec);
-    ASSERT(!ec);
-  }
-  return state == TrueTriState;
+  return triStateOfStyle(style, selectionStyle.get()) == TrueTriState;
 }
 
 TriState Editor::selectionHasStyle(CSSStyleDeclaration* style) const {
   TriState state = FalseTriState;
 
   if (!m_frame->selection()->isRange()) {
-    Node* nodeToRemove;
-    RefPtr<CSSComputedStyleDeclaration> selectionStyle =
-        selectionComputedStyle(nodeToRemove);
+    bool shouldUseFixedFontDefaultSize;
+    RefPtr<CSSMutableStyleDeclaration> selectionStyle =
+        selectionComputedStyle(shouldUseFixedFontDefaultSize);
     if (!selectionStyle)
       return FalseTriState;
-    state = triStateOfStyleInComputedStyle(style, selectionStyle.get());
-    if (nodeToRemove) {
-      ExceptionCode ec = 0;
-      nodeToRemove->remove(ec);
-      ASSERT(!ec);
-    }
+    state = triStateOfStyle(style, selectionStyle.get());
   } else {
     for (Node* node = m_frame->selection()->start().node(); node;
          node = node->traverseNextNode()) {
       RefPtr<CSSComputedStyleDeclaration> nodeStyle = computedStyle(node);
       if (nodeStyle) {
-        TriState nodeState = triStateOfStyleInComputedStyle(
-            style, nodeStyle.get(), !node->isTextNode());
+        TriState nodeState =
+            triStateOfStyle(style, nodeStyle.get(), !node->isTextNode());
         if (node == m_frame->selection()->start().node())
           state = nodeState;
         else if (state != nodeState && node->isTextNode()) {
@@ -1001,9 +989,9 @@ static bool hasTransparentBackgroundColor(CSSStyleDeclaration* style) {
 }
 
 String Editor::selectionStartCSSPropertyValue(int propertyID) {
-  Node* nodeToRemove;
-  RefPtr<CSSComputedStyleDeclaration> selectionStyle =
-      selectionComputedStyle(nodeToRemove);
+  bool shouldUseFixedFontDefaultSize = false;
+  RefPtr<CSSMutableStyleDeclaration> selectionStyle =
+      selectionComputedStyle(shouldUseFixedFontDefaultSize);
   if (!selectionStyle)
     return String();
 
@@ -1021,7 +1009,7 @@ String Editor::selectionStartCSSPropertyValue(int propertyID) {
     ExceptionCode ec = 0;
     for (Node* ancestor = range->commonAncestorContainer(ec); ancestor;
          ancestor = ancestor->parentNode()) {
-      selectionStyle = computedStyle(ancestor);
+      selectionStyle = computedStyle(ancestor)->copy();
       if (!hasTransparentBackgroundColor(selectionStyle.get())) {
         value = selectionStyle->getPropertyValue(CSSPropertyBackgroundColor);
         break;
@@ -1036,15 +1024,8 @@ String Editor::selectionStartCSSPropertyValue(int propertyID) {
     int fontPixelSize = static_cast<CSSPrimitiveValue*>(cssValue.get())
                             ->getIntValue(CSSPrimitiveValue::CSS_PX);
     int size = CSSStyleSelector::legacyFontSize(
-        m_frame->document(), fontPixelSize,
-        selectionStyle->useFixedFontDefaultSize());
+        m_frame->document(), fontPixelSize, shouldUseFixedFontDefaultSize);
     value = String::number(size);
-  }
-
-  if (nodeToRemove) {
-    ExceptionCode ec = 0;
-    nodeToRemove->remove(ec);
-    ASSERT(!ec);
   }
 
   return value;
@@ -3657,10 +3638,8 @@ void Editor::computeAndSetTypingStyle(CSSStyleDeclaration* style,
   m_frame->selection()->setTypingStyle(mutableStyle.release());
 }
 
-PassRefPtr<CSSComputedStyleDeclaration> Editor::selectionComputedStyle(
-    Node*& nodeToRemove) const {
-  nodeToRemove = 0;
-
+PassRefPtr<CSSMutableStyleDeclaration> Editor::selectionComputedStyle(
+    bool& shouldUseFixedFontDefaultSize) const {
   if (m_frame->selection()->isNone())
     return 0;
 
@@ -3687,36 +3666,21 @@ PassRefPtr<CSSComputedStyleDeclaration> Editor::selectionComputedStyle(
     return 0;
 
   RefPtr<Element> styleElement = element;
-  ExceptionCode ec = 0;
+  RefPtr<CSSComputedStyleDeclaration> style =
+      computedStyle(styleElement.release());
+  RefPtr<CSSMutableStyleDeclaration> mutableStyle = style->copy();
+  shouldUseFixedFontDefaultSize = style->useFixedFontDefaultSize();
 
-  if (m_frame->selection()->typingStyle()) {
-    styleElement = m_frame->document()->createElement(spanTag, false);
+  if (!m_frame->selection()->typingStyle())
+    return mutableStyle;
 
-    styleElement->setAttribute(
-        styleAttr, m_frame->selection()->typingStyle()->cssText(), ec);
-    ASSERT(!ec);
+  RefPtr<CSSMutableStyleDeclaration> typingStyle =
+      m_frame->selection()->typingStyle()->copy();
+  ApplyStyleCommand::removeNonEditingProperties(typingStyle.get());
+  prepareEditingStyleToApplyAt(typingStyle.get(), position);
+  mutableStyle->merge(typingStyle.get());
 
-    styleElement->appendChild(m_frame->document()->createEditingTextNode(""),
-                              ec);
-    ASSERT(!ec);
-
-    if (element->renderer() && element->renderer()->canHaveChildren())
-      element->appendChild(styleElement, ec);
-    else {
-      Node* parent = element->parent();
-      Node* next = element->nextSibling();
-
-      if (next)
-        parent->insertBefore(styleElement, next, ec);
-      else
-        parent->appendChild(styleElement, ec);
-    }
-    ASSERT(!ec);
-
-    nodeToRemove = styleElement.get();
-  }
-
-  return computedStyle(styleElement.release());
+  return mutableStyle;
 }
 
 void Editor::textFieldDidBeginEditing(Element* e) {

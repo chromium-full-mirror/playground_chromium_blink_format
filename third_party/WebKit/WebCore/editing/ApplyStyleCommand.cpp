@@ -143,7 +143,7 @@ void StyleChange::init(PassRefPtr<CSSStyleDeclaration> style,
 
   RefPtr<CSSComputedStyleDeclaration> computedStyle = position.computedStyle();
   RefPtr<CSSMutableStyleDeclaration> mutableStyle =
-      getPropertiesNotInComputedStyle(style.get(), computedStyle.get());
+      getPropertiesNotIn(style.get(), computedStyle.get());
 
   reconcileTextDecorationProperties(mutableStyle.get());
   if (!document->frame()->editor()->shouldStyleWithCSS())
@@ -157,7 +157,7 @@ void StyleChange::init(PassRefPtr<CSSStyleDeclaration> style,
 
   // If unicode-bidi is present in mutableStyle and direction is not, then add
   // direction to mutableStyle.
-  // FIXME: Shouldn't this be done in getPropertiesNotInComputedStyle?
+  // FIXME: Shouldn't this be done in getPropertiesNotIn?
   if (mutableStyle->getPropertyCSSValue(CSSPropertyUnicodeBidi) &&
       !style->getPropertyCSSValue(CSSPropertyDirection))
     mutableStyle->setProperty(CSSPropertyDirection,
@@ -421,26 +421,26 @@ static bool fontWeightIsBold(CSSStyleDeclaration* style) {
   return false;          // Make compiler happy
 }
 
-RefPtr<CSSMutableStyleDeclaration> getPropertiesNotInComputedStyle(
-    CSSStyleDeclaration* style,
-    CSSComputedStyleDeclaration* computedStyle) {
-  ASSERT(style);
+RefPtr<CSSMutableStyleDeclaration> getPropertiesNotIn(
+    CSSStyleDeclaration* styleWithRedundantProperties,
+    CSSStyleDeclaration* baseStyle) {
+  ASSERT(styleWithRedundantProperties);
   ASSERT(computedStyle);
-  RefPtr<CSSMutableStyleDeclaration> result = style->copy();
-  computedStyle->diff(result.get());
+  RefPtr<CSSMutableStyleDeclaration> result =
+      styleWithRedundantProperties->copy();
+  baseStyle->diff(result.get());
 
-  RefPtr<CSSValue> computedTextDecorationsInEffect =
-      computedStyle->getPropertyCSSValue(
-          CSSPropertyWebkitTextDecorationsInEffect);
+  RefPtr<CSSValue> baseTextDecorationsInEffect =
+      baseStyle->getPropertyCSSValue(CSSPropertyWebkitTextDecorationsInEffect);
   diffTextDecorations(result.get(), CSSPropertyTextDecoration,
-                      computedTextDecorationsInEffect.get());
+                      baseTextDecorationsInEffect.get());
   diffTextDecorations(result.get(), CSSPropertyWebkitTextDecorationsInEffect,
-                      computedTextDecorationsInEffect.get());
+                      baseTextDecorationsInEffect.get());
 
-  if (fontWeightIsBold(result.get()) == fontWeightIsBold(computedStyle))
+  if (fontWeightIsBold(result.get()) == fontWeightIsBold(baseStyle))
     result->removeProperty(CSSPropertyFontWeight);
 
-  if (getRGBAFontColor(result.get()) == getRGBAFontColor(computedStyle))
+  if (getRGBAFontColor(result.get()) == getRGBAFontColor(baseStyle))
     result->removeProperty(CSSPropertyColor);
 
   return result;
@@ -480,6 +480,12 @@ static const int editingStyleProperties[] = {
 size_t numEditingStyleProperties =
     sizeof(editingStyleProperties) / sizeof(editingStyleProperties[0]);
 
+RefPtr<CSSMutableStyleDeclaration>
+ApplyStyleCommand::removeNonEditingProperties(CSSStyleDeclaration* style) {
+  return style->copyPropertiesInSet(editingStyleProperties,
+                                    numEditingStyleProperties);
+}
+
 PassRefPtr<CSSMutableStyleDeclaration>
 ApplyStyleCommand::editingStyleAtPosition(
     Position pos,
@@ -490,8 +496,7 @@ ApplyStyleCommand::editingStyleAtPosition(
   if (!computedStyleAtPosition)
     style = CSSMutableStyleDeclaration::create();
   else
-    style = computedStyleAtPosition->copyPropertiesInSet(
-        editingStyleProperties, numEditingStyleProperties);
+    style = removeNonEditingProperties(computedStyleAtPosition.get());
 
   if (style && pos.node() && pos.node()->computedStyle()) {
     RenderStyle* renderStyle = pos.node()->computedStyle();
