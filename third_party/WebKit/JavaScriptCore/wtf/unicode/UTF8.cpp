@@ -271,7 +271,7 @@ ConversionResult convertUTF8ToUTF16(const char** sourceStart,
   UChar* target = *targetStart;
   while (source < sourceEnd) {
     UChar32 ch = 0;
-    int extraBytesToRead = UTF8SequenceLength(*source) - 1;
+    int extraBytesToRead = inlineUTF8SequenceLength(*source) - 1;
     if (source + extraBytesToRead >= sourceEnd) {
       result = sourceExhausted;
       break;
