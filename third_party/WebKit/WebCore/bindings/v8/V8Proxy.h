@@ -133,6 +133,7 @@ struct V8ExtensionInfo {
   String scheme;
   int group;
   v8::Extension* extension;
+  bool useCallback;  // FIXME: remove
 };
 typedef WTF::Vector<V8ExtensionInfo> V8Extensions;
 
@@ -347,6 +348,11 @@ class V8Proxy {
   static void registerExtension(v8::Extension*,
                                 const String& schemeRestriction);
   static void registerExtension(v8::Extension*, int extensionGroup);
+
+  // Same as above, but new version.
+  // FIXME: remove the other 2 versions in phase 3 of multipart checkin:
+  // https://bugs.webkit.org/show_bug.cgi?id=45721
+  static void registerExtension(v8::Extension*);
 
   static void registerExtensionWithV8(v8::Extension*);
   static bool registeredExtensionWithV8(v8::Extension*);
