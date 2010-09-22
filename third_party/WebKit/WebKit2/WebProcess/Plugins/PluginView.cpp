@@ -235,12 +235,26 @@ void PluginView::Stream::didFinishLoading(NetscapePlugInStreamLoader*) {
   m_pluginView = 0;
 }
 
-PluginView::PluginView(WebCore::HTMLPlugInElement* pluginElement,
+static inline WebPage* webPage(HTMLPlugInElement* pluginElement) {
+  Frame* frame = pluginElement->document()->frame();
+  ASSERT(frame);
+
+  WebPage* webPage =
+      static_cast<WebFrameLoaderClient*>(frame->loader()->client())
+          ->webFrame()
+          ->page();
+  ASSERT(webPage);
+
+  return webPage;
+}
+
+PluginView::PluginView(HTMLPlugInElement* pluginElement,
                        PassRefPtr<Plugin> plugin,
                        const Plugin::Parameters& parameters)
     : PluginViewBase(0),
       m_pluginElement(pluginElement),
       m_plugin(plugin),
+      m_webPage(webPage(pluginElement)),
       m_parameters(parameters),
       m_isInitialized(false),
       m_isWaitingUntilMediaCanStart(false),
@@ -250,13 +264,13 @@ PluginView::PluginView(WebCore::HTMLPlugInElement* pluginElement,
                                 &PluginView::pendingURLRequestsTimerFired),
       m_npRuntimeObjectMap(this) {
 #if PLATFORM(MAC)
-  webPage()->addPluginView(this);
+  m_webPage->addPluginView(this);
 #endif
 }
 
 PluginView::~PluginView() {
 #if PLATFORM(MAC)
-  webPage()->removePluginView(this);
+  m_webPage->removePluginView(this);
 #endif
 
   ASSERT(!m_isBeingDestroyed);
@@ -286,16 +300,6 @@ PluginView::~PluginView() {
 
 Frame* PluginView::frame() {
   return m_pluginElement->document()->frame();
-}
-
-WebPage* PluginView::webPage() {
-  WebPage* webPage =
-      static_cast<WebFrameLoaderClient*>(frame()->loader()->client())
-          ->webFrame()
-          ->page();
-  ASSERT(webPage);
-
-  return webPage;
 }
 
 void PluginView::manualLoadDidReceiveResponse(
@@ -394,9 +398,9 @@ void PluginView::initializePlugin() {
     }
   }
 
-  setWindowFrame(webPage()->windowFrame());
-  setWindowIsVisible(webPage()->windowIsVisible());
-  setWindowIsFocused(webPage()->windowIsFocused());
+  setWindowFrame(m_webPage->windowFrame());
+  setWindowIsVisible(m_webPage->windowIsVisible());
+  setWindowIsFocused(m_webPage->windowIsFocused());
 #endif
 }
 

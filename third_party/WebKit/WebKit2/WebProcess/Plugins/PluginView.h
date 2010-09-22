@@ -78,8 +78,6 @@ class PluginView : public WebCore::PluginViewBase,
              const Plugin::Parameters& parameters);
   virtual ~PluginView();
 
-  WebPage* webPage();
-
   void initializePlugin();
   void destroyPlugin();
 
@@ -147,6 +145,7 @@ class PluginView : public WebCore::PluginViewBase,
 
   WebCore::HTMLPlugInElement* m_pluginElement;
   RefPtr<Plugin> m_plugin;
+  WebPage* m_webPage;
   Plugin::Parameters m_parameters;
 
   bool m_isInitialized;
