@@ -479,6 +479,32 @@ TransformationMatrix RenderLayer::renderableTransform(
   return *m_transform;
 }
 
+static bool checkContainingBlockChainForPagination(
+    RenderBoxModelObject* renderer,
+    RenderBox* ancestorColumnsRenderer) {
+  RenderView* view = renderer->view();
+  RenderBoxModelObject* prevBlock = renderer;
+  RenderBlock* containingBlock;
+  for (containingBlock = renderer->containingBlock();
+       containingBlock && containingBlock != view &&
+       containingBlock != ancestorColumnsRenderer;
+       containingBlock = containingBlock->containingBlock())
+    prevBlock = containingBlock;
+
+  // If the columns block wasn't in our containing block chain, then we aren't
+  // paginated by it.
+  if (containingBlock != ancestorColumnsRenderer)
+    return false;
+
+  // If the previous block is absolutely positioned, then we can't be paginated
+  // by the columns block.
+  if (prevBlock->isPositioned())
+    return false;
+
+  // Otherwise we are paginated by the columns block.
+  return true;
+}
+
 void RenderLayer::updatePagination() {
   m_isPaginated = false;
   if (isComposited() || !parent())
@@ -497,11 +523,11 @@ void RenderLayer::updatePagination() {
   RenderLayer* ancestorStackingContext = stackingContext();
   for (RenderLayer* curr = parent(); curr; curr = curr->parent()) {
     if (curr->renderer()->hasColumns()) {
-      m_isPaginated = true;
+      m_isPaginated =
+          checkContainingBlockChainForPagination(renderer(), curr->renderBox());
       return;
     }
-    if (curr == ancestorStackingContext ||
-        (curr->parent() && curr->parent()->renderer()->isPositioned()))
+    if (curr == ancestorStackingContext)
       return;
   }
 }
