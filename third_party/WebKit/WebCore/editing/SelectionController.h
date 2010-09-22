@@ -303,7 +303,7 @@ inline void SelectionController::setTypingStyle(
   m_typingStyle = style;
 }
 
-#if !(PLATFORM(MAC) || PLATFORM(GTK) || PLATFORM(CHROMIUM))
+#if !(PLATFORM(MAC) || PLATFORM(GTK))
 inline void SelectionController::notifyAccessibilityForSelectionChange() {}
 #endif
 
