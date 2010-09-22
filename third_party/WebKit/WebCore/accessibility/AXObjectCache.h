@@ -142,8 +142,24 @@ class AXObjectCache : public Noncopyable {
                         bool postToElement,
                         PostType = PostAsynchronously);
 
+  enum AXTextChange {
+    AXTextInserted,
+    AXTextDeleted,
+  };
+
+  void nodeTextChangeNotification(RenderObject*,
+                                  AXTextChange,
+                                  unsigned offset,
+                                  unsigned count);
+
+  bool nodeHasRole(Node*, const AtomicString& role);
+
  protected:
   void postPlatformNotification(AccessibilityObject*, AXNotification);
+  void nodeTextChangePlatformNotification(AccessibilityObject*,
+                                          AXTextChange,
+                                          unsigned offset,
+                                          unsigned count);
 
  private:
   HashMap<AXID, RefPtr<AccessibilityObject>> m_objects;
@@ -182,6 +198,15 @@ inline void AXObjectCache::postNotification(AccessibilityObject*,
                                             PostType) {}
 inline void AXObjectCache::postPlatformNotification(AccessibilityObject*,
                                                     AXNotification) {}
+inline void AXObjectCache::nodeTextChangeNotification(RenderObject*,
+                                                      AXTextChange,
+                                                      unsigned,
+                                                      unsigned) {}
+inline void AXObjectCache::nodeTextChangePlatformNotification(
+    AccessibilityObject*,
+    AXTextChange,
+    unsigned,
+    unsigned) {}
 inline void AXObjectCache::handleFocusedUIElementChanged(RenderObject*,
                                                          RenderObject*) {}
 inline void AXObjectCache::handleScrolledToAnchor(const Node*) {}

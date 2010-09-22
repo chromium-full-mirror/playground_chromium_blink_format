@@ -83,6 +83,11 @@ void AXObjectCache::postPlatformNotification(AccessibilityObject* obj,
   client->postAccessibilityNotification(obj, notification);
 }
 
+void AXObjectCache::nodeTextChangePlatformNotification(AccessibilityObject*,
+                                                       AXTextChange,
+                                                       unsigned,
+                                                       unsigned) {}
+
 void AXObjectCache::handleFocusedUIElementChanged(RenderObject*,
                                                   RenderObject*) {}
 
