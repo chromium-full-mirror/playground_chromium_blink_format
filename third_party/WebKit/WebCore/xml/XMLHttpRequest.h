@@ -71,6 +71,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
 
   virtual ScriptExecutionContext* scriptExecutionContext() const;
 
+  const KURL& url() const { return m_url; }
   String statusText(ExceptionCode&) const;
   int status(ExceptionCode&) const;
   State readyState() const;

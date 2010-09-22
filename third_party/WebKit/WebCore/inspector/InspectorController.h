@@ -232,6 +232,9 @@ class InspectorController : public Noncopyable {
   static void didModifyDOMAttr(Element*);
   static void characterDataModified(CharacterData*);
 
+  static void instrumentWillSendXMLHttpRequest(ScriptExecutionContext*,
+                                               const KURL&);
+
 #if ENABLE(WORKERS)
   enum WorkerAction { WorkerCreated, WorkerDestroyed };
 
@@ -327,6 +330,11 @@ class InspectorController : public Noncopyable {
     return m_debuggerAgent.get();
   }
   void resume();
+
+  void setNativeBreakpoint(PassRefPtr<InspectorObject> breakpoint,
+                           unsigned int* breakpointId);
+  void removeNativeBreakpoint(unsigned int breakpointId);
+
 #endif
 
   void evaluateForTestInFrontend(long testCallId, const String& script);
@@ -394,7 +402,12 @@ class InspectorController : public Noncopyable {
 
   void didEvaluateForTestInFrontend(long callId, const String& jsonResult);
 
+  static InspectorController* inspectorControllerForScriptExecutionContext(
+      ScriptExecutionContext* context);
   static InspectorController* inspectorControllerForNode(Node*);
+  static InspectorController* inspectorControllerForDocument(
+      Document* document);
+
   void willInsertDOMNodeImpl(Node* node, Node* parent);
   void didInsertDOMNodeImpl(Node*);
   void willRemoveDOMNodeImpl(Node*);
@@ -403,12 +416,16 @@ class InspectorController : public Noncopyable {
   void didModifyDOMAttrImpl(Element*);
   void characterDataModifiedImpl(CharacterData*);
 
+  void instrumentWillSendXMLHttpRequestImpl(const KURL&);
+
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   friend class InspectorDebuggerAgent;
   String breakpointsSettingKey();
   PassRefPtr<InspectorValue> loadBreakpoints();
   void saveBreakpoints(PassRefPtr<InspectorObject> breakpoints);
 #endif
+
+  static unsigned s_inspectorControllerCount;
 
   Page* m_inspectedPage;
   InspectorClient* m_client;
@@ -463,6 +480,9 @@ class InspectorController : public Noncopyable {
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   bool m_attachDebuggerWhenShown;
   OwnPtr<InspectorDebuggerAgent> m_debuggerAgent;
+
+  HashMap<unsigned int, String> m_XHRBreakpoints;
+  unsigned int m_lastBreakpointId;
 
   OwnPtr<InspectorProfilerAgent> m_profilerAgent;
 #endif
@@ -524,19 +544,43 @@ inline void InspectorController::characterDataModified(
 #endif
 }
 
+inline void InspectorController::instrumentWillSendXMLHttpRequest(
+    ScriptExecutionContext* context,
+    const KURL& url) {
+#if ENABLE(INSPECTOR)
+  if (InspectorController* inspectorController =
+          inspectorControllerForScriptExecutionContext(context))
+    inspectorController->instrumentWillSendXMLHttpRequestImpl(url);
+#endif
+}
+
+inline InspectorController*
+InspectorController::inspectorControllerForScriptExecutionContext(
+    ScriptExecutionContext* context) {
+  if (!s_inspectorControllerCount || !context || !context->isDocument())
+    return 0;
+  return inspectorControllerForDocument(static_cast<Document*>(context));
+}
+
 inline InspectorController* InspectorController::inspectorControllerForNode(
     Node* node) {
-#if ENABLE(INSPECTOR)
-  if (Page* page = node->document()->page()) {
-    if (InspectorController* inspectorController =
-            page->inspectorController()) {
-      if (inspectorController->hasFrontend())
-        return inspectorController;
-    }
-  }
-#endif
+  if (!s_inspectorControllerCount)
+    return 0;
+  return inspectorControllerForDocument(node->document());
+}
 
-  return 0;
+inline InspectorController* InspectorController::inspectorControllerForDocument(
+    Document* document) {
+  ASSERT(document);
+  Page* page = document->page();
+  if (!page)
+    return 0;
+  InspectorController* inspectorController = page->inspectorController();
+  if (!inspectorController)
+    return 0;
+  if (!inspectorController->hasFrontend())
+    return 0;
+  return inspectorController;
 }
 
 }  // namespace WebCore

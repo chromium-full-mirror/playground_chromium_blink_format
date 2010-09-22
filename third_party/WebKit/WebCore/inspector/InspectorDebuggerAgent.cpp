@@ -68,8 +68,7 @@ InspectorDebuggerAgent::InspectorDebuggerAgent(
     : m_inspectorController(inspectorController),
       m_frontend(frontend),
       m_pausedScriptState(0),
-      m_breakpointsLoaded(false),
-      m_breakProgramReason(InspectorValue::null()) {}
+      m_breakpointsLoaded(false) {}
 
 InspectorDebuggerAgent::~InspectorDebuggerAgent() {
   ScriptDebugServer::shared().removeListener(
@@ -314,12 +313,13 @@ void InspectorDebuggerAgent::failedToParseSource(const String& url,
 
 void InspectorDebuggerAgent::didPause(ScriptState* scriptState) {
   ASSERT(scriptState && !m_pausedScriptState);
-  ASSERT(m_breakProgramReason);
   m_pausedScriptState = scriptState;
-  RefPtr<InspectorObject> details = InspectorObject::create();
-  details->setValue("callFrames", currentCallFrames());
-  details->setValue("status", m_breakProgramReason);
-  m_frontend->pausedScript(details);
+
+  if (!m_breakProgramDetails)
+    m_breakProgramDetails = InspectorObject::create();
+  m_breakProgramDetails->setValue("callFrames", currentCallFrames());
+
+  m_frontend->pausedScript(m_breakProgramDetails);
 }
 
 void InspectorDebuggerAgent::didContinue() {
@@ -327,16 +327,19 @@ void InspectorDebuggerAgent::didContinue() {
   m_frontend->resumedScript();
 }
 
-void InspectorDebuggerAgent::breakProgram(PassRefPtr<InspectorValue> reason) {
+void InspectorDebuggerAgent::breakProgram(DebuggerEventType type,
+                                          PassRefPtr<InspectorValue> data) {
+  m_breakProgramDetails = InspectorObject::create();
+  m_breakProgramDetails->setNumber("eventType", type);
+  m_breakProgramDetails->setValue("eventData", data);
   s_debuggerAgentOnBreakpoint = this;
-  m_breakProgramReason = reason;
 
   ScriptDebugServer::shared().breakProgram();
   if (!s_debuggerAgentOnBreakpoint)
     return;
 
   s_debuggerAgentOnBreakpoint = 0;
-  m_breakProgramReason = InspectorValue::null();
+  m_breakProgramDetails = 0;
 }
 
 }  // namespace WebCore
