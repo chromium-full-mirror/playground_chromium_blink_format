@@ -94,6 +94,9 @@ class PluginController {
   virtual bool isAcceleratedCompositingEnabled() = 0;
 #endif
 
+  // Tells the controller that the plug-in process has crashed.
+  virtual void pluginProcessCrashed() = 0;
+
  protected:
   virtual ~PluginController() {}
 };

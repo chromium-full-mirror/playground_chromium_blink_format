@@ -138,6 +138,7 @@ class PluginView : public WebCore::PluginViewBase,
                         bool allowPopups);
   virtual void setStatusbarText(const String&);
   virtual bool isAcceleratedCompositingEnabled();
+  virtual void pluginProcessCrashed();
 
   // WebFrame::LoadListener
   virtual void didFinishLoad(WebFrame*);
