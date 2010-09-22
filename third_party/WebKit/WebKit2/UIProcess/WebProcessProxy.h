@@ -68,6 +68,8 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
 
   template <typename E, typename T>
   bool send(E messageID, uint64_t destinationID, const T& arguments);
+  template <typename T>
+  bool send(const T& message, uint64_t destinationID);
 
   CoreIPC::Connection* connection() const {
     ASSERT(m_connection);
@@ -176,6 +178,16 @@ bool WebProcessProxy::send(E messageID,
   argumentEncoder->encode(arguments);
 
   return sendMessage(CoreIPC::MessageID(messageID), argumentEncoder.release());
+}
+
+template <typename T>
+bool WebProcessProxy::send(const T& message, uint64_t destinationID) {
+  OwnPtr<CoreIPC::ArgumentEncoder> argumentEncoder(
+      new CoreIPC::ArgumentEncoder(destinationID));
+  argumentEncoder->encode(message);
+
+  return sendMessage(CoreIPC::MessageID(T::messageID),
+                     argumentEncoder.release());
 }
 
 }  // namespace WebKit
