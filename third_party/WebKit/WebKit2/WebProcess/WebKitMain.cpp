@@ -153,7 +153,7 @@ extern "C" __declspec(dllexport) int WebKitMain(HINSTANCE hInstance,
   if (!commandLine.parse(lpstrCmdLine))
     return EXIT_FAILURE;
 
-  return WebKitMain(commandLine) :
+  return WebKitMain(commandLine);
 }
 
 #endif
