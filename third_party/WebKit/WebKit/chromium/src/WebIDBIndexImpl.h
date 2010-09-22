@@ -50,14 +50,12 @@ class WebIDBIndexImpl : public WebIDBIndex {
 
   virtual void openObjectCursor(const WebIDBKeyRange&,
                                 unsigned short direction,
-                                WebIDBCallbacks*,
-                                int transactionId);
+                                WebIDBCallbacks*);
   virtual void openCursor(const WebIDBKeyRange&,
                           unsigned short direction,
-                          WebIDBCallbacks*,
-                          int transactionId);
-  virtual void getObject(const WebIDBKey&, WebIDBCallbacks*, int transactionId);
-  virtual void get(const WebIDBKey&, WebIDBCallbacks*, int transactionId);
+                          WebIDBCallbacks*);
+  virtual void getObject(const WebIDBKey&, WebIDBCallbacks*);
+  virtual void get(const WebIDBKey&, WebIDBCallbacks*);
 
  private:
   WTF::RefPtr<WebCore::IDBIndexBackendInterface> m_backend;
