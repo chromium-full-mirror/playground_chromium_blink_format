@@ -27,6 +27,22 @@
 #ifndef Widget_h
 #define Widget_h
 
+#include "IntRect.h"
+#include <wtf/Forward.h>
+#include <wtf/RefCounted.h>
+
+#if PLATFORM(CHROMIUM)
+#include "PlatformWidget.h"
+#endif
+
+#if PLATFORM(MAC)
+#include <wtf/RetainPtr.h>
+#endif
+
+#if PLATFORM(QT)
+#include <qglobal.h>
+#endif
+
 #if PLATFORM(MAC)
 #ifdef __OBJC__
 @class NSView;
@@ -51,7 +67,6 @@ typedef GtkWidget* PlatformWidget;
 #endif
 
 #if PLATFORM(QT)
-#include <qglobal.h>
 QT_BEGIN_NAMESPACE
 class QWidget;
 QT_END_NAMESPACE
@@ -72,10 +87,6 @@ typedef BView* PlatformWidget;
 typedef void* PlatformWidget;
 #endif
 
-#if PLATFORM(CHROMIUM)
-#include "PlatformWidget.h"
-#endif
-
 #if PLATFORM(EFL)
 typedef struct _Evas_Object Evas_Object;
 typedef struct _Evas Evas;
@@ -89,13 +100,6 @@ typedef QWebPageClient* PlatformPageClient;
 #else
 typedef PlatformWidget PlatformPageClient;
 #endif
-
-#include "IntPoint.h"
-#include "IntRect.h"
-#include "IntSize.h"
-
-#include <wtf/Forward.h>
-#include <wtf/RefCounted.h>
 
 namespace WebCore {
 
@@ -132,14 +136,9 @@ class Widget : public RefCounted<Widget> {
   Widget(PlatformWidget = 0);
   virtual ~Widget();
 
-  PlatformWidget platformWidget() const { return m_widget; }
-  void setPlatformWidget(PlatformWidget widget) {
-    if (widget != m_widget) {
-      releasePlatformWidget();
-      m_widget = widget;
-      retainPlatformWidget();
-    }
-  }
+  PlatformWidget platformWidget() const;
+  void setPlatformWidget(PlatformWidget);
+
 #if PLATFORM(HAIKU)
   PlatformWidget topLevelPlatformWidget() const {
     return m_topLevelPlatformWidget;
@@ -276,7 +275,11 @@ class Widget : public RefCounted<Widget> {
 
  private:
   ScrollView* m_parent;
+#if !PLATFORM(MAC)
   PlatformWidget m_widget;
+#else
+  RetainPtr<NSView> m_widget;
+#endif
   bool m_selfVisible;
   bool m_parentVisible;
 
@@ -298,6 +301,30 @@ class Widget : public RefCounted<Widget> {
   PlatformWidget m_topLevelPlatformWidget;
 #endif
 };
+
+#if !PLATFORM(MAC)
+
+inline PlatformWidget Widget::platformWidget() const {
+  return m_widget;
+}
+
+inline void Widget::setPlatformWidget(PlatformWidget widget) {
+  if (widget != m_widget) {
+    releasePlatformWidget();
+    m_widget = widget;
+    retainPlatformWidget();
+  }
+}
+
+#endif
+
+#if !PLATFORM(GTK)
+
+inline void Widget::releasePlatformWidget() {}
+
+inline void Widget::retainPlatformWidget() {}
+
+#endif
 
 }  // namespace WebCore
 

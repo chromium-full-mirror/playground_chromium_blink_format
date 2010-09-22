@@ -35,6 +35,8 @@ typedef struct HICON__* HICON;
 typedef HICON HCURSOR;
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
+#elif PLATFORM(MAC)
+#include <wtf/RetainPtr.h>
 #elif PLATFORM(GTK)
 #include "GRefPtrGtk.h"
 #elif PLATFORM(QT)
@@ -187,7 +189,11 @@ class Cursor {
   IntPoint m_hotSpot;
 #endif
 
+#if !PLATFORM(MAC)
   mutable PlatformCursor m_platformCursor;
+#else
+  mutable RetainPtr<NSCursor> m_platformCursor;
+#endif
 };
 
 IntPoint determineHotSpot(Image*, const IntPoint& specifiedHotSpot);

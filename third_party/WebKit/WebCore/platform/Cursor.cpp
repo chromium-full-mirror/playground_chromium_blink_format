@@ -245,10 +245,14 @@ Cursor::Cursor(Image* image, const IntPoint& hotSpot)
 
 Cursor::Cursor(Type type) : m_type(type), m_platformCursor(0) {}
 
+#if !PLATFORM(MAC)
+
 PlatformCursor Cursor::platformCursor() const {
   ensurePlatformCursor();
   return m_platformCursor;
 }
+
+#endif
 
 const Cursor& pointerCursor() {
   DEFINE_STATIC_LOCAL(Cursor, c, (Cursor::Pointer));
