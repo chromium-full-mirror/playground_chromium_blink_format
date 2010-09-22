@@ -62,9 +62,6 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
   virtual bool initialize(WebGraphicsContext3D::Attributes attributes,
                           WebView*,
                           bool);
-  // FIXME: remove once compositor is switched over to GraphicsContext3D.
-  virtual bool initialize(WebGraphicsContext3D::Attributes attributes,
-                          WebView*);
   virtual bool makeContextCurrent();
 
   virtual int width();

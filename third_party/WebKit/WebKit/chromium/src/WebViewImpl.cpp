@@ -2374,10 +2374,6 @@ SharedGraphicsContext3D* WebViewImpl::getSharedGraphicsContext3D() {
   return m_sharedContext3D.get();
 }
 
-WebGLES2Context* WebViewImpl::gles2Context() {
-  return 0;
-}
-
 WebGraphicsContext3D* WebViewImpl::graphicsContext3D() {
 #if USE(ACCELERATED_COMPOSITING)
   GraphicsContext3D* context = 0;

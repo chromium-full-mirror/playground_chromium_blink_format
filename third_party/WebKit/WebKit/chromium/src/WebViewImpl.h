@@ -310,9 +310,6 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
                            const WebCore::IntRect& clipRect);
   void invalidateRootLayerRect(const WebCore::IntRect&);
 #endif
-  // FIXME: remove this method once the compositor is fully switched
-  // over to GraphicsContext3D.
-  virtual WebGLES2Context* gles2Context();
 
   // Returns the onscreen 3D context used by the compositor. This is
   // used by the renderer's code to set up resource sharing between
