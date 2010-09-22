@@ -290,7 +290,7 @@ static void webkit_web_database_set_name(WebKitWebDatabase* webDatabase,
  *
  * Returns the security origin of the #WebKitWebDatabase.
  *
- * Returns: the security origin of the database
+ * Returns: (transfer none): the security origin of the database
  *
  * Since: 1.1.14
  **/

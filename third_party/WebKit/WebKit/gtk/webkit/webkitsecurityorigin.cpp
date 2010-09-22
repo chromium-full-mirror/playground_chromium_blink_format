@@ -357,7 +357,8 @@ void webkit_security_origin_set_web_database_quota(
  *
  * Returns a list of all Web Databases in the security origin.
  *
- * Returns: a #GList of databases in the security origin.
+ * Returns: (transfer container) (element-type WebKitWebDatabase): a
+ * #GList of databases in the security origin.
  *
  * Since: 1.1.14
  **/
