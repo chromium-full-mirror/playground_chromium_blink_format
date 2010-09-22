@@ -63,6 +63,7 @@ void WebPlatformStrategies::refreshPlugins() {
 }
 
 void WebPlatformStrategies::getPluginInfo(
+    const WebCore::Page*,
     Vector<WebCore::PluginInfo>& outPlugins) {
   const Vector<PluginPackage*>& plugins =
       PluginDatabase::installedPlugins()->plugins();
