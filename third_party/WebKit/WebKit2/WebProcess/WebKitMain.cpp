@@ -25,13 +25,32 @@
 
 #include "CommandLine.h"
 
+#include "ProcessLauncher.h"
 #include "WebProcessMain.h"
+#include <wtf/text/CString.h>
 
 #if PLATFORM(MAC)
 #include <objc/objc-auto.h>
 #endif
 
 using namespace WebKit;
+
+static int WebKitMain(const CommandLine& commandLine) {
+  ProcessLauncher::ProcessType processType;
+  if (!ProcessLauncher::getProcessTypeFromString(
+          commandLine["type"].utf8().data(), processType))
+    return EXIT_FAILURE;
+
+  switch (processType) {
+    case ProcessLauncher::WebProcess:
+      return WebProcessMain(commandLine);
+    case ProcessLauncher::PluginProcess:
+      // FIXME: Handle this.
+      break;
+  }
+
+  return EXIT_FAILURE;
+}
 
 #if PLATFORM(MAC)
 
@@ -44,11 +63,7 @@ int WebKitMain(int argc, char** argv) {
   if (!commandLine.parse(argc, argv))
     return EXIT_FAILURE;
 
-  String mode = commandLine["mode"];
-  if (mode == "legacywebprocess")
-    return WebProcessMain(&commandLine);
-
-  return EXIT_FAILURE;
+  return WebKitMain(commandLine);
 }
 
 #elif PLATFORM(WIN)
@@ -138,11 +153,7 @@ extern "C" __declspec(dllexport) int WebKitMain(HINSTANCE hInstance,
   if (!commandLine.parse(lpstrCmdLine))
     return EXIT_FAILURE;
 
-  String mode = commandLine["mode"];
-  if (mode == "webprocess")
-    return WebKit::WebProcessMain(&commandLine);
-
-  return EXIT_FAILURE;
+  return WebKitMain(commandLine) :
 }
 
 #endif
