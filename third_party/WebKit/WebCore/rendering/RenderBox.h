@@ -50,6 +50,11 @@ class RenderBox : public RenderBoxModelObject {
   void setWidth(int width) { m_frameRect.setWidth(width); }
   void setHeight(int height) { m_frameRect.setHeight(height); }
 
+  int logicalWidth() const;
+  int logicalHeight() const;
+  void setLogicalWidth(int);
+  void setLogicalHeight(int);
+
   IntPoint location() const { return m_frameRect.location(); }
   IntSize locationOffset() const { return IntSize(x(), y()); }
   IntSize size() const { return m_frameRect.size(); }
