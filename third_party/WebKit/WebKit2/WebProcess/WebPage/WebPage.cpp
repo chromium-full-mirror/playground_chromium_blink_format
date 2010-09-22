@@ -185,11 +185,8 @@ void WebPage::initializeInjectedBundleUIClient(WKBundlePageUIClient* client) {
 PassRefPtr<Plugin> WebPage::createPlugin(const Plugin::Parameters& parameters) {
   String pluginPath;
 
-  // FIXME: In the future, this should return a real CoreIPC connection to the
-  // plug-in host, but for now we just
-  // return the path and load the plug-in in the web process.
   if (!WebProcess::shared().connection()->sendSync(
-          WebProcessProxyMessage::GetPluginHostConnection, 0,
+          WebProcessProxyMessage::GetPluginPath, 0,
           CoreIPC::In(parameters.mimeType, parameters.url.string()),
           CoreIPC::Out(pluginPath), CoreIPC::Connection::NoTimeout))
     return 0;

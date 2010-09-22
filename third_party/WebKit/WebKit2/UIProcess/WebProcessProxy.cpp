@@ -197,9 +197,9 @@ void WebProcessProxy::getPlugins(bool refresh, Vector<PluginInfo>& plugins) {
   m_context->pluginInfoStore()->getPlugins(plugins);
 }
 
-void WebProcessProxy::getPluginHostConnection(const String& mimeType,
-                                              const KURL& url,
-                                              String& pluginPath) {
+void WebProcessProxy::getPluginPath(const String& mimeType,
+                                    const KURL& url,
+                                    String& pluginPath) {
   String newMimeType = mimeType.lower();
 
   PluginInfoStore::Plugin plugin =
@@ -317,7 +317,7 @@ void WebProcessProxy::didReceiveMessage(CoreIPC::Connection* connection,
 
       // These are synchronous messages and should never be handled here.
       case WebProcessProxyMessage::GetPlugins:
-      case WebProcessProxyMessage::GetPluginHostConnection:
+      case WebProcessProxyMessage::GetPluginPath:
         ASSERT_NOT_REACHED();
         break;
     }
@@ -359,7 +359,7 @@ CoreIPC::SyncReplyMode WebProcessProxy::didReceiveSyncMessage(
         return CoreIPC::AutomaticReply;
       }
 
-      case WebProcessProxyMessage::GetPluginHostConnection: {
+      case WebProcessProxyMessage::GetPluginPath: {
         String mimeType;
         String urlString;
 
@@ -367,8 +367,7 @@ CoreIPC::SyncReplyMode WebProcessProxy::didReceiveSyncMessage(
           return CoreIPC::AutomaticReply;
 
         String pluginPath;
-        getPluginHostConnection(mimeType, KURL(ParsedURLString, urlString),
-                                pluginPath);
+        getPluginPath(mimeType, KURL(ParsedURLString, urlString), pluginPath);
         reply->encode(CoreIPC::In(pluginPath));
         return CoreIPC::AutomaticReply;
       }
