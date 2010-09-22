@@ -67,7 +67,8 @@ class RenderImage : public RenderReplaced {
   bool isHeightSpecified() const;
 
   virtual void intrinsicSizeChanged() {
-    imageChanged(m_imageResource->imagePtr());
+    if (m_imageResource)
+      imageChanged(m_imageResource->imagePtr());
   }
 
  private:
