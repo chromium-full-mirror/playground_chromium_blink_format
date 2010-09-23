@@ -850,7 +850,7 @@ static bool _ewk_frame_rect_is_negative_value(const WebCore::IntRect& i) {
  *         n bigger than search results.
  */
 Eina_Bool ewk_frame_text_matches_nth_pos_get(Evas_Object* o,
-                                             int n,
+                                             size_t n,
                                              int* x,
                                              int* y) {
   EWK_FRAME_SD_GET_OR_RETURN(o, sd, EINA_FALSE);

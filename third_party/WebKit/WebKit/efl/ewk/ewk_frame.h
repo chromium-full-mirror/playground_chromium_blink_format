@@ -182,7 +182,7 @@ EAPI Eina_Bool ewk_frame_text_matches_highlight_set(Evas_Object* o,
                                                     Eina_Bool highlight);
 EAPI Eina_Bool ewk_frame_text_matches_highlight_get(const Evas_Object* o);
 EAPI Eina_Bool ewk_frame_text_matches_nth_pos_get(Evas_Object* o,
-                                                  int n,
+                                                  size_t n,
                                                   int* x,
                                                   int* y);
 
