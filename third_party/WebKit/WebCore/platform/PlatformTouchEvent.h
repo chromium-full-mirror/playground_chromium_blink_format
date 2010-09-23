@@ -35,6 +35,12 @@ QT_END_NAMESPACE
 #include "IntPoint.h"
 #endif
 
+#if PLATFORM(BREWMP)
+typedef unsigned short uint16;
+typedef unsigned long int uint32;
+#define AEEEvent uint16
+#endif
+
 namespace WebCore {
 
 enum TouchEventType { TouchStart, TouchMove, TouchEnd, TouchCancel };
@@ -54,6 +60,8 @@ class PlatformTouchEvent {
                      TouchEventType,
                      PlatformTouchPoint::State,
                      int metaState);
+#elif PLATFORM(BREWMP)
+  PlatformTouchEvent(AEEEvent, uint16 wParam, uint32 dwParam);
 #endif
 
   TouchEventType type() const { return m_type; }
