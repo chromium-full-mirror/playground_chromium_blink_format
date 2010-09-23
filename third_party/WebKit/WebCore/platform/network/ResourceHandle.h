@@ -185,7 +185,7 @@ class ResourceHandle : public RefCounted<ResourceHandle>
   void fileLoadTimer(Timer<ResourceHandle>*);
   void onHandleCreated(LPARAM);
   void onRedirect();
-  void onRequestComplete(LPARAM);
+  bool onRequestComplete();
   static void CALLBACK
       internetStatusCallback(HINTERNET, DWORD_PTR, DWORD, LPVOID, DWORD);
   friend void __stdcall transferJobStatusCallback(HINTERNET,
