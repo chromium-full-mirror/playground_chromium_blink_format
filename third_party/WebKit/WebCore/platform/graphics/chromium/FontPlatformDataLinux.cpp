@@ -71,7 +71,7 @@ FontPlatformData::FontPlatformData(const FontPlatformData& src)
       m_fakeItalic(src.m_fakeItalic),
       m_style(src.m_style),
       m_harfbuzzFace(src.m_harfbuzzFace) {
-  m_typeface->safeRef();
+  SkSafeRef(m_typeface);
 }
 
 FontPlatformData::FontPlatformData(SkTypeface* tf,
@@ -84,7 +84,7 @@ FontPlatformData::FontPlatformData(SkTypeface* tf,
       m_textSize(textSize),
       m_fakeBold(fakeBold),
       m_fakeItalic(fakeItalic) {
-  m_typeface->safeRef();
+  SkSafeRef(m_typeface);
   querySystemForRenderStyle();
 }
 
@@ -95,12 +95,12 @@ FontPlatformData::FontPlatformData(const FontPlatformData& src, float textSize)
       m_fakeBold(src.m_fakeBold),
       m_fakeItalic(src.m_fakeItalic),
       m_harfbuzzFace(src.m_harfbuzzFace) {
-  m_typeface->safeRef();
+  SkSafeRef(m_typeface);
   querySystemForRenderStyle();
 }
 
 FontPlatformData::~FontPlatformData() {
-  m_typeface->safeUnref();
+  SkSafeUnref(m_typeface);
 }
 
 FontPlatformData& FontPlatformData::operator=(const FontPlatformData& src) {
