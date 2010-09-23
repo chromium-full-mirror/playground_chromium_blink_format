@@ -2197,7 +2197,8 @@ void RenderObject::getTransformFromContainer(
     transform.multLeft(layer->currentTransform());
 
 #if ENABLE(3D_RENDERING)
-  if (containerObject && containerObject->hasLayer() &&
+  if (containerObject && containerObject->isBox() &&
+      containerObject->hasLayer() &&
       containerObject->style()->hasPerspective()) {
     // Perpsective on the container affects us, so we have to factor it in here.
     ASSERT(containerObject->hasLayer());
