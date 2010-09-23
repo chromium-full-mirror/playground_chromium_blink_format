@@ -1572,8 +1572,11 @@ void LayoutTestController::addUserStyleSheet(const CppArgumentList& arguments,
     return;
   WebView::addUserStyleSheet(
       cppVariantToWebString(arguments[0]), WebVector<WebString>(),
-      arguments[2].toBoolean() ? WebView::UserContentInjectInAllFrames
-                               : WebView::UserContentInjectInTopFrameOnly);
+      arguments[1].toBoolean() ? WebView::UserContentInjectInAllFrames
+                               : WebView::UserContentInjectInTopFrameOnly,
+      // Chromium defaults to InjectInSubsequentDocuments, but for compatibility
+      // with the other ports' DRTs, we use UserStyleInjectInExistingDocuments.
+      WebView::UserStyleInjectInExistingDocuments);
 }
 
 void LayoutTestController::setEditingBehavior(const CppArgumentList& arguments,

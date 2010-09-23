@@ -1959,7 +1959,8 @@ void WebView::addUserScript(const WebString& sourceCode,
 
 void WebView::addUserStyleSheet(const WebString& sourceCode,
                                 const WebVector<WebString>& patternsIn,
-                                WebView::UserContentInjectIn injectIn) {
+                                WebView::UserContentInjectIn injectIn,
+                                WebView::UserStyleInjectionTime injectionTime) {
   OwnPtr<Vector<String>> patterns(new Vector<String>);
   for (size_t i = 0; i < patternsIn.size(); ++i)
     patterns->append(patternsIn[i]);
@@ -1976,8 +1977,8 @@ void WebView::addUserStyleSheet(const WebString& sourceCode,
   // an empty URL.
   pageGroup->addUserStyleSheetToWorld(
       world.get(), sourceCode, WebURL(), patterns.release(), 0,
-      static_cast<UserContentInjectedFrames>(injectIn),
-      UserStyleSheet::AuthorLevel);
+      static_cast<UserContentInjectedFrames>(injectIn), UserStyleAuthorLevel,
+      static_cast<WebCore::UserStyleInjectionTime>(injectionTime));
 }
 
 void WebView::removeAllUserContent() {

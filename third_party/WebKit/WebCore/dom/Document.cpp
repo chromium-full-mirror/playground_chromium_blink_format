@@ -2370,8 +2370,7 @@ const Vector<RefPtr<CSSStyleSheet>>* Document::pageGroupUserSheets() const {
         continue;
       RefPtr<CSSStyleSheet> parsedSheet = CSSStyleSheet::createInline(
           const_cast<Document*>(this), sheet->url());
-      parsedSheet->setIsUserStyleSheet(sheet->level() ==
-                                       UserStyleSheet::UserLevel);
+      parsedSheet->setIsUserStyleSheet(sheet->level() == UserStyleUserLevel);
       parsedSheet->parseString(sheet->source(), !inQuirksMode());
       if (!m_pageGroupUserSheets)
         m_pageGroupUserSheets.set(new Vector<RefPtr<CSSStyleSheet>>);
