@@ -43,8 +43,8 @@ class InlineFlowBox : public InlineBox {
         m_lastChild(0),
         m_prevLineBox(0),
         m_nextLineBox(0),
-        m_includeLeftEdge(false),
-        m_includeRightEdge(false)
+        m_includeLogicalLeftEdge(false),
+        m_includeLogicalRightEdge(false)
 #ifndef NDEBUG
         ,
         m_hasBadChildList(false)
@@ -142,57 +142,60 @@ class InlineFlowBox : public InlineBox {
 
   virtual RenderLineBoxList* rendererLineBoxes() const;
 
-  int marginBorderPaddingLeft() const {
-    return marginLeft() + borderLeft() + paddingLeft();
+  // logicalLeft = left in a horizontal line and top in a vertical line.
+  int marginBorderPaddingLogicalLeft() const {
+    return marginLogicalLeft() + borderLogicalLeft() + paddingLogicalLeft();
   }
-  int marginBorderPaddingRight() const {
-    return marginRight() + borderRight() + paddingRight();
+  int marginBorderPaddingLogicalRight() const {
+    return marginLogicalRight() + borderLogicalRight() + paddingLogicalRight();
   }
-  int marginLeft() const {
-    if (includeLeftEdge())
-      return boxModelObject()->marginLeft();
-    return 0;
+  int marginLogicalLeft() const {
+    if (!includeLogicalLeftEdge())
+      return 0;
+    return !isVertical() ? boxModelObject()->marginLeft()
+                         : boxModelObject()->marginTop();
   }
-  int marginRight() const {
-    if (includeRightEdge())
-      return boxModelObject()->marginRight();
-    return 0;
+  int marginLogicalRight() const {
+    if (!includeLogicalRightEdge())
+      return 0;
+    return !isVertical() ? boxModelObject()->marginRight()
+                         : boxModelObject()->marginBottom();
   }
-  int borderLeft() const {
-    if (includeLeftEdge())
-      return renderer()->style()->borderLeftWidth();
-    return 0;
+  int borderLogicalLeft() const {
+    if (!includeLogicalLeftEdge())
+      return 0;
+    return !isVertical() ? renderer()->style()->borderLeftWidth()
+                         : renderer()->style()->borderTopWidth();
   }
-  int borderRight() const {
-    if (includeRightEdge())
-      return renderer()->style()->borderRightWidth();
-    return 0;
+  int borderLogicalRight() const {
+    if (!includeLogicalRightEdge())
+      return 0;
+    return !isVertical() ? renderer()->style()->borderRightWidth()
+                         : renderer()->style()->borderBottomWidth();
   }
-  int borderTop() const { return renderer()->style()->borderTopWidth(); }
-  int borderBottom() const { return renderer()->style()->borderBottomWidth(); }
-  int paddingLeft() const {
-    if (includeLeftEdge())
-      return boxModelObject()->paddingLeft();
-    return 0;
+  int paddingLogicalLeft() const {
+    if (!includeLogicalLeftEdge())
+      return 0;
+    return !isVertical() ? boxModelObject()->paddingLeft()
+                         : boxModelObject()->paddingTop();
   }
-  int paddingRight() const {
-    if (includeRightEdge())
-      return boxModelObject()->paddingRight();
-    return 0;
+  int paddingLogicalRight() const {
+    if (!includeLogicalRightEdge())
+      return 0;
+    return !isVertical() ? boxModelObject()->paddingRight()
+                         : boxModelObject()->paddingBottom();
   }
-  int paddingTop() const { return boxModelObject()->paddingTop(); }
-  int paddingBottom() const { return boxModelObject()->paddingBottom(); }
 
-  bool includeLeftEdge() const { return m_includeLeftEdge; }
-  bool includeRightEdge() const { return m_includeRightEdge; }
+  bool includeLogicalLeftEdge() const { return m_includeLogicalLeftEdge; }
+  bool includeLogicalRightEdge() const { return m_includeLogicalRightEdge; }
   void setEdges(bool includeLeft, bool includeRight) {
-    m_includeLeftEdge = includeLeft;
-    m_includeRightEdge = includeRight;
+    m_includeLogicalLeftEdge = includeLeft;
+    m_includeLogicalRightEdge = includeRight;
   }
 
   // Helper functions used during line construction and placement.
   void determineSpacingForFlowBoxes(bool lastLine, RenderObject* endObject);
-  int getFlowSpacingWidth();
+  int getFlowSpacingLogicalWidth();
   bool onEndChain(RenderObject* endObject);
   int placeBoxesHorizontally(int x,
                              bool& needsWordSpacing,
@@ -313,8 +316,8 @@ class InlineFlowBox : public InlineBox {
       m_prevLineBox;  // The previous box that also uses our RenderObject
   InlineFlowBox* m_nextLineBox;  // The next box that also uses our RenderObject
 
-  bool m_includeLeftEdge : 1;
-  bool m_includeRightEdge : 1;
+  bool m_includeLogicalLeftEdge : 1;
+  bool m_includeLogicalRightEdge : 1;
   bool m_hasTextChildren : 1;
 
 #ifndef NDEBUG

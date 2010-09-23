@@ -53,11 +53,13 @@ InlineFlowBox::~InlineFlowBox() {
 
 #endif
 
-int InlineFlowBox::getFlowSpacingWidth() {
-  int totWidth = marginBorderPaddingLeft() + marginBorderPaddingRight();
+int InlineFlowBox::getFlowSpacingLogicalWidth() {
+  int totWidth =
+      marginBorderPaddingLogicalLeft() + marginBorderPaddingLogicalRight();
   for (InlineBox* curr = firstChild(); curr; curr = curr->nextOnLine()) {
     if (curr->isInlineFlowBox())
-      totWidth += static_cast<InlineFlowBox*>(curr)->getFlowSpacingWidth();
+      totWidth +=
+          static_cast<InlineFlowBox*>(curr)->getFlowSpacingLogicalWidth();
   }
   return totWidth;
 }
@@ -270,7 +272,7 @@ int InlineFlowBox::placeBoxesHorizontally(
   leftVisualOverflow = min(xPos + boxShadowLeft, leftVisualOverflow);
 
   int startX = xPos;
-  xPos += borderLeft() + paddingLeft();
+  xPos += borderLogicalLeft() + paddingLogicalLeft();
 
   for (InlineBox* curr = firstChild(); curr; curr = curr->nextOnLine()) {
     if (curr->renderer()->isText()) {
@@ -338,10 +340,10 @@ int InlineFlowBox::placeBoxesHorizontally(
       }
       if (curr->renderer()->isRenderInline()) {
         InlineFlowBox* flow = static_cast<InlineFlowBox*>(curr);
-        xPos += flow->marginLeft();
+        xPos += flow->marginLogicalLeft();
         xPos = flow->placeBoxesHorizontally(xPos, needsWordSpacing,
                                             textBoxDataMap);
-        xPos += flow->marginRight();
+        xPos += flow->marginLogicalRight();
         leftLayoutOverflow =
             min(leftLayoutOverflow, flow->leftLayoutOverflow());
         rightLayoutOverflow =
@@ -376,7 +378,7 @@ int InlineFlowBox::placeBoxesHorizontally(
     }
   }
 
-  xPos += borderRight() + paddingRight();
+  xPos += borderLogicalRight() + paddingLogicalRight();
   setLogicalWidth(xPos - startX);
   rightVisualOverflow =
       max(x() + logicalWidth() + boxShadowRight, rightVisualOverflow);
@@ -892,7 +894,8 @@ void InlineFlowBox::paintBoxShadow(GraphicsContext* context,
     // protrude incorrectly at the edges, and we want to possibly include
     // shadows cast from the previous/following lines
     boxModelObject()->paintBoxShadow(context, tx, ty, w, h, s, shadowStyle,
-                                     includeLeftEdge(), includeRightEdge());
+                                     includeLogicalLeftEdge(),
+                                     includeLogicalRightEdge());
   }
 }
 
@@ -953,9 +956,9 @@ void InlineFlowBox::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
       // only box for this object.  In those
       // cases only a single call to draw is required.
       if (!hasBorderImage || (!prevLineBox() && !nextLineBox()))
-        boxModelObject()->paintBorder(context, tx, ty, w, h,
-                                      renderer()->style(), includeLeftEdge(),
-                                      includeRightEdge());
+        boxModelObject()->paintBorder(
+            context, tx, ty, w, h, renderer()->style(),
+            includeLogicalLeftEdge(), includeLogicalRightEdge());
       else {
         // We have a border image that spans multiple lines.
         // We need to adjust _tx and _ty by the width of all previous lines.
@@ -1118,9 +1121,9 @@ void InlineFlowBox::paintTextDecorations(PaintInfo& paintInfo,
       ((!paintedChildren && ((deco & UNDERLINE) || (deco & OVERLINE))) ||
        (paintedChildren && (deco & LINE_THROUGH))) &&
       shouldDrawTextDecoration(renderer())) {
-    int x = m_x + borderLeft() + paddingLeft();
-    int w = m_logicalWidth -
-            (borderLeft() + paddingLeft() + borderRight() + paddingRight());
+    int x = m_x + borderLogicalLeft() + paddingLogicalLeft();
+    int w = m_logicalWidth - (borderLogicalLeft() + paddingLogicalLeft() +
+                              borderLogicalRight() + paddingLogicalRight());
     RootInlineBox* rootLine = root();
     if (rootLine->ellipsisBox()) {
       int ellipsisX = m_x + rootLine->ellipsisBox()->x();
@@ -1161,7 +1164,7 @@ void InlineFlowBox::paintTextDecorations(PaintInfo& paintInfo,
     }
 
     // We must have child boxes and have decorations defined.
-    tx += borderLeft() + paddingLeft();
+    tx += borderLogicalLeft() + paddingLogicalLeft();
 
     Color underline, overline, linethrough;
     underline = overline = linethrough =
@@ -1185,7 +1188,8 @@ void InlineFlowBox::paintTextDecorations(PaintInfo& paintInfo,
 
     int baselinePos = renderer()->style(m_firstLine)->font().ascent();
     if (!isRootInlineBox())
-      baselinePos += borderTop() + paddingTop();
+      baselinePos +=
+          boxModelObject()->borderTop() + boxModelObject()->paddingTop();
 
     bool setClip = false;
     int extraOffset = 0;

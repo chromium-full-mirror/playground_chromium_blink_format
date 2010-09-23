@@ -517,8 +517,8 @@ void RenderBoxModelObject::paintFillLayerExtended(
   if (context->paintingDisabled())
     return;
 
-  bool includeLeftEdge = box ? box->includeLeftEdge() : true;
-  bool includeRightEdge = box ? box->includeRightEdge() : true;
+  bool includeLeftEdge = box ? box->includeLogicalLeftEdge() : true;
+  bool includeRightEdge = box ? box->includeLogicalRightEdge() : true;
   int bLeft = includeLeftEdge ? borderLeft() : 0;
   int bRight = includeRightEdge ? borderRight() : 0;
   int pLeft = includeLeftEdge ? paddingLeft() : 0;

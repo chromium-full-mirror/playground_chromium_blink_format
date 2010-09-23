@@ -365,7 +365,7 @@ void RenderBlock::computeHorizontalPositionsForLine(
     GlyphOverflowAndFallbackFontsMap& textBoxDataMap) {
   // First determine our total width.
   int availableWidth = lineWidth(height(), firstLine);
-  int totWidth = lineBox->getFlowSpacingWidth();
+  int totWidth = lineBox->getFlowSpacingLogicalWidth();
   bool needsWordSpacing = false;
   unsigned numSpaces = 0;
   ETextAlign textAlign = style()->textAlign();
