@@ -95,6 +95,7 @@ struct ByteTerm {
     struct {
       int next;
       int end;
+      bool onceThrough;
     } alternative;
     unsigned checkInputCount;
   };
@@ -216,17 +217,19 @@ struct ByteTerm {
     return ByteTerm(TypeBackReference, subpatternId, false, inputPos);
   }
 
-  static ByteTerm BodyAlternativeBegin() {
+  static ByteTerm BodyAlternativeBegin(bool onceThrough) {
     ByteTerm term(TypeBodyAlternativeBegin);
     term.alternative.next = 0;
     term.alternative.end = 0;
+    term.alternative.onceThrough = onceThrough;
     return term;
   }
 
-  static ByteTerm BodyAlternativeDisjunction() {
+  static ByteTerm BodyAlternativeDisjunction(bool onceThrough) {
     ByteTerm term(TypeBodyAlternativeDisjunction);
     term.alternative.next = 0;
     term.alternative.end = 0;
+    term.alternative.onceThrough = onceThrough;
     return term;
   }
 
@@ -234,6 +237,7 @@ struct ByteTerm {
     ByteTerm term(TypeBodyAlternativeEnd);
     term.alternative.next = 0;
     term.alternative.end = 0;
+    term.alternative.onceThrough = false;
     return term;
   }
 
@@ -241,6 +245,7 @@ struct ByteTerm {
     ByteTerm term(TypeAlternativeBegin);
     term.alternative.next = 0;
     term.alternative.end = 0;
+    term.alternative.onceThrough = false;
     return term;
   }
 
@@ -248,6 +253,7 @@ struct ByteTerm {
     ByteTerm term(TypeAlternativeDisjunction);
     term.alternative.next = 0;
     term.alternative.end = 0;
+    term.alternative.onceThrough = false;
     return term;
   }
 
@@ -255,6 +261,7 @@ struct ByteTerm {
     ByteTerm term(TypeAlternativeEnd);
     term.alternative.next = 0;
     term.alternative.end = 0;
+    term.alternative.onceThrough = false;
     return term;
   }
 

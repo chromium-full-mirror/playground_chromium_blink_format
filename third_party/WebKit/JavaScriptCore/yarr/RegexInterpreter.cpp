@@ -1172,6 +1172,10 @@ class Interpreter {
 
         input.next();
         context->matchBegin = input.getPos();
+
+        if (currentTerm().alternative.onceThrough)
+          context->term += currentTerm().alternative.next;
+
         MATCH_NEXT();
       }
       case ByteTerm::TypeBodyAlternativeEnd:
@@ -1325,7 +1329,8 @@ class ByteCompiler {
   }
 
   PassOwnPtr<BytecodePattern> compile(BumpPointerAllocator* allocator) {
-    regexBegin(m_pattern.m_numSubpatterns, m_pattern.m_body->m_callFrameSize);
+    regexBegin(m_pattern.m_numSubpatterns, m_pattern.m_body->m_callFrameSize,
+               m_pattern.m_body->m_alternatives[0]->onceThrough());
     emitDisjunction(m_pattern.m_body);
     regexEnd();
 
@@ -1586,21 +1591,25 @@ class ByteCompiler {
     }
   }
 
-  void regexBegin(unsigned numSubpatterns, unsigned callFrameSize) {
+  void regexBegin(unsigned numSubpatterns,
+                  unsigned callFrameSize,
+                  bool onceThrough) {
     m_bodyDisjunction =
         adoptPtr(new ByteDisjunction(numSubpatterns, callFrameSize));
-    m_bodyDisjunction->terms.append(ByteTerm::BodyAlternativeBegin());
+    m_bodyDisjunction->terms.append(
+        ByteTerm::BodyAlternativeBegin(onceThrough));
     m_bodyDisjunction->terms[0].frameLocation = 0;
     m_currentAlternativeIndex = 0;
   }
 
   void regexEnd() { closeBodyAlternative(); }
 
-  void alternativeBodyDisjunction() {
+  void alternativeBodyDisjunction(bool onceThrough) {
     int newAlternativeIndex = m_bodyDisjunction->terms.size();
     m_bodyDisjunction->terms[m_currentAlternativeIndex].alternative.next =
         newAlternativeIndex - m_currentAlternativeIndex;
-    m_bodyDisjunction->terms.append(ByteTerm::BodyAlternativeDisjunction());
+    m_bodyDisjunction->terms.append(
+        ByteTerm::BodyAlternativeDisjunction(onceThrough));
 
     m_currentAlternativeIndex = newAlternativeIndex;
   }
@@ -1620,14 +1629,15 @@ class ByteCompiler {
     for (unsigned alt = 0; alt < disjunction->m_alternatives.size(); ++alt) {
       unsigned currentCountAlreadyChecked = inputCountAlreadyChecked;
 
+      PatternAlternative* alternative = disjunction->m_alternatives[alt];
+
       if (alt) {
         if (disjunction == m_pattern.m_body)
-          alternativeBodyDisjunction();
+          alternativeBodyDisjunction(alternative->onceThrough());
         else
           alternativeDisjunction();
       }
 
-      PatternAlternative* alternative = disjunction->m_alternatives[alt];
       unsigned minimumSize = alternative->m_minimumSize;
 
       ASSERT(minimumSize >= parenthesesInputCountAlreadyChecked);
