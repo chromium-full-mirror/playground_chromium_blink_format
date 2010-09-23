@@ -180,6 +180,7 @@ class ResourceHandle : public RefCounted<ResourceHandle>
   static void forceContentSniffing();
 
 #if USE(WININET)
+  void setSynchronousInternetHandle(HINTERNET);
   void fileLoadTimer(Timer<ResourceHandle>*);
   void onHandleCreated(LPARAM);
   void onRedirect();
