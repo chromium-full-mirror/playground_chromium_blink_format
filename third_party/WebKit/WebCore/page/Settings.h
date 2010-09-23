@@ -234,7 +234,7 @@ class Settings : public Noncopyable {
   void setDOMPasteAllowed(bool);
   bool isDOMPasteAllowed() const { return m_isDOMPasteAllowed; }
 
-  void setMinDOMTimerInterval(double);  // Interval specified in seconds.
+  static void setMinDOMTimerInterval(double);  // Interval specified in seconds.
 
   void setUsesPageCache(bool);
   bool usesPageCache() const { return m_usesPageCache; }

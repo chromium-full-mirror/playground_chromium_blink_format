@@ -2704,6 +2704,7 @@ HRESULT STDMETHODCALLTYPE WebView::initWithFrame(
 #endif
     WebKitSetApplicationCachePathIfNecessary();
     WebPlatformStrategies::initialize();
+    Settings::setMinDOMTimerInterval(0.004);
 
     didOneTimeInitialization = true;
   }
@@ -2732,7 +2733,6 @@ HRESULT STDMETHODCALLTYPE WebView::initWithFrame(
       new WebGeolocationControllerClient(this);
 #endif
   m_page = new Page(pageClients);
-  m_page->settings()->setMinDOMTimerInterval(0.004);
 
   BSTR localStoragePath;
   if (SUCCEEDED(m_preferences->localStorageDatabasePath(&localStoragePath))) {
