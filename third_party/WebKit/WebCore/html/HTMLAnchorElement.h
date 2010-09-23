@@ -109,6 +109,8 @@ class HTMLAnchorElement : public HTMLElement {
   virtual short tabIndex() const;
   virtual bool draggable() const;
 
+  void sendPings(const KURL& destinationURL);
+
   enum EventType {
     MouseEventWithoutShiftKey,
     MouseEventWithShiftKey,

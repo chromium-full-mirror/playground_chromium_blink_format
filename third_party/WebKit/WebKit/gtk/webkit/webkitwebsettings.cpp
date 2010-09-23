@@ -108,6 +108,7 @@ struct _WebKitWebSettingsPrivate {
   gboolean enable_page_cache;
   gboolean auto_resize_window;
   gboolean enable_java_applet;
+  gboolean enable_hyperlink_auditing;
 };
 
 #define WEBKIT_WEB_SETTINGS_GET_PRIVATE(obj)                    \
@@ -159,7 +160,7 @@ enum {
   PROP_ENABLE_SITE_SPECIFIC_QUIRKS,
   PROP_ENABLE_PAGE_CACHE,
   PROP_AUTO_RESIZE_WINDOW,
-  PROP_ENABLE_JAVA_APPLET
+  PROP_ENABLE_JAVA_APPLET PROP_ENABLE_HYPERLINK_AUDITING
 };
 
 // Create a default user agent string
@@ -796,6 +797,19 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
           _("Whether Java Applet support through <applet> should be enabled"),
           TRUE, flags));
 
+  /**
+  * WebKitWebSettings:enable-hyperlink-auditing:
+  *
+  * Enable or disable support for <a ping>.
+  *
+  * Since: 1.1.22
+  */
+  g_object_class_install_property(
+      gobject_class, PROP_ENABLE_HYPERLINK_AUDITING,
+      g_param_spec_boolean(
+          "enable-hyperlink-auditing", _("Enable Hyperlink Auditing"),
+          _("Whether <a ping> should be able to send pings"), FALSE, flags));
+
   g_type_class_add_private(klass, sizeof(WebKitWebSettingsPrivate));
 }
 
@@ -1017,6 +1031,9 @@ static void webkit_web_settings_set_property(GObject* object,
     case PROP_ENABLE_JAVA_APPLET:
       priv->enable_java_applet = g_value_get_boolean(value);
       break;
+    case PROP_ENABLE_HYPERLINK_AUDITING:
+      priv->enable_hyperlink_auditing = g_value_get_boolean(value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
       break;
@@ -1161,6 +1178,9 @@ static void webkit_web_settings_get_property(GObject* object,
     case PROP_ENABLE_JAVA_APPLET:
       g_value_set_boolean(value, priv->enable_java_applet);
       break;
+    case PROP_ENABLE_HYPERLINK_AUDITING:
+      g_value_set_boolean(value, priv->enable_hyperlink_auditing);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
       break;
@@ -1229,7 +1249,8 @@ WebKitWebSettings* webkit_web_settings_copy(WebKitWebSettings* web_settings) {
       priv->enable_default_context_menu, "enable-site-specific-quirks",
       priv->enable_site_specific_quirks, "enable-page-cache",
       priv->enable_page_cache, "auto-resize-window", priv->auto_resize_window,
-      "enable-java-applet", priv->enable_java_applet, NULL));
+      "enable-java-applet", priv->enable_java_applet,
+      "enable-hyperlink-auditing", priv->enable_hyperlink_auditing, NULL));
 
   return copy;
 }

@@ -75,7 +75,8 @@ class QWEBKIT_EXPORT QWebSettings {
     TiledBackingStoreEnabled,
     FrameFlatteningEnabled,
     SiteSpecificQuirksEnabled,
-    WebGLEnabled
+    WebGLEnabled,
+    HyperlinkAuditingEnabled
   };
   enum WebGraphic {
     MissingImageGraphic,

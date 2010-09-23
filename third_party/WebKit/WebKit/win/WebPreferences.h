@@ -428,6 +428,9 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE setMemoryInfoEnabled(BOOL);
   virtual HRESULT STDMETHODCALLTYPE memoryInfoEnabled(BOOL*);
 
+  virtual HRESULT STDMETHODCALLTYPE hyperlinkAuditingEnabled(BOOL*);
+  virtual HRESULT STDMETHODCALLTYPE setHyperlinkAuditingEnabled(BOOL);
+
   // WebPreferences
 
   // This method accesses a different preference key than
