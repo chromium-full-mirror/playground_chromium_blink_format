@@ -185,6 +185,7 @@ class ResourceHandleInternal : public Noncopyable {
   String m_postReferrer;
   bool m_hasReceivedResponse;
   bool m_resend;
+  String m_redirectUrl;
 #endif
 #if USE(CURL)
   CURL* m_handle;
