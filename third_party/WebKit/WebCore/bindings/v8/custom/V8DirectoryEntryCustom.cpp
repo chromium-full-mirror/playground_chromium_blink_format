@@ -79,7 +79,7 @@ v8::Handle<v8::Value> V8DirectoryEntry::getDirectoryCallback(
         V8Flags::HasInstance(args[1])
             ? V8Flags::toNative(v8::Handle<v8::Object>::Cast(args[1]))
             : 0);
-    flags = adoptRef(tmp_flags);
+    flags = tmp_flags;
   }
   RefPtr<EntryCallback> successCallback;
   if (args.Length() > 2 && !args[2]->IsNull() && !args[2]->IsUndefined()) {
@@ -132,7 +132,7 @@ v8::Handle<v8::Value> V8DirectoryEntry::getFileCallback(
         V8Flags::HasInstance(args[1])
             ? V8Flags::toNative(v8::Handle<v8::Object>::Cast(args[1]))
             : 0);
-    flags = adoptRef(tmp_flags);
+    flags = tmp_flags;
   }
   RefPtr<EntryCallback> successCallback;
   if (args.Length() > 2 && !args[2]->IsNull() && !args[2]->IsUndefined()) {
