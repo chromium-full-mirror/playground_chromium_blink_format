@@ -58,6 +58,7 @@ class WebFormElement;
 class WebHistoryItem;
 class WebInputElement;
 class WebPasswordAutocompleteListener;
+class WebPerformance;
 class WebRange;
 class WebSecurityOrigin;
 class WebString;
@@ -191,6 +192,8 @@ class WebFrame {
   virtual void forms(WebVector<WebFormElement>&) const = 0;
 
   virtual WebAnimationController* animationController() = 0;
+
+  virtual WebPerformance performance() const = 0;
 
   // Scripting ----------------------------------------------------------
 
