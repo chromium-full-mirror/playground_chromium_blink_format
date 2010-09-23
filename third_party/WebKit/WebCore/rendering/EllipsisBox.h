@@ -36,6 +36,7 @@ class EllipsisBox : public InlineBox {
               int height,
               int y,
               bool firstLine,
+              bool isVertical,
               InlineBox* markupBox)
       : InlineBox(obj,
                   0,
@@ -45,6 +46,7 @@ class EllipsisBox : public InlineBox {
                   true,
                   false,
                   false,
+                  isVertical,
                   0,
                   0,
                   parent),

@@ -52,6 +52,7 @@ class InlineBox {
         m_hasVirtualLogicalHeight(false)
 #endif
         ,
+        m_isVertical(false),
         m_endsWithBreak(false),
         m_hasSelectedChildren(false),
         m_hasEllipsisBoxOrHyphen(false),
@@ -77,6 +78,7 @@ class InlineBox {
             bool constructed,
             bool dirty,
             bool extracted,
+            bool isVertical,
             InlineBox* next,
             InlineBox* prev,
             InlineFlowBox* parent)
@@ -97,6 +99,7 @@ class InlineBox {
         m_hasVirtualLogicalHeight(false)
 #endif
         ,
+        m_isVertical(isVertical),
         m_endsWithBreak(false),
         m_hasSelectedChildren(false),
         m_hasEllipsisBoxOrHyphen(false),
@@ -158,6 +161,7 @@ class InlineBox {
 #if ENABLE(SVG)
   virtual bool isSVGInlineTextBox() const { return false; }
   virtual bool isSVGRootInlineBox() const { return false; }
+#endif
 
   bool hasVirtualLogicalHeight() const { return m_hasVirtualLogicalHeight; }
   void setHasVirtualLogicalHeight() { m_hasVirtualLogicalHeight = true; }
@@ -165,7 +169,9 @@ class InlineBox {
     ASSERT_NOT_REACHED();
     return 0;
   }
-#endif
+
+  bool isVertical() const { return m_isVertical; }
+  void setIsVertical(bool v) { m_isVertical = v; }
 
   virtual IntRect calculateBoundaries() const {
     ASSERT_NOT_REACHED();
@@ -319,6 +325,8 @@ class InlineBox {
   bool m_extracted : 1;
   bool m_hasVirtualLogicalHeight : 1;
 
+  bool m_isVertical;
+
   // for RootInlineBox
   bool m_endsWithBreak : 1;        // Whether the line ends with a <br>.
   bool m_hasSelectedChildren : 1;  // Whether we have any children selected
@@ -337,7 +345,7 @@ class InlineBox {
   mutable bool m_determinedIfPrevOnLineExists : 1;
   mutable bool m_nextOnLineExists : 1;
   mutable bool m_prevOnLineExists : 1;
-  int m_toAdd : 12;  // for justified text
+  int m_toAdd : 11;  // for justified text
 
 #ifndef NDEBUG
  private:
