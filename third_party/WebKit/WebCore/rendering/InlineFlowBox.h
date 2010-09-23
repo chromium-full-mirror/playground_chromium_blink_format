@@ -197,9 +197,9 @@ class InlineFlowBox : public InlineBox {
   void determineSpacingForFlowBoxes(bool lastLine, RenderObject* endObject);
   int getFlowSpacingLogicalWidth();
   bool onEndChain(RenderObject* endObject);
-  int placeBoxesHorizontally(int x,
-                             bool& needsWordSpacing,
-                             GlyphOverflowAndFallbackFontsMap&);
+  int placeBoxesInInlineDirection(int x,
+                                  bool& needsWordSpacing,
+                                  GlyphOverflowAndFallbackFontsMap&);
   void computeLogicalBoxHeights(int& maxPositionTop,
                                 int& maxPositionBottom,
                                 int& maxAscent,
@@ -210,16 +210,16 @@ class InlineFlowBox : public InlineBox {
                                  int& maxDescent,
                                  int maxPositionTop,
                                  int maxPositionBottom);
-  void placeBoxesVertically(int y,
-                            int maxHeight,
-                            int maxAscent,
-                            bool strictMode,
-                            int& lineTop,
-                            int& lineBottom);
-  void computeVerticalOverflow(int lineTop,
-                               int lineBottom,
-                               bool strictMode,
-                               GlyphOverflowAndFallbackFontsMap&);
+  void placeBoxesInBlockDirection(int y,
+                                  int maxHeight,
+                                  int maxAscent,
+                                  bool strictMode,
+                                  int& lineTop,
+                                  int& lineBottom);
+  void computeBlockDirectionOverflow(int lineTop,
+                                     int lineBottom,
+                                     bool strictMode,
+                                     GlyphOverflowAndFallbackFontsMap&);
 
   void removeChild(InlineBox* child);
 
@@ -294,15 +294,15 @@ class InlineFlowBox : public InlineBox {
                       : IntRect(m_x, m_y, m_logicalWidth, logicalHeight());
   }
 
-  void setHorizontalOverflowPositions(int leftLayoutOverflow,
-                                      int rightLayoutOverflow,
-                                      int leftVisualOverflow,
-                                      int rightVisualOverflow);
-  void setVerticalOverflowPositions(int topLayoutOverflow,
-                                    int bottomLayoutOverflow,
-                                    int topVisualOverflow,
-                                    int bottomVisualOverflow,
-                                    int boxHeight);
+  void setInlineDirectionOverflowPositions(int leftLayoutOverflow,
+                                           int rightLayoutOverflow,
+                                           int leftVisualOverflow,
+                                           int rightVisualOverflow);
+  void setBlockDirectionOverflowPositions(int topLayoutOverflow,
+                                          int bottomLayoutOverflow,
+                                          int topVisualOverflow,
+                                          int bottomVisualOverflow,
+                                          int boxHeight);
 
  protected:
   OwnPtr<RenderOverflow> m_overflow;
@@ -325,7 +325,7 @@ class InlineFlowBox : public InlineBox {
 #endif
 };
 
-inline void InlineFlowBox::setHorizontalOverflowPositions(
+inline void InlineFlowBox::setInlineDirectionOverflowPositions(
     int leftLayoutOverflow,
     int rightLayoutOverflow,
     int leftVisualOverflow,
@@ -347,7 +347,7 @@ inline void InlineFlowBox::setHorizontalOverflowPositions(
   m_overflow->setRightVisualOverflow(rightVisualOverflow);
 }
 
-inline void InlineFlowBox::setVerticalOverflowPositions(
+inline void InlineFlowBox::setBlockDirectionOverflowPositions(
     int topLayoutOverflow,
     int bottomLayoutOverflow,
     int topVisualOverflow,

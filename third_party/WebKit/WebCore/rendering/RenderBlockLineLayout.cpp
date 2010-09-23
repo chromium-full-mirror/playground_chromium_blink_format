@@ -356,7 +356,7 @@ RootInlineBox* RenderBlock::constructLine(unsigned runCount,
   return lastRootBox();
 }
 
-void RenderBlock::computeHorizontalPositionsForLine(
+void RenderBlock::computeInlineDirectionPositionsForLine(
     RootInlineBox* lineBox,
     bool firstLine,
     BidiRun* firstRun,
@@ -559,14 +559,14 @@ void RenderBlock::computeHorizontalPositionsForLine(
   // (and
   // compute accurate widths for the inline flow boxes).
   needsWordSpacing = false;
-  lineBox->placeBoxesHorizontally(x, needsWordSpacing, textBoxDataMap);
+  lineBox->placeBoxesInInlineDirection(x, needsWordSpacing, textBoxDataMap);
 }
 
-void RenderBlock::computeVerticalPositionsForLine(
+void RenderBlock::computeBlockDirectionPositionsForLine(
     RootInlineBox* lineBox,
     BidiRun* firstRun,
     GlyphOverflowAndFallbackFontsMap& textBoxDataMap) {
-  setHeight(lineBox->verticallyAlignBoxes(height(), textBoxDataMap));
+  setHeight(lineBox->alignBoxesInBlockDirection(height(), textBoxDataMap));
   lineBox->setBlockHeight(height());
 
   // Now make sure we place replaced render objects correctly.
@@ -881,13 +881,13 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
 
             // Now we position all of our text runs horizontally.
             if (!isSVGRootInlineBox)
-              computeHorizontalPositionsForLine(
+              computeInlineDirectionPositionsForLine(
                   lineBox, firstLine, resolver.firstRun(), trailingSpaceRun,
                   end.atEnd(), textBoxDataMap);
 
             // Now position our text runs vertically.
-            computeVerticalPositionsForLine(lineBox, resolver.firstRun(),
-                                            textBoxDataMap);
+            computeBlockDirectionPositionsForLine(lineBox, resolver.firstRun(),
+                                                  textBoxDataMap);
 
 #if ENABLE(SVG)
             // SVG text layout code computes vertical & horizontal positions on
@@ -1041,8 +1041,9 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         m_lineBoxes.appendLineBox(trailingFloatsLineBox);
         trailingFloatsLineBox->setConstructed();
         GlyphOverflowAndFallbackFontsMap textBoxDataMap;
-        trailingFloatsLineBox->verticallyAlignBoxes(height(), textBoxDataMap);
-        trailingFloatsLineBox->setVerticalOverflowPositions(
+        trailingFloatsLineBox->alignBoxesInBlockDirection(height(),
+                                                          textBoxDataMap);
+        trailingFloatsLineBox->setBlockDirectionOverflowPositions(
             height(), bottomLayoutOverflow, height(), bottomVisualOverflow, 0);
         trailingFloatsLineBox->setBlockHeight(height());
       }

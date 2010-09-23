@@ -159,11 +159,11 @@ void RootInlineBox::addHighlightOverflow() {
   IntRect inflatedRect =
       enclosingIntRect(page->chrome()->client()->customHighlightRect(
           renderer()->node(), renderer()->style()->highlight(), rootRect));
-  setHorizontalOverflowPositions(
+  setInlineDirectionOverflowPositions(
       leftLayoutOverflow(), rightLayoutOverflow(),
       min(leftVisualOverflow(), inflatedRect.x()),
       max(rightVisualOverflow(), inflatedRect.right()));
-  setVerticalOverflowPositions(
+  setBlockDirectionOverflowPositions(
       topLayoutOverflow(), bottomLayoutOverflow(),
       min(topVisualOverflow(), inflatedRect.y()),
       max(bottomVisualOverflow(), inflatedRect.bottom()), logicalHeight());
@@ -242,7 +242,7 @@ void RootInlineBox::childRemoved(InlineBox* box) {
   }
 }
 
-int RootInlineBox::verticallyAlignBoxes(
+int RootInlineBox::alignBoxesInBlockDirection(
     int heightOfBlock,
     GlyphOverflowAndFallbackFontsMap& textBoxDataMap) {
 #if ENABLE(SVG)
@@ -269,9 +269,10 @@ int RootInlineBox::verticallyAlignBoxes(
   int maxHeight = maxAscent + maxDescent;
   int lineTop = heightOfBlock;
   int lineBottom = heightOfBlock;
-  placeBoxesVertically(heightOfBlock, maxHeight, maxAscent, noQuirksMode,
-                       lineTop, lineBottom);
-  computeVerticalOverflow(lineTop, lineBottom, noQuirksMode, textBoxDataMap);
+  placeBoxesInBlockDirection(heightOfBlock, maxHeight, maxAscent, noQuirksMode,
+                             lineTop, lineBottom);
+  computeBlockDirectionOverflow(lineTop, lineBottom, noQuirksMode,
+                                textBoxDataMap);
   setLineTopBottomPositions(lineTop, lineBottom);
 
   heightOfBlock += maxHeight;

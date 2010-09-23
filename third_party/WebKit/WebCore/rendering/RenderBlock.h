@@ -506,15 +506,16 @@ class RenderBlock : public RenderBox {
                                bool lastLine,
                                RenderObject* endObject);
   InlineFlowBox* createLineBoxes(RenderObject*, bool firstLine);
-  void computeHorizontalPositionsForLine(RootInlineBox*,
-                                         bool firstLine,
-                                         BidiRun* firstRun,
-                                         BidiRun* trailingSpaceRun,
-                                         bool reachedEnd,
-                                         GlyphOverflowAndFallbackFontsMap&);
-  void computeVerticalPositionsForLine(RootInlineBox*,
-                                       BidiRun*,
-                                       GlyphOverflowAndFallbackFontsMap&);
+  void computeInlineDirectionPositionsForLine(
+      RootInlineBox*,
+      bool firstLine,
+      BidiRun* firstRun,
+      BidiRun* trailingSpaceRun,
+      bool reachedEnd,
+      GlyphOverflowAndFallbackFontsMap&);
+  void computeBlockDirectionPositionsForLine(RootInlineBox*,
+                                             BidiRun*,
+                                             GlyphOverflowAndFallbackFontsMap&);
   void deleteEllipsisLineBoxes();
   void checkLinesForTextOverflow();
   void addOverflowFromInlineChildren();

@@ -63,8 +63,8 @@ class RootInlineBox : public InlineFlowBox {
     return max(0, selectionBottom() - selectionTop());
   }
 
-  int verticallyAlignBoxes(int heightOfBlock,
-                           GlyphOverflowAndFallbackFontsMap&);
+  int alignBoxesInBlockDirection(int heightOfBlock,
+                                 GlyphOverflowAndFallbackFontsMap&);
   void setLineTopBottomPositions(int top, int bottom);
 
   virtual RenderLineBoxList* rendererLineBoxes() const;

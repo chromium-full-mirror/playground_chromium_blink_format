@@ -269,7 +269,7 @@ void RenderListItem::positionListMarker() {
       for (InlineFlowBox* box = m_marker->inlineBoxWrapper()->parent(); box;
            box = box->parent()) {
         if (markerXPos < box->leftLayoutOverflow()) {
-          box->setHorizontalOverflowPositions(
+          box->setInlineDirectionOverflowPositions(
               markerXPos, box->rightLayoutOverflow(), box->leftVisualOverflow(),
               box->rightVisualOverflow());
           if (box == root)
@@ -285,7 +285,7 @@ void RenderListItem::positionListMarker() {
       for (InlineFlowBox* box = m_marker->inlineBoxWrapper()->parent(); box;
            box = box->parent()) {
         if (markerXPos + m_marker->width() > box->rightLayoutOverflow()) {
-          box->setHorizontalOverflowPositions(
+          box->setInlineDirectionOverflowPositions(
               box->leftLayoutOverflow(), markerXPos + m_marker->width(),
               box->leftVisualOverflow(), box->rightVisualOverflow());
           if (box == root)
