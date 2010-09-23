@@ -164,7 +164,7 @@ class ChromiumBridge {
 #if OS(WINDOWS)
   static bool ensureFontLoaded(HFONT font);
 #endif
-#if OS(LINUX)
+#if OS(LINUX) || OS(FREEBSD)
   static void getRenderStyleForStrike(const char* family,
                                       int sizeAndStyle,
                                       FontRenderStyle* result);

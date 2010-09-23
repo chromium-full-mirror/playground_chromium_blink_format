@@ -39,7 +39,7 @@
 #if OS(WINDOWS)
 #include "PlatformString.h"
 #include <windows.h>
-#elif OS(LINUX)
+#elif OS(LINUX) || OS(FREEBSD)
 #include "SkTypeface.h"
 #endif
 
@@ -52,7 +52,7 @@ struct FontCustomPlatformData : Noncopyable {
 #if OS(WINDOWS)
   FontCustomPlatformData(HANDLE fontReference, const String& name)
       : m_fontReference(fontReference), m_name(name) {}
-#elif OS(LINUX)
+#elif OS(LINUX) || OS(FREEBSD)
   explicit FontCustomPlatformData(SkTypeface* typeface)
       : m_fontReference(typeface) {}
 #endif
@@ -69,7 +69,7 @@ struct FontCustomPlatformData : Noncopyable {
 #if OS(WINDOWS)
   HANDLE m_fontReference;
   String m_name;
-#elif OS(LINUX)
+#elif OS(LINUX) || OS(FREEBSD)
   SkTypeface* m_fontReference;
 #endif
 };
