@@ -227,6 +227,7 @@ class LayoutTestController : public CppBoundClass {
   void numberOfActiveAnimations(const CppArgumentList&, CppVariant*);
   void suspendAnimations(const CppArgumentList&, CppVariant*);
   void resumeAnimations(const CppArgumentList&, CppVariant*);
+  void sampleSVGAnimationForElementAtTime(const CppArgumentList&, CppVariant*);
   void disableImageLoading(const CppArgumentList&, CppVariant*);
   void setIconDatabaseEnabled(const CppArgumentList&, CppVariant*);
   void dumpSelectionRect(const CppArgumentList&, CppVariant*);

@@ -110,6 +110,7 @@
 #include "ReplaceSelectionCommand.h"
 #include "ResourceHandle.h"
 #include "ResourceRequest.h"
+#include "SVGSMILElement.h"
 #include "ScriptController.h"
 #include "ScriptSourceCode.h"
 #include "ScriptValue.h"
@@ -1598,6 +1599,28 @@ bool WebFrameImpl::selectionStartHasSpellingMarkerFor(int from,
   if (!m_frame)
     return false;
   return m_frame->editor()->selectionStartHasSpellingMarkerFor(from, length);
+}
+
+bool WebFrameImpl::pauseSVGAnimation(const WebString& animationId,
+                                     double time,
+                                     const WebString& elementId) {
+#if !ENABLE(SVG)
+  return false;
+#else
+  if (!m_frame)
+    return false;
+
+  Document* document = m_frame->document();
+  if (!document || !document->svgExtensions())
+    return false;
+
+  Node* coreNode = document->getElementById(animationId);
+  if (!coreNode || !SVGSMILElement::isSMILElement(coreNode))
+    return false;
+
+  return document->accessSVGExtensions()->sampleAnimationAtTime(
+      elementId, static_cast<SVGSMILElement*>(coreNode), time);
+#endif
 }
 
 // WebFrameImpl public ---------------------------------------------------------

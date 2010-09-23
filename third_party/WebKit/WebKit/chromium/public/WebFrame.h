@@ -537,6 +537,12 @@ class WebFrame {
   virtual bool selectionStartHasSpellingMarkerFor(int from,
                                                   int length) const = 0;
 
+  // Pauses and samples an SVG animation.  Returns false if there's no svg
+  // animation to pause.  This is only for testing.
+  virtual bool pauseSVGAnimation(const WebString& animationId,
+                                 double time,
+                                 const WebString& elementId) = 0;
+
  protected:
   ~WebFrame() {}
 };
