@@ -70,6 +70,9 @@ class AsyncFileSystemChromium : public AsyncFileSystem {
                                PassOwnPtr<AsyncFileSystemCallbacks>);
   virtual void readDirectory(const String& path,
                              PassOwnPtr<AsyncFileSystemCallbacks>);
+  virtual void createWriter(FileWriterClient* client,
+                            const String& path,
+                            PassOwnPtr<AsyncFileSystemCallbacks>);
 
  private:
   WebKit::WebFileSystem* m_webFileSystem;

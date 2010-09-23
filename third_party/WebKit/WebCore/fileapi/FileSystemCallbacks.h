@@ -40,12 +40,15 @@
 
 namespace WebCore {
 
+class AsyncFileWriter;
 class DOMFileSystem;
 class ErrorCallback;
 class EntriesCallback;
 class EntryArray;
 class EntryCallback;
 class FileSystemCallback;
+class FileWriter;
+class FileWriterCallback;
 class MetadataCallback;
 class ScriptExecutionContext;
 class VoidCallback;
@@ -70,6 +73,10 @@ class FileSystemCallbacksBase : public AsyncFileSystemCallbacks {
   // hasMore is true there can be more chunks.
   virtual void didReadDirectoryEntry(const String& name, bool isDirectory);
   virtual void didReadDirectoryEntries(bool hasMore);
+
+  // For createFileWriter.
+  virtual void didCreateFileWriter(PassOwnPtr<AsyncFileWriter>,
+                                   long long length);
 
   // For ErrorCallback.
   virtual void didFail(int code);
@@ -133,6 +140,19 @@ class MetadataCallbacks : public FileSystemCallbacksBase {
 
  private:
   RefPtr<MetadataCallback> m_successCallback;
+};
+
+class FileWriterCallbacks : public FileSystemCallbacksBase {
+ public:
+  FileWriterCallbacks(PassRefPtr<FileWriter>,
+                      PassRefPtr<FileWriterCallback>,
+                      PassRefPtr<ErrorCallback>);
+  virtual void didCreateFileWriter(PassOwnPtr<AsyncFileWriter>,
+                                   long long length);
+
+ private:
+  RefPtr<FileWriter> m_fileWriter;
+  RefPtr<FileWriterCallback> m_successCallback;
 };
 
 class VoidCallbacks : public FileSystemCallbacksBase {
