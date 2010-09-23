@@ -123,7 +123,7 @@ void AsyncFileSystemChromium::readDirectory(
 class FileWriterHelperCallbacks : public WebKit::WebFileSystemCallbacks {
  public:
   FileWriterHelperCallbacks(
-      FileWriterClient* client,
+      AsyncFileWriterClient* client,
       const String& path,
       WebKit::WebFileSystem* webFileSystem,
       PassOwnPtr<WebCore::AsyncFileSystemCallbacks> callbacks)
@@ -172,14 +172,14 @@ class FileWriterHelperCallbacks : public WebKit::WebFileSystemCallbacks {
   }
 
  private:
-  FileWriterClient* m_client;
+  AsyncFileWriterClient* m_client;
   String m_path;
   WebKit::WebFileSystem* m_webFileSystem;
   OwnPtr<WebCore::AsyncFileSystemCallbacks> m_callbacks;
 };
 
 void AsyncFileSystemChromium::createWriter(
-    FileWriterClient* client,
+    AsyncFileWriterClient* client,
     const String& path,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
   m_webFileSystem->readMetadata(

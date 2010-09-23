@@ -34,8 +34,8 @@
 #if ENABLE(FILE_SYSTEM)
 
 #include "ActiveDOMObject.h"
+#include "AsyncFileWriterClient.h"
 #include "EventTarget.h"
-#include "FileWriterClient.h"
 #include <wtf/OwnPtr.h>
 #include <wtf/PassOwnPtr.h>
 #include <wtf/PassRefPtr.h>
@@ -52,7 +52,7 @@ class ScriptExecutionContext;
 class FileWriter : public RefCounted<FileWriter>,
                    public ActiveDOMObject,
                    public EventTarget,
-                   public FileWriterClient {
+                   public AsyncFileWriterClient {
  public:
   static PassRefPtr<FileWriter> create(ScriptExecutionContext* context) {
     return adoptRef(new FileWriter(context));
@@ -72,7 +72,7 @@ class FileWriter : public RefCounted<FileWriter>,
   long long position() const { return m_position; }
   long long length() const { return m_length; }
 
-  // FileWriterClient
+  // AsyncFileWriterClient
   void didWrite(long long bytes, bool complete);
   void didTruncate(long long length);
   void didFail(ExceptionCode ec);

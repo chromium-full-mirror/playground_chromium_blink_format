@@ -41,7 +41,7 @@ namespace WebCore {
 
 class AsyncFileSystem;
 class AsyncFileSystemCallbacks;
-class FileWriterClient;
+class AsyncFileWriterClient;
 
 // This class provides async interface for platform-specific file system
 // implementation.  Note that all the methods take platform paths.
@@ -142,7 +142,7 @@ class AsyncFileSystem : public Noncopyable {
   // AsyncFileSystemCallbacks::didCreateFileWriter() is called when an
   // AsyncFileWriter is created successfully.
   // AsyncFileSystemCallbacks::didFail() is called otherwise.
-  virtual void createWriter(FileWriterClient* client,
+  virtual void createWriter(AsyncFileWriterClient* client,
                             const String& path,
                             PassOwnPtr<AsyncFileSystemCallbacks>) = 0;
 
