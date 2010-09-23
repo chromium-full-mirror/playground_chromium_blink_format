@@ -349,12 +349,10 @@ bool MediaControlStatusDisplayElement::rendererIsNeeded(RenderStyle* style) {
 
 MediaControlInputElement::MediaControlInputElement(
     HTMLMediaElement* mediaElement,
-    PseudoId pseudo,
-    const String& type)
+    PseudoId pseudo)
     : HTMLInputElement(inputTag, mediaElement->document()),
       m_mediaElement(mediaElement),
       m_pseudoStyleId(pseudo) {
-  setType(type);
   setInDocument();
 
   switch (pseudo) {
@@ -489,16 +487,18 @@ void MediaControlInputElement::setDisplayType(
 inline MediaControlMuteButtonElement::MediaControlMuteButtonElement(
     HTMLMediaElement* mediaElement,
     ButtonLocation location)
-    : MediaControlInputElement(mediaElement,
-                               location == Controller
-                                   ? MEDIA_CONTROLS_MUTE_BUTTON
-                                   : MEDIA_CONTROLS_VOLUME_SLIDER_MUTE_BUTTON,
-                               "button") {}
+    : MediaControlInputElement(
+          mediaElement,
+          location == Controller ? MEDIA_CONTROLS_MUTE_BUTTON
+                                 : MEDIA_CONTROLS_VOLUME_SLIDER_MUTE_BUTTON) {}
 
 PassRefPtr<MediaControlMuteButtonElement> MediaControlMuteButtonElement::create(
     HTMLMediaElement* mediaElement,
     ButtonLocation location) {
-  return adoptRef(new MediaControlMuteButtonElement(mediaElement, location));
+  RefPtr<MediaControlMuteButtonElement> button =
+      adoptRef(new MediaControlMuteButtonElement(mediaElement, location));
+  button->setType("button");
+  return button.release();
 }
 
 void MediaControlMuteButtonElement::defaultEventHandler(Event* event) {
@@ -517,13 +517,14 @@ void MediaControlMuteButtonElement::updateDisplayType() {
 
 inline MediaControlPlayButtonElement::MediaControlPlayButtonElement(
     HTMLMediaElement* mediaElement)
-    : MediaControlInputElement(mediaElement,
-                               MEDIA_CONTROLS_PLAY_BUTTON,
-                               "button") {}
+    : MediaControlInputElement(mediaElement, MEDIA_CONTROLS_PLAY_BUTTON) {}
 
 PassRefPtr<MediaControlPlayButtonElement> MediaControlPlayButtonElement::create(
     HTMLMediaElement* mediaElement) {
-  return adoptRef(new MediaControlPlayButtonElement(mediaElement));
+  RefPtr<MediaControlPlayButtonElement> button =
+      adoptRef(new MediaControlPlayButtonElement(mediaElement));
+  button->setType("button");
+  return button.release();
 }
 
 void MediaControlPlayButtonElement::defaultEventHandler(Event* event) {
@@ -544,7 +545,7 @@ void MediaControlPlayButtonElement::updateDisplayType() {
 inline MediaControlSeekButtonElement::MediaControlSeekButtonElement(
     HTMLMediaElement* mediaElement,
     PseudoId pseudoId)
-    : MediaControlInputElement(mediaElement, pseudoId, "button"),
+    : MediaControlInputElement(mediaElement, pseudoId),
       m_seeking(false),
       m_capturing(false),
       m_seekTimer(this, &MediaControlSeekButtonElement::seekTimerFired) {}
@@ -552,8 +553,10 @@ inline MediaControlSeekButtonElement::MediaControlSeekButtonElement(
 PassRefPtr<MediaControlSeekButtonElement> MediaControlSeekButtonElement::create(
     HTMLMediaElement* mediaElement,
     PseudoId pseudoStyleId) {
-  return adoptRef(
-      new MediaControlSeekButtonElement(mediaElement, pseudoStyleId));
+  RefPtr<MediaControlSeekButtonElement> button =
+      adoptRef(new MediaControlSeekButtonElement(mediaElement, pseudoStyleId));
+  button->setType("button");
+  return button.release();
 }
 
 inline bool MediaControlSeekButtonElement::isForwardButton() const {
@@ -610,13 +613,14 @@ void MediaControlSeekButtonElement::detach() {
 
 inline MediaControlRewindButtonElement::MediaControlRewindButtonElement(
     HTMLMediaElement* element)
-    : MediaControlInputElement(element,
-                               MEDIA_CONTROLS_REWIND_BUTTON,
-                               "button") {}
+    : MediaControlInputElement(element, MEDIA_CONTROLS_REWIND_BUTTON) {}
 
 PassRefPtr<MediaControlRewindButtonElement>
 MediaControlRewindButtonElement::create(HTMLMediaElement* mediaElement) {
-  return adoptRef(new MediaControlRewindButtonElement(mediaElement));
+  RefPtr<MediaControlRewindButtonElement> button =
+      adoptRef(new MediaControlRewindButtonElement(mediaElement));
+  button->setType("button");
+  return button.release();
 }
 
 void MediaControlRewindButtonElement::defaultEventHandler(Event* event) {
@@ -632,13 +636,15 @@ void MediaControlRewindButtonElement::defaultEventHandler(Event* event) {
 inline MediaControlReturnToRealtimeButtonElement::
     MediaControlReturnToRealtimeButtonElement(HTMLMediaElement* mediaElement)
     : MediaControlInputElement(mediaElement,
-                               MEDIA_CONTROLS_RETURN_TO_REALTIME_BUTTON,
-                               "button") {}
+                               MEDIA_CONTROLS_RETURN_TO_REALTIME_BUTTON) {}
 
 PassRefPtr<MediaControlReturnToRealtimeButtonElement>
 MediaControlReturnToRealtimeButtonElement::create(
     HTMLMediaElement* mediaElement) {
-  return adoptRef(new MediaControlReturnToRealtimeButtonElement(mediaElement));
+  RefPtr<MediaControlReturnToRealtimeButtonElement> button =
+      adoptRef(new MediaControlReturnToRealtimeButtonElement(mediaElement));
+  button->setType("button");
+  return button.release();
 }
 
 void MediaControlReturnToRealtimeButtonElement::defaultEventHandler(
@@ -656,14 +662,15 @@ inline MediaControlToggleClosedCaptionsButtonElement::
     MediaControlToggleClosedCaptionsButtonElement(
         HTMLMediaElement* mediaElement)
     : MediaControlInputElement(mediaElement,
-                               MEDIA_CONTROLS_TOGGLE_CLOSED_CAPTIONS_BUTTON,
-                               "button") {}
+                               MEDIA_CONTROLS_TOGGLE_CLOSED_CAPTIONS_BUTTON) {}
 
 PassRefPtr<MediaControlToggleClosedCaptionsButtonElement>
 MediaControlToggleClosedCaptionsButtonElement::create(
     HTMLMediaElement* mediaElement) {
-  return adoptRef(
-      new MediaControlToggleClosedCaptionsButtonElement(mediaElement));
+  RefPtr<MediaControlToggleClosedCaptionsButtonElement> button =
+      adoptRef(new MediaControlToggleClosedCaptionsButtonElement(mediaElement));
+  button->setType("button");
+  return button.release();
 }
 
 void MediaControlToggleClosedCaptionsButtonElement::defaultEventHandler(
@@ -687,12 +694,14 @@ void MediaControlToggleClosedCaptionsButtonElement::updateDisplayType() {
 
 MediaControlTimelineElement::MediaControlTimelineElement(
     HTMLMediaElement* mediaElement)
-    : MediaControlInputElement(mediaElement, MEDIA_CONTROLS_TIMELINE, "range") {
-}
+    : MediaControlInputElement(mediaElement, MEDIA_CONTROLS_TIMELINE) {}
 
 PassRefPtr<MediaControlTimelineElement> MediaControlTimelineElement::create(
     HTMLMediaElement* mediaElement) {
-  return adoptRef(new MediaControlTimelineElement(mediaElement));
+  RefPtr<MediaControlTimelineElement> timeline =
+      adoptRef(new MediaControlTimelineElement(mediaElement));
+  timeline->setType("range");
+  return timeline.release();
 }
 
 void MediaControlTimelineElement::defaultEventHandler(Event* event) {
@@ -740,13 +749,14 @@ void MediaControlTimelineElement::update(bool updateDuration) {
 
 inline MediaControlVolumeSliderElement::MediaControlVolumeSliderElement(
     HTMLMediaElement* mediaElement)
-    : MediaControlInputElement(mediaElement,
-                               MEDIA_CONTROLS_VOLUME_SLIDER,
-                               "range") {}
+    : MediaControlInputElement(mediaElement, MEDIA_CONTROLS_VOLUME_SLIDER) {}
 
 PassRefPtr<MediaControlVolumeSliderElement>
 MediaControlVolumeSliderElement::create(HTMLMediaElement* mediaElement) {
-  return adoptRef(new MediaControlVolumeSliderElement(mediaElement));
+  RefPtr<MediaControlVolumeSliderElement> slider =
+      adoptRef(new MediaControlVolumeSliderElement(mediaElement));
+  slider->setType("range");
+  return slider.release();
 }
 
 void MediaControlVolumeSliderElement::defaultEventHandler(Event* event) {
@@ -783,13 +793,15 @@ void MediaControlVolumeSliderElement::update() {
 
 inline MediaControlFullscreenButtonElement::MediaControlFullscreenButtonElement(
     HTMLMediaElement* mediaElement)
-    : MediaControlInputElement(mediaElement,
-                               MEDIA_CONTROLS_FULLSCREEN_BUTTON,
-                               "button") {}
+    : MediaControlInputElement(mediaElement, MEDIA_CONTROLS_FULLSCREEN_BUTTON) {
+}
 
 PassRefPtr<MediaControlFullscreenButtonElement>
 MediaControlFullscreenButtonElement::create(HTMLMediaElement* mediaElement) {
-  return adoptRef(new MediaControlFullscreenButtonElement(mediaElement));
+  RefPtr<MediaControlFullscreenButtonElement> button =
+      adoptRef(new MediaControlFullscreenButtonElement(mediaElement));
+  button->setType("button");
+  return button.release();
 }
 
 void MediaControlFullscreenButtonElement::defaultEventHandler(Event* event) {
