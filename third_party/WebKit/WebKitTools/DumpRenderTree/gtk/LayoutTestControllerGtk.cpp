@@ -702,8 +702,8 @@ void LayoutTestController::overridePreference(JSStringRef key,
     g_object_set(settings, propertyName, valueAsString.get(), NULL);
   else if (G_VALUE_HOLDS_BOOLEAN(&currentPropertyValue))
     g_object_set(G_OBJECT(settings), propertyName,
-                 g_ascii_strcasecmp(valueAsString.get(), "true") ||
-                     g_ascii_strcasecmp(valueAsString.get(), "1"),
+                 !g_ascii_strcasecmp(valueAsString.get(), "true") ||
+                     !g_ascii_strcasecmp(valueAsString.get(), "1"),
                  NULL);
   else if (G_VALUE_HOLDS_INT(&currentPropertyValue))
     g_object_set(G_OBJECT(settings), propertyName, atoi(valueAsString.get()),
