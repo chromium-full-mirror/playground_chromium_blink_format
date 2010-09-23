@@ -358,7 +358,7 @@ class FunctionExecutable : public ScriptExecutable {
 
   const Identifier& name() { return m_name; }
   size_t parameterCount() const { return m_parameters->size(); }
-  unsigned variableCount() const { return m_numVariables; }
+  unsigned capturedVariableCount() const { return m_numCapturedVariables; }
   UString paramString() const;
   SharedSymbolTable* symbolTable() const { return m_symbolTable; }
 
@@ -393,7 +393,7 @@ class FunctionExecutable : public ScriptExecutable {
                                                          ScopeChainNode*,
                                                          CodeBlock*);
 
-  unsigned m_numVariables : 31;
+  unsigned m_numCapturedVariables : 31;
   bool m_forceUsesArguments : 1;
 
   RefPtr<FunctionParameters> m_parameters;

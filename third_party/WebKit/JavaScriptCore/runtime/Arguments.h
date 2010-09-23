@@ -247,7 +247,7 @@ inline void JSActivation::copyRegisters() {
   ASSERT(!d()->registerArray);
 
   size_t numParametersMinusThis = d()->functionExecutable->parameterCount();
-  size_t numVars = d()->functionExecutable->variableCount();
+  size_t numVars = d()->functionExecutable->capturedVariableCount();
   size_t numLocals = numVars + numParametersMinusThis;
 
   if (!numLocals)

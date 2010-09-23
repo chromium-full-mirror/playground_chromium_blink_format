@@ -1752,6 +1752,12 @@ class ScopeNode : public StatementNode, public ParserArenaRefCounted {
   bool hasCapturedVariables() const {
     return !!m_data->m_capturedVariables.size();
   }
+  size_t capturedVariableCount() const {
+    return m_data->m_capturedVariables.size();
+  }
+  bool captures(const Identifier& ident) {
+    return m_data->m_capturedVariables.contains(ident.impl());
+  }
 
   VarStack& varStack() {
     ASSERT(m_data);
