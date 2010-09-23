@@ -32,6 +32,7 @@
 #include "EventException.h"
 #include "IDBAbortEvent.h"
 #include "IDBDatabase.h"
+#include "IDBDatabaseException.h"
 #include "IDBObjectStore.h"
 #include "IDBObjectStoreBackendInterface.h"
 #include "IDBPendingTransactionMonitor.h"
@@ -48,7 +49,7 @@ IDBTransaction::IDBTransaction(
       m_database(db),
       m_stopped(false),
       m_timer(this, &IDBTransaction::timerFired) {
-  IDBPendingTransactionMonitor::addPendingTransaction(m_backend->id());
+  IDBPendingTransactionMonitor::addPendingTransaction(m_backend.get());
 }
 
 IDBTransaction::~IDBTransaction() {}
@@ -65,8 +66,12 @@ PassRefPtr<IDBObjectStore> IDBTransaction::objectStore(const String& name,
                                                        const ExceptionCode&) {
   RefPtr<IDBObjectStoreBackendInterface> objectStoreBackend =
       m_backend->objectStore(name);
+  if (!objectStoreBackend) {
+    throwError(IDBDatabaseException::NOT_ALLOWED_ERR);
+    return 0;
+  }
   RefPtr<IDBObjectStore> objectStore =
-      IDBObjectStore::create(objectStoreBackend);
+      IDBObjectStore::create(objectStoreBackend, m_backend.get());
   return objectStore.release();
 }
 

@@ -60,7 +60,6 @@ class IDBFactoryBackendInterface
                     PassRefPtr<SecurityOrigin>,
                     Frame*,
                     const String& dataDir) = 0;
-  virtual void abortPendingTransactions(const Vector<int>& ids) = 0;
 };
 
 }  // namespace WebCore

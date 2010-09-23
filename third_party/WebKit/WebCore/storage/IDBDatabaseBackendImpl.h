@@ -74,6 +74,10 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
       unsigned short mode,
       unsigned long timeout);
 
+  IDBTransactionCoordinator* transactionCoordinator() const {
+    return m_transactionCoordinator.get();
+  }
+
  private:
   IDBDatabaseBackendImpl(const String& name,
                          const String& description,

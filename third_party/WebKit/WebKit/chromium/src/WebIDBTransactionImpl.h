@@ -33,10 +33,6 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 
-namespace WebCore {
-class IDBTransactionBackendInterface;
-}
-
 namespace WebKit {
 
 // See comment in WebIndexedDatabase for a high level overview these classes.
@@ -49,8 +45,12 @@ class WebIDBTransactionImpl : public WebIDBTransaction {
   virtual int mode() const;
   virtual WebIDBObjectStore* objectStore(const WebString& name);
   virtual void abort();
+  virtual void didCompleteTaskEvents();
   virtual int id() const;
   virtual void setCallbacks(WebIDBTransactionCallbacks*);
+
+  virtual WebCore::IDBTransactionBackendInterface*
+  getIDBTransactionBackendInterface() const;
 
  private:
   WTF::RefPtr<WebCore::IDBTransactionBackendInterface> m_backend;

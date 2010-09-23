@@ -36,6 +36,7 @@ namespace WebCore {
 
 class IDBDatabaseBackendImpl;
 class IDBIndexBackendImpl;
+class IDBTransactionBackendInterface;
 class SQLiteDatabase;
 
 class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
@@ -56,7 +57,9 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
   String keyPath() const { return m_keyPath; }
   PassRefPtr<DOMStringList> indexNames() const;
 
-  void get(PassRefPtr<IDBKey> key, PassRefPtr<IDBCallbacks>);
+  void get(PassRefPtr<IDBKey> key,
+           PassRefPtr<IDBCallbacks>,
+           IDBTransactionBackendInterface* transaction);
   void put(PassRefPtr<SerializedScriptValue> value,
            PassRefPtr<IDBKey> key,
            bool addOnly,
@@ -85,6 +88,8 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
 
   void loadIndexes();
   SQLiteDatabase& sqliteDatabase() const;
+
+  void getInternal(PassRefPtr<IDBKey> key, PassRefPtr<IDBCallbacks>);
 
   RefPtr<IDBDatabaseBackendImpl> m_database;
 

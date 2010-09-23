@@ -50,7 +50,7 @@ class WebIDBObjectStoreImpl : public WebIDBObjectStore {
   WebString keyPath() const;
   WebDOMStringList indexNames() const;
 
-  void get(const WebIDBKey& key, WebIDBCallbacks*);
+  void get(const WebIDBKey& key, WebIDBCallbacks*, const WebIDBTransaction&);
   void put(const WebSerializedScriptValue& value,
            const WebIDBKey& key,
            bool addOnly,

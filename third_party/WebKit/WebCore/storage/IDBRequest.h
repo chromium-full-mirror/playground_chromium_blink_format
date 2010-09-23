@@ -42,13 +42,17 @@
 
 namespace WebCore {
 
+class IDBTransactionBackendInterface;
+
 class IDBRequest : public IDBCallbacks,
                    public EventTarget,
                    public ActiveDOMObject {
  public:
-  static PassRefPtr<IDBRequest> create(ScriptExecutionContext* context,
-                                       PassRefPtr<IDBAny> source) {
-    return adoptRef(new IDBRequest(context, source));
+  static PassRefPtr<IDBRequest> create(
+      ScriptExecutionContext* context,
+      PassRefPtr<IDBAny> source,
+      IDBTransactionBackendInterface* transaction = 0) {
+    return adoptRef(new IDBRequest(context, source, transaction));
   }
   virtual ~IDBRequest();
 
@@ -82,7 +86,9 @@ class IDBRequest : public IDBCallbacks,
   using RefCounted<IDBCallbacks>::deref;
 
  private:
-  IDBRequest(ScriptExecutionContext*, PassRefPtr<IDBAny> source);
+  IDBRequest(ScriptExecutionContext*,
+             PassRefPtr<IDBAny> source,
+             IDBTransactionBackendInterface* transaction);
 
   void timerFired(Timer<IDBRequest>*);
   void scheduleEvent(PassRefPtr<IDBAny> result, PassRefPtr<IDBDatabaseError>);
@@ -94,6 +100,7 @@ class IDBRequest : public IDBCallbacks,
   virtual EventTargetData* ensureEventTargetData();
 
   RefPtr<IDBAny> m_source;
+  RefPtr<IDBTransactionBackendInterface> m_transaction;
 
   struct PendingEvent {
     RefPtr<IDBAny> m_result;

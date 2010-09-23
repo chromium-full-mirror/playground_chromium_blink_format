@@ -38,6 +38,7 @@ class IDBCallbacks;
 class IDBIndexBackendInterface;
 class IDBKey;
 class IDBKeyRange;
+class IDBTransactionBackendInterface;
 class SerializedScriptValue;
 
 class IDBObjectStoreBackendInterface
@@ -49,7 +50,9 @@ class IDBObjectStoreBackendInterface
   virtual String keyPath() const = 0;
   virtual PassRefPtr<DOMStringList> indexNames() const = 0;
 
-  virtual void get(PassRefPtr<IDBKey> key, PassRefPtr<IDBCallbacks>) = 0;
+  virtual void get(PassRefPtr<IDBKey> key,
+                   PassRefPtr<IDBCallbacks>,
+                   IDBTransactionBackendInterface* transaction) = 0;
   virtual void put(PassRefPtr<SerializedScriptValue> value,
                    PassRefPtr<IDBKey> key,
                    bool addOnly,

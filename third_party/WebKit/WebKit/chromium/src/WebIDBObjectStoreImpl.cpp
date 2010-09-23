@@ -33,6 +33,7 @@
 #include "WebIDBIndexImpl.h"
 #include "WebIDBKey.h"
 #include "WebIDBKeyRange.h"
+#include "WebIDBTransaction.h"
 #include "WebSerializedScriptValue.h"
 
 #if ENABLE(INDEXED_DATABASE)
@@ -60,8 +61,10 @@ WebDOMStringList WebIDBObjectStoreImpl::indexNames() const {
 }
 
 void WebIDBObjectStoreImpl::get(const WebIDBKey& key,
-                                WebIDBCallbacks* callbacks) {
-  m_objectStore->get(key, IDBCallbacksProxy::create(callbacks));
+                                WebIDBCallbacks* callbacks,
+                                const WebIDBTransaction& transaction) {
+  m_objectStore->get(key, IDBCallbacksProxy::create(callbacks),
+                     transaction.getIDBTransactionBackendInterface());
 }
 
 void WebIDBObjectStoreImpl::put(const WebSerializedScriptValue& value,

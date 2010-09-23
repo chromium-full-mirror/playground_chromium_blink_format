@@ -50,7 +50,6 @@ class WebIDBFactoryImpl : public WebIDBFactory {
                     const WebSecurityOrigin&,
                     WebFrame*,
                     const WebString& dataDir);
-  virtual void abortPendingTransactions(const WebVector<int>& pendingIDs);
 
  private:
   WTF::RefPtr<WebCore::IDBFactoryBackendInterface> m_idbFactoryBackend;

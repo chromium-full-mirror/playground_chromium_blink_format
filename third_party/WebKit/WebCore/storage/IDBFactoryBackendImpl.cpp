@@ -170,12 +170,6 @@ void IDBFactoryBackendImpl::open(const String& name,
   m_databaseBackendMap.set(name, databaseBackend.release());
 }
 
-void IDBFactoryBackendImpl::abortPendingTransactions(
-    const Vector<int>& pendingIDs) {
-  for (size_t i = 0; i < pendingIDs.size(); ++i)
-    m_transactionCoordinator->abort(pendingIDs.at(i));
-}
-
 String IDBFactoryBackendImpl::databaseFileName(const String& name,
                                                SecurityOrigin* securityOrigin) {
   String databaseIdentifier = securityOrigin->databaseIdentifier();

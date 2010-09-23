@@ -64,15 +64,6 @@ void WebIDBFactoryImpl::open(const WebString& name,
                             dataDir);
 }
 
-void WebIDBFactoryImpl::abortPendingTransactions(
-    const WebVector<int>& pendingIDs) {
-  WTF::Vector<int> ids(pendingIDs.size());
-  for (size_t i = 0; i < pendingIDs.size(); ++i)
-    ids[i] = pendingIDs[i];
-
-  m_idbFactoryBackend->abortPendingTransactions(ids);
-}
-
 }  // namespace WebKit
 
 #endif  // ENABLE(INDEXED_DATABASE)

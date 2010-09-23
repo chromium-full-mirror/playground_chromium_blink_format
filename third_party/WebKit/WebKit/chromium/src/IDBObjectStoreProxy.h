@@ -49,7 +49,9 @@ class IDBObjectStoreProxy : public IDBObjectStoreBackendInterface {
   String keyPath() const;
   PassRefPtr<DOMStringList> indexNames() const;
 
-  void get(PassRefPtr<IDBKey> key, PassRefPtr<IDBCallbacks>);
+  void get(PassRefPtr<IDBKey> key,
+           PassRefPtr<IDBCallbacks>,
+           IDBTransactionBackendInterface*);
   void put(PassRefPtr<SerializedScriptValue> value,
            PassRefPtr<IDBKey> key,
            bool addOnly,
