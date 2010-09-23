@@ -229,7 +229,8 @@ class HTMLTreeBuilder::ExternalCharacterTokenBuffer : public Noncopyable {
 
 HTMLTreeBuilder::HTMLTreeBuilder(HTMLTokenizer* tokenizer,
                                  HTMLDocument* document,
-                                 bool reportErrors)
+                                 bool reportErrors,
+                                 bool usePreHTML5ParserQuirks)
     : m_framesetOk(true),
       m_document(document),
       m_tree(document, FragmentScriptingAllowed, false),
@@ -240,7 +241,8 @@ HTMLTreeBuilder::HTMLTreeBuilder(HTMLTokenizer* tokenizer,
       m_secondaryInsertionMode(InitialMode),
       m_tokenizer(tokenizer),
       m_scriptToProcessStartLine(uninitializedLineNumberValue),
-      m_lastScriptElementStartLine(uninitializedLineNumberValue) {}
+      m_lastScriptElementStartLine(uninitializedLineNumberValue),
+      m_usePreHTML5ParserQuirks(usePreHTML5ParserQuirks) {}
 
 // FIXME: Member variables should be grouped into self-initializing structs to
 // minimize code duplication between these constructors.
@@ -248,7 +250,8 @@ HTMLTreeBuilder::HTMLTreeBuilder(
     HTMLTokenizer* tokenizer,
     DocumentFragment* fragment,
     Element* contextElement,
-    FragmentScriptingPermission scriptingPermission)
+    FragmentScriptingPermission scriptingPermission,
+    bool usePreHTML5ParserQuirks)
     : m_framesetOk(true),
       m_fragmentContext(fragment, contextElement, scriptingPermission),
       m_document(m_fragmentContext.document()),
@@ -261,7 +264,8 @@ HTMLTreeBuilder::HTMLTreeBuilder(
       m_secondaryInsertionMode(InitialMode),
       m_tokenizer(tokenizer),
       m_scriptToProcessStartLine(uninitializedLineNumberValue),
-      m_lastScriptElementStartLine(uninitializedLineNumberValue) {
+      m_lastScriptElementStartLine(uninitializedLineNumberValue),
+      m_usePreHTML5ParserQuirks(usePreHTML5ParserQuirks) {
   if (contextElement) {
     // Steps 4.2-4.6 of the HTML5 Fragment Case parsing algorithm:
     // http://www.whatwg.org/specs/web-apps/current-work/multipage/the-end.html#fragment-case
@@ -2045,6 +2049,14 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
                 FragmentScriptingNotAllowed)
           m_scriptToProcess->removeAllChildren();
         setInsertionMode(m_originalInsertionMode);
+
+        // This token will not have been created by the tokenizer if a
+        // self-closing script tag was encountered and pre-HTML5 parser
+        // quirks are enabled. We must set the tokenizer's state to
+        // DataState explicitly since the tokenzier didn't have a chance to.
+        ASSERT(m_tokenizer->state() == HTMLTokenizer::DataState ||
+               m_usePreHTML5ParserQuirks);
+        m_tokenizer->setState(HTMLTokenizer::DataState);
         return;
       }
       m_tree.openElements()->pop();
@@ -2556,6 +2568,8 @@ bool HTMLTreeBuilder::processStartTagForInHead(AtomicHTMLToken& token) {
   }
   if (token.name() == scriptTag) {
     processScriptStartTag(token);
+    if (m_usePreHTML5ParserQuirks && token.selfClosing())
+      processFakeEndTag(scriptTag);
     return true;
   }
   if (token.name() == headTag) {
