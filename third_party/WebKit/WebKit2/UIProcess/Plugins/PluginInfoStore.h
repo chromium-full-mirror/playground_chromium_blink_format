@@ -61,6 +61,9 @@ class PluginInfoStore {
   // type.
   Plugin findPlugin(String& mimeType, const WebCore::KURL& url);
 
+  // Returns the info for the plug-in with the given path.
+  Plugin infoForPluginWithPath(const String& pluginPath);
+
  private:
   Plugin findPluginForMIMEType(const String& mimeType);
   Plugin findPluginForExtension(const String& extension, String& mimeType);

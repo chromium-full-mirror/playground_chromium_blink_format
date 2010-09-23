@@ -77,6 +77,8 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
     return m_connection.get();
   }
 
+  WebContext* context() const { return m_context; }
+
   PlatformProcessIdentifier processIdentifier() const {
     return m_processLauncher->processIdentifier();
   }
