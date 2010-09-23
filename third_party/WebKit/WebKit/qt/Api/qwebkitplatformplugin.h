@@ -98,12 +98,10 @@ class QWebKitPlatformPlugin {
   enum Extension { MultipleSelections, Notifications, Haptics };
 
   virtual bool supportsExtension(Extension extension) const = 0;
-  virtual QWebSelectMethod* createSelectInputMethod() const = 0;
-  virtual QWebNotificationPresenter* createNotificationPresenter() const = 0;
-  virtual QWebHapticFeedbackPlayer* createHapticFeedbackPlayer() const = 0;
+  virtual QObject* createExtension(Extension extension) const = 0;
 };
 
 Q_DECLARE_INTERFACE(QWebKitPlatformPlugin,
-                    "com.nokia.Qt.WebKit.PlatformPlugin/1.4");
+                    "com.nokia.Qt.WebKit.PlatformPlugin/1.5");
 
 #endif  // QWEBKITPLATFORMPLUGIN_H
