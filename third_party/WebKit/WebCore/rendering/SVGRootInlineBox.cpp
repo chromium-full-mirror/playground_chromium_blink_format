@@ -209,8 +209,8 @@ void SVGRootInlineBox::layoutChildBoxes(InlineFlowBox* start) {
       IntRect boxRect = textBox->calculateBoundaries();
       textBox->setX(boxRect.x());
       textBox->setY(boxRect.y());
-      textBox->setWidth(boxRect.width());
-      textBox->setHeight(boxRect.height());
+      textBox->setLogicalWidth(boxRect.width());
+      textBox->setLogicalHeight(boxRect.height());
     } else {
       ASSERT(child->isInlineFlowBox());
 
@@ -224,8 +224,8 @@ void SVGRootInlineBox::layoutChildBoxes(InlineFlowBox* start) {
       IntRect boxRect = flowBox->calculateBoundaries();
       flowBox->setX(boxRect.x());
       flowBox->setY(boxRect.y());
-      flowBox->setWidth(boxRect.width());
-      flowBox->setHeight(boxRect.height());
+      flowBox->setLogicalWidth(boxRect.width());
+      flowBox->setLogicalHeight(boxRect.height());
     }
   }
 }
@@ -263,8 +263,8 @@ void SVGRootInlineBox::layoutRootBox() {
   // Position ourselves.
   setX(0);
   setY(0);
-  setWidth(widthBlock);
-  setHeight(heightBlock);
+  setLogicalWidth(widthBlock);
+  setLogicalHeight(heightBlock);
   setBlockHeight(heightBlock);
   setLineTopBottomPositions(0, heightBlock);
 }

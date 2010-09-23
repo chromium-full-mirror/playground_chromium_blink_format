@@ -444,8 +444,8 @@ void RenderInline::paint(PaintInfo& paintInfo, int tx, int ty) {
 void RenderInline::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
   if (InlineFlowBox* curr = firstLineBox()) {
     for (; curr; curr = curr->nextLineBox())
-      rects.append(IntRect(tx + curr->x(), ty + curr->y(), curr->width(),
-                           curr->height()));
+      rects.append(IntRect(tx + curr->x(), ty + curr->y(), curr->logicalWidth(),
+                           curr->logicalHeight()));
   } else
     rects.append(IntRect(tx, ty, 0, 0));
 
@@ -464,7 +464,8 @@ void RenderInline::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
 void RenderInline::absoluteQuads(Vector<FloatQuad>& quads) {
   if (InlineFlowBox* curr = firstLineBox()) {
     for (; curr; curr = curr->nextLineBox()) {
-      FloatRect localRect(curr->x(), curr->y(), curr->width(), curr->height());
+      FloatRect localRect(curr->x(), curr->y(), curr->logicalWidth(),
+                          curr->logicalHeight());
       quads.append(localToAbsoluteQuad(localRect));
     }
   } else
@@ -598,12 +599,13 @@ IntRect RenderInline::linesBoundingBox() const {
          curr = curr->nextLineBox()) {
       if (curr == firstLineBox() || curr->x() < leftSide)
         leftSide = curr->x();
-      if (curr == firstLineBox() || curr->x() + curr->width() > rightSide)
-        rightSide = curr->x() + curr->width();
+      if (curr == firstLineBox() ||
+          curr->x() + curr->logicalWidth() > rightSide)
+        rightSide = curr->x() + curr->logicalWidth();
     }
     result.setWidth(rightSide - leftSide);
     result.setX(leftSide);
-    result.setHeight(lastLineBox()->y() + lastLineBox()->height() -
+    result.setHeight(lastLineBox()->y() + lastLineBox()->logicalHeight() -
                      firstLineBox()->y());
     result.setY(firstLineBox()->y());
   }
@@ -1039,8 +1041,8 @@ void RenderInline::addFocusRingRects(Vector<IntRect>& rects, int tx, int ty) {
   for (InlineFlowBox* curr = firstLineBox(); curr; curr = curr->nextLineBox()) {
     RootInlineBox* root = curr->root();
     int top = max(root->lineTop(), curr->y());
-    int bottom = min(root->lineBottom(), curr->y() + curr->height());
-    IntRect rect(tx + curr->x(), ty + top, curr->width(), bottom - top);
+    int bottom = min(root->lineBottom(), curr->y() + curr->logicalHeight());
+    IntRect rect(tx + curr->x(), ty + top, curr->logicalWidth(), bottom - top);
     if (!rect.isEmpty())
       rects.append(rect);
   }
@@ -1099,8 +1101,8 @@ void RenderInline::paintOutline(GraphicsContext* graphicsContext,
   for (InlineFlowBox* curr = firstLineBox(); curr; curr = curr->nextLineBox()) {
     RootInlineBox* root = curr->root();
     int top = max(root->lineTop(), curr->y());
-    int bottom = min(root->lineBottom(), curr->y() + curr->height());
-    rects.append(IntRect(curr->x(), top, curr->width(), bottom - top));
+    int bottom = min(root->lineBottom(), curr->y() + curr->logicalHeight());
+    rects.append(IntRect(curr->x(), top, curr->logicalWidth(), bottom - top));
   }
   rects.append(IntRect());
 

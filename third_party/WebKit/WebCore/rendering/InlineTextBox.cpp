@@ -146,10 +146,10 @@ IntRect InlineTextBox::selectionRect(int tx, int ty, int startPos, int endPos) {
       TextRun(characters, len, textObj->allowTabs(), textPos(), m_toAdd,
               direction() == RTL, m_dirOverride),
       IntPoint(tx + m_x, ty + selTop), selHeight, sPos, ePos));
-  if (r.x() > tx + m_x + m_width)
+  if (r.x() > tx + m_x + m_logicalWidth)
     r.setWidth(0);
-  else if (r.right() - 1 > tx + m_x + m_width)
-    r.setWidth(tx + m_x + m_width - r.x());
+  else if (r.right() - 1 > tx + m_x + m_logicalWidth)
+    r.setWidth(tx + m_x + m_logicalWidth - r.x());
   return r;
 }
 
@@ -191,7 +191,7 @@ int InlineTextBox::placeEllipsisBox(bool flowIsLTR,
   // LTR: the left edge of the ellipsis is to the left of our text run.
   // RTL: the right edge of the ellipsis is to the right of our text run.
   bool ltrFullTruncation = flowIsLTR && ellipsisX <= m_x;
-  bool rtlFullTruncation = !flowIsLTR && ellipsisX >= (m_x + m_width);
+  bool rtlFullTruncation = !flowIsLTR && ellipsisX >= (m_x + m_logicalWidth);
   if (ltrFullTruncation || rtlFullTruncation) {
     // Too far.  Just set full truncation, but return -1 and let the ellipsis
     // just be placed at the edge of the box.
@@ -200,7 +200,7 @@ int InlineTextBox::placeEllipsisBox(bool flowIsLTR,
     return -1;
   }
 
-  bool ltrEllipsisWithinBox = flowIsLTR && (ellipsisX < m_x + m_width);
+  bool ltrEllipsisWithinBox = flowIsLTR && (ellipsisX < m_x + m_logicalWidth);
   bool rtlEllipsisWithinBox = !flowIsLTR && (ellipsisX > m_x);
   if (ltrEllipsisWithinBox || rtlEllipsisWithinBox) {
     foundBox = true;
@@ -215,7 +215,8 @@ int InlineTextBox::placeEllipsisBox(bool flowIsLTR,
       // Width in pixels of the visible portion of the box, excluding the
       // ellipsis.
       int visibleBoxWidth = visibleRightEdge - visibleLeftEdge - ellipsisWidth;
-      ellipsisX = ltr ? m_x + visibleBoxWidth : m_x + m_width - visibleBoxWidth;
+      ellipsisX =
+          ltr ? m_x + visibleBoxWidth : m_x + m_logicalWidth - visibleBoxWidth;
     }
 
     int offset = offsetForPosition(ellipsisX, false);
@@ -246,7 +247,7 @@ int InlineTextBox::placeEllipsisBox(bool flowIsLTR,
     if (flowIsLTR)
       return m_x + widthOfVisibleText;
     else
-      return (m_x + m_width) - widthOfVisibleText - ellipsisWidth;
+      return (m_x + m_logicalWidth) - widthOfVisibleText - ellipsisWidth;
   }
   return -1;
 }
@@ -312,7 +313,7 @@ bool InlineTextBox::nodeAtPoint(const HitTestRequest&,
   if (isLineBreak())
     return false;
 
-  IntRect rect(tx + m_x, ty + m_y, m_width, height());
+  IntRect rect(tx + m_x, ty + m_y, m_logicalWidth, logicalHeight());
   if (m_truncation != cFullTruncation && visibleToHitTesting() &&
       rect.intersects(result.rectFromPoint(x, y))) {
     renderer()->updateHitTestResult(result, IntPoint(x - tx, y - ty));
@@ -418,10 +419,10 @@ void InlineTextBox::paint(PaintInfo& paintInfo, int tx, int ty) {
   // Would it be simpler to just check our own shadow and stroke overflow by
   // hand here?
   int leftOverflow = parent()->x() - parent()->leftVisualOverflow();
-  int rightOverflow =
-      parent()->rightVisualOverflow() - (parent()->x() + parent()->width());
+  int rightOverflow = parent()->rightVisualOverflow() -
+                      (parent()->x() + parent()->logicalWidth());
   int xPos = tx + m_x - leftOverflow;
-  int w = width() + leftOverflow + rightOverflow;
+  int w = logicalWidth() + leftOverflow + rightOverflow;
   if (xPos >= paintInfo.rect.right() || xPos + w <= paintInfo.rect.x())
     return;
 
@@ -453,7 +454,7 @@ void InlineTextBox::paint(PaintInfo& paintInfo, int tx, int ty) {
       int widthOfVisibleText =
           toRenderText(renderer())
               ->width(m_start, m_truncation, textPos(), m_firstLine);
-      int widthOfHiddenText = m_width - widthOfVisibleText;
+      int widthOfHiddenText = m_logicalWidth - widthOfVisibleText;
       // FIXME: The hit testing logic also needs to take this translation int
       // account.
       tx += direction() == LTR ? widthOfHiddenText : -widthOfHiddenText;
@@ -611,12 +612,12 @@ void InlineTextBox::paint(PaintInfo& paintInfo, int tx, int ty) {
     if (!paintSelectedTextSeparately || ePos <= sPos) {
       // FIXME: Truncate right-to-left text correctly.
       paintTextWithShadows(context, font, textRun, 0, length, length,
-                           textOrigin, m_x + tx, m_y + ty, width(), height(),
-                           textShadow, textStrokeWidth > 0);
+                           textOrigin, m_x + tx, m_y + ty, logicalWidth(),
+                           logicalHeight(), textShadow, textStrokeWidth > 0);
     } else
       paintTextWithShadows(context, font, textRun, ePos, sPos, length,
-                           textOrigin, m_x + tx, m_y + ty, width(), height(),
-                           textShadow, textStrokeWidth > 0);
+                           textOrigin, m_x + tx, m_y + ty, logicalWidth(),
+                           logicalHeight(), textShadow, textStrokeWidth > 0);
 
     if (textStrokeWidth > 0)
       context->restore();
@@ -630,8 +631,8 @@ void InlineTextBox::paint(PaintInfo& paintInfo, int tx, int ty) {
     updateGraphicsContext(context, selectionFillColor, selectionStrokeColor,
                           selectionStrokeWidth, styleToUse->colorSpace());
     paintTextWithShadows(context, font, textRun, sPos, ePos, length, textOrigin,
-                         m_x + tx, m_y + ty, width(), height(), selectionShadow,
-                         selectionStrokeWidth > 0);
+                         m_x + tx, m_y + ty, logicalWidth(), logicalHeight(),
+                         selectionShadow, selectionStrokeWidth > 0);
 
     if (selectionStrokeWidth > 0)
       context->restore();
@@ -737,7 +738,7 @@ void InlineTextBox::paintSelection(GraphicsContext* context,
     ePos = length;
   }
 
-  context->clip(IntRect(m_x + tx, y + ty, m_width, h));
+  context->clip(IntRect(m_x + tx, y + ty, m_logicalWidth, h));
   context->drawHighlightForText(
       font, TextRun(characters, length, textRenderer()->allowTabs(), textPos(),
                     m_toAdd, direction() == RTL,
@@ -791,9 +792,9 @@ void InlineTextBox::paintCustomHighlight(int tx,
     return;
 
   RootInlineBox* r = root();
-  FloatRect rootRect(tx + r->x(), ty + selectionTop(), r->width(),
+  FloatRect rootRect(tx + r->x(), ty + selectionTop(), r->logicalWidth(),
                      selectionHeight());
-  FloatRect textRect(tx + x(), rootRect.y(), width(), rootRect.height());
+  FloatRect textRect(tx + x(), rootRect.y(), logicalWidth(), rootRect.height());
 
   page->chrome()->client()->paintCustomHighlight(
       renderer()->node(), type, textRect, rootRect, true, false);
@@ -812,12 +813,12 @@ void InlineTextBox::paintDecoration(GraphicsContext* context,
   if (m_truncation == cFullTruncation)
     return;
 
-  int width = m_width;
+  int width = m_logicalWidth;
   if (m_truncation != cNoTruncation) {
     width = toRenderText(renderer())
                 ->width(m_start, m_truncation, textPos(), m_firstLine);
     if (direction() == RTL)
-      tx += (m_width - width);
+      tx += (m_logicalWidth - width);
   }
 
   // Get the text decoration colors.
@@ -927,8 +928,8 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
   if (m_truncation == cFullTruncation)
     return;
 
-  int start = 0;        // start of line to draw, relative to tx
-  int width = m_width;  // how much line to draw
+  int start = 0;               // start of line to draw, relative to tx
+  int width = m_logicalWidth;  // how much line to draw
 
   // Determine whether we need to measure text
   bool markerSpansWholeBox = true;
@@ -985,11 +986,11 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
   // we pin to two pixels under the baseline.
   int lineThickness = cMisspellingLineThickness;
   int baseline = renderer()->style(m_firstLine)->font().ascent();
-  int descent = height() - baseline;
+  int descent = logicalHeight() - baseline;
   int underlineOffset;
   if (descent <= (2 + lineThickness)) {
     // Place the underline at the very bottom of the text in small/medium fonts.
-    underlineOffset = height() - lineThickness;
+    underlineOffset = logicalHeight() - lineThickness;
   } else {
     // In larger fonts, though, place the underline up near the baseline to
     // prevent a big gap.
@@ -1037,7 +1038,7 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
     pt->save();
     updateGraphicsContext(pt, color, color, 0,
                           style->colorSpace());  // Don't draw text at all!
-    pt->clip(IntRect(tx + m_x, ty + y, m_width, h));
+    pt->clip(IntRect(tx + m_x, ty + y, m_logicalWidth, h));
     pt->drawHighlightForText(font, run, IntPoint(m_x + tx, y + ty), h, color,
                              style->colorSpace(), sPos, ePos);
     pt->restore();
@@ -1156,8 +1157,8 @@ void InlineTextBox::paintCompositionUnderline(
   if (m_truncation == cFullTruncation)
     return;
 
-  int start = 0;        // start of line to draw, relative to tx
-  int width = m_width;  // how much line to draw
+  int start = 0;               // start of line to draw, relative to tx
+  int width = m_logicalWidth;  // how much line to draw
   bool useWholeWidth = true;
   unsigned paintStart = m_start;
   unsigned paintEnd = end() + 1;  // end points at the last char, not past it
@@ -1188,7 +1189,7 @@ void InlineTextBox::paintCompositionUnderline(
   // If there's not enough space the underline will touch or overlap characters.
   int lineThickness = 1;
   int baseline = renderer()->style(m_firstLine)->font().ascent();
-  if (underline.thick && height() - baseline >= 2)
+  if (underline.thick && logicalHeight() - baseline >= 2)
     lineThickness = 2;
 
   // We need to have some space between underlines of subsequent clauses,
@@ -1200,8 +1201,9 @@ void InlineTextBox::paintCompositionUnderline(
 
   ctx->setStrokeColor(underline.color, renderer()->style()->colorSpace());
   ctx->setStrokeThickness(lineThickness);
-  ctx->drawLineForText(IntPoint(tx + start, ty + height() - lineThickness),
-                       width, textRenderer()->document()->printing());
+  ctx->drawLineForText(
+      IntPoint(tx + start, ty + logicalHeight() - lineThickness), width,
+      textRenderer()->document()->printing());
 }
 
 int InlineTextBox::caretMinOffset() const {

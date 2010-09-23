@@ -42,11 +42,11 @@ class SVGInlineTextBox : public InlineTextBox {
 
   virtual bool isSVGInlineTextBox() const { return true; }
 
-  virtual int virtualHeight() const { return m_height; }
-  void setHeight(int height) { m_height = height; }
+  virtual int virtualLogicalHeight() const { return m_logicalHeight; }
+  void setLogicalHeight(int height) { m_logicalHeight = height; }
 
   virtual int selectionTop() { return m_y; }
-  virtual int selectionHeight() { return m_height; }
+  virtual int selectionHeight() { return m_logicalHeight; }
   virtual int offsetForPosition(int x, bool includePartialGlyphs = true) const;
   virtual int positionForOffset(int offset) const;
 
@@ -133,7 +133,7 @@ class SVGInlineTextBox : public InlineTextBox {
                                           RenderStyle*);
 
  private:
-  int m_height;
+  int m_logicalHeight;
   AffineTransform m_chunkTransformation;
   Vector<SVGTextChunkPart> m_svgTextChunkParts;
   mutable SVGTextChunkPart m_currentChunkPart;

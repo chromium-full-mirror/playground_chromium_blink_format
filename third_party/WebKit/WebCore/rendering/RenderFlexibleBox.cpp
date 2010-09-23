@@ -1084,8 +1084,8 @@ void RenderFlexibleBox::applyLineClamp(FlexBoxIterator& iterator,
       InlineBox* anchorBox = lastLine->lastChild();
       if (anchorBox && anchorBox->renderer()->node() &&
           anchorBox->renderer()->node()->isLink())
-        totalWidth =
-            anchorBox->width() + font.width(TextRun(ellipsisAndSpace, 2));
+        totalWidth = anchorBox->logicalWidth() +
+                     font.width(TextRun(ellipsisAndSpace, 2));
       else {
         anchorBox = 0;
         totalWidth = font.width(TextRun(&horizontalEllipsis, 1));
@@ -1108,7 +1108,8 @@ void RenderFlexibleBox::applyLineClamp(FlexBoxIterator& iterator,
 
       int blockEdge = ltr ? blockRightEdge : blockLeftEdge;
       if (!lastVisibleLine->canAccommodateEllipsis(
-              ltr, blockEdge, lastVisibleLine->x() + lastVisibleLine->width(),
+              ltr, blockEdge,
+              lastVisibleLine->x() + lastVisibleLine->logicalWidth(),
               totalWidth))
         continue;
 

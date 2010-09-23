@@ -267,8 +267,8 @@ PassRefPtr<StringImpl> RenderText::originalText() const {
 
 void RenderText::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
   for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox())
-    rects.append(
-        IntRect(tx + box->x(), ty + box->y(), box->width(), box->height()));
+    rects.append(IntRect(tx + box->x(), ty + box->y(), box->logicalWidth(),
+                         box->logicalHeight()));
 }
 
 void RenderText::absoluteRectsForRange(Vector<IntRect>& rects,
@@ -294,7 +294,8 @@ void RenderText::absoluteRectsForRange(Vector<IntRect>& rects,
     // Note: box->end() returns the index of the last character, not the index
     // past it
     if (start <= box->start() && box->end() < end) {
-      IntRect r = IntRect(box->x(), box->y(), box->width(), box->height());
+      IntRect r = IntRect(box->x(), box->y(), box->logicalWidth(),
+                          box->logicalHeight());
       if (useSelectionHeight) {
         IntRect selectionRect = box->selectionRect(0, 0, start, end);
         r.setHeight(selectionRect.height());
@@ -311,7 +312,7 @@ void RenderText::absoluteRectsForRange(Vector<IntRect>& rects,
         if (!useSelectionHeight) {
           // change the height and y position because selectionRect uses
           // selection-specific values
-          r.setHeight(box->height());
+          r.setHeight(box->logicalHeight());
           r.setY(box->y());
         }
         FloatPoint origin = localToAbsolute(r.location());
@@ -407,7 +408,7 @@ void RenderText::absoluteQuadsForRange(Vector<FloatQuad>& quads,
         if (!useSelectionHeight) {
           // change the height and y position because selectionRect uses
           // selection-specific values
-          r.setHeight(box->height());
+          r.setHeight(box->logicalHeight());
           r.setY(box->y());
         }
         quads.append(localToAbsoluteQuad(FloatRect(r)));
@@ -454,7 +455,7 @@ VisiblePosition RenderText::positionForPoint(const IntPoint& point) {
     return createVisiblePosition(offset + firstTextBox()->start(), DOWNSTREAM);
   }
   if (lastTextBox() && point.y() >= lastTextBox()->root()->lineTop() &&
-      point.x() >= lastTextBox()->m_x + lastTextBox()->m_width) {
+      point.x() >= lastTextBox()->m_x + lastTextBox()->logicalWidth()) {
     // at the y coordinate of the last line or below
     // and the x coordinate is to the right of the last text box right edge
     offset = lastTextBox()->offsetForPosition(point.x());
@@ -477,7 +478,7 @@ VisiblePosition RenderText::positionForPoint(const IntPoint& point) {
           // to the previous line
           return createVisiblePosition(offset + box->start(), DOWNSTREAM);
 
-        if (point.x() < box->m_x + box->m_width)
+        if (point.x() < box->m_x + box->logicalWidth())
           // and the x coordinate is to the left of the right edge of this box
           // check to see if position goes in this box
           return createVisiblePosition(
@@ -530,11 +531,12 @@ IntRect RenderText::localCaretRect(InlineBox* inlineBox,
   int caretWidthRightOfOffset = caretWidth - caretWidthLeftOfOffset;
 
   int rootLeft = box->root()->x();
-  int rootRight = rootLeft + box->root()->width();
+  int rootRight = rootLeft + box->root()->logicalWidth();
   // FIXME: should we use the width of the root inline box or the
   // width of the containing block for this?
   if (extraWidthToEndOfLine)
-    *extraWidthToEndOfLine = (box->root()->width() + rootLeft) - (left + 1);
+    *extraWidthToEndOfLine =
+        (box->root()->logicalWidth() + rootLeft) - (left + 1);
 
   RenderBlock* cb = containingBlock();
   RenderStyle* cbStyle = cb->style();
@@ -1367,12 +1369,13 @@ IntRect RenderText::linesBoundingBox() const {
          curr = curr->nextTextBox()) {
       if (curr == firstTextBox() || curr->x() < leftSide)
         leftSide = curr->x();
-      if (curr == firstTextBox() || curr->x() + curr->width() > rightSide)
-        rightSide = curr->x() + curr->width();
+      if (curr == firstTextBox() ||
+          curr->x() + curr->logicalWidth() > rightSide)
+        rightSide = curr->x() + curr->logicalWidth();
     }
     result.setWidth(rightSide - leftSide);
     result.setX(leftSide);
-    result.setHeight(lastTextBox()->y() + lastTextBox()->height() -
+    result.setHeight(lastTextBox()->y() + lastTextBox()->logicalHeight() -
                      firstTextBox()->y());
     result.setY(firstTextBox()->y());
   }

@@ -71,7 +71,7 @@ bool RootInlineBox::canAccommodateEllipsis(bool ltr,
   // First sanity-check the unoverflowed width of the whole line to see if there
   // is sufficient room.
   int delta = ltr ? lineBoxEdge - blockEdge : blockEdge - lineBoxEdge;
-  if (width() - delta < ellipsisWidth)
+  if (logicalWidth() - delta < ellipsisWidth)
     return false;
 
   // Next iterate over all the line boxes on the line.  If we find a replaced
@@ -89,8 +89,8 @@ void RootInlineBox::placeEllipsis(const AtomicString& ellipsisStr,
   // Create an ellipsis box.
   EllipsisBox* ellipsisBox = new (renderer()->renderArena())
       EllipsisBox(renderer(), ellipsisStr, this,
-                  ellipsisWidth - (markupBox ? markupBox->width() : 0),
-                  height(), y(), !prevRootBox(), markupBox);
+                  ellipsisWidth - (markupBox ? markupBox->logicalWidth() : 0),
+                  logicalHeight(), y(), !prevRootBox(), markupBox);
 
   if (!gEllipsisBoxMap)
     gEllipsisBoxMap = new EllipsisBoxMap();
@@ -98,8 +98,8 @@ void RootInlineBox::placeEllipsis(const AtomicString& ellipsisStr,
   setHasEllipsisBox(true);
 
   // FIXME: Do we need an RTL version of this?
-  if (ltr && (x() + width() + ellipsisWidth) <= blockRightEdge) {
-    ellipsisBox->m_x = x() + width();
+  if (ltr && (x() + logicalWidth() + ellipsisWidth) <= blockRightEdge) {
+    ellipsisBox->m_x = x() + logicalWidth();
     return;
   }
 
@@ -145,7 +145,7 @@ void RootInlineBox::addHighlightOverflow() {
     return;
 
   // Highlight acts as a selection inflation.
-  FloatRect rootRect(0, selectionTop(), width(), selectionHeight());
+  FloatRect rootRect(0, selectionTop(), logicalWidth(), selectionHeight());
   IntRect inflatedRect =
       enclosingIntRect(page->chrome()->client()->customHighlightRect(
           renderer()->node(), renderer()->style()->highlight(), rootRect));
@@ -156,7 +156,7 @@ void RootInlineBox::addHighlightOverflow() {
   setVerticalOverflowPositions(
       topLayoutOverflow(), bottomLayoutOverflow(),
       min(topVisualOverflow(), inflatedRect.y()),
-      max(bottomVisualOverflow(), inflatedRect.bottom()), height());
+      max(bottomVisualOverflow(), inflatedRect.bottom()), logicalHeight());
 }
 
 void RootInlineBox::paintCustomHighlight(PaintInfo& paintInfo,
@@ -176,7 +176,8 @@ void RootInlineBox::paintCustomHighlight(PaintInfo& paintInfo,
     return;
 
   // Get the inflated rect so that we can properly hit test.
-  FloatRect rootRect(tx + x(), ty + selectionTop(), width(), selectionHeight());
+  FloatRect rootRect(tx + x(), ty + selectionTop(), logicalWidth(),
+                     selectionHeight());
   FloatRect inflatedRect = page->chrome()->client()->customHighlightRect(
       renderer()->node(), highlightType, rootRect);
   if (inflatedRect.intersects(paintInfo.rect))
@@ -291,8 +292,8 @@ GapRects RootInlineBox::fillLineSelectionGap(int selTop,
         rootBlock, blockX, blockY, tx, ty, paintInfo));
   if (rightGap)
     result.uniteRight(block()->fillRightSelectionGap(
-        lastBox->parent()->renderer(), lastBox->x() + lastBox->width(), selTop,
-        selHeight, rootBlock, blockX, blockY, tx, ty, paintInfo));
+        lastBox->parent()->renderer(), lastBox->x() + lastBox->logicalWidth(),
+        selTop, selHeight, rootBlock, blockX, blockY, tx, ty, paintInfo));
 
   // When dealing with bidi text, a non-contiguous selection region is possible.
   // e.g. The logical text aaaAAAbbb (capitals denote RTL text and non-capitals
@@ -307,7 +308,7 @@ GapRects RootInlineBox::fillLineSelectionGap(int selTop,
   if (firstBox && firstBox != lastBox) {
     // Now fill in any gaps on the line that occurred between two selected
     // elements.
-    int lastX = firstBox->x() + firstBox->width();
+    int lastX = firstBox->x() + firstBox->logicalWidth();
     bool isPreviousBoxSelected =
         firstBox->selectionState() != RenderObject::SelectionNone;
     for (InlineBox* box = firstBox->nextLeafChild(); box;
@@ -318,7 +319,7 @@ GapRects RootInlineBox::fillLineSelectionGap(int selTop,
           result.uniteCenter(block()->fillHorizontalSelectionGap(
               box->parent()->renderer(), lastX + tx, selTop + ty,
               box->x() - lastX, selHeight, paintInfo));
-        lastX = box->x() + box->width();
+        lastX = box->x() + box->logicalWidth();
       }
       if (box == lastBox)
         break;
@@ -424,7 +425,7 @@ InlineBox* RootInlineBox::closestLeafChildForXPos(int x,
     // Return it.
     return firstLeaf;
 
-  if (x >= lastLeaf->m_x + lastLeaf->m_width &&
+  if (x >= lastLeaf->m_x + lastLeaf->m_logicalWidth &&
       !lastLeaf->renderer()->isListMarker() &&
       (!onlyEditableLeaves || isEditableLeaf(lastLeaf)))
     // The x coordinate is greater or equal to right edge of the lastLeaf.
@@ -436,7 +437,7 @@ InlineBox* RootInlineBox::closestLeafChildForXPos(int x,
     if (!leaf->renderer()->isListMarker() &&
         (!onlyEditableLeaves || isEditableLeaf(leaf))) {
       closestLeaf = leaf;
-      if (x < leaf->m_x + leaf->m_width)
+      if (x < leaf->m_x + leaf->m_logicalWidth)
         // The x coordinate is less than the right edge of the box.
         // Return it.
         return leaf;

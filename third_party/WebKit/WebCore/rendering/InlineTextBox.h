@@ -80,7 +80,7 @@ class InlineTextBox : public InlineBox {
 
  public:
   virtual IntRect calculateBoundaries() const {
-    return IntRect(x(), y(), width(), height());
+    return IntRect(x(), y(), logicalWidth(), logicalHeight());
   }
 
   virtual IntRect selectionRect(int absx, int absy, int startPos, int endPos);
@@ -119,9 +119,9 @@ class InlineTextBox : public InlineBox {
   virtual bool isLineBreak() const;
 
   void setSpaceAdd(int add) {
-    m_width -= m_toAdd;
+    m_logicalWidth -= m_toAdd;
     m_toAdd = add;
-    m_width += m_toAdd;
+    m_logicalWidth += m_toAdd;
   }
 
  private:

@@ -79,10 +79,10 @@ void InlineBox::showTreeForThis() const {
 }
 #endif
 
-int InlineBox::height() const {
+int InlineBox::logicalHeight() const {
 #if ENABLE(SVG)
-  if (hasVirtualHeight())
-    return virtualHeight();
+  if (hasVirtualLogicalHeight())
+    return virtualLogicalHeight();
 #endif
 
   if (renderer()->isText())
@@ -260,7 +260,7 @@ bool InlineBox::canAccommodateEllipsis(bool ltr,
   if (!m_renderer || !m_renderer->isReplaced())
     return true;
 
-  IntRect boxRect(m_x, 0, m_width, 10);
+  IntRect boxRect(m_x, 0, m_logicalWidth, 10);
   IntRect ellipsisRect(ltr ? blockEdge - ellipsisWidth : blockEdge, 0,
                        ellipsisWidth, 10);
   return !(boxRect.intersects(ellipsisRect));

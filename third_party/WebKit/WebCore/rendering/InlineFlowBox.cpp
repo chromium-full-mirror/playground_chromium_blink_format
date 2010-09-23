@@ -292,7 +292,7 @@ int InlineFlowBox::placeBoxesHorizontally(
       int letterSpacing =
           min(0, (int)rt->style(m_firstLine)->font().letterSpacing());
       rightLayoutOverflow =
-          max(xPos + text->width() - letterSpacing, rightLayoutOverflow);
+          max(xPos + text->logicalWidth() - letterSpacing, rightLayoutOverflow);
 
       GlyphOverflowAndFallbackFontsMap::iterator it =
           textBoxDataMap.find(static_cast<InlineTextBox*>(curr));
@@ -318,9 +318,10 @@ int InlineFlowBox::placeBoxesHorizontally(
 
       leftVisualOverflow = min(xPos + childOverflowLeft, leftVisualOverflow);
       rightVisualOverflow =
-          max(xPos + text->width() + childOverflowRight, rightVisualOverflow);
+          max(xPos + text->logicalWidth() + childOverflowRight,
+              rightVisualOverflow);
 
-      xPos += text->width();
+      xPos += text->logicalWidth();
     } else {
       if (curr->renderer()->isPositioned()) {
         if (curr->renderer()->parent()->style()->direction() == LTR)
@@ -356,8 +357,9 @@ int InlineFlowBox::placeBoxesHorizontally(
         RenderBox* box = toRenderBox(curr->renderer());
         int childLeftOverflow =
             box->hasOverflowClip() ? 0 : box->leftLayoutOverflow();
-        int childRightOverflow =
-            box->hasOverflowClip() ? curr->width() : box->rightLayoutOverflow();
+        int childRightOverflow = box->hasOverflowClip()
+                                     ? curr->logicalWidth()
+                                     : box->rightLayoutOverflow();
 
         leftLayoutOverflow = min(xPos + childLeftOverflow, leftLayoutOverflow);
         rightLayoutOverflow =
@@ -368,16 +370,16 @@ int InlineFlowBox::placeBoxesHorizontally(
         rightVisualOverflow =
             max(xPos + box->rightVisualOverflow(), rightVisualOverflow);
 
-        xPos += curr->width() + curr->boxModelObject()->marginRight();
+        xPos += curr->logicalWidth() + curr->boxModelObject()->marginRight();
       }
     }
   }
 
   xPos += borderRight() + paddingRight();
-  setWidth(xPos - startX);
+  setLogicalWidth(xPos - startX);
   rightVisualOverflow =
-      max(x() + width() + boxShadowRight, rightVisualOverflow);
-  rightLayoutOverflow = max(x() + width(), rightLayoutOverflow);
+      max(x() + logicalWidth() + boxShadowRight, rightVisualOverflow);
+  rightLayoutOverflow = max(x() + logicalWidth(), rightLayoutOverflow);
 
   setHorizontalOverflowPositions(leftLayoutOverflow, rightLayoutOverflow,
                                  leftVisualOverflow, rightVisualOverflow);
@@ -580,7 +582,7 @@ void InlineFlowBox::placeBoxesVertically(int yPos,
     curr->setY(newY);
 
     if (childAffectsTopBottomPos) {
-      int boxHeight = curr->height();
+      int boxHeight = curr->logicalHeight();
       selectionTop = min(selectionTop, newY);
       selectionBottom = max(selectionBottom, newY + boxHeight);
     }
@@ -591,7 +593,7 @@ void InlineFlowBox::placeBoxesVertically(int yPos,
     setY(y() + baselinePosition(true) - font.ascent());
     if (hasTextChildren() || strictMode) {
       selectionTop = min(selectionTop, y());
-      selectionBottom = max(selectionBottom, y() + height());
+      selectionBottom = max(selectionBottom, y() + logicalHeight());
     }
   }
 }
@@ -601,7 +603,7 @@ void InlineFlowBox::computeVerticalOverflow(
     int lineBottom,
     bool strictMode,
     GlyphOverflowAndFallbackFontsMap& textBoxDataMap) {
-  int boxHeight = height();
+  int boxHeight = logicalHeight();
 
   // Any spillage outside of the line top and bottom is not considered overflow.
   // We just ignore this, since it only happens
@@ -665,7 +667,7 @@ void InlineFlowBox::computeVerticalOverflow(
 
       topVisualOverflow = min(curr->y() + childOverflowTop, topVisualOverflow);
       bottomVisualOverflow =
-          max(curr->y() + text->height() + childOverflowBottom,
+          max(curr->y() + text->logicalHeight() + childOverflowBottom,
               bottomVisualOverflow);
     } else if (curr->renderer()->isRenderInline()) {
       InlineFlowBox* flow = static_cast<InlineFlowBox*>(curr);
@@ -684,8 +686,9 @@ void InlineFlowBox::computeVerticalOverflow(
       int boxY = curr->y();
       int childTopOverflow =
           box->hasOverflowClip() ? 0 : box->topLayoutOverflow();
-      int childBottomOverflow =
-          box->hasOverflowClip() ? curr->height() : box->bottomLayoutOverflow();
+      int childBottomOverflow = box->hasOverflowClip()
+                                    ? curr->logicalHeight()
+                                    : box->bottomLayoutOverflow();
       topLayoutOverflow = min(boxY + childTopOverflow, topLayoutOverflow);
       bottomLayoutOverflow =
           max(boxY + childBottomOverflow, bottomLayoutOverflow);
@@ -723,7 +726,7 @@ bool InlineFlowBox::nodeAtPoint(const HitTestRequest& request,
   }
 
   // Now check ourselves.
-  IntRect rect(tx + m_x, ty + m_y, m_width, height());
+  IntRect rect(tx + m_x, ty + m_y, m_logicalWidth, logicalHeight());
   if (visibleToHitTesting() && rect.intersects(result.rectFromPoint(x, y))) {
     renderer()->updateHitTestResult(
         result, IntPoint(x - tx, y - ty));  // Don't add in m_x or m_y here, we
@@ -860,13 +863,13 @@ void InlineFlowBox::paintFillLayer(const PaintInfo& paintInfo,
     // but it isn't even clear how this should work at all.
     int xOffsetOnLine = 0;
     for (InlineFlowBox* curr = prevLineBox(); curr; curr = curr->prevLineBox())
-      xOffsetOnLine += curr->width();
+      xOffsetOnLine += curr->logicalWidth();
     int startX = tx - xOffsetOnLine;
     int totalWidth = xOffsetOnLine;
     for (InlineFlowBox* curr = this; curr; curr = curr->nextLineBox())
-      totalWidth += curr->width();
+      totalWidth += curr->logicalWidth();
     paintInfo.context->save();
-    paintInfo.context->clip(IntRect(tx, ty, width(), height()));
+    paintInfo.context->clip(IntRect(tx, ty, logicalWidth(), logicalHeight()));
     boxModelObject()->paintFillLayerExtended(paintInfo, c, fillLayer, startX,
                                              ty, totalWidth, h, this, op);
     paintInfo.context->restore();
@@ -900,8 +903,8 @@ void InlineFlowBox::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
 
   int x = m_x;
   int y = m_y;
-  int w = width();
-  int h = height();
+  int w = logicalWidth();
+  int h = logicalHeight();
 
   // Constrain our background/border painting to the line top and bottom if
   // necessary.
@@ -968,11 +971,11 @@ void InlineFlowBox::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
         int xOffsetOnLine = 0;
         for (InlineFlowBox* curr = prevLineBox(); curr;
              curr = curr->prevLineBox())
-          xOffsetOnLine += curr->width();
+          xOffsetOnLine += curr->logicalWidth();
         int startX = tx - xOffsetOnLine;
         int totalWidth = xOffsetOnLine;
         for (InlineFlowBox* curr = this; curr; curr = curr->nextLineBox())
-          totalWidth += curr->width();
+          totalWidth += curr->logicalWidth();
         context->save();
         context->clip(IntRect(tx, ty, w, h));
         boxModelObject()->paintBorder(context, startX, ty, totalWidth, h,
@@ -991,8 +994,8 @@ void InlineFlowBox::paintMask(PaintInfo& paintInfo, int tx, int ty) {
 
   int x = m_x;
   int y = m_y;
-  int w = width();
-  int h = height();
+  int w = logicalWidth();
+  int h = logicalHeight();
 
   // Constrain our background/border painting to the line top and bottom if
   // necessary.
@@ -1050,11 +1053,11 @@ void InlineFlowBox::paintMask(PaintInfo& paintInfo, int tx, int ty) {
     // We need to adjust _tx and _ty by the width of all previous lines.
     int xOffsetOnLine = 0;
     for (InlineFlowBox* curr = prevLineBox(); curr; curr = curr->prevLineBox())
-      xOffsetOnLine += curr->width();
+      xOffsetOnLine += curr->logicalWidth();
     int startX = tx - xOffsetOnLine;
     int totalWidth = xOffsetOnLine;
     for (InlineFlowBox* curr = this; curr; curr = curr->nextLineBox())
-      totalWidth += curr->width();
+      totalWidth += curr->logicalWidth();
     paintInfo.context->save();
     paintInfo.context->clip(IntRect(tx, ty, w, h));
     boxModelObject()->paintNinePieceImage(paintInfo.context, startX, ty,
@@ -1115,12 +1118,12 @@ void InlineFlowBox::paintTextDecorations(PaintInfo& paintInfo,
        (paintedChildren && (deco & LINE_THROUGH))) &&
       shouldDrawTextDecoration(renderer())) {
     int x = m_x + borderLeft() + paddingLeft();
-    int w = m_width -
+    int w = m_logicalWidth -
             (borderLeft() + paddingLeft() + borderRight() + paddingRight());
     RootInlineBox* rootLine = root();
     if (rootLine->ellipsisBox()) {
       int ellipsisX = m_x + rootLine->ellipsisBox()->x();
-      int ellipsisWidth = rootLine->ellipsisBox()->width();
+      int ellipsisWidth = rootLine->ellipsisBox()->logicalWidth();
       bool ltr = renderer()->style()->direction() == LTR;
       if (rootLine == this) {
         // Trim w and x so that the underline isn't drawn underneath the
@@ -1305,10 +1308,10 @@ int InlineFlowBox::placeEllipsisBox(bool ltr,
       result = currResult;
 
     if (ltr) {
-      visibleLeftEdge += box->width();
+      visibleLeftEdge += box->logicalWidth();
       box = box->nextOnLine();
     } else {
-      visibleRightEdge -= box->width();
+      visibleRightEdge -= box->logicalWidth();
       box = box->prevOnLine();
     }
   }

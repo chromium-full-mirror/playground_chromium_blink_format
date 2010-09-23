@@ -1005,7 +1005,7 @@ void RenderBox::paintCustomHighlight(int tx,
   InlineBox* boxWrap = inlineBoxWrapper();
   RootInlineBox* r = boxWrap ? boxWrap->root() : 0;
   if (r) {
-    FloatRect rootRect(tx + r->x(), ty + r->selectionTop(), r->width(),
+    FloatRect rootRect(tx + r->x(), ty + r->selectionTop(), r->logicalWidth(),
                        r->selectionHeight());
     FloatRect imageRect(tx + x(), rootRect.y(), width(), rootRect.height());
     page->chrome()->client()->paintCustomHighlight(node(), type, imageRect,
@@ -2072,9 +2072,9 @@ int RenderBox::containingBlockWidthForPositioned(
   int fromRight;
   if (containingBlock->style()->direction() == LTR) {
     fromLeft = first->x() + first->borderLeft();
-    fromRight = last->x() + last->width() - last->borderRight();
+    fromRight = last->x() + last->logicalWidth() - last->borderRight();
   } else {
-    fromRight = first->x() + first->width() - first->borderRight();
+    fromRight = first->x() + first->logicalWidth() - first->borderRight();
     fromLeft = last->x() + last->borderLeft();
   }
 

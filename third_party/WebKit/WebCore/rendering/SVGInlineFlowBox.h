@@ -31,10 +31,11 @@ namespace WebCore {
 
 class SVGInlineFlowBox : public InlineFlowBox {
  public:
-  SVGInlineFlowBox(RenderObject* obj) : InlineFlowBox(obj), m_height(0) {}
+  SVGInlineFlowBox(RenderObject* obj)
+      : InlineFlowBox(obj), m_logicalHeight(0) {}
 
-  virtual int virtualHeight() const { return m_height; }
-  void setHeight(int h) { m_height = h; }
+  virtual int virtualLogicalHeight() const { return m_logicalHeight; }
+  void setLogicalHeight(int h) { m_logicalHeight = h; }
 
   virtual void paint(PaintInfo&, int tx, int ty);
 
@@ -42,7 +43,7 @@ class SVGInlineFlowBox : public InlineFlowBox {
   void layoutFlowBox();
 
  private:
-  int m_height;
+  int m_logicalHeight;
 };
 
 }  // namespace WebCore
