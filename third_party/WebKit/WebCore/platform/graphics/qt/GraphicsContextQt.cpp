@@ -195,7 +195,7 @@ class GraphicsContextPlatformPrivate : public Noncopyable {
   ContextShadow shadow;
   QStack<ContextShadow> shadowStack;
 
-  bool hasShadow() const { return shadow.type != ContextShadow::NoShadow; }
+  bool hasShadow() const { return shadow.m_type != ContextShadow::NoShadow; }
 
   QRectF clipBoundingRect() const {
 #if QT_VERSION >= QT_VERSION_CHECK(4, 8, 0)
@@ -432,9 +432,9 @@ void GraphicsContext::strokeArc(const IntRect& rect,
 
   if (m_data->hasShadow()) {
     p->save();
-    p->translate(m_data->shadow.offset);
+    p->translate(m_data->shadow.offset());
     QPen pen(p->pen());
-    pen.setColor(m_data->shadow.color);
+    pen.setColor(m_data->shadow.m_color);
     p->setPen(pen);
     p->drawArc(rect, startAngle, angleSpan);
     p->restore();
@@ -463,12 +463,12 @@ void GraphicsContext::drawConvexPolygon(size_t npoints,
   p->setRenderHint(QPainter::Antialiasing, shouldAntialias);
   if (m_data->hasShadow()) {
     p->save();
-    p->translate(m_data->shadow.offset);
+    p->translate(m_data->shadow.offset());
     if (p->brush().style() != Qt::NoBrush)
-      p->setBrush(QBrush(m_data->shadow.color));
+      p->setBrush(QBrush(m_data->shadow.m_color));
     QPen pen(p->pen());
     if (pen.style() != Qt::NoPen) {
-      pen.setColor(m_data->shadow.color);
+      pen.setColor(m_data->shadow.m_color);
       p->setPen(pen);
     }
     p->drawConvexPolygon(polygon);
@@ -511,9 +511,9 @@ void GraphicsContext::fillPath() {
   path.setFillRule(toQtFillRule(fillRule()));
 
   if (m_data->hasShadow()) {
-    p->translate(m_data->shadow.offset);
-    p->fillPath(path, m_data->shadow.color);
-    p->translate(-m_data->shadow.offset);
+    p->translate(m_data->shadow.offset());
+    p->fillPath(path, QColor(m_data->shadow.m_color));
+    p->translate(-m_data->shadow.offset());
   }
   if (m_common->state.fillPattern) {
     AffineTransform affine;
@@ -540,11 +540,11 @@ void GraphicsContext::strokePath() {
   path.setFillRule(toQtFillRule(fillRule()));
 
   if (m_data->hasShadow()) {
-    p->translate(m_data->shadow.offset);
+    p->translate(m_data->shadow.offset());
     QPen shadowPen(pen);
-    shadowPen.setColor(m_data->shadow.color);
+    shadowPen.setColor(m_data->shadow.m_color);
     p->strokePath(path, shadowPen);
-    p->translate(-m_data->shadow.offset);
+    p->translate(-m_data->shadow.offset());
   }
   if (m_common->state.strokePattern) {
     AffineTransform affine;
@@ -661,7 +661,7 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
                         m_common->state.fillPattern->repeatX(),
                         m_common->state.fillPattern->repeatY());
       shadowPainter->setCompositionMode(QPainter::CompositionMode_SourceIn);
-      shadowPainter->fillRect(normalizedRect, shadow->color);
+      shadowPainter->fillRect(normalizedRect, shadow->m_color);
       shadow->endShadowLayer(p);
     }
     drawRepeatPattern(p, image, normalizedRect,
@@ -675,13 +675,13 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
     if (shadowPainter) {
       shadowPainter->fillRect(normalizedRect, brush);
       shadowPainter->setCompositionMode(QPainter::CompositionMode_SourceIn);
-      shadowPainter->fillRect(normalizedRect, shadow->color);
+      shadowPainter->fillRect(normalizedRect, shadow->m_color);
       shadow->endShadowLayer(p);
     }
     p->fillRect(normalizedRect, brush);
   } else {
     if (m_data->hasShadow()) {
-      if (shadow->type == ContextShadow::BlurShadow) {
+      if (shadow->m_type == ContextShadow::BlurShadow) {
         QPainter* shadowPainter = shadow->beginShadowLayer(p, normalizedRect);
         if (shadowPainter) {
           shadowPainter->fillRect(normalizedRect, p->brush());
@@ -690,10 +690,10 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
       } else {
         // Solid rectangle fill with no blur shadow can be done faster
         // without using the shadow layer at all.
-        QColor shadowColor = shadow->color;
+        QColor shadowColor = shadow->m_color;
         shadowColor.setAlphaF(shadowColor.alphaF() *
                               p->brush().color().alphaF());
-        p->fillRect(normalizedRect.translated(shadow->offset), shadowColor);
+        p->fillRect(normalizedRect.translated(shadow->offset()), shadowColor);
       }
     }
     p->fillRect(normalizedRect, p->brush());
@@ -713,14 +713,14 @@ void GraphicsContext::fillRect(const FloatRect& rect,
   if (m_data->hasShadow()) {
     ContextShadow* shadow = contextShadow();
 
-    if (shadow->type != ContextShadow::BlurShadow) {
+    if (shadow->m_type != ContextShadow::BlurShadow) {
       // We do not need any layer for simple shadow.
-      p->fillRect(normalizedRect.translated(shadow->offset), shadow->color);
+      p->fillRect(normalizedRect.translated(shadow->offset()), shadow->m_color);
     } else {
       QPainter* shadowPainter = shadow->beginShadowLayer(p, normalizedRect);
       if (shadowPainter) {
         shadowPainter->setCompositionMode(QPainter::CompositionMode_Source);
-        shadowPainter->fillRect(normalizedRect, shadow->color);
+        shadowPainter->fillRect(normalizedRect, shadow->m_color);
         shadow->endShadowLayer(p);
       }
     }
@@ -743,9 +743,9 @@ void GraphicsContext::fillRoundedRect(const IntRect& rect,
                                            bottomRight);
   QPainter* p = m_data->p();
   if (m_data->hasShadow()) {
-    p->translate(m_data->shadow.offset);
-    p->fillPath(path.platformPath(), m_data->shadow.color);
-    p->translate(-m_data->shadow.offset);
+    p->translate(m_data->shadow.offset());
+    p->fillPath(path.platformPath(), QColor(m_data->shadow.m_color));
+    p->translate(-m_data->shadow.offset());
   }
   p->fillPath(path.platformPath(), QColor(color));
 }
@@ -911,9 +911,11 @@ void GraphicsContext::setPlatformShadow(const FloatSize& size,
     // CanvasRenderingContext
     // We flip the height since CG and HTML5 Canvas have opposite Y axis
     m_common->state.shadowOffset = FloatSize(size.width(), -size.height());
-    m_data->shadow = ContextShadow(color, blur, size.width(), -size.height());
+    m_data->shadow =
+        ContextShadow(color, blur, FloatSize(size.width(), -size.height()));
   } else {
-    m_data->shadow = ContextShadow(color, blur, size.width(), size.height());
+    m_data->shadow =
+        ContextShadow(color, blur, FloatSize(size.width(), size.height()));
   }
 }
 

@@ -26,6 +26,7 @@
 #include "config.h"
 #include "CairoUtilities.h"
 
+#include "Color.h"
 #include <cairo.h>
 #include <wtf/Vector.h>
 
@@ -45,6 +46,12 @@ void copyContextProperties(cairo_t* srcCr, cairo_t* dstCr) {
   cairo_set_line_width(dstCr, cairo_get_line_width(srcCr));
   cairo_set_miter_limit(dstCr, cairo_get_miter_limit(srcCr));
   cairo_set_fill_rule(dstCr, cairo_get_fill_rule(srcCr));
+}
+
+void setSourceRGBAFromColor(cairo_t* context, const Color& color) {
+  float red, green, blue, alpha;
+  color.getRGBA(red, green, blue, alpha);
+  cairo_set_source_rgba(context, red, green, blue, alpha);
 }
 
 }  // namespace WebCore
