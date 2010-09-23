@@ -40,6 +40,8 @@ PluginProcessManager& PluginProcessManager::shared() {
   return pluginProcessManager;
 }
 
+PluginProcessManager::PluginProcessManager() {}
+
 void PluginProcessManager::getPluginProcessConnection(
     const String& pluginPath,
     WebProcessProxy* webProcessProxy,
