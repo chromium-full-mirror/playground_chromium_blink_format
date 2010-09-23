@@ -26,6 +26,7 @@
 class QWebSelectMethod;
 class QWebKitPlatformPlugin;
 class QWebNotificationPresenter;
+class QWebHapticFeedbackPlayer;
 class QWebSelectData;
 
 namespace WebCore {
@@ -37,6 +38,7 @@ class QtPlatformPlugin {
 
   QWebSelectMethod* createSelectInputMethod();
   QWebNotificationPresenter* createNotificationPresenter();
+  QWebHapticFeedbackPlayer* createHapticFeedbackPlayer();
 
   QWebKitPlatformPlugin* plugin();
 

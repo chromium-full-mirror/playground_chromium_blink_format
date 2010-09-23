@@ -80,8 +80,12 @@ class QWebNotificationPresenter : public QObject {
   void notificationClicked();
 };
 
-class QWebHapticFeedbackPlayer {
+class QWebHapticFeedbackPlayer : public QObject {
+  Q_OBJECT
  public:
+  QWebHapticFeedbackPlayer() {}
+  virtual ~QWebHapticFeedbackPlayer() {}
+
   enum HapticStrength { None, Weak, Medium, Strong };
 
   enum HapticEvent { Press, Release };
