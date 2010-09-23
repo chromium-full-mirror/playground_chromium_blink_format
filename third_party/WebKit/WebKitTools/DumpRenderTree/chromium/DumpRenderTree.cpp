@@ -49,6 +49,8 @@ static const char optionAllowExternalPages[] = "--allow-external-pages";
 static const char optionStartupDialog[] = "--testshell-startup-dialog";
 static const char optionCheckLayoutTestSystemDeps[] =
     "--check-layout-test-sys-deps";
+static const char optionEnableAccelerated2DCanvas[] =
+    "--enable-accelerated-2d-canvas";
 
 static void runTest(TestShell& shell,
                     TestParams& params,
@@ -94,6 +96,7 @@ int main(int argc, char* argv[]) {
   bool testShellMode = false;
   bool allowExternalPages = false;
   bool startupDialog = false;
+  bool accelerated2DCanvasEnabled = false;
   for (int i = 1; i < argc; ++i) {
     string argument(argv[i]);
     if (argument == "-")
@@ -114,6 +117,8 @@ int main(int argc, char* argv[]) {
       startupDialog = true;
     else if (argument == optionCheckLayoutTestSystemDeps)
       exit(checkLayoutTestSystemDependencies() ? EXIT_SUCCESS : EXIT_FAILURE);
+    else if (argument == optionEnableAccelerated2DCanvas)
+      accelerated2DCanvasEnabled = true;
     else if (argument.size() && argument[0] == '-')
       fprintf(stderr, "Unknown option: %s\n", argv[i]);
     else
@@ -130,6 +135,7 @@ int main(int argc, char* argv[]) {
   {  // Explicit scope for the TestShell instance.
     TestShell shell(testShellMode);
     shell.setAllowExternalPages(allowExternalPages);
+    shell.setAccelerated2dCanvasEnabled(accelerated2DCanvasEnabled);
     if (serverMode && !tests.size()) {
       params.printSeparators = true;
       char testString[2048];  // 2048 is the same as the sizes of other
