@@ -71,6 +71,12 @@ class WebPreferences : public APIObject {
   void setXSSAuditorEnabled(bool);
   bool xssAuditorEnabled() const;
 
+  void setFrameFlatteningEnabled(bool);
+  bool frameFlatteningEnabled() const;
+
+  void setPluginsEnabled(bool);
+  bool pluginsEnabled() const;
+
   void setFontSmoothingLevel(FontSmoothingLevel);
   FontSmoothingLevel fontSmoothingLevel() const;
 

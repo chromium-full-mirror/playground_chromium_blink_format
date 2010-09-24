@@ -39,6 +39,7 @@ WebPreferencesStore::WebPreferencesStore()
       offlineWebApplicationCacheEnabled(false),
       localStorageEnabled(true),
       xssAuditorEnabled(true),
+      frameFlatteningEnabled(false),
       fontSmoothingLevel(FontSmoothingLevelMedium),
       minimumFontSize(1),
       minimumLogicalFontSize(9),
@@ -58,6 +59,7 @@ void WebPreferencesStore::encode(CoreIPC::ArgumentEncoder* encoder) const {
   encoder->encode(offlineWebApplicationCacheEnabled);
   encoder->encode(localStorageEnabled);
   encoder->encode(xssAuditorEnabled);
+  encoder->encode(frameFlatteningEnabled);
   encoder->encode(fontSmoothingLevel);
   encoder->encode(minimumFontSize);
   encoder->encode(minimumLogicalFontSize);
@@ -84,6 +86,8 @@ bool WebPreferencesStore::decode(CoreIPC::ArgumentDecoder* decoder,
   if (!decoder->decode(s.localStorageEnabled))
     return false;
   if (!decoder->decode(s.xssAuditorEnabled))
+    return false;
+  if (!decoder->decode(s.frameFlatteningEnabled))
     return false;
   if (!decoder->decode(s.fontSmoothingLevel))
     return false;

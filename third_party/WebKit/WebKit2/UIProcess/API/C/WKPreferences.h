@@ -71,6 +71,18 @@ WK_EXPORT void WKPreferencesSetXSSAuditorEnabled(WKPreferencesRef preferences,
                                                  bool xssAuditorEnabled);
 WK_EXPORT bool WKPreferencesGetXSSAuditorEnabled(WKPreferencesRef preferences);
 
+// Defaults to false.
+WK_EXPORT void WKPreferencesSetFrameFlatteningEnabled(
+    WKPreferencesRef preferences,
+    bool frameFlatteningEnabled);
+WK_EXPORT bool WKPreferencesGetFrameFlatteningEnabled(
+    WKPreferencesRef preferences);
+
+// Default to true.
+WK_EXPORT void WKPreferencesSetPluginsEnabled(WKPreferencesRef preferences,
+                                              bool pluginsEnabled);
+WK_EXPORT bool WKPreferencesGetPluginsEnabled(WKPreferencesRef preferences);
+
 WK_EXPORT void WKPreferencesSetStandardFontFamily(
     WKPreferencesRef preferencesRef,
     WKStringRef family);
