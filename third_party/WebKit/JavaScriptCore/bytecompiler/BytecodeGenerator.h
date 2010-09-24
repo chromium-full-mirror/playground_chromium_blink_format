@@ -350,6 +350,10 @@ class BytecodeGenerator : public FastAllocBase {
                            ElementNode*);  // stops at first elision
 
   RegisterID* emitNewFunction(RegisterID* dst, FunctionBodyNode* body);
+  RegisterID* emitLazyNewFunction(RegisterID* dst, FunctionBodyNode* body);
+  RegisterID* emitNewFunctionInternal(RegisterID* dst,
+                                      unsigned index,
+                                      bool shouldNullCheck);
   RegisterID* emitNewFunctionExpression(RegisterID* dst, FuncExprNode* func);
   RegisterID* emitNewRegExp(RegisterID* dst, RegExp* regExp);
 
@@ -641,6 +645,8 @@ class BytecodeGenerator : public FastAllocBase {
                                       body->lineNo(), body->lastLine());
   }
 
+  RegisterID* emitInitLazyRegister(RegisterID*);
+
   Vector<Instruction>& instructions() { return m_codeBlock->instructions(); }
   SymbolTable& symbolTable() { return *m_symbolTable; }
 
@@ -655,6 +661,7 @@ class BytecodeGenerator : public FastAllocBase {
   RegisterID* emitThrowExpressionTooDeepException();
 
   void createArgumentsIfNecessary();
+  RegisterID* createLazyRegisterIfNecessary(RegisterID*);
 
   bool m_shouldEmitDebugHooks;
   bool m_shouldEmitProfileHooks;
@@ -693,6 +700,16 @@ class BytecodeGenerator : public FastAllocBase {
   unsigned m_globalConstantIndex;
 
   int m_globalVarStorageOffset;
+
+  int m_firstLazyFunction;
+  int m_lastLazyFunction;
+  HashMap<unsigned int,
+          FunctionBodyNode*,
+          WTF::IntHash<unsigned int>,
+          WTF::UnsignedWithZeroKeyHashTraits<unsigned int>>
+      m_lazyFunctions;
+  typedef HashMap<FunctionBodyNode*, unsigned> FunctionOffsetMap;
+  FunctionOffsetMap m_functionOffsets;
 
   // Constant pool
   IdentifierMap m_identifierMap;
