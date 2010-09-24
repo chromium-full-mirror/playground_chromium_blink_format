@@ -189,7 +189,7 @@ void ChunkedUpdateDrawingArea::didReceiveMessage(
 
   // We can switch drawing areas on the fly, so if this message was targetted at
   // an obsolete drawing area, ignore it.
-  if (targetDrawingAreaID != id())
+  if (targetDrawingAreaID != info().id)
     return;
 
   switch (messageID.get<DrawingAreaMessage::Kind>()) {
