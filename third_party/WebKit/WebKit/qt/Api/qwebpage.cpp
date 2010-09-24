@@ -2480,7 +2480,7 @@ QWebPage::ViewportConfiguration QWebPage::viewportConfigurationForSize(
 
   WebCore::ViewportConfiguration conf =
       WebCore::findConfigurationForViewportData(
-          mainFrame()->d->viewportArguments, desktopWidth, deviceWidth,
+          mainFrame()->d->viewportArguments(), desktopWidth, deviceWidth,
           deviceHeight, deviceDPI, availableSize);
 
   ViewportConfiguration result;

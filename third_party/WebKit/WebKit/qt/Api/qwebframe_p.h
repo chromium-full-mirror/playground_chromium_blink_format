@@ -95,6 +95,8 @@ class QWebFramePrivate {
                                    const QRegion& clip);
 #endif
 
+  WebCore::ViewportArguments viewportArguments();
+
   QWebFrame* q;
   Qt::ScrollBarPolicy horizontalScrollBarPolicy;
   Qt::ScrollBarPolicy verticalScrollBarPolicy;
@@ -106,7 +108,6 @@ class QWebFramePrivate {
   int marginWidth;
   int marginHeight;
   bool zoomTextOnly;
-  WebCore::ViewportArguments viewportArguments;
 };
 
 class QWebHitTestResultPrivate {

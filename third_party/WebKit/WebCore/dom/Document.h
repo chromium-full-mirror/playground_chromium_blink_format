@@ -38,6 +38,7 @@
 #include "QualifiedName.h"
 #include "ScriptExecutionContext.h"
 #include "Timer.h"
+#include "ViewportArguments.h"
 #include <wtf/FixedArray.h>
 #include <wtf/HashCountedSet.h>
 #include <wtf/OwnPtr.h>
@@ -284,6 +285,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 #if ENABLE(FULLSCREEN_API)
   DEFINE_ATTRIBUTE_EVENT_LISTENER(webkitfullscreenchange);
 #endif
+
+  ViewportArguments viewportArguments() const { return m_viewportArguments; }
 
   DocumentType* doctype() const { return m_docType.get(); }
 
@@ -1484,6 +1487,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 #endif
 
   int m_loadEventDelayCount;
+
+  ViewportArguments m_viewportArguments;
 };
 
 inline bool Document::hasElementWithId(AtomicStringImpl* id) const {
