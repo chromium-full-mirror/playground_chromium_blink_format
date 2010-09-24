@@ -72,6 +72,7 @@ class WebWheelEvent;
 #if ENABLE(TOUCH_EVENTS)
 class WebTouchEvent;
 #endif
+struct WebPageCreationParameters;
 struct WebPreferencesStore;
 
 class WebPage : public APIObject {
@@ -79,9 +80,7 @@ class WebPage : public APIObject {
   static const Type APIType = TypeBundlePage;
 
   static PassRefPtr<WebPage> create(uint64_t pageID,
-                                    const WebCore::IntSize& viewSize,
-                                    const WebPreferencesStore&,
-                                    const DrawingAreaBase::DrawingAreaInfo&);
+                                    const WebPageCreationParameters&);
   ~WebPage();
 
   void close();
@@ -168,10 +167,7 @@ class WebPage : public APIObject {
   static const WebEvent* currentEvent();
 
  private:
-  WebPage(uint64_t pageID,
-          const WebCore::IntSize& viewSize,
-          const WebPreferencesStore&,
-          const DrawingAreaBase::DrawingAreaInfo&);
+  WebPage(uint64_t pageID, const WebPageCreationParameters&);
 
   virtual Type type() const { return APIType; }
 

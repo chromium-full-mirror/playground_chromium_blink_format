@@ -191,9 +191,7 @@ WebPage* WebProcess::createWebPage(
       m_pageMap.add(pageID, 0);
   if (result.second) {
     ASSERT(!result.first->second);
-    result.first->second =
-        WebPage::create(pageID, parameters.viewSize, parameters.store,
-                        parameters.drawingAreaInfo);
+    result.first->second = WebPage::create(pageID, parameters);
   }
 
   ASSERT(result.first->second);
