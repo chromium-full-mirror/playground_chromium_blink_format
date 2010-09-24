@@ -654,13 +654,6 @@ void JIT::emitSlow_op_instanceof(Instruction* currentInstruction,
   stubCall.call(dst);
 }
 
-void JIT::emit_op_new_func(Instruction* currentInstruction) {
-  JITStubCall stubCall(this, cti_op_new_func);
-  stubCall.addArgument(
-      ImmPtr(m_codeBlock->functionDecl(currentInstruction[2].u.operand)));
-  stubCall.call(currentInstruction[1].u.operand);
-}
-
 void JIT::emit_op_get_global_var(Instruction* currentInstruction) {
   int dst = currentInstruction[1].u.operand;
   JSGlobalObject* globalObject = m_codeBlock->globalObject();
@@ -1594,11 +1587,10 @@ void JIT::emit_op_create_arguments(Instruction* currentInstruction) {
   argsCreated.link(this);
 }
 
-void JIT::emit_op_init_arguments(Instruction* currentInstruction) {
+void JIT::emit_op_init_lazy_reg(Instruction* currentInstruction) {
   unsigned dst = currentInstruction[1].u.operand;
 
   emitStore(dst, JSValue());
-  emitStore(unmodifiedArgumentsRegister(dst), JSValue());
 }
 
 void JIT::emit_op_get_callee(Instruction* currentInstruction) {
