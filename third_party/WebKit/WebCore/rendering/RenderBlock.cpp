@@ -6574,7 +6574,7 @@ IntRect RenderBlock::localCaretRect(InlineBox* inlineBox,
       FloatPoint absRightPoint = localToAbsolute(FloatPoint(myRight, 0));
 
       int containerRight =
-          containingBlock()->x() + containingBlockWidthForContent();
+          containingBlock()->x() + containingBlockLogicalWidthForContent();
       FloatPoint absContainerPoint =
           localToAbsolute(FloatPoint(containerRight, 0));
 

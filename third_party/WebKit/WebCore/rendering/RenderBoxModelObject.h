@@ -125,7 +125,7 @@ class RenderBoxModelObject : public RenderObject {
            paddingRight() != 0;
   }
 
-  virtual int containingBlockWidthForContent() const;
+  virtual int containingBlockLogicalWidthForContent() const;
 
   virtual void childBecameNonInline(RenderObject* /*child*/) {}
 
