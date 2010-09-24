@@ -391,7 +391,7 @@ void HTMLCanvasElement::createImageBuffer() const {
                 size.height() / unscaledSize.height()));
   m_imageBuffer->context()->setShadowsIgnoreTransforms(true);
   m_imageBuffer->context()->setImageInterpolationQuality(
-      CanvasInterpolationQuality);
+      DefaultInterpolationQuality);
 }
 
 GraphicsContext* HTMLCanvasElement::drawingContext() const {
