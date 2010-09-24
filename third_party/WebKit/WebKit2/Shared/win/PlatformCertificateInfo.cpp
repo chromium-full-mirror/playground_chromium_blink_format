@@ -47,7 +47,7 @@ PlatformCertificateInfo::PlatformCertificateInfo(
   if (!certificateInfo)
     return;
 
-  void* data = wkGetSSLPeerCertificateData(certificateInfo.get());
+  void* data = wkGetSSLPeerCertificateData(certificateInfo);
   if (!data)
     return;
 
