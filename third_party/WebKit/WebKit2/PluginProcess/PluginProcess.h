@@ -30,14 +30,23 @@
 
 #include "Connection.h"
 #include "RunLoop.h"
+#include <wtf/Forward.h>
 
 namespace WebKit {
+
+class NetscapePluginModule;
+class WebProcessConnection;
 
 class PluginProcess : Noncopyable, CoreIPC::Connection::Client {
  public:
   static PluginProcess& shared();
 
-  void initialize(CoreIPC::Connection::Identifier);
+  void initializeConnection(CoreIPC::Connection::Identifier);
+  void removeWebProcessConnection(WebProcessConnection* webProcessConnection);
+
+  NetscapePluginModule* netscapePluginModule() const {
+    return m_pluginModule.get();
+  }
 
  private:
   PluginProcess();
@@ -51,8 +60,23 @@ class PluginProcess : Noncopyable, CoreIPC::Connection::Client {
   virtual void didReceiveInvalidMessage(CoreIPC::Connection*,
                                         CoreIPC::MessageID);
 
+  // Message handlers.
+  void initialize(const String& pluginPath);
+  void createWebProcessConnection();
+
+  void shutdownTimerFired();
+
   // The connection to the UI process.
   RefPtr<CoreIPC::Connection> m_connection;
+
+  // Our web process connections.
+  Vector<RefPtr<WebProcessConnection>> m_webProcessConnections;
+
+  // The plug-in module.
+  RefPtr<NetscapePluginModule> m_pluginModule;
+
+  // A timer used for the shutdown timeout.
+  RunLoop::Timer<PluginProcess> m_shutdownTimer;
 };
 
 }  // namespace WebKit

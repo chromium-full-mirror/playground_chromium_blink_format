@@ -83,6 +83,11 @@ void PluginProcessProxy::didFinishLaunching(
   m_connection->send(Messages::PluginProcess::Initialize(m_pluginInfo.path), 0);
 }
 
+void PluginProcessProxy::didCreateWebProcessConnection(
+    const CoreIPC::MachPort&) {
+  // FIXME: Implement.
+}
+
 }  // namespace WebKit
 
 #endif  // ENABLE(PLUGIN_PROCESS)
