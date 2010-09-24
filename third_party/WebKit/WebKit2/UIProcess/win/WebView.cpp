@@ -190,7 +190,6 @@ WebView::WebView(RECT rect, WebPageNamespace* pageNamespace, HWND hostWindow)
   m_page = pageNamespace->createWebPage();
   m_page->setPageClient(this);
   m_page->setDrawingArea(ChunkedUpdateDrawingAreaProxy::create(this));
-  m_page->initializeWebPage(IntRect(rect).size());
 
   m_window = ::CreateWindowEx(
       0, kWebKit2WebViewWindowClassName, 0,
@@ -198,6 +197,8 @@ WebView::WebView(RECT rect, WebPageNamespace* pageNamespace, HWND hostWindow)
       rect.right - rect.left, rect.bottom - rect.top,
       m_hostWindow ? m_hostWindow : HWND_MESSAGE, 0, instanceHandle(), this);
   ASSERT(::IsWindow(m_window));
+
+  m_page->initializeWebPage(IntRect(rect).size());
 
   ::ShowWindow(m_window, SW_SHOW);
 
@@ -622,6 +623,10 @@ void WebView::pageDidEnterAcceleratedCompositing() {}
 
 void WebView::pageDidLeaveAcceleratedCompositing() {}
 #endif  // USE(ACCELERATED_COMPOSITING)
+
+HWND WebView::nativeWindow() {
+  return m_window;
+}
 
 // WebCore::WindowMessageListener
 

@@ -1403,6 +1403,11 @@ WebPageCreationParameters WebPageProxy::creationParameters(
   parameters.viewSize = size;
   parameters.store = pageNamespace()->context()->preferences()->store();
   parameters.drawingAreaInfo = m_drawingArea->info();
+
+#if PLATFORM(WIN)
+  parameters.nativeWindow = m_pageClient->nativeWindow();
+#endif
+
   return parameters;
 }
 
