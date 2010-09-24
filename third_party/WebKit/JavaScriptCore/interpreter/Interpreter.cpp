@@ -3999,11 +3999,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       */
       int dst = vPC[1].u.operand;
       int func = vPC[2].u.operand;
-      int shouldCheck = vPC[3].u.operand;
 
-      if (!shouldCheck || !callFrame->r(dst).jsValue())
-        callFrame->r(dst) = JSValue(codeBlock->functionDecl(func)->make(
-            callFrame, callFrame->scopeChain()));
+      callFrame->r(dst) = JSValue(codeBlock->functionDecl(func)->make(
+          callFrame, callFrame->scopeChain()));
 
       vPC += OPCODE_LENGTH(op_new_func);
       NEXT_INSTRUCTION();
@@ -4582,17 +4580,18 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       vPC += OPCODE_LENGTH(op_convert_this);
       NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_init_lazy_reg) {
-      /* init_lazy_reg dst(r)
+    DEFINE_OPCODE(op_init_arguments) {
+      /* create_arguments dst(r)
 
-         Initialises dst(r) to JSValue().
+         Initialises 'arguments' to JSValue().
 
          This opcode appears only at the beginning of a code block.
        */
       int dst = vPC[1].u.operand;
 
       callFrame->r(dst) = JSValue();
-      vPC += OPCODE_LENGTH(op_init_lazy_reg);
+      callFrame->r(unmodifiedArgumentsRegister(dst)) = JSValue();
+      vPC += OPCODE_LENGTH(op_init_arguments);
       NEXT_INSTRUCTION();
     }
     DEFINE_OPCODE(op_create_arguments) {

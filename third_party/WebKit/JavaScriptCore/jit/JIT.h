@@ -1029,7 +1029,7 @@ class JIT : private JSInterfaceJIT {
   void emit_op_get_by_pname(Instruction*);
   void emit_op_get_global_var(Instruction*);
   void emit_op_get_scoped_var(Instruction*);
-  void emit_op_init_lazy_reg(Instruction*);
+  void emit_op_init_arguments(Instruction*);
   void emit_op_instanceof(Instruction*);
   void emit_op_jeq_null(Instruction*);
   void emit_op_jfalse(Instruction*);

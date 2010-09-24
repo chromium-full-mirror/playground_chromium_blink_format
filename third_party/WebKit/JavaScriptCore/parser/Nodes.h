@@ -1744,10 +1744,6 @@ class ScopeNode : public StatementNode, public ParserArenaRefCounted {
   bool usesArguments() const { return m_features & ArgumentsFeature; }
   void setUsesArguments() { m_features |= ArgumentsFeature; }
   bool usesThis() const { return m_features & ThisFeature; }
-  bool needsActivationForMoreThanVariables() const {
-    ASSERT(m_data);
-    return m_features & (EvalFeature | WithFeature | CatchFeature);
-  }
   bool needsActivation() const {
     ASSERT(m_data);
     return (hasCapturedVariables()) ||
