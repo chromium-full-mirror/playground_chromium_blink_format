@@ -1526,11 +1526,11 @@ void RenderBox::computeLogicalWidth() {
     setWidth(w.value() + borderAndPaddingWidth());
   else {
     // Calculate Width
-    setWidth(computeLogicalWidthUsing(Width, containerWidth));
+    setWidth(computeLogicalWidthUsing(LogicalWidth, containerWidth));
 
     // Calculate MaxWidth
     if (!style()->maxWidth().isUndefined()) {
-      int maxW = computeLogicalWidthUsing(MaxWidth, containerWidth);
+      int maxW = computeLogicalWidthUsing(MaxLogicalWidth, containerWidth);
       if (width() > maxW) {
         setWidth(maxW);
         w = style()->maxWidth();
@@ -1538,7 +1538,7 @@ void RenderBox::computeLogicalWidth() {
     }
 
     // Calculate MinWidth
-    int minW = computeLogicalWidthUsing(MinWidth, containerWidth);
+    int minW = computeLogicalWidthUsing(MinLogicalWidth, containerWidth);
     if (width() < minW) {
       setWidth(minW);
       w = style()->minWidth();
@@ -1570,33 +1570,37 @@ void RenderBox::computeLogicalWidth() {
   }
 }
 
-int RenderBox::computeLogicalWidthUsing(WidthType widthType, int cw) {
-  int widthResult = width();
-  Length w;
-  if (widthType == Width)
-    w = style()->width();
-  else if (widthType == MinWidth)
-    w = style()->minWidth();
+int RenderBox::computeLogicalWidthUsing(LogicalWidthType widthType,
+                                        int availableLogicalWidth) {
+  int logicalWidthResult = logicalWidth();
+  Length logicalWidth;
+  if (widthType == LogicalWidth)
+    logicalWidth = style()->logicalWidth();
+  else if (widthType == MinLogicalWidth)
+    logicalWidth = style()->logicalMinWidth();
   else
-    w = style()->maxWidth();
+    logicalWidth = style()->logicalMaxWidth();
 
-  if (w.isIntrinsicOrAuto()) {
-    int marginLeft = style()->marginLeft().calcMinValue(cw);
-    int marginRight = style()->marginRight().calcMinValue(cw);
-    if (cw)
-      widthResult = cw - marginLeft - marginRight;
+  if (logicalWidth.isIntrinsicOrAuto()) {
+    int marginStart =
+        style()->marginStart().calcMinValue(availableLogicalWidth);
+    int marginEnd = style()->marginEnd().calcMinValue(availableLogicalWidth);
+    if (availableLogicalWidth)
+      logicalWidthResult = availableLogicalWidth - marginStart - marginEnd;
 
     if (sizesToIntrinsicWidth(widthType)) {
-      widthResult = max(widthResult, minPrefWidth());
-      widthResult = min(widthResult, maxPrefWidth());
+      logicalWidthResult = max(logicalWidthResult, minPrefWidth());
+      logicalWidthResult = min(logicalWidthResult, maxPrefWidth());
     }
-  } else
-    widthResult = computeBorderBoxLogicalWidth(w.calcValue(cw));
+  } else  // FIXME: If the containing block flow is perpendicular to our
+          // direction we need to use the available logical height instead.
+    logicalWidthResult = computeBorderBoxLogicalWidth(
+        logicalWidth.calcValue(availableLogicalWidth));
 
-  return widthResult;
+  return logicalWidthResult;
 }
 
-bool RenderBox::sizesToIntrinsicWidth(WidthType widthType) const {
+bool RenderBox::sizesToIntrinsicWidth(LogicalWidthType widthType) const {
   // Marquees in WinIE are like a mixture of blocks and inline-blocks.  They
   // size as though they're blocks,
   // but they allow text to sit on the same line as the marquee.
@@ -1606,13 +1610,18 @@ bool RenderBox::sizesToIntrinsicWidth(WidthType widthType) const {
   // This code may look a bit strange.  Basically width:intrinsic should clamp
   // the size when testing both
   // min-width and width.  max-width is only clamped if it is also intrinsic.
-  Length width =
-      (widthType == MaxWidth) ? style()->maxWidth() : style()->width();
-  if (width.type() == Intrinsic)
+  Length logicalWidth = (widthType == MaxLogicalWidth)
+                            ? style()->logicalMaxWidth()
+                            : style()->logicalWidth();
+  if (logicalWidth.type() == Intrinsic)
     return true;
 
   // Children of a horizontal marquee do not fill the container by default.
   // FIXME: Need to deal with MAUTO value properly.  It could be vertical.
+  // FIXME: Think about block-flow here.  Need to find out how marquee direction
+  // relates to
+  // block-flow (as well as how marquee overflow should relate to block flow).
+  // https://bugs.webkit.org/show_bug.cgi?id=46472
   if (parent()->style()->overflowX() == OMARQUEE) {
     EMarqueeDirection dir = parent()->style()->marqueeDirection();
     if (dir == MAUTO || dir == MFORWARD || dir == MBACKWARD || dir == MLEFT ||
@@ -1624,6 +1633,8 @@ bool RenderBox::sizesToIntrinsicWidth(WidthType widthType) const {
   // vertical boxes
   // that don't stretch their kids lay out their children at their intrinsic
   // widths.
+  // FIXME: Think about block-flow here.
+  // https://bugs.webkit.org/show_bug.cgi?id=46473
   if (parent()->isFlexibleBox() &&
       (parent()->style()->boxOrient() == HORIZONTAL ||
        parent()->style()->boxAlign() != BSTRETCH))
@@ -1632,7 +1643,9 @@ bool RenderBox::sizesToIntrinsicWidth(WidthType widthType) const {
   // Button, input, select, textarea, legend and datagrid treat
   // width value of 'auto' as 'intrinsic' unless it's in a
   // stretching vertical flexbox.
-  if (width.type() == Auto &&
+  // FIXME: Think about block-flow here.
+  // https://bugs.webkit.org/show_bug.cgi?id=46473
+  if (logicalWidth.type() == Auto &&
       !(parent()->isFlexibleBox() &&
         parent()->style()->boxOrient() == VERTICAL &&
         parent()->style()->boxAlign() == BSTRETCH) &&
