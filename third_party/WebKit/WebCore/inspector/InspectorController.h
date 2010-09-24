@@ -359,11 +359,10 @@ class InspectorController : public Noncopyable {
   void restoreDebugger();
   void restoreProfiler();
   void unbindAllResources();
+  void setSearchingForNode(bool enabled);
 
   // Following are used from InspectorBackend and internally.
-  void setSearchingForNode(bool enabled);
-  void enableSearchingForNode() { setSearchingForNode(true); }
-  void disableSearchingForNode() { setSearchingForNode(false); }
+  void setSearchingForNode(bool enabled, bool* newState);
 
   void setMonitoringXHREnabled(bool enabled, bool* newState);
   void storeLastActivePanel(const String& panelName);
