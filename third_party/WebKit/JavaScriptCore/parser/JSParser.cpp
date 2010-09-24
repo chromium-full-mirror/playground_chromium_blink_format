@@ -257,11 +257,17 @@ class JSParser {
   bool m_syntaxAlreadyValidated;
 
   struct Scope {
-    Scope() : m_usesEval(false), m_needsFullActivation(false) {}
+    Scope()
+        : m_usesEval(false),
+          m_needsFullActivation(false),
+          m_allowsNewDecls(true) {}
 
     void declareVariable(const Identifier* ident) {
       m_declaredVariables.add(ident->ustring().impl());
     }
+
+    void preventNewDecls() { m_allowsNewDecls = false; }
+    bool allowsNewDecls() const { return m_allowsNewDecls; }
 
     void useVariable(const Identifier* ident, bool isEval) {
       m_usesEval |= isEval;
@@ -301,6 +307,7 @@ class JSParser {
    private:
     bool m_usesEval;
     bool m_needsFullActivation;
+    bool m_allowsNewDecls;
     IdentifierSet m_declaredVariables;
     IdentifierSet m_usedVariables;
     IdentifierSet m_closedVariables;
@@ -334,6 +341,16 @@ class JSParser {
     m_scopeStack[m_scopeStack.size() - 2].collectFreeVariables(
         &m_scopeStack.last(), shouldTrackClosedVariables);
     m_scopeStack.removeLast();
+  }
+
+  void declareVariable(const Identifier* ident) {
+    unsigned i = m_scopeStack.size() - 1;
+    ASSERT(i < m_scopeStack.size());
+    while (!m_scopeStack[i].allowsNewDecls()) {
+      i--;
+      ASSERT(i < m_scopeStack.size());
+    }
+    m_scopeStack[i].declareVariable(ident);
   }
 
   ScopeStack m_scopeStack;
@@ -486,7 +503,7 @@ TreeExpression JSParser::parseVarDeclarationList(
     lastIdent = name;
     next();
     bool hasInitializer = match(EQUAL);
-    currentScope()->declareVariable(name);
+    declareVariable(name);
     context.addVar(name, (hasInitializer || (!m_allowsIn && match(INTOKEN)))
                              ? DeclarationStacks::HasInitializer
                              : 0);
@@ -522,7 +539,7 @@ TreeConstDeclList JSParser::parseConstDeclarationList(TreeBuilder& context) {
     const Identifier* name = m_token.m_data.ident;
     next();
     bool hasInitializer = match(EQUAL);
-    currentScope()->declareVariable(name);
+    declareVariable(name);
     context.addVar(
         name, DeclarationStacks::IsConstant |
                   (hasInitializer ? DeclarationStacks::HasInitializer : 0));
@@ -836,6 +853,7 @@ TreeStatement JSParser::parseTryStatement(TreeBuilder& context) {
     next();
     ScopeRef catchScope = pushScope();
     catchScope->declareVariable(ident);
+    catchScope->preventNewDecls();
     consumeOrFail(CLOSEPAREN);
     matchOrFail(OPENBRACE);
     int initialEvalCount = context.evalCount();
@@ -942,7 +960,7 @@ TreeFormalParameterList JSParser::parseFormalParameters(TreeBuilder& context,
   matchOrFail(IDENT);
   usesArguments =
       m_globalData->propertyNames->arguments == *m_token.m_data.ident;
-  currentScope()->declareVariable(m_token.m_data.ident);
+  declareVariable(m_token.m_data.ident);
   TreeFormalParameterList list =
       context.createFormalParameterList(*m_token.m_data.ident);
   TreeFormalParameterList tail = list;
@@ -951,7 +969,7 @@ TreeFormalParameterList JSParser::parseFormalParameters(TreeBuilder& context,
     next();
     matchOrFail(IDENT);
     const Identifier* ident = m_token.m_data.ident;
-    currentScope()->declareVariable(ident);
+    declareVariable(ident);
     next();
     usesArguments =
         usesArguments || m_globalData->propertyNames->arguments == *ident;
@@ -1025,7 +1043,7 @@ TreeStatement JSParser::parseFunctionDeclaration(TreeBuilder& context) {
       context, name, parameters, body, openBracePos, closeBracePos,
       bodyStartLine)));
   failIfFalse(name);
-  currentScope()->declareVariable(name);
+  declareVariable(name);
   return context.createFuncDeclStatement(name, body, parameters, openBracePos,
                                          closeBracePos, bodyStartLine,
                                          m_lastLine);
