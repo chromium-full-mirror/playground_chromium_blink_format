@@ -219,7 +219,7 @@ void RenderTable::computeLogicalWidth() {
     // An auto width table should shrink to fit within the line width if
     // necessary in order to
     // avoid overlapping floats.
-    availableWidth = cb->lineWidth(y(), false);
+    availableWidth = cb->availableLogicalWidthForLine(y(), false);
 
     // Subtract out any fixed margins from our available width for auto width
     // tables.

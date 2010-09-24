@@ -261,8 +261,8 @@ void RenderListItem::positionListMarker() {
     // break anything other than repainting
     // not being as tight as it could be though.
     if (style()->direction() == LTR) {
-      int leftLineOffset =
-          leftRelOffset(yOffset, leftOffset(yOffset, false), false);
+      int leftLineOffset = logicalLeftOffsetForLine(
+          yOffset, logicalLeftOffsetForLine(yOffset, false), false);
       markerXPos = leftLineOffset - xOffset - paddingLeft() - borderLeft() +
                    m_marker->marginLeft();
       m_marker->inlineBoxWrapper()->adjustPosition(markerXPos - markerOldX, 0);
@@ -277,8 +277,8 @@ void RenderListItem::positionListMarker() {
         }
       }
     } else {
-      int rightLineOffset =
-          rightRelOffset(yOffset, rightOffset(yOffset, false), false);
+      int rightLineOffset = logicalRightOffsetForLine(
+          yOffset, logicalRightOffsetForLine(yOffset, false), false);
       markerXPos = rightLineOffset - xOffset + paddingRight() + borderRight() +
                    m_marker->marginLeft();
       m_marker->inlineBoxWrapper()->adjustPosition(markerXPos - markerOldX, 0);
