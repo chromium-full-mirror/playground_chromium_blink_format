@@ -265,10 +265,10 @@ class RenderBox : public RenderBoxModelObject {
 
   virtual IntSize offsetFromContainer(RenderObject*, const IntPoint&) const;
 
-  int calcBorderBoxWidth(int width) const;
-  int calcBorderBoxHeight(int height) const;
-  int calcContentBoxWidth(int width) const;
-  int calcContentBoxHeight(int height) const;
+  int computeBorderBoxLogicalWidth(int width) const;
+  int computeBorderBoxLogicalHeight(int height) const;
+  int computeContentBoxLogicalWidth(int width) const;
+  int computeContentBoxLogicalHeight(int height) const;
 
   virtual void borderFitAdjust(int& /*x*/, int& /*w*/) const {
   }  // Shrink the box in which the border paints if border-fit is set.
@@ -277,9 +277,9 @@ class RenderBox : public RenderBoxModelObject {
   // shifted right by left-aligned floats can recompute their left and
   // right margins (so that they can remain centered after being
   // shifted. -dwh
-  void calcHorizontalMargins(const Length& marginLeft,
-                             const Length& marginRight,
-                             int containerWidth);
+  void computeInlineDirectionMargins(const Length& marginLeft,
+                                     const Length& marginRight,
+                                     int containerWidth);
 
   void positionLineBox(InlineBox*);
 
@@ -331,15 +331,15 @@ class RenderBox : public RenderBoxModelObject {
   bool sizesToIntrinsicWidth(WidthType) const;
   virtual bool stretchesToMinIntrinsicWidth() const { return false; }
 
-  int calcWidthUsing(WidthType, int containerWidth);
-  int calcHeightUsing(const Length& height);
-  int calcReplacedWidthUsing(Length width) const;
-  int calcReplacedHeightUsing(Length height) const;
+  int computeLogicalWidthUsing(WidthType, int containerWidth);
+  int computeLogicalHeightUsing(const Length& height);
+  int computeReplacedWidthUsing(Length width) const;
+  int computeReplacedHeightUsing(Length height) const;
 
-  virtual int calcReplacedWidth(bool includeMaxWidth = true) const;
-  virtual int calcReplacedHeight() const;
+  virtual int computeReplacedWidth(bool includeMaxWidth = true) const;
+  virtual int computeReplacedHeight() const;
 
-  int calcPercentageHeight(const Length& height);
+  int computePercentageLogicalHeight(const Length& height);
 
   // Block flows subclass availableWidth to handle multi column layout
   // (shrinking the width available to children when laying out.)
@@ -351,7 +351,7 @@ class RenderBox : public RenderBoxModelObject {
   int availableHeightUsing(const Length&) const;
   virtual int availableLogicalWidth() const;
 
-  void calcVerticalMargins();
+  void computeBlockDirectionMargins();
 
   virtual int verticalScrollbarWidth() const;
   int horizontalScrollbarHeight() const;
@@ -471,9 +471,9 @@ class RenderBox : public RenderBoxModelObject {
                             bool behindText);
 #endif
 
-  void calcAbsoluteHorizontal();
+  void computePositionedLogicalWidth();
 
-  virtual bool shouldCalculateSizeAsReplaced() const {
+  virtual bool shouldComputeSizeAsReplaced() const {
     return isReplaced() && !isInlineBlockOrInlineTable();
   }
 
@@ -506,35 +506,35 @@ class RenderBox : public RenderBoxModelObject {
   int containingBlockHeightForPositioned(
       const RenderBoxModelObject* containingBlock) const;
 
-  void calcAbsoluteVertical();
-  void calcAbsoluteHorizontalValues(Length width,
-                                    const RenderBoxModelObject* cb,
-                                    TextDirection containerDirection,
-                                    int containerWidth,
-                                    int bordersPlusPadding,
-                                    Length left,
-                                    Length right,
-                                    Length marginLeft,
-                                    Length marginRight,
-                                    int& widthValue,
-                                    int& marginLeftValue,
-                                    int& marginRightValue,
-                                    int& xPos);
-  void calcAbsoluteVerticalValues(Length height,
-                                  const RenderBoxModelObject* cb,
-                                  int containerHeight,
-                                  int bordersPlusPadding,
-                                  Length top,
-                                  Length bottom,
-                                  Length marginTop,
-                                  Length marginBottom,
-                                  int& heightValue,
-                                  int& marginTopValue,
-                                  int& marginBottomValue,
-                                  int& yPos);
+  void computePositionedLogicalHeight();
+  void computePositionedLogicalWidthUsing(Length width,
+                                          const RenderBoxModelObject* cb,
+                                          TextDirection containerDirection,
+                                          int containerWidth,
+                                          int bordersPlusPadding,
+                                          Length left,
+                                          Length right,
+                                          Length marginLeft,
+                                          Length marginRight,
+                                          int& widthValue,
+                                          int& marginLeftValue,
+                                          int& marginRightValue,
+                                          int& xPos);
+  void computePositionedLogicalHeightUsing(Length height,
+                                           const RenderBoxModelObject* cb,
+                                           int containerHeight,
+                                           int bordersPlusPadding,
+                                           Length top,
+                                           Length bottom,
+                                           Length marginTop,
+                                           Length marginBottom,
+                                           int& heightValue,
+                                           int& marginTopValue,
+                                           int& marginBottomValue,
+                                           int& yPos);
 
-  void calcAbsoluteVerticalReplaced();
-  void calcAbsoluteHorizontalReplaced();
+  void computePositionedLogicalHeightReplaced();
+  void computePositionedLogicalWidthReplaced();
 
   // This function calculates the minimum and maximum preferred widths for an
   // object.

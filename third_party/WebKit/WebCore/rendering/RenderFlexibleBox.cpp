@@ -165,7 +165,7 @@ void RenderFlexibleBox::calcPrefWidths() {
 
   if (style()->width().isFixed() && style()->width().value() > 0)
     m_minPrefWidth = m_maxPrefWidth =
-        calcContentBoxWidth(style()->width().value());
+        computeContentBoxLogicalWidth(style()->width().value());
   else {
     m_minPrefWidth = m_maxPrefWidth = 0;
 
@@ -179,17 +179,21 @@ void RenderFlexibleBox::calcPrefWidths() {
 
   if (style()->minWidth().isFixed() && style()->minWidth().value() > 0) {
     m_maxPrefWidth =
-        max(m_maxPrefWidth, calcContentBoxWidth(style()->minWidth().value()));
+        max(m_maxPrefWidth,
+            computeContentBoxLogicalWidth(style()->minWidth().value()));
     m_minPrefWidth =
-        max(m_minPrefWidth, calcContentBoxWidth(style()->minWidth().value()));
+        max(m_minPrefWidth,
+            computeContentBoxLogicalWidth(style()->minWidth().value()));
   }
 
   if (style()->maxWidth().isFixed() &&
       style()->maxWidth().value() != undefinedLength) {
     m_maxPrefWidth =
-        min(m_maxPrefWidth, calcContentBoxWidth(style()->maxWidth().value()));
+        min(m_maxPrefWidth,
+            computeContentBoxLogicalWidth(style()->maxWidth().value()));
     m_minPrefWidth =
-        min(m_minPrefWidth, calcContentBoxWidth(style()->maxWidth().value()));
+        min(m_minPrefWidth,
+            computeContentBoxLogicalWidth(style()->maxWidth().value()));
   }
 
   int toAdd = borderAndPaddingWidth();
@@ -375,7 +379,7 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
       }
 
       // Compute the child's vertical margins.
-      child->calcVerticalMargins();
+      child->computeBlockDirectionMargins();
 
       if (!child->needsLayout() && paginated &&
           view()->layoutState()->m_pageHeight) {
@@ -679,8 +683,8 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
     }
   }
 
-  // So that the calcHeight in layoutBlock() knows to relayout positioned
-  // objects because of
+  // So that the computeLogicalHeight in layoutBlock() knows to relayout
+  // positioned objects because of
   // a height change, we revert our height back to the intrinsic height before
   // returning.
   if (heightSpecified)
@@ -755,7 +759,7 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
       }
 
       // Compute the child's vertical margins.
-      child->calcVerticalMargins();
+      child->computeBlockDirectionMargins();
 
       // Add in the child's marginTop to our height.
       setHeight(height() + child->marginTop());
@@ -994,8 +998,8 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
     }
   }
 
-  // So that the calcHeight in layoutBlock() knows to relayout positioned
-  // objects because of
+  // So that the computeLogicalHeight in layoutBlock() knows to relayout
+  // positioned objects because of
   // a height change, we revert our height back to the intrinsic height before
   // returning.
   if (heightSpecified)

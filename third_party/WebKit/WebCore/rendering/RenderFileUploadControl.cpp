@@ -275,7 +275,7 @@ void RenderFileUploadControl::calcPrefWidths() {
 
   if (style()->width().isFixed() && style()->width().value() > 0)
     m_minPrefWidth = m_maxPrefWidth =
-        calcContentBoxWidth(style()->width().value());
+        computeContentBoxLogicalWidth(style()->width().value());
   else {
     // Figure out how big the filename space needs to be for a given number of
     // characters
@@ -288,9 +288,11 @@ void RenderFileUploadControl::calcPrefWidths() {
 
   if (style()->minWidth().isFixed() && style()->minWidth().value() > 0) {
     m_maxPrefWidth =
-        max(m_maxPrefWidth, calcContentBoxWidth(style()->minWidth().value()));
+        max(m_maxPrefWidth,
+            computeContentBoxLogicalWidth(style()->minWidth().value()));
     m_minPrefWidth =
-        max(m_minPrefWidth, calcContentBoxWidth(style()->minWidth().value()));
+        max(m_minPrefWidth,
+            computeContentBoxLogicalWidth(style()->minWidth().value()));
   } else if (style()->width().isPercent() ||
              (style()->width().isAuto() && style()->height().isPercent()))
     m_minPrefWidth = 0;
@@ -300,9 +302,11 @@ void RenderFileUploadControl::calcPrefWidths() {
   if (style()->maxWidth().isFixed() &&
       style()->maxWidth().value() != undefinedLength) {
     m_maxPrefWidth =
-        min(m_maxPrefWidth, calcContentBoxWidth(style()->maxWidth().value()));
+        min(m_maxPrefWidth,
+            computeContentBoxLogicalWidth(style()->maxWidth().value()));
     m_minPrefWidth =
-        min(m_minPrefWidth, calcContentBoxWidth(style()->maxWidth().value()));
+        min(m_minPrefWidth,
+            computeContentBoxLogicalWidth(style()->maxWidth().value()));
   }
 
   int toAdd = borderAndPaddingWidth();

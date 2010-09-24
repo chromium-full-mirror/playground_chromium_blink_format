@@ -205,7 +205,7 @@ void RenderTable::removeChild(RenderObject* oldChild) {
 
 void RenderTable::computeLogicalWidth() {
   if (isPositioned())
-    calcAbsoluteHorizontal();
+    computePositionedLogicalWidth();
 
   RenderBlock* cb = containingBlock();
   int availableWidth = cb->availableWidth();
@@ -241,8 +241,8 @@ void RenderTable::computeLogicalWidth() {
   // Finally, with our true width determined, compute our margins for real.
   m_marginRight = 0;
   m_marginLeft = 0;
-  calcHorizontalMargins(style()->marginLeft(), style()->marginRight(),
-                        availableWidth);
+  computeInlineDirectionMargins(style()->marginLeft(), style()->marginRight(),
+                                availableWidth);
 }
 
 void RenderTable::layout() {
@@ -344,7 +344,7 @@ void RenderTable::layout() {
     // Tables size as though CSS height includes border/padding.
     th = h.value() - (bpTop + bpBottom);
   else if (h.isPercent())
-    th = calcPercentageHeight(h);
+    th = computePercentageLogicalHeight(h);
   th = max(0, th);
 
   for (RenderObject* child = firstChild(); child;

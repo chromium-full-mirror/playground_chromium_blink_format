@@ -451,7 +451,7 @@ bool RenderImage::isHeightSpecified() const {
   return false;
 }
 
-int RenderImage::calcReplacedWidth(bool includeMaxWidth) const {
+int RenderImage::computeReplacedWidth(bool includeMaxWidth) const {
   if (m_imageResource->imageHasRelativeWidth())
     if (RenderObject* cb = isPositioned() ? container() : containingBlock()) {
       if (cb->isBox())
@@ -462,7 +462,7 @@ int RenderImage::calcReplacedWidth(bool includeMaxWidth) const {
 
   int width;
   if (isWidthSpecified())
-    width = calcReplacedWidthUsing(style()->width());
+    width = computeReplacedWidthUsing(style()->width());
   else if (m_imageResource->usesImageContainerSize())
     width = m_imageResource->imageSize(style()->effectiveZoom()).width();
   else if (m_imageResource->imageHasRelativeWidth())
@@ -471,18 +471,18 @@ int RenderImage::calcReplacedWidth(bool includeMaxWidth) const {
   else
     width = calcAspectRatioWidth();
 
-  int minW = calcReplacedWidthUsing(style()->minWidth());
+  int minW = computeReplacedWidthUsing(style()->minWidth());
   int maxW = !includeMaxWidth || style()->maxWidth().isUndefined()
                  ? width
-                 : calcReplacedWidthUsing(style()->maxWidth());
+                 : computeReplacedWidthUsing(style()->maxWidth());
 
   return max(minW, min(width, maxW));
 }
 
-int RenderImage::calcReplacedHeight() const {
+int RenderImage::computeReplacedHeight() const {
   int height;
   if (isHeightSpecified())
-    height = calcReplacedHeightUsing(style()->height());
+    height = computeReplacedHeightUsing(style()->height());
   else if (m_imageResource->usesImageContainerSize())
     height = m_imageResource->imageSize(style()->effectiveZoom()).height();
   else if (m_imageResource->imageHasRelativeHeight())
@@ -491,10 +491,10 @@ int RenderImage::calcReplacedHeight() const {
   else
     height = calcAspectRatioHeight();
 
-  int minH = calcReplacedHeightUsing(style()->minHeight());
+  int minH = computeReplacedHeightUsing(style()->minHeight());
   int maxH = style()->maxHeight().isUndefined()
                  ? height
-                 : calcReplacedHeightUsing(style()->maxHeight());
+                 : computeReplacedHeightUsing(style()->maxHeight());
 
   return max(minH, min(height, maxH));
 }
@@ -505,7 +505,7 @@ int RenderImage::calcAspectRatioWidth() const {
     return 0;
   if (!m_imageResource->hasImage() || m_imageResource->errorOccurred())
     return size.width();  // Don't bother scaling.
-  return RenderBox::calcReplacedHeight() * size.width() / size.height();
+  return RenderBox::computeReplacedHeight() * size.width() / size.height();
 }
 
 int RenderImage::calcAspectRatioHeight() const {
@@ -514,7 +514,7 @@ int RenderImage::calcAspectRatioHeight() const {
     return 0;
   if (!m_imageResource->hasImage() || m_imageResource->errorOccurred())
     return size.height();  // Don't bother scaling.
-  return RenderBox::calcReplacedWidth() * size.height() / size.width();
+  return RenderBox::computeReplacedWidth() * size.height() / size.width();
 }
 
 }  // namespace WebCore

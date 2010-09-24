@@ -39,8 +39,8 @@ class RenderReplaced : public RenderBox {
 
   virtual IntSize intrinsicSize() const;
 
-  virtual int calcReplacedWidth(bool includeMaxWidth = true) const;
-  virtual int calcReplacedHeight() const;
+  virtual int computeReplacedWidth(bool includeMaxWidth = true) const;
+  virtual int computeReplacedHeight() const;
   virtual int minimumReplacedHeight() const { return 0; }
 
   virtual void setSelectionState(SelectionState);

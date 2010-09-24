@@ -90,8 +90,8 @@ class RenderImage : public RenderReplaced {
                            int ty,
                            HitTestAction);
 
-  virtual int calcReplacedWidth(bool includeMaxWidth = true) const;
-  virtual int calcReplacedHeight() const;
+  virtual int computeReplacedWidth(bool includeMaxWidth = true) const;
+  virtual int computeReplacedHeight() const;
 
   int calcAspectRatioWidth() const;
   int calcAspectRatioHeight() const;

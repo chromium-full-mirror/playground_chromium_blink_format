@@ -1510,7 +1510,7 @@ void RenderBlock::adjustPositionedBlock(RenderBox* child,
   if (child->style()->hasStaticY()) {
     int y = height();
     if (!marginInfo.canCollapseWithTop()) {
-      child->calcVerticalMargins();
+      child->computeBlockDirectionMargins();
       int marginTop = child->marginTop();
       int collapsedTopPos = marginInfo.posMargin();
       int collapsedTopNeg = marginInfo.negMargin();
@@ -1873,11 +1873,11 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
         // width computation will take into account the delta between |leftOff|
         // and |xPos|
         // so that we can just pass the content width in directly to the
-        // |calcHorizontalMargins|
+        // |computeInlineDirectionMargins|
         // function.
-        child->calcHorizontalMargins(child->style()->marginLeft(),
-                                     child->style()->marginRight(),
-                                     lineWidth(child->y(), false));
+        child->computeInlineDirectionMargins(child->style()->marginLeft(),
+                                             child->style()->marginRight(),
+                                             lineWidth(child->y(), false));
         chPos = leftOff + child->marginLeft();
       }
     }
@@ -1903,11 +1903,11 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
         // width computation will take into account the delta between |rightOff|
         // and |xPos|
         // so that we can just pass the content width in directly to the
-        // |calcHorizontalMargins|
+        // |computeInlineDirectionMargins|
         // function.
-        child->calcHorizontalMargins(child->style()->marginLeft(),
-                                     child->style()->marginRight(),
-                                     lineWidth(child->y(), false));
+        child->computeInlineDirectionMargins(child->style()->marginLeft(),
+                                             child->style()->marginRight(),
+                                             lineWidth(child->y(), false));
         chPos = rightOff - child->marginRight() - child->width();
       }
     }
@@ -2051,7 +2051,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
   int oldTopNegMargin = maxTopNegMargin();
 
   // The child is a normal flow object.  Compute its vertical margins now.
-  child->calcVerticalMargins();
+  child->computeBlockDirectionMargins();
 
   // Do not allow a collapse if the margin top collapse style is set to
   // SEPARATE.
@@ -3404,7 +3404,7 @@ RenderBlock::FloatingObject* RenderBlock::insertFloatingObject(RenderBox* o) {
     o->layoutIfNeeded();
   else {
     o->computeLogicalWidth();
-    o->calcVerticalMargins();
+    o->computeBlockDirectionMargins();
   }
   newObj->m_width = o->width() + o->marginLeft() + o->marginRight();
 
@@ -5277,7 +5277,7 @@ void RenderBlock::calcPrefWidths() {
   if (!isTableCell() && style()->width().isFixed() &&
       style()->width().value() > 0)
     m_minPrefWidth = m_maxPrefWidth =
-        calcContentBoxWidth(style()->width().value());
+        computeContentBoxLogicalWidth(style()->width().value());
   else {
     m_minPrefWidth = 0;
     m_maxPrefWidth = 0;
@@ -5300,23 +5300,28 @@ void RenderBlock::calcPrefWidths() {
     if (isTableCell()) {
       Length w = toRenderTableCell(this)->styleOrColWidth();
       if (w.isFixed() && w.value() > 0)
-        m_maxPrefWidth = max(m_minPrefWidth, calcContentBoxWidth(w.value()));
+        m_maxPrefWidth =
+            max(m_minPrefWidth, computeContentBoxLogicalWidth(w.value()));
     }
   }
 
   if (style()->minWidth().isFixed() && style()->minWidth().value() > 0) {
     m_maxPrefWidth =
-        max(m_maxPrefWidth, calcContentBoxWidth(style()->minWidth().value()));
+        max(m_maxPrefWidth,
+            computeContentBoxLogicalWidth(style()->minWidth().value()));
     m_minPrefWidth =
-        max(m_minPrefWidth, calcContentBoxWidth(style()->minWidth().value()));
+        max(m_minPrefWidth,
+            computeContentBoxLogicalWidth(style()->minWidth().value()));
   }
 
   if (style()->maxWidth().isFixed() &&
       style()->maxWidth().value() != undefinedLength) {
     m_maxPrefWidth =
-        min(m_maxPrefWidth, calcContentBoxWidth(style()->maxWidth().value()));
+        min(m_maxPrefWidth,
+            computeContentBoxLogicalWidth(style()->maxWidth().value()));
     m_minPrefWidth =
-        min(m_minPrefWidth, calcContentBoxWidth(style()->maxWidth().value()));
+        min(m_minPrefWidth,
+            computeContentBoxLogicalWidth(style()->maxWidth().value()));
   }
 
   int toAdd = 0;

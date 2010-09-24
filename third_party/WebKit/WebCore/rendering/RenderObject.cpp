@@ -2318,8 +2318,8 @@ RenderObject* RenderObject::container(RenderBoxModelObject* repaintContainer,
   // containingBlock() simply skips relpositioned inlines and lets an enclosing
   // block handle
   // the layout of the positioned object.  This does mean that
-  // calcAbsoluteHorizontal and
-  // calcAbsoluteVertical have to use container().
+  // computePositionedLogicalWidth and
+  // computePositionedLogicalHeight have to use container().
   RenderObject* o = parent();
 
   if (isText())
