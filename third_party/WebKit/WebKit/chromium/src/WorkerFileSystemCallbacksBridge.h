@@ -31,6 +31,8 @@
 #ifndef WorkerFileSystemCallbacksBridge_h
 #define WorkerFileSystemCallbacksBridge_h
 
+#if ENABLE(FILE_SYSTEM)
+
 #include "PlatformString.h"
 #include "ScriptExecutionContext.h"
 #include "WebFileError.h"
@@ -140,5 +142,7 @@ class WorkerFileSystemCallbacksBridge
 };
 
 }  // namespace WebCore
+
+#endif
 
 #endif  // WorkerFileSystemCallbacksBridge_h

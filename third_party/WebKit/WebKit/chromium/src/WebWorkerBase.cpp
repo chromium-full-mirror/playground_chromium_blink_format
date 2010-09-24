@@ -252,6 +252,7 @@ bool WebWorkerBase::allowDatabase(WebFrame*,
   return bridge->result();
 }
 
+#if ENABLE(FILE_SYSTEM)
 void WebWorkerBase::openFileSystem(WebFileSystem::Type type,
                                    long long size,
                                    WebFileSystemCallbacks* callbacks) {
@@ -264,6 +265,7 @@ void WebWorkerBase::openFileSystem(WebFileSystem::Type type,
   bridge->postOpenFileSystemToMainThread(commonClient(), type, size,
                                          openFileSystemMode);
 }
+#endif
 
 // WorkerObjectProxy -----------------------------------------------------------
 
