@@ -61,6 +61,7 @@ class WebLoaderClient {
   void didFirstVisuallyNonEmptyLayoutForFrame(WebPageProxy*,
                                               WebFrameProxy*,
                                               APIObject*);
+  void didRemoveFrameFromHierarchy(WebPageProxy*, WebFrameProxy*, APIObject*);
 
   void didStartProgress(WebPageProxy*);
   void didChangeProgress(WebPageProxy*);

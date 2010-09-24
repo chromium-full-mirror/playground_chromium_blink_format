@@ -71,6 +71,9 @@ class InjectedBundlePageLoaderClient {
   void didFirstVisuallyNonEmptyLayoutForFrame(WebPage*,
                                               WebFrame*,
                                               RefPtr<APIObject>& userData);
+  void didRemoveFrameFromHierarchy(WebPage*,
+                                   WebFrame*,
+                                   RefPtr<APIObject>& userData);
 
   void didClearWindowObjectForFrame(WebPage*,
                                     WebFrame*,

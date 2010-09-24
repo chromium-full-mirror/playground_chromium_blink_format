@@ -155,6 +155,17 @@ void WebLoaderClient::didFirstVisuallyNonEmptyLayoutForFrame(
       m_pageLoaderClient.clientInfo);
 }
 
+void WebLoaderClient::didRemoveFrameFromHierarchy(WebPageProxy* page,
+                                                  WebFrameProxy* frame,
+                                                  APIObject* userData) {
+  if (!m_pageLoaderClient.didRemoveFrameFromHierarchy)
+    return;
+
+  m_pageLoaderClient.didRemoveFrameFromHierarchy(toRef(page), toRef(frame),
+                                                 toRef(userData),
+                                                 m_pageLoaderClient.clientInfo);
+}
+
 void WebLoaderClient::didStartProgress(WebPageProxy* page) {
   if (!m_pageLoaderClient.didStartProgress)
     return;

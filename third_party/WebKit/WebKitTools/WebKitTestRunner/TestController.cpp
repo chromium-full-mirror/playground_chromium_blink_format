@@ -139,7 +139,7 @@ void TestController::initialize(int argc, const char* argv[]) {
   WKPageSetPageUIClient(m_mainWebView->page(), &pageUIClient);
 
   WKPageLoaderClient pageLoaderClient = {
-      0, this, 0, 0, 0, 0, 0, didFinishLoadForFrame, 0, 0, 0, 0,
+      0, this, 0, 0, 0, 0, 0, didFinishLoadForFrame, 0, 0, 0, 0, 0,
       0, 0,    0, 0, 0, 0, 0};
   WKPageSetPageLoaderClient(m_mainWebView->page(), &pageLoaderClient);
 }

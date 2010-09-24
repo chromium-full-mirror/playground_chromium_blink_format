@@ -103,7 +103,21 @@ void WebFrameLoaderClient::setCopiesOnScroll() {
 }
 
 void WebFrameLoaderClient::detachedFromParent2() {
-  notImplemented();
+  WebPage* webPage = m_frame->page();
+  if (!webPage)
+    return;
+
+  RefPtr<APIObject> userData;
+
+  // Notify the bundle client.
+  webPage->injectedBundleLoaderClient().didRemoveFrameFromHierarchy(
+      webPage, m_frame, userData);
+
+  // Notify the UIProcess.
+  WebProcess::shared().connection()->send(
+      WebPageProxyMessage::DidRemoveFrameFromHierarchy, webPage->pageID(),
+      CoreIPC::In(m_frame->frameID(),
+                  InjectedBundleUserMessageEncoder(userData.get())));
 }
 
 void WebFrameLoaderClient::detachedFromParent3() {

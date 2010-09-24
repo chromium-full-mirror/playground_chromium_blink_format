@@ -113,6 +113,11 @@ typedef void (*WKPageDidFirstVisuallyNonEmptyLayoutForFrame)(
     WKFrameRef frame,
     WKTypeRef userData,
     const void* clientInfo);
+typedef void (*WKPageDidRemoveFrameFromHierarchyCallback)(
+    WKPageRef page,
+    WKFrameRef frame,
+    WKTypeRef userData,
+    const void* clientInfo);
 
 // Progress Client
 typedef void (*WKPageDidStartProgressCallback)(WKPageRef page,
@@ -150,6 +155,7 @@ struct WKPageLoaderClient {
   WKPageDidFirstLayoutForFrame didFirstLayoutForFrame;
   WKPageDidFirstVisuallyNonEmptyLayoutForFrame
       didFirstVisuallyNonEmptyLayoutForFrame;
+  WKPageDidRemoveFrameFromHierarchyCallback didRemoveFrameFromHierarchy;
 
   // FIXME: Move to progress client.
   WKPageDidStartProgressCallback didStartProgress;

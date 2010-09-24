@@ -238,6 +238,7 @@ class WebPageProxy : public APIObject {
   void didReceiveTitleForFrame(WebFrameProxy*, const String&, APIObject*);
   void didFirstLayoutForFrame(WebFrameProxy*, APIObject*);
   void didFirstVisuallyNonEmptyLayoutForFrame(WebFrameProxy*, APIObject*);
+  void didRemoveFrameFromHierarchy(WebFrameProxy*, APIObject*);
   void didStartProgress();
   void didChangeProgress(double);
   void didFinishProgress();
