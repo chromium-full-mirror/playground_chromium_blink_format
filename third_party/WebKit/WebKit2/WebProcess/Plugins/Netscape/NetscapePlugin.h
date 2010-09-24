@@ -112,6 +112,8 @@ class NetscapePlugin : public Plugin {
   bool allowPopups() const;
 
   bool platformPostInitialize();
+  void platformDestroy();
+  void platformGeometryDidChange();
   void platformPaint(WebCore::GraphicsContext*,
                      const WebCore::IntRect& dirtyRect);
 
@@ -200,6 +202,8 @@ class NetscapePlugin : public Plugin {
   NPDrawingModel m_drawingModel;
   NPEventModel m_eventModel;
   RetainPtr<PlatformLayer> m_pluginLayer;
+#elif PLATFORM(WIN)
+  HWND m_window;
 #endif
 };
 

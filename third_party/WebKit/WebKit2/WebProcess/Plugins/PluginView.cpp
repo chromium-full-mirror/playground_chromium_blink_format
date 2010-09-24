@@ -854,6 +854,12 @@ void PluginView::pluginProcessCrashed() {
   invalidateRect(frameRect());
 }
 
+#if PLATFORM(WIN)
+HWND PluginView::nativeParentWindow() {
+  return m_webPage->nativeWindow();
+}
+#endif
+
 void PluginView::didFinishLoad(WebFrame* webFrame) {
   RefPtr<URLRequest> request = m_pendingFrameLoads.take(webFrame);
   ASSERT(request);
