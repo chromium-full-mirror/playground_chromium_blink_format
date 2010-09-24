@@ -69,6 +69,10 @@ void qt_wk_didFirstVisuallyNonEmptyLayoutForFrame(WKPageRef,
                                                   WKFrameRef,
                                                   WKTypeRef,
                                                   const void* clientInfo);
+void qt_wk_didRemoveFrameFromHierarchy(WKPageRef,
+                                       WKFrameRef,
+                                       WKTypeRef,
+                                       const void* clientInfo);
 void qt_wk_didStartProgress(WKPageRef, const void* clientInfo);
 void qt_wk_didChangeProgress(WKPageRef, const void* clientInfo);
 void qt_wk_didFinishProgress(WKPageRef, const void* clientInfo);

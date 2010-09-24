@@ -116,6 +116,13 @@ void qt_wk_didFirstLayoutForFrame(WKPageRef page,
   emit toQWKPage(clientInfo)->initialLayoutCompleted();
 }
 
+void qt_wk_didRemoveFrameFromHierarchy(WKPageRef page,
+                                       WKFrameRef frame,
+                                       WKTypeRef userData,
+                                       const void* clientInfo) {
+  // FIXME: Implement (bug #46432)
+}
+
 void qt_wk_didFirstVisuallyNonEmptyLayoutForFrame(WKPageRef page,
                                                   WKFrameRef frame,
                                                   WKTypeRef userData,
