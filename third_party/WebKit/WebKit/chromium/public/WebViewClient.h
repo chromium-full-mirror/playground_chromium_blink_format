@@ -298,14 +298,6 @@ class WebViewClient : virtual public WebWidgetClient {
   // accessibility object.
   virtual void focusAccessibilityObject(const WebAccessibilityObject&) {}
 
-  // Notifies embedder that the state of an accessibility object has changed.
-  virtual void didChangeAccessibilityObjectState(
-      const WebAccessibilityObject&) {}
-
-  // Notifies embedder that the children of an accessibility object has changed.
-  virtual void didChangeAccessibilityObjectChildren(
-      const WebAccessibilityObject&) {}
-
   // Notifies embedder about an accessibility notification.
   virtual void postAccessibilityNotification(const WebAccessibilityObject&,
                                              WebAccessibilityNotification) {}

@@ -304,8 +304,6 @@ class ChromeClient {
 
   virtual void postAccessibilityNotification(AccessibilityObject*,
                                              AXObjectCache::AXNotification) {}
-  virtual void didChangeAccessibilityObjectState(AccessibilityObject*) {}
-  virtual void didChangeAccessibilityObjectChildren(AccessibilityObject*) {}
 
  protected:
   virtual ~ChromeClient() {}
