@@ -62,7 +62,7 @@ class AsyncFileWriterChromium : public AsyncFileWriter,
 
   // WebFileWriterClient
   virtual void didWrite(long long bytes, bool complete);
-  virtual void didTruncate(long long length);
+  virtual void didTruncate();
   virtual void didFail(WebKit::WebFileError);
 
  private:
