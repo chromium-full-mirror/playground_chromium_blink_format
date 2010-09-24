@@ -906,7 +906,7 @@ textCheckingLineStyleForMarkerType(DocumentMarker::MarkerType markerType) {
       return GraphicsContext::TextCheckingSpellingLineStyle;
     case DocumentMarker::Grammar:
       return GraphicsContext::TextCheckingGrammarLineStyle;
-    case DocumentMarker::Replacement:
+    case DocumentMarker::CorrectionIndicator:
       return GraphicsContext::TextCheckingReplacementLineStyle;
     default:
       ASSERT_NOT_REACHED();
@@ -1099,6 +1099,7 @@ void InlineTextBox::paintDocumentMarkers(GraphicsContext* pt,
       case DocumentMarker::Grammar:
       case DocumentMarker::Spelling:
       case DocumentMarker::Replacement:
+      case DocumentMarker::CorrectionIndicator:
       case DocumentMarker::RejectedCorrection:
         if (background)
           continue;
@@ -1134,10 +1135,11 @@ void InlineTextBox::paintDocumentMarkers(GraphicsContext* pt,
       case DocumentMarker::TextMatch:
         paintTextMatchMarker(pt, tx, ty, marker, style, font);
         break;
-      case DocumentMarker::Replacement:
+      case DocumentMarker::CorrectionIndicator:
         computeRectForReplacementMarker(tx, ty, marker, style, font);
         paintSpellingOrGrammarMarker(pt, tx, ty, marker, style, font, false);
         break;
+      case DocumentMarker::Replacement:
       case DocumentMarker::RejectedCorrection:
         break;
       default:
