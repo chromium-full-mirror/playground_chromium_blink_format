@@ -1254,6 +1254,15 @@ bool RenderLayerBacking::startAnimation(double timeOffset,
   return runningAcceleratedAnimation;
 }
 
+void RenderLayerBacking::animationPaused(double timeOffset,
+                                         const String& animationName) {
+  m_graphicsLayer->pauseAnimation(animationName, timeOffset);
+}
+
+void RenderLayerBacking::animationFinished(const String& animationName) {
+  m_graphicsLayer->removeAnimation(animationName);
+}
+
 bool RenderLayerBacking::startTransition(double timeOffset,
                                          int property,
                                          const RenderStyle* fromStyle,
@@ -1272,8 +1281,11 @@ bool RenderLayerBacking::startTransition(double timeOffset,
           new FloatAnimationValue(1, compositingOpacity(toStyle->opacity())));
       // The boxSize param is only used for transform animations (which can only
       // run on RenderBoxes), so we pass an empty size here.
-      if (m_graphicsLayer->addAnimation(opacityVector, IntSize(), opacityAnim,
-                                        String(), timeOffset)) {
+      if (m_graphicsLayer->addAnimation(
+              opacityVector, IntSize(), opacityAnim,
+              GraphicsLayer::animationNameForTransition(
+                  AnimatedPropertyOpacity),
+              timeOffset)) {
         // To ensure that the correct opacity is visible when the animation
         // ends, also set the final opacity.
         updateLayerOpacity(toStyle);
@@ -1294,7 +1306,9 @@ bool RenderLayerBacking::startTransition(double timeOffset,
           new TransformAnimationValue(1, &toStyle->transform()));
       if (m_graphicsLayer->addAnimation(
               transformVector, toRenderBox(renderer())->borderBoxRect().size(),
-              transformAnim, String(), timeOffset)) {
+              transformAnim, GraphicsLayer::animationNameForTransition(
+                                 AnimatedPropertyWebkitTransform),
+              timeOffset)) {
         // To ensure that the correct transform is visible when the animation
         // ends, also set the final opacity.
         updateLayerTransform(toStyle);
@@ -1309,6 +1323,21 @@ bool RenderLayerBacking::startTransition(double timeOffset,
   return didAnimate;
 }
 
+void RenderLayerBacking::transitionPaused(double timeOffset, int property) {
+  AnimatedPropertyID animatedProperty = cssToGraphicsLayerProperty(property);
+  if (animatedProperty != AnimatedPropertyInvalid)
+    m_graphicsLayer->pauseAnimation(
+        GraphicsLayer::animationNameForTransition(animatedProperty),
+        timeOffset);
+}
+
+void RenderLayerBacking::transitionFinished(int property) {
+  AnimatedPropertyID animatedProperty = cssToGraphicsLayerProperty(property);
+  if (animatedProperty != AnimatedPropertyInvalid)
+    m_graphicsLayer->removeAnimation(
+        GraphicsLayer::animationNameForTransition(animatedProperty));
+}
+
 void RenderLayerBacking::notifyAnimationStarted(const GraphicsLayer*,
                                                 double time) {
   renderer()->animation()->notifyAnimationStarted(renderer(), time);
@@ -1319,21 +1348,7 @@ void RenderLayerBacking::notifySyncRequired(const GraphicsLayer*) {
     compositor()->scheduleSync();
 }
 
-void RenderLayerBacking::animationFinished(const String& animationName) {
-  m_graphicsLayer->removeAnimationsForKeyframes(animationName);
-}
-
-void RenderLayerBacking::animationPaused(double timeOffset,
-                                         const String& animationName) {
-  m_graphicsLayer->pauseAnimation(animationName, timeOffset);
-}
-
-void RenderLayerBacking::transitionFinished(int property) {
-  AnimatedPropertyID animatedProperty = cssToGraphicsLayerProperty(property);
-  if (animatedProperty != AnimatedPropertyInvalid)
-    m_graphicsLayer->removeAnimationsForProperty(animatedProperty);
-}
-
+// This is used for the 'freeze' API, for testing only.
 void RenderLayerBacking::suspendAnimations(double time) {
   m_graphicsLayer->suspendAnimations(time);
 }
