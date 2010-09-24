@@ -33,8 +33,8 @@
 
 #if ENABLE(WORKERS)
 
+#include "WebFileSystem.h"
 #include "WebWorkerClient.h"
-
 #include "WorkerContextProxy.h"
 #include <wtf/PassOwnPtr.h>
 #include <wtf/RefPtr.h>
@@ -117,6 +117,12 @@ class WebWorkerClientImpl : public WebCore::WorkerContextProxy,
                              unsigned long estimatedSize) {
     ASSERT_NOT_REACHED();
     return true;
+  }
+  virtual void openFileSystem(WebFrame*,
+                              WebFileSystem::Type,
+                              long long size,
+                              WebFileSystemCallbacks*) {
+    ASSERT_NOT_REACHED();
   }
 
  private:

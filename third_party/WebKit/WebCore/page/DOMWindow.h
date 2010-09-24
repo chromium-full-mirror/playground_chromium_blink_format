@@ -58,7 +58,6 @@ class Frame;
 class History;
 class IDBFactory;
 class InspectorTimelineAgent;
-class LocalFileSystem;
 class Location;
 class StyleMedia;
 class Navigator;
@@ -495,9 +494,6 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
 #endif
 #if ENABLE(INDEXED_DATABASE)
   mutable RefPtr<IDBFactory> m_idbFactory;
-#endif
-#if ENABLE(FILE_SYSTEM)
-  RefPtr<LocalFileSystem> m_localFileSystem;
 #endif
 
   EventTargetData m_eventTargetData;

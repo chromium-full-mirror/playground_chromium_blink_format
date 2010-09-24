@@ -42,13 +42,19 @@
 #include "WebFileSystemCallbacksImpl.h"
 #include "WebFrameClient.h"
 #include "WebFrameImpl.h"
+#include "WebWorkerImpl.h"
+#include "WorkerContext.h"
+#include "WorkerThread.h"
+#include <wtf/Threading.h>
 
 using namespace WebKit;
 
 namespace WebCore {
 
-PassRefPtr<LocalFileSystem> LocalFileSystem::create(const String& path) {
-  return adoptRef(new LocalFileSystem(path));
+LocalFileSystem& LocalFileSystem::localFileSystem() {
+  AtomicallyInitializedStatic(LocalFileSystem*,
+                              localFileSystem = new LocalFileSystem(""));
+  return *localFileSystem;
 }
 
 void LocalFileSystem::requestFileSystem(
@@ -66,7 +72,14 @@ void LocalFileSystem::requestFileSystem(
         new WebFileSystemCallbacksImpl(
             new FileSystemCallbacks(successCallback, errorCallback, context)));
   } else {
-    // FIXME: Add implementation for workers.
+    WorkerContext* workerContext = static_cast<WorkerContext*>(context);
+    WorkerLoaderProxy* workerLoaderProxy =
+        &workerContext->thread()->workerLoaderProxy();
+    WebWorkerBase* webWorker = static_cast<WebWorkerBase*>(workerLoaderProxy);
+    webWorker->openFileSystem(
+        static_cast<WebFileSystem::Type>(type), size,
+        new WebFileSystemCallbacksImpl(
+            new FileSystemCallbacks(successCallback, errorCallback, context)));
   }
 }
 

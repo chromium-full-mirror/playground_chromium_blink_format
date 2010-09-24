@@ -35,11 +35,18 @@
 
 #include "AsyncFileSystemCallbacks.h"
 #include "FileSystem.h"
+#include "NotImplemented.h"
 
 namespace WebCore {
 
+#if !PLATFORM(CHROMIUM)
+bool AsyncFileSystem::isAvailable() {
+  notImplemented();
+  return false;
+}
+
 PassOwnPtr<AsyncFileSystem> AsyncFileSystem::create(const String&) {
-  // FIXME: return default AsyncFileSystem implementation.
+  notImplemented();
   return 0;
 }
 
@@ -64,6 +71,7 @@ void AsyncFileSystem::openFileSystem(
 
   callbacks->didOpenFileSystem(name, AsyncFileSystem::create(rootPath));
 }
+#endif
 
 // Default implementation.
 String AsyncFileSystem::virtualToPlatformPath(const String& path) const {

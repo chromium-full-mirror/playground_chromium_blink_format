@@ -31,6 +31,9 @@
 #ifndef WebCommonWorkerClient_h
 #define WebCommonWorkerClient_h
 
+#include "WebCommon.h"
+#include "WebFileSystem.h"
+
 namespace WebKit {
 
 class WebApplicationCacheHost;
@@ -96,6 +99,13 @@ class WebCommonWorkerClient {
                              const WebString& name,
                              const WebString& displayName,
                              unsigned long estimatedSize) = 0;
+
+  // Called on the main webkit thread before opening a file system.
+  virtual void openFileSystem(WebFileSystem::Type,
+                              long long size,
+                              WebFileSystemCallbacks*) {
+    WEBKIT_ASSERT_NOT_REACHED();
+  }
 
  protected:
   ~WebCommonWorkerClient() {}
