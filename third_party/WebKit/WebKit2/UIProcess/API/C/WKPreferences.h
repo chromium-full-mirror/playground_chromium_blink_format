@@ -87,7 +87,7 @@ WK_EXPORT void WKPreferencesSetStandardFontFamily(
     WKPreferencesRef preferencesRef,
     WKStringRef family);
 WK_EXPORT WKStringRef
-WebPreferencesCopyStandardFontFamily(WKPreferencesRef preferencesRef);
+WKPreferencesCopyStandardFontFamily(WKPreferencesRef preferencesRef);
 
 WK_EXPORT void WKPreferencesSetFixedFontFamily(WKPreferencesRef preferencesRef,
                                                WKStringRef family);

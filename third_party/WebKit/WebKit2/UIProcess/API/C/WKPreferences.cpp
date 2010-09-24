@@ -118,7 +118,7 @@ void WKPreferencesSetStandardFontFamily(WKPreferencesRef preferencesRef,
   toWK(preferencesRef)->setStandardFontFamily(toWTFString(family));
 }
 
-WKStringRef WebPreferencesCopyStandardFontFamily(
+WKStringRef WKPreferencesCopyStandardFontFamily(
     WKPreferencesRef preferencesRef) {
   return toCopiedRef(toWK(preferencesRef)->standardFontFamily());
 }
