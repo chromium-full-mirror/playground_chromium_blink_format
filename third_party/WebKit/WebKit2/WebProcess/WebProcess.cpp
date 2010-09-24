@@ -31,6 +31,7 @@
 #include "WebCoreArgumentCoders.h"
 #include "WebFrame.h"
 #include "WebPage.h"
+#include "WebPageCreationParameters.h"
 #include "WebPlatformStrategies.h"
 #include "WebPreferencesStore.h"
 #include "WebProcessProxyMessageKinds.h"
@@ -181,9 +182,7 @@ WebPage* WebProcess::webPage(uint64_t pageID) const {
 
 WebPage* WebProcess::createWebPage(
     uint64_t pageID,
-    const IntSize& viewSize,
-    const WebPreferencesStore& store,
-    const DrawingAreaBase::DrawingAreaInfo& drawingAreaInfo) {
+    const WebPageCreationParameters& parameters) {
   // It is necessary to check for page existence here since during a
   // window.open() (or targeted
   // link) the WebPage gets created both in the synchronous handler and through
@@ -193,7 +192,8 @@ WebPage* WebProcess::createWebPage(
   if (result.second) {
     ASSERT(!result.first->second);
     result.first->second =
-        WebPage::create(pageID, viewSize, store, drawingAreaInfo);
+        WebPage::create(pageID, parameters.viewSize, parameters.store,
+                        parameters.drawingAreaInfo);
   }
 
   ASSERT(result.first->second);
@@ -291,13 +291,11 @@ void WebProcess::didReceiveMessage(CoreIPC::Connection* connection,
 
       case WebProcessMessage::Create: {
         uint64_t pageID = arguments->destinationID();
-        IntSize viewSize;
-        WebPreferencesStore store;
-        DrawingArea::DrawingAreaInfo drawingAreaInfo;
-        if (!arguments->decode(CoreIPC::Out(viewSize, store, drawingAreaInfo)))
+        WebPageCreationParameters parameters;
+        if (!arguments->decode(CoreIPC::Out(parameters)))
           return;
 
-        createWebPage(pageID, viewSize, store, drawingAreaInfo);
+        createWebPage(pageID, parameters);
         return;
       }
       case WebProcessMessage::RegisterURLSchemeAsEmptyDocument: {
