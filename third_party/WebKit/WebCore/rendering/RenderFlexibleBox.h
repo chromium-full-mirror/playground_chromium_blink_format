@@ -36,7 +36,7 @@ class RenderFlexibleBox : public RenderBlock {
 
   virtual const char* renderName() const;
 
-  virtual void calcPrefWidths();
+  virtual void computePreferredLogicalWidths();
   void calcHorizontalPrefWidths();
   void calcVerticalPrefWidths();
 

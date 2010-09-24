@@ -64,7 +64,7 @@ class RenderListItem : public RenderBlock {
   virtual void paint(PaintInfo&, int tx, int ty);
 
   virtual void layout();
-  virtual void calcPrefWidths();
+  virtual void computePreferredLogicalWidths();
 
   virtual void positionListMarker();
 

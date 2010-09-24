@@ -39,7 +39,7 @@ class RenderListMarker : public RenderBox {
   RenderListMarker(RenderListItem*);
   virtual ~RenderListMarker();
 
-  virtual void calcPrefWidths();
+  virtual void computePreferredLogicalWidths();
 
   const String& text() const { return m_text; }
 

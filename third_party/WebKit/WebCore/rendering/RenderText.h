@@ -95,8 +95,8 @@ class RenderText : public RenderObject {
 
   virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
 
-  virtual int minPrefWidth() const;
-  virtual int maxPrefWidth() const;
+  virtual int minPreferredLogicalWidth() const;
+  virtual int maxPreferredLogicalWidth() const;
 
   void trimmedPrefWidths(int leadWidth,
                          int& beginMinW,
@@ -161,7 +161,7 @@ class RenderText : public RenderObject {
 
   void checkConsistency() const;
 
-  virtual void calcPrefWidths(int leadWidth);
+  virtual void computePreferredLogicalWidths(int leadWidth);
   bool isAllCollapsibleWhitespace();
 
  protected:
@@ -174,9 +174,10 @@ class RenderText : public RenderObject {
   virtual InlineTextBox* createTextBox();  // Subclassed by SVG.
 
  private:
-  void calcPrefWidths(int leadWidth,
-                      HashSet<const SimpleFontData*>& fallbackFonts,
-                      GlyphOverflow&);
+  void computePreferredLogicalWidths(
+      int leadWidth,
+      HashSet<const SimpleFontData*>& fallbackFonts,
+      GlyphOverflow&);
 
   // Make length() private so that callers that have a RenderText*
   // will use the more efficient textLength() instead, while

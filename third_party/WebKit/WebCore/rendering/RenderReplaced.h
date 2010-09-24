@@ -66,7 +66,7 @@ class RenderReplaced : public RenderBox {
   virtual int baselinePosition(bool firstLine,
                                bool isRootLineBox = false) const;
 
-  virtual void calcPrefWidths();
+  virtual void computePreferredLogicalWidths();
 
   int calcAspectRatioWidth() const;
   int calcAspectRatioHeight() const;

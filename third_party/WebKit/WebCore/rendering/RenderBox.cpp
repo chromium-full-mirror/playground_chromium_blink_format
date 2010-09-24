@@ -73,8 +73,8 @@ RenderBox::RenderBox(Node* node)
       m_marginRight(0),
       m_marginTop(0),
       m_marginBottom(0),
-      m_minPrefWidth(-1),
-      m_maxPrefWidth(-1),
+      m_minPreferredLogicalWidth(-1),
+      m_maxPreferredLogicalWidth(-1),
       m_inlineBoxWrapper(0) {
   setIsBox();
 }
@@ -538,18 +538,18 @@ void RenderBox::panScroll(const IntPoint& source) {
     layer()->panScrollFromPoint(source);
 }
 
-int RenderBox::minPrefWidth() const {
-  if (prefWidthsDirty())
-    const_cast<RenderBox*>(this)->calcPrefWidths();
+int RenderBox::minPreferredLogicalWidth() const {
+  if (preferredLogicalWidthsDirty())
+    const_cast<RenderBox*>(this)->computePreferredLogicalWidths();
 
-  return m_minPrefWidth;
+  return m_minPreferredLogicalWidth;
 }
 
-int RenderBox::maxPrefWidth() const {
-  if (prefWidthsDirty())
-    const_cast<RenderBox*>(this)->calcPrefWidths();
+int RenderBox::maxPreferredLogicalWidth() const {
+  if (preferredLogicalWidthsDirty())
+    const_cast<RenderBox*>(this)->computePreferredLogicalWidths();
 
-  return m_maxPrefWidth;
+  return m_maxPreferredLogicalWidth;
 }
 
 int RenderBox::overrideSize() const {
@@ -1516,7 +1516,8 @@ void RenderBox::computeLogicalWidth() {
     m_marginLeft = marginLeft.calcMinValue(containerWidth);
     m_marginRight = marginRight.calcMinValue(containerWidth);
     if (treatAsReplaced)
-      setWidth(max(w.value() + borderAndPaddingWidth(), minPrefWidth()));
+      setWidth(
+          max(w.value() + borderAndPaddingWidth(), minPreferredLogicalWidth()));
 
     return;
   }
@@ -1546,7 +1547,7 @@ void RenderBox::computeLogicalWidth() {
   }
 
   if (stretchesToMinIntrinsicWidth()) {
-    setWidth(max(width(), minPrefWidth()));
+    setWidth(max(width(), minPreferredLogicalWidth()));
     w = Length(width(), Fixed);
   }
 
@@ -1589,8 +1590,8 @@ int RenderBox::computeLogicalWidthUsing(LogicalWidthType widthType,
       logicalWidthResult = availableLogicalWidth - marginStart - marginEnd;
 
     if (sizesToIntrinsicWidth(widthType)) {
-      logicalWidthResult = max(logicalWidthResult, minPrefWidth());
-      logicalWidthResult = min(logicalWidthResult, maxPrefWidth());
+      logicalWidthResult = max(logicalWidthResult, minPreferredLogicalWidth());
+      logicalWidthResult = min(logicalWidthResult, maxPreferredLogicalWidth());
     }
   } else  // FIXME: If the containing block flow is perpendicular to our
           // direction we need to use the available logical height instead.
@@ -2272,12 +2273,12 @@ void RenderBox::computePositionedLogicalWidth() {
   }
 
   if (stretchesToMinIntrinsicWidth() &&
-      width() < minPrefWidth() - bordersPlusPadding) {
+      width() < minPreferredLogicalWidth() - bordersPlusPadding) {
     computePositionedLogicalWidthUsing(
-        Length(minPrefWidth() - bordersPlusPadding, Fixed), containerBlock,
-        containerDirection, containerWidth, bordersPlusPadding, left, right,
-        marginLeft, marginRight, widthResult, m_marginLeft, m_marginRight,
-        xResult);
+        Length(minPreferredLogicalWidth() - bordersPlusPadding, Fixed),
+        containerBlock, containerDirection, containerWidth, bordersPlusPadding,
+        left, right, marginLeft, marginRight, widthResult, m_marginLeft,
+        m_marginRight, xResult);
     setWidth(widthResult);
     setX(xResult);
   }
@@ -2426,8 +2427,8 @@ void RenderBox::computePositionedLogicalWidthUsing(
       int rightValue = right.calcValue(containerWidth);
 
       // FIXME: would it be better to have shrink-to-fit in one step?
-      int preferredWidth = maxPrefWidth() - bordersPlusPadding;
-      int preferredMinWidth = minPrefWidth() - bordersPlusPadding;
+      int preferredWidth = maxPreferredLogicalWidth() - bordersPlusPadding;
+      int preferredMinWidth = minPreferredLogicalWidth() - bordersPlusPadding;
       int availableWidth = availableSpace - rightValue;
       widthValue = min(max(preferredMinWidth, availableWidth), preferredWidth);
       leftValue = availableSpace - (widthValue + rightValue);
@@ -2436,8 +2437,8 @@ void RenderBox::computePositionedLogicalWidthUsing(
       leftValue = left.calcValue(containerWidth);
 
       // FIXME: would it be better to have shrink-to-fit in one step?
-      int preferredWidth = maxPrefWidth() - bordersPlusPadding;
-      int preferredMinWidth = minPrefWidth() - bordersPlusPadding;
+      int preferredWidth = maxPreferredLogicalWidth() - bordersPlusPadding;
+      int preferredMinWidth = minPreferredLogicalWidth() - bordersPlusPadding;
       int availableWidth = availableSpace - leftValue;
       widthValue = min(max(preferredMinWidth, availableWidth), preferredWidth);
     } else if (leftIsAuto && !width.isAuto() && !rightIsAuto) {

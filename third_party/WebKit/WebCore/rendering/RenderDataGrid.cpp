@@ -83,44 +83,44 @@ RenderStyle* RenderDataGrid::headerStyle(DataGridColumn* column) {
   return column->headerStyle();
 }
 
-void RenderDataGrid::calcPrefWidths() {
-  m_minPrefWidth = 0;
-  m_maxPrefWidth = 0;
+void RenderDataGrid::computePreferredLogicalWidths() {
+  m_minPreferredLogicalWidth = 0;
+  m_maxPreferredLogicalWidth = 0;
 
   if (style()->width().isFixed() && style()->width().value() > 0)
-    m_minPrefWidth = m_maxPrefWidth =
+    m_minPreferredLogicalWidth = m_maxPreferredLogicalWidth =
         computeContentBoxLogicalWidth(style()->width().value());
   else
-    m_maxPrefWidth = computeContentBoxLogicalWidth(cDefaultWidth);
+    m_maxPreferredLogicalWidth = computeContentBoxLogicalWidth(cDefaultWidth);
 
   if (style()->minWidth().isFixed() && style()->minWidth().value() > 0) {
-    m_maxPrefWidth =
-        max(m_maxPrefWidth,
+    m_maxPreferredLogicalWidth =
+        max(m_maxPreferredLogicalWidth,
             computeContentBoxLogicalWidth(style()->minWidth().value()));
-    m_minPrefWidth =
-        max(m_minPrefWidth,
+    m_minPreferredLogicalWidth =
+        max(m_minPreferredLogicalWidth,
             computeContentBoxLogicalWidth(style()->minWidth().value()));
   } else if (style()->width().isPercent() ||
              (style()->width().isAuto() && style()->height().isPercent()))
-    m_minPrefWidth = 0;
+    m_minPreferredLogicalWidth = 0;
   else
-    m_minPrefWidth = m_maxPrefWidth;
+    m_minPreferredLogicalWidth = m_maxPreferredLogicalWidth;
 
   if (style()->maxWidth().isFixed() &&
       style()->maxWidth().value() != undefinedLength) {
-    m_maxPrefWidth =
-        min(m_maxPrefWidth,
+    m_maxPreferredLogicalWidth =
+        min(m_maxPreferredLogicalWidth,
             computeContentBoxLogicalWidth(style()->maxWidth().value()));
-    m_minPrefWidth =
-        min(m_minPrefWidth,
+    m_minPreferredLogicalWidth =
+        min(m_minPreferredLogicalWidth,
             computeContentBoxLogicalWidth(style()->maxWidth().value()));
   }
 
   int toAdd = borderAndPaddingWidth();
-  m_minPrefWidth += toAdd;
-  m_maxPrefWidth += toAdd;
+  m_minPreferredLogicalWidth += toAdd;
+  m_maxPreferredLogicalWidth += toAdd;
 
-  setPrefWidthsDirty(false);
+  setPreferredLogicalWidthsDirty(false);
 }
 
 void RenderDataGrid::layout() {

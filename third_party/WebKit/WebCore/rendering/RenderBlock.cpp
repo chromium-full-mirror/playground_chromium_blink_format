@@ -2024,7 +2024,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
     // to invalidate the child's pref widths.
     if (relayoutChildren && (child->style()->paddingLeft().isPercent() ||
                              child->style()->paddingRight().isPercent()))
-      child->setPrefWidthsDirty(true, false);
+      child->setPreferredLogicalWidthsDirty(true, false);
 
     // Handle the four types of special elements first.  These include
     // positioned content, floating content, compacts and
@@ -2301,7 +2301,7 @@ void RenderBlock::layoutPositionedObjects(bool relayoutChildren) {
       // to invalidate the child's pref widths.
       // if (relayoutChildren && (r->style()->paddingLeft().isPercent() ||
       // r->style()->paddingRight().isPercent()))
-      r->setPrefWidthsDirty(true, false);
+      r->setPreferredLogicalWidthsDirty(true, false);
 
       if (!r->needsLayout() && paginated &&
           view()->layoutState()->m_pageHeight) {
@@ -4510,7 +4510,7 @@ int RenderBlock::getClearDelta(RenderBox* child, int yPos) {
   int result = clearSet ? max(0, bottom - yPos) : 0;
   if (!result && child->avoidsFloats()) {
     int availableWidth = this->availableWidth();
-    if (child->minPrefWidth() > availableWidth)
+    if (child->minPreferredLogicalWidth() > availableWidth)
       return 0;
 
     int y = yPos;
@@ -5269,58 +5269,60 @@ void RenderBlock::adjustForColumns(IntSize& offset,
   }
 }
 
-void RenderBlock::calcPrefWidths() {
-  ASSERT(prefWidthsDirty());
+void RenderBlock::computePreferredLogicalWidths() {
+  ASSERT(preferredLogicalWidthsDirty());
 
   updateFirstLetter();
 
   if (!isTableCell() && style()->width().isFixed() &&
       style()->width().value() > 0)
-    m_minPrefWidth = m_maxPrefWidth =
+    m_minPreferredLogicalWidth = m_maxPreferredLogicalWidth =
         computeContentBoxLogicalWidth(style()->width().value());
   else {
-    m_minPrefWidth = 0;
-    m_maxPrefWidth = 0;
+    m_minPreferredLogicalWidth = 0;
+    m_maxPreferredLogicalWidth = 0;
 
     if (childrenInline())
-      calcInlinePrefWidths();
+      computeInlinePreferredLogicalWidths();
     else
-      calcBlockPrefWidths();
+      computeBlockPreferredLogicalWidths();
 
-    m_maxPrefWidth = max(m_minPrefWidth, m_maxPrefWidth);
+    m_maxPreferredLogicalWidth =
+        max(m_minPreferredLogicalWidth, m_maxPreferredLogicalWidth);
 
     if (!style()->autoWrap() && childrenInline()) {
-      m_minPrefWidth = m_maxPrefWidth;
+      m_minPreferredLogicalWidth = m_maxPreferredLogicalWidth;
 
       // A horizontal marquee with inline children has no minimum width.
       if (layer() && layer()->marquee() && layer()->marquee()->isHorizontal())
-        m_minPrefWidth = 0;
+        m_minPreferredLogicalWidth = 0;
     }
 
     if (isTableCell()) {
       Length w = toRenderTableCell(this)->styleOrColWidth();
       if (w.isFixed() && w.value() > 0)
-        m_maxPrefWidth =
-            max(m_minPrefWidth, computeContentBoxLogicalWidth(w.value()));
+        m_maxPreferredLogicalWidth =
+            max(m_minPreferredLogicalWidth,
+                computeContentBoxLogicalWidth(w.value()));
     }
   }
 
   if (style()->minWidth().isFixed() && style()->minWidth().value() > 0) {
-    m_maxPrefWidth =
-        max(m_maxPrefWidth,
+    m_maxPreferredLogicalWidth =
+        max(m_maxPreferredLogicalWidth,
             computeContentBoxLogicalWidth(style()->minWidth().value()));
-    m_minPrefWidth =
-        max(m_minPrefWidth,
+    m_minPreferredLogicalWidth =
+        max(m_minPreferredLogicalWidth,
             computeContentBoxLogicalWidth(style()->minWidth().value()));
   }
 
   if (style()->maxWidth().isFixed() &&
       style()->maxWidth().value() != undefinedLength) {
-    m_maxPrefWidth =
-        min(m_maxPrefWidth,
+    m_maxPreferredLogicalWidth =
+        min(m_maxPreferredLogicalWidth,
             computeContentBoxLogicalWidth(style()->maxWidth().value()));
-    m_minPrefWidth =
-        min(m_minPrefWidth,
+    m_minPreferredLogicalWidth =
+        min(m_minPreferredLogicalWidth,
             computeContentBoxLogicalWidth(style()->maxWidth().value()));
   }
 
@@ -5330,10 +5332,10 @@ void RenderBlock::calcPrefWidths() {
   if (hasOverflowClip() && style()->overflowY() == OSCROLL)
     toAdd += verticalScrollbarWidth();
 
-  m_minPrefWidth += toAdd;
-  m_maxPrefWidth += toAdd;
+  m_minPreferredLogicalWidth += toAdd;
+  m_maxPreferredLogicalWidth += toAdd;
 
-  setPrefWidthsDirty(false);
+  setPreferredLogicalWidthsDirty(false);
 }
 
 struct InlineMinMaxIterator {
@@ -5443,7 +5445,7 @@ static inline void stripTrailingSpace(int& inlineMax,
   }
 }
 
-void RenderBlock::calcInlinePrefWidths() {
+void RenderBlock::computeInlinePreferredLogicalWidths() {
   int inlineMax = 0;
   int inlineMin = 0;
 
@@ -5537,7 +5539,7 @@ void RenderBlock::calcInlinePrefWidths() {
           inlineMin += childMin;
           inlineMax += childMax;
 
-          child->setPrefWidthsDirty(false);
+          child->setPreferredLogicalWidthsDirty(false);
         } else {
           // Inline replaced elts add in their margins to their min/max values.
           int margins = 0;
@@ -5556,8 +5558,8 @@ void RenderBlock::calcInlinePrefWidths() {
         // Case (2). Inline replaced elements and floats.
         // Go ahead and terminate the current line as far as
         // minwidth is concerned.
-        childMin += child->minPrefWidth();
-        childMax += child->maxPrefWidth();
+        childMin += child->minPreferredLogicalWidth();
+        childMax += child->maxPreferredLogicalWidth();
 
         bool clearPreviousFloat;
         if (child->isFloating()) {
@@ -5573,14 +5575,16 @@ void RenderBlock::calcInlinePrefWidths() {
         bool canBreakReplacedElement = !child->isImage() || allowImagesToBreak;
         if ((canBreakReplacedElement && (autoWrap || oldAutoWrap)) ||
             clearPreviousFloat) {
-          m_minPrefWidth = max(inlineMin, m_minPrefWidth);
+          m_minPreferredLogicalWidth =
+              max(inlineMin, m_minPreferredLogicalWidth);
           inlineMin = 0;
         }
 
         // If we're supposed to clear the previous float, then terminate
         // maxwidth as well.
         if (clearPreviousFloat) {
-          m_maxPrefWidth = max(inlineMax, m_maxPrefWidth);
+          m_maxPreferredLogicalWidth =
+              max(inlineMax, m_maxPreferredLogicalWidth);
           inlineMax = 0;
         }
 
@@ -5598,12 +5602,14 @@ void RenderBlock::calcInlinePrefWidths() {
 
         if (!autoWrap || !canBreakReplacedElement) {
           if (child->isFloating())
-            m_minPrefWidth = max(childMin, m_minPrefWidth);
+            m_minPreferredLogicalWidth =
+                max(childMin, m_minPreferredLogicalWidth);
           else
             inlineMin += childMin;
         } else {
           // Now check our line.
-          m_minPrefWidth = max(childMin, m_minPrefWidth);
+          m_minPreferredLogicalWidth =
+              max(childMin, m_minPreferredLogicalWidth);
 
           // Now start a new line.
           inlineMin = 0;
@@ -5620,7 +5626,8 @@ void RenderBlock::calcInlinePrefWidths() {
         RenderText* t = toRenderText(child);
 
         if (t->isWordBreak()) {
-          m_minPrefWidth = max(inlineMin, m_minPrefWidth);
+          m_minPreferredLogicalWidth =
+              max(inlineMin, m_minPreferredLogicalWidth);
           inlineMin = 0;
           continue;
         }
@@ -5642,7 +5649,8 @@ void RenderBlock::calcInlinePrefWidths() {
         // breaking opportunity.
         if (!hasBreak && childMax == 0) {
           if (autoWrap && (beginWS || endWS)) {
-            m_minPrefWidth = max(inlineMin, m_minPrefWidth);
+            m_minPreferredLogicalWidth =
+                max(inlineMin, m_minPreferredLogicalWidth);
             inlineMin = 0;
           }
           continue;
@@ -5674,10 +5682,12 @@ void RenderBlock::calcInlinePrefWidths() {
           // we start and end with whitespace.
           if (beginWS)
             // Go ahead and end the current line.
-            m_minPrefWidth = max(inlineMin, m_minPrefWidth);
+            m_minPreferredLogicalWidth =
+                max(inlineMin, m_minPreferredLogicalWidth);
           else {
             inlineMin += beginMin;
-            m_minPrefWidth = max(inlineMin, m_minPrefWidth);
+            m_minPreferredLogicalWidth =
+                max(inlineMin, m_minPreferredLogicalWidth);
             childMin -= ti;
           }
 
@@ -5686,18 +5696,22 @@ void RenderBlock::calcInlinePrefWidths() {
           if (endWS) {
             // We end in whitespace, which means we can go ahead
             // and end our current line.
-            m_minPrefWidth = max(inlineMin, m_minPrefWidth);
+            m_minPreferredLogicalWidth =
+                max(inlineMin, m_minPreferredLogicalWidth);
             inlineMin = 0;
           } else {
-            m_minPrefWidth = max(inlineMin, m_minPrefWidth);
+            m_minPreferredLogicalWidth =
+                max(inlineMin, m_minPreferredLogicalWidth);
             inlineMin = endMin;
           }
         }
 
         if (hasBreak) {
           inlineMax += beginMax;
-          m_maxPrefWidth = max(inlineMax, m_maxPrefWidth);
-          m_maxPrefWidth = max(childMax, m_maxPrefWidth);
+          m_maxPreferredLogicalWidth =
+              max(inlineMax, m_maxPreferredLogicalWidth);
+          m_maxPreferredLogicalWidth =
+              max(childMax, m_maxPreferredLogicalWidth);
           inlineMax = endMax;
         } else
           inlineMax += childMax;
@@ -5707,8 +5721,8 @@ void RenderBlock::calcInlinePrefWidths() {
       if (child->isListMarker())
         stripFrontSpaces = true;
     } else {
-      m_minPrefWidth = max(inlineMin, m_minPrefWidth);
-      m_maxPrefWidth = max(inlineMax, m_maxPrefWidth);
+      m_minPreferredLogicalWidth = max(inlineMin, m_minPreferredLogicalWidth);
+      m_maxPreferredLogicalWidth = max(inlineMax, m_maxPreferredLogicalWidth);
       inlineMin = inlineMax = 0;
       stripFrontSpaces = true;
       trailingSpaceChild = 0;
@@ -5720,14 +5734,14 @@ void RenderBlock::calcInlinePrefWidths() {
   if (style()->collapseWhiteSpace())
     stripTrailingSpace(inlineMax, inlineMin, trailingSpaceChild);
 
-  m_minPrefWidth = max(inlineMin, m_minPrefWidth);
-  m_maxPrefWidth = max(inlineMax, m_maxPrefWidth);
+  m_minPreferredLogicalWidth = max(inlineMin, m_minPreferredLogicalWidth);
+  m_maxPreferredLogicalWidth = max(inlineMax, m_maxPreferredLogicalWidth);
 }
 
 // Use a very large value (in effect infinite).
 #define BLOCK_MAX_WIDTH 15000
 
-void RenderBlock::calcBlockPrefWidths() {
+void RenderBlock::computeBlockPreferredLogicalWidths() {
   bool nowrap = style()->whiteSpace() == NOWRAP;
 
   RenderObject* child = firstChild();
@@ -5743,11 +5757,13 @@ void RenderBlock::calcBlockPrefWidths() {
         (child->isBox() && toRenderBox(child)->avoidsFloats())) {
       int floatTotalWidth = floatLeftWidth + floatRightWidth;
       if (child->style()->clear() & CLEFT) {
-        m_maxPrefWidth = max(floatTotalWidth, m_maxPrefWidth);
+        m_maxPreferredLogicalWidth =
+            max(floatTotalWidth, m_maxPreferredLogicalWidth);
         floatLeftWidth = 0;
       }
       if (child->style()->clear() & CRIGHT) {
-        m_maxPrefWidth = max(floatTotalWidth, m_maxPrefWidth);
+        m_maxPreferredLogicalWidth =
+            max(floatTotalWidth, m_maxPreferredLogicalWidth);
         floatRightWidth = 0;
       }
     }
@@ -5765,14 +5781,14 @@ void RenderBlock::calcBlockPrefWidths() {
       marginRight += mr.value();
     margin = marginLeft + marginRight;
 
-    int w = child->minPrefWidth() + margin;
-    m_minPrefWidth = max(w, m_minPrefWidth);
+    int w = child->minPreferredLogicalWidth() + margin;
+    m_minPreferredLogicalWidth = max(w, m_minPreferredLogicalWidth);
 
     // IE ignores tables for calculation of nowrap. Makes some sense.
     if (nowrap && !child->isTable())
-      m_maxPrefWidth = max(w, m_maxPrefWidth);
+      m_maxPreferredLogicalWidth = max(w, m_maxPreferredLogicalWidth);
 
-    w = child->maxPrefWidth() + margin;
+    w = child->maxPreferredLogicalWidth() + margin;
 
     if (!child->isFloating()) {
       if (child->isBox() && toRenderBox(child)->avoidsFloats()) {
@@ -5785,10 +5801,11 @@ void RenderBlock::calcBlockPrefWidths() {
                                      : floatLeftWidth + marginLeft;
         int maxRight = marginRight > 0 ? max(floatRightWidth, marginRight)
                                        : floatRightWidth + marginRight;
-        w = child->maxPrefWidth() + maxLeft + maxRight;
+        w = child->maxPreferredLogicalWidth() + maxLeft + maxRight;
         w = max(w, floatLeftWidth + floatRightWidth);
       } else
-        m_maxPrefWidth = max(floatLeftWidth + floatRightWidth, m_maxPrefWidth);
+        m_maxPreferredLogicalWidth =
+            max(floatLeftWidth + floatRightWidth, m_maxPreferredLogicalWidth);
       floatLeftWidth = floatRightWidth = 0;
     }
 
@@ -5798,7 +5815,7 @@ void RenderBlock::calcBlockPrefWidths() {
       else
         floatRightWidth += w;
     } else
-      m_maxPrefWidth = max(w, m_maxPrefWidth);
+      m_maxPreferredLogicalWidth = max(w, m_maxPreferredLogicalWidth);
 
     // A very specific WinIE quirk.
     // Example:
@@ -5819,22 +5836,23 @@ void RenderBlock::calcBlockPrefWidths() {
     // table cell).
     if (document()->inQuirksMode() && child->style()->width().isPercent() &&
         !isTableCell() && child->isTable() &&
-        m_maxPrefWidth < BLOCK_MAX_WIDTH) {
+        m_maxPreferredLogicalWidth < BLOCK_MAX_WIDTH) {
       RenderBlock* cb = containingBlock();
       while (!cb->isRenderView() && !cb->isTableCell())
         cb = cb->containingBlock();
       if (!cb->isTableCell())
-        m_maxPrefWidth = BLOCK_MAX_WIDTH;
+        m_maxPreferredLogicalWidth = BLOCK_MAX_WIDTH;
     }
 
     child = child->nextSibling();
   }
 
   // Always make sure these values are non-negative.
-  m_minPrefWidth = max(0, m_minPrefWidth);
-  m_maxPrefWidth = max(0, m_maxPrefWidth);
+  m_minPreferredLogicalWidth = max(0, m_minPreferredLogicalWidth);
+  m_maxPreferredLogicalWidth = max(0, m_maxPreferredLogicalWidth);
 
-  m_maxPrefWidth = max(floatLeftWidth + floatRightWidth, m_maxPrefWidth);
+  m_maxPreferredLogicalWidth =
+      max(floatLeftWidth + floatRightWidth, m_maxPreferredLogicalWidth);
 }
 
 bool RenderBlock::hasLineIfEmpty() const {

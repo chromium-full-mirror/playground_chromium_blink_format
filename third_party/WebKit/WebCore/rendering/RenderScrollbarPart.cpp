@@ -118,13 +118,13 @@ void RenderScrollbarPart::computeScrollbarHeight() {
   m_marginBottom = style()->marginBottom().calcMinValue(visibleSize);
 }
 
-void RenderScrollbarPart::calcPrefWidths() {
-  if (!prefWidthsDirty())
+void RenderScrollbarPart::computePreferredLogicalWidths() {
+  if (!preferredLogicalWidthsDirty())
     return;
 
-  m_minPrefWidth = m_maxPrefWidth = 0;
+  m_minPreferredLogicalWidth = m_maxPreferredLogicalWidth = 0;
 
-  setPrefWidthsDirty(false);
+  setPreferredLogicalWidthsDirty(false);
 }
 
 void RenderScrollbarPart::styleWillChange(StyleDifference diff,

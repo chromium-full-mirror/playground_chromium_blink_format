@@ -637,8 +637,8 @@ void RenderText::trimmedPrefWidths(int leadWidth,
   if (!collapseWhiteSpace)
     stripFrontSpaces = false;
 
-  if (m_hasTab || prefWidthsDirty())
-    calcPrefWidths(leadWidth);
+  if (m_hasTab || preferredLogicalWidthsDirty())
+    computePreferredLogicalWidths(leadWidth);
 
   beginWS = !stripFrontSpaces && m_hasBeginWS;
   endWS = m_hasEndWS;
@@ -720,33 +720,34 @@ static inline bool isSpaceAccordingToStyle(UChar c, RenderStyle* style) {
   return c == ' ' || (c == noBreakSpace && style->nbspMode() == SPACE);
 }
 
-int RenderText::minPrefWidth() const {
-  if (prefWidthsDirty())
-    const_cast<RenderText*>(this)->calcPrefWidths(0);
+int RenderText::minPreferredLogicalWidth() const {
+  if (preferredLogicalWidthsDirty())
+    const_cast<RenderText*>(this)->computePreferredLogicalWidths(0);
 
   return m_minWidth;
 }
 
-int RenderText::maxPrefWidth() const {
-  if (prefWidthsDirty())
-    const_cast<RenderText*>(this)->calcPrefWidths(0);
+int RenderText::maxPreferredLogicalWidth() const {
+  if (preferredLogicalWidthsDirty())
+    const_cast<RenderText*>(this)->computePreferredLogicalWidths(0);
 
   return m_maxWidth;
 }
 
-void RenderText::calcPrefWidths(int leadWidth) {
+void RenderText::computePreferredLogicalWidths(int leadWidth) {
   HashSet<const SimpleFontData*> fallbackFonts;
   GlyphOverflow glyphOverflow;
-  calcPrefWidths(leadWidth, fallbackFonts, glyphOverflow);
+  computePreferredLogicalWidths(leadWidth, fallbackFonts, glyphOverflow);
   if (fallbackFonts.isEmpty() && !glyphOverflow.left && !glyphOverflow.right &&
       !glyphOverflow.top && !glyphOverflow.bottom)
     m_knownToHaveNoOverflowAndNoFallbackFonts = true;
 }
 
-void RenderText::calcPrefWidths(int leadWidth,
-                                HashSet<const SimpleFontData*>& fallbackFonts,
-                                GlyphOverflow& glyphOverflow) {
-  ASSERT(m_hasTab || prefWidthsDirty() ||
+void RenderText::computePreferredLogicalWidths(
+    int leadWidth,
+    HashSet<const SimpleFontData*>& fallbackFonts,
+    GlyphOverflow& glyphOverflow) {
+  ASSERT(m_hasTab || preferredLogicalWidthsDirty() ||
          !m_knownToHaveNoOverflowAndNoFallbackFonts);
 
   m_minWidth = 0;
@@ -952,7 +953,7 @@ void RenderText::calcPrefWidths(int leadWidth,
     m_endMinWidth = currMaxWidth;
   }
 
-  setPrefWidthsDirty(false);
+  setPreferredLogicalWidthsDirty(false);
 }
 
 bool RenderText::isAllCollapsibleWhitespace() {
@@ -1336,9 +1337,10 @@ unsigned RenderText::width(unsigned from,
     if (!style()->preserveNewline() && !from && len == textLength()) {
       if (fallbackFonts) {
         ASSERT(glyphOverflow);
-        if (prefWidthsDirty() || !m_knownToHaveNoOverflowAndNoFallbackFonts) {
-          const_cast<RenderText*>(this)->calcPrefWidths(0, *fallbackFonts,
-                                                        *glyphOverflow);
+        if (preferredLogicalWidthsDirty() ||
+            !m_knownToHaveNoOverflowAndNoFallbackFonts) {
+          const_cast<RenderText*>(this)->computePreferredLogicalWidths(
+              0, *fallbackFonts, *glyphOverflow);
           if (fallbackFonts->isEmpty() && !glyphOverflow->left &&
               !glyphOverflow->right && !glyphOverflow->top &&
               !glyphOverflow->bottom)
@@ -1346,7 +1348,7 @@ unsigned RenderText::width(unsigned from,
         }
         w = m_maxWidth;
       } else
-        w = maxPrefWidth();
+        w = maxPreferredLogicalWidth();
     } else
       w = widthFromCache(f, from, len, xPos, fallbackFonts, glyphOverflow);
   } else

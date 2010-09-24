@@ -51,10 +51,10 @@ void RenderReplica::layout() {
   setNeedsLayout(false);
 }
 
-void RenderReplica::calcPrefWidths() {
-  m_minPrefWidth = parentBox()->width();
-  m_maxPrefWidth = m_minPrefWidth;
-  setPrefWidthsDirty(false);
+void RenderReplica::computePreferredLogicalWidths() {
+  m_minPreferredLogicalWidth = parentBox()->width();
+  m_maxPreferredLogicalWidth = m_minPreferredLogicalWidth;
+  setPreferredLogicalWidthsDirty(false);
 }
 
 void RenderReplica::paint(PaintInfo& paintInfo, int tx, int ty) {

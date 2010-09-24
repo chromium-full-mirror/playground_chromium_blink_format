@@ -58,7 +58,7 @@ class RenderTableCell : public RenderBlock {
 
   Length styleOrColWidth() const;
 
-  virtual void calcPrefWidths();
+  virtual void computePreferredLogicalWidths();
 
   void updateWidth(int);
 

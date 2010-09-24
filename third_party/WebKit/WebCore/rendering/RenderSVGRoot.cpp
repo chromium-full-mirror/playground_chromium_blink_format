@@ -60,8 +60,8 @@ int RenderSVGRoot::baselinePosition(bool, bool) const {
   return height() + marginTop() + marginBottom();
 }
 
-void RenderSVGRoot::calcPrefWidths() {
-  ASSERT(prefWidthsDirty());
+void RenderSVGRoot::computePreferredLogicalWidths() {
+  ASSERT(preferredLogicalWidthsDirty());
 
   int borderAndPadding = borderAndPaddingWidth();
   int width = computeReplacedWidth(false) + borderAndPadding;
@@ -75,12 +75,12 @@ void RenderSVGRoot::calcPrefWidths() {
 
   if (style()->width().isPercent() ||
       (style()->width().isAuto() && style()->height().isPercent())) {
-    m_minPrefWidth = 0;
-    m_maxPrefWidth = width;
+    m_minPreferredLogicalWidth = 0;
+    m_maxPreferredLogicalWidth = width;
   } else
-    m_minPrefWidth = m_maxPrefWidth = width;
+    m_minPreferredLogicalWidth = m_maxPreferredLogicalWidth = width;
 
-  setPrefWidthsDirty(false);
+  setPreferredLogicalWidthsDirty(false);
 }
 
 int RenderSVGRoot::computeReplacedWidth(bool includeMaxWidth) const {

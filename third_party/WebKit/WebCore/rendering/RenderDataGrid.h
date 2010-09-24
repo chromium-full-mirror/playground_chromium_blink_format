@@ -44,7 +44,7 @@ class RenderDataGrid : public RenderBlock, private ScrollbarClient {
 
   virtual const char* renderName() const { return "RenderDataGrid"; }
   virtual bool canHaveChildren() const { return false; }
-  virtual void calcPrefWidths();
+  virtual void computePreferredLogicalWidths();
   virtual void layout();
   virtual void paintObject(PaintInfo&, int tx, int ty);
 

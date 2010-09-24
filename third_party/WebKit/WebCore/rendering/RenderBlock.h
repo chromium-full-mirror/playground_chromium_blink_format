@@ -325,7 +325,7 @@ class RenderBlock : public RenderBox {
                            int ty,
                            HitTestAction);
 
-  virtual void calcPrefWidths();
+  virtual void computePreferredLogicalWidths();
 
   virtual int firstLineBoxBaseline() const;
   virtual int lastLineBoxBaseline() const;
@@ -598,8 +598,8 @@ class RenderBlock : public RenderBox {
                                         int tx,
                                         int ty);
 
-  void calcInlinePrefWidths();
-  void calcBlockPrefWidths();
+  void computeInlinePreferredLogicalWidths();
+  void computeBlockPreferredLogicalWidths();
 
   // Obtains the nearest enclosing block (including this block) that contributes
   // a first-line style to our inline

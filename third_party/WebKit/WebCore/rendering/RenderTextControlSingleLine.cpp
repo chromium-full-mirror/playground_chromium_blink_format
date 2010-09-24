@@ -596,7 +596,7 @@ int RenderTextControlSingleLine::preferredContentWidth(float charWidth) const {
 
   if (RenderBox* spinRenderer =
           m_innerSpinButton ? m_innerSpinButton->renderBox() : 0)
-    result += spinRenderer->minPrefWidth();
+    result += spinRenderer->minPreferredLogicalWidth();
 
 #if ENABLE(INPUT_SPEECH)
   if (RenderBox* speechRenderer =
@@ -613,8 +613,8 @@ int RenderTextControlSingleLine::preferredDecorationWidthRight() const {
   if (RenderBox* spinRenderer =
           m_outerSpinButton ? m_outerSpinButton->renderBox() : 0) {
     spinRenderer->computeLogicalWidth();
-    width += spinRenderer->minPrefWidth() + spinRenderer->marginLeft() +
-             spinRenderer->marginRight();
+    width += spinRenderer->minPreferredLogicalWidth() +
+             spinRenderer->marginLeft() + spinRenderer->marginRight();
   }
   if (width > 0)
     width += paddingRight() + borderRight();

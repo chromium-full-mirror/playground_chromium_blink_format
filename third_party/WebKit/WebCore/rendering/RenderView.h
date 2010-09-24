@@ -49,7 +49,7 @@ class RenderView : public RenderBlock {
   virtual void layout();
   virtual void computeLogicalWidth();
   virtual void computeLogicalHeight();
-  virtual void calcPrefWidths();
+  virtual void computePreferredLogicalWidths();
 
   // The same as the FrameView's layoutHeight/layoutWidth but with null check
   // guards.
