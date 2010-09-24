@@ -155,8 +155,8 @@ void RenderImage::imageChanged(WrappedImagePtr newImage, const IntRect* rect) {
       int oldheight = height();
       if (!prefWidthsDirty())
         setPrefWidthsDirty(true);
-      calcWidth();
-      calcHeight();
+      computeLogicalWidth();
+      computeLogicalHeight();
 
       if (imageSizeChanged || width() != oldwidth || height() != oldheight) {
         shouldRepaint = false;

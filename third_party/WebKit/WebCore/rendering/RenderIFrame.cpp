@@ -38,8 +38,8 @@ using namespace HTMLNames;
 
 RenderIFrame::RenderIFrame(Element* element) : RenderFrameBase(element) {}
 
-void RenderIFrame::calcHeight() {
-  RenderPart::calcHeight();
+void RenderIFrame::computeLogicalHeight() {
+  RenderPart::computeLogicalHeight();
   if (!flattenFrame())
     return;
 
@@ -55,8 +55,8 @@ void RenderIFrame::calcHeight() {
   }
 }
 
-void RenderIFrame::calcWidth() {
-  RenderPart::calcWidth();
+void RenderIFrame::computeLogicalWidth() {
+  RenderPart::computeLogicalWidth();
   if (!flattenFrame())
     return;
 
@@ -101,8 +101,8 @@ bool RenderIFrame::flattenFrame() {
 void RenderIFrame::layout() {
   ASSERT(needsLayout());
 
-  RenderPart::calcWidth();
-  RenderPart::calcHeight();
+  RenderPart::computeLogicalWidth();
+  RenderPart::computeLogicalHeight();
 
   if (flattenFrame()) {
     layoutWithFlattening(style()->width().isFixed(),

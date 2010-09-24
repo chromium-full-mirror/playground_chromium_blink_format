@@ -174,7 +174,7 @@ class RenderTable : public RenderBlock {
 
   virtual void setCellWidths();
 
-  virtual void calcWidth();
+  virtual void computeLogicalWidth();
 
   virtual IntRect overflowClipRect(int tx, int ty);
 

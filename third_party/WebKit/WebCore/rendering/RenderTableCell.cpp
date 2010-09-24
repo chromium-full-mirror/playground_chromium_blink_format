@@ -146,7 +146,7 @@ void RenderTableCell::calcPrefWidths() {
   }
 }
 
-void RenderTableCell::calcWidth() {}
+void RenderTableCell::computeLogicalWidth() {}
 
 void RenderTableCell::updateWidth(int w) {
   if (w != width()) {

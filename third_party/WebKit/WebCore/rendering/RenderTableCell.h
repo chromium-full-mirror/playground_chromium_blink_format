@@ -145,7 +145,7 @@ class RenderTableCell : public RenderBlock {
            hasTransform() || hasMask() || hasReflection();
   }
 
-  virtual void calcWidth();
+  virtual void computeLogicalWidth();
 
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
   virtual void paintMask(PaintInfo&, int tx, int ty);

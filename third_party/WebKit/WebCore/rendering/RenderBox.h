@@ -314,8 +314,8 @@ class RenderBox : public RenderBoxModelObject {
 
   virtual int containingBlockWidthForContent() const;
 
-  virtual void calcWidth();
-  virtual void calcHeight();
+  virtual void computeLogicalWidth();
+  virtual void computeLogicalHeight();
 
   bool stretchesToViewHeight() const {
     return document()->inQuirksMode() && style()->height().isAuto() &&
@@ -410,12 +410,12 @@ class RenderBox : public RenderBoxModelObject {
   // object remains dirty.
   void tryLayoutDoingPositionedMovementOnly() {
     int oldWidth = width();
-    calcWidth();
+    computeLogicalWidth();
     // If we shrink to fit our width may have changed, so we still need full
     // layout.
     if (oldWidth != width())
       return;
-    calcHeight();
+    computeLogicalHeight();
     setNeedsLayout(false);
   }
 

@@ -82,8 +82,8 @@ void RenderApplet::createWidgetIfNecessary() {
 void RenderApplet::layout() {
   ASSERT(needsLayout());
 
-  calcWidth();
-  calcHeight();
+  computeLogicalWidth();
+  computeLogicalHeight();
 
   // The applet's widget gets created lazily upon first layout.
   createWidgetIfNecessary();

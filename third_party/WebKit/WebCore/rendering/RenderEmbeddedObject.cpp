@@ -233,8 +233,8 @@ bool RenderEmbeddedObject::getReplacementTextGeometry(
 void RenderEmbeddedObject::layout() {
   ASSERT(needsLayout());
 
-  calcWidth();
-  calcHeight();
+  computeLogicalWidth();
+  computeLogicalHeight();
 
   RenderPart::layout();
 

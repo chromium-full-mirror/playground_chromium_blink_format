@@ -38,8 +38,8 @@ void RenderIndicator::layout() {
   ASSERT(needsLayout());
 
   LayoutRepainter repainter(*this, checkForRepaintDuringLayout());
-  calcWidth();
-  calcHeight();
+  computeLogicalWidth();
+  computeLogicalHeight();
   layoutParts();
   repainter.repaintAfterLayout();
   setNeedsLayout(false);
