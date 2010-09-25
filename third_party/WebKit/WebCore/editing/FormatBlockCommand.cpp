@@ -40,33 +40,6 @@ FormatBlockCommand::FormatBlockCommand(Document* document,
                                        const AtomicString& tagName)
     : CompositeEditCommand(document), m_tagName(tagName) {}
 
-bool FormatBlockCommand::modifyRange() {
-  ASSERT(endingSelection().isRange());
-  VisiblePosition visibleStart = endingSelection().visibleStart();
-  VisiblePosition visibleEnd = endingSelection().visibleEnd();
-  VisiblePosition startOfLastParagraph = startOfParagraph(visibleEnd);
-
-  if (startOfParagraph(visibleStart) == startOfLastParagraph)
-    return false;
-
-  setEndingSelection(visibleStart);
-  doApply();
-  visibleStart = endingSelection().visibleStart();
-  VisiblePosition nextParagraph = endOfParagraph(visibleStart).next();
-  while (nextParagraph.isNotNull() && nextParagraph != startOfLastParagraph) {
-    setEndingSelection(nextParagraph);
-    doApply();
-    nextParagraph = endOfParagraph(endingSelection().visibleStart()).next();
-  }
-  setEndingSelection(visibleEnd);
-  doApply();
-  visibleEnd = endingSelection().visibleEnd();
-  setEndingSelection(VisibleSelection(visibleStart.deepEquivalent(),
-                                      visibleEnd.deepEquivalent(), DOWNSTREAM));
-
-  return true;
-}
-
 void FormatBlockCommand::doApply() {
   if (!endingSelection().isNonOrphanedCaretOrRange())
     return;
@@ -85,13 +58,37 @@ void FormatBlockCommand::doApply() {
   // margin/padding, but not others.  We should make the gap painting more
   // consistent and
   // then use a left margin/padding rule here.
-  if (visibleEnd != visibleStart && isStartOfParagraph(visibleEnd))
+  if (visibleEnd != visibleStart && isStartOfParagraph(visibleEnd)) {
     setEndingSelection(
         VisibleSelection(visibleStart, visibleEnd.previous(true)));
+    visibleEnd = endingSelection().visibleEnd();
+  }
 
-  if (endingSelection().isRange() && modifyRange())
+  VisiblePosition startOfLastParagraph = startOfParagraph(visibleEnd);
+  if (endingSelection().isCaret() ||
+      startOfParagraph(visibleStart) == startOfLastParagraph) {
+    doApplyForSingleParagraph();
     return;
+  }
 
+  setEndingSelection(visibleStart);
+  doApplyForSingleParagraph();
+  visibleStart = endingSelection().visibleStart();
+  VisiblePosition nextParagraph = endOfParagraph(visibleStart).next();
+  while (nextParagraph.isNotNull() && nextParagraph != startOfLastParagraph) {
+    setEndingSelection(nextParagraph);
+    doApplyForSingleParagraph();
+    nextParagraph = endOfParagraph(endingSelection().visibleStart()).next();
+  }
+  setEndingSelection(visibleEnd);
+  doApplyForSingleParagraph();
+  visibleEnd = endingSelection().visibleEnd();
+
+  setEndingSelection(VisibleSelection(visibleStart.deepEquivalent(),
+                                      visibleEnd.deepEquivalent(), DOWNSTREAM));
+}
+
+void FormatBlockCommand::doApplyForSingleParagraph() {
   ExceptionCode ec;
   String localName, prefix;
   if (!Document::parseQualifiedName(m_tagName, prefix, localName, ec))
