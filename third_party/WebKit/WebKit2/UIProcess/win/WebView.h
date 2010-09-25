@@ -120,6 +120,7 @@ class WebView : public APIObject,
   virtual void setCursor(const WebCore::Cursor&);
   virtual void registerEditCommand(PassRefPtr<WebEditCommandProxy>, UndoOrRedo);
   virtual void clearAllEditCommands();
+  virtual void setEditCommandState(const WTF::String&, bool, int);
 
 #if USE(ACCELERATED_COMPOSITING)
   virtual void pageDidEnterAcceleratedCompositing();
