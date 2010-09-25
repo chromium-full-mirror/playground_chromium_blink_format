@@ -972,6 +972,10 @@ void CodeBlock::dump(ExecState* exec,
       printGetByIdOp(exec, location, it, "get_string_length");
       break;
     }
+    case op_get_arguments_length: {
+      printUnaryOp(exec, location, it, "get_arguments_length");
+      break;
+    }
     case op_put_by_id: {
       printPutByIdOp(exec, location, it, "put_by_id");
       break;
@@ -1026,6 +1030,15 @@ void CodeBlock::dump(ExecState* exec,
       int r1 = (++it)->u.operand;
       int r2 = (++it)->u.operand;
       printf("[%4d] get_by_val\t %s, %s, %s\n", location,
+             registerName(exec, r0).data(), registerName(exec, r1).data(),
+             registerName(exec, r2).data());
+      break;
+    }
+    case op_get_argument_by_val: {
+      int r0 = (++it)->u.operand;
+      int r1 = (++it)->u.operand;
+      int r2 = (++it)->u.operand;
+      printf("[%4d] get_argument_by_val\t %s, %s, %s\n", location,
              registerName(exec, r0).data(), registerName(exec, r1).data(),
              registerName(exec, r2).data());
       break;

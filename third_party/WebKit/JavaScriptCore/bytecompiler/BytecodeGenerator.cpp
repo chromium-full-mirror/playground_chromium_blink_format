@@ -1408,6 +1408,16 @@ RegisterID* BytecodeGenerator::emitGetById(RegisterID* dst,
   return dst;
 }
 
+RegisterID* BytecodeGenerator::emitGetArgumentsLength(RegisterID* dst,
+                                                      RegisterID* base) {
+  emitOpcode(op_get_arguments_length);
+  instructions().append(dst->index());
+  ASSERT(base->index() == m_codeBlock->argumentsRegister());
+  instructions().append(base->index());
+  instructions().append(addConstant(propertyNames().arguments));
+  return dst;
+}
+
 RegisterID* BytecodeGenerator::emitPutById(RegisterID* base,
                                            const Identifier& property,
                                            RegisterID* value) {
@@ -1478,6 +1488,17 @@ RegisterID* BytecodeGenerator::emitDeleteById(RegisterID* dst,
   instructions().append(dst->index());
   instructions().append(base->index());
   instructions().append(addConstant(property));
+  return dst;
+}
+
+RegisterID* BytecodeGenerator::emitGetArgumentByVal(RegisterID* dst,
+                                                    RegisterID* base,
+                                                    RegisterID* property) {
+  emitOpcode(op_get_argument_by_val);
+  instructions().append(dst->index());
+  ASSERT(base->index() == m_codeBlock->argumentsRegister());
+  instructions().append(base->index());
+  instructions().append(property->index());
   return dst;
 }
 

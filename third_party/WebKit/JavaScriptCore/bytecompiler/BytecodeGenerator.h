@@ -398,6 +398,7 @@ class BytecodeGenerator : public FastAllocBase {
   RegisterID* emitGetById(RegisterID* dst,
                           RegisterID* base,
                           const Identifier& property);
+  RegisterID* emitGetArgumentsLength(RegisterID* dst, RegisterID* base);
   RegisterID* emitPutById(RegisterID* base,
                           const Identifier& property,
                           RegisterID* value);
@@ -410,6 +411,9 @@ class BytecodeGenerator : public FastAllocBase {
   RegisterID* emitGetByVal(RegisterID* dst,
                            RegisterID* base,
                            RegisterID* property);
+  RegisterID* emitGetArgumentByVal(RegisterID* dst,
+                                   RegisterID* base,
+                                   RegisterID* property);
   RegisterID* emitPutByVal(RegisterID* base,
                            RegisterID* property,
                            RegisterID* value);
