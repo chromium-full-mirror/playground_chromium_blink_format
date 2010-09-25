@@ -346,7 +346,7 @@ class InlineBox {
   bool m_extracted : 1;
   bool m_hasVirtualLogicalHeight : 1;
 
-  bool m_isVertical;
+  bool m_isVertical : 1;
 
   // for RootInlineBox
   bool m_endsWithBreak : 1;        // Whether the line ends with a <br>.
