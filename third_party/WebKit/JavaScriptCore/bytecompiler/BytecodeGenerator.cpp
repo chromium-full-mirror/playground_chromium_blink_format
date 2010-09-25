@@ -1414,7 +1414,7 @@ RegisterID* BytecodeGenerator::emitGetArgumentsLength(RegisterID* dst,
   instructions().append(dst->index());
   ASSERT(base->index() == m_codeBlock->argumentsRegister());
   instructions().append(base->index());
-  instructions().append(addConstant(propertyNames().arguments));
+  instructions().append(addConstant(propertyNames().length));
   return dst;
 }
 

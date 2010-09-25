@@ -1627,8 +1627,8 @@ void JIT::emitSlow_op_get_argument_by_val(
     JITStubCall(this, cti_op_create_arguments_no_params).call();
   else
     JITStubCall(this, cti_op_create_arguments).call();
-  emitPutVirtualRegister(dst);
-  emitPutVirtualRegister(unmodifiedArgumentsRegister(dst));
+  emitPutVirtualRegister(arguments);
+  emitPutVirtualRegister(unmodifiedArgumentsRegister(arguments));
 
   skipArgumentsCreation.link(this);
   JITStubCall stubCall(this, cti_op_get_by_val);
