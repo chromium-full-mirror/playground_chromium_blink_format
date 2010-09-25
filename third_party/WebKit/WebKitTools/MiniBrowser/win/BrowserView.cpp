@@ -73,6 +73,11 @@ static void setStatusText(WKPageRef page,
                           WKStringRef text,
                           const void* clientInfo) {}
 
+static void mouseDidMoveOverElement(WKPageRef page,
+                                    WKEventModifiers modifiers,
+                                    WKTypeRef userData,
+                                    const void* clientInfo) {}
+
 static void contentsSizeChanged(WKPageRef page,
                                 int width,
                                 int height,
@@ -103,6 +108,7 @@ void BrowserView::create(RECT webViewRect, BrowserWindow* parentWindow) {
                              runJavaScriptConfirm,
                              runJavaScriptPrompt,
                              setStatusText,
+                             mouseDidMoveOverElement,
                              contentsSizeChanged};
 
   WKPageSetPageUIClient(WKViewGetPage(m_webView), &uiClient);

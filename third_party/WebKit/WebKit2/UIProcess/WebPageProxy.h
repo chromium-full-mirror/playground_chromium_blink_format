@@ -274,6 +274,7 @@ class WebPageProxy : public APIObject {
                              const String&,
                              const String&);
   void setStatusText(const String&);
+  void mouseDidMoveOverElement(WebEvent::Modifiers, APIObject*);
   void contentsSizeChanged(WebFrameProxy*, const WebCore::IntSize&);
 
   // Back/Forward list management

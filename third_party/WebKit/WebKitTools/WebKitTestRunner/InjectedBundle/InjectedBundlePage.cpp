@@ -193,13 +193,16 @@ InjectedBundlePage::InjectedBundlePage(WKBundlePageRef page)
       didRunInsecureContentForFrame};
   WKBundlePageSetLoaderClient(m_page, &loaderClient);
 
-  WKBundlePageUIClient uiClient = {0,
-                                   this,
-                                   willAddMessageToConsole,
-                                   willSetStatusbarText,
-                                   willRunJavaScriptAlert,
-                                   willRunJavaScriptConfirm,
-                                   willRunJavaScriptPrompt};
+  WKBundlePageUIClient uiClient = {
+      0,
+      this,
+      willAddMessageToConsole,
+      willSetStatusbarText,
+      willRunJavaScriptAlert,
+      willRunJavaScriptConfirm,
+      willRunJavaScriptPrompt,
+      0 /*mouseDidMoveOverElement*/
+  };
   WKBundlePageSetUIClient(m_page, &uiClient);
 
   WKBundlePageEditorClient editorClient = {0,

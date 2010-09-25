@@ -30,6 +30,7 @@
 #include "NotImplemented.h"
 
 #include "DrawingArea.h"
+#include "InjectedBundleUserMessageCoders.h"
 #include "WebCoreArgumentCoders.h"
 #include "WebFrame.h"
 #include "WebFrameLoaderClient.h"
@@ -343,9 +344,20 @@ void WebChromeClient::scrollbarsModeDidChange() const {
   notImplemented();
 }
 
-void WebChromeClient::mouseDidMoveOverElement(const HitTestResult&,
-                                              unsigned modifierFlags) {
-  notImplemented();
+void WebChromeClient::mouseDidMoveOverElement(
+    const HitTestResult& hitTestResult,
+    unsigned modifierFlags) {
+  RefPtr<APIObject> userData;
+
+  // Notify the bundle client.
+  m_page->injectedBundleUIClient().mouseDidMoveOverElement(
+      m_page, hitTestResult, userData);
+
+  // Notify the UIProcess.
+  WebProcess::shared().connection()->send(
+      WebPageProxyMessage::MouseDidMoveOverElement, m_page->pageID(),
+      CoreIPC::In(modifierFlags,
+                  InjectedBundleUserMessageEncoder(userData.get())));
 }
 
 void WebChromeClient::setToolTip(const String& toolTip, TextDirection) {

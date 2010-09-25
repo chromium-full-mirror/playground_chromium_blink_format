@@ -25,6 +25,7 @@
 
 #include "InjectedBundlePageUIClient.h"
 
+#include "InjectedBundleHitTestResult.h"
 #include "WKAPICast.h"
 #include "WKBundleAPICast.h"
 #include <wtf/text/WTFString.h>
@@ -85,6 +86,22 @@ void InjectedBundlePageUIClient::willRunJavaScriptPrompt(
     m_client.willRunJavaScriptPrompt(toRef(page), toRef(message.impl()),
                                      toRef(defaultValue.impl()), toRef(frame),
                                      m_client.clientInfo);
+}
+
+void InjectedBundlePageUIClient::mouseDidMoveOverElement(
+    WebPage* page,
+    const HitTestResult& coreHitTestResult,
+    RefPtr<APIObject>& userData) {
+  if (!m_client.mouseDidMoveOverElement)
+    return;
+
+  RefPtr<InjectedBundleHitTestResult> hitTestResult =
+      InjectedBundleHitTestResult::create(coreHitTestResult);
+
+  WKTypeRef userDataToPass = 0;
+  m_client.mouseDidMoveOverElement(toRef(page), toRef(hitTestResult.get()),
+                                   &userDataToPass, m_client.clientInfo);
+  userData = adoptRef(toWK(userDataToPass));
 }
 
 }  // namespace WebKit

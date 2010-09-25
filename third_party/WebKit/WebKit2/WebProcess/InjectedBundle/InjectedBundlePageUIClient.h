@@ -29,8 +29,13 @@
 #include "WKBundlePage.h"
 #include <wtf/Forward.h>
 
+namespace WebCore {
+class HitTestResult;
+}
+
 namespace WebKit {
 
+class APIObject;
 class WebFrame;
 class WebPage;
 
@@ -49,6 +54,9 @@ class InjectedBundlePageUIClient {
                                const String&,
                                const String&,
                                WebFrame*);
+  void mouseDidMoveOverElement(WebPage*,
+                               const WebCore::HitTestResult&,
+                               RefPtr<APIObject>& userData);
 
  private:
   WKBundlePageUIClient m_client;
