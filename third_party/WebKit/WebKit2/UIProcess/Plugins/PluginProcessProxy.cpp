@@ -27,10 +27,12 @@
 
 #include "PluginProcessProxy.h"
 
+#include "MachPort.h"
 #include "PluginProcessManager.h"
 #include "PluginProcessMessages.h"
 #include "RunLoop.h"
 #include "WebCoreArgumentCoders.h"
+#include "WebProcessProxy.h"
 
 namespace WebKit {
 
@@ -43,7 +45,9 @@ PassOwnPtr<PluginProcessProxy> PluginProcessProxy::create(
 PluginProcessProxy::PluginProcessProxy(
     PluginProcessManager* PluginProcessManager,
     const PluginInfoStore::Plugin& pluginInfo)
-    : m_pluginProcessManager(PluginProcessManager), m_pluginInfo(pluginInfo) {
+    : m_pluginProcessManager(PluginProcessManager),
+      m_pluginInfo(pluginInfo),
+      m_numPendingConnectionRequests(0) {
   ProcessLauncher::LaunchOptions launchOptions;
   launchOptions.processType = ProcessLauncher::PluginProcess;
 #if PLATFORM(MAC)
@@ -53,11 +57,31 @@ PluginProcessProxy::PluginProcessProxy(
   m_processLauncher = ProcessLauncher::create(this, launchOptions);
 }
 
+PluginProcessProxy::~PluginProcessProxy() {}
+
+// Asks the plug-in process to create a new connection to a web process. The
+// connection identifier will be
+// encoded in the given argument encoder and sent back to the connection of the
+// given web process.
+void PluginProcessProxy::createWebProcessConnection(
+    WebProcessProxy* webProcessProxy,
+    CoreIPC::ArgumentEncoder* reply) {
+  m_pendingConnectionReplies.append(make_pair(webProcessProxy, reply));
+
+  if (m_processLauncher->isLaunching()) {
+    m_numPendingConnectionRequests++;
+    return;
+  }
+
+  // Ask the plug-in process to create a connection.
+  m_connection->send(Messages::PluginProcess::CreateWebProcessConnection(), 0);
+}
+
 void PluginProcessProxy::didReceiveMessage(
-    CoreIPC::Connection*,
+    CoreIPC::Connection* connection,
     CoreIPC::MessageID messageID,
     CoreIPC::ArgumentDecoder* arguments) {
-  // FIXME: Implement.
+  didReceivePluginProcessProxyMessage(connection, messageID, arguments);
 }
 
 void PluginProcessProxy::didClose(CoreIPC::Connection*) {
@@ -81,11 +105,27 @@ void PluginProcessProxy::didFinishLaunching(
 
   // Initialize the plug-in host process.
   m_connection->send(Messages::PluginProcess::Initialize(m_pluginInfo.path), 0);
+
+  // Send all our pending requests.
+  for (unsigned i = 0; i < m_numPendingConnectionRequests; ++i)
+    m_connection->send(Messages::PluginProcess::CreateWebProcessConnection(),
+                       0);
+
+  m_numPendingConnectionRequests = 0;
 }
 
 void PluginProcessProxy::didCreateWebProcessConnection(
-    const CoreIPC::MachPort&) {
-  // FIXME: Implement.
+    const CoreIPC::MachPort& machPort) {
+  ASSERT(!m_pendingConnectionReplies.isEmpty());
+
+  // Grab the first pending connection reply.
+  RefPtr<WebProcessProxy> replyWebProcessProxy =
+      m_pendingConnectionReplies.first().first.release();
+  CoreIPC::ArgumentEncoder* reply = m_pendingConnectionReplies.first().second;
+
+  // FIXME: This is Mac specific.
+  reply->encode(CoreIPC::MachPort(machPort.port(), MACH_MSG_TYPE_MOVE_SEND));
+  replyWebProcessProxy->connection()->sendSyncReply(reply);
 }
 
 }  // namespace WebKit

@@ -72,7 +72,9 @@ void PluginProcess::removeWebProcessConnection(
 
 void PluginProcess::didReceiveMessage(CoreIPC::Connection* connection,
                                       CoreIPC::MessageID messageID,
-                                      CoreIPC::ArgumentDecoder* arguments) {}
+                                      CoreIPC::ArgumentDecoder* arguments) {
+  didReceivePluginProcessMessage(connection, messageID, arguments);
+}
 
 void PluginProcess::didClose(CoreIPC::Connection*) {
   // The UI process has crashed, just go ahead and quit.

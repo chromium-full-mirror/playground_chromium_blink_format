@@ -66,7 +66,7 @@ void PluginProcessManager::getPluginProcessConnection(
     m_pluginProcesses.append(pluginProcess);
   }
 
-  // FIXME: Ask the plug-in process for a connection
+  pluginProcess->createWebProcessConnection(webProcessProxy, reply);
 }
 
 void PluginProcessManager::removePluginProcessProxy(
