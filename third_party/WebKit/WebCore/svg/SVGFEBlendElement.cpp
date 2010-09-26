@@ -59,6 +59,14 @@ void SVGFEBlendElement::parseMappedAttribute(Attribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
+void SVGFEBlendElement::svgAttributeChanged(const QualifiedName& attrName) {
+  SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
+
+  if (attrName == SVGNames::modeAttr || attrName == SVGNames::inAttr ||
+      attrName == SVGNames::in2Attr)
+    invalidate();
+}
+
 void SVGFEBlendElement::synchronizeProperty(const QualifiedName& attrName) {
   SVGFilterPrimitiveStandardAttributes::synchronizeProperty(attrName);
 
