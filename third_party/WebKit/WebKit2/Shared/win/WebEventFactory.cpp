@@ -45,14 +45,8 @@ static inline LPARAM relativeCursorPosition(HWND hwnd) {
   return MAKELPARAM(point.x, point.y);
 }
 
-static inline POINT positionForEvent(HWND hWnd, LPARAM lParam) {
+static inline POINT point(LPARAM lParam) {
   POINT point = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-  return point;
-}
-
-static inline POINT globalPositionForEvent(HWND hWnd, LPARAM lParam) {
-  POINT point = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-  ::ClientToScreen(hWnd, &point);
   return point;
 }
 
@@ -388,8 +382,9 @@ WebMouseEvent WebEventFactory::createWebMouseEvent(HWND hWnd,
       type = WebEvent::KeyDown;
   }
 
-  POINT position = positionForEvent(hWnd, lParam);
-  POINT globalPosition = globalPositionForEvent(hWnd, lParam);
+  POINT position = point(lParam);
+  POINT globalPosition = position;
+  ::ClientToScreen(hWnd, &globalPosition);
 
   int positionX = position.x;
   int positionY = position.y;
@@ -415,8 +410,9 @@ WebWheelEvent WebEventFactory::createWebWheelEvent(HWND hWnd,
   // Taken from WebCore
   static const float cScrollbarPixelsPerLine = 100.0f / 3.0f;
 
-  POINT position = positionForEvent(hWnd, lParam);
-  POINT globalPosition = globalPositionForEvent(hWnd, lParam);
+  POINT globalPosition = point(lParam);
+  POINT position = globalPosition;
+  ::ScreenToClient(hWnd, &position);
 
   int positionX = position.x;
   int positionY = position.y;
