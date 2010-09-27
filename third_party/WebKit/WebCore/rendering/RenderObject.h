@@ -869,7 +869,6 @@ class RenderObject : public CachedResourceClient {
                                  int caretOffset,
                                  int* extraWidthToEndOfLine = 0);
 
-  virtual void computeBlockDirectionMargins() {}
   bool isTopMarginQuirk() const { return m_topMarginQuirk; }
   bool isBottomMarginQuirk() const { return m_bottomMarginQuirk; }
   void setTopMarginQuirk(bool b = true) { m_topMarginQuirk = b; }

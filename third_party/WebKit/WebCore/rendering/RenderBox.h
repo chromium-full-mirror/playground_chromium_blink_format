@@ -320,10 +320,12 @@ class RenderBox : public RenderBoxModelObject {
   // Resolve auto margins in the inline direction of the containing block so
   // that objects can be pushed to the start, middle or end
   // of the containing block.
-  void computeMarginsInContainingBlockInlineDirection(
-      RenderBlock* containingBlock,
-      int containerWidth,
-      int childWidth);
+  void computeInlineDirectionMargins(RenderBlock* containingBlock,
+                                     int containerWidth,
+                                     int childWidth);
+
+  // Used to resolve margins in the containing block's block-flow direction.
+  void computeBlockDirectionMargins(RenderBlock* containingBlock);
 
   void positionLineBox(InlineBox*);
 
@@ -405,8 +407,6 @@ class RenderBox : public RenderBoxModelObject {
     return style()->isVerticalBlockFlow() ? availableLogicalHeight()
                                           : availableLogicalWidth();
   }
-
-  void computeBlockDirectionMargins();
 
   virtual int verticalScrollbarWidth() const;
   int horizontalScrollbarHeight() const;

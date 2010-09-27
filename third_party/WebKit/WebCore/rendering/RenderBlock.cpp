@@ -1511,7 +1511,7 @@ void RenderBlock::adjustPositionedBlock(RenderBox* child,
   if (child->style()->hasStaticY()) {
     int y = height();
     if (!marginInfo.canCollapseWithTop()) {
-      child->computeBlockDirectionMargins();
+      child->computeBlockDirectionMargins(this);
       int marginTop = child->marginTop();
       int collapsedTopPos = marginInfo.posMargin();
       int collapsedTopNeg = marginInfo.negMargin();
@@ -1876,7 +1876,7 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
         // so that we can just pass the content width in directly to the
         // |computeMarginsInContainingBlockInlineDirection|
         // function.
-        child->computeMarginsInContainingBlockInlineDirection(
+        child->computeInlineDirectionMargins(
             this, availableLogicalWidthForLine(child->y(), false),
             child->width());
         chPos = leftOff + child->marginLeft();
@@ -1906,7 +1906,7 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
         // so that we can just pass the content width in directly to the
         // |computeInlineDirectionMargins|
         // function.
-        child->computeMarginsInContainingBlockInlineDirection(
+        child->computeInlineDirectionMargins(
             this, availableLogicalWidthForLine(child->y(), false),
             child->width());
         chPos = rightOff - child->marginRight() - child->width();
@@ -2052,7 +2052,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
   int oldTopNegMargin = maxTopNegMargin();
 
   // The child is a normal flow object.  Compute its vertical margins now.
-  child->computeBlockDirectionMargins();
+  child->computeBlockDirectionMargins(this);
 
   // Do not allow a collapse if the margin top collapse style is set to
   // SEPARATE.
@@ -3405,7 +3405,7 @@ RenderBlock::FloatingObject* RenderBlock::insertFloatingObject(RenderBox* o) {
     o->layoutIfNeeded();
   else {
     o->computeLogicalWidth();
-    o->computeBlockDirectionMargins();
+    o->computeBlockDirectionMargins(this);
   }
   newObj->m_width = o->width() + o->marginLeft() + o->marginRight();
 

@@ -767,6 +767,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
   Length marginEnd() const;
   Length marginStartUsing(const RenderStyle* otherStyle) const;
   Length marginEndUsing(const RenderStyle* otherStyle) const;
+  Length marginBeforeUsing(const RenderStyle* otherStyle) const;
+  Length marginAfterUsing(const RenderStyle* otherStyle) const;
 
   LengthBox paddingBox() const { return surround->padding; }
   Length paddingTop() const { return surround->padding.top(); }
