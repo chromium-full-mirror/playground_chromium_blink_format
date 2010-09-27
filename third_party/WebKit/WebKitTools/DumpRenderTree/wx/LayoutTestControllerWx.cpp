@@ -427,6 +427,17 @@ JSValueRef LayoutTestController::computedStyleIncludingVisitedInfo(JSContextRef,
   return 0;
 }
 
+JSValueRef LayoutTestController::nodesFromRect(JSContextRef context,
+                                               JSValueRef value,
+                                               int,
+                                               int,
+                                               unsigned,
+                                               unsigned,
+                                               bool) {
+  // FIXME: Implement this.
+  return 0;
+}
+
 void LayoutTestController::authenticateSession(JSStringRef,
                                                JSStringRef,
                                                JSStringRef) {}

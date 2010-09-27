@@ -761,6 +761,30 @@ static JSValueRef computedStyleIncludingVisitedInfoCallback(
   return controller->computedStyleIncludingVisitedInfo(context, arguments[0]);
 }
 
+static JSValueRef nodesFromRectCallback(JSContextRef context,
+                                        JSObjectRef function,
+                                        JSObjectRef thisObject,
+                                        size_t argumentCount,
+                                        const JSValueRef arguments[],
+                                        JSValueRef* exception) {
+  if (argumentCount != 6)
+    return JSValueMakeUndefined(context);
+
+  int x = JSValueToNumber(context, arguments[1], NULL);
+  int y = JSValueToNumber(context, arguments[2], NULL);
+  int hPadding =
+      static_cast<unsigned>(JSValueToNumber(context, arguments[3], NULL));
+  int vPadding =
+      static_cast<unsigned>(JSValueToNumber(context, arguments[4], NULL));
+  bool ignoreClipping = JSValueToBoolean(context, arguments[5]);
+
+  // Has mac implementation.
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  return controller->nodesFromRect(context, arguments[0], x, y, hPadding,
+                                   vPadding, ignoreClipping);
+}
+
 static JSValueRef layerTreeAsTextCallback(JSContextRef context,
                                           JSObjectRef function,
                                           JSObjectRef thisObject,
@@ -2736,6 +2760,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"computedStyleIncludingVisitedInfo",
        computedStyleIncludingVisitedInfoCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"nodesFromRect", nodesFromRectCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"decodeHostName", decodeHostNameCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
