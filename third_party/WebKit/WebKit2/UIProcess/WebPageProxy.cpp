@@ -748,7 +748,7 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       String url;
       uint64_t listenerID;
       if (!arguments->decode(CoreIPC::Out(frameID, navigationType, modifiers,
-                                          url, mouseButton, listenerID)))
+                                          mouseButton, url, listenerID)))
         return;
       decidePolicyForNewWindowAction(
           process()->webFrame(frameID),
