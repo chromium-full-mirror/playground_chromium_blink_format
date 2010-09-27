@@ -263,13 +263,13 @@ class StringImpl : public StringImplBase {
     return m_hash;
   }
   static unsigned computeHash(const UChar* data, unsigned length) {
-    return WTF::stringHash(data, length);
+    return WTF::StringHasher::createHash<UChar>(data, length);
   }
   static unsigned computeHash(const char* data, unsigned length) {
-    return WTF::stringHash(data, length);
+    return WTF::StringHasher::createHash<char>(data, length);
   }
   static unsigned computeHash(const char* data) {
-    return WTF::stringHash(data);
+    return WTF::StringHasher::createHash<char>(data);
   }
 
   ALWAYS_INLINE void deref() {
