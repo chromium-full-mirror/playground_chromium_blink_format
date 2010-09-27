@@ -314,7 +314,7 @@ LRESULT WebView::onMouseEvent(HWND hWnd,
 
   WebMouseEvent mouseEvent =
       WebEventFactory::createWebMouseEvent(hWnd, message, wParam, lParam);
-  m_page->mouseEvent(mouseEvent);
+  m_page->handleMouseEvent(mouseEvent);
 
   handled = true;
   return 0;
@@ -344,7 +344,7 @@ LRESULT WebView::onWheelEvent(HWND hWnd,
 
   WebWheelEvent wheelEvent =
       WebEventFactory::createWebWheelEvent(hWnd, message, wParam, lParam);
-  m_page->wheelEvent(wheelEvent);
+  m_page->handleWheelEvent(wheelEvent);
 
   handled = true;
   return 0;
@@ -357,7 +357,7 @@ LRESULT WebView::onKeyEvent(HWND hWnd,
                             bool& handled) {
   WebKeyboardEvent keyboardEvent =
       WebEventFactory::createWebKeyboardEvent(hWnd, message, wParam, lParam);
-  m_page->keyEvent(keyboardEvent);
+  m_page->handleKeyboardEvent(keyboardEvent);
 
   handled = true;
   return 0;

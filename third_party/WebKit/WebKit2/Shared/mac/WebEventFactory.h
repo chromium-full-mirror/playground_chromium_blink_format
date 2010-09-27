@@ -37,7 +37,8 @@ class WebEventFactory {
  public:
   static WebMouseEvent createWebMouseEvent(NSEvent* event, NSView* windowView);
   static WebWheelEvent createWebWheelEvent(NSEvent* event, NSView* windowView);
-  static WebKeyboardEvent createWebKeyboardEvent(NSEvent* event);
+  static WebKeyboardEvent createWebKeyboardEvent(NSEvent* event,
+                                                 NSView* windowView);
 };
 
 }  // namespace WebKit
