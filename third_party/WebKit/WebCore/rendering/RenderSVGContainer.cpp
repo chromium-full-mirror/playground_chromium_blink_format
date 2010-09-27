@@ -51,7 +51,7 @@ void RenderSVGContainer::layout() {
   calcViewport();
 
   LayoutRepainter repainter(*this,
-                            m_everHadLayout && checkForRepaintDuringLayout());
+                            checkForRepaintDuringLayout() || selfWillPaint());
 
   // Allow RenderSVGTransformableContainer to update its transform.
   bool updatedTransform = calculateLocalTransform();
