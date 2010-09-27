@@ -545,11 +545,13 @@ class GraphicsContext3D : public Noncopyable {
     kSourceFormatRGBA8,
     kSourceFormatRGB8,
     kSourceFormatBGRA8,
+    kSourceFormatARGB8,
     kSourceFormatRGBA5551,
     kSourceFormatRGBA4444,
     kSourceFormatRGB565,
     kSourceFormatR8,
     kSourceFormatRA8,
+    kSourceFormatAR8,
     kSourceFormatA8
   };
 
