@@ -375,7 +375,7 @@ typedef enum {
   NPPVpluginCoreAnimationLayer = 1003
 #endif
 
-#if defined(MOZ_PLATFORM_MAEMO) && (MOZ_PLATFORM_MAEMO == 5)
+#if defined(MOZ_PLATFORM_MAEMO) && (MOZ_PLATFORM_MAEMO >= 5)
   ,
   NPPVpluginWindowlessLocalBool = 2002
 #endif
@@ -429,7 +429,7 @@ typedef enum {
   NPNVsupportsCocoaBool =
       3001 /* TRUE if the browser supports the Cocoa event model */
 #endif     /* XP_MACOSX */
-#if defined(MOZ_PLATFORM_MAEMO) && (MOZ_PLATFORM_MAEMO == 5)
+#if defined(MOZ_PLATFORM_MAEMO) && (MOZ_PLATFORM_MAEMO >= 5)
   ,
   NPNVSupportsWindowlessLocal = 2002
 #endif
