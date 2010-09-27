@@ -38,6 +38,7 @@
 #include "IntRect.h"
 #include "LayerChromium.h"
 #include "SkBitmap.h"
+#include "VideoLayerChromium.h"
 #include <wtf/HashMap.h>
 #include <wtf/Noncopyable.h>
 #include <wtf/PassOwnPtr.h>
@@ -120,6 +121,9 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
   const CanvasLayerChromium::SharedValues* canvasLayerSharedValues() const {
     return m_canvasLayerSharedValues.get();
   }
+  const VideoLayerChromium::SharedValues* videoLayerSharedValues() const {
+    return m_videoLayerSharedValues.get();
+  }
 
   void resizeOnscreenContent(const IntSize&);
 
@@ -194,6 +198,7 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
   OwnPtr<LayerChromium::SharedValues> m_layerSharedValues;
   OwnPtr<ContentLayerChromium::SharedValues> m_contentLayerSharedValues;
   OwnPtr<CanvasLayerChromium::SharedValues> m_canvasLayerSharedValues;
+  OwnPtr<VideoLayerChromium::SharedValues> m_videoLayerSharedValues;
 
   OwnPtr<GraphicsContext3D> m_context;
 };
