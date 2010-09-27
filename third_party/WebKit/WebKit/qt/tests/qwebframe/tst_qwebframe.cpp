@@ -2696,6 +2696,7 @@ void tst_QWebFrame::popupFocus() {
       "</html>");
   view.resize(400, 100);
   view.show();
+  QTest::qWaitForWindowShown(&view);
   view.setFocus();
   QTRY_VERIFY(view.hasFocus());
 
