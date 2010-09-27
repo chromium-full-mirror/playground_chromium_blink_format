@@ -35,7 +35,9 @@
 
 namespace JSC {
 
-class JSCell : public NoncopyableCustomAllocated {
+class JSCell {
+  WTF_MAKE_NONCOPYABLE(JSCell);
+
   friend class GetterSetter;
   friend class Heap;
   friend class JIT;

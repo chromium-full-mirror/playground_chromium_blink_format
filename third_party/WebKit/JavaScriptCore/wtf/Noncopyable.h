@@ -21,6 +21,25 @@
 #ifndef WTF_Noncopyable_h
 #define WTF_Noncopyable_h
 
+#ifndef __has_feature
+#define __has_feature(x) 0
+#endif
+
+#if __has_feature(cxx_deleted_functions)
+#define WTF_MAKE_NONCOPYABLE(ClassName)                                      \
+  _Pragma("clang diagnostic push")                                           \
+      _Pragma("clang diagnostic ignored \"-Wunknown-pragmas\"")              \
+          _Pragma("clang diagnostic ignored \"-Wc++0x-extensions\"") private \
+      : ClassName(const ClassName&) = delete;                                \
+  ClassName& operator=(const ClassName&) = delete;                           \
+  _Pragma("clang diagnostic pop")
+#else
+#define WTF_MAKE_NONCOPYABLE(ClassName) \
+ private:                               \
+  ClassName(const ClassName&);          \
+  ClassName& operator=(const ClassName&);
+#endif
+
 // We don't want argument-dependent lookup to pull in everything from the WTF
 // namespace when you use Noncopyable, so put it in its own namespace.
 
@@ -37,18 +56,8 @@ class Noncopyable : public FastAllocBase {
   ~Noncopyable() {}
 };
 
-class NoncopyableCustomAllocated {
-  NoncopyableCustomAllocated(const NoncopyableCustomAllocated&);
-  NoncopyableCustomAllocated& operator=(const NoncopyableCustomAllocated&);
-
- protected:
-  NoncopyableCustomAllocated() {}
-  ~NoncopyableCustomAllocated() {}
-};
-
 }  // namespace WTFNoncopyable
 
 using WTFNoncopyable::Noncopyable;
-using WTFNoncopyable::NoncopyableCustomAllocated;
 
 #endif  // WTF_Noncopyable_h

@@ -131,8 +131,9 @@ class RefCounted : public RefCountedBase, public Noncopyable {
 };
 
 template <typename T>
-class RefCountedCustomAllocated : public RefCountedBase,
-                                  public NoncopyableCustomAllocated {
+class RefCountedCustomAllocated : public RefCountedBase {
+  WTF_MAKE_NONCOPYABLE(RefCountedCustomAllocated);
+
  public:
   void deref() {
     if (derefBase())
