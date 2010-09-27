@@ -91,6 +91,7 @@ void InjectedBundlePageUIClient::willRunJavaScriptPrompt(
 void InjectedBundlePageUIClient::mouseDidMoveOverElement(
     WebPage* page,
     const HitTestResult& coreHitTestResult,
+    WebEvent::Modifiers modifiers,
     RefPtr<APIObject>& userData) {
   if (!m_client.mouseDidMoveOverElement)
     return;
@@ -100,7 +101,8 @@ void InjectedBundlePageUIClient::mouseDidMoveOverElement(
 
   WKTypeRef userDataToPass = 0;
   m_client.mouseDidMoveOverElement(toRef(page), toRef(hitTestResult.get()),
-                                   &userDataToPass, m_client.clientInfo);
+                                   toRef(modifiers), &userDataToPass,
+                                   m_client.clientInfo);
   userData = adoptRef(toWK(userDataToPass));
 }
 

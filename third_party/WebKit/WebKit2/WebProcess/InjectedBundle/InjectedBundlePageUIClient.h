@@ -27,6 +27,7 @@
 #define InjectedBundlePageUIClient_h
 
 #include "WKBundlePage.h"
+#include "WebEvent.h"
 #include <wtf/Forward.h>
 
 namespace WebCore {
@@ -56,6 +57,7 @@ class InjectedBundlePageUIClient {
                                WebFrame*);
   void mouseDidMoveOverElement(WebPage*,
                                const WebCore::HitTestResult&,
+                               WebEvent::Modifiers,
                                RefPtr<APIObject>& userData);
 
  private:
