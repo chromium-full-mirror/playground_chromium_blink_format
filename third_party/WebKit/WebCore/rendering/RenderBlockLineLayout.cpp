@@ -566,7 +566,8 @@ void RenderBlock::computeBlockDirectionPositionsForLine(
     RootInlineBox* lineBox,
     BidiRun* firstRun,
     GlyphOverflowAndFallbackFontsMap& textBoxDataMap) {
-  setHeight(lineBox->alignBoxesInBlockDirection(height(), textBoxDataMap));
+  setLogicalHeight(
+      lineBox->alignBoxesInBlockDirection(height(), textBoxDataMap));
   lineBox->setBlockHeight(height());
 
   // Now make sure we place replaced render objects correctly.
@@ -609,7 +610,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
 
   m_overflow.clear();
 
-  setHeight(borderTop() + paddingTop());
+  setLogicalHeight(borderTop() + paddingTop());
   int toAdd = borderBottom() + paddingBottom() + horizontalScrollbarHeight();
 
   // Figure out if we should clear out our line boxes.
@@ -943,13 +944,13 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
                 lineBox->deleteLine(renderArena());
                 removeFloatingObjectsBelow(lastFloatFromPreviousLine,
                                            oldHeight);
-                setHeight(oldHeight + adjustment);
+                setLogicalHeight(oldHeight + adjustment);
                 resolver.setPosition(oldEnd);
                 end = oldEnd;
                 continue;
               }
 
-              setHeight(lineBox->blockHeight());
+              setLogicalHeight(lineBox->blockHeight());
             }
           }
         }
@@ -1008,12 +1009,12 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
                  f != end; ++f) {
               int floatTop = (*f)->y() - (*f)->marginTop();
               insertFloatingObject(*f);
-              setHeight(floatTop + delta);
+              setLogicalHeight(floatTop + delta);
               positionNewFloats();
             }
           }
         }
-        setHeight(lastRootBox()->blockHeight());
+        setLogicalHeight(lastRootBox()->blockHeight());
       } else {
         // Delete all the remaining lines.
         RootInlineBox* line = endLine;
@@ -1076,10 +1077,10 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
   }
 
   // Now add in the bottom border/padding.
-  setHeight(height() + toAdd);
+  setLogicalHeight(height() + toAdd);
 
   if (!firstLineBox() && hasLineIfEmpty())
-    setHeight(height() + lineHeight(true, true));
+    setLogicalHeight(height() + lineHeight(true, true));
 
   // See if we have any lines that spill out of our block.  If we do, then we
   // will possibly need to
@@ -1218,7 +1219,7 @@ RootInlineBox* RenderBlock::determineStartPosition(
         for (Vector<RenderBox*>::iterator f = cleanLineFloats->begin();
              f != end; ++f) {
           insertFloatingObject(*f);
-          setHeight((*f)->y() - (*f)->marginTop());
+          setLogicalHeight((*f)->y() - (*f)->marginTop());
           positionNewFloats();
           ASSERT(floats[numCleanFloats].object == *f);
           numCleanFloats++;
@@ -1226,7 +1227,7 @@ RootInlineBox* RenderBlock::determineStartPosition(
       }
       line = line->nextRootBox();
     }
-    setHeight(savedHeight);
+    setLogicalHeight(savedHeight);
   }
 
   firstLine = !last;
@@ -1235,7 +1236,7 @@ RootInlineBox* RenderBlock::determineStartPosition(
   RenderObject* startObj;
   int pos = 0;
   if (last) {
-    setHeight(last->blockHeight());
+    setLogicalHeight(last->blockHeight());
     startObj = last->lineBreakObj();
     pos = last->lineBreakPos();
     resolver.setStatus(last->lineBreakBidiStatus());
@@ -1617,7 +1618,7 @@ void RenderBlock::fitBelowFloats(int widthToFit,
   }
 
   if (newLineWidth > availableWidth) {
-    setHeight(lastFloatBottom);
+    setLogicalHeight(lastFloatBottom);
     availableWidth = newLineWidth;
   }
 }

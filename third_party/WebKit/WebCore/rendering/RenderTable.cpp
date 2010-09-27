@@ -208,7 +208,7 @@ void RenderTable::computeLogicalWidth() {
     computePositionedLogicalWidth();
 
   RenderBlock* cb = containingBlock();
-  int availableWidth = cb->availableWidth();
+  int availableWidth = cb->availableLogicalWidth();
 
   LengthType widthType = style()->width().type();
   if (widthType > Relative && style()->width().isPositive()) {
