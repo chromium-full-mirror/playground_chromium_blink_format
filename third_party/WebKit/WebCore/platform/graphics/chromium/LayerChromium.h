@@ -61,7 +61,7 @@ class LayerChromium : public RefCounted<LayerChromium> {
  public:
   static PassRefPtr<LayerChromium> create(GraphicsLayerChromium* owner = 0);
 
-  ~LayerChromium();
+  virtual ~LayerChromium();
 
   const LayerChromium* rootLayer() const;
   LayerChromium* superlayer() const;
@@ -200,7 +200,9 @@ class LayerChromium : public RefCounted<LayerChromium> {
 
   bool preserves3D() { return m_owner && m_owner->preserves3D(); }
 
-  void setLayerRenderer(LayerRendererChromium*);
+  // Derived types must override this method if they need to react to a change
+  // in the LayerRendererChromium.
+  virtual void setLayerRenderer(LayerRendererChromium*);
 
   void setOwner(GraphicsLayerChromium* owner) { m_owner = owner; }
 
@@ -258,7 +260,7 @@ class LayerChromium : public RefCounted<LayerChromium> {
   GraphicsLayerChromium* m_owner;
   LayerChromium(GraphicsLayerChromium* owner);
 
-  LayerRendererChromium* layerRenderer() const { return m_layerRenderer; }
+  LayerRendererChromium* layerRenderer() const { return m_layerRenderer.get(); }
   GraphicsContext3D* layerRendererContext() const;
 
   static void drawTexturedQuad(GraphicsContext3D*,
@@ -324,7 +326,7 @@ class LayerChromium : public RefCounted<LayerChromium> {
   bool m_needsDisplayOnBoundsChange;
 
   // Points to the layer renderer that updates and draws this layer.
-  LayerRendererChromium* m_layerRenderer;
+  RefPtr<LayerRendererChromium> m_layerRenderer;
 
   FloatRect m_frame;
   TransformationMatrix m_transform;
