@@ -189,11 +189,9 @@ static bool executeToggleStyle(Frame* frame,
                                             // selectionHasStyle
 
   // Style is considered present when
-  // mac: present at the beginning of selection
+  // Mac: present at the beginning of selection
   // other: present throughout the selection
 
-  // FIXME: Make stateStyle() to use this editing method too for the cases where
-  // it's used for queryCommandState.
   bool styleIsPresent;
   if (frame->editor()->behavior().shouldToggleStyleBasedOnStartOfSelection())
     styleIsPresent = frame->editor()->selectionStartHasStyle(style.get());
@@ -271,6 +269,10 @@ static TriState stateStyle(Frame* frame,
   RefPtr<CSSMutableStyleDeclaration> style =
       CSSMutableStyleDeclaration::create();
   style->setProperty(propertyID, desiredValue);
+
+  if (frame->editor()->behavior().shouldToggleStyleBasedOnStartOfSelection())
+    return frame->editor()->selectionStartHasStyle(style.get()) ? TrueTriState
+                                                                : FalseTriState;
   return frame->editor()->selectionHasStyle(style.get());
 }
 
