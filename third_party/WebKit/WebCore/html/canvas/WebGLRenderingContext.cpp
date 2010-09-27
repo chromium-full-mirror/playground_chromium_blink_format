@@ -668,7 +668,11 @@ void WebGLRenderingContext::deleteBuffer(WebGLBuffer* buffer) {
 void WebGLRenderingContext::deleteFramebuffer(WebGLFramebuffer* framebuffer) {
   if (!framebuffer)
     return;
-
+  if (framebuffer == m_framebufferBinding) {
+    m_framebufferBinding = 0;
+    // Have to call bindFramebuffer here to bind back to internal fbo.
+    m_context->bindFramebuffer(GraphicsContext3D::FRAMEBUFFER, 0);
+  }
   framebuffer->deleteObject();
 }
 
@@ -688,10 +692,11 @@ void WebGLRenderingContext::deleteRenderbuffer(
     WebGLRenderbuffer* renderbuffer) {
   if (!renderbuffer)
     return;
-
+  if (renderbuffer == m_renderbufferBinding)
+    m_renderbufferBinding = 0;
   renderbuffer->deleteObject();
   if (m_framebufferBinding)
-    m_framebufferBinding->onAttachedObjectChange(renderbuffer);
+    m_framebufferBinding->removeAttachment(renderbuffer);
 }
 
 void WebGLRenderingContext::deleteShader(WebGLShader* shader) {
@@ -707,7 +712,7 @@ void WebGLRenderingContext::deleteTexture(WebGLTexture* texture) {
 
   texture->deleteObject();
   if (m_framebufferBinding)
-    m_framebufferBinding->onAttachedObjectChange(texture);
+    m_framebufferBinding->removeAttachment(texture);
 }
 
 void WebGLRenderingContext::depthFunc(unsigned long func) {
@@ -2997,7 +3002,7 @@ void WebGLRenderingContext::useProgram(WebGLProgram* program,
       m_currentProgram->onDetached();
     m_currentProgram = program;
     m_context->useProgram(objectOrZero(program));
-    if (program)
+    if (program && program->object())
       program->onAttached();
   }
   cleanupAfterGraphicsCall(false);
