@@ -50,6 +50,7 @@ class RenderListItem : public RenderBlock {
   bool notInList() const { return m_notInList; }
 
   const String& markerText() const;
+  String markerTextWithSuffix() const;
 
   void updateListMarkerNumbers();
 

@@ -42,6 +42,7 @@ class RenderListMarker : public RenderBox {
   virtual void computePreferredLogicalWidths();
 
   const String& text() const { return m_text; }
+  String suffix() const;
 
   bool isInside() const;
 
