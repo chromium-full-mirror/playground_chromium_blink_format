@@ -59,6 +59,8 @@ G_BEGIN_DECLS
 #if !GTK_CHECK_VERSION(2, 18, 0)
 #define gtk_widget_set_visible(widget, FALSE) \
   GTK_WIDGET_UNSET_FLAGS((widget), GTK_VISIBLE)
+#define gtk_widget_get_visible(widget) (GTK_WIDGET_FLAGS(widget) & GTK_VISIBLE)
+
 #define gtk_widget_set_window(widget, new_window) \
   (widget)->window = (new_window)
 #define gtk_widget_set_can_focus(widget, TRUE) \
@@ -70,12 +72,16 @@ G_BEGIN_DECLS
 #endif  // GTK_CHECK_VERSION(2, 18, 0)
 
 #if !GTK_CHECK_VERSION(2, 17, 3)
-static void gdk_window_get_root_coords(GdkWindow* window,
-                                       gint x,
-                                       gint y,
-                                       gint* rootX,
-                                       gint* rootY);
+void gdk_window_get_root_coords(GdkWindow* window,
+                                gint x,
+                                gint y,
+                                gint* rootX,
+                                gint* rootY);
 #endif  // GTK_CHECK_VERSION(2, 17, 3)
+
+#if !GTK_CHECK_VERSION(2, 16, 0)
+const gchar* gtk_menu_item_get_label(GtkMenuItem*);
+#endif  // GTK_CHECK_VERSION(2, 16, 0)
 
 #if !GTK_CHECK_VERSION(2, 14, 0)
 #define gtk_widget_get_window(widget) (widget)->window
@@ -99,6 +105,7 @@ void gtk_adjustment_set_value(GtkAdjustment* adjusment, gdouble value);
 #endif  // GTK_CHECK_VERSION(2, 14, 0)
 
 GdkDevice* getDefaultGDKPointerDevice(GdkWindow* window);
+GdkCursor* blankCursor();
 
 G_END_DECLS
 
