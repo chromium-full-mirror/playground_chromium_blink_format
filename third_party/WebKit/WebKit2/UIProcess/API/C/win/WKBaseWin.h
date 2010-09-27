@@ -23,23 +23,13 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WKAPICastWin_h
-#define WKAPICastWin_h
+#ifndef WKBaseWin_h
+#define WKBaseWin_h
 
-#ifndef WKAPICast_h
-#error "Please #include \"WKAPICast.h\" instead of this file directly."
+#ifndef WKBase_h
+#error "Please #include \"WKBase.h\" instead of this file directly."
 #endif
 
-namespace WebKit {
-class WebView;
-}
+typedef const struct OpaqueWKView* WKViewRef;
 
-inline WebKit::WebView* toWK(WKViewRef v) {
-  return reinterpret_cast<WebKit::WebView*>(const_cast<OpaqueWKView*>(v));
-}
-
-inline WKViewRef toRef(WebKit::WebView* v) {
-  return reinterpret_cast<WKViewRef>(v);
-}
-
-#endif  // WKAPICastWin_h
+#endif /* WKBaseWin_h */

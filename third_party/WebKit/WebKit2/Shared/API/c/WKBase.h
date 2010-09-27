@@ -32,6 +32,8 @@
 #include <WebKit2/WKBaseWin.h>
 #endif
 
+/* WebKit2 shared types */
+
 typedef uint32_t WKTypeID;
 typedef const void* WKTypeRef;
 
@@ -41,14 +43,23 @@ typedef struct OpaqueWKArray* WKMutableArrayRef;
 typedef const struct OpaqueWKDictionary* WKDictionaryRef;
 typedef struct OpaqueWKDictionary* WKMutableDictionaryRef;
 
-typedef const struct OpaqueWKBackForwardList* WKBackForwardListRef;
-typedef const struct OpaqueWKBackForwardListItem* WKBackForwardListItemRef;
 typedef const struct OpaqueWKBoolean* WKBooleanRef;
-typedef const struct OpaqueWKCertificateInfo* WKCertificateInfoRef;
-typedef const struct OpaqueWKContext* WKContextRef;
 typedef const struct OpaqueWKData* WKDataRef;
 typedef const struct OpaqueWKDouble* WKDoubleRef;
 typedef const struct OpaqueWKError* WKErrorRef;
+typedef const struct OpaqueWKCertificateInfo* WKCertificateInfoRef;
+typedef const struct OpaqueWKSerializedScriptValue* WKSerializedScriptValueRef;
+typedef const struct OpaqueWKString* WKStringRef;
+typedef const struct OpaqueWKUInt64* WKUInt64Ref;
+typedef const struct OpaqueWKURL* WKURLRef;
+typedef const struct OpaqueWKURLRequest* WKURLRequestRef;
+typedef const struct OpaqueWKURLResponse* WKURLResponseRef;
+
+/* WebKit2 main API types */
+
+typedef const struct OpaqueWKBackForwardList* WKBackForwardListRef;
+typedef const struct OpaqueWKBackForwardListItem* WKBackForwardListItemRef;
+typedef const struct OpaqueWKContext* WKContextRef;
 typedef const struct OpaqueWKFormSubmissionListener*
     WKFormSubmissionListenerRef;
 typedef const struct OpaqueWKFrame* WKFrameRef;
@@ -57,12 +68,18 @@ typedef const struct OpaqueWKNavigationData* WKNavigationDataRef;
 typedef const struct OpaqueWKPage* WKPageRef;
 typedef const struct OpaqueWKPageNamespace* WKPageNamespaceRef;
 typedef const struct OpaqueWKPreferences* WKPreferencesRef;
-typedef const struct OpaqueWKSerializedScriptValue* WKSerializedScriptValueRef;
-typedef const struct OpaqueWKString* WKStringRef;
-typedef const struct OpaqueWKUInt64* WKUInt64Ref;
-typedef const struct OpaqueWKURL* WKURLRef;
-typedef const struct OpaqueWKURLRequest* WKURLRequestRef;
-typedef const struct OpaqueWKURLResponse* WKURLResponseRef;
+
+/* WebKit2 Bundle types */
+
+typedef const struct OpaqueWKBundle* WKBundleRef;
+typedef const struct OpaqueWKBundleFrame* WKBundleFrameRef;
+typedef const struct OpaqueWKBundleHitTestResult* WKBundleHitTestResultRef;
+typedef const struct OpaqueWKBundleNodeHandle* WKBundleNodeHandleRef;
+typedef const struct OpaqueWKBundlePage* WKBundlePageRef;
+typedef const struct OpaqueWKBundleRangeHandle* WKBundleRangeHandleRef;
+typedef const struct OpaqueWKBundleScriptWorld* WKBundleScriptWorldRef;
+typedef const struct OpaqueWKBundleDOMCSSStyleDeclaration*
+    WKBundleCSSStyleDeclarationRef;
 
 #undef WK_EXPORT
 #if defined(WK_NO_EXPORT)
