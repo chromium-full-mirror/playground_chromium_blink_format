@@ -151,6 +151,7 @@ inline bool operator==(const AtomicString& a, const AtomicString& b) {
   return a.impl() == b.impl();
 }
 bool operator==(const AtomicString& a, const char* b);
+bool operator==(const AtomicString& a, const Vector<UChar>& b);
 inline bool operator==(const AtomicString& a, const String& b) {
   return equal(a.impl(), b.impl());
 }
@@ -159,6 +160,9 @@ inline bool operator==(const char* a, const AtomicString& b) {
 }
 inline bool operator==(const String& a, const AtomicString& b) {
   return equal(a.impl(), b.impl());
+}
+inline bool operator==(const Vector<UChar>& a, const AtomicString& b) {
+  return b == a;
 }
 
 inline bool operator!=(const AtomicString& a, const AtomicString& b) {
@@ -170,11 +174,17 @@ inline bool operator!=(const AtomicString& a, const char* b) {
 inline bool operator!=(const AtomicString& a, const String& b) {
   return !equal(a.impl(), b.impl());
 }
+inline bool operator!=(const AtomicString& a, const Vector<UChar>& b) {
+  return !(a == b);
+}
 inline bool operator!=(const char* a, const AtomicString& b) {
   return !(b == a);
 }
 inline bool operator!=(const String& a, const AtomicString& b) {
   return !equal(a.impl(), b.impl());
+}
+inline bool operator!=(const Vector<UChar>& a, const AtomicString& b) {
+  return !(a == b);
 }
 
 inline bool equalIgnoringCase(const AtomicString& a, const AtomicString& b) {
