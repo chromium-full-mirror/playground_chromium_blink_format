@@ -70,6 +70,10 @@ void WebProcessConnection::didReceiveInvalidMessage(CoreIPC::Connection*,
   // FIXME: Implement.
 }
 
+void WebProcessConnection::createPlugin(uint64_t pluginInstanceID,
+                                        const Plugin::Parameters&,
+                                        bool& result) {}
+
 }  // namespace WebKit
 
 #endif  // ENABLE(PLUGIN_PROCESS)
