@@ -113,4 +113,12 @@ void ProcessLauncher::terminateProcess() {
   ::TerminateProcess(m_processIdentifier, 0);
 }
 
+void ProcessLauncher::platformInvalidate() {
+  if (!m_processIdentifier)
+    return;
+
+  ::CloseHandle(m_processIdentifier);
+  m_processIdentifier = 0;
+}
+
 }  // namespace WebKit
