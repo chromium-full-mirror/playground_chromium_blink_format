@@ -46,11 +46,6 @@ typedef unsigned long DWORD;
 typedef unsigned long DWORD_PTR;
 typedef void* LPVOID;
 typedef LPVOID HINTERNET;
-typedef unsigned WPARAM;
-typedef long LPARAM;
-typedef struct HWND__* HWND;
-typedef _W64 long LONG_PTR;
-typedef LONG_PTR LRESULT;
 #endif
 
 #if PLATFORM(MAC)
@@ -182,20 +177,10 @@ class ResourceHandle : public RefCounted<ResourceHandle>
 #if USE(WININET)
   void setSynchronousInternetHandle(HINTERNET);
   void fileLoadTimer(Timer<ResourceHandle>*);
-  void onHandleCreated(LPARAM);
   void onRedirect();
   bool onRequestComplete();
   static void CALLBACK
       internetStatusCallback(HINTERNET, DWORD_PTR, DWORD, LPVOID, DWORD);
-  friend void __stdcall transferJobStatusCallback(HINTERNET,
-                                                  DWORD_PTR,
-                                                  DWORD,
-                                                  LPVOID,
-                                                  DWORD);
-  friend LRESULT __stdcall ResourceHandleWndProc(HWND,
-                                                 unsigned message,
-                                                 WPARAM,
-                                                 LPARAM);
 #endif
 
 #if PLATFORM(QT) || USE(CURL) || USE(SOUP) || PLATFORM(ANDROID)
