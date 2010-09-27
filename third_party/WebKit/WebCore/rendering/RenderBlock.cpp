@@ -1280,12 +1280,12 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
 
   m_overflow.clear();
 
-  if (oldWidth != width() || oldColumnWidth != desiredColumnWidth())
+  if (oldWidth != logicalWidth() || oldColumnWidth != desiredColumnWidth())
     relayoutChildren = true;
 
   clearFloats();
 
-  int previousHeight = height();
+  int previousHeight = logicalHeight();
   setLogicalHeight(0);
   bool hasSpecifiedPageHeight = false;
   ColumnInfo* colInfo = columnInfo();
@@ -1295,7 +1295,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
       // that we can
       // avoid doing two layout passes.
       computeLogicalHeight();
-      int columnHeight = contentHeight();
+      int columnHeight = contentLogicalHeight();
       if (columnHeight > 0) {
         pageHeight = columnHeight;
         hasSpecifiedPageHeight = true;
@@ -1373,18 +1373,24 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
     layoutBlockChildren(relayoutChildren, maxFloatBottom);
 
   // Expand our intrinsic height to encompass floats.
-  int toAdd = borderBottom() + paddingBottom() + horizontalScrollbarHeight();
-  if (floatBottom() > (height() - toAdd) && expandsToEncloseOverhangingFloats())
+  int toAdd =
+      borderAfter() + paddingAfter() +
+      horizontalScrollbarHeight();  // FIXME:
+                                    // https://bugs.webkit.org/show_bug.cgi?id=46645,
+                                    // overflow and block-flow.
+  if (floatBottom() > (logicalHeight() - toAdd) &&
+      expandsToEncloseOverhangingFloats())
     setLogicalHeight(floatBottom() + toAdd);
 
   if (layoutColumns(hasSpecifiedPageHeight, pageHeight, statePusher))
     return;
 
   // Calculate our new height.
-  int oldHeight = height();
+  int oldHeight = logicalHeight();
   computeLogicalHeight();
-  if (oldHeight != height()) {
-    if (oldHeight > height() && maxFloatBottom > height() &&
+  int newHeight = logicalHeight();
+  if (oldHeight != newHeight) {
+    if (oldHeight > newHeight && maxFloatBottom > newHeight &&
         !childrenInline()) {
       // One of our children's floats may have become an overhanging float for
       // us. We need to look for it.
@@ -1392,14 +1398,14 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
            child = child->nextSibling()) {
         if (child->isBlockFlow() && !child->isFloatingOrPositioned()) {
           RenderBlock* block = toRenderBlock(child);
-          if (block->floatBottom() + block->y() > height())
+          if (block->floatBottom() + block->logicalTop() > newHeight)
             addOverhangingFloats(block, -block->x(), -block->y(), false);
         }
       }
     }
   }
 
-  if (previousHeight != height())
+  if (previousHeight != newHeight)
     relayoutChildren = true;
 
   // Add overflow from children (unless we're multi-column, since in that case
