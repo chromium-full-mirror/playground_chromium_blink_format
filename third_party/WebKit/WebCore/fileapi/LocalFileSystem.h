@@ -56,8 +56,7 @@ class LocalFileSystem : public Noncopyable {
   void requestFileSystem(ScriptExecutionContext*,
                          AsyncFileSystem::Type,
                          long long size,
-                         PassRefPtr<FileSystemCallback>,
-                         PassRefPtr<ErrorCallback>);
+                         PassOwnPtr<AsyncFileSystemCallbacks>);
 
 #if !PLATFORM(CHROMIUM)
   // This call is not thread-safe; must be called before any worker threads are

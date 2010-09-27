@@ -69,6 +69,7 @@
 #include "ErrorCallback.h"
 #include "FileError.h"
 #include "FileSystemCallback.h"
+#include "FileSystemCallbacks.h"
 #include "LocalFileSystem.h"
 #endif
 
@@ -375,9 +376,18 @@ void WorkerContext::requestFileSystem(
     return;
   }
 
+  AsyncFileSystem::Type fileSystemType =
+      static_cast<AsyncFileSystem::Type>(type);
+  if (fileSystemType != AsyncFileSystem::Temporary &&
+      fileSystemType != AsyncFileSystem::Persistent) {
+    DOMFileSystem::scheduleCallback(
+        this, errorCallback, FileError::create(INVALID_MODIFICATION_ERR));
+    return;
+  }
+
   LocalFileSystem::localFileSystem().requestFileSystem(
-      this, static_cast<AsyncFileSystem::Type>(type), size, successCallback,
-      errorCallback);
+      this, fileSystemType, size,
+      FileSystemCallbacks::create(successCallback, errorCallback, this));
 }
 
 COMPILE_ASSERT(static_cast<int>(WorkerContext::TEMPORARY) ==
