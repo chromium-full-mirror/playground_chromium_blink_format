@@ -236,7 +236,6 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   // GLint* range, GLint* precision);
 
   String getShaderSource(WebGLShader*, ExceptionCode&);
-  String getString(unsigned long name);
 
   WebGLGetInfo getTexParameter(unsigned long target,
                                unsigned long pname,

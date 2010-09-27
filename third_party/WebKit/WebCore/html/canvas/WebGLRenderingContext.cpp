@@ -1457,6 +1457,8 @@ WebGLGetInfo WebGLRenderingContext::getParameter(unsigned long pname,
       return getLongParameter(pname);
     case GraphicsContext3D::RENDERBUFFER_BINDING:
       return WebGLGetInfo(PassRefPtr<WebGLRenderbuffer>(m_renderbufferBinding));
+    case GraphicsContext3D::RENDERER:
+      return WebGLGetInfo(m_context->getString(GraphicsContext3D::RENDERER));
     case GraphicsContext3D::SAMPLE_BUFFERS:
       return getLongParameter(pname);
     case GraphicsContext3D::SAMPLE_COVERAGE_INVERT:
@@ -1469,6 +1471,11 @@ WebGLGetInfo WebGLRenderingContext::getParameter(unsigned long pname,
       return getWebGLIntArrayParameter(pname);
     case GraphicsContext3D::SCISSOR_TEST:
       return getBooleanParameter(pname);
+    case GraphicsContext3D::SHADING_LANGUAGE_VERSION:
+      return WebGLGetInfo(
+          "WebGL GLSL ES 1.0 (" +
+          m_context->getString(GraphicsContext3D::SHADING_LANGUAGE_VERSION) +
+          ")");
     case GraphicsContext3D::STENCIL_BACK_FAIL:
       return getUnsignedLongParameter(pname);
     case GraphicsContext3D::STENCIL_BACK_FUNC:
@@ -1518,6 +1525,13 @@ WebGLGetInfo WebGLRenderingContext::getParameter(unsigned long pname,
       return WebGLGetInfo(m_unpackFlipY);
     case GraphicsContext3D::UNPACK_PREMULTIPLY_ALPHA_WEBGL:
       return WebGLGetInfo(m_unpackPremultiplyAlpha);
+    case GraphicsContext3D::VENDOR:
+      return WebGLGetInfo(
+          "Webkit (" + m_context->getString(GraphicsContext3D::VENDOR) + ")");
+    case GraphicsContext3D::VERSION:
+      return WebGLGetInfo("WebGL 1.0 (" +
+                          m_context->getString(GraphicsContext3D::VERSION) +
+                          ")");
     case GraphicsContext3D::VIEWPORT:
       return getWebGLIntArrayParameter(pname);
     default:
@@ -1645,11 +1659,6 @@ String WebGLRenderingContext::getShaderSource(WebGLShader* shader,
     return "";
   WebGLStateRestorer(this, false);
   return m_context->getShaderSource(objectOrZero(shader));
-}
-
-String WebGLRenderingContext::getString(unsigned long name) {
-  WebGLStateRestorer(this, false);
-  return m_context->getString(name);
 }
 
 WebGLGetInfo WebGLRenderingContext::getTexParameter(unsigned long target,
