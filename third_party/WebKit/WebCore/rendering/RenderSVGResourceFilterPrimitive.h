@@ -40,6 +40,9 @@ class RenderSVGResourceFilterPrimitive : public RenderSVGHiddenContainer {
       SVGFilterPrimitiveStandardAttributes* filterPrimitiveElement);
 
  private:
+  virtual const char* renderName() const {
+    return "RenderSVGResourceFilterPrimitive";
+  }
   virtual bool isSVGResourceFilterPrimitive() const { return true; }
 };
 
