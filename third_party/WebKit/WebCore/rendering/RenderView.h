@@ -55,6 +55,12 @@ class RenderView : public RenderBlock {
   // guards.
   int viewHeight() const;
   int viewWidth() const;
+  int viewLogicalWidth() const {
+    return style()->isVerticalBlockFlow() ? viewWidth() : viewHeight();
+  }
+  int viewLogicalHeight() const {
+    return style()->isVerticalBlockFlow() ? viewHeight() : viewWidth();
+  }
 
   float zoomFactor() const;
 
