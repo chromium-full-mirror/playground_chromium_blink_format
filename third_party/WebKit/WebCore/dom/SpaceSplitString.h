@@ -90,6 +90,7 @@ class SpaceSplitString {
   }
 
   size_t size() const { return m_data ? m_data->size() : 0; }
+  bool isNull() const { return !m_data; }
   const AtomicString& operator[](size_t i) const {
     ASSERT(i < size());
     return (*m_data)[i];

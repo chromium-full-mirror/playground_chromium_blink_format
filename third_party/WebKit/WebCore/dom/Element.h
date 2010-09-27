@@ -37,6 +37,7 @@ class Attribute;
 class ClientRect;
 class ClientRectList;
 class DOMStringMap;
+class DOMTokenList;
 class ElementRareData;
 class IntSize;
 
@@ -298,6 +299,9 @@ class Element : public ContainerNode {
   unsigned childElementCount() const;
 
   bool webkitMatchesSelector(const String& selectors, ExceptionCode&);
+
+  DOMTokenList* classList();
+  DOMTokenList* optionalClassList() const;
 
   DOMStringMap* dataset();
   DOMStringMap* optionalDataset() const;
