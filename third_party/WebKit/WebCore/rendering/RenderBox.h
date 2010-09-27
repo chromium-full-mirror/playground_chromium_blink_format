@@ -209,6 +209,8 @@ class RenderBox : public RenderBoxModelObject {
   virtual int marginAfter() const;
   virtual int marginStart() const;
   virtual int marginEnd() const;
+  void setMarginStart(int);
+  void setMarginEnd(int);
 
   // The following five functions are used to implement collapsing margins.
   // All objects know their maximal positive and negative margins.  The
@@ -273,13 +275,13 @@ class RenderBox : public RenderBoxModelObject {
   virtual void borderFitAdjust(int& /*x*/, int& /*w*/) const {
   }  // Shrink the box in which the border paints if border-fit is set.
 
-  // This method is now public so that centered objects like tables that are
-  // shifted right by left-aligned floats can recompute their left and
-  // right margins (so that they can remain centered after being
-  // shifted. -dwh
-  void computeInlineDirectionMargins(const Length& marginLeft,
-                                     const Length& marginRight,
-                                     int containerWidth);
+  // Resolve auto margins in the inline direction of the containing block so
+  // that objects can be pushed to the start, middle or end
+  // of the containing block.
+  void computeMarginsInContainingBlockInlineDirection(
+      RenderBlock* containingBlock,
+      int containerWidth,
+      int childWidth);
 
   void positionLineBox(InlineBox*);
 
@@ -313,6 +315,7 @@ class RenderBox : public RenderBoxModelObject {
   virtual void repaintDuringLayoutIfMoved(const IntRect&);
 
   virtual int containingBlockLogicalWidthForContent() const;
+  int perpendicularContainingBlockLogicalHeight() const;
 
   virtual void computeLogicalWidth();
   virtual void computeLogicalHeight();
@@ -328,8 +331,8 @@ class RenderBox : public RenderBoxModelObject {
   // filling the width
   // of a containing block).  HTML4 buttons, <select>s, <input>s, legends, and
   // floating/compact elements do this.
-  bool sizesToIntrinsicWidth(LogicalWidthType) const;
-  virtual bool stretchesToMinIntrinsicWidth() const { return false; }
+  bool sizesToIntrinsicLogicalWidth(LogicalWidthType) const;
+  virtual bool stretchesToMinIntrinsicLogicalWidth() const { return false; }
 
   int computeLogicalWidthUsing(LogicalWidthType, int availableLogicalWidth);
   int computeLogicalHeightUsing(const Length& height);
@@ -543,6 +546,11 @@ class RenderBox : public RenderBoxModelObject {
   virtual void computePreferredLogicalWidths() {
     setPreferredLogicalWidthsDirty(false);
   }
+
+  void setMarginStartUsing(const RenderStyle*, int);
+  void setMarginEndUsing(const RenderStyle*, int);
+  int marginStartUsing(const RenderStyle*) const;
+  int marginEndUsing(const RenderStyle*) const;
 
  private:
   // The width/height of the contents + borders + padding.  The x/y location is

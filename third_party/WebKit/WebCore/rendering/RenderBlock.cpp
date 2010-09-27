@@ -1873,11 +1873,11 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
         // width computation will take into account the delta between |leftOff|
         // and |xPos|
         // so that we can just pass the content width in directly to the
-        // |computeInlineDirectionMargins|
+        // |computeMarginsInContainingBlockInlineDirection|
         // function.
-        child->computeInlineDirectionMargins(
-            child->style()->marginLeft(), child->style()->marginRight(),
-            availableLogicalWidthForLine(child->y(), false));
+        child->computeMarginsInContainingBlockInlineDirection(
+            this, availableLogicalWidthForLine(child->y(), false),
+            child->width());
         chPos = leftOff + child->marginLeft();
       }
     }
@@ -1905,9 +1905,9 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
         // so that we can just pass the content width in directly to the
         // |computeInlineDirectionMargins|
         // function.
-        child->computeInlineDirectionMargins(
-            child->style()->marginLeft(), child->style()->marginRight(),
-            availableLogicalWidthForLine(child->y(), false));
+        child->computeMarginsInContainingBlockInlineDirection(
+            this, availableLogicalWidthForLine(child->y(), false),
+            child->width());
         chPos = rightOff - child->marginRight() - child->width();
       }
     }
