@@ -84,7 +84,14 @@ static int gDelayUpdateScrollInfo = 0;
 static DelayedUpdateScrollInfoSet* gDelayedUpdateScrollInfoSet = 0;
 
 // Our MarginInfo state used when laying out block children.
-RenderBlock::MarginInfo::MarginInfo(RenderBlock* block, int top, int bottom) {
+RenderBlock::MarginInfo::MarginInfo(RenderBlock* block,
+                                    int beforeBorderPadding,
+                                    int afterBorderPadding)
+    : m_atBeforeSideOfBlock(true),
+      m_atAfterSideOfBlock(false),
+      m_marginBeforeQuirk(false),
+      m_marginAfterQuirk(false),
+      m_determinedMarginBeforeQuirk(false) {
   // Whether or not we can collapse our own margins with our children.  We don't
   // do this
   // if we had any border/padding (obviously), if we're the root or HTML
@@ -96,8 +103,8 @@ RenderBlock::MarginInfo::MarginInfo(RenderBlock* block, int top, int bottom) {
       !block->hasOverflowClip() && !block->isInlineBlockOrInlineTable() &&
       !block->isBlockFlowRoot();
 
-  m_canCollapseTopWithChildren =
-      m_canCollapseWithChildren && (top == 0) &&
+  m_canCollapseMarginBeforeWithChildren =
+      m_canCollapseWithChildren && (beforeBorderPadding == 0) &&
       block->style()->marginTopCollapse() != MSEPARATE;
 
   // If any height other than auto is specified in CSS, then we don't collapse
@@ -107,23 +114,20 @@ RenderBlock::MarginInfo::MarginInfo(RenderBlock* block, int top, int bottom) {
   // effects when the children overflow out of the parent block and yet still
   // collapse
   // with it.  We also don't collapse if we have any bottom border/padding.
-  m_canCollapseBottomWithChildren =
-      m_canCollapseWithChildren && (bottom == 0) &&
-      (block->style()->height().isAuto() &&
-       block->style()->height().value() == 0) &&
+  m_canCollapseMarginAfterWithChildren =
+      m_canCollapseWithChildren && (afterBorderPadding == 0) &&
+      (block->style()->logicalHeight().isAuto() &&
+       block->style()->logicalHeight().value() == 0) &&
       block->style()->marginBottomCollapse() != MSEPARATE;
 
   m_quirkContainer = block->isTableCell() || block->isBody() ||
                      block->style()->marginTopCollapse() == MDISCARD ||
                      block->style()->marginBottomCollapse() == MDISCARD;
 
-  m_atTopOfBlock = true;
-  m_atBottomOfBlock = false;
-
-  m_posMargin = m_canCollapseTopWithChildren ? block->maxTopMargin(true) : 0;
-  m_negMargin = m_canCollapseTopWithChildren ? block->maxTopMargin(false) : 0;
-
-  m_topQuirk = m_bottomQuirk = m_determinedTopQuirk = false;
+  m_posMargin =
+      m_canCollapseMarginBeforeWithChildren ? block->maxTopMargin(true) : 0;
+  m_negMargin =
+      m_canCollapseMarginAfterWithChildren ? block->maxTopMargin(false) : 0;
 }
 
 // -------------------------------------------------------------------------------------------------------
@@ -1516,7 +1520,7 @@ void RenderBlock::adjustPositionedBlock(RenderBox* child,
 
   if (child->style()->hasStaticY()) {
     int y = height();
-    if (!marginInfo.canCollapseWithTop()) {
+    if (!marginInfo.canCollapseWithMarginBefore()) {
       child->computeBlockDirectionMargins(this);
       int marginTop = child->marginTop();
       int collapsedTopPos = marginInfo.posMargin();
@@ -1550,10 +1554,11 @@ void RenderBlock::adjustFloatingBlock(const MarginInfo& marginInfo) {
   // our block.  If this is the case, then we do not add the margin in to our
   // height when computing the position of the float.   This condition can be
   // tested
-  // for by simply calling canCollapseWithTop.  See
+  // for by simply calling canCollapseWithMarginBefore.  See
   // http://www.hixie.ch/tests/adhoc/css/box/block/margin-collapse/046.html for
   // an example of this scenario.
-  int marginOffset = marginInfo.canCollapseWithTop() ? 0 : marginInfo.margin();
+  int marginOffset =
+      marginInfo.canCollapseWithMarginBefore() ? 0 : marginInfo.margin();
   setLogicalHeight(height() + marginOffset);
   positionNewFloats();
   setLogicalHeight(height() - marginOffset);
@@ -1672,7 +1677,7 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
   bool topQuirk =
       child->isTopMarginQuirk() || style()->marginTopCollapse() == MDISCARD;
 
-  if (marginInfo.canCollapseWithTop()) {
+  if (marginInfo.canCollapseWithMarginBefore()) {
     // This child is collapsing with the top of the
     // block.  If it has larger margin values, then we need to update
     // our own maximal values.
@@ -1685,12 +1690,14 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
     // collapse it away, even if the margin is smaller (www.webreference.com
     // has an example of this, a <dt> with 0.8em author-specified inside
     // a <dl> inside a <td>.
-    if (!marginInfo.determinedTopQuirk() && !topQuirk && (posTop - negTop)) {
+    if (!marginInfo.determinedMarginBeforeQuirk() && !topQuirk &&
+        (posTop - negTop)) {
       setTopMarginQuirk(false);
-      marginInfo.setDeterminedTopQuirk(true);
+      marginInfo.setDeterminedMarginBeforeQuirk(true);
     }
 
-    if (!marginInfo.determinedTopQuirk() && topQuirk && marginTop() == 0)
+    if (!marginInfo.determinedMarginBeforeQuirk() && topQuirk &&
+        marginTop() == 0)
       // We have no top margin and our top child has a quirky margin.
       // We will pick up this quirky margin and pass it through.
       // This deals with the <td><div><p> case.
@@ -1699,9 +1706,9 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
       setTopMarginQuirk(true);
   }
 
-  if (marginInfo.quirkContainer() && marginInfo.atTopOfBlock() &&
+  if (marginInfo.quirkContainer() && marginInfo.atBeforeSideOfBlock() &&
       (posTop - negTop))
-    marginInfo.setTopQuirk(topQuirk);
+    marginInfo.setMarginBeforeQuirk(topQuirk);
 
   int beforeCollapseY = height();
   int ypos = beforeCollapseY;
@@ -1720,7 +1727,7 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
     marginInfo.setPosMarginIfLarger(child->maxBottomMargin(true));
     marginInfo.setNegMarginIfLarger(child->maxBottomMargin(false));
 
-    if (!marginInfo.canCollapseWithTop())
+    if (!marginInfo.canCollapseWithMarginBefore())
       // We need to make sure that the position of the self-collapsing block
       // is correct, since it could have overflowing content
       // that needs to be positioned correctly (e.g., a block that
@@ -1730,10 +1737,10 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
     if (child->style()->marginTopCollapse() == MSEPARATE) {
       setLogicalHeight(height() + marginInfo.margin() + child->marginTop());
       ypos = height();
-    } else if (!marginInfo.atTopOfBlock() ||
-               (!marginInfo.canCollapseTopWithChildren() &&
+    } else if (!marginInfo.atBeforeSideOfBlock() ||
+               (!marginInfo.canCollapseMarginBeforeWithChildren() &&
                 (!document()->inQuirksMode() || !marginInfo.quirkContainer() ||
-                 !marginInfo.topQuirk()))) {
+                 !marginInfo.marginBeforeQuirk()))) {
       // We're collapsing with a previous sibling's margins and not
       // with the top of the block.
       setLogicalHeight(height() + max(marginInfo.posMargin(), posTop) -
@@ -1745,8 +1752,9 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
     marginInfo.setNegMargin(child->maxBottomMargin(false));
 
     if (marginInfo.margin())
-      marginInfo.setBottomQuirk(child->isBottomMarginQuirk() ||
-                                style()->marginBottomCollapse() == MDISCARD);
+      marginInfo.setMarginAfterQuirk(child->isBottomMarginQuirk() ||
+                                     style()->marginBottomCollapse() ==
+                                         MDISCARD);
   }
 
   // If margins would pull us past the top of the next page, then we need to
@@ -1804,14 +1812,14 @@ int RenderBlock::clearFloatsIfNeeded(RenderBox* child,
     // Increase our height by the amount we had to clear.
     setLogicalHeight(height() + heightIncrease);
 
-  if (marginInfo.canCollapseWithTop()) {
+  if (marginInfo.canCollapseWithMarginBefore()) {
     // We can no longer collapse with the top of the block since a clear
     // occurred.  The empty blocks collapse into the cleared block.
     // FIXME: This isn't quite correct.  Need clarification for what to do
     // if the height the cleared block is offset by is smaller than the
     // margins involved.
     setMaxTopMargins(oldTopPosMargin, oldTopNegMargin);
-    marginInfo.setAtTopOfBlock(false);
+    marginInfo.setAtBeforeSideOfBlock(false);
   }
 
   return yPos + heightIncrease;
@@ -1823,7 +1831,7 @@ int RenderBlock::estimateVerticalPosition(RenderBox* child,
   // when it's wrong we sometimes trigger a pathological
   // relayout if there are intruding floats.
   int yPosEstimate = height();
-  if (!marginInfo.canCollapseWithTop()) {
+  if (!marginInfo.canCollapseWithMarginBefore()) {
     int childMarginTop = child->selfNeedsLayout() ? child->marginTop()
                                                   : child->collapsedMarginTop();
     yPosEstimate += max(marginInfo.margin(), childMarginTop);
@@ -1925,17 +1933,18 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
 }
 
 void RenderBlock::setCollapsedBottomMargin(const MarginInfo& marginInfo) {
-  if (marginInfo.canCollapseWithBottom() && !marginInfo.canCollapseWithTop()) {
+  if (marginInfo.canCollapseWithMarginAfter() &&
+      !marginInfo.canCollapseWithMarginBefore()) {
     // Update our max pos/neg bottom margins, since we collapsed our bottom
     // margins
     // with our children.
     setMaxBottomMargins(max(maxBottomPosMargin(), marginInfo.posMargin()),
                         max(maxBottomNegMargin(), marginInfo.negMargin()));
 
-    if (!marginInfo.bottomQuirk())
+    if (!marginInfo.marginAfterQuirk())
       setBottomMarginQuirk(false);
 
-    if (marginInfo.bottomQuirk() && marginBottom() == 0)
+    if (marginInfo.marginAfterQuirk() && marginBottom() == 0)
       // We have no bottom margin and our last child has a quirky margin.
       // We will pick up this quirky margin and pass it through.
       // This deals with the <td><div><p> case.
@@ -1946,13 +1955,14 @@ void RenderBlock::setCollapsedBottomMargin(const MarginInfo& marginInfo) {
 void RenderBlock::handleBottomOfBlock(int top,
                                       int bottom,
                                       MarginInfo& marginInfo) {
-  marginInfo.setAtBottomOfBlock(true);
+  marginInfo.setAtAfterSideOfBlock(true);
 
   // If we can't collapse with children then go ahead and add in the bottom
   // margin.
-  if (!marginInfo.canCollapseWithBottom() && !marginInfo.canCollapseWithTop() &&
+  if (!marginInfo.canCollapseWithMarginAfter() &&
+      !marginInfo.canCollapseWithMarginBefore() &&
       (!document()->inQuirksMode() || !marginInfo.quirkContainer() ||
-       !marginInfo.bottomQuirk()))
+       !marginInfo.marginAfterQuirk()))
     setLogicalHeight(height() + marginInfo.margin());
 
   // Now add in our bottom border/padding.
@@ -2064,7 +2074,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
   // Do not allow a collapse if the margin top collapse style is set to
   // SEPARATE.
   if (child->style()->marginTopCollapse() == MSEPARATE) {
-    marginInfo.setAtTopOfBlock(false);
+    marginInfo.setAtBeforeSideOfBlock(false);
     marginInfo.clearMargin();
   }
 
@@ -2117,7 +2127,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
     child->layout();
 
   // Cache if we are at the top of the block right now.
-  bool atTopOfBlock = marginInfo.atTopOfBlock();
+  bool atBeforeSideOfBlock = marginInfo.atBeforeSideOfBlock();
 
   // Now determine the correct ypos based off examination of collapsing margin
   // values.
@@ -2153,7 +2163,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
       // at the top of the block prior
       // to collapsing our margins, and as long as we didn't clear or move as a
       // result of other pagination.
-      if (atTopOfBlock && oldY == yBeforeClear && !isPositioned() &&
+      if (atBeforeSideOfBlock && oldY == yBeforeClear && !isPositioned() &&
           !isTableCell()) {
         // FIXME: Should really check if we're exceeding the page height before
         // propagating the strut, but we don't
@@ -2201,8 +2211,8 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
   // We are no longer at the top of the block if we encounter a non-empty child.
   // This has to be done after checking for clear, so that margins can be reset
   // if a clear occurred.
-  if (marginInfo.atTopOfBlock() && !child->isSelfCollapsingBlock())
-    marginInfo.setAtTopOfBlock(false);
+  if (marginInfo.atBeforeSideOfBlock() && !child->isSelfCollapsingBlock())
+    marginInfo.setAtBeforeSideOfBlock(false);
 
   // Now place the child in the correct horizontal position
   determineHorizontalPosition(child);
@@ -6752,7 +6762,7 @@ int RenderBlock::applyAfterBreak(RenderBox* child,
       (checkColumnBreaks && child->style()->columnBreakAfter() == PBALWAYS) ||
       (checkPageBreaks && child->style()->pageBreakAfter() == PBALWAYS);
   if (checkAfterAlways && inNormalFlow(child)) {
-    marginInfo.setBottomQuirk(
+    marginInfo.setMarginAfterQuirk(
         true);  // Cause margins to be discarded for any following content.
     if (checkColumnBreaks)
       view()->layoutState()->addForcedColumnBreak(yPos);
