@@ -138,11 +138,7 @@ void tst_QWebView::reusePage() {
   }
 
   view1->show();
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   QTest::qWaitForWindowShown(view1);
-#else
-  QTest::qWait(2000);
-#endif
   delete view1;
   QVERIFY(page != 0);  // deleting view must not have deleted the page, since
                        // it's not a child of view
@@ -151,11 +147,7 @@ void tst_QWebView::reusePage() {
   view2->setPage(page);
   view2->show();  // in Windowless mode, you should still be able to see the
                   // plugin here
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   QTest::qWaitForWindowShown(view2);
-#else
-  QTest::qWait(2000);
-#endif
   delete view2;
 
   delete page;  // must not crash

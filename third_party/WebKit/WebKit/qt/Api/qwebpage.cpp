@@ -88,6 +88,7 @@
 #include "GeolocationPermissionClientQt.h"
 #include "NotificationPresenterClientQt.h"
 #include "PageClientQt.h"
+#include "PlatformTouchEvent.h"
 #include "WorkerThread.h"
 #include "wtf/Threading.h"
 
@@ -115,15 +116,11 @@
 #include <QSysInfo>
 #include <QTextCharFormat>
 #include <QTextDocument>
+#include <QTouchEvent>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #if defined(Q_WS_X11)
 #include <QX11Info>
-#endif
-
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
-#include <QTouchEvent>
-#include "PlatformTouchEvent.h"
 #endif
 
 using namespace WebCore;
@@ -263,10 +260,6 @@ QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
 #ifndef QT_NO_UNDOSTACK
       ,
       undoStack(0)
-#endif
-#if QT_VERSION < QT_VERSION_CHECK(4, 6, 0)
-      ,
-      view(0)
 #endif
       ,
       insideOpenCall(false),
@@ -813,7 +806,6 @@ void QWebPagePrivate::mouseReleaseEvent(QGraphicsSceneMouseEvent* ev) {
 }
 
 void QWebPagePrivate::handleSoftwareInputPanel(Qt::MouseButton button) {
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   Frame* frame = page->focusController()->focusedFrame();
   if (!frame)
     return;
@@ -832,7 +824,6 @@ void QWebPagePrivate::handleSoftwareInputPanel(Qt::MouseButton button) {
   }
 
   clickCausedFocus = false;
-#endif
 }
 
 void QWebPagePrivate::mouseReleaseEvent(QMouseEvent* ev) {
@@ -1148,10 +1139,8 @@ QPalette QWebPage::palette() const {
 void QWebPagePrivate::inputMethodEvent(QInputMethodEvent* ev) {
   WebCore::Frame* frame = page->focusController()->focusedOrMainFrame();
   WebCore::Editor* editor = frame->editor();
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   QInputMethodEvent::Attribute selection(QInputMethodEvent::Selection, 0, 0,
                                          QVariant());
-#endif
 
   if (!editor->canEdit()) {
     ev->ignore();
@@ -1201,13 +1190,11 @@ void QWebPagePrivate::inputMethodEvent(QInputMethodEvent* ev) {
         }
         break;
       }
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
       case QInputMethodEvent::Selection: {
         selection = a;
         hasSelection = true;
         break;
       }
-#endif
     }
   }
 
@@ -1222,7 +1209,6 @@ void QWebPagePrivate::inputMethodEvent(QInputMethodEvent* ev) {
     // non-0 updates selection of supplied preedit text
     // 4. otherwise event is updating supplied pre-edit text
     QString preedit = ev->preeditString();
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
     if (hasSelection) {
       QString text =
           (renderTextControl) ? QString(renderTextControl->text()) : QString();
@@ -1234,9 +1220,7 @@ void QWebPagePrivate::inputMethodEvent(QInputMethodEvent* ev) {
                                  : selection.start,
           (selection.length < 0) ? selection.start
                                  : selection.start + selection.length);
-    } else
-#endif
-        if (!preedit.isEmpty())
+    } else if (!preedit.isEmpty())
       editor->setComposition(preedit, underlines, preedit.length(), 0);
   }
 
@@ -1452,7 +1436,6 @@ bool QWebPagePrivate::handleScrolling(QKeyEvent* ev, Frame* frame) {
   return frame->eventHandler()->scrollRecursively(direction, granularity);
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
 bool QWebPagePrivate::touchEvent(QTouchEvent* event) {
   WebCore::Frame* frame = QWebFramePrivate::core(mainFrame);
   if (!frame->view())
@@ -1465,7 +1448,6 @@ bool QWebPagePrivate::touchEvent(QTouchEvent* event) {
   // Return whether the default action was cancelled in the JS event handler
   return frame->eventHandler()->handleTouchEvent(PlatformTouchEvent(event));
 }
-#endif
 
 /*!
   This method is used by the input method to query a set of properties of the
@@ -1547,7 +1529,6 @@ QVariant QWebPage::inputMethodQuery(Qt::InputMethodQuery property) const {
       }
       return QVariant();
     }
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
     case Qt::ImAnchorPosition: {
       if (renderTextControl) {
         if (editor->hasComposition()) {
@@ -1573,7 +1554,6 @@ QVariant QWebPage::inputMethodQuery(Qt::InputMethodQuery property) const {
       }
       return QVariant(0);
     }
-#endif
     default:
       return QVariant();
   }
@@ -2087,11 +2067,7 @@ void QWebPage::setView(QWidget* view) {
     \sa setView()
 */
 QWidget* QWebPage::view() const {
-#if QT_VERSION < QT_VERSION_CHECK(4, 6, 0)
-  return d->view;
-#else
   return d->view.data();
-#endif
 }
 
 /*!
@@ -3068,13 +3044,11 @@ bool QWebPage::event(QEvent* ev) {
     case QEvent::Leave:
       d->leaveEvent(ev);
       break;
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
     case QEvent::TouchBegin:
     case QEvent::TouchUpdate:
     case QEvent::TouchEnd:
       // Return whether the default action was cancelled in the JS event handler
       return d->touchEvent(static_cast<QTouchEvent*>(ev));
-#endif
 #ifndef QT_NO_PROPERTIES
     case QEvent::DynamicPropertyChange:
       d->dynamicPropertyChangeEvent(

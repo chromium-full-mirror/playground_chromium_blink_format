@@ -1443,12 +1443,9 @@ void tst_QWebPage::frameAt() {
 void tst_QWebPage::inputMethods_data() {
   QTest::addColumn<QString>("viewType");
   QTest::newRow("QWebView") << "QWebView";
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   QTest::newRow("QGraphicsWebView") << "QGraphicsWebView";
-#endif
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
 static Qt::InputMethodHints inputMethodHints(QObject* object) {
   if (QGraphicsObject* o = qobject_cast<QGraphicsObject*>(object))
     return o->inputMethodHints();
@@ -1456,13 +1453,10 @@ static Qt::InputMethodHints inputMethodHints(QObject* object) {
     return w->inputMethodHints();
   return Qt::InputMethodHints();
 }
-#endif
 
 static bool inputMethodEnabled(QObject* object) {
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   if (QGraphicsObject* o = qobject_cast<QGraphicsObject*>(object))
     return o->flags() & QGraphicsItem::ItemAcceptsInputMethod;
-#endif
   if (QWidget* w = qobject_cast<QWidget*>(object))
     return w->testAttribute(Qt::WA_InputMethodEnabled);
   return false;
@@ -1478,9 +1472,7 @@ void tst_QWebPage::inputMethods() {
     wv->setPage(page);
     view = wv;
     container = view;
-  }
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
-  else if (viewType == "QGraphicsWebView") {
+  } else if (viewType == "QGraphicsWebView") {
     QGraphicsWebView* wv = new QGraphicsWebView;
     wv->setPage(page);
     view = wv;
@@ -1492,9 +1484,7 @@ void tst_QWebPage::inputMethods() {
     wv->setGeometry(QRect(0, 0, 500, 500));
 
     container = gv;
-  }
-#endif
-  else
+  } else
     QVERIFY2(false, "Unknown view type");
 
   page->settings()->setFontFamily(QWebSettings::SerifFont, "FooSerifFont");
@@ -1519,7 +1509,6 @@ void tst_QWebPage::inputMethods() {
                     Qt::NoButton, Qt::NoModifier);
   page->event(&evrel);
 
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   // This part of the test checks if the SIP (Software Input Panel) is
   // triggered,
   // which normally happens on mobile platforms, when a user input form receives
@@ -1542,15 +1531,11 @@ void tst_QWebPage::inputMethods() {
     QVERIFY(viewEventSpy.contains(QEvent::RequestSoftwareInputPanel));
   else
     QVERIFY(!viewEventSpy.contains(QEvent::RequestSoftwareInputPanel));
-#endif
   viewEventSpy.clear();
 
   page->event(&evpres);
   page->event(&evrel);
-
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   QVERIFY(viewEventSpy.contains(QEvent::RequestSoftwareInputPanel));
-#endif
 
   // ImMicroFocus
   QVariant variant = page->inputMethodQuery(Qt::ImMicroFocus);
@@ -1579,7 +1564,6 @@ void tst_QWebPage::inputMethods() {
     page->event(&eventText);
   }
 
-#if QT_VERSION >= 0x040600
   // ImMaximumTextLength
   variant = page->inputMethodQuery(Qt::ImMaximumTextLength);
   QCOMPARE(20, variant.toInt());
@@ -1631,14 +1615,12 @@ void tst_QWebPage::inputMethods() {
   variant = page->inputMethodQuery(Qt::ImCurrentSelection);
   selectionValue = variant.value<QString>();
   QCOMPARE(selectionValue, QString("tWebK"));
-#endif
 
   // ImSurroundingText
   variant = page->inputMethodQuery(Qt::ImSurroundingText);
   QString value = variant.value<QString>();
   QCOMPARE(value, QString("QtWebKit"));
 
-#if QT_VERSION >= 0x040600
   {
     QList<QInputMethodEvent::Attribute> attributes;
     // Clear the selection, so the next test does not clear any contents.
@@ -1654,7 +1636,6 @@ void tst_QWebPage::inputMethods() {
   variant = page->inputMethodQuery(Qt::ImSurroundingText);
   value = variant.value<QString>();
   QCOMPARE(value, QString("QtWebKit"));
-#endif
 
   // Cancel current composition first
   inputAttributes << QInputMethodEvent::Attribute(QInputMethodEvent::Selection,
@@ -1763,13 +1744,11 @@ void tst_QWebPage::inputMethods() {
   page->event(&evrelPassword);
 
   QVERIFY(inputMethodEnabled(view));
-#if QT_VERSION >= 0x040600
   QVERIFY(inputMethodHints(view) & Qt::ImhHiddenText);
 
   page->event(&evpres);
   page->event(&evrel);
   QVERIFY(!(inputMethodHints(view) & Qt::ImhHiddenText));
-#endif
 
   page->mainFrame()->setHtml("<html><body><p>nothing to input here");
   viewEventSpy.clear();
@@ -1784,11 +1763,8 @@ void tst_QWebPage::inputMethods() {
     page->event(&evrel);
   }
 
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   QVERIFY(!viewEventSpy.contains(QEvent::RequestSoftwareInputPanel));
-#endif
 
-#if QT_VERSION >= 0x040600
   // START - Test for sending empty QInputMethodEvent
   page->mainFrame()->setHtml(
       "<html><body>"
@@ -1807,8 +1783,7 @@ void tst_QWebPage::inputMethods() {
           ->evaluateJavaScript("document.getElementById('input3').value")
           .toString();
   QCOMPARE(inputValue, QString("QtWebKit2"));
-// END - Test for sending empty QInputMethodEvent
-#endif
+  // END - Test for sending empty QInputMethodEvent
 
   delete container;
 }
@@ -2236,12 +2211,10 @@ void tst_QWebPage::originatingObjectInNetworkRequests() {
   QList<QWebFrame*> childFrames = m_page->mainFrame()->childFrames();
   QCOMPARE(childFrames.count(), 2);
 
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   for (int i = 0; i < 2; ++i)
     QVERIFY(qobject_cast<QWebFrame*>(
                 networkManager->requests.at(i).originatingObject()) ==
             childFrames.at(i));
-#endif
 }
 
 /**

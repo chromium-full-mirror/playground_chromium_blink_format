@@ -570,7 +570,6 @@ void EditorClientQt::willSetInputMethodState() {}
 void EditorClientQt::setInputMethodState(bool active) {
   QWebPageClient* webPageClient = m_page->d->client;
   if (webPageClient) {
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
     Qt::InputMethodHints hints;
 
     HTMLInputElement* inputElement = 0;
@@ -608,7 +607,6 @@ void EditorClientQt::setInputMethodState(bool active) {
     hints |= Qt::ImhNoPredictiveText;
 #endif  // Q_WS_MAEMO_5 || Q_WS_MAEMO_6 || Q_OS_SYMBIAN
     webPageClient->setInputMethodHints(hints);
-#endif  // QT_VERSION check
     webPageClient->setInputMethodEnabled(active);
   }
   emit m_page->microFocusChanged();
