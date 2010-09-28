@@ -28,12 +28,18 @@
 
 #include "GraphicsLayer.h"
 
+#include <wtf/HashSet.h>
 #include <wtf/Noncopyable.h>
+#include <wtf/text/StringHash.h>
 
 namespace WebCore {
 
-class WebGLObject;
+class CanvasPattern;
 class HTMLCanvasElement;
+class HTMLImageElement;
+class HTMLVideoElement;
+class KURL;
+class WebGLObject;
 
 class CanvasRenderingContext : public Noncopyable {
  public:
@@ -57,8 +63,16 @@ class CanvasRenderingContext : public Noncopyable {
   virtual PlatformLayer* platformLayer() const { return 0; }
 #endif
 
+ protected:
+  void checkOrigin(const CanvasPattern*);
+  void checkOrigin(const HTMLCanvasElement*);
+  void checkOrigin(const HTMLImageElement*);
+  void checkOrigin(const HTMLVideoElement*);
+  void checkOrigin(const KURL&);
+
  private:
   HTMLCanvasElement* m_canvas;
+  HashSet<String> m_cleanOrigins;
 };
 
 }  // namespace WebCore

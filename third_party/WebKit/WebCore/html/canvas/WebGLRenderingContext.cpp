@@ -2042,7 +2042,12 @@ void WebGLRenderingContext::readPixels(long x,
                                        long height,
                                        unsigned long format,
                                        unsigned long type,
-                                       ArrayBufferView* pixels) {
+                                       ArrayBufferView* pixels,
+                                       ExceptionCode& ec) {
+  if (!canvas()->originClean()) {
+    ec = SECURITY_ERR;
+    return;
+  }
   // Validate input parameters.
   unsigned long componentsPerPixel, bytesPerComponent;
   if (!m_context->computeFormatAndTypeParameters(
@@ -2330,6 +2335,7 @@ void WebGLRenderingContext::texImage2D(unsigned target,
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
+  checkOrigin(image);
   texImage2DImpl(target, level, internalformat, format, type,
                  image->cachedImage()->image(), m_unpackFlipY,
                  m_unpackPremultiplyAlpha, ec);
@@ -2347,7 +2353,7 @@ void WebGLRenderingContext::texImage2D(unsigned target,
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
-
+  checkOrigin(canvas);
   texImage2DImpl(target, level, internalformat, format, type,
                  canvas->copiedImage(), m_unpackFlipY, m_unpackPremultiplyAlpha,
                  ec);
@@ -2365,6 +2371,7 @@ PassRefPtr<Image> WebGLRenderingContext::videoFrameToImage(
     m_context->synthesizeGLError(GraphicsContext3D::OUT_OF_MEMORY);
     return 0;
   }
+  checkOrigin(video);
   IntRect destRect(0, 0, size.width(), size.height());
   // FIXME: Turn this into a GPU-GPU texture copy instead of CPU readback.
   video->paintCurrentFrameInContext(buf->context(), destRect);
@@ -2542,6 +2549,7 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
+  checkOrigin(image);
   texSubImage2DImpl(target, level, xoffset, yoffset, format, type,
                     image->cachedImage()->image(), m_unpackFlipY,
                     m_unpackPremultiplyAlpha, ec);
@@ -2560,7 +2568,7 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
-
+  checkOrigin(canvas);
   texSubImage2DImpl(target, level, xoffset, yoffset, format, type,
                     canvas->copiedImage(), m_unpackFlipY,
                     m_unpackPremultiplyAlpha, ec);

@@ -273,7 +273,8 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                   long height,
                   unsigned long format,
                   unsigned long type,
-                  ArrayBufferView* pixels);
+                  ArrayBufferView* pixels,
+                  ExceptionCode&);
   void releaseShaderCompiler();
   void renderbufferStorage(unsigned long target,
                            unsigned long internalformat,
