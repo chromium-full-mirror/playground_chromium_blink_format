@@ -35,13 +35,10 @@
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QStyle>
+#include <QTouchEvent>
 #include <QtDebug>
 #include <WebKit2/WKFrame.h>
 #include <WebKit2/WKRetainPtr.h>
-
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
-#include <QTouchEvent>
-#endif
 
 using namespace WebKit;
 using namespace WebCore;
@@ -210,14 +207,10 @@ void QWKPagePrivate::_q_webActionTriggered(bool checked) {
 }
 #endif  // QT_NO_ACTION
 
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
-
 void QWKPagePrivate::touchEvent(QTouchEvent* event) {
   WebTouchEvent touchEvent = WebEventFactory::createWebTouchEvent(event);
   page->handleTouchEvent(touchEvent);
 }
-
-#endif
 
 QWKPage::QWKPage(WKPageNamespaceRef namespaceRef)
     : d(new QWKPagePrivate(this, namespaceRef)) {

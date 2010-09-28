@@ -75,9 +75,7 @@ class QWKPagePrivate : WebKit::PageClient {
 
   void _q_webActionTriggered(bool checked);
 
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   void touchEvent(QTouchEvent*);
-#endif
 
   QWKPage* q;
 
