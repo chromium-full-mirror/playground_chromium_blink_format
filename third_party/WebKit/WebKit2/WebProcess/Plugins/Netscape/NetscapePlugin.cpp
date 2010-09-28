@@ -406,8 +406,8 @@ void NetscapePlugin::geometryDidChange(const IntRect& frameRect,
   m_frameRect = frameRect;
   m_clipRect = clipRect;
 
-  callSetWindow();
   platformGeometryDidChange();
+  callSetWindow();
 }
 
 void NetscapePlugin::frameDidFinishLoading(uint64_t requestID) {
