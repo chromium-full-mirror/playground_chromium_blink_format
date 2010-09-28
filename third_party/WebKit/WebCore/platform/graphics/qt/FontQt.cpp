@@ -223,12 +223,13 @@ static void drawTextCommon(GraphicsContext* ctx,
   if (ctx->textDrawingMode() & cTextStroke) {
     QPainterPath path;
     path.addText(pt, font, string);
-    p->setPen(textStrokePen);
-    p->strokePath(path, p->pen());
+    p->strokePath(path, textStrokePen);
   }
   if (ctx->textDrawingMode() & cTextFill) {
+    QPen previousPen = p->pen();
     p->setPen(textFillPen);
     p->drawText(pt, string, flags, run.padding());
+    p->setPen(previousPen);
   }
 }
 
