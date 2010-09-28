@@ -128,6 +128,7 @@ class Range : public RefCounted<Range> {
   void textRects(Vector<IntRect>&, bool useSelectionHeight = false);
   // Transform-friendly
   void textQuads(Vector<FloatQuad>&, bool useSelectionHeight = false);
+  void getBorderAndTextQuads(Vector<FloatQuad>&) const;
 
   void nodeChildrenChanged(ContainerNode*);
   void nodeChildrenWillBeRemoved(ContainerNode*);
@@ -169,8 +170,6 @@ class Range : public RefCounted<Range> {
 
   enum ActionType { DELETE_CONTENTS, EXTRACT_CONTENTS, CLONE_CONTENTS };
   PassRefPtr<DocumentFragment> processContents(ActionType, ExceptionCode&);
-
-  void getBorderAndTextQuads(Vector<FloatQuad>&) const;
 
   RefPtr<Document> m_ownerDocument;
   RangeBoundaryPoint m_start;

@@ -3054,7 +3054,7 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
               result->type == TextCheckingTypeCorrection) {
             // We only show the correction panel on the last word.
             Vector<FloatQuad> textQuads;
-            rangeToReplace->textQuads(textQuads);
+            rangeToReplace->getBorderAndTextQuads(textQuads);
             Vector<FloatQuad>::const_iterator end = textQuads.end();
             FloatRect totalBoundingBox;
             for (Vector<FloatQuad>::const_iterator it = textQuads.begin();
