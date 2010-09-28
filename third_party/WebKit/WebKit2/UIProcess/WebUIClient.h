@@ -38,6 +38,7 @@ class IntSize;
 namespace WebKit {
 
 class APIObject;
+class NativeWebKeyboardEvent;
 class WebFrameProxy;
 class WebPageProxy;
 
@@ -60,6 +61,7 @@ class WebUIClient {
   void contentsSizeChanged(WebPageProxy*,
                            const WebCore::IntSize&,
                            WebFrameProxy*);
+  void didNotHandleKeyEvent(WebPageProxy*, const NativeWebKeyboardEvent&);
 
  private:
   WKPageUIClient m_pageUIClient;

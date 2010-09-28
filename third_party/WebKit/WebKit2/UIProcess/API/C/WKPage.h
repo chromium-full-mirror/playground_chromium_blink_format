@@ -28,6 +28,7 @@
 
 #include <WebKit2/WKBase.h>
 #include <WebKit2/WKEvent.h>
+#include <WebKit2/WKNativeEvent.h>
 
 #ifndef __cplusplus
 #include <stdbool.h>
@@ -239,6 +240,9 @@ typedef void (*WKPageContentsSizeChangedCallback)(WKPageRef page,
                                                   int height,
                                                   WKFrameRef frame,
                                                   const void* clientInfo);
+typedef void (*WKPageDidNotHandleKeyEventCallback)(WKPageRef page,
+                                                   WKNativeEventPtr event,
+                                                   const void* clientInfo);
 
 struct WKPageUIClient {
   int version;
@@ -252,6 +256,7 @@ struct WKPageUIClient {
   WKPageSetStatusTextCallback setStatusText;
   WKPageMouseDidMoveOverElementCallback mouseDidMoveOverElement;
   WKPageContentsSizeChangedCallback contentsSizeChanged;
+  WKPageDidNotHandleKeyEventCallback didNotHandleKeyEvent;
 };
 typedef struct WKPageUIClient WKPageUIClient;
 

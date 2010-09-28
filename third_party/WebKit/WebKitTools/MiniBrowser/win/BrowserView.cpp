@@ -99,17 +99,20 @@ void BrowserView::create(RECT webViewRect, BrowserWindow* parentWindow) {
 
   m_webView = WKViewCreate(webViewRect, pageNamespace, parentWindow->window());
 
-  WKPageUIClient uiClient = {0,            /* version */
-                             parentWindow, /* clientInfo */
-                             createNewPage,
-                             showPage,
-                             closePage,
-                             runJavaScriptAlert,
-                             runJavaScriptConfirm,
-                             runJavaScriptPrompt,
-                             setStatusText,
-                             mouseDidMoveOverElement,
-                             contentsSizeChanged};
+  WKPageUIClient uiClient = {
+      0,            /* version */
+      parentWindow, /* clientInfo */
+      createNewPage,
+      showPage,
+      closePage,
+      runJavaScriptAlert,
+      runJavaScriptConfirm,
+      runJavaScriptPrompt,
+      setStatusText,
+      mouseDidMoveOverElement,
+      contentsSizeChanged,
+      0 /* didNotHandleKeyEvent */
+  };
 
   WKPageSetPageUIClient(WKViewGetPage(m_webView), &uiClient);
 }

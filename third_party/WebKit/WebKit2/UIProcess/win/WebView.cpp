@@ -27,6 +27,7 @@
 
 #include "ChunkedUpdateDrawingAreaProxy.h"
 #include "RunLoop.h"
+#include "NativeWebKeyboardEvent.h"
 #include "WebEditCommandProxy.h"
 #include "WebEventFactory.h"
 #include "WebPageNamespace.h"
@@ -355,9 +356,8 @@ LRESULT WebView::onKeyEvent(HWND hWnd,
                             WPARAM wParam,
                             LPARAM lParam,
                             bool& handled) {
-  WebKeyboardEvent keyboardEvent =
-      WebEventFactory::createWebKeyboardEvent(hWnd, message, wParam, lParam);
-  m_page->handleKeyboardEvent(keyboardEvent);
+  m_page->handleKeyboardEvent(
+      NativeWebKeyboardEvent(hWnd, message, wParam, lParam));
 
   handled = true;
   return 0;
