@@ -341,6 +341,13 @@ bool ScrollView::scroll(ScrollDirection direction,
   return false;
 }
 
+void ScrollView::windowResizerRectChanged() {
+  if (platformWidget())
+    return;
+
+  updateScrollbars(scrollOffset());
+}
+
 static const unsigned cMaxUpdateScrollbarsPass = 2;
 
 void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
