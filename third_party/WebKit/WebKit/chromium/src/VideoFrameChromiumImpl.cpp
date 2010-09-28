@@ -114,6 +114,8 @@ const IntSize VideoFrameChromiumImpl::requiredTextureSize(
           return IntSize(stride(plane), height() / 2);
         case vPlane:
           return IntSize(stride(plane), height() / 2);
+        default:
+          break;
       }
   }
   return IntSize();
