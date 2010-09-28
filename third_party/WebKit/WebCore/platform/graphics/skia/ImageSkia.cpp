@@ -149,7 +149,10 @@ static ResamplingMode computeResamplingMode(
 
   // Everything else gets resampled.
   // If the platform context permits high quality interpolation, use it.
-  if (platformContext->interpolationQuality() == InterpolationHigh)
+  // High quality interpolation only enabled for scaling and translation.
+  if (platformContext->interpolationQuality() == InterpolationHigh &&
+      !(platformContext->canvas()->getTotalMatrix().getType() &
+        (SkMatrix::kAffine_Mask | SkMatrix::kPerspective_Mask)))
     return RESAMPLE_AWESOME;
 
   return RESAMPLE_LINEAR;
@@ -182,8 +185,12 @@ static void drawResampledBitmap(SkCanvas& canvas,
                    srcIRect.height() == bitmap.height();
 
   // We will always draw in integer sizes, so round the destination rect.
+  // First we need to apply canvas transformation matrix to get desired size of
+  // resampled image.
+  SkRect destRectTransformed;
+  canvas.getTotalMatrix().mapRect(&destRectTransformed, destRect);
   SkIRect destRectRounded;
-  destRect.round(&destRectRounded);
+  destRectTransformed.round(&destRectRounded);
   SkIRect resizedImageRect =  // Represents the size of the resized image.
       {0, 0, destRectRounded.width(), destRectRounded.height()};
 
@@ -200,7 +207,12 @@ static void drawResampledBitmap(SkCanvas& canvas,
   // Compute the visible portion of our rect.
   SkRect destBitmapSubsetSk;
   ClipRectToCanvas(canvas, destRect, &destBitmapSubsetSk);
-  destBitmapSubsetSk.offset(-destRect.fLeft, -destRect.fTop);
+  // Determine size of resampled image based on clipped destination rect.
+  SkRect destBitmapSubsetSkTransformed;
+  canvas.getTotalMatrix().mapRect(&destBitmapSubsetSkTransformed,
+                                  destBitmapSubsetSk);
+  destBitmapSubsetSkTransformed.offset(-destBitmapSubsetSkTransformed.fLeft,
+                                       -destBitmapSubsetSkTransformed.fTop);
 
   // The matrix inverting, etc. could have introduced rounding error which
   // causes the bounds to be outside of the resized bitmap. We round outward
@@ -208,7 +220,7 @@ static void drawResampledBitmap(SkCanvas& canvas,
   // need, and then clamp to the bitmap bounds so we don't get any invalid
   // data.
   SkIRect destBitmapSubsetSkI;
-  destBitmapSubsetSk.roundOut(&destBitmapSubsetSkI);
+  destBitmapSubsetSkTransformed.roundOut(&destBitmapSubsetSkI);
   if (!destBitmapSubsetSkI.intersect(resizedImageRect))
     return;  // Resized image does not intersect.
 
