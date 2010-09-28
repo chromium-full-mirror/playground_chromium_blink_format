@@ -56,7 +56,7 @@ class PlatformTouchEvent {
 #if PLATFORM(QT)
   PlatformTouchEvent(QTouchEvent*);
 #elif PLATFORM(ANDROID)
-  PlatformTouchEvent(const IntPoint& windowPos,
+  PlatformTouchEvent(const Vector<IntPoint>&,
                      TouchEventType,
                      PlatformTouchPoint::State,
                      int metaState);

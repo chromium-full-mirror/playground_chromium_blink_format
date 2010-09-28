@@ -38,12 +38,14 @@ enum AndroidMetaKeyState {
   META_SYM_ON = 0x04
 };
 
-PlatformTouchEvent::PlatformTouchEvent(const IntPoint& windowPos,
+PlatformTouchEvent::PlatformTouchEvent(const Vector<IntPoint>& windowPoints,
                                        TouchEventType type,
                                        PlatformTouchPoint::State state,
                                        int metaState)
     : m_type(type), m_metaKey(false) {
-  m_touchPoints.append(PlatformTouchPoint(windowPos, state));
+  m_touchPoints.reserveCapacity(windowPoints.size());
+  for (unsigned c = 0; c < windowPoints.size(); c++)
+    m_touchPoints.append(PlatformTouchPoint(windowPos, state));
 
   m_altKey = metaState & META_ALT_ON;
   m_shiftKey = metaState & META_SHIFT_ON;
