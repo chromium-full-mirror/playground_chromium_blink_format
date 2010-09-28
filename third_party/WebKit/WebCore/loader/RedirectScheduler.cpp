@@ -405,7 +405,7 @@ void RedirectScheduler::scheduleFormSubmission(
   bool lockBackForwardList =
       mustLockBackForwardList(m_frame, isUserGesture) ||
       (submission->state()->formSubmissionTrigger() == SubmittedByJavaScript &&
-       m_frame->tree()->parent());
+       m_frame->tree()->parent() && !isUserGesture);
 
   schedule(adoptPtr(new ScheduledFormSubmission(submission, lockBackForwardList,
                                                 duringLoad, isUserGesture)));
