@@ -99,16 +99,12 @@ const IntSize VideoFrameChromiumImpl::requiredTextureSize(
     case RGBA:
       return IntSize(stride(plane), height());
     case YV12:
-      switch (plane) {
-        case yPlane:
-          return IntSize(stride(plane), height());
-        case uPlane:
-          return IntSize(stride(plane), height() / 2);
-        case vPlane:
-          return IntSize(stride(plane), height() / 2);
-        default:
-          break;
-      }
+      if (plane == static_cast<unsigned>(yPlane))
+        return IntSize(stride(plane), height());
+      else if (plane == static_cast<unsigned>(uPlane))
+        return IntSize(stride(plane), height() / 2);
+      else if (plane == static_cast<unsigned>(vPlane))
+        return IntSize(stride(plane), height() / 2);
     default:
       break;
   }
