@@ -90,7 +90,10 @@ void WebProcessConnection::didReceiveMessage(
     CoreIPC::Connection* connection,
     CoreIPC::MessageID messageID,
     CoreIPC::ArgumentDecoder* arguments) {
-  // FIXME: Implement.
+  PluginControllerProxy* pluginControllerProxy =
+      m_pluginControllers.get(arguments->destinationID());
+  pluginControllerProxy->didReceivePluginControllerProxyMessage(
+      connection, messageID, arguments);
 }
 
 CoreIPC::SyncReplyMode WebProcessConnection::didReceiveSyncMessage(
