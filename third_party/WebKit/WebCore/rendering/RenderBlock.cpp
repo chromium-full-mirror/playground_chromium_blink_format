@@ -105,7 +105,7 @@ RenderBlock::MarginInfo::MarginInfo(RenderBlock* block,
 
   m_canCollapseMarginBeforeWithChildren =
       m_canCollapseWithChildren && (beforeBorderPadding == 0) &&
-      block->style()->marginTopCollapse() != MSEPARATE;
+      block->style()->marginBeforeCollapse() != MSEPARATE;
 
   // If any height other than auto is specified in CSS, then we don't collapse
   // our bottom
@@ -118,11 +118,11 @@ RenderBlock::MarginInfo::MarginInfo(RenderBlock* block,
       m_canCollapseWithChildren && (afterBorderPadding == 0) &&
       (block->style()->logicalHeight().isAuto() &&
        block->style()->logicalHeight().value() == 0) &&
-      block->style()->marginBottomCollapse() != MSEPARATE;
+      block->style()->marginAfterCollapse() != MSEPARATE;
 
   m_quirkContainer = block->isTableCell() || block->isBody() ||
-                     block->style()->marginTopCollapse() == MDISCARD ||
-                     block->style()->marginBottomCollapse() == MDISCARD;
+                     block->style()->marginBeforeCollapse() == MDISCARD ||
+                     block->style()->marginAfterCollapse() == MDISCARD;
 
   m_posMargin =
       m_canCollapseMarginBeforeWithChildren ? block->maxTopMargin(true) : 0;
@@ -1167,8 +1167,8 @@ bool RenderBlock::isSelfCollapsingBlock() const {
   // extension
   if (height() > 0 || isTable() || borderAndPaddingHeight() ||
       style()->minHeight().isPositive() ||
-      style()->marginTopCollapse() == MSEPARATE ||
-      style()->marginBottomCollapse() == MSEPARATE)
+      style()->marginBeforeCollapse() == MSEPARATE ||
+      style()->marginAfterCollapse() == MSEPARATE)
     return false;
 
   bool hasAutoHeight = style()->height().isAuto();
@@ -1675,7 +1675,7 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
   // See if the top margin is quirky. We only care if this child has
   // margins that will collapse with us.
   bool topQuirk =
-      child->isTopMarginQuirk() || style()->marginTopCollapse() == MDISCARD;
+      child->isTopMarginQuirk() || style()->marginBeforeCollapse() == MDISCARD;
 
   if (marginInfo.canCollapseWithMarginBefore()) {
     // This child is collapsing with the top of the
@@ -1734,7 +1734,7 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
       // had a specified height of 0 but that actually had subcontent).
       ypos = height() + collapsedTopPos - collapsedTopNeg;
   } else {
-    if (child->style()->marginTopCollapse() == MSEPARATE) {
+    if (child->style()->marginBeforeCollapse() == MSEPARATE) {
       setLogicalHeight(height() + marginInfo.margin() + child->marginTop());
       ypos = height();
     } else if (!marginInfo.atBeforeSideOfBlock() ||
@@ -1753,7 +1753,7 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
 
     if (marginInfo.margin())
       marginInfo.setMarginAfterQuirk(child->isBottomMarginQuirk() ||
-                                     style()->marginBottomCollapse() ==
+                                     style()->marginAfterCollapse() ==
                                          MDISCARD);
   }
 
@@ -2073,7 +2073,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
 
   // Do not allow a collapse if the margin top collapse style is set to
   // SEPARATE.
-  if (child->style()->marginTopCollapse() == MSEPARATE) {
+  if (child->style()->marginBeforeCollapse() == MSEPARATE) {
     marginInfo.setAtBeforeSideOfBlock(false);
     marginInfo.clearMargin();
   }
@@ -2220,7 +2220,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
   // Update our height now that the child has been placed in the correct
   // position.
   setLogicalHeight(height() + child->height());
-  if (child->style()->marginBottomCollapse() == MSEPARATE) {
+  if (child->style()->marginAfterCollapse() == MSEPARATE) {
     setLogicalHeight(height() + child->marginBottom());
     marginInfo.clearMargin();
   }

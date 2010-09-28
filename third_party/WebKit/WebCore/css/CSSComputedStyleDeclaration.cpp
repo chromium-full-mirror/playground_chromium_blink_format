@@ -116,7 +116,7 @@ static const int computedProperties[] = {
 #endif
     CSSPropertyWebkitFontSmoothing, CSSPropertyWebkitHighlight,
     CSSPropertyWebkitLineBreak, CSSPropertyWebkitLineClamp,
-    CSSPropertyWebkitMarginBottomCollapse, CSSPropertyWebkitMarginTopCollapse,
+    CSSPropertyWebkitMarginBeforeCollapse, CSSPropertyWebkitMarginAfterCollapse,
     CSSPropertyWebkitMarqueeDirection, CSSPropertyWebkitMarqueeIncrement,
     CSSPropertyWebkitMarqueeRepetition, CSSPropertyWebkitMarqueeStyle,
     CSSPropertyWebkitMaskAttachment, CSSPropertyWebkitMaskBoxImage,
@@ -1430,10 +1430,10 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       // Not a real style property -- used by the editing engine -- so has no
       // computed value.
       break;
-    case CSSPropertyWebkitMarginBottomCollapse:
-      return CSSPrimitiveValue::create(style->marginBottomCollapse());
-    case CSSPropertyWebkitMarginTopCollapse:
-      return CSSPrimitiveValue::create(style->marginTopCollapse());
+    case CSSPropertyWebkitMarginAfterCollapse:
+      return CSSPrimitiveValue::create(style->marginAfterCollapse());
+    case CSSPropertyWebkitMarginBeforeCollapse:
+      return CSSPrimitiveValue::create(style->marginBeforeCollapse());
     case CSSPropertyWebkitPerspective:
       if (!style->hasPerspective())
         return CSSPrimitiveValue::createIdentifier(CSSValueNone);
