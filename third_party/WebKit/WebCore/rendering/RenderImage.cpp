@@ -383,7 +383,9 @@ bool RenderImage::nodeAtPoint(const HitTestRequest& request,
                               int tx,
                               int ty,
                               HitTestAction hitTestAction) {
-  HitTestResult tempResult(result.point(), result.padding());
+  HitTestResult tempResult(result.point(), result.topPadding(),
+                           result.rightPadding(), result.bottomPadding(),
+                           result.leftPadding());
   bool inside = RenderReplaced::nodeAtPoint(request, tempResult, x, y, tx, ty,
                                             hitTestAction);
 

@@ -273,9 +273,9 @@ bool RenderLineBoxList::hitTest(RenderBoxModelObject* renderer,
   // FIXME: This check is flawed in the following extremely obscure way:
   // if some line in the middle has a huge overflow, it might actually extend
   // below the last line.
-  if (y - result.paddingHeight() >=
+  if (y - result.topPadding() >=
           ty + lastLineBox()->root()->bottomVisibleOverflow() ||
-      y + result.paddingHeight() <
+      y + result.bottomPadding() <
           ty + firstLineBox()->root()->topVisibleOverflow())
     return false;
 
@@ -284,9 +284,8 @@ bool RenderLineBoxList::hitTest(RenderBoxModelObject* renderer,
   // assumptions
   // based off positions of our first line box or our last line box.
   for (InlineFlowBox* curr = lastLineBox(); curr; curr = curr->prevLineBox()) {
-    if (y + result.paddingHeight() >= ty + curr->root()->topVisibleOverflow() &&
-        y - result.paddingHeight() <
-            ty + curr->root()->bottomVisibleOverflow()) {
+    if (y + result.bottomPadding() >= ty + curr->root()->topVisibleOverflow() &&
+        y - result.topPadding() < ty + curr->root()->bottomVisibleOverflow()) {
       bool inside = curr->nodeAtPoint(request, result, x, y, tx, ty);
       if (inside) {
         renderer->updateHitTestResult(result, IntPoint(x - tx, y - ty));

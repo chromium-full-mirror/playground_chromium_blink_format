@@ -68,8 +68,10 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
                            JSValueRef,
                            int x,
                            int y,
-                           unsigned hPadding,
-                           unsigned vPadding,
+                           unsigned top,
+                           unsigned right,
+                           unsigned bottom,
+                           unsigned left,
                            bool ignoreClipping);
   void notifyDone();
   int numberOfPages(float pageWidthInPixels, float pageHeightInPixels);

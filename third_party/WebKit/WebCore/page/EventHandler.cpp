@@ -913,7 +913,8 @@ HitTestResult EventHandler::hitTestResultAtPoint(
     HitTestScrollbars testScrollbars,
     HitTestRequest::HitTestRequestType hitType,
     const IntSize& padding) {
-  HitTestResult result(point, padding);
+  HitTestResult result(point, padding.height(), padding.width(),
+                       padding.height(), padding.width());
   if (!m_frame->contentRenderer())
     return result;
   if (ignoreClipping)
@@ -938,7 +939,9 @@ HitTestResult EventHandler::hitTestResultAtPoint(
             renderWidget->paddingLeft(),
         result.localPoint().y() + view->scrollY() - renderWidget->borderTop() -
             renderWidget->paddingTop());
-    HitTestResult widgetHitTestResult(widgetPoint, padding);
+    HitTestResult widgetHitTestResult(widgetPoint, padding.height(),
+                                      padding.width(), padding.height(),
+                                      padding.width());
     frame->contentRenderer()->layer()->hitTest(HitTestRequest(hitType),
                                                widgetHitTestResult);
     result = widgetHitTestResult;

@@ -1081,8 +1081,10 @@ KURL Document::baseURI() const {
 //   i.e. nodesFromRect(x, y, topSize, rightSize, bottomSize, leftSize);
 PassRefPtr<NodeList> Document::nodesFromRect(int centerX,
                                              int centerY,
-                                             unsigned hPadding,
-                                             unsigned vPadding,
+                                             unsigned topPadding,
+                                             unsigned rightPadding,
+                                             unsigned bottomPadding,
+                                             unsigned leftPadding,
                                              bool ignoreClipping) const {
   // FIXME: Share code between this, elementFromPoint and caretRangeFromPoint.
   if (!renderer())
@@ -1098,7 +1100,6 @@ PassRefPtr<NodeList> Document::nodesFromRect(int centerX,
   IntPoint point =
       roundedIntPoint(FloatPoint(centerX * zoomFactor + view()->scrollX(),
                                  centerY * zoomFactor + view()->scrollY()));
-  IntSize padding(hPadding, vPadding);
 
   int type = HitTestRequest::ReadOnly | HitTestRequest::Active;
 
@@ -1106,7 +1107,9 @@ PassRefPtr<NodeList> Document::nodesFromRect(int centerX,
   // outside of the viewport.
   if (ignoreClipping)
     type |= HitTestRequest::IgnoreClipping;
-  else if (!frameView->visibleContentRect().intersects(IntRect(point, padding)))
+  else if (!frameView->visibleContentRect().intersects(
+               HitTestResult::rectFromPoint(point, topPadding, rightPadding,
+                                            bottomPadding, leftPadding)))
     return 0;
 
   HitTestRequest request(type);
@@ -1114,12 +1117,13 @@ PassRefPtr<NodeList> Document::nodesFromRect(int centerX,
   // Passing a zero padding will trigger a rect hit test, however for the
   // purposes of nodesFromRect,
   // we special handle this case in order to return a valid NodeList.
-  if (padding.isZero()) {
+  if (!topPadding && !rightPadding && !bottomPadding && !leftPadding) {
     HitTestResult result(point);
     return handleZeroPadding(request, result);
   }
 
-  HitTestResult result(point, padding);
+  HitTestResult result(point, topPadding, rightPadding, bottomPadding,
+                       leftPadding);
   renderView()->layer()->hitTest(request, result);
 
   return StaticHashSetNodeList::adopt(result.rectBasedTestResult());

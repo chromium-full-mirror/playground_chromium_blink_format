@@ -765,8 +765,10 @@ _removeOriginAccessWhitelistEntryWithSourceOrigin:(NSString*)sourceOrigin
                  forDocument:(JSValueRef)value
                            x:(int)x
                            y:(int)y
-                    hPadding:(unsigned)hPadding
-                    vPadding:(unsigned)vPadding
+                         top:(unsigned)top
+                       right:(unsigned)right
+                      bottom:(unsigned)bottom
+                        left:(unsigned)left
               ignoreClipping:(BOOL)ignoreClipping;
 @end
 

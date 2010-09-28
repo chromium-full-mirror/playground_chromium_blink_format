@@ -3233,7 +3233,9 @@ RenderLayer* RenderLayer::hitTestLayer(
   if (fgRect.intersects(hitTestArea) && isSelfPaintingLayer()) {
     // Hit test with a temporary HitTestResult, because we only want to commit
     // to 'result' if we know we're frontmost.
-    HitTestResult tempResult(result.point(), result.padding());
+    HitTestResult tempResult(result.point(), result.topPadding(),
+                             result.rightPadding(), result.bottomPadding(),
+                             result.leftPadding());
     if (hitTestContents(request, tempResult, layerBounds, hitTestPoint,
                         HitTestDescendants) &&
         isHitCandidate(this, false, zOffsetForContentsPtr,
@@ -3268,7 +3270,9 @@ RenderLayer* RenderLayer::hitTestLayer(
     return candidateLayer;
 
   if (bgRect.intersects(hitTestArea) && isSelfPaintingLayer()) {
-    HitTestResult tempResult(result.point(), result.padding());
+    HitTestResult tempResult(result.point(), result.topPadding(),
+                             result.rightPadding(), result.bottomPadding(),
+                             result.leftPadding());
     if (hitTestContents(request, tempResult, layerBounds, hitTestPoint,
                         HitTestSelf) &&
         isHitCandidate(this, false, zOffsetForContentsPtr,
@@ -3335,7 +3339,9 @@ RenderLayer* RenderLayer::hitTestList(
   for (int i = list->size() - 1; i >= 0; --i) {
     RenderLayer* childLayer = list->at(i);
     RenderLayer* hitLayer = 0;
-    HitTestResult tempResult(result.point(), result.padding());
+    HitTestResult tempResult(result.point(), result.topPadding(),
+                             result.rightPadding(), result.bottomPadding(),
+                             result.leftPadding());
     if (childLayer->isPaginated())
       hitLayer = hitTestPaginatedChildLayer(
           childLayer, rootLayer, request, tempResult, hitTestRect, hitTestPoint,
