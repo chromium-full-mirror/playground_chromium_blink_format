@@ -130,11 +130,9 @@ void TextInputController::setMarkedText(const QString& string,
                                         int start,
                                         int end) {
   QList<QInputMethodEvent::Attribute> attributes;
-#if QT_VERSION >= 0x040600
   QInputMethodEvent::Attribute selection(QInputMethodEvent::Selection, start,
                                          end, QVariant());
   attributes << selection;
-#endif
   QInputMethodEvent event(string, attributes);
   QApplication::sendEvent(parent(), &event);
 }

@@ -40,12 +40,8 @@ LauncherWindow::LauncherWindow(WindowOptions* data, QGraphicsScene* sharedScene)
       m_currentZoom(100),
       m_view(0),
       m_inspector(0),
-      m_formatMenuAction(0)
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
-      ,
-      m_zoomAnimation(0)
-#endif
-{
+      m_formatMenuAction(0),
+      m_zoomAnimation(0) {
   if (data)
     m_windowOptions = *data;
 
@@ -138,9 +134,7 @@ void LauncherWindow::initializeView() {
   if (url.isValid())
     page()->mainFrame()->load(url);
 
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   m_touchMocking = false;
-#endif
 }
 
 void LauncherWindow::applyPrefs() {
@@ -262,12 +256,10 @@ void LauncherWindow::createChrome() {
   toggleFrameFlattening->setChecked(
       settings->testAttribute(QWebSettings::FrameFlatteningEnabled));
 
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   QAction* touchMockAction = toolsMenu->addAction("Toggle touch mocking", this,
                                                   SLOT(setTouchMocking(bool)));
   touchMockAction->setCheckable(true);
   touchMockAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_T));
-#endif
 
   toolsMenu->addSeparator();
 
@@ -475,7 +467,6 @@ void LauncherWindow::grabZoomKeys(bool grab) {
 #endif
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
 void LauncherWindow::sendTouchEvent() {
   if (m_touchPoints.isEmpty())
     return;
@@ -499,7 +490,6 @@ void LauncherWindow::sendTouchEvent() {
       m_touchPoints[1].state() == Qt::TouchPointReleased)
     m_touchPoints.removeAt(1);
 }
-#endif  // QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
 
 bool LauncherWindow::eventFilter(QObject* obj, QEvent* event) {
   // If click pos is the bottom right corner (square with size defined by
@@ -515,7 +505,6 @@ bool LauncherWindow::eventFilter(QObject* obj, QEvent* event) {
     }
   }
 
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   if (!m_touchMocking)
     return QObject::eventFilter(obj, event);
 
@@ -575,7 +564,6 @@ bool LauncherWindow::eventFilter(QObject* obj, QEvent* event) {
       m_touchPoints.last().setState(Qt::TouchPointStationary);
     }
   }
-#endif  // QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
 
   return false;
 }
@@ -610,7 +598,6 @@ void LauncherWindow::zoomAnimationFinished() {
 }
 
 void LauncherWindow::applyZoom() {
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   if (isGraphicsBased() &&
       page()->settings()->testAttribute(
           QWebSettings::TiledBackingStoreEnabled)) {
@@ -632,7 +619,6 @@ void LauncherWindow::applyZoom() {
     m_zoomAnimation->start();
     return;
   }
-#endif
   page()->mainFrame()->setZoomFactor(qreal(m_currentZoom) / 100.0);
 }
 
@@ -733,9 +719,7 @@ void LauncherWindow::selectElements() {
 }
 
 void LauncherWindow::setTouchMocking(bool on) {
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   m_touchMocking = on;
-#endif
 }
 
 void LauncherWindow::toggleWebView(bool graphicsBased) {
