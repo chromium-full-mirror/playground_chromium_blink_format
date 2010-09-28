@@ -64,6 +64,7 @@
 #include "FloatConversion.h"
 #include "FontFamilyValue.h"
 #include "FontValue.h"
+#include "HashTools.h"
 #include "MediaList.h"
 #include "MediaQueryExp.h"
 #include "Pair.h"
@@ -90,9 +91,6 @@ extern int cssyyparse(void* parser);
 
 using namespace std;
 using namespace WTF;
-
-#include "CSSPropertyNames.cpp"
-#include "CSSValueKeywords.cpp"
 
 namespace WebCore {
 

@@ -65,6 +65,7 @@
 #include "FrameLoader.h"
 #include "FrameTree.h"
 #include "FrameView.h"
+#include "HashTools.h"
 #include "HTMLDocumentParser.h"
 #include "HTMLBodyElement.h"
 #include "HTMLElementFactory.h"
@@ -74,8 +75,6 @@
 #include "Page.h"
 #include "Settings.h"
 #include <wtf/text/CString.h>
-
-#include "DocTypeStrings.cpp"
 
 namespace WebCore {
 
