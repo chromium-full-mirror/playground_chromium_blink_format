@@ -2497,7 +2497,7 @@ static QSize queryDeviceSizeForScreenContainingWidget(const QWidget* widget) {
 */
 
 QWebPage::ViewportConfiguration QWebPage::viewportConfigurationForSize(
-    QSize availableSize) const {
+    const QSize& availableSize) const {
   static int desktopWidth = 980;
   static int deviceDPI = 160;
 
