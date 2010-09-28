@@ -57,6 +57,14 @@ void WebProcessConnection::addPluginControllerProxy(
   m_pluginControllers.set(pluginInstanceID, pluginController.leakPtr());
 }
 
+void WebProcessConnection::destroyPlugin(
+    PluginControllerProxy* pluginController) {
+  pluginController->destroy();
+
+  // This will delete the plug-in controller proxy object.
+  removePluginControllerProxy(pluginController);
+}
+
 void WebProcessConnection::removePluginControllerProxy(
     PluginControllerProxy* pluginController) {
   {
@@ -95,7 +103,14 @@ CoreIPC::SyncReplyMode WebProcessConnection::didReceiveSyncMessage(
 }
 
 void WebProcessConnection::didClose(CoreIPC::Connection*) {
-  // FIXME: Implement.
+  // The web process crashed. Destroy all the plug-in controllers. Destroying
+  // the last plug-in controller
+  // will cause the web process connection itself to be destroyed.
+  Vector<PluginControllerProxy*> pluginControllers;
+  copyValuesToVector(m_pluginControllers, pluginControllers);
+
+  for (size_t i = 0; i < pluginControllers.size(); ++i)
+    destroyPlugin(pluginControllers[i]);
 }
 
 void WebProcessConnection::didReceiveInvalidMessage(CoreIPC::Connection*,

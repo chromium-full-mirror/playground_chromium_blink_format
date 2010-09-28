@@ -41,6 +41,7 @@ class PluginProxy : public Plugin, public CoreIPC::Connection::MessageReceiver {
   ~PluginProxy();
 
   uint64_t pluginInstanceID() const { return m_pluginInstanceID; }
+  void pluginProcessCrashed();
 
  private:
   explicit PluginProxy(PassRefPtr<PluginProcessConnection>);

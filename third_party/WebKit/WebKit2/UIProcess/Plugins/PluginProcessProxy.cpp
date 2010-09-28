@@ -85,6 +85,19 @@ void PluginProcessProxy::didReceiveMessage(
 }
 
 void PluginProcessProxy::didClose(CoreIPC::Connection*) {
+  // The plug-in process must have crashed or exited, send any pending sync
+  // replies we might have.
+  while (!m_pendingConnectionReplies.isEmpty()) {
+    RefPtr<WebProcessProxy> replyWebProcessProxy =
+        m_pendingConnectionReplies.first().first.release();
+    CoreIPC::ArgumentEncoder* reply = m_pendingConnectionReplies.first().second;
+    m_pendingConnectionReplies.removeFirst();
+
+    // FIXME: This is Mac specific.
+    reply->encode(CoreIPC::MachPort(0, MACH_MSG_TYPE_MOVE_SEND));
+    replyWebProcessProxy->connection()->sendSyncReply(reply);
+  }
+
   // Tell the plug-in process manager to forget about this plug-in process
   // proxy.
   m_pluginProcessManager->removePluginProcessProxy(this);
@@ -122,6 +135,7 @@ void PluginProcessProxy::didCreateWebProcessConnection(
   RefPtr<WebProcessProxy> replyWebProcessProxy =
       m_pendingConnectionReplies.first().first.release();
   CoreIPC::ArgumentEncoder* reply = m_pendingConnectionReplies.first().second;
+  m_pendingConnectionReplies.removeFirst();
 
   // FIXME: This is Mac specific.
   reply->encode(CoreIPC::MachPort(machPort.port(), MACH_MSG_TYPE_MOVE_SEND));

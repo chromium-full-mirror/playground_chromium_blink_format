@@ -53,6 +53,8 @@ class WebProcessConnection : public RefCounted<WebProcessConnection>,
   void addPluginControllerProxy(PassOwnPtr<PluginControllerProxy>);
   void removePluginControllerProxy(PluginControllerProxy*);
 
+  void destroyPlugin(PluginControllerProxy*);
+
   // CoreIPC::Connection::Client
   virtual void didReceiveMessage(CoreIPC::Connection*,
                                  CoreIPC::MessageID,
