@@ -75,6 +75,7 @@ class HTMLTextAreaElement : public HTMLTextFormControlElement {
   static String sanitizeUserInputValue(const String&, unsigned maxLength);
   void updateValue() const;
   void setNonDirtyValue(const String&);
+  void setValueCommon(const String&);
 
   virtual bool supportsPlaceholder() const { return true; }
   virtual bool isEmptyValue() const { return value().isEmpty(); }
