@@ -53,7 +53,6 @@ IDBRequest::IDBRequest(ScriptExecutionContext* context,
       m_source(source),
       m_transaction(transaction),
       m_timer(this, &IDBRequest::timerFired),
-      m_aborted(false),
       m_readyState(LOADING) {
   if (transaction)
     IDBPendingTransactionMonitor::removePendingTransaction(transaction);
@@ -77,12 +76,9 @@ IDBRequest::~IDBRequest() {
   // yet fired and there is a transaction waiting to be notified. This is an
   // error.
   ASSERT(!m_transaction);
-  abort();
 }
 
 bool IDBRequest::resetReadyState() {
-  if (m_aborted)
-    return false;
   ASSERT(m_readyState == DONE);
   m_readyState = LOADING;
   return true;
@@ -125,14 +121,6 @@ void IDBRequest::onSuccess(
   scheduleEvent(IDBAny::create(serializedScriptValue), 0);
 }
 
-void IDBRequest::abort() {
-  m_timer.stop();
-  m_aborted = true;
-  m_pendingEvents.clear();
-
-  // FIXME: This should cancel any pending work being done in the backend.
-}
-
 ScriptExecutionContext* IDBRequest::scriptExecutionContext() const {
   return ActiveDOMObject::scriptExecutionContext();
 }
@@ -153,7 +141,6 @@ EventTargetData* IDBRequest::ensureEventTargetData() {
 
 void IDBRequest::timerFired(Timer<IDBRequest>*) {
   ASSERT(m_selfRef);
-  ASSERT(!m_aborted);
   ASSERT(m_pendingEvents.size());
 
   // We need to keep self-referencing ourself, otherwise it's possible we'll be
@@ -190,9 +177,6 @@ void IDBRequest::scheduleEvent(PassRefPtr<IDBAny> result,
                                PassRefPtr<IDBDatabaseError> error) {
   ASSERT(m_readyState < DONE);
   ASSERT(!!m_selfRef == m_timer.isActive());
-
-  if (m_aborted)
-    return;
 
   PendingEvent pendingEvent;
   pendingEvent.m_result = result;

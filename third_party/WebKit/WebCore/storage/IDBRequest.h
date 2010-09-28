@@ -57,7 +57,6 @@ class IDBRequest : public IDBCallbacks,
   virtual ~IDBRequest();
 
   // Defined in the IDL
-  void abort();
   enum ReadyState { LOADING = 1, DONE = 2 };
   unsigned short readyState() const { return m_readyState; }
   DEFINE_ATTRIBUTE_EVENT_LISTENER(success);
@@ -113,7 +112,6 @@ class IDBRequest : public IDBCallbacks,
   RefPtr<IDBRequest>
       m_selfRef;  // This is set to us iff there's an event pending.
 
-  bool m_aborted;
   ReadyState m_readyState;
   EventTargetData m_eventTargetData;
 };
