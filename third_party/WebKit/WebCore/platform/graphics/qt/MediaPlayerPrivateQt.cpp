@@ -85,7 +85,7 @@ MediaPlayer::SupportsType MediaPlayerPrivateQt::supportsType(
 }
 
 MediaPlayerPrivateQt::MediaPlayerPrivateQt(MediaPlayer* player)
-    : m_player(player),
+    : m_webCorePlayer(player),
       m_mediaPlayer(new QMediaPlayer),
       m_mediaPlayerControl(0),
       m_videoItem(new QGraphicsVideoItem),
@@ -159,13 +159,13 @@ void MediaPlayerPrivateQt::commitLoad(const String& url) {
   // We are now loading
   if (m_networkState != MediaPlayer::Loading) {
     m_networkState = MediaPlayer::Loading;
-    m_player->networkStateChanged();
+    m_webCorePlayer->networkStateChanged();
   }
 
   // And we don't have any data yet
   if (m_readyState != MediaPlayer::HaveNothing) {
     m_readyState = MediaPlayer::HaveNothing;
-    m_player->readyStateChanged();
+    m_webCorePlayer->readyStateChanged();
   }
 
   const QUrl rUrl = QUrl(QString(url));
@@ -173,7 +173,7 @@ void MediaPlayerPrivateQt::commitLoad(const String& url) {
 
   // Grab the client media element
   HTMLMediaElement* element =
-      static_cast<HTMLMediaElement*>(m_player->mediaPlayerClient());
+      static_cast<HTMLMediaElement*>(m_webCorePlayer->mediaPlayerClient());
 
   // Construct the media content with a network request if the resource is
   // http[s]
@@ -419,7 +419,7 @@ void MediaPlayerPrivateQt::stateChanged(QMediaPlayer::State state) {
 }
 
 void MediaPlayerPrivateQt::nativeSizeChanged(const QSizeF&) {
-  m_player->sizeChanged();
+  m_webCorePlayer->sizeChanged();
 }
 
 void MediaPlayerPrivateQt::queuedSeekTimeout() {
@@ -437,7 +437,7 @@ void MediaPlayerPrivateQt::queuedSeekTimeout() {
 void MediaPlayerPrivateQt::seekTimeout() {
   // If we haven't heard anything, assume the seek succeeded
   if (m_isSeeking) {
-    m_player->timeChanged();
+    m_webCorePlayer->timeChanged();
     m_isSeeking = false;
   }
 }
@@ -445,7 +445,7 @@ void MediaPlayerPrivateQt::seekTimeout() {
 void MediaPlayerPrivateQt::positionChanged(qint64) {
   // Only propogate this event if we are seeking
   if (m_isSeeking && m_queuedSeek == -1) {
-    m_player->timeChanged();
+    m_webCorePlayer->timeChanged();
     m_isSeeking = false;
   }
 }
@@ -455,15 +455,15 @@ void MediaPlayerPrivateQt::bufferStatusChanged(int) {
 }
 
 void MediaPlayerPrivateQt::durationChanged(qint64) {
-  m_player->durationChanged();
+  m_webCorePlayer->durationChanged();
 }
 
 void MediaPlayerPrivateQt::volumeChanged(int volume) {
-  m_player->volumeChanged(static_cast<float>(volume) / 100.0);
+  m_webCorePlayer->volumeChanged(static_cast<float>(volume) / 100.0);
 }
 
 void MediaPlayerPrivateQt::mutedChanged(bool muted) {
-  m_player->muteChanged(muted);
+  m_webCorePlayer->muteChanged(muted);
 }
 
 void MediaPlayerPrivateQt::updateStates() {
@@ -512,10 +512,10 @@ void MediaPlayerPrivateQt::updateStates() {
   // multiple
   // sources to fail.
   if (m_readyState != oldReadyState)
-    m_player->readyStateChanged();
+    m_webCorePlayer->readyStateChanged();
 
   if (m_networkState != oldNetworkState)
-    m_player->networkStateChanged();
+    m_webCorePlayer->networkStateChanged();
 }
 
 void MediaPlayerPrivateQt::setSize(const IntSize& size) {
@@ -554,14 +554,14 @@ void MediaPlayerPrivateQt::paint(GraphicsContext* context,
 }
 
 void MediaPlayerPrivateQt::repaint() {
-  m_player->repaint();
+  m_webCorePlayer->repaint();
 }
 
 #if USE(ACCELERATED_COMPOSITING)
 void MediaPlayerPrivateQt::acceleratedRenderingStateChanged() {
+  MediaPlayerClient* client = m_webCorePlayer->mediaPlayerClient();
   bool composited =
-      m_player->mediaPlayerClient()->mediaPlayerRenderingCanBeAccelerated(
-          m_player);
+      client->mediaPlayerRenderingCanBeAccelerated(m_webCorePlayer);
   if (composited == m_composited)
     return;
 

@@ -123,7 +123,7 @@ class MediaPlayerPrivateQt : public QObject,
  private:
   MediaPlayerPrivateQt(MediaPlayer*);
 
-  MediaPlayer* m_player;
+  MediaPlayer* m_webCorePlayer;
   QMediaPlayer* m_mediaPlayer;
   QMediaPlayerControl* m_mediaPlayerControl;
   QGraphicsVideoItem* m_videoItem;
