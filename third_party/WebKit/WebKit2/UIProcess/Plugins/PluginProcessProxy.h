@@ -62,6 +62,8 @@ class PluginProcessProxy : CoreIPC::Connection::Client,
  private:
   PluginProcessProxy(PluginProcessManager*, const PluginInfoStore::Plugin&);
 
+  void pluginProcessCrashedOrFailedToLaunch();
+
   // CoreIPC::Connection::Client
   virtual void didReceiveMessage(CoreIPC::Connection*,
                                  CoreIPC::MessageID,

@@ -77,14 +77,7 @@ void PluginProcessProxy::createWebProcessConnection(
   m_connection->send(Messages::PluginProcess::CreateWebProcessConnection(), 0);
 }
 
-void PluginProcessProxy::didReceiveMessage(
-    CoreIPC::Connection* connection,
-    CoreIPC::MessageID messageID,
-    CoreIPC::ArgumentDecoder* arguments) {
-  didReceivePluginProcessProxyMessage(connection, messageID, arguments);
-}
-
-void PluginProcessProxy::didClose(CoreIPC::Connection*) {
+void PluginProcessProxy::pluginProcessCrashedOrFailedToLaunch() {
   // The plug-in process must have crashed or exited, send any pending sync
   // replies we might have.
   while (!m_pendingConnectionReplies.isEmpty()) {
@@ -104,6 +97,17 @@ void PluginProcessProxy::didClose(CoreIPC::Connection*) {
   delete this;
 }
 
+void PluginProcessProxy::didReceiveMessage(
+    CoreIPC::Connection* connection,
+    CoreIPC::MessageID messageID,
+    CoreIPC::ArgumentDecoder* arguments) {
+  didReceivePluginProcessProxyMessage(connection, messageID, arguments);
+}
+
+void PluginProcessProxy::didClose(CoreIPC::Connection*) {
+  pluginProcessCrashedOrFailedToLaunch();
+}
+
 void PluginProcessProxy::didReceiveInvalidMessage(CoreIPC::Connection*,
                                                   CoreIPC::MessageID) {}
 
@@ -111,6 +115,11 @@ void PluginProcessProxy::didFinishLaunching(
     ProcessLauncher*,
     CoreIPC::Connection::Identifier connectionIdentifier) {
   ASSERT(!m_connection);
+
+  if (!connectionIdentifier) {
+    pluginProcessCrashedOrFailedToLaunch();
+    return;
+  }
 
   m_connection = CoreIPC::Connection::createServerConnection(
       connectionIdentifier, this, RunLoop::main());
