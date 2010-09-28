@@ -1566,7 +1566,7 @@ const UChar* WordAwareIterator::characters() const {
 
 // --------
 
-static inline UChar foldQuoteMark(UChar c) {
+static inline UChar foldQuoteMarkOrSoftHyphen(UChar c) {
   switch (c) {
     case hebrewPunctuationGershayim:
     case leftDoubleQuotationMark:
@@ -1576,25 +1576,34 @@ static inline UChar foldQuoteMark(UChar c) {
     case leftSingleQuotationMark:
     case rightSingleQuotationMark:
       return '\'';
+    case softHyphen:
+      // Replace soft hyphen with an ignorable character so that their presence
+      // or absence will
+      // not affect string comparison.
+      return 0;
     default:
       return c;
   }
 }
 
-static inline void foldQuoteMarks(String& s) {
+static inline void foldQuoteMarksAndSoftHyphens(String& s) {
   s.replace(hebrewPunctuationGeresh, '\'');
   s.replace(hebrewPunctuationGershayim, '"');
   s.replace(leftDoubleQuotationMark, '"');
   s.replace(leftSingleQuotationMark, '\'');
   s.replace(rightDoubleQuotationMark, '"');
   s.replace(rightSingleQuotationMark, '\'');
+  // Replace soft hyphen with an ignorable character so that their presence or
+  // absence will
+  // not affect string comparison.
+  s.replace(softHyphen, 0);
 }
 
 #if USE(ICU_UNICODE) && !UCONFIG_NO_COLLATION
 
-static inline void foldQuoteMarks(UChar* data, size_t length) {
+static inline void foldQuoteMarksAndSoftHyphens(UChar* data, size_t length) {
   for (size_t i = 0; i < length; ++i)
-    data[i] = foldQuoteMark(data[i]);
+    data[i] = foldQuoteMarkOrSoftHyphen(data[i]);
 }
 
 static const size_t minimumSearchBufferSize = 8192;
@@ -1853,7 +1862,7 @@ inline SearchBuffer::SearchBuffer(const String& target, bool isCaseSensitive)
   // way
   // to add tailoring on top of the locale-specific tailoring as of this
   // writing.
-  foldQuoteMarks(m_target);
+  foldQuoteMarksAndSoftHyphens(m_target);
 
   size_t targetLength = m_target.length();
   m_buffer.reserveInitialCapacity(
@@ -1905,7 +1914,7 @@ inline size_t SearchBuffer::append(const UChar* characters, size_t length) {
   size_t usableLength = min(m_buffer.capacity() - oldLength, length);
   ASSERT(usableLength);
   m_buffer.append(characters, usableLength);
-  foldQuoteMarks(m_buffer.data() + oldLength, usableLength);
+  foldQuoteMarksAndSoftHyphens(m_buffer.data() + oldLength, usableLength);
   return usableLength;
 }
 
@@ -2045,7 +2054,7 @@ inline SearchBuffer::SearchBuffer(const String& target, bool isCaseSensitive)
       m_cursor(0) {
   ASSERT(!m_target.isEmpty());
   m_target.replace(noBreakSpace, ' ');
-  foldQuoteMarks(m_target);
+  foldQuoteMarksAndSoftHyphens(m_target);
 }
 
 inline SearchBuffer::~SearchBuffer() {}
@@ -2060,7 +2069,7 @@ inline bool SearchBuffer::atBreak() const {
 }
 
 inline void SearchBuffer::append(UChar c, bool isStart) {
-  m_buffer[m_cursor] = c == noBreakSpace ? ' ' : foldQuoteMark(c);
+  m_buffer[m_cursor] = c == noBreakSpace ? ' ' : foldQuoteMarkOrSoftHyphen(c);
   m_isCharacterStartBuffer[m_cursor] = isStart;
   if (++m_cursor == m_target.length()) {
     m_cursor = 0;

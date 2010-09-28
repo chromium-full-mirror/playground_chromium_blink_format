@@ -883,7 +883,7 @@ CounterDirectiveMap& RenderStyle::accessCounterDirectives() {
 }
 
 const AtomicString& RenderStyle::hyphenString() const {
-  ASSERT(hyphens() == HyphensAuto);
+  ASSERT(hyphens() != HyphensNone);
 
   const AtomicString& hyphenationString =
       rareInheritedData.get()->hyphenationString;
