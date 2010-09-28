@@ -33,12 +33,13 @@ QT_END_NAMESPACE
 
 namespace WebCore {
 
-class MediaPlayerPrivate : public QObject, public MediaPlayerPrivateInterface {
+class MediaPlayerPrivateQt : public QObject,
+                             public MediaPlayerPrivateInterface {
   Q_OBJECT
 
  public:
   static MediaPlayerPrivateInterface* create(MediaPlayer* player);
-  ~MediaPlayerPrivate();
+  ~MediaPlayerPrivateQt();
 
   static void registerMediaEngine(MediaEngineRegistrar);
   static void getSupportedTypes(HashSet<String>&);
@@ -120,7 +121,7 @@ class MediaPlayerPrivate : public QObject, public MediaPlayerPrivateInterface {
   void updateStates();
 
  private:
-  MediaPlayerPrivate(MediaPlayer*);
+  MediaPlayerPrivateQt(MediaPlayer*);
 
   MediaPlayer* m_player;
   QMediaPlayer* m_mediaPlayer;

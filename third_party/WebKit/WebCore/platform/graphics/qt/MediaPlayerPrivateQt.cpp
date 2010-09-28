@@ -53,15 +53,15 @@ using namespace WTF;
 
 namespace WebCore {
 
-MediaPlayerPrivateInterface* MediaPlayerPrivate::create(MediaPlayer* player) {
-  return new MediaPlayerPrivate(player);
+MediaPlayerPrivateInterface* MediaPlayerPrivateQt::create(MediaPlayer* player) {
+  return new MediaPlayerPrivateQt(player);
 }
 
-void MediaPlayerPrivate::registerMediaEngine(MediaEngineRegistrar registrar) {
+void MediaPlayerPrivateQt::registerMediaEngine(MediaEngineRegistrar registrar) {
   registrar(create, getSupportedTypes, supportsType);
 }
 
-void MediaPlayerPrivate::getSupportedTypes(HashSet<String>& supported) {
+void MediaPlayerPrivateQt::getSupportedTypes(HashSet<String>& supported) {
   QStringList types = QMediaPlayer::supportedMimeTypes();
 
   for (int i = 0; i < types.size(); i++) {
@@ -71,7 +71,7 @@ void MediaPlayerPrivate::getSupportedTypes(HashSet<String>& supported) {
   }
 }
 
-MediaPlayer::SupportsType MediaPlayerPrivate::supportsType(
+MediaPlayer::SupportsType MediaPlayerPrivateQt::supportsType(
     const String& mime,
     const String& codec) {
   if (!mime.startsWith("audio/") && !mime.startsWith("video/"))
@@ -84,7 +84,7 @@ MediaPlayer::SupportsType MediaPlayerPrivate::supportsType(
   return MediaPlayer::MayBeSupported;
 }
 
-MediaPlayerPrivate::MediaPlayerPrivate(MediaPlayer* player)
+MediaPlayerPrivateQt::MediaPlayerPrivateQt(MediaPlayer* player)
     : m_player(player),
       m_mediaPlayer(new QMediaPlayer),
       m_mediaPlayerControl(0),
@@ -129,20 +129,20 @@ MediaPlayerPrivate::MediaPlayerPrivate(MediaPlayer* player)
   }
 }
 
-MediaPlayerPrivate::~MediaPlayerPrivate() {
+MediaPlayerPrivateQt::~MediaPlayerPrivateQt() {
   delete m_mediaPlayer;
   delete m_videoScene;
 }
 
-bool MediaPlayerPrivate::hasVideo() const {
+bool MediaPlayerPrivateQt::hasVideo() const {
   return m_mediaPlayer->isVideoAvailable();
 }
 
-bool MediaPlayerPrivate::hasAudio() const {
+bool MediaPlayerPrivateQt::hasAudio() const {
   return true;
 }
 
-void MediaPlayerPrivate::load(const String& url) {
+void MediaPlayerPrivateQt::load(const String& url) {
   m_mediaUrl = url;
 
   // QtMultimedia does not have an API to throttle loading
@@ -155,7 +155,7 @@ void MediaPlayerPrivate::load(const String& url) {
   commitLoad(url);
 }
 
-void MediaPlayerPrivate::commitLoad(const String& url) {
+void MediaPlayerPrivateQt::commitLoad(const String& url) {
   // We are now loading
   if (m_networkState != MediaPlayer::Loading) {
     m_networkState = MediaPlayer::Loading;
@@ -237,38 +237,38 @@ void MediaPlayerPrivate::commitLoad(const String& url) {
     m_mediaPlayer->play();
 }
 
-void MediaPlayerPrivate::resumeLoad() {
+void MediaPlayerPrivateQt::resumeLoad() {
   m_delayingLoad = false;
 
   if (!m_mediaUrl.isNull())
     commitLoad(m_mediaUrl);
 }
 
-void MediaPlayerPrivate::cancelLoad() {
+void MediaPlayerPrivateQt::cancelLoad() {
   m_mediaPlayer->setMedia(QMediaContent());
   updateStates();
 }
 
-void MediaPlayerPrivate::prepareToPlay() {
+void MediaPlayerPrivateQt::prepareToPlay() {
   if (m_mediaPlayer->media().isNull() || m_delayingLoad)
     resumeLoad();
 }
 
-void MediaPlayerPrivate::play() {
+void MediaPlayerPrivateQt::play() {
   if (m_mediaPlayer->state() != QMediaPlayer::PlayingState)
     m_mediaPlayer->play();
 }
 
-void MediaPlayerPrivate::pause() {
+void MediaPlayerPrivateQt::pause() {
   if (m_mediaPlayer->state() == QMediaPlayer::PlayingState)
     m_mediaPlayer->pause();
 }
 
-bool MediaPlayerPrivate::paused() const {
+bool MediaPlayerPrivateQt::paused() const {
   return (m_mediaPlayer->state() != QMediaPlayer::PlayingState);
 }
 
-void MediaPlayerPrivate::seek(float position) {
+void MediaPlayerPrivateQt::seek(float position) {
   if (!m_mediaPlayer->isSeekable())
     return;
 
@@ -305,11 +305,11 @@ void MediaPlayerPrivate::seek(float position) {
   }
 }
 
-bool MediaPlayerPrivate::seeking() const {
+bool MediaPlayerPrivateQt::seeking() const {
   return m_isSeeking;
 }
 
-float MediaPlayerPrivate::duration() const {
+float MediaPlayerPrivateQt::duration() const {
   if (m_readyState < MediaPlayer::HaveMetadata)
     return 0.0f;
 
@@ -322,12 +322,12 @@ float MediaPlayerPrivate::duration() const {
   return duration;
 }
 
-float MediaPlayerPrivate::currentTime() const {
+float MediaPlayerPrivateQt::currentTime() const {
   float currentTime = m_mediaPlayer->position() / 1000.0f;
   return currentTime;
 }
 
-PassRefPtr<TimeRanges> MediaPlayerPrivate::buffered() const {
+PassRefPtr<TimeRanges> MediaPlayerPrivateQt::buffered() const {
   RefPtr<TimeRanges> buffered = TimeRanges::create();
 
   if (!m_mediaPlayerControl)
@@ -345,7 +345,7 @@ PassRefPtr<TimeRanges> MediaPlayerPrivate::buffered() const {
   return buffered.release();
 }
 
-float MediaPlayerPrivate::maxTimeSeekable() const {
+float MediaPlayerPrivateQt::maxTimeSeekable() const {
   if (!m_mediaPlayerControl)
     return 0;
 
@@ -354,7 +354,7 @@ float MediaPlayerPrivate::maxTimeSeekable() const {
          1000.0f;
 }
 
-unsigned MediaPlayerPrivate::bytesLoaded() const {
+unsigned MediaPlayerPrivateQt::bytesLoaded() const {
   QLatin1String bytesLoadedKey("bytes-loaded");
   if (m_mediaPlayer->availableExtendedMetaData().contains(bytesLoadedKey))
     return m_mediaPlayer->extendedMetaData(bytesLoadedKey).toInt();
@@ -362,67 +362,67 @@ unsigned MediaPlayerPrivate::bytesLoaded() const {
   return m_mediaPlayer->bufferStatus();
 }
 
-unsigned MediaPlayerPrivate::totalBytes() const {
+unsigned MediaPlayerPrivateQt::totalBytes() const {
   if (m_mediaPlayer->availableMetaData().contains(QtMultimediaKit::Size))
     return m_mediaPlayer->metaData(QtMultimediaKit::Size).toInt();
 
   return 100;
 }
 
-void MediaPlayerPrivate::setPreload(MediaPlayer::Preload preload) {
+void MediaPlayerPrivateQt::setPreload(MediaPlayer::Preload preload) {
   m_preload = preload;
   if (m_delayingLoad && m_preload != MediaPlayer::None)
     resumeLoad();
 }
 
-void MediaPlayerPrivate::setRate(float rate) {
+void MediaPlayerPrivateQt::setRate(float rate) {
   m_mediaPlayer->setPlaybackRate(rate);
 }
 
-void MediaPlayerPrivate::setVolume(float volume) {
+void MediaPlayerPrivateQt::setVolume(float volume) {
   m_mediaPlayer->setVolume(static_cast<int>(volume * 100.0));
 }
 
-bool MediaPlayerPrivate::supportsMuting() const {
+bool MediaPlayerPrivateQt::supportsMuting() const {
   return true;
 }
 
-void MediaPlayerPrivate::setMuted(bool muted) {
+void MediaPlayerPrivateQt::setMuted(bool muted) {
   m_mediaPlayer->setMuted(muted);
 }
 
-MediaPlayer::NetworkState MediaPlayerPrivate::networkState() const {
+MediaPlayer::NetworkState MediaPlayerPrivateQt::networkState() const {
   return m_networkState;
 }
 
-MediaPlayer::ReadyState MediaPlayerPrivate::readyState() const {
+MediaPlayer::ReadyState MediaPlayerPrivateQt::readyState() const {
   return m_readyState;
 }
 
-void MediaPlayerPrivate::setVisible(bool visible) {
+void MediaPlayerPrivateQt::setVisible(bool visible) {
   m_isVisible = visible;
 }
 
-void MediaPlayerPrivate::mediaStatusChanged(QMediaPlayer::MediaStatus) {
+void MediaPlayerPrivateQt::mediaStatusChanged(QMediaPlayer::MediaStatus) {
   updateStates();
 }
 
-void MediaPlayerPrivate::handleError(QMediaPlayer::Error) {
+void MediaPlayerPrivateQt::handleError(QMediaPlayer::Error) {
   updateStates();
 }
 
-void MediaPlayerPrivate::stateChanged(QMediaPlayer::State state) {
+void MediaPlayerPrivateQt::stateChanged(QMediaPlayer::State state) {
   if (state != QMediaPlayer::PlayingState && m_isSeeking && m_queuedSeek >= 0) {
     m_mediaPlayer->setPosition(m_queuedSeek);
     m_queuedSeek = -1;
   }
 }
 
-void MediaPlayerPrivate::nativeSizeChanged(const QSizeF&) {
+void MediaPlayerPrivateQt::nativeSizeChanged(const QSizeF&) {
   m_player->sizeChanged();
 }
 
-void MediaPlayerPrivate::queuedSeekTimeout() {
+void MediaPlayerPrivateQt::queuedSeekTimeout() {
   // If we haven't heard anything, assume the player is now paused
   // and we can attempt the seek
   if (m_isSeeking && m_queuedSeek >= 0) {
@@ -434,7 +434,7 @@ void MediaPlayerPrivate::queuedSeekTimeout() {
   }
 }
 
-void MediaPlayerPrivate::seekTimeout() {
+void MediaPlayerPrivateQt::seekTimeout() {
   // If we haven't heard anything, assume the seek succeeded
   if (m_isSeeking) {
     m_player->timeChanged();
@@ -442,7 +442,7 @@ void MediaPlayerPrivate::seekTimeout() {
   }
 }
 
-void MediaPlayerPrivate::positionChanged(qint64) {
+void MediaPlayerPrivateQt::positionChanged(qint64) {
   // Only propogate this event if we are seeking
   if (m_isSeeking && m_queuedSeek == -1) {
     m_player->timeChanged();
@@ -450,23 +450,23 @@ void MediaPlayerPrivate::positionChanged(qint64) {
   }
 }
 
-void MediaPlayerPrivate::bufferStatusChanged(int) {
+void MediaPlayerPrivateQt::bufferStatusChanged(int) {
   notImplemented();
 }
 
-void MediaPlayerPrivate::durationChanged(qint64) {
+void MediaPlayerPrivateQt::durationChanged(qint64) {
   m_player->durationChanged();
 }
 
-void MediaPlayerPrivate::volumeChanged(int volume) {
+void MediaPlayerPrivateQt::volumeChanged(int volume) {
   m_player->volumeChanged(static_cast<float>(volume) / 100.0);
 }
 
-void MediaPlayerPrivate::mutedChanged(bool muted) {
+void MediaPlayerPrivateQt::mutedChanged(bool muted) {
   m_player->muteChanged(muted);
 }
 
-void MediaPlayerPrivate::updateStates() {
+void MediaPlayerPrivateQt::updateStates() {
   // Store the old states so that we can detect a change and raise change events
   MediaPlayer::NetworkState oldNetworkState = m_networkState;
   MediaPlayer::ReadyState oldReadyState = m_readyState;
@@ -518,7 +518,7 @@ void MediaPlayerPrivate::updateStates() {
     m_player->networkStateChanged();
 }
 
-void MediaPlayerPrivate::setSize(const IntSize& size) {
+void MediaPlayerPrivateQt::setSize(const IntSize& size) {
   if (size == m_currentSize)
     return;
 
@@ -526,14 +526,15 @@ void MediaPlayerPrivate::setSize(const IntSize& size) {
   m_videoItem->setSize(QSizeF(QSize(size)));
 }
 
-IntSize MediaPlayerPrivate::naturalSize() const {
+IntSize MediaPlayerPrivateQt::naturalSize() const {
   if (!hasVideo() || m_readyState < MediaPlayer::HaveMetadata)
     return IntSize();
 
   return IntSize(m_videoItem->nativeSize().toSize());
 }
 
-void MediaPlayerPrivate::paint(GraphicsContext* context, const IntRect& rect) {
+void MediaPlayerPrivateQt::paint(GraphicsContext* context,
+                                 const IntRect& rect) {
 #if USE(ACCELERATED_COMPOSITING)
   if (m_composited)
     return;
@@ -552,12 +553,12 @@ void MediaPlayerPrivate::paint(GraphicsContext* context, const IntRect& rect) {
                        m_videoItem->sceneBoundingRect());
 }
 
-void MediaPlayerPrivate::repaint() {
+void MediaPlayerPrivateQt::repaint() {
   m_player->repaint();
 }
 
 #if USE(ACCELERATED_COMPOSITING)
-void MediaPlayerPrivate::acceleratedRenderingStateChanged() {
+void MediaPlayerPrivateQt::acceleratedRenderingStateChanged() {
   bool composited =
       m_player->mediaPlayerClient()->mediaPlayerRenderingCanBeAccelerated(
           m_player);
@@ -571,15 +572,15 @@ void MediaPlayerPrivate::acceleratedRenderingStateChanged() {
     m_videoScene->addItem(m_videoItem);
 }
 
-PlatformLayer* MediaPlayerPrivate::platformLayer() const {
+PlatformLayer* MediaPlayerPrivateQt::platformLayer() const {
   return m_composited ? m_videoItem : 0;
 }
 #endif
 
-PlatformMedia MediaPlayerPrivate::platformMedia() const {
+PlatformMedia MediaPlayerPrivateQt::platformMedia() const {
   PlatformMedia pm;
   pm.type = PlatformMedia::QtMediaPlayerType;
-  pm.media.qtMediaPlayer = const_cast<MediaPlayerPrivate*>(this);
+  pm.media.qtMediaPlayer = const_cast<MediaPlayerPrivateQt*>(this);
   return pm;
 }
 
