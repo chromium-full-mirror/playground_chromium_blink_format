@@ -34,6 +34,8 @@
 
 namespace WebKit {
 
+class PluginControllerProxy;
+
 // A connection from a plug-in process to a web process.
 
 class WebProcessConnection : public RefCounted<WebProcessConnection>,
@@ -44,6 +46,9 @@ class WebProcessConnection : public RefCounted<WebProcessConnection>,
   virtual ~WebProcessConnection();
 
   CoreIPC::Connection* connection() const { return m_connection.get(); }
+
+  void addPluginControllerProxy(PluginControllerProxy*);
+  void removePluginControllerProxy(PluginControllerProxy*);
 
  private:
   WebProcessConnection(CoreIPC::Connection::Identifier);
@@ -72,6 +77,8 @@ class WebProcessConnection : public RefCounted<WebProcessConnection>,
                     bool& result);
 
   RefPtr<CoreIPC::Connection> m_connection;
+
+  HashMap<uint64_t, PluginControllerProxy*> m_pluginControllers;
 };
 
 }  // namespace WebKit
