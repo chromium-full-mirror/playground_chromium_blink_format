@@ -2134,8 +2134,6 @@ void WebViewImpl::setRootGraphicsLayer(WebCore::PlatformLayer* layer) {
 }
 
 void WebViewImpl::setRootLayerNeedsDisplay() {
-  if (m_layerRenderer)
-    m_layerRenderer->setNeedsDisplay();
   m_client->scheduleComposite();
   // FIXME: To avoid breaking the downstream Chrome render_widget while
   // downstream
@@ -2178,7 +2176,7 @@ void WebViewImpl::scrollRootLayerRect(const IntSize& scrollDelta,
   // rects allows us to intermix invalidates with scrolls.
   IntRect damagedContentsRect;
   if (scrollDelta.width()) {
-    float dx = static_cast<float>(scrollDelta.width());
+    int dx = scrollDelta.width();
     damagedContentsRect.setY(contentRect.y());
     damagedContentsRect.setHeight(contentRect.height());
     if (dx > 0) {
@@ -2189,7 +2187,7 @@ void WebViewImpl::scrollRootLayerRect(const IntSize& scrollDelta,
       damagedContentsRect.setWidth(-dx);
     }
   } else {
-    float dy = static_cast<float>(scrollDelta.height());
+    int dy = scrollDelta.height();
     damagedContentsRect.setX(contentRect.x());
     damagedContentsRect.setWidth(contentRect.width());
     if (dy > 0) {
@@ -2201,7 +2199,7 @@ void WebViewImpl::scrollRootLayerRect(const IntSize& scrollDelta,
     }
   }
 
-  m_scrollDamage.unite(damagedContentsRect);
+  m_rootLayerScrollDamage.unite(damagedContentsRect);
   setRootLayerNeedsDisplay();
 }
 
@@ -2221,11 +2219,12 @@ void WebViewImpl::invalidateRootLayerRect(const IntRect& rect) {
 
   // rect is in viewport space. Convert to content space
   // so that invalidations and scroll invalidations play well with one-another.
-  FloatRect contentRect = view->windowToContents(rect);
+  IntRect contentRect = view->windowToContents(rect);
 
-  // FIXME: add a smarter damage aggregation logic? Right now, LayerChromium
-  // does simple union-ing.
-  m_layerRenderer->rootLayer()->setNeedsDisplay(contentRect);
+  // FIXME: add a smarter damage aggregation logic and/or unify with
+  // LayerChromium's damage logic
+  m_rootLayerDirtyRect.unite(contentRect);
+  setRootLayerNeedsDisplay();
 }
 
 void WebViewImpl::setIsAcceleratedCompositingActive(bool active) {
@@ -2331,14 +2330,14 @@ void WebViewImpl::doComposite() {
       visibleRect, contentRect, IntPoint(view->scrollX(), view->scrollY()));
 
   // Draw the contents of the root layer.
-  Vector<FloatRect> damageRects;
-  damageRects.append(m_scrollDamage);
-  damageRects.append(m_layerRenderer->rootLayer()->dirtyRect());
+  Vector<IntRect> damageRects;
+  damageRects.append(m_rootLayerScrollDamage);
+  damageRects.append(m_rootLayerDirtyRect);
   for (size_t i = 0; i < damageRects.size(); ++i) {
     // The damage rect for the root layer is in content space [e.g. unscrolled].
     // Convert from content space to viewPort space.
-    const FloatRect damagedContentRect = damageRects[i];
-    IntRect damagedRect = view->contentsToWindow(IntRect(damagedContentRect));
+    const IntRect damagedContentRect = damageRects[i];
+    IntRect damagedRect = view->contentsToWindow(damagedContentRect);
 
     // Intersect this rectangle with the viewPort.
     damagedRect.intersect(viewPort);
@@ -2349,8 +2348,8 @@ void WebViewImpl::doComposite() {
       m_layerRenderer->updateRootLayerTextureRect(damagedRect);
     }
   }
-  m_layerRenderer->rootLayer()->resetNeedsDisplay();
-  m_scrollDamage = WebRect();
+  m_rootLayerDirtyRect = IntRect();
+  m_rootLayerScrollDamage = IntRect();
 
   // Draw the actual layers...
   m_layerRenderer->drawLayers(visibleRect, contentRect);
