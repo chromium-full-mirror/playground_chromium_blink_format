@@ -187,7 +187,7 @@ VideoLayerChromium::VideoLayerChromium(GraphicsLayerChromium* owner,
       m_skipsDraw(true),
       m_frameFormat(VideoFrameChromium::Invalid),
       m_provider(provider) {
-  for (int plane = 0; plane < VideoFrameChromium::maxPlanes; plane++) {
+  for (unsigned plane = 0; plane < VideoFrameChromium::maxPlanes; plane++) {
     m_textures[plane] = 0;
     m_textureSizes[plane] = IntSize();
     m_frameSizes[plane] = IntSize();
@@ -196,7 +196,7 @@ VideoLayerChromium::VideoLayerChromium(GraphicsLayerChromium* owner,
 
 VideoLayerChromium::~VideoLayerChromium() {
   GraphicsContext3D* context = layerRendererContext();
-  for (int plane = 0; plane < VideoFrameChromium::maxPlanes; plane++) {
+  for (unsigned plane = 0; plane < VideoFrameChromium::maxPlanes; plane++) {
     if (m_textures[plane])
       GLC(context, context->deleteTexture(m_textures[plane]));
   }
@@ -240,7 +240,7 @@ void VideoLayerChromium::updateContents() {
   }
 
   // Update texture planes.
-  for (int plane = 0; plane < frame->planes(); plane++) {
+  for (unsigned plane = 0; plane < frame->planes(); plane++) {
     ASSERT(frame->requiredTextureSize(plane) == m_textureSizes[plane]);
     updateTexture(context, m_textures[plane], frame->requiredTextureSize(plane),
                   textureFormat, frame->data(plane));
@@ -257,6 +257,8 @@ unsigned VideoLayerChromium::determineTextureFormat(VideoFrameChromium* frame) {
       return GraphicsContext3D::LUMINANCE;
     case VideoFrameChromium::RGBA:
       return GraphicsContext3D::RGBA;
+    default:
+      break;
   }
   return GraphicsContext3D::INVALID_VALUE;
 }
@@ -267,7 +269,7 @@ bool VideoLayerChromium::allocateTexturesIfNeeded(GraphicsContext3D* context,
   ASSERT(context);
   ASSERT(frame);
 
-  for (int plane = 0; plane < frame->planes(); plane++) {
+  for (unsigned plane = 0; plane < frame->planes(); plane++) {
     IntSize planeTextureSize = frame->requiredTextureSize(plane);
 
     // If the renderer cannot handle this large of a texture, return false.
