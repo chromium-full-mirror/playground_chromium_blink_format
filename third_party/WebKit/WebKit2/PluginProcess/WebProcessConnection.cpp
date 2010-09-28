@@ -50,16 +50,22 @@ WebProcessConnection::WebProcessConnection(
 }
 
 void WebProcessConnection::addPluginControllerProxy(
-    PluginControllerProxy* pluginController) {
-  ASSERT(!m_pluginControllers.contains(pluginController->pluginInstanceID()));
-  m_pluginControllers.set(pluginController->pluginInstanceID(),
-                          pluginController);
+    PassOwnPtr<PluginControllerProxy> pluginController) {
+  uint64_t pluginInstanceID = pluginController->pluginInstanceID();
+
+  ASSERT(!m_pluginControllers.contains(pluginInstanceID));
+  m_pluginControllers.set(pluginInstanceID, pluginController.leakPtr());
 }
 
 void WebProcessConnection::removePluginControllerProxy(
     PluginControllerProxy* pluginController) {
-  ASSERT(m_pluginControllers.contains(pluginController->pluginInstanceID()));
-  m_pluginControllers.remove(pluginController->pluginInstanceID());
+  {
+    ASSERT(m_pluginControllers.contains(pluginController->pluginInstanceID()));
+
+    OwnPtr<PluginControllerProxy> pluginControllerOwnPtr = adoptPtr(
+        m_pluginControllers.take(pluginController->pluginInstanceID()));
+    ASSERT(pluginControllerOwnPtr == pluginController);
+  }
 
   if (!m_pluginControllers.isEmpty())
     return;
@@ -98,8 +104,28 @@ void WebProcessConnection::didReceiveInvalidMessage(CoreIPC::Connection*,
 }
 
 void WebProcessConnection::createPlugin(uint64_t pluginInstanceID,
-                                        const Plugin::Parameters&,
-                                        bool& result) {}
+                                        const Plugin::Parameters& parameters,
+                                        bool& result) {
+  OwnPtr<PluginControllerProxy> pluginControllerProxy =
+      PluginControllerProxy::create(this, pluginInstanceID);
+
+  PluginControllerProxy* pluginControllerProxyPtr = pluginControllerProxy.get();
+
+  // Make sure to add the proxy to the map before initializing it, since the
+  // plug-in might call out to the web process from
+  // its NPP_New function. This will hand over ownership of the proxy to the web
+  // process connection.
+  addPluginControllerProxy(pluginControllerProxy.release());
+
+  // Now try to initialize the plug-in.
+  result = pluginControllerProxyPtr->initialize(parameters);
+
+  if (!result) {
+    // We failed to initialize, remove the plug-in controller. This could cause
+    // us to be deleted.
+    removePluginControllerProxy(pluginControllerProxyPtr);
+  }
+}
 
 }  // namespace WebKit
 
