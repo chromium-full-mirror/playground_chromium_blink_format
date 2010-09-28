@@ -76,7 +76,7 @@ void PluginProcessConnection::didReceiveMessage(
 
 void PluginProcessConnection::didClose(CoreIPC::Connection*) {
   // The plug-in process must have crashed.
-  for (HashMap<uint64_t, PluginProxy *>::const_iterator
+  for (HashMap<uint64_t, PluginProxy *>::const_iterator::Values
            it = m_plugins.begin().values(),
            end = m_plugins.end().values();
        it != end; ++it) {

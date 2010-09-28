@@ -52,13 +52,9 @@ PluginProxy::PluginProxy(PassRefPtr<PluginProcessConnection> connection)
       m_pluginController(0),
       m_isStarted(false)
 
-{
-  m_connection->addPluginProxy(this);
-}
+{}
 
-PluginProxy::~PluginProxy() {
-  m_connection->removePluginProxy(this);
-}
+PluginProxy::~PluginProxy() {}
 
 void PluginProxy::pluginProcessCrashed() {
   if (m_pluginController)
@@ -86,13 +82,21 @@ bool PluginProxy::initialize(PluginController* pluginController,
     return false;
 
   m_isStarted = true;
+  m_connection->addPluginProxy(this);
+
   return true;
 }
 
 void PluginProxy::destroy() {
-  m_pluginController = 0;
+  ASSERT(m_isStarted);
 
-  notImplemented();
+  m_connection->connection()->sendSync(
+      Messages::WebProcessConnection::DestroyPlugin(m_pluginInstanceID),
+      Messages::WebProcessConnection::DestroyPlugin::Reply(), 0,
+      CoreIPC::Connection::NoTimeout);
+
+  m_isStarted = false;
+  m_connection->removePluginProxy(this);
 }
 
 void PluginProxy::paint(GraphicsContext*, const IntRect& dirtyRect) {
