@@ -117,6 +117,8 @@ const IntSize VideoFrameChromiumImpl::requiredTextureSize(
         default:
           break;
       }
+    default:
+      break;
   }
   return IntSize();
 }
