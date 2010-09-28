@@ -127,9 +127,9 @@ void ScrollbarThemeChromiumLinux::paintButton(GraphicsContext* gc,
   if (((direction == PlatformThemeChromiumGtk::West ||
         direction == PlatformThemeChromiumGtk::North) &&
        scrollbar->currentPos()) ||
-      (direction == PlatformThemeChromiumGtk::East ||
-       direction == PlatformThemeChromiumGtk::South) &&
-          scrollbar->currentPos() != scrollbar->maximum())
+      ((direction == PlatformThemeChromiumGtk::East ||
+        direction == PlatformThemeChromiumGtk::South) &&
+       scrollbar->currentPos() != scrollbar->maximum()))
     states |= EnabledState;
 
   if (states & EnabledState) {
