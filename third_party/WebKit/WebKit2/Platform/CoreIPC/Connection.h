@@ -113,11 +113,19 @@ class Connection : public ThreadSafeShared<Connection> {
   bool send(const T& message, uint64_t destinationID);
 
   static const unsigned long long NoTimeout = 10000000000ULL;
+  // FIXME: This variant of send is deprecated, all clients should move to the
+  // overload that takes a message.
   template <typename E, typename T, typename U>
   bool sendSync(E messageID,
                 uint64_t destinationID,
                 const T& arguments,
                 const U& reply,
+                double timeout);
+
+  template <typename T>
+  bool sendSync(const T& message,
+                const typename T::Reply& reply,
+                uint64_t destinationID,
                 double timeout);
 
   template <typename E>
@@ -274,6 +282,32 @@ inline bool Connection::sendSync(E messageID,
 
   // Decode the reply.
   return replyDecoder->decode(const_cast<U&>(reply));
+}
+
+template <typename T>
+bool Connection::sendSync(const T& message,
+                          const typename T::Reply& reply,
+                          uint64_t destinationID,
+                          double timeout) {
+  OwnPtr<ArgumentEncoder> argumentEncoder(new ArgumentEncoder(destinationID));
+
+  uint64_t syncRequestID = ++m_syncRequestID;
+
+  // Encode the sync request ID.
+  argumentEncoder->encode(syncRequestID);
+
+  // Encode the rest of the input arguments.
+  argumentEncoder->encode(message);
+
+  // Now send the message and wait for a reply.
+  OwnPtr<ArgumentDecoder> replyDecoder =
+      sendSyncMessage(MessageID(T::messageID, MessageID::SyncMessage),
+                      syncRequestID, argumentEncoder.release(), timeout);
+  if (!replyDecoder)
+    return false;
+
+  // Decode the reply.
+  return replyDecoder->decode(const_cast<typename T::Reply&>(reply));
 }
 
 template <typename E>

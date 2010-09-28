@@ -57,8 +57,8 @@ CoreIPC::SyncReplyMode WebProcessConnection::didReceiveSyncMessage(
     CoreIPC::MessageID messageID,
     CoreIPC::ArgumentDecoder* arguments,
     CoreIPC::ArgumentEncoder* reply) {
-  // FIXME: Implement.
-  return CoreIPC::AutomaticReply;
+  return didReceiveSyncWebProcessConnectionMessage(connection, messageID,
+                                                   arguments, reply);
 }
 
 void WebProcessConnection::didClose(CoreIPC::Connection*) {
