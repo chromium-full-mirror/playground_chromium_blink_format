@@ -127,7 +127,7 @@ RenderBlock::MarginInfo::MarginInfo(RenderBlock* block,
   m_posMargin =
       m_canCollapseMarginBeforeWithChildren ? block->maxTopMargin(true) : 0;
   m_negMargin =
-      m_canCollapseMarginAfterWithChildren ? block->maxTopMargin(false) : 0;
+      m_canCollapseMarginBeforeWithChildren ? block->maxTopMargin(false) : 0;
 }
 
 // -------------------------------------------------------------------------------------------------------
