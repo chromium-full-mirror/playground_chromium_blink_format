@@ -49,6 +49,12 @@ WKBackForwardListItemRef WKBackForwardListGetForwardItem(
   return toRef(toWK(listRef)->forwardItem());
 }
 
+WKBackForwardListItemRef WKBackForwardListGetItemAtIndex(
+    WKBackForwardListRef listRef,
+    int index) {
+  return toRef(toWK(listRef)->itemAtIndex(index));
+}
+
 unsigned WKBackForwardListGetBackListCount(WKBackForwardListRef listRef) {
   return toWK(listRef)->backListCount();
 }
