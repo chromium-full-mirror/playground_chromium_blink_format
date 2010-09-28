@@ -20,6 +20,8 @@
 #include "config.h"
 #include "GOwnPtr.h"
 
+#if ENABLE(GLIB_SUPPORT)
+
 #include <gio/gio.h>
 #include <glib.h>
 
@@ -66,3 +68,5 @@ void freeOwnedGPtr<GFile>(GFile* ptr) {
     g_object_unref(ptr);
 }
 }  // namespace WTF
+
+#endif  // ENABLE(GLIB_SUPPORT)

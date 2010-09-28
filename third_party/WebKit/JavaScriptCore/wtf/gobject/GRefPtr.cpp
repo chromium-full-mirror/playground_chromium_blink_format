@@ -20,6 +20,8 @@
 #include "config.h"
 #include "GRefPtr.h"
 
+#if ENABLE(GLIB_SUPPORT)
+
 #include <glib.h>
 
 namespace WTF {
@@ -78,3 +80,5 @@ void derefPlatformPtr(GSource* ptr) {
 }
 
 }  // namespace WTF
+
+#endif  // ENABLE(GLIB_SUPPORT)

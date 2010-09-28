@@ -23,6 +23,8 @@
 #ifndef WTF_GRefPtr_h
 #define WTF_GRefPtr_h
 
+#if ENABLE(GLIB_SUPPORT)
+
 #include "AlwaysInline.h"
 #include "PlatformRefPtr.h"
 #include <algorithm>
@@ -59,5 +61,7 @@ inline void derefPlatformPtr(T* ptr) {
 }
 
 }  // namespace WTF
+
+#endif  // ENABLE(GLIB_SUPPORT)
 
 #endif  // WTF_GRefPtr_h
