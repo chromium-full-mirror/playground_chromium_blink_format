@@ -421,6 +421,22 @@ static bool fontWeightIsBold(CSSStyleDeclaration* style) {
   return false;          // Make compiler happy
 }
 
+static int getTextAlignment(CSSStyleDeclaration* style) {
+  int textAlign = getIdentifierValue(style, CSSPropertyTextAlign);
+  switch (textAlign) {
+    case CSSValueCenter:
+    case CSSValueWebkitCenter:
+      return CSSValueCenter;
+    case CSSValueLeft:
+    case CSSValueWebkitLeft:
+      return CSSValueLeft;
+    case CSSValueRight:
+    case CSSValueWebkitRight:
+      return CSSValueRight;
+  }
+  return CSSValueInvalid;
+}
+
 RefPtr<CSSMutableStyleDeclaration> getPropertiesNotIn(
     CSSStyleDeclaration* styleWithRedundantProperties,
     CSSStyleDeclaration* baseStyle) {
@@ -442,6 +458,9 @@ RefPtr<CSSMutableStyleDeclaration> getPropertiesNotIn(
 
   if (getRGBAFontColor(result.get()) == getRGBAFontColor(baseStyle))
     result->removeProperty(CSSPropertyColor);
+
+  if (getTextAlignment(result.get()) == getTextAlignment(baseStyle))
+    result->removeProperty(CSSPropertyTextAlign);
 
   return result;
 }
