@@ -32,6 +32,7 @@
 #include "HTMLFormElement.h"
 #include "MIMETypeRegistry.h"
 #include "NotImplemented.h"
+#include "Page.h"
 #include "PluginDatabase.h"
 #include "RenderPart.h"
 #include "WebView.h"
@@ -185,7 +186,7 @@ PassRefPtr<Frame> FrameLoaderClientWinCE::createFrame(
                                 allowsScrolling, marginWidth, marginHeight);
 }
 
-void FrameLoaderClientWinCE::didTransferChildFrameToNewDocument() {}
+void FrameLoaderClientWinCE::didTransferChildFrameToNewDocument(Page*) {}
 
 void FrameLoaderClientWinCE::redirectDataToPlugin(Widget* pluginWidget) {
   ASSERT(!m_pluginView);

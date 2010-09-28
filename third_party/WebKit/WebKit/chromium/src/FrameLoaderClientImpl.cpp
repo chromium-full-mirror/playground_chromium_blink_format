@@ -1304,7 +1304,7 @@ PassRefPtr<Frame> FrameLoaderClientImpl::createFrame(
   return m_webFrame->createChildFrame(frameRequest, ownerElement);
 }
 
-void FrameLoaderClientImpl::didTransferChildFrameToNewDocument() {
+void FrameLoaderClientImpl::didTransferChildFrameToNewDocument(Page*) {
   ASSERT(m_webFrame->frame()->ownerElement());
 
   WebFrameImpl* newParent = static_cast<WebFrameImpl*>(m_webFrame->parent());

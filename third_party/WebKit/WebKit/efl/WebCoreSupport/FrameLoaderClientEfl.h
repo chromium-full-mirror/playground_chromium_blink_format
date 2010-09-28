@@ -181,7 +181,7 @@ class FrameLoaderClientEfl : public FrameLoaderClient {
                                         bool allowsScrolling,
                                         int marginWidth,
                                         int marginHeight);
-  virtual void didTransferChildFrameToNewDocument();
+  virtual void didTransferChildFrameToNewDocument(Page*);
 
   virtual PassRefPtr<Widget> createPlugin(const IntSize&,
                                           HTMLPlugInElement*,

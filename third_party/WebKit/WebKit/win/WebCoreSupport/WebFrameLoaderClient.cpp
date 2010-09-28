@@ -796,7 +796,7 @@ PassRefPtr<Frame> WebFrameLoaderClient::createFrame(
   return result.release();
 }
 
-void WebFrameLoaderClient::didTransferChildFrameToNewDocument() {}
+void WebFrameLoaderClient::didTransferChildFrameToNewDocument(Page*) {}
 
 PassRefPtr<Frame> WebFrameLoaderClient::createFrame(
     const KURL& URL,

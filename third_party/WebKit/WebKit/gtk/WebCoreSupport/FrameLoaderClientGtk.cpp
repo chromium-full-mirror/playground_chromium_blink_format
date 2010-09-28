@@ -665,7 +665,7 @@ PassRefPtr<Frame> FrameLoaderClient::createFrame(
   return childFrame.release();
 }
 
-void FrameLoaderClient::didTransferChildFrameToNewDocument() {
+void FrameLoaderClient::didTransferChildFrameToNewDocument(WebCore::Page*) {
   ASSERT(m_frame);
 
   // Update the frame's webview to the new parent's webview.

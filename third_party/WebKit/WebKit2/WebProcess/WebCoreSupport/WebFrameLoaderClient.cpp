@@ -1025,7 +1025,7 @@ PassRefPtr<Frame> WebFrameLoaderClient::createFrame(
   return coreSubframe;
 }
 
-void WebFrameLoaderClient::didTransferChildFrameToNewDocument() {
+void WebFrameLoaderClient::didTransferChildFrameToNewDocument(Page*) {
   notImplemented();
 }
 

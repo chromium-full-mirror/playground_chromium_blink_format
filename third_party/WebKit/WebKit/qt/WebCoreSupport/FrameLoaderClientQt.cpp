@@ -1266,7 +1266,7 @@ PassRefPtr<Frame> FrameLoaderClientQt::createFrame(
   return frameData.frame.release();
 }
 
-void FrameLoaderClientQt::didTransferChildFrameToNewDocument() {
+void FrameLoaderClientQt::didTransferChildFrameToNewDocument(Page*) {
   ASSERT(m_frame->ownerElement());
 
   if (!m_webFrame)

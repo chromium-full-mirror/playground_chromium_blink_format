@@ -46,6 +46,7 @@
 #include "Language.h"
 #include "MIMETypeRegistry.h"
 #include "NotImplemented.h"
+#include "Page.h"
 #include "PluginDatabase.h"
 #include "ProgressTracker.h"
 #include "RenderPart.h"
@@ -402,7 +403,7 @@ PassRefPtr<Frame> FrameLoaderClientEfl::createFrame(
                                referrer);
 }
 
-void FrameLoaderClientEfl::didTransferChildFrameToNewDocument() {}
+void FrameLoaderClientEfl::didTransferChildFrameToNewDocument(Page*) {}
 
 void FrameLoaderClientEfl::redirectDataToPlugin(Widget* pluginWidget) {
   ASSERT(!m_pluginView);

@@ -695,7 +695,7 @@ PassRefPtr<Frame> FrameLoaderClientHaiku::createFrame(
   return 0;
 }
 
-void FrameLoaderClientHaiku::didTransferChildFrameToNewDocument() {}
+void FrameLoaderClientHaiku::didTransferChildFrameToNewDocument(Page*) {}
 
 ObjectContentType FrameLoaderClientHaiku::objectContentType(
     const KURL& url,

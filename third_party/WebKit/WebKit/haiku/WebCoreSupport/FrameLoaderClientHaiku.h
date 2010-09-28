@@ -244,7 +244,7 @@ class FrameLoaderClientHaiku : public FrameLoaderClient {
                                         bool allowsScrolling,
                                         int marginWidth,
                                         int marginHeight);
-  virtual void didTransferChildFrameToNewDocument();
+  virtual void didTransferChildFrameToNewDocument(WebCore::Page*);
   virtual PassRefPtr<Widget> createPlugin(const IntSize&,
                                           HTMLPlugInElement*,
                                           const KURL&,
