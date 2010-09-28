@@ -82,6 +82,12 @@ static int depth(CodeBlock* codeBlock, ScopeChain& sc) {
 }
 
 #if ENABLE(INTERPRETER)
+static NEVER_INLINE JSValue concatenateStrings(ExecState* exec,
+                                               Register* strings,
+                                               unsigned count) {
+  return jsString(exec, strings, count);
+}
+
 NEVER_INLINE bool Interpreter::resolve(CallFrame* callFrame,
                                        Instruction* vPC,
                                        JSValue& exceptionValue) {
@@ -4760,7 +4766,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       int count = vPC[3].u.operand;
 
       callFrame->r(dst) =
-          jsString(callFrame, &callFrame->registers()[src], count);
+          concatenateStrings(callFrame, &callFrame->registers()[src], count);
       CHECK_FOR_EXCEPTION();
       vPC += OPCODE_LENGTH(op_strcat);
 
