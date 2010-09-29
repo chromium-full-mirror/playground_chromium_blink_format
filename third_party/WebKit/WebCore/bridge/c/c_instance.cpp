@@ -162,7 +162,7 @@ JSValue CInstance::invokeMethod(ExecState* exec, RuntimeMethod* runtimeMethod) {
   }
 
   if (!retval)
-    throwError(exec, createError(exec, "Error calling method on NPObject!"));
+    throwError(exec, createError(exec, "Error calling method on NPObject."));
 
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);
@@ -197,7 +197,7 @@ JSValue CInstance::invokeDefaultMethod(ExecState* exec) {
   }
 
   if (!retval)
-    throwError(exec, createError(exec, "Error calling method on NPObject!"));
+    throwError(exec, createError(exec, "Error calling method on NPObject."));
 
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);
@@ -236,7 +236,7 @@ JSValue CInstance::invokeConstruct(ExecState* exec, const ArgList& args) {
   }
 
   if (!retval)
-    throwError(exec, createError(exec, "Error calling method on NPObject!"));
+    throwError(exec, createError(exec, "Error calling method on NPObject."));
 
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);
