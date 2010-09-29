@@ -45,7 +45,7 @@
 #include "FrameView.h"
 #include "HTMLElement.h"
 #include "HTMLNames.h"
-#include "InspectorController.h"
+#include "InspectorInstrumentation.h"
 #include "NodeList.h"
 #include "NodeRenderStyle.h"
 #include "Page.h"
@@ -549,7 +549,7 @@ void Element::setAttribute(const AtomicString& name,
 
 #if ENABLE(INSPECTOR)
   if (!isSynchronizingStyleAttribute())
-    InspectorController::willModifyDOMAttr(this);
+    InspectorInstrumentation::willModifyDOMAttr(document(), this);
 #endif
 
   const AtomicString& localName =
@@ -583,7 +583,7 @@ void Element::setAttribute(const AtomicString& name,
 
 #if ENABLE(INSPECTOR)
   if (!isSynchronizingStyleAttribute())
-    InspectorController::didModifyDOMAttr(this);
+    InspectorInstrumentation::didModifyDOMAttr(document(), this);
 #endif
 }
 
@@ -592,7 +592,7 @@ void Element::setAttribute(const QualifiedName& name,
                            ExceptionCode&) {
 #if ENABLE(INSPECTOR)
   if (!isSynchronizingStyleAttribute())
-    InspectorController::willModifyDOMAttr(this);
+    InspectorInstrumentation::willModifyDOMAttr(document(), this);
 #endif
 
   document()->incDOMTreeVersion();
@@ -617,7 +617,7 @@ void Element::setAttribute(const QualifiedName& name,
 
 #if ENABLE(INSPECTOR)
   if (!isSynchronizingStyleAttribute())
-    InspectorController::didModifyDOMAttr(this);
+    InspectorInstrumentation::didModifyDOMAttr(document(), this);
 #endif
 }
 
@@ -1324,7 +1324,7 @@ void Element::setAttributeNS(const AtomicString& namespaceURI,
 }
 
 void Element::removeAttribute(const String& name, ExceptionCode& ec) {
-  InspectorController::willModifyDOMAttr(this);
+  InspectorInstrumentation::willModifyDOMAttr(document(), this);
 
   String localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
 
@@ -1334,7 +1334,7 @@ void Element::removeAttribute(const String& name, ExceptionCode& ec) {
       ec = 0;
   }
 
-  InspectorController::didModifyDOMAttr(this);
+  InspectorInstrumentation::didModifyDOMAttr(document(), this);
 }
 
 void Element::removeAttributeNS(const String& namespaceURI,
