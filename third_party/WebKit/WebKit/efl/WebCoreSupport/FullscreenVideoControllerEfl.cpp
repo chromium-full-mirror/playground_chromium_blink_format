@@ -81,6 +81,7 @@ void FullscreenVideoController::exitFullscreen() {
 
 bool FullscreenVideoController::canPlay() const {
   notImplemented();
+  return false;
 }
 
 void FullscreenVideoController::play() {
@@ -149,10 +150,6 @@ void FullscreenVideoController::doSeek() {
 }
 
 void FullscreenVideoController::endSeek() {
-  notImplemented();
-}
-
-static String timeToString(float time) {
   notImplemented();
 }
 
