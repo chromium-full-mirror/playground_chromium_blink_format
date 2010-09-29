@@ -33,6 +33,7 @@
 #include "PluginControllerProxyMessages.h"
 #include "PluginProcessConnection.h"
 #include "WebCoreArgumentCoders.h"
+#include "WebEvent.h"
 #include "WebProcessConnectionMessages.h"
 #include <WebCore/GraphicsContext.h>
 
@@ -222,28 +223,57 @@ void PluginProxy::manualStreamDidFail(bool wasCancelled) {
   notImplemented();
 }
 
-bool PluginProxy::handleMouseEvent(const WebMouseEvent&) {
-  notImplemented();
-  return false;
+bool PluginProxy::handleMouseEvent(const WebMouseEvent& mouseEvent) {
+  bool handled = false;
+  if (!m_connection->connection()->sendSync(
+          Messages::PluginControllerProxy::HandleMouseEvent(mouseEvent),
+          Messages::PluginControllerProxy::HandleMouseEvent::Reply(handled),
+          m_pluginInstanceID, CoreIPC::Connection::NoTimeout))
+    return false;
+
+  return handled;
 }
 
-bool PluginProxy::handleWheelEvent(const WebWheelEvent&) {
-  notImplemented();
-  return false;
+bool PluginProxy::handleWheelEvent(const WebWheelEvent& wheelEvent) {
+  bool handled = false;
+  if (!m_connection->connection()->sendSync(
+          Messages::PluginControllerProxy::HandleWheelEvent(wheelEvent),
+          Messages::PluginControllerProxy::HandleWheelEvent::Reply(handled),
+          m_pluginInstanceID, CoreIPC::Connection::NoTimeout))
+    return false;
+
+  return handled;
 }
 
-bool PluginProxy::handleMouseEnterEvent(const WebMouseEvent&) {
-  notImplemented();
-  return false;
+bool PluginProxy::handleMouseEnterEvent(const WebMouseEvent& mouseEnterEvent) {
+  bool handled = false;
+  if (!m_connection->connection()->sendSync(
+          Messages::PluginControllerProxy::HandleMouseEnterEvent(
+              mouseEnterEvent),
+          Messages::PluginControllerProxy::HandleMouseEnterEvent::Reply(
+              handled),
+          m_pluginInstanceID, CoreIPC::Connection::NoTimeout))
+    return false;
+
+  return handled;
 }
 
-bool PluginProxy::handleMouseLeaveEvent(const WebMouseEvent&) {
-  notImplemented();
-  return false;
+bool PluginProxy::handleMouseLeaveEvent(const WebMouseEvent& mouseLeaveEvent) {
+  bool handled = false;
+  if (!m_connection->connection()->sendSync(
+          Messages::PluginControllerProxy::HandleMouseLeaveEvent(
+              mouseLeaveEvent),
+          Messages::PluginControllerProxy::HandleMouseLeaveEvent::Reply(
+              handled),
+          m_pluginInstanceID, CoreIPC::Connection::NoTimeout))
+    return false;
+
+  return handled;
 }
 
-void PluginProxy::setFocus(bool) {
-  notImplemented();
+void PluginProxy::setFocus(bool hasFocus) {
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::SetFocus(hasFocus), m_pluginInstanceID);
 }
 
 NPObject* PluginProxy::pluginScriptableNPObject() {
@@ -252,23 +282,28 @@ NPObject* PluginProxy::pluginScriptableNPObject() {
 }
 
 #if PLATFORM(MAC)
-void PluginProxy::windowFocusChanged(bool) {
+void PluginProxy::windowFocusChanged(bool hasFocus) {
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::WindowFocusChanged(hasFocus),
+      m_pluginInstanceID);
+}
+
+void PluginProxy::windowFrameChanged(const IntRect& windowFrame) {
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::WindowFrameChanged(windowFrame),
+      m_pluginInstanceID);
   notImplemented();
 }
 
-void PluginProxy::windowFrameChanged(const IntRect&) {
-  notImplemented();
+void PluginProxy::windowVisibilityChanged(bool isVisible) {
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::WindowVisibilityChanged(isVisible),
+      m_pluginInstanceID);
 }
-
-void PluginProxy::windowVisibilityChanged(bool) {
-  notImplemented();
-}
-
 #endif
 
 PluginController* PluginProxy::controller() {
-  notImplemented();
-  return 0;
+  return m_pluginController;
 }
 
 void PluginProxy::update(const IntRect& paintedRect) {
