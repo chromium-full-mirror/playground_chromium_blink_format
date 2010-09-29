@@ -26,6 +26,7 @@
 #include <JavaScriptCore/JavaScript.h>
 #include <JavaScriptCore/JSRetainPtr.h>
 #include <JSObjectRefPrivate.h>
+#include <QtCore/qdatetime.h>
 #include <QtCore/qmath.h>
 #include <QtCore/qnumeric.h>
 #include <QtCore/qshareddata.h>
@@ -120,6 +121,7 @@ class QScriptValuePrivate : public QSharedData {
   inline bool isObject();
   inline bool isFunction();
   inline bool isArray();
+  inline bool isDate();
 
   inline QString toString() const;
   inline qsreal toNumber() const;
@@ -131,6 +133,7 @@ class QScriptValuePrivate : public QSharedData {
 
   inline QScriptValuePrivate* toObject(QScriptEnginePrivate* engine);
   inline QScriptValuePrivate* toObject();
+  inline QDateTime toDateTime();
   inline QScriptValuePrivate* prototype();
   inline void setPrototype(QScriptValuePrivate* prototype);
 
@@ -476,6 +479,19 @@ bool QScriptValuePrivate::isArray() {
   }
 }
 
+bool QScriptValuePrivate::isDate() {
+  switch (m_state) {
+    case JSValue:
+      if (refinedJSValue() != JSObject)
+        return false;
+    // Fall-through.
+    case JSObject:
+      return m_engine->isDate(*this);
+    default:
+      return false;
+  }
+}
+
 QString QScriptValuePrivate::toString() const {
   switch (m_state) {
     case Invalid:
@@ -678,6 +694,23 @@ QScriptValuePrivate* QScriptValuePrivate::toObject() {
 
   // Without an engine there is not much we can do.
   return new QScriptValuePrivate;
+}
+
+QDateTime QScriptValuePrivate::toDateTime() {
+  if (!isDate())
+    return QDateTime();
+
+  JSValueRef exception = 0;
+  qsreal t = JSValueToNumber(*m_engine, *this, &exception);
+
+  if (exception) {
+    m_engine->setException(exception, QScriptEnginePrivate::NotNullException);
+    return QDateTime();
+  }
+
+  QDateTime result;
+  result.setMSecsSinceEpoch(qint64(t));
+  return result;
 }
 
 inline QScriptValuePrivate* QScriptValuePrivate::prototype() {

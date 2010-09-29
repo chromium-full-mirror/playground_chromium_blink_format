@@ -49,6 +49,7 @@ class QScriptOriginalGlobalObject {
   inline QVector<JSStringRef> objectGetOwnPropertyNames(
       JSObjectRef object) const;
 
+  inline bool isDate(JSValueRef value) const;
   inline bool isArray(JSValueRef value) const;
   inline bool isError(JSValueRef value) const;
 
@@ -74,6 +75,8 @@ class QScriptOriginalGlobalObject {
   JSValueRef m_errorPrototype;
   JSObjectRef m_functionConstructor;
   JSValueRef m_functionPrototype;
+  JSObjectRef m_dateConstructor;
+  JSValueRef m_datePrototype;
 
   // Reference to standard JS functions that are not exposed by JSC C API.
   JSObjectRef m_hasOwnPropertyFunction;
@@ -94,6 +97,8 @@ QScriptOriginalGlobalObject::QScriptOriginalGlobalObject(
                    m_errorConstructor, m_errorPrototype);
   initializeMember(globalObject, propertyName.get(), "Function",
                    m_functionConstructor, m_functionPrototype);
+  initializeMember(globalObject, propertyName.get(), "Date", m_dateConstructor,
+                   m_datePrototype);
 
   propertyName.adopt(JSStringCreateWithUTF8CString("hasOwnProperty"));
   m_hasOwnPropertyFunction = const_cast<JSObjectRef>(JSObjectGetProperty(
@@ -148,6 +153,8 @@ QScriptOriginalGlobalObject::~QScriptOriginalGlobalObject() {
   JSValueUnprotect(m_context, m_errorPrototype);
   JSValueUnprotect(m_context, m_functionConstructor);
   JSValueUnprotect(m_context, m_functionPrototype);
+  JSValueUnprotect(m_context, m_dateConstructor);
+  JSValueUnprotect(m_context, m_datePrototype);
   JSValueUnprotect(m_context, m_hasOwnPropertyFunction);
   JSValueUnprotect(m_context, m_getOwnPropertyNamesFunction);
   JSGlobalContextRelease(m_context);
@@ -194,6 +201,10 @@ QScriptOriginalGlobalObject::objectGetOwnPropertyNames(
     Q_ASSERT(!exception);
   }
   return names;
+}
+
+inline bool QScriptOriginalGlobalObject::isDate(JSValueRef value) const {
+  return isType(value, m_dateConstructor, m_datePrototype);
 }
 
 inline bool QScriptOriginalGlobalObject::isArray(JSValueRef value) const {

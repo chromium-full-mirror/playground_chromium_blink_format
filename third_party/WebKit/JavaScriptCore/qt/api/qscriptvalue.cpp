@@ -282,6 +282,16 @@ bool QScriptValue::isArray() const {
 }
 
 /*!
+    Returns true if this QScriptValue is an object of the Date class;
+    otherwise returns false.
+
+    \sa QScriptEngine::newDate()
+*/
+bool QScriptValue::isDate() const {
+  return d_ptr->isDate();
+}
+
+/*!
   Returns true if this QScriptValue is of the Object type; otherwise
   returns false.
 
@@ -432,6 +442,17 @@ quint16 QScriptValue::toUInt16() const {
 */
 QScriptValue QScriptValue::toObject() const {
   return QScriptValuePrivate::get(d_ptr->toObject());
+}
+
+/*!
+    Returns a QDateTime representation of this value, in local time.
+    If this QScriptValue is not a date, or the value of the date is
+    NaN (Not-a-Number), an invalid QDateTime is returned.
+
+    \sa isDate()
+*/
+QDateTime QScriptValue::toDateTime() const {
+  return d_ptr->toDateTime();
 }
 
 /*!

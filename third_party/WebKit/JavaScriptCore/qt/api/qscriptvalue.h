@@ -26,6 +26,7 @@
 
 class QScriptEngine;
 class QScriptValuePrivate;
+class QDateTime;
 
 class QScriptValue;
 typedef QList<QScriptValue> QScriptValueList;
@@ -122,6 +123,7 @@ class QScriptValue {
   bool isObject() const;
   bool isError() const;
   bool isArray() const;
+  bool isDate() const;
 
   QString toString() const;
   qsreal toNumber() const;
@@ -132,6 +134,7 @@ class QScriptValue {
   quint32 toUInt32() const;
   quint16 toUInt16() const;
   QScriptValue toObject() const;
+  QDateTime toDateTime() const;
 
   QScriptValue call(const QScriptValue& thisObject = QScriptValue(),
                     const QScriptValueList& args = QScriptValueList());

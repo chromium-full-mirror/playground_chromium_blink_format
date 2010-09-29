@@ -93,12 +93,14 @@ class QScriptEnginePrivate : public QSharedData {
 
   QScriptValuePrivate* newObject() const;
   QScriptValuePrivate* newArray(uint length);
+  QScriptValuePrivate* newDate(qsreal value);
   QScriptValuePrivate* globalObject() const;
 
   inline QScriptStringPrivate* toStringHandle(const QString& str) const;
 
   inline operator JSGlobalContextRef() const;
 
+  inline bool isDate(JSValueRef value) const;
   inline bool isArray(JSValueRef value) const;
   inline bool isError(JSValueRef value) const;
   inline bool objectHasOwnProperty(JSObjectRef object,
@@ -245,6 +247,10 @@ QScriptStringPrivate* QScriptEnginePrivate::toStringHandle(
 QScriptEnginePrivate::operator JSGlobalContextRef() const {
   Q_ASSERT(this);
   return m_context;
+}
+
+bool QScriptEnginePrivate::isDate(JSValueRef value) const {
+  return m_originalGlobalObject.isDate(value);
 }
 
 bool QScriptEnginePrivate::isArray(JSValueRef value) const {
