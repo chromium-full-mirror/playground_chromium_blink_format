@@ -267,7 +267,8 @@ void RegExp::printTraceData() {
   if (codeBlock.getFallback())
     sprintf(jitAddr, "fallback");
   else
-    sprintf(jitAddr, "0x%014lx", (uintptr_t)codeBlock.getAddr());
+    sprintf(jitAddr, "0x%014lx",
+            reinterpret_cast<unsigned long int>(codeBlock.getAddr()));
 #else
   const char* jitAddr = "JIT Off";
 #endif
