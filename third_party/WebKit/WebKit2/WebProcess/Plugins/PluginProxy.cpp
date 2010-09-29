@@ -77,8 +77,8 @@ bool PluginProxy::initialize(PluginController* pluginController,
   bool result = false;
 
   if (!m_connection->connection()->sendSync(
-          Messages::WebProcessConnection::CreatePlugin(m_pluginInstanceID,
-                                                       parameters),
+          Messages::WebProcessConnection::CreatePlugin(
+              m_pluginInstanceID, parameters, pluginController->userAgent()),
           Messages::WebProcessConnection::CreatePlugin::Reply(result), 0,
           CoreIPC::Connection::NoTimeout))
     return false;

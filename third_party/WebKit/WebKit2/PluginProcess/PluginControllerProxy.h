@@ -46,7 +46,8 @@ class PluginControllerProxy : PluginController {
  public:
   static PassOwnPtr<PluginControllerProxy> create(
       WebProcessConnection* connection,
-      uint64_t pluginInstanceID);
+      uint64_t pluginInstanceID,
+      const String& userAgent);
   ~PluginControllerProxy();
 
   uint64_t pluginInstanceID() const { return m_pluginInstanceID; }
@@ -65,13 +66,14 @@ class PluginControllerProxy : PluginController {
 
  private:
   PluginControllerProxy(WebProcessConnection* connection,
-                        uint64_t pluginInstanceID);
+                        uint64_t pluginInstanceID,
+                        const String& userAgent);
 
   void paint();
 
   // PluginController
   virtual void invalidate(const WebCore::IntRect&);
-  virtual String userAgent(const WebCore::KURL&);
+  virtual String userAgent();
   virtual void loadURL(uint64_t requestID,
                        const String& method,
                        const String& urlString,
@@ -108,6 +110,8 @@ class PluginControllerProxy : PluginController {
 
   WebProcessConnection* m_connection;
   uint64_t m_pluginInstanceID;
+
+  String m_userAgent;
 
   RefPtr<Plugin> m_plugin;
 

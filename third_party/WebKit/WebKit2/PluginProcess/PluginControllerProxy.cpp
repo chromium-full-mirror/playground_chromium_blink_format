@@ -43,14 +43,18 @@ namespace WebKit {
 
 PassOwnPtr<PluginControllerProxy> PluginControllerProxy::create(
     WebProcessConnection* connection,
-    uint64_t pluginInstanceID) {
-  return adoptPtr(new PluginControllerProxy(connection, pluginInstanceID));
+    uint64_t pluginInstanceID,
+    const String& userAgent) {
+  return adoptPtr(
+      new PluginControllerProxy(connection, pluginInstanceID, userAgent));
 }
 
 PluginControllerProxy::PluginControllerProxy(WebProcessConnection* connection,
-                                             uint64_t pluginInstanceID)
+                                             uint64_t pluginInstanceID,
+                                             const String& userAgent)
     : m_connection(connection),
       m_pluginInstanceID(pluginInstanceID),
+      m_userAgent(userAgent),
       m_paintTimer(RunLoop::main(), this, &PluginControllerProxy::paint) {}
 
 PluginControllerProxy::~PluginControllerProxy() {
@@ -122,9 +126,8 @@ void PluginControllerProxy::invalidate(const IntRect& rect) {
   m_paintTimer.startOneShot(0);
 }
 
-String PluginControllerProxy::userAgent(const WebCore::KURL&) {
-  notImplemented();
-  return String();
+String PluginControllerProxy::userAgent() {
+  return m_userAgent;
 }
 
 void PluginControllerProxy::loadURL(uint64_t requestID,

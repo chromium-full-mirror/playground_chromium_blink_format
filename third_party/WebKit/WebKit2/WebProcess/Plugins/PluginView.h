@@ -120,7 +120,7 @@ class PluginView : public WebCore::PluginViewBase,
 
   // PluginController
   virtual void invalidate(const WebCore::IntRect&);
-  virtual String userAgent(const WebCore::KURL&);
+  virtual String userAgent();
   virtual void loadURL(uint64_t requestID,
                        const String& method,
                        const String& urlString,

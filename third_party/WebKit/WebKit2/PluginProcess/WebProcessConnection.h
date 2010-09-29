@@ -76,6 +76,7 @@ class WebProcessConnection : public RefCounted<WebProcessConnection>,
       CoreIPC::ArgumentEncoder*);
   void createPlugin(uint64_t pluginInstanceID,
                     const Plugin::Parameters&,
+                    const String& userAgent,
                     bool& result);
   void destroyPlugin(uint64_t pluginInstanceID);
 
