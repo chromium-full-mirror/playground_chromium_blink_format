@@ -19,7 +19,7 @@
 
 #ifndef GStreamerGWorld_h
 #define GStreamerGWorld_h
-#if ENABLE(VIDEO)
+#if USE(GSTREAMER)
 
 #include "PlatformVideoWindow.h"
 #include "RefCounted.h"
@@ -66,5 +66,5 @@ class GStreamerGWorld : public RefCounted<GStreamerGWorld> {
   gchar* m_dynamicPadName;
 };
 }
-#endif  // ENABLE(VIDEO)
+#endif  // USE(GSTREAMER)
 #endif

@@ -21,7 +21,7 @@
 #ifndef VideoSinkGStreamer_h
 #define VideoSinkGStreamer_h
 
-#if ENABLE(VIDEO)
+#if USE(GSTREAMER)
 
 #include <glib-object.h>
 #include <gst/video/gstvideosink.h>
@@ -75,5 +75,5 @@ GstElement* webkit_video_sink_new(void);
 
 G_END_DECLS
 
-#endif  // ENABLE(VIDEO)
+#endif  // USE(GSTREAMER)
 #endif
