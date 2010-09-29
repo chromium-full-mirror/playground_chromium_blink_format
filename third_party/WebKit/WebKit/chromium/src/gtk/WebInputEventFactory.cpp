@@ -50,7 +50,7 @@ bool countsAsDoubleClick(gint timeDiff, gint xDiff, gint yDiff) {
   gint doubleClickTime = 250;
   gint doubleClickDistance = 5;
   g_object_get(G_OBJECT(settings), "gtk-double-click-time", &doubleClickTime,
-               "gtk-double-click-distance", &doubleClickDistance, 0);
+               "gtk-double-click-distance", &doubleClickDistance, NULL);
   return timeDiff <= doubleClickTime && abs(xDiff) <= doubleClickDistance &&
          abs(yDiff) <= doubleClickDistance;
 }
