@@ -28,6 +28,7 @@
 #include "PluginProxy.h"
 
 #include "BackingStore.h"
+#include "DataReference.h"
 #include "NotImplemented.h"
 #include "PluginController.h"
 #include "PluginControllerProxyMessages.h"
@@ -177,7 +178,10 @@ void PluginProxy::frameDidFail(uint64_t requestID, bool wasCancelled) {
 void PluginProxy::didEvaluateJavaScript(uint64_t requestID,
                                         const WTF::String& requestURLString,
                                         const WTF::String& result) {
-  notImplemented();
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::DidEvaluateJavaScript(
+          requestID, requestURLString, result),
+      m_pluginInstanceID);
 }
 
 void PluginProxy::streamDidReceiveResponse(uint64_t streamID,
@@ -186,21 +190,33 @@ void PluginProxy::streamDidReceiveResponse(uint64_t streamID,
                                            uint32_t lastModifiedTime,
                                            const WTF::String& mimeType,
                                            const WTF::String& headers) {
-  notImplemented();
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::StreamDidReceiveResponse(
+          streamID, responseURL.string(), streamLength, lastModifiedTime,
+          mimeType, headers),
+      m_pluginInstanceID);
 }
 
 void PluginProxy::streamDidReceiveData(uint64_t streamID,
                                        const char* bytes,
                                        int length) {
-  notImplemented();
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::StreamDidReceiveData(
+          streamID, CoreIPC::DataReference(
+                        reinterpret_cast<const uint8_t*>(bytes), length)),
+      m_pluginInstanceID);
 }
 
 void PluginProxy::streamDidFinishLoading(uint64_t streamID) {
-  notImplemented();
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::StreamDidFinishLoading(streamID),
+      m_pluginInstanceID);
 }
 
 void PluginProxy::streamDidFail(uint64_t streamID, bool wasCancelled) {
-  notImplemented();
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::StreamDidFail(streamID, wasCancelled),
+      m_pluginInstanceID);
 }
 
 void PluginProxy::manualStreamDidReceiveResponse(const KURL& responseURL,
