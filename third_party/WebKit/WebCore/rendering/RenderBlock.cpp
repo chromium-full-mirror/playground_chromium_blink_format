@@ -1345,8 +1345,8 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
   if (!isCell) {
     initMaxMarginValues();
 
-    setTopMarginQuirk(style()->marginTop().quirk());
-    setBottomMarginQuirk(style()->marginBottom().quirk());
+    setMarginBeforeQuirk(style()->marginBefore().quirk());
+    setMarginAfterQuirk(style()->marginAfter().quirk());
 
     Node* n = node();
     if (n && n->hasTagName(formTag) &&
@@ -1676,8 +1676,8 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
 
   // See if the top margin is quirky. We only care if this child has
   // margins that will collapse with us.
-  bool topQuirk =
-      child->isTopMarginQuirk() || style()->marginBeforeCollapse() == MDISCARD;
+  bool topQuirk = child->isMarginBeforeQuirk() ||
+                  style()->marginBeforeCollapse() == MDISCARD;
 
   if (marginInfo.canCollapseWithMarginBefore()) {
     // This child is collapsing with the top of the
@@ -1694,7 +1694,7 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
     // a <dl> inside a <td>.
     if (!marginInfo.determinedMarginBeforeQuirk() && !topQuirk &&
         (posTop - negTop)) {
-      setTopMarginQuirk(false);
+      setMarginBeforeQuirk(false);
       marginInfo.setDeterminedMarginBeforeQuirk(true);
     }
 
@@ -1705,7 +1705,7 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
       // This deals with the <td><div><p> case.
       // Don't do this for a block that split two inlines though.  You do
       // still apply margins in this case.
-      setTopMarginQuirk(true);
+      setMarginBeforeQuirk(true);
   }
 
   if (marginInfo.quirkContainer() && marginInfo.atBeforeSideOfBlock() &&
@@ -1754,7 +1754,7 @@ int RenderBlock::collapseMargins(RenderBox* child, MarginInfo& marginInfo) {
     marginInfo.setNegMargin(child->maxMarginAfter(NegativeMargin));
 
     if (marginInfo.margin())
-      marginInfo.setMarginAfterQuirk(child->isBottomMarginQuirk() ||
+      marginInfo.setMarginAfterQuirk(child->isMarginAfterQuirk() ||
                                      style()->marginAfterCollapse() ==
                                          MDISCARD);
   }
@@ -1945,13 +1945,13 @@ void RenderBlock::setCollapsedBottomMargin(const MarginInfo& marginInfo) {
                             max(maxNegMarginAfter(), marginInfo.negMargin()));
 
     if (!marginInfo.marginAfterQuirk())
-      setBottomMarginQuirk(false);
+      setMarginAfterQuirk(false);
 
     if (marginInfo.marginAfterQuirk() && marginBottom() == 0)
       // We have no bottom margin and our last child has a quirky margin.
       // We will pick up this quirky margin and pass it through.
       // This deals with the <td><div><p> case.
-      setBottomMarginQuirk(true);
+      setMarginAfterQuirk(true);
   }
 }
 
@@ -4305,7 +4305,7 @@ int RenderBlock::addOverhangingFloats(RenderBlock* child,
   // Prevent floats from being added to the canvas by the root element, e.g.,
   // <html>.
   if (child->hasOverflowClip() || !child->containsFloats() || child->isRoot() ||
-      child->hasColumns())
+      child->hasColumns() || child->isBlockFlowRoot())
     return 0;
 
   int lowestFloatBottom = 0;
