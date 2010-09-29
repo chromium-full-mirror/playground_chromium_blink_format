@@ -309,6 +309,8 @@ class AccessibilityRenderObject : public AccessibilityObject {
   void elementsFromAttribute(Vector<Element*>& elements,
                              const QualifiedName& name) const;
 
+  virtual ESpeak speakProperty() const;
+
   virtual const AtomicString& ariaLiveRegionStatus() const;
   virtual const AtomicString& ariaLiveRegionRelevant() const;
   virtual bool ariaLiveRegionAtomic() const;

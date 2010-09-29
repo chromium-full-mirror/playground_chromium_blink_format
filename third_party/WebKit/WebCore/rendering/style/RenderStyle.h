@@ -1071,6 +1071,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
            blockFlow() == BottomToTopBlockFlow;
   }
 
+  ESpeak speak() { return static_cast<ESpeak>(rareInheritedData->speak); }
+
   // attribute setter methods
 
   void setDisplay(EDisplay v) { noninherited_flags._effectiveDisplay = v; }
@@ -1615,6 +1617,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void setTransformOriginZ(float f) {
     SET_VAR(rareNonInheritedData.access()->m_transform, m_z, f);
   }
+  void setSpeak(ESpeak s) { SET_VAR(rareInheritedData, speak, s); }
   // End CSS3 Setters
 
   // Apple-specific property setters
@@ -1879,6 +1882,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return BCNORMAL;
   }
   static const AtomicString& initialHighlight() { return nullAtom; }
+  static ESpeak initialSpeak() { return SpeakNormal; }
   static Hyphens initialHyphens() { return HyphensManual; }
   static const AtomicString& initialHyphenationString() { return nullAtom; }
   static const AtomicString& initialHyphenationLocale() { return nullAtom; }

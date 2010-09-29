@@ -82,13 +82,14 @@ static const int computedProperties[] = {
     CSSPropertyPaddingTop, CSSPropertyPageBreakAfter,
     CSSPropertyPageBreakBefore, CSSPropertyPageBreakInside,
     CSSPropertyPointerEvents, CSSPropertyPosition, CSSPropertyResize,
-    CSSPropertyRight, CSSPropertyTableLayout, CSSPropertyTextAlign,
-    CSSPropertyTextDecoration, CSSPropertyTextIndent, CSSPropertyTextRendering,
-    CSSPropertyTextShadow, CSSPropertyTextOverflow, CSSPropertyTextTransform,
-    CSSPropertyTop, CSSPropertyUnicodeBidi, CSSPropertyVerticalAlign,
-    CSSPropertyVisibility, CSSPropertyWhiteSpace, CSSPropertyWidows,
-    CSSPropertyWidth, CSSPropertyWordBreak, CSSPropertyWordSpacing,
-    CSSPropertyWordWrap, CSSPropertyZIndex, CSSPropertyZoom,
+    CSSPropertyRight, CSSPropertySpeak, CSSPropertyTableLayout,
+    CSSPropertyTextAlign, CSSPropertyTextDecoration, CSSPropertyTextIndent,
+    CSSPropertyTextRendering, CSSPropertyTextShadow, CSSPropertyTextOverflow,
+    CSSPropertyTextTransform, CSSPropertyTop, CSSPropertyUnicodeBidi,
+    CSSPropertyVerticalAlign, CSSPropertyVisibility, CSSPropertyWhiteSpace,
+    CSSPropertyWidows, CSSPropertyWidth, CSSPropertyWordBreak,
+    CSSPropertyWordSpacing, CSSPropertyWordWrap, CSSPropertyZIndex,
+    CSSPropertyZoom,
 
     CSSPropertyWebkitAnimationDelay, CSSPropertyWebkitAnimationDirection,
     CSSPropertyWebkitAnimationDuration, CSSPropertyWebkitAnimationFillMode,
@@ -1489,6 +1490,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
           zoomAdjustedPixelValue(style->clip().left().value(), style.get()));
       return CSSPrimitiveValue::create(rect.release());
     }
+    case CSSPropertySpeak:
+      return CSSPrimitiveValue::create(style->speak());
     case CSSPropertyWebkitTransform:
       return computedTransform(renderer, style.get());
     case CSSPropertyWebkitTransformOrigin: {

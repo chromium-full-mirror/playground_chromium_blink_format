@@ -153,6 +153,9 @@ class AccessibilityUIElement {
   JSStringRef documentURI();
   JSStringRef url();
 
+  // CSS3-speech properties.
+  JSStringRef speak();
+
   // Table-specific attributes
   JSStringRef attributesOfColumnHeaders();
   JSStringRef attributesOfRowHeaders();

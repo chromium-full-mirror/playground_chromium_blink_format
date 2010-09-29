@@ -1486,6 +1486,13 @@ AccessibilityObject* AccessibilityRenderObject::internalLinkElement() const {
   return firstAccessibleObjectFromNode(linkedNode);
 }
 
+ESpeak AccessibilityRenderObject::speakProperty() const {
+  if (!m_renderer)
+    return AccessibilityObject::speakProperty();
+
+  return m_renderer->style()->speak();
+}
+
 void AccessibilityRenderObject::addRadioButtonGroupMembers(
     AccessibilityChildrenVector& linkedUIElements) const {
   if (!m_renderer || roleValue() != RadioButtonRole)
