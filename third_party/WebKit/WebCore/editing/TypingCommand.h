@@ -107,7 +107,7 @@ class TypingCommand : public CompositeEditCommand {
   virtual bool preservesTypingStyle() const { return m_preservesTypingStyle; }
 
   void updatePreservesTypingStyle(ETypingCommand);
-  void markMisspellingsAfterTyping();
+  void markMisspellingsAfterTyping(ETypingCommand);
   void typingAddedToOpenCommand(ETypingCommand);
   bool makeEditableRootEmpty();
 
