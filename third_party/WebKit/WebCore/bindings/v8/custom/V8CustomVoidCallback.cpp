@@ -68,6 +68,7 @@ bool invokeCallback(v8::Persistent<v8::Object> callback,
                     bool& callbackReturnValue,
                     ScriptExecutionContext* scriptExecutionContext) {
   v8::TryCatch exceptionCatcher;
+  exceptionCatcher.SetVerbose(true);
 
   v8::Local<v8::Function> callbackFunction;
   if (callback->IsFunction()) {
@@ -88,16 +89,7 @@ bool invokeCallback(v8::Persistent<v8::Object> callback,
 
   v8::Handle<v8::Value> result = callbackFunction->Call(thisObject, argc, argv);
   callbackReturnValue = !result.IsEmpty() && result->BooleanValue();
-
-  if (exceptionCatcher.HasCaught()) {
-    v8::Local<v8::Message> message = exceptionCatcher.Message();
-    scriptExecutionContext->reportException(
-        toWebCoreString(message->Get()), message->GetLineNumber(),
-        toWebCoreString(message->GetScriptResourceName()));
-    return true;
-  }
-
-  return false;
+  return exceptionCatcher.HasCaught();
 }
 
 }  // namespace WebCore
