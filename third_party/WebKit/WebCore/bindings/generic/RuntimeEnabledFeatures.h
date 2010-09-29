@@ -164,7 +164,7 @@ class RuntimeEnabledFeatures {
     isSpeechInputEnabled = isEnabled;
   }
   static bool speechInputEnabled() { return isSpeechInputEnabled; }
-  static bool speechEnabled() { return isSpeechInputEnabled; }
+  static bool webkitspeechEnabled() { return isSpeechInputEnabled; }
 
 #if ENABLE(XHR_RESPONSE_BLOB)
   static bool xhrResponseBlobEnabled() { return isXHRResponseBlobEnabled; }

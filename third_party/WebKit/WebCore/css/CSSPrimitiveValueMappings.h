@@ -350,7 +350,7 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(ControlPart e)
       break;
     case InputSpeechButtonPart:
 #if ENABLE(INPUT_SPEECH)
-      m_value.ident = CSSValueInputSpeechButton;
+      m_value.ident = CSSValueWebkitInputSpeechButton;
 #endif
       break;
   }
