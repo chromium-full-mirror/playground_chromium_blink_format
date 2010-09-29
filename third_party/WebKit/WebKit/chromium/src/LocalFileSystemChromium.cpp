@@ -74,8 +74,9 @@ void LocalFileSystem::requestFileSystem(
     WorkerLoaderProxy* workerLoaderProxy =
         &workerContext->thread()->workerLoaderProxy();
     WebWorkerBase* webWorker = static_cast<WebWorkerBase*>(workerLoaderProxy);
-    webWorker->openFileSystem(static_cast<WebFileSystem::Type>(type), size,
-                              new WebFileSystemCallbacksImpl(callbacks));
+    webWorker->openFileSystem(
+        static_cast<WebFileSystem::Type>(type), size,
+        new WebFileSystemCallbacksImpl(callbacks, context));
   }
 }
 

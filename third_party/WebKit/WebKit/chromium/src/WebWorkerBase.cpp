@@ -258,10 +258,9 @@ void WebWorkerBase::openFileSystem(WebFileSystem::Type type,
                                    WebFileSystemCallbacks* callbacks) {
   WorkerScriptController* controller =
       WorkerScriptController::controllerForContext();
-  WorkerContext* workerContext = controller->workerContext();
-
   RefPtr<WorkerFileSystemCallbacksBridge> bridge =
-      WorkerFileSystemCallbacksBridge::create(this, workerContext, callbacks);
+      WorkerFileSystemCallbacksBridge::create(this, controller->workerContext(),
+                                              callbacks);
   bridge->postOpenFileSystemToMainThread(commonClient(), type, size,
                                          openFileSystemMode);
 }

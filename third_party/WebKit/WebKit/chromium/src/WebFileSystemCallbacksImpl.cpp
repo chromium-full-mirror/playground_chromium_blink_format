@@ -34,10 +34,11 @@
 
 #include "AsyncFileSystemCallbacks.h"
 #include "AsyncFileSystemChromium.h"
-#include "ExceptionCode.h"
+#include "ScriptExecutionContext.h"
 #include "WebFileSystemEntry.h"
 #include "WebFileInfo.h"
 #include "WebString.h"
+#include "WorkerAsyncFileSystemChromium.h"
 #include <wtf/Vector.h>
 
 using namespace WebCore;
@@ -45,19 +46,20 @@ using namespace WebCore;
 namespace WebKit {
 
 WebFileSystemCallbacksImpl::WebFileSystemCallbacksImpl(
-    PassOwnPtr<AsyncFileSystemCallbacks> callbacks)
-    : m_callbacks(callbacks) {}
+    PassOwnPtr<AsyncFileSystemCallbacks> callbacks,
+    WebCore::ScriptExecutionContext* context)
+    : m_callbacks(callbacks), m_context(context) {
+  ASSERT(m_callbacks);
+}
 
 WebFileSystemCallbacksImpl::~WebFileSystemCallbacksImpl() {}
 
 void WebFileSystemCallbacksImpl::didSucceed() {
-  ASSERT(m_callbacks);
   m_callbacks->didSucceed();
   delete this;
 }
 
 void WebFileSystemCallbacksImpl::didReadMetadata(const WebFileInfo& info) {
-  ASSERT(m_callbacks);
   m_callbacks->didReadMetadata(info.modificationTime);
   delete this;
 }
@@ -65,7 +67,6 @@ void WebFileSystemCallbacksImpl::didReadMetadata(const WebFileInfo& info) {
 void WebFileSystemCallbacksImpl::didReadDirectory(
     const WebVector<WebFileSystemEntry>& entries,
     bool hasMore) {
-  ASSERT(m_callbacks);
   for (size_t i = 0; i < entries.size(); ++i)
     m_callbacks->didReadDirectoryEntry(entries[i].name, entries[i].isDirectory);
   m_callbacks->didReadDirectoryEntries(hasMore);
@@ -75,12 +76,15 @@ void WebFileSystemCallbacksImpl::didReadDirectory(
 
 void WebFileSystemCallbacksImpl::didOpenFileSystem(const WebString& name,
                                                    const WebString& path) {
-  m_callbacks->didOpenFileSystem(name, new AsyncFileSystemChromium(path));
+  if (m_context && m_context->isWorkerContext())
+    m_callbacks->didOpenFileSystem(
+        name, WorkerAsyncFileSystemChromium::create(m_context, path));
+  else
+    m_callbacks->didOpenFileSystem(name, AsyncFileSystemChromium::create(path));
   delete this;
 }
 
 void WebFileSystemCallbacksImpl::didFail(WebFileError error) {
-  ASSERT(m_callbacks);
   m_callbacks->didFail(error);
   delete this;
 }

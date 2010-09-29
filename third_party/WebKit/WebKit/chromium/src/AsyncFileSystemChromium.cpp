@@ -58,18 +58,18 @@ AsyncFileSystemChromium::AsyncFileSystemChromium(const String& rootPath)
 AsyncFileSystemChromium::~AsyncFileSystemChromium() {}
 
 void AsyncFileSystemChromium::move(
-    const String& srcPath,
-    const String& destPath,
+    const String& sourcePath,
+    const String& destinationPath,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
-  m_webFileSystem->move(srcPath, destPath,
+  m_webFileSystem->move(sourcePath, destinationPath,
                         new WebKit::WebFileSystemCallbacksImpl(callbacks));
 }
 
 void AsyncFileSystemChromium::copy(
-    const String& srcPath,
-    const String& destPath,
+    const String& sourcePath,
+    const String& destinationPath,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
-  m_webFileSystem->copy(srcPath, destPath,
+  m_webFileSystem->copy(sourcePath, destinationPath,
                         new WebKit::WebFileSystemCallbacksImpl(callbacks));
 }
 
