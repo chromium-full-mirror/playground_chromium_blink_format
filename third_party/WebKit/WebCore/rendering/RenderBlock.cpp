@@ -1823,8 +1823,8 @@ int RenderBlock::clearFloatsIfNeeded(RenderBox* child,
   return yPos + heightIncrease;
 }
 
-int RenderBlock::estimateVerticalPosition(RenderBox* child,
-                                          const MarginInfo& marginInfo) {
+int RenderBlock::estimateLogicalTopPosition(RenderBox* child,
+                                            const MarginInfo& marginInfo) {
   // FIXME: We need to eliminate the estimation of vertical position, because
   // when it's wrong we sometimes trigger a pathological
   // relayout if there are intruding floats.
@@ -1862,7 +1862,7 @@ int RenderBlock::estimateVerticalPosition(RenderBox* child,
   return yPosEstimate;
 }
 
-void RenderBlock::determineHorizontalPosition(RenderBox* child) {
+void RenderBlock::determineLogicalLeftPositionForChild(RenderBox* child) {
   int xPos = borderLeft() + paddingLeft();
   if (style()->direction() == LTR) {
     // Add in our left margin.
@@ -1977,6 +1977,16 @@ void RenderBlock::handleAfterSideOfBlock(int top,
   setCollapsedBottomMargin(marginInfo);
 }
 
+void RenderBlock::setLogicalTopForChild(RenderBox* child, int logicalTop) {
+  if (style()->isVerticalBlockFlow()) {
+    view()->addLayoutDelta(IntSize(0, child->y() - logicalTop));
+    child->setLocation(child->x(), logicalTop);
+  } else {
+    view()->addLayoutDelta(IntSize(child->x() - logicalTop, 0));
+    child->setLocation(logicalTop, child->y());
+  }
+}
+
 void RenderBlock::layoutBlockChildren(bool relayoutChildren,
                                       int& maxFloatBottom) {
   if (gPercentHeightDescendantsMap) {
@@ -2066,38 +2076,42 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
                                    MarginInfo& marginInfo,
                                    int& previousFloatBottom,
                                    int& maxFloatBottom) {
-  int oldTopPosMargin = maxPosMarginBefore();
-  int oldTopNegMargin = maxNegMarginBefore();
+  int oldPosMarginBefore = maxPosMarginBefore();
+  int oldNegMarginBefore = maxNegMarginBefore();
 
-  // The child is a normal flow object.  Compute its vertical margins now.
+  // The child is a normal flow object.  Compute the margins we will use for
+  // collapsing now.
   child->computeBlockDirectionMargins(this);
 
-  // Do not allow a collapse if the margin top collapse style is set to
+  // Do not allow a collapse if the margin-before-collapse style is set to
   // SEPARATE.
   if (child->style()->marginBeforeCollapse() == MSEPARATE) {
     marginInfo.setAtBeforeSideOfBlock(false);
     marginInfo.clearMargin();
   }
 
-  // Try to guess our correct y position.  In most cases this guess will
-  // be correct.  Only if we're wrong (when we compute the real y position)
+  // Try to guess our correct logical top position.  In most cases this guess
+  // will
+  // be correct.  Only if we're wrong (when we compute the real logical top
+  // position)
   // will we have to potentially relayout.
-  int yPosEstimate = estimateVerticalPosition(child, marginInfo);
+  int logicalTopEstimate = estimateLogicalTopPosition(child, marginInfo);
 
   // Cache our old rect so that we can dirty the proper repaint rects if the
   // child moves.
   IntRect oldRect(child->x(), child->y(), child->width(), child->height());
+  int oldLogicalTop = logicalTopForChild(child);
+
 #ifndef NDEBUG
   IntSize oldLayoutDelta = view()->layoutDelta();
 #endif
   // Go ahead and position the child as though it didn't collapse with the top.
-  view()->addLayoutDelta(IntSize(0, child->y() - yPosEstimate));
-  child->setLocation(child->x(), yPosEstimate);
+  setLogicalTopForChild(child, logicalTopEstimate);
 
   RenderBlock* childRenderBlock =
       child->isRenderBlock() ? toRenderBlock(child) : 0;
   bool markDescendantsWithFloats = false;
-  if (yPosEstimate != oldRect.y() && !child->avoidsFloats() &&
+  if (logicalTopEstimate != oldLogicalTop && !child->avoidsFloats() &&
       childRenderBlock && childRenderBlock->containsFloats())
     markDescendantsWithFloats = true;
   else if (!child->avoidsFloats() || child->shrinkToAvoidFloats()) {
@@ -2105,15 +2119,16 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
     // mark it for
     // layout.
     int fb = max(previousFloatBottom, floatBottom());
-    if (fb > yPosEstimate)
+    if (fb > logicalTopEstimate)
       markDescendantsWithFloats = true;
   }
 
   if (childRenderBlock) {
     if (markDescendantsWithFloats)
       childRenderBlock->markAllDescendantsWithFloatsForLayout();
-    previousFloatBottom = max(
-        previousFloatBottom, oldRect.y() + toRenderBlock(child)->floatBottom());
+    if (!child->isBlockFlowRoot())
+      previousFloatBottom = max(
+          previousFloatBottom, oldLogicalTop + childRenderBlock->floatBottom());
   }
 
   bool paginated = view()->layoutState()->isPaginated();
@@ -2132,28 +2147,29 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
 
   // Now determine the correct ypos based off examination of collapsing margin
   // values.
-  int yBeforeClear = collapseMargins(child, marginInfo);
+  int logicalTopBeforeClear = collapseMargins(child, marginInfo);
 
   // Now check for clear.
-  int yAfterClear = clearFloatsIfNeeded(child, marginInfo, oldTopPosMargin,
-                                        oldTopNegMargin, yBeforeClear);
+  int logicalTopAfterClear =
+      clearFloatsIfNeeded(child, marginInfo, oldPosMarginBefore,
+                          oldNegMarginBefore, logicalTopBeforeClear);
 
   if (paginated) {
-    int oldY = yAfterClear;
+    int oldTop = logicalTopAfterClear;
 
     // If the object has a page or column break value of "before", then we
     // should shift to the top of the next page.
-    yAfterClear = applyBeforeBreak(child, yAfterClear);
+    logicalTopAfterClear = applyBeforeBreak(child, logicalTopAfterClear);
 
     // For replaced elements and scrolled elements, we want to shift them to the
     // next page if they don't fit on the current one.
-    int yBeforeUnsplittableAdjustment = yAfterClear;
-    int yAfterUnsplittableAdjustment =
-        adjustForUnsplittableChild(child, yAfterClear);
+    int logicalTopBeforeUnsplittableAdjustment = logicalTopAfterClear;
+    int logicalTopAfterUnsplittableAdjustment =
+        adjustForUnsplittableChild(child, logicalTopAfterClear);
 
     int paginationStrut = 0;
-    int unsplittableAdjustmentDelta =
-        yAfterUnsplittableAdjustment - yBeforeUnsplittableAdjustment;
+    int unsplittableAdjustmentDelta = logicalTopAfterUnsplittableAdjustment -
+                                      logicalTopBeforeUnsplittableAdjustment;
     if (unsplittableAdjustmentDelta)
       paginationStrut = unsplittableAdjustmentDelta;
     else if (childRenderBlock && childRenderBlock->paginationStrut())
@@ -2164,31 +2180,30 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
       // at the top of the block prior
       // to collapsing our margins, and as long as we didn't clear or move as a
       // result of other pagination.
-      if (atBeforeSideOfBlock && oldY == yBeforeClear && !isPositioned() &&
-          !isTableCell()) {
+      if (atBeforeSideOfBlock && oldTop == logicalTopBeforeClear &&
+          !isPositioned() && !isTableCell()) {
         // FIXME: Should really check if we're exceeding the page height before
         // propagating the strut, but we don't
         // have all the information to do so (the strut only has the remaining
         // amount to push).  Gecko gets this wrong too
         // and pushes to the next page anyway, so not too concerned about it.
-        setPaginationStrut(yAfterClear + paginationStrut);
+        setPaginationStrut(logicalTopAfterClear + paginationStrut);
         if (childRenderBlock)
           childRenderBlock->setPaginationStrut(0);
       } else
-        yAfterClear += paginationStrut;
+        logicalTopAfterClear += paginationStrut;
     }
 
     // Similar to how we apply clearance.  Go ahead and boost height() to be the
     // place where we're going to position the child.
-    setLogicalHeight(height() + (yAfterClear - oldY));
+    setLogicalHeight(logicalHeight() + (logicalTopAfterClear - oldTop));
   }
 
-  view()->addLayoutDelta(IntSize(0, yPosEstimate - yAfterClear));
-  child->setLocation(child->x(), yAfterClear);
+  setLogicalTopForChild(child, logicalTopAfterClear);
 
-  // Now we have a final y position.  See if it really does end up being
+  // Now we have a final top position.  See if it really does end up being
   // different from our estimate.
-  if (yAfterClear != yPosEstimate) {
+  if (logicalTopAfterClear != logicalTopEstimate) {
     if (child->shrinkToAvoidFloats()) {
       // The child's width depends on the line width.
       // When the child shifts to clear an item, its width can
@@ -2215,14 +2230,14 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
   if (marginInfo.atBeforeSideOfBlock() && !child->isSelfCollapsingBlock())
     marginInfo.setAtBeforeSideOfBlock(false);
 
-  // Now place the child in the correct horizontal position
-  determineHorizontalPosition(child);
+  // Now place the child in the correct left position
+  determineLogicalLeftPositionForChild(child);
 
   // Update our height now that the child has been placed in the correct
   // position.
-  setLogicalHeight(height() + child->height());
+  setLogicalHeight(logicalHeight() + logicalHeightForChild(child));
   if (child->style()->marginAfterCollapse() == MSEPARATE) {
-    setLogicalHeight(height() + child->marginBottom());
+    setLogicalHeight(logicalHeight() + child->marginAfterUsing(style()));
     marginInfo.clearMargin();
   }
   // If the child has overhanging floats that intrude into following siblings
