@@ -246,6 +246,8 @@ class RenderBlock : public RenderBox {
   void setMarginEndForChild(RenderBox* child, int);
   void setMarginBeforeForChild(RenderBox* child, int);
   void setMarginAfterForChild(RenderBox* child, int);
+  int collapsedMarginBeforeForChild(RenderBox* child) const;
+  int collapsedMarginAfterForChild(RenderBox* child) const;
 
  protected:
   // These functions are only used internally to manipulate the render tree
