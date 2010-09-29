@@ -211,6 +211,11 @@ class ScriptController {
   void evaluateInWorld(const ScriptSourceCode&, DOMWrapperWorld*);
   static void getAllWorlds(Vector<DOMWrapperWorld*>& worlds);
 
+  void setAllowPopupsFromPlugin(bool allowPopupsFromPlugin) {
+    m_allowPopupsFromPlugin = allowPopupsFromPlugin;
+  }
+  bool allowPopupsFromPlugin() const { return m_allowPopupsFromPlugin; }
+
  private:
   Frame* m_frame;
   const String* m_sourceURL;
@@ -219,6 +224,7 @@ class ScriptController {
 
   bool m_processingTimerCallback;
   bool m_paused;
+  bool m_allowPopupsFromPlugin;
 
   OwnPtr<V8Proxy> m_proxy;
   typedef HashMap<Widget*, NPObject*> PluginObjectMap;

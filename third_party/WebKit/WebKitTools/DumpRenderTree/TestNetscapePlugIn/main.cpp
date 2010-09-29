@@ -229,9 +229,24 @@ NPError NPP_New(NPMIMEType pluginType,
       // this #ifdef can be removed.
       obj->testGetURLOnDestroy = TRUE;
 #endif
-    } else if (strcasecmp(argn[i], "src") == 0 &&
+    } else if (!strcasecmp(argn[i], "src") &&
                strstr(argv[i], "plugin-document-has-focus.pl"))
       obj->testKeyboardFocusForPlugins = TRUE;
+    else if (!strcasecmp(argn[i], "evaluatescript")) {
+      char* script = argv[i];
+      if (script == strstr(script, "mouse::")) {
+        obj->mouseDownForEvaluateScript = true;
+        obj->evaluateScriptOnMouseDownOrKeyDown =
+            strdup(script + sizeof("mouse::") - 1);
+      } else if (script == strstr(script, "key::")) {
+        obj->evaluateScriptOnMouseDownOrKeyDown =
+            strdup(script + sizeof("key::") - 1);
+      }
+      // When testing evaluate script on mouse-down or key-down, allow event
+      // logging to handle events.
+      if (obj->evaluateScriptOnMouseDownOrKeyDown)
+        obj->eventLogging = true;
+    }
   }
 
 #if XP_MACOSX
@@ -419,6 +434,9 @@ static int16_t handleEventCarbon(NPP instance,
     case mouseDown:
       GlobalToLocal(&pt);
       pluginLog(instance, "mouseDown at (%d, %d)", pt.h, pt.v);
+      if (obj->evaluateScriptOnMouseDownOrKeyDown &&
+          obj->mouseDownForEvaluateScript)
+        executeScript(obj, obj->evaluateScriptOnMouseDownOrKeyDown);
       break;
     case mouseUp:
       GlobalToLocal(&pt);
@@ -426,6 +444,9 @@ static int16_t handleEventCarbon(NPP instance,
       break;
     case keyDown:
       pluginLog(instance, "keyDown '%c'", (char)(event->message & 0xFF));
+      if (obj->evaluateScriptOnMouseDownOrKeyDown &&
+          !obj->mouseDownForEvaluateScript)
+        executeScript(obj, obj->evaluateScriptOnMouseDownOrKeyDown);
       break;
     case keyUp:
       pluginLog(instance, "keyUp '%c'", (char)(event->message & 0xFF));
@@ -503,6 +524,9 @@ static int16_t handleEventCocoa(NPP instance,
             instance, "keyDown '%c'",
             CFStringGetCharacterAtIndex(
                 reinterpret_cast<CFStringRef>(event->data.key.characters), 0));
+      if (obj->evaluateScriptOnMouseDownOrKeyDown &&
+          !obj->mouseDownForEvaluateScript)
+        executeScript(obj, obj->evaluateScriptOnMouseDownOrKeyDown);
       return 1;
 
     case NPCocoaEventKeyUp:
@@ -525,6 +549,9 @@ static int16_t handleEventCocoa(NPP instance,
     case NPCocoaEventMouseDown:
       pluginLog(instance, "mouseDown at (%d, %d)",
                 (int)event->data.mouse.pluginX, (int)event->data.mouse.pluginY);
+      if (obj->evaluateScriptOnMouseDownOrKeyDown &&
+          obj->mouseDownForEvaluateScript)
+        executeScript(obj, obj->evaluateScriptOnMouseDownOrKeyDown);
       return 1;
     case NPCocoaEventMouseUp:
       pluginLog(instance, "mouseUp at (%d, %d)", (int)event->data.mouse.pluginX,
