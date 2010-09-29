@@ -373,8 +373,8 @@ class RenderBox : public RenderBoxModelObject {
   virtual void computeLogicalWidth();
   virtual void computeLogicalHeight();
 
-  bool stretchesToViewHeight() const {
-    return document()->inQuirksMode() && style()->height().isAuto() &&
+  bool stretchesToViewport() const {
+    return document()->inQuirksMode() && style()->logicalHeight().isAuto() &&
            !isFloatingOrPositioned() && (isRoot() || isBody()) &&
            !isBlockFlowRoot();
   }

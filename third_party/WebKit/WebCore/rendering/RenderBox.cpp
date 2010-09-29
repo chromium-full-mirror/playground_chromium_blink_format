@@ -1936,7 +1936,7 @@ void RenderBox::computeLogicalHeight() {
                                                            ->style()
                                                            ->logicalHeight()
                                                            .isPercent()));
-  if (stretchesToViewHeight() || paginatedContentNeedsBaseHeight) {
+  if (stretchesToViewport() || paginatedContentNeedsBaseHeight) {
     // FIXME: Finish accounting for block flow here.
     // https://bugs.webkit.org/show_bug.cgi?id=46603
     int margins = collapsedMarginBefore() + collapsedMarginAfter();

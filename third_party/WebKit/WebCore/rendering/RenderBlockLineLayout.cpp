@@ -1047,10 +1047,10 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
   }
 
   // Now add in the bottom border/padding.
-  setLogicalHeight(height() + toAdd);
+  setLogicalHeight(logicalHeight() + toAdd);
 
   if (!firstLineBox() && hasLineIfEmpty())
-    setLogicalHeight(height() + lineHeight(true, true));
+    setLogicalHeight(logicalHeight() + lineHeight(true, true));
 
   // See if we have any lines that spill out of our block.  If we do, then we
   // will possibly need to
