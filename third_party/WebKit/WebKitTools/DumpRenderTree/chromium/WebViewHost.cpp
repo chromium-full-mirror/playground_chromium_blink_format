@@ -531,6 +531,8 @@ void WebViewHost::postAccessibilityNotification(
       case WebAccessibilityNotificationRowExpanded:
         printf("RowExpanded");
         break;
+      default:
+        break;
     }
 
     WebKit::WebNode node = obj.node();
@@ -1015,10 +1017,11 @@ WebViewHost::WebViewHost(TestShell* shell)
       m_policyDelegateIsPermissive(false),
       m_policyDelegateShouldNotifyDone(false),
       m_shell(shell),
+      m_webWidget(0),
       m_topLoadingFrame(0),
-      m_hasWindow(false),
       m_pageId(-1),
       m_lastPageIdUpdated(-1),
+      m_hasWindow(false),
       m_smartInsertDeleteEnabled(true)
 #if OS(WINDOWS)
       ,
@@ -1030,8 +1033,7 @@ WebViewHost::WebViewHost(TestShell* shell)
       ,
       m_blocksRedirects(false),
       m_requestReturnNull(false),
-      m_isPainting(false),
-      m_webWidget(0) {
+      m_isPainting(false) {
   m_navigationController.set(new TestNavigationController(this));
 }
 
