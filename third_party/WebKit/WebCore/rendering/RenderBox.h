@@ -414,6 +414,10 @@ class RenderBox : public RenderBoxModelObject {
 
   virtual int verticalScrollbarWidth() const;
   int horizontalScrollbarHeight() const;
+  int scrollbarLogicalHeight() const {
+    return style()->isVerticalBlockFlow() ? horizontalScrollbarHeight()
+                                          : verticalScrollbarWidth();
+  }
   virtual bool scroll(ScrollDirection,
                       ScrollGranularity,
                       float multiplier = 1,
