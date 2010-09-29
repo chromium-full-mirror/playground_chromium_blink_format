@@ -1792,6 +1792,13 @@ static String valueForeColor(Frame* frame, Event*) {
   return valueStyle(frame, CSSPropertyColor);
 }
 
+static String valueFormatBlock(Frame* frame, Event*) {
+  Element* formatBlockElement = frame->editor()->elementForFormatBlockCommand();
+  if (!formatBlockElement)
+    return "";
+  return formatBlockElement->localName();
+}
+
 // Map of functions
 
 struct CommandEntry {
@@ -1896,7 +1903,7 @@ static const CommandMap& createCommandMap() {
       valueForeColor, notTextInsertion, doNotAllowExecutionWhenDisabled}},
     {"FormatBlock",
      {executeFormatBlock, supported, enabledInRichlyEditableText, stateNone,
-      valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
+      valueFormatBlock, notTextInsertion, doNotAllowExecutionWhenDisabled}},
     {"ForwardDelete",
      {executeForwardDelete, supported, enabledInEditableText, stateNone,
       valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
