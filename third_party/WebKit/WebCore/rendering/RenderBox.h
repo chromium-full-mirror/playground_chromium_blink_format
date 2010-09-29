@@ -260,22 +260,26 @@ class RenderBox : public RenderBoxModelObject {
   // |maxNegmargin|.
   // For a non-collapsing box, such as a leaf element, this formula will simply
   // return
-  // the margin of the element.  Blocks override the maxTopMargin and
-  // maxBottomMargin
+  // the margin of the element.  Blocks override the maxMarginBefore and
+  // maxMarginAfter
   // methods.
+  enum MarginSign { PositiveMargin, NegativeMargin };
   virtual bool isSelfCollapsingBlock() const { return false; }
-  int collapsedMarginTop() const {
-    return maxTopMargin(true) - maxTopMargin(false);
+  int collapsedMarginBefore() const {
+    return maxMarginBefore(PositiveMargin) - maxMarginBefore(NegativeMargin);
   }
-  int collapsedMarginBottom() const {
-    return maxBottomMargin(true) - maxBottomMargin(false);
+  int collapsedMarginAfter() const {
+    return maxMarginAfter(PositiveMargin) - maxMarginAfter(NegativeMargin);
   }
-  virtual int maxTopMargin(bool positive) const {
-    return positive ? std::max(0, marginTop()) : -std::min(0, marginTop());
+  virtual int maxMarginBefore(MarginSign sign) const {
+    int beforeMargin = marginBefore();
+    return (sign == PositiveMargin) ? std::max(0, beforeMargin)
+                                    : -std::min(0, beforeMargin);
   }
-  virtual int maxBottomMargin(bool positive) const {
-    return positive ? std::max(0, marginBottom())
-                    : -std::min(0, marginBottom());
+  virtual int maxMarginAfter(MarginSign sign) const {
+    int afterMargin = marginAfter();
+    return (sign == PositiveMargin) ? std::max(0, afterMargin)
+                                    : -std::min(0, afterMargin);
   }
 
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
