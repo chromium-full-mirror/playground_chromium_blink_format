@@ -2026,6 +2026,7 @@ void HTMLMediaElement::userCancelledLoad() {
   m_player.clear();
 #endif
   stopPeriodicTimers();
+  m_loadState = WaitingForSource;
 
   // 2 - Set the error attribute to a new MediaError object whose code attribute
   // is set to MEDIA_ERR_ABORTED.
