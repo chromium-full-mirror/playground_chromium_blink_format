@@ -232,12 +232,17 @@ class RenderBlock : public RenderBox {
 
   // Accessors for logical width/height and margins in the containing block's
   // block-flow direction.
+  int logicalWidthForChild(RenderBox* child) {
+    return style()->isVerticalBlockFlow() ? child->width() : child->height();
+  }
   int logicalHeightForChild(RenderBox* child) {
     return style()->isVerticalBlockFlow() ? child->height() : child->width();
   }
   int logicalTopForChild(RenderBox* child) {
     return style()->isVerticalBlockFlow() ? child->y() : child->x();
   }
+  void setLogicalLeftForChild(RenderBox* child, int logicalLeft);
+  void setLogicalTopForChild(RenderBox* child, int logicalTop);
   int marginBeforeForChild(RenderBoxModelObject* child) const;
   int marginAfterForChild(RenderBoxModelObject* child) const;
   int marginStartForChild(RenderBoxModelObject* child) const;
@@ -325,8 +330,15 @@ class RenderBlock : public RenderBox {
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual void paintObject(PaintInfo&, int tx, int ty);
 
-  int logicalRightOffsetForContent() const;
-  int logicalLeftOffsetForContent() const;
+  int logicalRightOffsetForContent() const {
+    return style()->isVerticalBlockFlow()
+               ? borderLeft() + paddingLeft() + availableLogicalWidth()
+               : borderTop() + paddingTop() + availableLogicalWidth();
+  }
+  int logicalLeftOffsetForContent() const {
+    return style()->isVerticalBlockFlow() ? borderLeft() + paddingLeft()
+                                          : borderTop() + paddingTop();
+  }
   int logicalRightOffsetForLine(int position,
                                 int fixedOffset,
                                 bool applyTextIndent = true,
@@ -847,7 +859,6 @@ class RenderBlock : public RenderBox {
   void determineLogicalLeftPositionForChild(RenderBox* child);
   void handleAfterSideOfBlock(int top, int bottom, MarginInfo&);
   void setCollapsedBottomMargin(const MarginInfo&);
-  void setLogicalTopForChild(RenderBox* child, int logicalTop);
   // End helper functions and structs used by layoutBlockChildren.
 
   // Pagination routines.
