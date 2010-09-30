@@ -462,8 +462,12 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
 
   // ANGLE related.
   struct ShaderSourceEntry {
-    ShaderSourceEntry()
-        : type(0), source(0), log(0), translatedSource(0), isValid(false) {}
+    ShaderSourceEntry(unsigned long shaderType)
+        : type(shaderType),
+          source(0),
+          log(0),
+          translatedSource(0),
+          isValid(false) {}
 
     ~ShaderSourceEntry() {
       if (source)
@@ -485,7 +489,7 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
   void angleDestroyCompilers();
   bool angleValidateShaderSource(ShaderSourceEntry& entry);
 
-  typedef HashMap<WebGLId, ShaderSourceEntry> ShaderSourceMap;
+  typedef HashMap<WebGLId, ShaderSourceEntry*> ShaderSourceMap;
   ShaderSourceMap m_shaderSourceMap;
 
   ShHandle m_fragmentCompiler;

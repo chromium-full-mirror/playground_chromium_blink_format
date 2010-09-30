@@ -107,6 +107,11 @@ WebGraphicsContext3DDefaultImpl::~WebGraphicsContext3DDefaultImpl() {
 
     m_glContext->Destroy();
 
+    for (ShaderSourceMap::iterator ii = m_shaderSourceMap.begin();
+         ii != m_shaderSourceMap.end(); ++ii) {
+      if (ii->second)
+        delete ii->second;
+    }
     angleDestroyCompilers();
   }
 }
@@ -750,15 +755,16 @@ void WebGraphicsContext3DDefaultImpl::compileShader(WebGLId shader) {
     glCompileShader(shader);
     return;
   }
-  ShaderSourceEntry& entry = result->second;
+  ShaderSourceEntry* entry = result->second;
+  ASSERT(entry);
 
-  if (!angleValidateShaderSource(entry))
+  if (!angleValidateShaderSource(*entry))
     return;  // Shader didn't validate, don't move forward with compiling
              // translated source
 
   int shaderLength =
-      entry.translatedSource ? strlen(entry.translatedSource) : 0;
-  glShaderSource(shader, 1, const_cast<const char**>(&entry.translatedSource),
+      entry->translatedSource ? strlen(entry->translatedSource) : 0;
+  glShaderSource(shader, 1, const_cast<const char**>(&entry->translatedSource),
                  &shaderLength);
   glCompileShader(shader);
 
@@ -1076,24 +1082,25 @@ void WebGraphicsContext3DDefaultImpl::getShaderiv(WebGLId shader,
 
   ShaderSourceMap::iterator result = m_shaderSourceMap.find(shader);
   if (result != m_shaderSourceMap.end()) {
-    ShaderSourceEntry& entry = result->second;
+    ShaderSourceEntry* entry = result->second;
+    ASSERT(entry);
     switch (pname) {
       case GL_COMPILE_STATUS:
-        if (!entry.isValid) {
+        if (!entry->isValid) {
           *value = 0;
           return;
         }
         break;
       case GL_INFO_LOG_LENGTH:
-        if (!entry.isValid) {
-          *value = entry.log ? strlen(entry.log) : 0;
+        if (!entry->isValid) {
+          *value = entry->log ? strlen(entry->log) : 0;
           if (*value)
             (*value)++;
           return;
         }
         break;
       case GL_SHADER_SOURCE_LENGTH:
-        *value = entry.source ? strlen(entry.source) : 0;
+        *value = entry->source ? strlen(entry->source) : 0;
         if (*value)
           (*value)++;
         return;
@@ -1108,11 +1115,12 @@ WebString WebGraphicsContext3DDefaultImpl::getShaderInfoLog(WebGLId shader) {
 
   ShaderSourceMap::iterator result = m_shaderSourceMap.find(shader);
   if (result != m_shaderSourceMap.end()) {
-    ShaderSourceEntry& entry = result->second;
-    if (!entry.isValid) {
-      if (!entry.log)
+    ShaderSourceEntry* entry = result->second;
+    ASSERT(entry);
+    if (!entry->isValid) {
+      if (!entry->log)
         return WebString();
-      WebString res = WebString::fromUTF8(entry.log, strlen(entry.log));
+      WebString res = WebString::fromUTF8(entry->log, strlen(entry->log));
       return res;
     }
   }
@@ -1137,10 +1145,11 @@ WebString WebGraphicsContext3DDefaultImpl::getShaderSource(WebGLId shader) {
 
   ShaderSourceMap::iterator result = m_shaderSourceMap.find(shader);
   if (result != m_shaderSourceMap.end()) {
-    ShaderSourceEntry& entry = result->second;
-    if (!entry.source)
+    ShaderSourceEntry* entry = result->second;
+    ASSERT(entry);
+    if (!entry->source)
       return WebString();
-    WebString res = WebString::fromUTF8(entry.source, strlen(entry.source));
+    WebString res = WebString::fromUTF8(entry->source, strlen(entry->source));
     return res;
   }
 
@@ -1292,14 +1301,15 @@ void WebGraphicsContext3DDefaultImpl::shaderSource(WebGLId shader,
   GLint length = string ? strlen(string) : 0;
   ShaderSourceMap::iterator result = m_shaderSourceMap.find(shader);
   if (result != m_shaderSourceMap.end()) {
-    ShaderSourceEntry& entry = result->second;
-    if (entry.source) {
-      fastFree(entry.source);
-      entry.source = 0;
+    ShaderSourceEntry* entry = result->second;
+    ASSERT(entry);
+    if (entry->source) {
+      fastFree(entry->source);
+      entry->source = 0;
     }
-    if (!tryFastMalloc((length + 1) * sizeof(char)).getValue(entry.source))
+    if (!tryFastMalloc((length + 1) * sizeof(char)).getValue(entry->source))
       return;  // FIXME: generate an error?
-    memcpy(entry.source, string, (length + 1) * sizeof(char));
+    memcpy(entry->source, string, (length + 1) * sizeof(char));
   } else
     glShaderSource(shader, 1, &string, &length);
 }
@@ -1509,10 +1519,12 @@ unsigned WebGraphicsContext3DDefaultImpl::createShader(
   ASSERT(shaderType == GL_VERTEX_SHADER || shaderType == GL_FRAGMENT_SHADER);
   unsigned shader = glCreateShader(shaderType);
   if (shader) {
-    ShaderSourceEntry entry;
-    entry.type = shaderType;
-    m_shaderSourceMap.set(shader, entry);
+    ShaderSourceMap::iterator result = m_shaderSourceMap.find(shader);
+    if (result != m_shaderSourceMap.end())
+      delete result->second;
+    m_shaderSourceMap.set(shader, new ShaderSourceEntry(shaderType));
   }
+
   return shader;
 }
 
@@ -1546,8 +1558,12 @@ void WebGraphicsContext3DDefaultImpl::deleteRenderbuffer(
 
 void WebGraphicsContext3DDefaultImpl::deleteShader(unsigned shader) {
   makeContextCurrent();
+
+  ShaderSourceMap::iterator result = m_shaderSourceMap.find(shader);
+  if (result != m_shaderSourceMap.end())
+    delete result->second;
+  m_shaderSourceMap.remove(result);
   glDeleteShader(shader);
-  m_shaderSourceMap.remove(shader);
 }
 
 void WebGraphicsContext3DDefaultImpl::deleteTexture(unsigned texture) {
