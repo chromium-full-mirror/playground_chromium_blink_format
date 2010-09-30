@@ -34,10 +34,14 @@ using namespace std;
 class WindowGeometryInitializedBeforeSetWindow : public PluginTest {
  public:
   WindowGeometryInitializedBeforeSetWindow(NPP npp, const string& identifier)
-      : PluginTest(npp, identifier) {}
+      : PluginTest(npp, identifier), m_didReceiveInitialSetWindowCall(false) {}
 
  private:
   virtual NPError NPP_SetWindow(NPP instance, NPWindow* window) {
+    if (m_didReceiveInitialSetWindowCall)
+      return NPERR_NO_ERROR;
+    m_didReceiveInitialSetWindowCall = true;
+
     if (window->type != NPWindowTypeWindow) {
       pluginLog(instance,
                 "window->type should be NPWindowTypeWindow but was %d",
@@ -84,6 +88,8 @@ class WindowGeometryInitializedBeforeSetWindow : public PluginTest {
               "NPP_SetWindow was called");
     return NPERR_NO_ERROR;
   }
+
+  bool m_didReceiveInitialSetWindowCall;
 };
 
 static PluginTest::Register<WindowGeometryInitializedBeforeSetWindow>
