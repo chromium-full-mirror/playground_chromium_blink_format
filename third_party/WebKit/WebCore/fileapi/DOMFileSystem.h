@@ -44,6 +44,7 @@
 namespace WebCore {
 
 class DirectoryEntry;
+class DirectoryReader;
 class Entry;
 class EntryCallback;
 class EntriesCallback;
@@ -103,7 +104,8 @@ class DOMFileSystem : public RefCounted<DOMFileSystem>, public ActiveDOMObject {
                     PassRefPtr<Flags>,
                     PassRefPtr<EntryCallback>,
                     PassRefPtr<ErrorCallback>);
-  void readDirectory(const String& path,
+  void readDirectory(DirectoryReader* reader,
+                     const String& path,
                      PassRefPtr<EntriesCallback>,
                      PassRefPtr<ErrorCallback>);
   void createWriter(const FileEntry* file,
@@ -112,10 +114,17 @@ class DOMFileSystem : public RefCounted<DOMFileSystem>, public ActiveDOMObject {
 
   // Schedule a callback. This should not cross threads (should be called on the
   // same context thread).
+  // FIXME: move this to a more generic place.
   template <typename CB, typename CBArg>
   static void scheduleCallback(ScriptExecutionContext*,
                                PassRefPtr<CB>,
                                PassRefPtr<CBArg>);
+
+  template <typename CB, typename CBArg>
+  void scheduleCallback(PassRefPtr<CB> callback,
+                        PassRefPtr<CBArg> callbackArg) {
+    scheduleCallback(scriptExecutionContext(), callback, callbackArg);
+  }
 
  private:
   DOMFileSystem(ScriptExecutionContext*,

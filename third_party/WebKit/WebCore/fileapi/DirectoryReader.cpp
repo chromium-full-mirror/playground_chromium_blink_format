@@ -35,17 +35,22 @@
 
 #include "DOMFileSystem.h"
 #include "EntriesCallback.h"
+#include "EntryArray.h"
 #include "ErrorCallback.h"
 
 namespace WebCore {
 
 DirectoryReader::DirectoryReader(PassRefPtr<DOMFileSystem> fileSystem,
                                  const String& fullPath)
-    : m_fileSystem(fileSystem), m_fullPath(fullPath) {}
+    : m_fileSystem(fileSystem), m_fullPath(fullPath), m_hasMore(true) {}
 
 void DirectoryReader::readEntries(PassRefPtr<EntriesCallback> entriesCallback,
                                   PassRefPtr<ErrorCallback> errorCallback) {
-  m_fileSystem->readDirectory(m_fullPath, entriesCallback, errorCallback);
+  if (!m_hasMore) {
+    m_fileSystem->scheduleCallback(entriesCallback, EntryArray::create());
+    return;
+  }
+  m_fileSystem->readDirectory(this, m_fullPath, entriesCallback, errorCallback);
 }
 
 }  // namespace
