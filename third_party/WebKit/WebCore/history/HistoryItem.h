@@ -172,8 +172,8 @@ class HistoryItem : public RefCounted<HistoryItem> {
   bool hasChildren() const;
   void clearChildren();
 
-  bool hasSameDocuments(HistoryItem* otherItem);
-  bool hasSameFrames(HistoryItem* otherItem);
+  bool shouldDoSameDocumentNavigationTo(HistoryItem* otherItem) const;
+  bool hasSameFrames(HistoryItem* otherItem) const;
 
   // This should not be called directly for HistoryItems that are already
   // included
@@ -239,6 +239,8 @@ class HistoryItem : public RefCounted<HistoryItem> {
   void padDailyCountsForNewVisit(double time);
   void collapseDailyVisitsToWeekly();
   void recordVisitAtTime(double, VisitCountBehavior = IncreaseVisitCount);
+
+  bool hasSameDocumentTree(HistoryItem* otherItem) const;
 
   HistoryItem* findTargetItem();
 

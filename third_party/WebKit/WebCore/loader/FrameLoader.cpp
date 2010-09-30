@@ -3563,13 +3563,9 @@ void FrameLoader::navigateToDifferentDocument(HistoryItem* item,
 
 // Loads content into this frame, as specified by history item
 void FrameLoader::loadItem(HistoryItem* item, FrameLoadType loadType) {
-  // We do same-document navigation in the following cases:
-  // - The HistoryItem corresponds to the same document (or documents in the
-  // case of frames).
-  // - The HistoryItem is not the same as the current item.
   HistoryItem* currentItem = history()->currentItem();
   bool sameDocumentNavigation =
-      currentItem && item != currentItem && item->hasSameDocuments(currentItem);
+      currentItem && item->shouldDoSameDocumentNavigationTo(currentItem);
 
 #if ENABLE(WML)
   // All WML decks should go through the real load mechanism, not the
