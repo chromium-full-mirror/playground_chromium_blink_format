@@ -344,7 +344,7 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
 
   unsigned length = itemText.length();
   const UChar* string = itemText.characters();
-  TextRun textRun(string, length, 0, 0, 0, itemStyle->direction() == RTL,
+  TextRun textRun(string, length, 0, 0, 0, !itemStyle->isLeftToRightDirection(),
                   itemStyle->unicodeBidi() == Override, false, false);
 
   // Draw the item text

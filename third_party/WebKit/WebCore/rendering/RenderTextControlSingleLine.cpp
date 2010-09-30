@@ -389,7 +389,8 @@ void RenderTextControlSingleLine::forwardEvent(Event* event) {
     if (innerTextRenderer) {
       if (RenderLayer* innerLayer = innerTextRenderer->layer())
         innerLayer->scrollToOffset(
-            style()->direction() == RTL ? innerLayer->scrollWidth() : 0, 0);
+            !style()->isLeftToRightDirection() ? innerLayer->scrollWidth() : 0,
+            0);
     }
 
     capsLockStateMayHaveChanged();

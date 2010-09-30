@@ -59,7 +59,7 @@ const unsigned cMaxLineDepth = 200;
 static int getBorderPaddingMargin(RenderBoxModelObject* child,
                                   bool endOfInline) {
   bool leftSide =
-      (child->style()->direction() == LTR) ? !endOfInline : endOfInline;
+      (child->style()->isLeftToRightDirection()) ? !endOfInline : endOfInline;
   if (leftSide)
     return child->marginLeft() + child->paddingLeft() + child->borderLeft();
   return child->marginRight() + child->paddingRight() + child->borderRight();
@@ -274,7 +274,7 @@ RootInlineBox* RenderBlock::constructLine(unsigned runCount,
     // Create a box for our object.
     bool isOnlyRun = (runCount == 1);
     if (runCount == 2 && !r->m_object->isListMarker())
-      isOnlyRun = ((style()->direction() == RTL) ? lastRun : firstRun)
+      isOnlyRun = (!style()->isLeftToRightDirection() ? lastRun : firstRun)
                       ->m_object->isListMarker();
 
     InlineBox* box = createInlineBoxForRenderer(r->m_object, false, isOnlyRun);
@@ -423,7 +423,7 @@ void RenderBlock::computeInlineDirectionPositionsForLine(
       // lines.  In
       // particular with RTL blocks, wide lines should still spill out to the
       // left.
-      if (style()->direction() == LTR) {
+      if (style()->isLeftToRightDirection()) {
         if (totWidth > availableWidth && trailingSpaceRun)
           trailingSpaceRun->m_box->setLogicalWidth(
               max(0, trailingSpaceRun->m_box->logicalWidth() - totWidth +
@@ -447,7 +447,7 @@ void RenderBlock::computeInlineDirectionPositionsForLine(
     case TAAUTO:
       numSpaces = 0;
       // for right to left fall through to right aligned
-      if (style()->direction() == LTR) {
+      if (style()->isLeftToRightDirection()) {
         if (totWidth > availableWidth && trailingSpaceRun)
           trailingSpaceRun->m_box->setLogicalWidth(
               max(0, trailingSpaceRun->m_box->logicalWidth() - totWidth +
@@ -460,7 +460,7 @@ void RenderBlock::computeInlineDirectionPositionsForLine(
       // So even if text-align is right, if direction is LTR, wide lines should
       // overflow out of the right
       // side of the block.
-      if (style()->direction() == LTR) {
+      if (style()->isLeftToRightDirection()) {
         if (trailingSpaceRun) {
           totWidth -= trailingSpaceRun->m_box->logicalWidth();
           trailingSpaceRun->m_box->setLogicalWidth(0);
@@ -486,7 +486,7 @@ void RenderBlock::computeInlineDirectionPositionsForLine(
                                  (availableWidth - totWidth + 1) / 2);
         trailingSpaceRun->m_box->setLogicalWidth(max(0, trailingSpaceWidth));
       }
-      if (style()->direction() == LTR)
+      if (style()->isLeftToRightDirection())
         x += max((availableWidth - totWidth) / 2, 0);
       else
         x += totWidth > availableWidth
@@ -1211,7 +1211,7 @@ RootInlineBox* RenderBlock::determineStartPosition(
     pos = last->lineBreakPos();
     resolver.setStatus(last->lineBreakBidiStatus());
   } else {
-    bool ltr = style()->direction() == LTR
+    bool ltr = style()->isLeftToRightDirection()
 #if ENABLE(SVG)
                || (style()->unicodeBidi() == UBNormal && isSVGText())
 #endif
@@ -1466,7 +1466,7 @@ void RenderBlock::skipTrailingWhitespace(InlineIterator& iterator,
         // the relative positioned
         // inline so that we can obtain the value later.
         toRenderInline(c)->layer()->setStaticX(
-            style()->direction() == LTR
+            style()->isLeftToRightDirection()
                 ? logicalLeftOffsetForLine(height(), false)
                 : logicalRightOffsetForLine(height(), false));
         toRenderInline(c)->layer()->setStaticY(height());
@@ -1476,11 +1476,11 @@ void RenderBlock::skipTrailingWhitespace(InlineIterator& iterator,
       if (box->style()->hasStaticX()) {
         if (box->style()->isOriginalDisplayInlineType())
           box->layer()->setStaticX(
-              style()->direction() == LTR
+              style()->isLeftToRightDirection()
                   ? logicalLeftOffsetForLine(height(), false)
                   : width() - logicalRightOffsetForLine(height(), false));
         else
-          box->layer()->setStaticX(style()->direction() == LTR
+          box->layer()->setStaticX(style()->isLeftToRightDirection()
                                        ? borderLeft() + paddingLeft()
                                        : borderRight() + paddingRight());
       }
@@ -1519,7 +1519,7 @@ int RenderBlock::skipLeadingWhitespace(
         // the relative positioned
         // inline so that we can obtain the value later.
         toRenderInline(c)->layer()->setStaticX(
-            style()->direction() == LTR
+            style()->isLeftToRightDirection()
                 ? logicalLeftOffsetForLine(height(), firstLine)
                 : logicalRightOffsetForLine(height(), firstLine));
         toRenderInline(c)->layer()->setStaticY(height());
@@ -1529,11 +1529,11 @@ int RenderBlock::skipLeadingWhitespace(
       if (box->style()->hasStaticX()) {
         if (box->style()->isOriginalDisplayInlineType())
           box->layer()->setStaticX(
-              style()->direction() == LTR
+              style()->isLeftToRightDirection()
                   ? logicalLeftOffsetForLine(height(), firstLine)
                   : width() - logicalRightOffsetForLine(height(), firstLine));
         else
-          box->layer()->setStaticX(style()->direction() == LTR
+          box->layer()->setStaticX(style()->isLeftToRightDirection()
                                        ? borderLeft() + paddingLeft()
                                        : borderRight() + paddingRight());
       }
@@ -1788,9 +1788,10 @@ InlineIterator RenderBlock::findNextLineBreak(
         bool isInlineType = box->style()->isOriginalDisplayInlineType();
         bool needToSetStaticX = box->style()->hasStaticX();
         if (box->style()->hasStaticX() && !isInlineType) {
-          box->layer()->setStaticX(o->parent()->style()->direction() == LTR
-                                       ? borderLeft() + paddingLeft()
-                                       : borderRight() + paddingRight());
+          box->layer()->setStaticX(
+              o->parent()->style()->isLeftToRightDirection()
+                  ? borderLeft() + paddingLeft()
+                  : borderRight() + paddingRight());
           needToSetStaticX = false;
         }
 
@@ -2411,7 +2412,7 @@ void RenderBlock::checkLinesForTextOverflow() {
   // check the left edge of the line box to see if it is less
   // Include the scrollbar for overflow blocks, which means we want to use
   // "contentWidth()"
-  bool ltr = style()->direction() == LTR;
+  bool ltr = style()->isLeftToRightDirection();
   for (RootInlineBox* curr = firstRootBox(); curr; curr = curr->nextRootBox()) {
     int blockRightEdge =
         logicalRightOffsetForLine(curr->y(), curr == firstRootBox());

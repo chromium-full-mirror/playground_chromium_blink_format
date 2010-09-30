@@ -211,7 +211,8 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
     const String& displayedFilename = fileTextValue();
     unsigned length = displayedFilename.length();
     const UChar* string = displayedFilename.characters();
-    TextRun textRun(string, length, false, 0, 0, style()->direction() == RTL,
+    TextRun textRun(string, length, false, 0, 0,
+                    !style()->isLeftToRightDirection(),
                     style()->unicodeBidi() == Override);
 
     // Determine where the filename should be placed
@@ -220,7 +221,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
         m_button->renderBox()->width() + afterButtonSpacing +
         (m_fileChooser->icon() ? iconWidth + iconFilenameSpacing : 0);
     int textX;
-    if (style()->direction() == LTR)
+    if (style()->isLeftToRightDirection())
       textX = contentLeft + buttonAndIconWidth;
     else
       textX = contentLeft + contentWidth() - buttonAndIconWidth -
@@ -245,7 +246,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
       int iconY =
           ty + borderTop() + paddingTop() + (contentHeight() - iconHeight) / 2;
       int iconX;
-      if (style()->direction() == LTR)
+      if (style()->isLeftToRightDirection())
         iconX =
             contentLeft + m_button->renderBox()->width() + afterButtonSpacing;
       else

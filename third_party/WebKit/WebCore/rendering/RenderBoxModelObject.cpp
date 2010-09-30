@@ -337,7 +337,7 @@ int RenderBoxModelObject::relativePositionOffsetX() const {
   if (!style()->left().isAuto()) {
     RenderBlock* cb = containingBlock();
     if (!style()->right().isAuto() &&
-        containingBlock()->style()->direction() == RTL)
+        !containingBlock()->style()->isLeftToRightDirection())
       return -style()->right().calcValue(cb->availableWidth());
     return style()->left().calcValue(cb->availableWidth());
   }

@@ -460,8 +460,8 @@ static void writeTextRun(TextStream& ts,
     y -= toRenderTableCell(o.containingBlock())->intrinsicPaddingBefore();
   ts << "text run at (" << run.m_x << "," << y << ") width "
      << run.m_logicalWidth;
-  if (run.direction() == RTL || run.m_dirOverride) {
-    ts << (run.direction() == RTL ? " RTL" : " LTR");
+  if (!run.isLeftToRightDirection() || run.m_dirOverride) {
+    ts << (!run.isLeftToRightDirection() ? " RTL" : " LTR");
     if (run.m_dirOverride)
       ts << " override";
   }

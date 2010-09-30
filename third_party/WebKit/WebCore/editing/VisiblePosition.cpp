@@ -125,12 +125,12 @@ Position VisiblePosition::leftVisuallyDistinctCandidate() const {
     while (true) {
       if ((renderer->isReplaced() || renderer->isBR()) &&
           offset == box->caretRightmostOffset())
-        return box->direction() == LTR
+        return box->isLeftToRightDirection()
                    ? previousVisuallyDistinctCandidate(m_deepPosition)
                    : nextVisuallyDistinctCandidate(m_deepPosition);
 
-      offset = box->direction() == LTR ? renderer->previousOffset(offset)
-                                       : renderer->nextOffset(offset);
+      offset = box->isLeftToRightDirection() ? renderer->previousOffset(offset)
+                                             : renderer->nextOffset(offset);
 
       int caretMinOffset = box->caretMinOffset();
       int caretMaxOffset = box->caretMaxOffset();
@@ -138,8 +138,8 @@ Position VisiblePosition::leftVisuallyDistinctCandidate() const {
       if (offset > caretMinOffset && offset < caretMaxOffset)
         break;
 
-      if (box->direction() == LTR ? offset < caretMinOffset
-                                  : offset > caretMaxOffset) {
+      if (box->isLeftToRightDirection() ? offset < caretMinOffset
+                                        : offset > caretMaxOffset) {
         // Overshot to the left.
         InlineBox* prevBox = box->prevLeafChild();
         if (!prevBox)
@@ -272,12 +272,12 @@ Position VisiblePosition::rightVisuallyDistinctCandidate() const {
     while (true) {
       if ((renderer->isReplaced() || renderer->isBR()) &&
           offset == box->caretLeftmostOffset())
-        return box->direction() == LTR
+        return box->isLeftToRightDirection()
                    ? nextVisuallyDistinctCandidate(m_deepPosition)
                    : previousVisuallyDistinctCandidate(m_deepPosition);
 
-      offset = box->direction() == LTR ? renderer->nextOffset(offset)
-                                       : renderer->previousOffset(offset);
+      offset = box->isLeftToRightDirection() ? renderer->nextOffset(offset)
+                                             : renderer->previousOffset(offset);
 
       int caretMinOffset = box->caretMinOffset();
       int caretMaxOffset = box->caretMaxOffset();
@@ -285,8 +285,8 @@ Position VisiblePosition::rightVisuallyDistinctCandidate() const {
       if (offset > caretMinOffset && offset < caretMaxOffset)
         break;
 
-      if (box->direction() == LTR ? offset > caretMaxOffset
-                                  : offset < caretMinOffset) {
+      if (box->isLeftToRightDirection() ? offset > caretMaxOffset
+                                        : offset < caretMinOffset) {
         // Overshot to the right.
         InlineBox* nextBox = box->nextLeafChild();
         if (!nextBox)

@@ -1510,7 +1510,7 @@ bool RenderBlock::expandsToEncloseOverhangingFloats() const {
 void RenderBlock::adjustPositionedBlock(RenderBox* child,
                                         const MarginInfo& marginInfo) {
   if (child->style()->hasStaticX()) {
-    if (style()->direction() == LTR)
+    if (style()->isLeftToRightDirection())
       child->layer()->setStaticX(borderLeft() + paddingLeft());
     else
       child->layer()->setStaticX(borderRight() + paddingRight());
@@ -1875,7 +1875,7 @@ void RenderBlock::determineLogicalLeftPositionForChild(RenderBox* child) {
   // floats.  They need
   // to shift over as necessary to dodge any floats that might get in the way.
   if (child->avoidsFloats()) {
-    int startOff = style()->direction() == LTR
+    int startOff = style()->isLeftToRightDirection()
                        ? logicalLeftOffsetForLine(logicalHeight(), false)
                        : totalAvailableLogicalWidth -
                              logicalRightOffsetForLine(logicalHeight(), false);
@@ -1903,7 +1903,7 @@ void RenderBlock::determineLogicalLeftPositionForChild(RenderBox* child) {
     }
   }
 
-  setLogicalLeftForChild(child, style()->direction() == LTR
+  setLogicalLeftForChild(child, style()->isLeftToRightDirection()
                                     ? newPosition
                                     : totalAvailableLogicalWidth - newPosition -
                                           logicalWidthForChild(child));
@@ -2448,14 +2448,14 @@ void RenderBlock::paintColumnRules(PaintInfo& paintInfo, int tx, int ty) {
   // We need to do multiple passes, breaking up our child painting into strips.
   ColumnInfo* colInfo = columnInfo();
   unsigned colCount = columnCount(colInfo);
-  int currXOffset = style()->direction() == LTR ? 0 : contentWidth();
+  int currXOffset = style()->isLeftToRightDirection() ? 0 : contentWidth();
   int ruleAdd = borderLeft() + paddingLeft();
-  int ruleX = style()->direction() == LTR ? 0 : contentWidth();
+  int ruleX = style()->isLeftToRightDirection() ? 0 : contentWidth();
   for (unsigned i = 0; i < colCount; i++) {
     IntRect colRect = columnRectAt(colInfo, i);
 
     // Move to the next position.
-    if (style()->direction() == LTR) {
+    if (style()->isLeftToRightDirection()) {
       ruleX += colRect.width() + colGap / 2;
       currXOffset += colRect.width() + colGap;
     } else {
@@ -2471,7 +2471,7 @@ void RenderBlock::paintColumnRules(PaintInfo& paintInfo, int tx, int ty) {
       int ruleBottom = ruleTop + contentHeight();
       drawLineForBoxSide(paintInfo.context, ruleStart, ruleTop, ruleEnd,
                          ruleBottom,
-                         style()->direction() == LTR ? BSLeft : BSRight,
+                         style()->isLeftToRightDirection() ? BSLeft : BSRight,
                          ruleColor, ruleStyle, 0, 0);
     }
 
@@ -2490,7 +2490,7 @@ void RenderBlock::paintColumnContents(PaintInfo& paintInfo,
   unsigned colCount = columnCount(colInfo);
   if (!colCount)
     return;
-  int currXOffset = style()->direction() == LTR
+  int currXOffset = style()->isLeftToRightDirection()
                         ? 0
                         : contentWidth() - columnRectAt(colInfo, 0).width();
   int currYOffset = 0;
@@ -2522,7 +2522,7 @@ void RenderBlock::paintColumnContents(PaintInfo& paintInfo,
     }
 
     // Move to the next position.
-    if (style()->direction() == LTR)
+    if (style()->isLeftToRightDirection())
       currXOffset += colRect.width() + colGap;
     else
       currXOffset -= (colRect.width() + colGap);
@@ -3298,7 +3298,7 @@ IntRect RenderBlock::fillRightSelectionGap(RenderObject* selObj,
 void RenderBlock::getHorizontalSelectionGapInfo(SelectionState state,
                                                 bool& leftGap,
                                                 bool& rightGap) {
-  bool ltr = style()->direction() == LTR;
+  bool ltr = style()->isLeftToRightDirection();
   leftGap = (state == RenderObject::SelectionInside) ||
             (state == RenderObject::SelectionEnd && ltr) ||
             (state == RenderObject::SelectionStart && !ltr);
@@ -3733,7 +3733,7 @@ int RenderBlock::logicalLeftOffsetForLine(int y,
     }
   }
 
-  if (applyTextIndent && style()->direction() == LTR) {
+  if (applyTextIndent && style()->isLeftToRightDirection()) {
     int cw = 0;
     if (style()->textIndent().isPercent())
       cw = containingBlock()->availableLogicalWidth();
@@ -3764,7 +3764,7 @@ int RenderBlock::logicalRightOffsetForLine(int y,
     }
   }
 
-  if (applyTextIndent && style()->direction() == RTL) {
+  if (applyTextIndent && !style()->isLeftToRightDirection()) {
     int cw = 0;
     if (style()->textIndent().isPercent())
       cw = containingBlock()->availableLogicalWidth();
@@ -3980,7 +3980,7 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
 
   if (hasColumns()) {
     // This only matters for LTR
-    if (style()->direction() == LTR) {
+    if (style()->isLeftToRightDirection()) {
       ColumnInfo* colInfo = columnInfo();
       unsigned count = columnCount(colInfo);
       if (count)
@@ -4016,7 +4016,7 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
         // show when we don't want them to.
         if (node() && node()->isContentEditable() &&
             node() == node()->rootEditableElement() &&
-            style()->direction() == LTR && !paddingRight())
+            style()->isLeftToRightDirection() && !paddingRight())
           childRightEdge += 1;
         right = max(right, childRightEdge + paddingRight() + relativeOffset);
       }
@@ -4098,7 +4098,7 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
 
   if (hasColumns()) {
     // This only matters for RTL
-    if (style()->direction() == RTL) {
+    if (!style()->isLeftToRightDirection()) {
       ColumnInfo* colInfo = columnInfo();
       unsigned count = columnCount(colInfo);
       if (count)
@@ -5102,7 +5102,7 @@ IntRect RenderBlock::columnRectAt(ColumnInfo* colInfo, unsigned index) const {
   int colTop = borderTop() + paddingTop();
   int colGap = columnGap();
   int colLeft =
-      style()->direction() == LTR
+      style()->isLeftToRightDirection()
           ? borderLeft() + paddingLeft() + (index * (colWidth + colGap))
           : borderLeft() + paddingLeft() + contentWidth() - colWidth -
                 (index * (colWidth + colGap));
@@ -5158,8 +5158,9 @@ bool RenderBlock::layoutColumns(bool hasSpecifiedPageHeight,
 
     if (columnCount(colInfo)) {
       IntRect lastRect = columnRectAt(colInfo, columnCount(colInfo) - 1);
-      int overflowLeft = style()->direction() == RTL ? min(0, lastRect.x()) : 0;
-      int overflowRight = style()->direction() == LTR
+      int overflowLeft =
+          !style()->isLeftToRightDirection() ? min(0, lastRect.x()) : 0;
+      int overflowRight = style()->isLeftToRightDirection()
                               ? max(width(), lastRect.x() + lastRect.width())
                               : 0;
       int overflowHeight = borderTop() + paddingTop() + colInfo->columnHeight();
@@ -5431,7 +5432,8 @@ static int getBorderPaddingMargin(const RenderBoxModelObject* child,
                                   bool endOfInline) {
   RenderStyle* cstyle = child->style();
   int result = 0;
-  bool leftSide = (cstyle->direction() == LTR) ? !endOfInline : endOfInline;
+  bool leftSide =
+      (cstyle->isLeftToRightDirection()) ? !endOfInline : endOfInline;
   result +=
       getBPMWidth((leftSide ? child->marginLeft() : child->marginRight()),
                   (leftSide ? cstyle->marginLeft() : cstyle->marginRight()));
@@ -6544,7 +6546,7 @@ IntRect RenderBlock::localCaretRect(InlineBox* inlineBox,
   switch (currentStyle->textAlign()) {
     case TAAUTO:
     case JUSTIFY:
-      if (currentStyle->direction() == RTL)
+      if (!currentStyle->isLeftToRightDirection())
         alignment = alignRight;
       break;
     case LEFT:
@@ -6932,28 +6934,28 @@ int RenderBlock::marginAfterForChild(RenderBoxModelObject* child) const {
 
 int RenderBlock::marginStartForChild(RenderBoxModelObject* child) const {
   if (style()->isVerticalBlockFlow())
-    return style()->direction() == LTR ? child->marginLeft()
-                                       : child->marginRight();
-  return style()->direction() == LTR ? child->marginTop()
-                                     : child->marginBottom();
+    return style()->isLeftToRightDirection() ? child->marginLeft()
+                                             : child->marginRight();
+  return style()->isLeftToRightDirection() ? child->marginTop()
+                                           : child->marginBottom();
 }
 
 int RenderBlock::marginEndForChild(RenderBoxModelObject* child) const {
   if (style()->isVerticalBlockFlow())
-    return style()->direction() == LTR ? child->marginRight()
-                                       : child->marginLeft();
-  return style()->direction() == LTR ? child->marginBottom()
-                                     : child->marginTop();
+    return style()->isLeftToRightDirection() ? child->marginRight()
+                                             : child->marginLeft();
+  return style()->isLeftToRightDirection() ? child->marginBottom()
+                                           : child->marginTop();
 }
 
 void RenderBlock::setMarginStartForChild(RenderBox* child, int margin) {
   if (style()->isVerticalBlockFlow()) {
-    if (style()->direction() == LTR)
+    if (style()->isLeftToRightDirection())
       child->setMarginLeft(margin);
     else
       child->setMarginRight(margin);
   } else {
-    if (style()->direction() == LTR)
+    if (style()->isLeftToRightDirection())
       child->setMarginTop(margin);
     else
       child->setMarginBottom(margin);
@@ -6962,12 +6964,12 @@ void RenderBlock::setMarginStartForChild(RenderBox* child, int margin) {
 
 void RenderBlock::setMarginEndForChild(RenderBox* child, int margin) {
   if (style()->isVerticalBlockFlow()) {
-    if (style()->direction() == LTR)
+    if (style()->isLeftToRightDirection())
       child->setMarginRight(margin);
     else
       child->setMarginLeft(margin);
   } else {
-    if (style()->direction() == LTR)
+    if (style()->isLeftToRightDirection())
       child->setMarginBottom(margin);
     else
       child->setMarginTop(margin);

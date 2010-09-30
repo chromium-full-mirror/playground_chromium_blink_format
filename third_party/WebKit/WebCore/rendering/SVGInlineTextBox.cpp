@@ -69,7 +69,8 @@ void SVGInlineTextBox::measureCharacter(RenderStyle* style,
                                         float& glyphHeight) const {
   ASSERT(style);
 
-  int offset = direction() == RTL ? end() - position : start() + position;
+  int offset =
+      !isLeftToRightDirection() ? end() - position : start() + position;
   int extraCharsAvailable = len() - position - 1;
   const UChar* characters = textRenderer()->characters();
 
@@ -755,7 +756,6 @@ void SVGInlineTextBox::buildLayoutInformation(SVGCharacterLayoutInfo& info,
   const Font& font = style->font();
   const UChar* characters = textRenderer->characters();
 
-  TextDirection textDirection = direction();
   unsigned startPosition = start();
   unsigned endPosition = end();
   unsigned length = len();
@@ -831,10 +831,10 @@ void SVGInlineTextBox::buildLayoutInformation(SVGCharacterLayoutInfo& info,
 
     const UChar* currentCharacter =
         characters +
-        (textDirection == RTL ? endPosition - i : startPosition + i);
+        (!isLeftToRightDirection() ? endPosition - i : startPosition + i);
     const UChar* lastCharacter = 0;
 
-    if (textDirection == RTL) {
+    if (!isLeftToRightDirection()) {
       if (i < endPosition)
         lastCharacter = characters + endPosition - i + 1;
     } else {

@@ -114,7 +114,7 @@ int RenderMarquee::computePosition(EMarqueeDirection dir,
   ASSERT(box);
   RenderStyle* s = box->style();
   if (isHorizontal()) {
-    bool ltr = s->direction() == LTR;
+    bool ltr = s->isLeftToRightDirection();
     int clientWidth = box->clientWidth();
     int contentWidth = ltr ? box->rightmostPosition(true, false)
                            : box->leftmostPosition(true, false);

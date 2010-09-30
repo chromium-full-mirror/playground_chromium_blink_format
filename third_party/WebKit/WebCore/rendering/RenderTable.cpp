@@ -780,7 +780,8 @@ int RenderTable::calcBorderLeft() const {
     if (tb.style() > BHIDDEN)
       borderWidth = tb.width();
 
-    int leftmostColumn = style()->direction() == RTL ? numEffCols() - 1 : 0;
+    int leftmostColumn =
+        !style()->isLeftToRightDirection() ? numEffCols() - 1 : 0;
     RenderTableCol* colGroup = colElement(leftmostColumn);
     if (colGroup) {
       const BorderValue& gb = style()->borderLeft();
@@ -842,7 +843,8 @@ int RenderTable::calcBorderRight() const {
     if (tb.style() > BHIDDEN)
       borderWidth = tb.width();
 
-    int rightmostColumn = style()->direction() == RTL ? 0 : numEffCols() - 1;
+    int rightmostColumn =
+        !style()->isLeftToRightDirection() ? 0 : numEffCols() - 1;
     RenderTableCol* colGroup = colElement(rightmostColumn);
     if (colGroup) {
       const BorderValue& gb = style()->borderRight();

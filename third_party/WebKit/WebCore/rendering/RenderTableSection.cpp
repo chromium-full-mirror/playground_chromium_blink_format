@@ -629,7 +629,7 @@ int RenderTableSection::layoutRows(int toAdd) {
 
       IntRect oldCellRect(cell->x(), cell->y(), cell->width(), cell->height());
 
-      if (style()->direction() == RTL)
+      if (!style()->isLeftToRightDirection())
         cell->setLocation(table()->columnPositions()[nEffCols] -
                               table()->columnPositions()[table()->colToEffCol(
                                   cell->col() + cell->colSpan())] +
@@ -948,7 +948,7 @@ int RenderTableSection::calcOuterBorderRight(bool rtl) const {
 }
 
 void RenderTableSection::recalcOuterBorder() {
-  bool rtl = table()->style()->direction() == RTL;
+  bool rtl = !table()->style()->isLeftToRightDirection();
   m_outerBorderTop = calcOuterBorderTop();
   m_outerBorderBottom = calcOuterBorderBottom();
   m_outerBorderLeft = calcOuterBorderLeft(rtl);
@@ -1091,7 +1091,7 @@ void RenderTableSection::paintObject(PaintInfo& paintInfo, int tx, int ty) {
   unsigned startcol = 0;
   unsigned endcol = totalCols;
   // FIXME: Implement RTL.
-  if (!m_hasOverflowingCell && style()->direction() == LTR) {
+  if (!m_hasOverflowingCell && style()->isLeftToRightDirection()) {
     int relativeX = x - tx;
     int left = relativeX - os;
     Vector<int>& columnPos = table()->columnPositions();
@@ -1287,7 +1287,7 @@ bool RenderTableSection::nodeAtPoint(const HitTestRequest& request,
     --leftrow;
 
   Vector<int>& columnPos = table()->columnPositions();
-  bool rtl = style()->direction() == RTL;
+  bool rtl = !style()->isLeftToRightDirection();
   int relativeX = xPos - tx;
   if (rtl)
     relativeX = columnPos[columnPos.size() - 1] - relativeX;

@@ -583,6 +583,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
   TextDirection direction() const {
     return static_cast<TextDirection>(inherited_flags._direction);
   }
+  bool isLeftToRightDirection() const { return direction() == LTR; }
+
   Length lineHeight() const { return inherited->line_height; }
   int computedLineHeight() const {
     Length lh = lineHeight();

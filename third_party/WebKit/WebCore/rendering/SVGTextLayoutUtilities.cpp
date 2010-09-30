@@ -325,7 +325,7 @@ TextRun svgTextRunForInlineTextBox(const UChar* characters,
       ,
       0 /* padding, only relevant for justified text, not relevant for SVG */
       ,
-      textBox->direction() == RTL,
+      !textBox->isLeftToRightDirection(),
       textBox->m_dirOverride ||
           style->visuallyOrdered() /* directionalOverride */);
 

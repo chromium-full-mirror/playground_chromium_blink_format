@@ -239,7 +239,7 @@ IntRect RenderTableCell::clippedOverflowRectForRepaint(
   if (!table()->collapseBorders() || table()->needsSectionRecalc())
     return RenderBlock::clippedOverflowRectForRepaint(repaintContainer);
 
-  bool rtl = table()->style()->direction() == RTL;
+  bool rtl = !table()->style()->isLeftToRightDirection();
   int outlineSize = style()->outlineSize();
   int left = max(borderHalfLeft(true), outlineSize);
   int right = max(borderHalfRight(true), outlineSize);
@@ -855,7 +855,7 @@ int RenderTableCell::borderAfter() const {
 
 int RenderTableCell::borderHalfLeft(bool outer) const {
   CollapsedBorderValue border =
-      collapsedLeftBorder(table()->style()->direction() == RTL);
+      collapsedLeftBorder(!table()->style()->isLeftToRightDirection());
   if (border.exists())
     return (border.width() + (outer ? 0 : 1)) /
            2;  // Give the extra pixel to top and left.
@@ -864,7 +864,7 @@ int RenderTableCell::borderHalfLeft(bool outer) const {
 
 int RenderTableCell::borderHalfRight(bool outer) const {
   CollapsedBorderValue border =
-      collapsedRightBorder(table()->style()->direction() == RTL);
+      collapsedRightBorder(!table()->style()->isLeftToRightDirection());
   if (border.exists())
     return (border.width() + (outer ? 1 : 0)) / 2;
   return 0;
@@ -975,7 +975,7 @@ static void addBorderStyle(RenderTableCell::CollapsedBorderStyles& borderStyles,
 
 void RenderTableCell::collectBorderStyles(
     CollapsedBorderStyles& borderStyles) const {
-  bool rtl = table()->style()->direction() == RTL;
+  bool rtl = !table()->style()->isLeftToRightDirection();
   addBorderStyle(borderStyles, collapsedLeftBorder(rtl));
   addBorderStyle(borderStyles, collapsedRightBorder(rtl));
   addBorderStyle(borderStyles, collapsedTopBorder());
@@ -1003,7 +1003,7 @@ void RenderTableCell::paintCollapsedBorder(GraphicsContext* graphicsContext,
   if (!table()->currentBorderStyle())
     return;
 
-  bool rtl = table()->style()->direction() == RTL;
+  bool rtl = !table()->style()->isLeftToRightDirection();
   CollapsedBorderValue leftVal = collapsedLeftBorder(rtl);
   CollapsedBorderValue rightVal = collapsedRightBorder(rtl);
   CollapsedBorderValue topVal = collapsedTopBorder();

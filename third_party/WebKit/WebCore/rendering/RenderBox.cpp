@@ -113,24 +113,24 @@ int RenderBox::marginAfter() const {
 
 int RenderBox::marginStart() const {
   if (style()->isVerticalBlockFlow())
-    return style()->direction() == LTR ? m_marginLeft : m_marginRight;
-  return style()->direction() == LTR ? m_marginTop : m_marginBottom;
+    return style()->isLeftToRightDirection() ? m_marginLeft : m_marginRight;
+  return style()->isLeftToRightDirection() ? m_marginTop : m_marginBottom;
 }
 
 int RenderBox::marginEnd() const {
   if (style()->isVerticalBlockFlow())
-    return style()->direction() == LTR ? m_marginRight : m_marginLeft;
-  return style()->direction() == LTR ? m_marginBottom : m_marginTop;
+    return style()->isLeftToRightDirection() ? m_marginRight : m_marginLeft;
+  return style()->isLeftToRightDirection() ? m_marginBottom : m_marginTop;
 }
 
 void RenderBox::setMarginStart(int margin) {
   if (style()->isVerticalBlockFlow()) {
-    if (style()->direction() == LTR)
+    if (style()->isLeftToRightDirection())
       m_marginLeft = margin;
     else
       m_marginRight = margin;
   } else {
-    if (style()->direction() == LTR)
+    if (style()->isLeftToRightDirection())
       m_marginTop = margin;
     else
       m_marginBottom = margin;
@@ -139,12 +139,12 @@ void RenderBox::setMarginStart(int margin) {
 
 void RenderBox::setMarginEnd(int margin) {
   if (style()->isVerticalBlockFlow()) {
-    if (style()->direction() == LTR)
+    if (style()->isLeftToRightDirection())
       m_marginRight = margin;
     else
       m_marginLeft = margin;
   } else {
-    if (style()->direction() == LTR)
+    if (style()->isLeftToRightDirection())
       m_marginBottom = margin;
     else
       m_marginTop = margin;
@@ -392,7 +392,7 @@ int RenderBox::scrollWidth() const {
   if (hasOverflowClip())
     return layer()->scrollWidth();
   // For objects with visible overflow, this matches IE.
-  if (style()->direction() == LTR)
+  if (style()->isLeftToRightDirection())
     return max(clientWidth(), rightmostPosition(true, false) - borderLeft());
   return clientWidth() - min(0, leftmostPosition(true, false) - borderLeft());
 }
@@ -1768,9 +1768,9 @@ void RenderBox::computeInlineDirectionMargins(RenderBlock* containingBlock,
   // available logical width.
   bool pushToEndFromTextAlign =
       !marginEndLength.isAuto() &&
-      ((containingBlockStyle->direction() == RTL &&
+      ((!containingBlockStyle->isLeftToRightDirection() &&
         containingBlockStyle->textAlign() == WEBKIT_LEFT) ||
-       (containingBlockStyle->direction() == LTR &&
+       (containingBlockStyle->isLeftToRightDirection() &&
         containingBlockStyle->textAlign() == WEBKIT_RIGHT));
   if ((marginStartLength.isAuto() && childWidth < containerWidth) ||
       pushToEndFromTextAlign) {
@@ -2223,7 +2223,7 @@ int RenderBox::containingBlockWidthForPositioned(
 
   int fromLeft;
   int fromRight;
-  if (containingBlock->style()->direction() == LTR) {
+  if (containingBlock->style()->isLeftToRightDirection()) {
     fromLeft = first->logicalLeft() + first->borderLogicalLeft();
     fromRight =
         last->logicalLeft() + last->logicalWidth() - last->borderLogicalRight();
@@ -2604,7 +2604,7 @@ void RenderBox::computePositionedLogicalWidthUsing(
   // of the first line box when really it should use the last line box.  When
   // this is fixed elsewhere, this block should be removed.
   if (containerBlock->isRenderInline() &&
-      containerBlock->style()->direction() == RTL) {
+      !containerBlock->style()->isLeftToRightDirection()) {
     const RenderInline* flow = toRenderInline(containerBlock);
     InlineFlowBox* firstLine = flow->firstLineBox();
     InlineFlowBox* lastLine = flow->lastLineBox();
@@ -3042,7 +3042,7 @@ void RenderBox::computePositionedLogicalWidthReplaced() {
   // of the first line box when really it should use the last line box.  When
   // this is fixed elsewhere, this block should be removed.
   if (containerBlock->isRenderInline() &&
-      containerBlock->style()->direction() == RTL) {
+      !containerBlock->style()->isLeftToRightDirection()) {
     const RenderInline* flow = toRenderInline(containerBlock);
     InlineFlowBox* firstLine = flow->firstLineBox();
     InlineFlowBox* lastLine = flow->lastLineBox();
@@ -3206,9 +3206,10 @@ IntRect RenderBox::localCaretRect(InlineBox* box,
 
   // FIXME: What about border and padding?
   IntRect rect(x(), y(), caretWidth, height());
-  TextDirection direction = box ? box->direction() : style()->direction();
+  bool ltr =
+      box ? box->isLeftToRightDirection() : style()->isLeftToRightDirection();
 
-  if ((!caretOffset) ^ (direction == LTR))
+  if ((!caretOffset) ^ ltr)
     rect.move(IntSize(width() - caretWidth, 0));
 
   if (box) {

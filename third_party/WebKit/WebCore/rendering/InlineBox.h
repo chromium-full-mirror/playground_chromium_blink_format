@@ -275,11 +275,12 @@ class InlineBox {
   TextDirection direction() const {
     return m_bidiEmbeddingLevel % 2 ? RTL : LTR;
   }
+  bool isLeftToRightDirection() const { return direction() == LTR; }
   int caretLeftmostOffset() const {
-    return direction() == LTR ? caretMinOffset() : caretMaxOffset();
+    return isLeftToRightDirection() ? caretMinOffset() : caretMaxOffset();
   }
   int caretRightmostOffset() const {
-    return direction() == LTR ? caretMaxOffset() : caretMinOffset();
+    return isLeftToRightDirection() ? caretMaxOffset() : caretMinOffset();
   }
 
   virtual void clearTruncation() {}
