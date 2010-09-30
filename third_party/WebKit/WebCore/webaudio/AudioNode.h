@@ -110,8 +110,8 @@ class AudioNode {
 
   // No significant resources should be allocated until initialize() is called.
   // Processing may not occur until a node is initialized.
-  virtual void initialize() = 0;
-  virtual void uninitialize() = 0;
+  virtual void initialize();
+  virtual void uninitialize();
 
   bool isInitialized() const { return m_isInitialized; }
   void lazyInitialize();
@@ -163,9 +163,8 @@ class AudioNode {
   // Called from context's audio thread.
   virtual void pullInputs(size_t framesToProcess);
 
-  bool m_isInitialized;
-
  private:
+  volatile bool m_isInitialized;
   NodeType m_type;
   RefPtr<AudioContext> m_context;
   double m_sampleRate;
