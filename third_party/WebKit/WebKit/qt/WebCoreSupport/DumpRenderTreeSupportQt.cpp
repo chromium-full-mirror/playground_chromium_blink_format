@@ -799,6 +799,14 @@ void DumpRenderTreeSupportQt::simulateDesktopNotificationClick(
 #endif
 }
 
+QString DumpRenderTreeSupportQt::plainText(const QVariant& range) {
+  QMap<QString, QVariant> map = range.toMap();
+  QVariant startContainer = map.value("startContainer");
+  map = startContainer.toMap();
+
+  return map.value("innerText").toString();
+}
+
 // Provide a backward compatibility with previously exported private symbols as
 // of QtWebKit 4.6 release
 

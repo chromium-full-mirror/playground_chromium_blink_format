@@ -129,6 +129,7 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
   static QString markerTextForListItem(const QWebElement& listItem);
   static QVariantMap computedStyleIncludingVisitedInfo(
       const QWebElement& element);
+  static QString plainText(const QVariant& rng);
 
   static void dumpFrameLoader(bool b);
   static void dumpResourceLoadCallbacks(bool b);
