@@ -51,7 +51,16 @@ class ResourceResponse : public ResourceResponseBase {
   friend class ResourceResponseBase;
 
   void doUpdateResourceResponse() { notImplemented(); }
+
+  PassOwnPtr<CrossThreadResourceResponseData> doPlatformCopyData(
+      PassOwnPtr<CrossThreadResourceResponseData> data) const {
+    return data;
+  }
+  void doPlatformAdopt(PassOwnPtr<CrossThreadResourceResponseData>) {}
 };
+
+struct CrossThreadResourceResponseData
+    : public CrossThreadResourceResponseDataBase {};
 
 }  // namespace WebCore
 

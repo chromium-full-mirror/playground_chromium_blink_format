@@ -87,6 +87,17 @@ class ResourceRequest : public ResourceRequestBase {
   void doUpdatePlatformRequest() {}
   void doUpdateResourceRequest() {}
 
+  PassOwnPtr<CrossThreadResourceRequestData> doPlatformCopyData(
+      PassOwnPtr<CrossThreadResourceRequestData>) const;
+  void doPlatformAdopt(PassOwnPtr<CrossThreadResourceRequestData>);
+
+  int m_requestorID;
+  int m_requestorProcessID;
+  int m_appCacheHostID;
+};
+
+struct CrossThreadResourceRequestData
+    : public CrossThreadResourceRequestDataBase {
   int m_requestorID;
   int m_requestorProcessID;
   int m_appCacheHostID;

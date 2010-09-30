@@ -67,7 +67,16 @@ class ResourceResponse : public ResourceResponseBase {
   SoupMessageFlags m_soupFlags;
 
   void doUpdateResourceResponse() {}
+
+  PassOwnPtr<CrossThreadResourceResponseData> doPlatformCopyData(
+      PassOwnPtr<CrossThreadResourceResponseData> data) const {
+    return data;
+  }
+  void doPlatformAdopt(PassOwnPtr<CrossThreadResourceResponseData>) {}
 };
+
+struct CrossThreadResourceResponseData
+    : public CrossThreadResourceResponseDataBase {};
 
 }  // namespace WebCore
 

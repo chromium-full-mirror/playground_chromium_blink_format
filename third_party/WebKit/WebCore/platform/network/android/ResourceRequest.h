@@ -56,7 +56,16 @@ class ResourceRequest : public ResourceRequestBase {
 
  private:
   friend class ResourceRequestBase;
+
+  PassOwnPtr<CrossThreadResourceRequestData> doPlatformCopyData(
+      PassOwnPtr<CrossThreadResourceRequestData> data) const {
+    return data;
+  }
+  void doPlatformAdopt(PassOwnPtr<CrossThreadResourceRequestData>) {}
 };
+
+struct CrossThreadResourceRequestData
+    : public CrossThreadResourceRequestDataBase {};
 
 }  // namespace WebCore
 

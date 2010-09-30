@@ -44,7 +44,19 @@ class ResourceResponse : public ResourceResponseBase {
                              expectedLength,
                              textEncodingName,
                              filename) {}
+
+ private:
+  friend class ResourceResponseBase;
+
+  PassOwnPtr<CrossThreadResourceResponseData> doPlatformCopyData(
+      PassOwnPtr<CrossThreadResourceResponseData> data) const {
+    return data;
+  }
+  void doPlatformAdopt(PassOwnPtr<CrossThreadResourceResponseData>) {}
 };
+
+struct CrossThreadResourceResponseData
+    : public CrossThreadResourceResponseDataBase {};
 
 }  // namespace WebCore
 

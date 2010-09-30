@@ -67,6 +67,7 @@ PassOwnPtr<ResourceRequest> ResourceRequestBase::adopt(
   }
   request->setHTTPBody(data->m_httpBody);
   request->setAllowCookies(data->m_allowCookies);
+  request->doPlatformAdopt(data);
   return request.release();
 }
 
@@ -95,7 +96,7 @@ PassOwnPtr<CrossThreadResourceRequestData> ResourceRequestBase::copyData()
   if (m_httpBody)
     data->m_httpBody = m_httpBody->deepCopy();
   data->m_allowCookies = m_allowCookies;
-  return data.release();
+  return asResourceRequest().doPlatformCopyData(data.release());
 }
 
 bool ResourceRequestBase::isEmpty() const {
@@ -346,14 +347,15 @@ bool equalIgnoringHeaderFields(const ResourceRequestBase& a,
   return true;
 }
 
-bool operator==(const ResourceRequestBase& a, const ResourceRequestBase& b) {
+bool ResourceRequestBase::compare(const ResourceRequest& a,
+                                  const ResourceRequest& b) {
   if (!equalIgnoringHeaderFields(a, b))
     return false;
 
   if (a.httpHeaderFields() != b.httpHeaderFields())
     return false;
 
-  return true;
+  return ResourceRequest::platformCompare(a, b);
 }
 
 bool ResourceRequestBase::isConditional() const {

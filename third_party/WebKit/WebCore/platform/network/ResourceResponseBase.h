@@ -118,7 +118,7 @@ class ResourceResponseBase : public FastAllocBase {
     return 1280;
   }
 
-  static bool compare(const ResourceResponse& a, const ResourceResponse& b);
+  static bool compare(const ResourceResponse&, const ResourceResponse&);
 
  protected:
   ResourceResponseBase();
@@ -158,6 +158,7 @@ class ResourceResponseBase : public FastAllocBase {
   bool m_isNull : 1;
 
  private:
+  const ResourceResponse& asResourceResponse() const;
   void parseCacheControlDirectives() const;
 
   mutable bool m_haveParsedCacheControlHeader : 1;
@@ -184,7 +185,7 @@ inline bool operator!=(const ResourceResponse& a, const ResourceResponse& b) {
   return !(a == b);
 }
 
-struct CrossThreadResourceResponseData : Noncopyable {
+struct CrossThreadResourceResponseDataBase : Noncopyable {
   KURL m_url;
   String m_mimeType;
   long long m_expectedContentLength;
