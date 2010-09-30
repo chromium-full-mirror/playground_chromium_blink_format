@@ -208,12 +208,7 @@ unsigned long long Timing::requestStart() const {
 }
 
 unsigned long long Timing::requestEnd() const {
-  ResourceLoadTiming* timing = resourceLoadTiming();
-  if (!timing)
-    return 0;
-
-  ASSERT(timing->sendEnd >= 0);
-  return resourceLoadTimeRelativeToAbsolute(timing->sendEnd);
+  return responseStart();
 }
 
 unsigned long long Timing::responseStart() const {
