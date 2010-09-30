@@ -229,6 +229,15 @@ void tst_QWebPage::infiniteLoopJS() {
 }
 
 void tst_QWebPage::geolocationRequestJS() {
+  /*
+    This test is disabled because it can only succeed if ENABLE(GEOLOCATION) is
+    true.
+    The code needs to be updated when the API of requestPermissionFromUser is
+    updated.
+  */
+  QSKIP("Test disabled as long as geolocation is disabled from the build.",
+        SkipSingle);
+
   JSTestPage* newPage = new JSTestPage(m_view);
   connect(
       newPage,
