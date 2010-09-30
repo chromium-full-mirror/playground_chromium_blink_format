@@ -44,13 +44,26 @@ WebPreferencesStore::WebPreferencesStore()
       minimumFontSize(1),
       minimumLogicalFontSize(9),
       defaultFontSize(16),
-      defaultFixedFontSize(13),
+      defaultFixedFontSize(13)
+#if PLATFORM(WIN)
+      ,
+      standardFontFamily("Times New Roman"),
+      cursiveFontFamily("Comic Sans MS"),
+      fantasyFontFamily("Comic Sans MS"),
+      fixedFontFamily("Courier New"),
+      sansSerifFontFamily("Arial"),
+      serifFontFamily("Times New Roman")
+#else
+      ,
       standardFontFamily("Times"),
       cursiveFontFamily("Apple Chancery"),
       fantasyFontFamily("Papyrus"),
       fixedFontFamily("Courier"),
       sansSerifFontFamily("Helvetica"),
-      serifFontFamily("Times") {}
+      serifFontFamily("Times")
+#endif
+{
+}
 
 void WebPreferencesStore::encode(CoreIPC::ArgumentEncoder* encoder) const {
   encoder->encode(javaScriptEnabled);
