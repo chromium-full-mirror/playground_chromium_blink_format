@@ -190,6 +190,8 @@ class MatchXPathJob : public WebCore::MatchJob {
       if (!ec)
         resultCollector.add(node);
     }
+#else
+    UNUSED_PARAM(resultCollector);
 #endif
   }
 };
