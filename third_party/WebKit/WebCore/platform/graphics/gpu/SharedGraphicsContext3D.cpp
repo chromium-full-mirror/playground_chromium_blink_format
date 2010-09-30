@@ -30,6 +30,8 @@
 
 #include "config.h"
 
+#if ENABLE(ACCELERATED_2D_CANVAS)
+
 #include "SharedGraphicsContext3D.h"
 
 #include "AffineTransform.h"
@@ -227,9 +229,8 @@ void SharedGraphicsContext3D::removeTexturesFor(NativeImagePtr ptr) {
 
 // static
 HashSet<SharedGraphicsContext3D*>* SharedGraphicsContext3D::allContexts() {
-  static OwnPtr<HashSet<SharedGraphicsContext3D*>> set(
-      new HashSet<SharedGraphicsContext3D*>);
-  return set.get();
+  DEFINE_STATIC_LOCAL(HashSet<SharedGraphicsContext3D*>, allContextsSet, ());
+  return &allContextsSet;
 }
 
 PassRefPtr<Texture> SharedGraphicsContext3D::createTexture(
@@ -352,3 +353,5 @@ bool SharedGraphicsContext3D::paintsIntoCanvasBuffer() const {
 }
 
 }  // namespace WebCore
+
+#endif

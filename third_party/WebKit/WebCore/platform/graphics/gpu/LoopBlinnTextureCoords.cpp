@@ -25,6 +25,8 @@
 
 #include "config.h"
 
+#if ENABLE(ACCELERATED_2D_CANVAS)
+
 #include "LoopBlinnTextureCoords.h"
 
 #include <math.h>
@@ -168,3 +170,5 @@ LoopBlinnTextureCoords::Result LoopBlinnTextureCoords::compute(
 }
 
 }  // namespace WebCore
+
+#endif

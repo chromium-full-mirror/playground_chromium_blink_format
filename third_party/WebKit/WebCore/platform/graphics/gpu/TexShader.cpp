@@ -29,6 +29,9 @@
  */
 
 #include "config.h"
+
+#if ENABLE(ACCELERATED_2D_CANVAS)
+
 #include "TexShader.h"
 
 #include "GraphicsContext3D.h"
@@ -95,3 +98,5 @@ void TexShader::use(const AffineTransform& transform,
   m_context->enableVertexAttribArray(m_positionLocation);
 }
 }
+
+#endif

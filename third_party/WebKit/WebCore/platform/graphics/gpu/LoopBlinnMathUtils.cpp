@@ -25,12 +25,13 @@
 
 #include "config.h"
 
+#if ENABLE(ACCELERATED_2D_CANVAS)
+
 #include "LoopBlinnMathUtils.h"
 
 #include "FloatPoint.h"
-#include "MathExtras.h"
 #include <algorithm>
-#include <string.h>  // for memcpy
+#include <wtf/MathExtras.h>
 
 namespace WebCore {
 namespace LoopBlinnMathUtils {
@@ -556,3 +557,5 @@ int numXRayCrossingsForCubic(const XRay& xRay,
 
 }  // namespace LoopBlinnMathUtils
 }  // namespace WebCore
+
+#endif

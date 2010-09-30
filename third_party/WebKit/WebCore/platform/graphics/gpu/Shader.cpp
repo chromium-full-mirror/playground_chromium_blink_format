@@ -29,6 +29,9 @@
  */
 
 #include "config.h"
+
+#if ENABLE(ACCELERATED_2D_CANVAS)
+
 #include "Shader.h"
 
 #include "AffineTransform.h"
@@ -108,3 +111,5 @@ Shader::~Shader() {
   m_context->deleteProgram(m_program);
 }
 }
+
+#endif

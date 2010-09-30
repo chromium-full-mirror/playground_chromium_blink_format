@@ -25,6 +25,8 @@
 
 #include "config.h"
 
+#if ENABLE(ACCELERATED_2D_CANVAS)
+
 #include "LoopBlinnClassifier.h"
 
 #include "LoopBlinnMathUtils.h"
@@ -120,3 +122,5 @@ LoopBlinnClassifier::Result LoopBlinnClassifier::classify(
 }
 
 }  // namespace WebCore
+
+#endif

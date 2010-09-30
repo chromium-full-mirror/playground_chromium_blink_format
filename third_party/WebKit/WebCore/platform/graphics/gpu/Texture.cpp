@@ -30,6 +30,8 @@
 
 #include "config.h"
 
+#if ENABLE(ACCELERATED_2D_CANVAS)
+
 #include "Texture.h"
 
 #include "FloatRect.h"
@@ -230,3 +232,5 @@ void Texture::bindTile(int tile) {
                            GraphicsContext3D::CLAMP_TO_EDGE);
 }
 }
+
+#endif
