@@ -1061,6 +1061,13 @@ bool CSSParser::parseValue(int propId, bool important) {
       if (id == CSSValueNormal || id == CSSValueBreakWord)
         validPrimitive = true;
       break;
+    case CSSPropertySpeak:  // none | normal | spell-out | digits |
+                            // literal-punctuation | no-punctuation | inherit
+      if (id == CSSValueNone || id == CSSValueNormal ||
+          id == CSSValueSpellOut || id == CSSValueDigits ||
+          id == CSSValueLiteralPunctuation || id == CSSValueNoPunctuation)
+        validPrimitive = true;
+      break;
 
     case CSSPropertyTextIndent:  // <length> | <percentage> | inherit
       validPrimitive = (!id && validUnit(value, FLength | FPercent, m_strict));
