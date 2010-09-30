@@ -236,7 +236,7 @@ class InspectorController : public Noncopyable {
                                                const KURL&);
 
 #if ENABLE(WORKERS)
-  enum WorkerAction { WorkerCreated, WorkerDestroyed };
+  enum WorkerAction{WorkerCreated, WorkerDestroyed};
 
   void postWorkerNotificationToFrontend(const InspectorWorkerResource&,
                                         WorkerAction);
@@ -574,12 +574,16 @@ inline InspectorController* InspectorController::inspectorControllerForDocument(
   Page* page = document->page();
   if (!page)
     return 0;
+#if ENABLE(INSPECTOR)
   InspectorController* inspectorController = page->inspectorController();
   if (!inspectorController)
     return 0;
   if (!inspectorController->hasFrontend())
     return 0;
   return inspectorController;
+#else
+  return 0;
+#endif
 }
 
 }  // namespace WebCore
