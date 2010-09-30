@@ -344,7 +344,9 @@ class GraphicsContextPlatformPrivate
   Vector<GraphicsContextPlatformPrivateData> m_backupData;
 };
 
-static HPEN createPen(const Color& col, double fWidth, StrokeStyle style) {
+static PassOwnPtr<HPEN> createPen(const Color& col,
+                                  double fWidth,
+                                  StrokeStyle style) {
   int width = stableRound(fWidth);
   if (width < 1)
     width = 1;
@@ -363,11 +365,12 @@ static HPEN createPen(const Color& col, double fWidth, StrokeStyle style) {
       break;
   }
 
-  return CreatePen(penStyle, width, RGB(col.red(), col.green(), col.blue()));
+  return adoptPtr(
+      CreatePen(penStyle, width, RGB(col.red(), col.green(), col.blue())));
 }
 
-static inline HGDIOBJ createBrush(const Color& col) {
-  return CreateSolidBrush(RGB(col.red(), col.green(), col.blue()));
+static inline PassOwnPtr<HBRUSH> createBrush(const Color& col) {
+  return adoptPtr(CreateSolidBrush(RGB(col.red(), col.green(), col.blue())));
 }
 
 template <typename PixelType, bool Is16bit>
@@ -657,41 +660,33 @@ void GraphicsContext::drawRect(const IntRect& rect) {
     return;
   trRect.move(transparentDC.toShift());
 
-  HGDIOBJ brush = 0;
+  OwnPtr<HBRUSH> brush;
   HGDIOBJ oldBrush;
   if (fillColor().alpha()) {
     brush = createBrush(fillColor());
-    oldBrush = SelectObject(dc, brush);
+    oldBrush = SelectObject(dc, brush.get());
   } else
-    SelectObject(dc, GetStockObject(NULL_BRUSH));
+    oldBrush = SelectObject(dc, GetStockObject(NULL_BRUSH));
 
-  HGDIOBJ pen = 0;
+  OwnPtr<HPEN> pen;
   HGDIOBJ oldPen;
   if (strokeStyle() != NoStroke) {
     pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
-    oldPen = SelectObject(dc, pen);
+    oldPen = SelectObject(dc, pen.get());
   } else
-    SelectObject(dc, GetStockObject(NULL_PEN));
+    oldPen = SelectObject(dc, GetStockObject(NULL_PEN));
 
-  if (!brush && !pen)
-    return;
+  if (brush || pen) {
+    if (trRect.width() <= 0)
+      trRect.setWidth(1);
+    if (trRect.height() <= 0)
+      trRect.setHeight(1);
 
-  if (trRect.width() <= 0)
-    trRect.setWidth(1);
-  if (trRect.height() <= 0)
-    trRect.setHeight(1);
-
-  Rectangle(dc, trRect.x(), trRect.y(), trRect.right(), trRect.bottom());
-
-  if (pen) {
-    SelectObject(dc, oldPen);
-    DeleteObject(pen);
+    Rectangle(dc, trRect.x(), trRect.y(), trRect.right(), trRect.bottom());
   }
 
-  if (brush) {
-    SelectObject(dc, oldBrush);
-    DeleteObject(brush);
-  }
+  SelectObject(dc, oldPen);
+  SelectObject(dc, oldBrush);
 }
 
 void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
@@ -715,14 +710,13 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
   trPoint1 += transparentDC.toShift();
   trPoint2 += transparentDC.toShift();
 
-  HGDIOBJ pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
-  HGDIOBJ oldPen = SelectObject(dc, pen);
+  OwnPtr<HPEN> pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
+  HGDIOBJ oldPen = SelectObject(dc, pen.get());
 
   MoveToEx(dc, trPoint1.x(), trPoint1.y(), 0);
   LineTo(dc, trPoint2.x(), trPoint2.y());
 
   SelectObject(dc, oldPen);
-  DeleteObject(pen);
 }
 
 void GraphicsContext::drawEllipse(const IntRect& rect) {
@@ -741,32 +735,27 @@ void GraphicsContext::drawEllipse(const IntRect& rect) {
     return;
   trRect.move(transparentDC.toShift());
 
-  HGDIOBJ brush = 0;
+  OwnPtr<HBRUSH> brush;
   HGDIOBJ oldBrush;
   if (fillColor().alpha()) {
     brush = createBrush(fillColor());
-    oldBrush = SelectObject(dc, brush);
+    oldBrush = SelectObject(dc, brush.get());
   } else
-    SelectObject(dc, GetStockObject(NULL_BRUSH));
-  HGDIOBJ pen = 0;
-  HGDIOBJ oldPen;
+    oldBrush = SelectObject(dc, GetStockObject(NULL_BRUSH));
+
+  OwnPtr<HPEN> pen;
+  HGDIOBJ oldPen = 0;
   if (strokeStyle() != NoStroke) {
     pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
-    oldPen = SelectObject(dc, pen);
+    oldPen = SelectObject(dc, pen.get());
   } else
-    SelectObject(dc, GetStockObject(NULL_PEN));
+    oldPen = SelectObject(dc, GetStockObject(NULL_PEN));
 
-  Ellipse(dc, trRect.x(), trRect.y(), trRect.right(), trRect.bottom());
+  if (brush || pen)
+    Ellipse(dc, trRect.x(), trRect.y(), trRect.right(), trRect.bottom());
 
-  if (pen) {
-    SelectObject(dc, oldPen);
-    DeleteObject(pen);
-  }
-
-  if (brush) {
-    SelectObject(dc, oldBrush);
-    DeleteObject(brush);
-  }
+  SelectObject(dc, oldPen);
+  SelectObject(dc, oldBrush);
 }
 
 static inline bool equalAngle(double a, double b) {
@@ -832,8 +821,8 @@ void GraphicsContext::strokeArc(const IntRect& rect,
     return;
   trRect.move(transparentDC.toShift());
 
-  HGDIOBJ pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
-  HGDIOBJ oldPen = SelectObject(dc, pen);
+  OwnPtr<HPEN> pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
+  HGDIOBJ oldPen = SelectObject(dc, pen.get());
 
   double a = trRect.width() * 0.5;
   double b = trRect.height() * 0.5;
@@ -892,7 +881,6 @@ void GraphicsContext::strokeArc(const IntRect& rect,
     SelectClipRgn(dc, clipRgn.get());
 
   SelectObject(dc, oldPen);
-  DeleteObject(pen);
 }
 
 void GraphicsContext::drawConvexPolygon(size_t npoints,
@@ -937,36 +925,27 @@ void GraphicsContext::drawConvexPolygon(size_t npoints,
     winPoints[i].y += transparentDC.toShift().height();
   }
 
-  HGDIOBJ brush = 0;
+  OwnPtr<HBRUSH> brush;
   HGDIOBJ oldBrush;
   if (fillColor().alpha()) {
     brush = createBrush(fillColor());
-    oldBrush = SelectObject(dc, brush);
+    oldBrush = SelectObject(dc, brush.get());
   } else
-    SelectObject(dc, GetStockObject(NULL_BRUSH));
+    oldBrush = SelectObject(dc, GetStockObject(NULL_BRUSH));
 
-  HGDIOBJ pen = 0;
+  OwnPtr<HPEN> pen;
   HGDIOBJ oldPen;
   if (strokeStyle() != NoStroke) {
     pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
-    oldPen = SelectObject(dc, pen);
+    oldPen = SelectObject(dc, pen.get());
   } else
-    SelectObject(dc, GetStockObject(NULL_PEN));
+    oldPen = SelectObject(dc, GetStockObject(NULL_PEN));
 
-  if (!brush && !pen)
-    return;
+  if (brush || pen)
+    Polygon(dc, winPoints.data(), npoints);
 
-  Polygon(dc, winPoints.data(), npoints);
-
-  if (pen) {
-    SelectObject(dc, oldPen);
-    DeleteObject(pen);
-  }
-
-  if (brush) {
-    SelectObject(dc, oldBrush);
-    DeleteObject(brush);
-  }
+  SelectObject(dc, oldPen);
+  SelectObject(dc, oldBrush);
 }
 
 void GraphicsContext::clipConvexPolygon(size_t numPoints,
@@ -1152,8 +1131,8 @@ void GraphicsContext::strokeRect(const FloatRect& rect, float width) {
     return;
   trRect.move(transparentDC.toShift());
 
-  HGDIOBJ pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
-  HGDIOBJ oldPen = SelectObject(dc, pen);
+  OwnPtr<HPEN> pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
+  HGDIOBJ oldPen = SelectObject(dc, pen.get());
 
   int right = trRect.right() - 1;
   int bottom = trRect.bottom() - 1;
@@ -1166,7 +1145,6 @@ void GraphicsContext::strokeRect(const FloatRect& rect, float width) {
   Polyline(dc, intPoints, 5);
 
   SelectObject(dc, oldPen);
-  DeleteObject(pen);
 }
 
 void GraphicsContext::beginTransparencyLayer(float opacity) {
@@ -1296,8 +1274,8 @@ void GraphicsContext::fillRoundedRect(const IntRect& fillRect,
 
   RECT rectWin = dstRect;
 
-  HGDIOBJ brush = createBrush(shadowColor);
-  HGDIOBJ oldBrush = SelectObject(dc, brush);
+  OwnPtr<HBRUSH> brush = createBrush(shadowColor);
+  HGDIOBJ oldBrush = SelectObject(dc, brush.get());
 
   SelectObject(dc, GetStockObject(NULL_PEN));
 
@@ -1342,7 +1320,6 @@ void GraphicsContext::fillRoundedRect(const IntRect& fillRect,
                   stableRound(newBottomRight.height() * 2));
 
   SelectObject(dc, oldBrush);
-  DeleteObject(brush);
 }
 
 void GraphicsContext::drawRoundCorner(bool needsNewClip,
@@ -1401,8 +1378,9 @@ void GraphicsContext::fillPath() {
   if (!m_data->m_dc)
     return;
 
+  OwnPtr<HBRUSH> brush = createBrush(c);
+
   if (m_data->m_opacity < 1.0f || m_data->hasAlpha()) {
-    HGDIOBJ brush = createBrush(c);
     for (Vector<Path>::const_iterator i = m_data->m_paths.begin();
          i != m_data->m_paths.end(); ++i) {
       IntRect trRect = enclosingIntRect(m_data->mapRect(i->boundingRect()));
@@ -1417,20 +1395,17 @@ void GraphicsContext::fillPath() {
                    transparentDC.toShift().height());
 
       SelectObject(dc, GetStockObject(NULL_PEN));
-      HGDIOBJ oldBrush = SelectObject(dc, brush);
+      HGDIOBJ oldBrush = SelectObject(dc, brush.get());
       i->platformPath()->fillPath(dc, &tr);
       SelectObject(dc, oldBrush);
     }
-    DeleteObject(brush);
   } else {
     SelectObject(m_data->m_dc, GetStockObject(NULL_PEN));
-    HGDIOBJ brush = createBrush(c);
-    HGDIOBJ oldBrush = SelectObject(m_data->m_dc, brush);
+    HGDIOBJ oldBrush = SelectObject(m_data->m_dc, brush.get());
     for (Vector<Path>::const_iterator i = m_data->m_paths.begin();
          i != m_data->m_paths.end(); ++i)
       i->platformPath()->fillPath(m_data->m_dc, &m_data->m_transform);
     SelectObject(m_data->m_dc, oldBrush);
-    DeleteObject(brush);
   }
 }
 
@@ -1442,8 +1417,9 @@ void GraphicsContext::strokePath() {
   if (!m_data->m_dc)
     return;
 
+  OwnPtr<HPEN> pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
+
   if (m_data->m_opacity < 1.0f || m_data->hasAlpha()) {
-    HGDIOBJ pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
     for (Vector<Path>::const_iterator i = m_data->m_paths.begin();
          i != m_data->m_paths.end(); ++i) {
       IntRect trRect = enclosingIntRect(m_data->mapRect(i->boundingRect()));
@@ -1458,20 +1434,17 @@ void GraphicsContext::strokePath() {
                    transparentDC.toShift().height());
 
       SelectObject(dc, GetStockObject(NULL_BRUSH));
-      HGDIOBJ oldPen = SelectObject(dc, pen);
+      HGDIOBJ oldPen = SelectObject(dc, pen.get());
       i->platformPath()->strokePath(dc, &tr);
       SelectObject(dc, oldPen);
     }
-    DeleteObject(pen);
   } else {
     SelectObject(m_data->m_dc, GetStockObject(NULL_BRUSH));
-    HGDIOBJ pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
-    HGDIOBJ oldPen = SelectObject(m_data->m_dc, pen);
+    HGDIOBJ oldPen = SelectObject(m_data->m_dc, pen.get());
     for (Vector<Path>::const_iterator i = m_data->m_paths.begin();
          i != m_data->m_paths.end(); ++i)
       i->platformPath()->strokePath(m_data->m_dc, &m_data->m_transform);
     SelectObject(m_data->m_dc, oldPen);
-    DeleteObject(pen);
   }
 }
 
