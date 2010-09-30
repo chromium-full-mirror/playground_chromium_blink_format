@@ -68,10 +68,20 @@ class WebFileSystem {
   }
 
   // Deletes a file or directory at a given |path|.
+  // It is an error to try to remove a directory that is not empty.
   // WebFileSystemCallbacks::didSucceed() must be called when the operation is
   // completed successfully.
   // WebFileSystemCallbacks::didFail() must be called otherwise.
   virtual void remove(const WebString& path, WebFileSystemCallbacks*) {
+    WEBKIT_ASSERT_NOT_REACHED();
+  }
+
+  // Deletes a file or directory recursively at a given |path|.
+  // WebFileSystemCallbacks::didSucceed() must be called when the operation is
+  // completed successfully.
+  // WebFileSystemCallbacks::didFail() must be called otherwise.
+  virtual void removeRecursively(const WebString& path,
+                                 WebFileSystemCallbacks*) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
 
