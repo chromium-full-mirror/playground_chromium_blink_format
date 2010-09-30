@@ -78,7 +78,7 @@ class DrawingBuffer : public Noncopyable {
     virtual void willPublish() = 0;
   };
 
-  void setWillPublishCallback(PassOwnPtr<WillPublishCallback>) {
+  void setWillPublishCallback(PassOwnPtr<WillPublishCallback> callback) {
     m_callback = callback;
   }
 #endif
