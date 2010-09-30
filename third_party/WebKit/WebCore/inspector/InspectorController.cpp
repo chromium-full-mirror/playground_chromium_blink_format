@@ -1119,7 +1119,7 @@ void InspectorController::didFinishLoading(unsigned long identifier,
     return;
 
   if (m_timelineAgent)
-    m_timelineAgent->didFinishLoadingResource(identifier, false);
+    m_timelineAgent->didFinishLoadingResource(identifier, false, finishTime);
 
   RefPtr<InspectorResource> resource = getTrackedResource(identifier);
   if (!resource)
@@ -1139,7 +1139,7 @@ void InspectorController::didFailLoading(unsigned long identifier,
     return;
 
   if (m_timelineAgent)
-    m_timelineAgent->didFinishLoadingResource(identifier, true);
+    m_timelineAgent->didFinishLoadingResource(identifier, true, 0);
 
   String message = "Failed to load resource";
   if (!error.localizedDescription().isEmpty())

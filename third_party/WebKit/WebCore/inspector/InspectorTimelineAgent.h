@@ -124,7 +124,7 @@ class InspectorTimelineAgent : ScriptGCEventListener, public Noncopyable {
                                const ResourceRequest&);
   void willReceiveResourceResponse(unsigned long, const ResourceResponse&);
   void didReceiveResourceResponse();
-  void didFinishLoadingResource(unsigned long, bool didFail);
+  void didFinishLoadingResource(unsigned long, bool didFail, double finishTime);
   void willReceiveResourceData(unsigned long identifier);
   void didReceiveResourceData();
 
