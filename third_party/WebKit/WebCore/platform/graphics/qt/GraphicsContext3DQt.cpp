@@ -364,6 +364,10 @@ bool GraphicsContext3D::isErrorGeneratedOnOutOfBoundsAccesses() const {
   return false;
 }
 
+int GraphicsContext3D::getGraphicsResetStatusARB() {
+  return NO_ERROR;
+}
+
 GraphicsContext3DInternal::GraphicsContext3DInternal(
     GraphicsContext3D::Attributes attrs,
     HostWindow* hostWindow)

@@ -1521,6 +1521,10 @@ int GraphicsContext3D::sizeInBytes(int type) {
 void GraphicsContext3D::synthesizeGLError(unsigned long error) {
   m_syntheticErrors.add(error);
 }
+
+int GraphicsContext3D::getGraphicsResetStatusARB() {
+  return NO_ERROR;
+}
 }
 
 #endif  // ENABLE(3D_CANVAS)
