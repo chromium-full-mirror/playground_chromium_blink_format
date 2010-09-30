@@ -72,6 +72,13 @@ class WebIDBObjectStore {
                       const WebIDBTransaction&) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
+  // FIXME: Remove once we update Chromium side.
+  virtual void createIndex(const WebString& name,
+                           const WebString& keyPath,
+                           bool unique,
+                           WebIDBCallbacks*) {
+    WEBKIT_ASSERT_NOT_REACHED();
+  }
   virtual void createIndex(const WebString& name,
                            const WebString& keyPath,
                            bool unique,
@@ -83,6 +90,10 @@ class WebIDBObjectStore {
   virtual WebIDBIndex* index(const WebString& name) {
     WEBKIT_ASSERT_NOT_REACHED();
     return 0;
+  }
+  // FIXME: Remove once we update Chromium side.
+  virtual void removeIndex(const WebString& name, WebIDBCallbacks*) {
+    WEBKIT_ASSERT_NOT_REACHED();
   }
   virtual void removeIndex(const WebString& name,
                            WebIDBCallbacks*,
