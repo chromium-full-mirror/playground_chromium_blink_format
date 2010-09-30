@@ -39,6 +39,12 @@ CounterNode::CounterNode(RenderObject* o, bool hasResetType, int value)
       m_firstChild(0),
       m_lastChild(0) {}
 
+PassRefPtr<CounterNode> CounterNode::create(RenderObject* renderer,
+                                            bool hasResetType,
+                                            int value) {
+  return adoptRef(new CounterNode(renderer, hasResetType, value));
+}
+
 CounterNode* CounterNode::nextInPreOrderAfterChildren(
     const CounterNode* stayWithin) const {
   if (this == stayWithin)
