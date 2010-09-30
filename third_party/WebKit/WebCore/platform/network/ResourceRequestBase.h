@@ -157,6 +157,13 @@ class ResourceRequestBase : public FastAllocBase {
     m_reportLoadTiming = reportLoadTiming;
   }
 
+  // Whether actual headers being sent/received should be collected and reported
+  // for the request.
+  bool reportRawHeaders() const { return m_reportRawHeaders; }
+  void setReportRawHeaders(bool reportRawHeaders) {
+    m_reportRawHeaders = reportRawHeaders;
+  }
+
   // What this request is for.
   TargetType targetType() const { return m_targetType; }
   void setTargetType(TargetType type) { m_targetType = type; }
@@ -171,6 +178,7 @@ class ResourceRequestBase : public FastAllocBase {
         m_platformRequestUpdated(true),
         m_reportUploadProgress(false),
         m_reportLoadTiming(false),
+        m_reportRawHeaders(false),
         m_targetType(TargetIsSubresource) {}
 
   ResourceRequestBase(const KURL& url, ResourceRequestCachePolicy policy)
@@ -183,6 +191,7 @@ class ResourceRequestBase : public FastAllocBase {
         m_platformRequestUpdated(false),
         m_reportUploadProgress(false),
         m_reportLoadTiming(false),
+        m_reportRawHeaders(false),
         m_targetType(TargetIsSubresource) {}
 
   void updatePlatformRequest() const;
@@ -208,6 +217,7 @@ class ResourceRequestBase : public FastAllocBase {
   mutable bool m_platformRequestUpdated;
   bool m_reportUploadProgress;
   bool m_reportLoadTiming;
+  bool m_reportRawHeaders;
   TargetType m_targetType;
 
  private:

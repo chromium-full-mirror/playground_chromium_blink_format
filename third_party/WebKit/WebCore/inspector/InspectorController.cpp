@@ -1034,6 +1034,10 @@ void InspectorController::willSendRequest(
     return;
 
   request.setReportLoadTiming(true);
+  // Only enable raw headers if front-end is attached, as otherwise we may lack
+  // permissions to fetch the headers.
+  if (m_frontend)
+    request.setReportRawHeaders(true);
 
   if (!redirectResponse.isNull()) {
     // Redirect may have empty URL and we'd like to not crash with invalid
