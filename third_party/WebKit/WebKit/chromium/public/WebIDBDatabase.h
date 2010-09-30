@@ -60,7 +60,8 @@ class WebIDBDatabase {
   virtual void createObjectStore(const WebString& name,
                                  const WebString& keyPath,
                                  bool autoIncrement,
-                                 WebIDBCallbacks*) {
+                                 WebIDBCallbacks*,
+                                 const WebIDBTransaction&) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
   // Transfers ownership of the WebIDBObjectStore to the caller.
@@ -70,7 +71,8 @@ class WebIDBDatabase {
     return 0;
   }
   virtual void removeObjectStore(const WebString& name,
-                                 WebIDBCallbacks* callbacks) {
+                                 WebIDBCallbacks* callbacks,
+                                 const WebIDBTransaction&) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
   virtual void setVersion(const WebString& version,
@@ -84,6 +86,7 @@ class WebIDBDatabase {
     WEBKIT_ASSERT_NOT_REACHED();
     return 0;
   }
+  virtual void close() { WEBKIT_ASSERT_NOT_REACHED(); }
 };
 
 }  // namespace WebKit

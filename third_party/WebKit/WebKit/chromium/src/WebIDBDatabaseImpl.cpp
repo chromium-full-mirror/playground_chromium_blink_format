@@ -62,12 +62,15 @@ WebDOMStringList WebIDBDatabaseImpl::objectStores() const {
   return m_databaseBackend->objectStores();
 }
 
-void WebIDBDatabaseImpl::createObjectStore(const WebString& name,
-                                           const WebString& keyPath,
-                                           bool autoIncrement,
-                                           WebIDBCallbacks* callbacks) {
-  m_databaseBackend->createObjectStore(name, keyPath, autoIncrement,
-                                       IDBCallbacksProxy::create(callbacks));
+void WebIDBDatabaseImpl::createObjectStore(
+    const WebString& name,
+    const WebString& keyPath,
+    bool autoIncrement,
+    WebIDBCallbacks* callbacks,
+    const WebIDBTransaction& transaction) {
+  m_databaseBackend->createObjectStore(
+      name, keyPath, autoIncrement, IDBCallbacksProxy::create(callbacks),
+      transaction.getIDBTransactionBackendInterface());
 }
 
 WebIDBObjectStore* WebIDBDatabaseImpl::objectStore(const WebString& name,
@@ -79,10 +82,13 @@ WebIDBObjectStore* WebIDBDatabaseImpl::objectStore(const WebString& name,
   return new WebIDBObjectStoreImpl(objectStore);
 }
 
-void WebIDBDatabaseImpl::removeObjectStore(const WebString& name,
-                                           WebIDBCallbacks* callbacks) {
-  m_databaseBackend->removeObjectStore(name,
-                                       IDBCallbacksProxy::create(callbacks));
+void WebIDBDatabaseImpl::removeObjectStore(
+    const WebString& name,
+    WebIDBCallbacks* callbacks,
+    const WebIDBTransaction& transaction) {
+  m_databaseBackend->removeObjectStore(
+      name, IDBCallbacksProxy::create(callbacks),
+      transaction.getIDBTransactionBackendInterface());
 }
 
 void WebIDBDatabaseImpl::setVersion(const WebString& version,
@@ -100,6 +106,10 @@ WebIDBTransaction* WebIDBDatabaseImpl::transaction(
   if (!transaction)
     return 0;
   return new WebIDBTransactionImpl(transaction);
+}
+
+void WebIDBDatabaseImpl::close() {
+  m_databaseBackend->close();
 }
 
 }  // namespace WebCore

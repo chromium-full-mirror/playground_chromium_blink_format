@@ -57,48 +57,27 @@ class WebIDBIndex {
     return false;
   }
 
-  // FIXME: Remove the versions without transaction parameters.
-  virtual void openObjectCursor(const WebIDBKeyRange& range,
+  virtual void openObjectCursor(const WebIDBKeyRange&,
                                 unsigned short direction,
-                                WebIDBCallbacks* callbacks,
+                                WebIDBCallbacks*,
                                 const WebIDBTransaction&) {
-    openObjectCursor(range, direction, callbacks);
+    WEBKIT_ASSERT_NOT_REACHED();
   }
-  virtual void openObjectCursor(const WebIDBKeyRange& range,
-                                unsigned short direction,
-                                WebIDBCallbacks* callbacks) {
-    WebIDBTransaction transaction;
-    openObjectCursor(range, direction, callbacks, transaction);
-  }
-  virtual void openCursor(const WebIDBKeyRange& range,
+  virtual void openCursor(const WebIDBKeyRange&,
                           unsigned short direction,
-                          WebIDBCallbacks* callbacks,
+                          WebIDBCallbacks*,
                           const WebIDBTransaction&) {
-    openCursor(range, direction, callbacks);
+    WEBKIT_ASSERT_NOT_REACHED();
   }
-  virtual void openCursor(const WebIDBKeyRange& range,
-                          unsigned short direction,
-                          WebIDBCallbacks* callbacks) {
-    WebIDBTransaction transaction;
-    openCursor(range, direction, callbacks, transaction);
-  }
-  virtual void getObject(const WebIDBKey& key,
-                         WebIDBCallbacks* callbacks,
+  virtual void getObject(const WebIDBKey&,
+                         WebIDBCallbacks*,
                          const WebIDBTransaction&) {
-    getObject(key, callbacks);
+    WEBKIT_ASSERT_NOT_REACHED();
   }
-  virtual void getObject(const WebIDBKey& key, WebIDBCallbacks* callbacks) {
-    WebIDBTransaction transaction;
-    getObject(key, callbacks, transaction);
-  }
-  virtual void get(const WebIDBKey& key,
-                   WebIDBCallbacks* callbacks,
+  virtual void get(const WebIDBKey&,
+                   WebIDBCallbacks*,
                    const WebIDBTransaction&) {
-    get(key, callbacks);
-  }
-  virtual void get(const WebIDBKey& key, WebIDBCallbacks* callbacks) {
-    WebIDBTransaction transaction;
-    get(key, callbacks, transaction);
+    WEBKIT_ASSERT_NOT_REACHED();
   }
 };
 

@@ -30,6 +30,7 @@
 
 #include "IDBCallbacks.h"
 #include "IDBKeyRange.h"
+#include "IDBTransactionBackendProxy.h"
 #include "WebIDBCallbacksImpl.h"
 #include "WebIDBDatabaseError.h"
 #include "WebIDBIndex.h"
@@ -68,26 +69,56 @@ bool IDBIndexBackendProxy::unique() {
 void IDBIndexBackendProxy::openObjectCursor(
     PassRefPtr<IDBKeyRange> keyRange,
     unsigned short direction,
-    PassRefPtr<IDBCallbacks> callbacks) {
+    PassRefPtr<IDBCallbacks> callbacks,
+    IDBTransactionBackendInterface* transaction) {
+  // The transaction pointer is guaranteed to be a pointer to a proxy object as,
+  // in the renderer,
+  // all implementations of IDB interfaces are proxy objects.
+  IDBTransactionBackendProxy* transactionProxy =
+      static_cast<IDBTransactionBackendProxy*>(transaction);
   m_webIDBIndex->openObjectCursor(keyRange, direction,
-                                  new WebIDBCallbacksImpl(callbacks));
+                                  new WebIDBCallbacksImpl(callbacks),
+                                  *transactionProxy->getWebIDBTransaction());
 }
 
-void IDBIndexBackendProxy::openCursor(PassRefPtr<IDBKeyRange> keyRange,
-                                      unsigned short direction,
-                                      PassRefPtr<IDBCallbacks> callbacks) {
+void IDBIndexBackendProxy::openCursor(
+    PassRefPtr<IDBKeyRange> keyRange,
+    unsigned short direction,
+    PassRefPtr<IDBCallbacks> callbacks,
+    IDBTransactionBackendInterface* transaction) {
+  // The transaction pointer is guaranteed to be a pointer to a proxy object as,
+  // in the renderer,
+  // all implementations of IDB interfaces are proxy objects.
+  IDBTransactionBackendProxy* transactionProxy =
+      static_cast<IDBTransactionBackendProxy*>(transaction);
   m_webIDBIndex->openCursor(keyRange, direction,
-                            new WebIDBCallbacksImpl(callbacks));
+                            new WebIDBCallbacksImpl(callbacks),
+                            *transactionProxy->getWebIDBTransaction());
 }
 
-void IDBIndexBackendProxy::getObject(PassRefPtr<IDBKey> key,
-                                     PassRefPtr<IDBCallbacks> callbacks) {
-  m_webIDBIndex->getObject(key, new WebIDBCallbacksImpl(callbacks));
+void IDBIndexBackendProxy::getObject(
+    PassRefPtr<IDBKey> key,
+    PassRefPtr<IDBCallbacks> callbacks,
+    IDBTransactionBackendInterface* transaction) {
+  // The transaction pointer is guaranteed to be a pointer to a proxy object as,
+  // in the renderer,
+  // all implementations of IDB interfaces are proxy objects.
+  IDBTransactionBackendProxy* transactionProxy =
+      static_cast<IDBTransactionBackendProxy*>(transaction);
+  m_webIDBIndex->getObject(key, new WebIDBCallbacksImpl(callbacks),
+                           *transactionProxy->getWebIDBTransaction());
 }
 
 void IDBIndexBackendProxy::get(PassRefPtr<IDBKey> key,
-                               PassRefPtr<IDBCallbacks> callbacks) {
-  m_webIDBIndex->get(key, new WebIDBCallbacksImpl(callbacks));
+                               PassRefPtr<IDBCallbacks> callbacks,
+                               IDBTransactionBackendInterface* transaction) {
+  // The transaction pointer is guaranteed to be a pointer to a proxy object as,
+  // in the renderer,
+  // all implementations of IDB interfaces are proxy objects.
+  IDBTransactionBackendProxy* transactionProxy =
+      static_cast<IDBTransactionBackendProxy*>(transaction);
+  m_webIDBIndex->get(key, new WebIDBCallbacksImpl(callbacks),
+                     *transactionProxy->getWebIDBTransaction());
 }
 
 }  // namespace WebCore

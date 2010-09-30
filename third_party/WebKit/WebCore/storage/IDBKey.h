@@ -26,17 +26,18 @@
 #ifndef IDBKey_h
 #define IDBKey_h
 
+#if ENABLE(INDEXED_DATABASE)
+
 #include "PlatformString.h"
 #include <wtf/Forward.h>
-
-#if ENABLE(INDEXED_DATABASE)
+#include <wtf/Threading.h>
 
 namespace WebCore {
 
 class SQLiteStatement;
 
 // FIXME: Add dates.
-class IDBKey : public RefCounted<IDBKey> {
+class IDBKey : public ThreadSafeShared<IDBKey> {
  public:
   static PassRefPtr<IDBKey> create() { return adoptRef(new IDBKey()); }
   static PassRefPtr<IDBKey> create(int32_t number) {
@@ -72,6 +73,9 @@ class IDBKey : public RefCounted<IDBKey> {
                                   String qualifiedTableName = "");
   int bind(SQLiteStatement& query, int column) const;
   void bindWithNulls(SQLiteStatement& query, int baseColumn) const;
+
+  using ThreadSafeShared<IDBKey>::ref;
+  using ThreadSafeShared<IDBKey>::deref;
 
  private:
   IDBKey();

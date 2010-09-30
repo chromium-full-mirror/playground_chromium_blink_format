@@ -37,7 +37,8 @@ IDBKey::IDBKey() : m_type(NullType) {}
 
 IDBKey::IDBKey(int32_t number) : m_type(NumberType), m_number(number) {}
 
-IDBKey::IDBKey(const String& string) : m_type(StringType), m_string(string) {}
+IDBKey::IDBKey(const String& string)
+    : m_type(StringType), m_string(string.crossThreadString()) {}
 
 IDBKey::~IDBKey() {}
 

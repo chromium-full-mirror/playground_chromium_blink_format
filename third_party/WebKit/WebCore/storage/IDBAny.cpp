@@ -61,6 +61,11 @@ PassRefPtr<IDBDatabase> IDBAny::idbDatabase() {
   return m_idbDatabase;
 }
 
+PassRefPtr<IDBFactory> IDBAny::idbFactory() {
+  ASSERT(m_type == IDBFactoryType);
+  return m_idbFactory;
+}
+
 PassRefPtr<IDBIndex> IDBAny::idbIndex() {
   ASSERT(m_type == IDBIndexType);
   return m_idbIndex;
@@ -76,9 +81,9 @@ PassRefPtr<IDBObjectStore> IDBAny::idbObjectStore() {
   return m_idbObjectStore;
 }
 
-PassRefPtr<IDBFactory> IDBAny::idbFactory() {
-  ASSERT(m_type == IDBFactoryType);
-  return m_idbFactory;
+PassRefPtr<IDBTransaction> IDBAny::idbTransaction() {
+  ASSERT(m_type == IDBTransactionType);
+  return m_idbTransaction;
 }
 
 PassRefPtr<SerializedScriptValue> IDBAny::serializedScriptValue() {
@@ -103,6 +108,12 @@ void IDBAny::set(PassRefPtr<IDBDatabase> value) {
   m_idbDatabase = value;
 }
 
+void IDBAny::set(PassRefPtr<IDBFactory> value) {
+  ASSERT(m_type == UndefinedType);
+  m_type = IDBFactoryType;
+  m_idbFactory = value;
+}
+
 void IDBAny::set(PassRefPtr<IDBIndex> value) {
   ASSERT(m_type == UndefinedType);
   m_type = IDBIndexType;
@@ -115,16 +126,16 @@ void IDBAny::set(PassRefPtr<IDBKey> value) {
   m_idbKey = value;
 }
 
+void IDBAny::set(PassRefPtr<IDBTransaction> value) {
+  ASSERT(m_type == UndefinedType);
+  m_type = IDBTransactionType;
+  m_idbTransaction = value;
+}
+
 void IDBAny::set(PassRefPtr<IDBObjectStore> value) {
   ASSERT(m_type == UndefinedType);
   m_type = IDBObjectStoreType;
   m_idbObjectStore = value;
-}
-
-void IDBAny::set(PassRefPtr<IDBFactory> value) {
-  ASSERT(m_type == UndefinedType);
-  m_type = IDBFactoryType;
-  m_idbFactory = value;
 }
 
 void IDBAny::set(PassRefPtr<SerializedScriptValue> value) {

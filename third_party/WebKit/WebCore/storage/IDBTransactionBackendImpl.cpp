@@ -54,7 +54,7 @@ IDBTransactionBackendImpl::IDBTransactionBackendImpl(
       m_mode(mode),
       m_timeout(timeout),
       m_id(id),
-      m_state(NotStarted),
+      m_state(Unused),
       m_database(database),
       m_transaction(new SQLiteTransaction(database->sqliteDatabase())),
       m_timer(this, &IDBTransactionBackendImpl::timerFired),
@@ -73,7 +73,7 @@ bool IDBTransactionBackendImpl::scheduleTask(
     return false;
 
   m_taskQueue.append(task);
-  if (m_state == NotStarted)
+  if (m_state == Unused)
     start();
 
   return true;
@@ -84,13 +84,17 @@ void IDBTransactionBackendImpl::abort() {
     return;
 
   m_state = Finished;
+  m_timer.stop();
   m_transaction->rollback();
   m_callbacks->onAbort();
   m_database->transactionCoordinator()->didFinishTransaction(this);
 }
 
 void IDBTransactionBackendImpl::didCompleteTaskEvents() {
-  ASSERT(m_state == Started);
+  if (m_state == Finished)
+    return;
+
+  ASSERT(m_state == Running);
   ASSERT(m_pendingEvents);
 
   m_pendingEvents--;
@@ -110,22 +114,21 @@ void IDBTransactionBackendImpl::didCompleteTaskEvents() {
 }
 
 void IDBTransactionBackendImpl::run() {
-  ASSERT(m_state == Started);
+  ASSERT(m_state == StartPending || m_state == Running);
   ASSERT(!m_timer.isActive());
 
   m_timer.startOneShot(0);
 }
 
 void IDBTransactionBackendImpl::start() {
-  ASSERT(m_state == NotStarted);
+  ASSERT(m_state == Unused);
 
-  m_state = Started;
-  m_transaction->begin();
+  m_state = StartPending;
   m_database->transactionCoordinator()->didStartTransaction(this);
 }
 
 void IDBTransactionBackendImpl::commit() {
-  ASSERT(m_state == Started);
+  ASSERT(m_state == Running);
 
   m_state = Finished;
   m_transaction->commit();
@@ -134,7 +137,12 @@ void IDBTransactionBackendImpl::commit() {
 
 void IDBTransactionBackendImpl::timerFired(Timer<IDBTransactionBackendImpl>*) {
   ASSERT(!m_taskQueue.isEmpty());
-  ASSERT(m_state == Started);
+
+  if (m_state == StartPending) {
+    m_transaction->begin();
+    m_state = Running;
+  } else
+    ASSERT(m_state == Running);
 
   TaskQueue queue;
   queue.swap(m_taskQueue);

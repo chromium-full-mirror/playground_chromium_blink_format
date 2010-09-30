@@ -51,22 +51,27 @@ class WebIDBObjectStoreImpl : public WebIDBObjectStore {
   WebDOMStringList indexNames() const;
 
   void get(const WebIDBKey& key, WebIDBCallbacks*, const WebIDBTransaction&);
-  void put(const WebSerializedScriptValue& value,
+  void put(const WebSerializedScriptValue&,
            const WebIDBKey& key,
            bool addOnly,
-           WebIDBCallbacks*);
-  void remove(const WebIDBKey& key, WebIDBCallbacks*);
+           WebIDBCallbacks*,
+           const WebIDBTransaction&);
+  void remove(const WebIDBKey& key, WebIDBCallbacks*, const WebIDBTransaction&);
 
   void createIndex(const WebString& name,
                    const WebString& keyPath,
                    bool unique,
-                   WebIDBCallbacks* callbacks);
+                   WebIDBCallbacks*,
+                   const WebIDBTransaction&);
   WebIDBIndex* index(const WebString& name);
-  void removeIndex(const WebString& name, WebIDBCallbacks* callbacks);
+  void removeIndex(const WebString& name,
+                   WebIDBCallbacks*,
+                   const WebIDBTransaction&);
 
   void openCursor(const WebIDBKeyRange&,
                   unsigned short direction,
-                  WebIDBCallbacks*);
+                  WebIDBCallbacks*,
+                  const WebIDBTransaction&);
 
  private:
   WTF::RefPtr<WebCore::IDBObjectStoreBackendInterface> m_objectStore;

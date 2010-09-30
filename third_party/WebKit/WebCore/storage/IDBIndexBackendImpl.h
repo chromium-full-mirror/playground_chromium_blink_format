@@ -35,6 +35,7 @@ namespace WebCore {
 class IDBKey;
 class IDBObjectStoreBackendImpl;
 class SQLiteDatabase;
+class ScriptExecutionContext;
 
 class IDBIndexBackendImpl : public IDBIndexBackendInterface {
  public:
@@ -60,12 +61,18 @@ class IDBIndexBackendImpl : public IDBIndexBackendInterface {
 
   virtual void openObjectCursor(PassRefPtr<IDBKeyRange>,
                                 unsigned short direction,
-                                PassRefPtr<IDBCallbacks>);
+                                PassRefPtr<IDBCallbacks>,
+                                IDBTransactionBackendInterface*);
   virtual void openCursor(PassRefPtr<IDBKeyRange>,
                           unsigned short direction,
-                          PassRefPtr<IDBCallbacks>);
-  virtual void getObject(PassRefPtr<IDBKey>, PassRefPtr<IDBCallbacks>);
-  virtual void get(PassRefPtr<IDBKey>, PassRefPtr<IDBCallbacks>);
+                          PassRefPtr<IDBCallbacks>,
+                          IDBTransactionBackendInterface*);
+  virtual void getObject(PassRefPtr<IDBKey>,
+                         PassRefPtr<IDBCallbacks>,
+                         IDBTransactionBackendInterface*);
+  virtual void get(PassRefPtr<IDBKey>,
+                   PassRefPtr<IDBCallbacks>,
+                   IDBTransactionBackendInterface*);
 
   IDBObjectStoreBackendImpl* objectStore() const { return m_objectStore.get(); }
 
@@ -77,6 +84,19 @@ class IDBIndexBackendImpl : public IDBIndexBackendInterface {
                       bool unique);
 
   SQLiteDatabase& sqliteDatabase() const;
+
+  static void openCursorInternal(ScriptExecutionContext*,
+                                 PassRefPtr<IDBIndexBackendImpl>,
+                                 PassRefPtr<IDBKeyRange>,
+                                 unsigned short direction,
+                                 bool objectCursor,
+                                 PassRefPtr<IDBCallbacks>,
+                                 PassRefPtr<IDBTransactionBackendInterface>);
+  static void getInternal(ScriptExecutionContext*,
+                          PassRefPtr<IDBIndexBackendImpl>,
+                          PassRefPtr<IDBKey>,
+                          bool getObject,
+                          PassRefPtr<IDBCallbacks>);
 
   RefPtr<IDBObjectStoreBackendImpl> m_objectStore;
 

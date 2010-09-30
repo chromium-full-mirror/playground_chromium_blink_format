@@ -33,11 +33,16 @@
 #include "IDBKey.h"
 #include "IDBKeyRange.h"
 #include "IDBRequest.h"
+#include "IDBTransactionBackendInterface.h"
 
 namespace WebCore {
 
-IDBIndex::IDBIndex(PassRefPtr<IDBIndexBackendInterface> backend)
-    : m_backend(backend) {}
+IDBIndex::IDBIndex(PassRefPtr<IDBIndexBackendInterface> backend,
+                   IDBTransactionBackendInterface* transaction)
+    : m_backend(backend), m_transaction(transaction) {
+  ASSERT(m_backend);
+  ASSERT(m_transaction);
+}
 
 IDBIndex::~IDBIndex() {}
 
@@ -46,8 +51,9 @@ PassRefPtr<IDBRequest> IDBIndex::openObjectCursor(
     PassRefPtr<IDBKeyRange> keyRange,
     unsigned short direction) {
   RefPtr<IDBRequest> request =
-      IDBRequest::create(context, IDBAny::create(this));
-  m_backend->openObjectCursor(keyRange, direction, request);
+      IDBRequest::create(context, IDBAny::create(this), m_transaction.get());
+  m_backend->openObjectCursor(keyRange, direction, request,
+                              m_transaction.get());
   return request;
 }
 
@@ -55,24 +61,24 @@ PassRefPtr<IDBRequest> IDBIndex::openCursor(ScriptExecutionContext* context,
                                             PassRefPtr<IDBKeyRange> keyRange,
                                             unsigned short direction) {
   RefPtr<IDBRequest> request =
-      IDBRequest::create(context, IDBAny::create(this));
-  m_backend->openCursor(keyRange, direction, request);
+      IDBRequest::create(context, IDBAny::create(this), m_transaction.get());
+  m_backend->openCursor(keyRange, direction, request, m_transaction.get());
   return request;
 }
 
 PassRefPtr<IDBRequest> IDBIndex::getObject(ScriptExecutionContext* context,
                                            PassRefPtr<IDBKey> key) {
   RefPtr<IDBRequest> request =
-      IDBRequest::create(context, IDBAny::create(this));
-  m_backend->getObject(key, request);
+      IDBRequest::create(context, IDBAny::create(this), m_transaction.get());
+  m_backend->getObject(key, request, m_transaction.get());
   return request;
 }
 
 PassRefPtr<IDBRequest> IDBIndex::get(ScriptExecutionContext* context,
                                      PassRefPtr<IDBKey> key) {
   RefPtr<IDBRequest> request =
-      IDBRequest::create(context, IDBAny::create(this));
-  m_backend->get(key, request);
+      IDBRequest::create(context, IDBAny::create(this), m_transaction.get());
+  m_backend->get(key, request, m_transaction.get());
   return request;
 }
 

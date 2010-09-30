@@ -72,9 +72,10 @@ class IDBTransactionBackendImpl : public IDBTransactionBackendInterface {
                             IDBDatabaseBackendImpl*);
 
   enum State {
-    NotStarted,
-    Started,
-    Finished,
+    Unused,        // Created, but no tasks yet.
+    StartPending,  // Enqueued tasks, but SQLite transaction not yet started.
+    Running,       // SQLite transaction started but not yet finished.
+    Finished,      // Either aborted or committed.
   };
 
   void start();

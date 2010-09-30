@@ -54,8 +54,8 @@ IDBRequest::IDBRequest(ScriptExecutionContext* context,
       m_transaction(transaction),
       m_timer(this, &IDBRequest::timerFired),
       m_readyState(LOADING) {
-  if (transaction)
-    IDBPendingTransactionMonitor::removePendingTransaction(transaction);
+  if (m_transaction)
+    IDBPendingTransactionMonitor::removePendingTransaction(m_transaction.get());
 }
 
 IDBRequest::~IDBRequest() {
@@ -78,9 +78,12 @@ IDBRequest::~IDBRequest() {
   ASSERT(!m_transaction);
 }
 
-bool IDBRequest::resetReadyState() {
+bool IDBRequest::resetReadyState(IDBTransactionBackendInterface* transaction) {
   ASSERT(m_readyState == DONE);
   m_readyState = LOADING;
+  ASSERT(!m_transaction);
+  m_transaction = transaction;
+  IDBPendingTransactionMonitor::removePendingTransaction(m_transaction.get());
   return true;
 }
 
@@ -93,7 +96,8 @@ void IDBRequest::onSuccess() {
 }
 
 void IDBRequest::onSuccess(PassRefPtr<IDBCursorBackendInterface> backend) {
-  scheduleEvent(IDBAny::create(IDBCursor::create(backend, this)), 0);
+  scheduleEvent(
+      IDBAny::create(IDBCursor::create(backend, this, m_transaction.get())), 0);
 }
 
 void IDBRequest::onSuccess(PassRefPtr<IDBDatabaseBackendInterface> backend) {
@@ -101,7 +105,8 @@ void IDBRequest::onSuccess(PassRefPtr<IDBDatabaseBackendInterface> backend) {
 }
 
 void IDBRequest::onSuccess(PassRefPtr<IDBIndexBackendInterface> backend) {
-  scheduleEvent(IDBAny::create(IDBIndex::create(backend)), 0);
+  scheduleEvent(IDBAny::create(IDBIndex::create(backend, m_transaction.get())),
+                0);
 }
 
 void IDBRequest::onSuccess(PassRefPtr<IDBKey> idbKey) {
@@ -109,11 +114,23 @@ void IDBRequest::onSuccess(PassRefPtr<IDBKey> idbKey) {
 }
 
 void IDBRequest::onSuccess(PassRefPtr<IDBObjectStoreBackendInterface> backend) {
-  // FIXME: the transaction pointer should be the one of the setVersion
-  // transaction. This is because
-  // this callback is only executed for operations that neen to run in a
-  // setVersion transaction.
-  scheduleEvent(IDBAny::create(IDBObjectStore::create(backend, 0)), 0);
+  // FIXME: This function should go away once createObjectStore is sync.
+  scheduleEvent(
+      IDBAny::create(IDBObjectStore::create(backend, m_transaction.get())), 0);
+}
+
+void IDBRequest::onSuccess(
+    PassRefPtr<IDBTransactionBackendInterface> prpBackend) {
+  RefPtr<IDBTransactionBackendInterface> backend = prpBackend;
+  // This is only used by setVersion which will always have a source that's an
+  // IDBDatabase.
+  m_source->idbDatabase()->setSetVersionTransaction(backend.get());
+  RefPtr<IDBTransaction> frontend = IDBTransaction::create(
+      scriptExecutionContext(), backend, m_source->idbDatabase().get());
+  backend->setCallbacks(frontend.get());
+  m_transaction = backend;
+  IDBPendingTransactionMonitor::removePendingTransaction(m_transaction.get());
+  scheduleEvent(IDBAny::create(frontend.release()), 0);
 }
 
 void IDBRequest::onSuccess(
@@ -151,6 +168,11 @@ void IDBRequest::timerFired(Timer<IDBRequest>*) {
   // m_selfRef being set.
   RefPtr<IDBRequest> selfRef = m_selfRef.release();
 
+  // readyStateReset can be called synchronously while we're dispatching the
+  // event.
+  RefPtr<IDBTransactionBackendInterface> transaction = m_transaction;
+  m_transaction.clear();
+
   Vector<PendingEvent> pendingEvents;
   pendingEvents.swap(m_pendingEvents);
   for (size_t i = 0; i < pendingEvents.size(); ++i) {
@@ -163,13 +185,12 @@ void IDBRequest::timerFired(Timer<IDBRequest>*) {
           IDBSuccessEvent::create(m_source, pendingEvents[i].m_result));
     }
   }
-  if (m_transaction) {
+  if (transaction) {
     // Now that we processed all pending events, let the transaction monitor
     // check if
     // it can commit the current transaction or if there's anything new pending.
     // FIXME: Handle the workers case.
-    m_transaction->didCompleteTaskEvents();
-    m_transaction.clear();
+    transaction->didCompleteTaskEvents();
   }
 }
 

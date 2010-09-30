@@ -36,6 +36,7 @@ class WebIDBDatabaseError;
 class WebIDBKey;
 class WebIDBIndex;
 class WebIDBObjectStore;
+class WebIDBTransaction;
 class WebSerializedScriptValue;
 
 class WebIDBCallbacks {
@@ -53,6 +54,7 @@ class WebIDBCallbacks {
   virtual void onSuccess(const WebIDBKey&) { WEBKIT_ASSERT_NOT_REACHED(); }
   virtual void onSuccess(WebIDBIndex*) { WEBKIT_ASSERT_NOT_REACHED(); }
   virtual void onSuccess(WebIDBObjectStore*) { WEBKIT_ASSERT_NOT_REACHED(); }
+  virtual void onSuccess(WebIDBTransaction*) { WEBKIT_ASSERT_NOT_REACHED(); }
   virtual void onSuccess(const WebSerializedScriptValue&) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
