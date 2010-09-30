@@ -40,8 +40,6 @@ ANGLEWebKitBridge::~ANGLEWebKitBridge() {
     ShDestruct(m_fragmentCompiler);
     ShDestruct(m_vertexCompiler);
   }
-
-  ShFinalize();
 }
 
 bool ANGLEWebKitBridge::validateShaderSource(const char* shaderSource,
