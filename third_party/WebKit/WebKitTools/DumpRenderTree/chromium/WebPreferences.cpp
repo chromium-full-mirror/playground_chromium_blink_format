@@ -101,6 +101,7 @@ void WebPreferences::reset() {
 
   tabsToLinks = false;
   hyperlinkAuditingEnabled = false;
+  acceleratedCompositingEnabled = false;
   accelerated2dCanvasEnabled = false;
 }
 
@@ -160,9 +161,6 @@ void WebPreferences::applyTo(WebView* webView) {
   settings->setTextDirectionSubmenuInclusionBehaviorNeverIncluded();
   settings->setUsesEncodingDetector(false);
   settings->setImagesEnabled(true);
-
-  // FIXME: crbug.com/51879
-  settings->setAcceleratedCompositingEnabled(false);
-
+  settings->setAcceleratedCompositingEnabled(acceleratedCompositingEnabled);
   settings->setAccelerated2dCanvasEnabled(accelerated2dCanvasEnabled);
 }
