@@ -71,7 +71,7 @@ class WebDragData {
 
   bool isNull() const { return !m_private; }
 
-  WEBKIT_API WebURL url() const;
+  WEBKIT_API WebString url() const;
   WEBKIT_API void setURL(const WebURL&);
 
   WEBKIT_API WebString urlTitle() const;
