@@ -63,8 +63,8 @@ class RenderImage : public RenderReplaced {
   void paintFocusRings(PaintInfo&, const RenderStyle*);
   virtual void paint(PaintInfo&, int tx, int ty);
 
-  bool isWidthSpecified() const;
-  bool isHeightSpecified() const;
+  bool isLogicalWidthSpecified() const;
+  bool isLogicalHeightSpecified() const;
 
   virtual void intrinsicSizeChanged() {
     if (m_imageResource)
@@ -90,11 +90,11 @@ class RenderImage : public RenderReplaced {
                            int ty,
                            HitTestAction);
 
-  virtual int computeReplacedWidth(bool includeMaxWidth = true) const;
-  virtual int computeReplacedHeight() const;
+  virtual int computeReplacedLogicalWidth(bool includeMaxWidth = true) const;
+  virtual int computeReplacedLogicalHeight() const;
 
-  int calcAspectRatioWidth() const;
-  int calcAspectRatioHeight() const;
+  int calcAspectRatioLogicalWidth() const;
+  int calcAspectRatioLogicalHeight() const;
 
  private:
   // Text to display as long as the image isn't available.

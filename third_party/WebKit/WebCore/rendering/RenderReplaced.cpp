@@ -53,12 +53,6 @@ RenderReplaced::RenderReplaced(Node* node, const IntSize& intrinsicSize)
 
 RenderReplaced::~RenderReplaced() {}
 
-void RenderReplaced::setStyle(PassRefPtr<RenderStyle> newStyle) {
-  if (newStyle->blockFlow() != TopToBottomBlockFlow)
-    newStyle->setBlockFlow(TopToBottomBlockFlow);
-  RenderBox::setStyle(newStyle);
-}
-
 void RenderReplaced::styleDidChange(StyleDifference diff,
                                     const RenderStyle* oldStyle) {
   RenderBox::styleDidChange(diff, oldStyle);
@@ -84,7 +78,6 @@ void RenderReplaced::layout() {
   addShadowOverflow();
 
   repainter.repaintAfterLayout();
-
   setNeedsLayout(false);
 }
 
@@ -214,61 +207,68 @@ static inline bool lengthIsSpecified(Length length) {
   return lengthType == Fixed || lengthType == Percent;
 }
 
-int RenderReplaced::computeReplacedWidth(bool includeMaxWidth) const {
-  int width;
+int RenderReplaced::computeReplacedLogicalWidth(bool includeMaxWidth) const {
+  int logicalWidth;
   if (lengthIsSpecified(style()->width()))
-    width = computeReplacedWidthUsing(style()->width());
+    logicalWidth = computeReplacedLogicalWidthUsing(style()->logicalWidth());
   else if (m_hasIntrinsicSize)
-    width = calcAspectRatioWidth();
+    logicalWidth = calcAspectRatioLogicalWidth();
   else
-    width = intrinsicSize().width();
+    logicalWidth = intrinsicLogicalWidth();
 
-  int minW = computeReplacedWidthUsing(style()->minWidth());
-  int maxW = !includeMaxWidth || style()->maxWidth().isUndefined()
-                 ? width
-                 : computeReplacedWidthUsing(style()->maxWidth());
+  int minLogicalWidth =
+      computeReplacedLogicalWidthUsing(style()->logicalMinWidth());
+  int maxLogicalWidth =
+      !includeMaxWidth || style()->logicalMaxWidth().isUndefined()
+          ? logicalWidth
+          : computeReplacedLogicalWidthUsing(style()->logicalMaxWidth());
 
-  return max(minW, min(width, maxW));
+  return max(minLogicalWidth, min(logicalWidth, maxLogicalWidth));
 }
 
-int RenderReplaced::computeReplacedHeight() const {
-  int height;
-  if (lengthIsSpecified(style()->height()))
-    height = computeReplacedHeightUsing(style()->height());
+int RenderReplaced::computeReplacedLogicalHeight() const {
+  int logicalHeight;
+  if (lengthIsSpecified(style()->logicalHeight()))
+    logicalHeight = computeReplacedLogicalHeightUsing(style()->logicalHeight());
   else if (m_hasIntrinsicSize)
-    height = calcAspectRatioHeight();
+    logicalHeight = calcAspectRatioLogicalHeight();
   else
-    height = intrinsicSize().height();
+    logicalHeight = intrinsicLogicalHeight();
 
-  int minH = computeReplacedHeightUsing(style()->minHeight());
-  int maxH = style()->maxHeight().isUndefined()
-                 ? height
-                 : computeReplacedHeightUsing(style()->maxHeight());
+  int minLogicalHeight =
+      computeReplacedLogicalHeightUsing(style()->logicalMinHeight());
+  int maxLogicalHeight =
+      style()->logicalMaxHeight().isUndefined()
+          ? logicalHeight
+          : computeReplacedLogicalHeightUsing(style()->logicalMaxHeight());
 
-  return max(minH, min(height, maxH));
+  return max(minLogicalHeight, min(logicalHeight, maxLogicalHeight));
 }
 
-int RenderReplaced::calcAspectRatioWidth() const {
-  int intrinsicWidth = intrinsicSize().width();
-  int intrinsicHeight = intrinsicSize().height();
+int RenderReplaced::calcAspectRatioLogicalWidth() const {
+  int intrinsicWidth = intrinsicLogicalWidth();
+  int intrinsicHeight = intrinsicLogicalHeight();
   if (!intrinsicHeight)
     return 0;
-  return RenderBox::computeReplacedHeight() * intrinsicWidth / intrinsicHeight;
+  return RenderBox::computeReplacedLogicalHeight() * intrinsicWidth /
+         intrinsicHeight;
 }
 
-int RenderReplaced::calcAspectRatioHeight() const {
-  int intrinsicWidth = intrinsicSize().width();
-  int intrinsicHeight = intrinsicSize().height();
+int RenderReplaced::calcAspectRatioLogicalHeight() const {
+  int intrinsicWidth = intrinsicLogicalWidth();
+  int intrinsicHeight = intrinsicLogicalHeight();
   if (!intrinsicWidth)
     return 0;
-  return RenderBox::computeReplacedWidth() * intrinsicHeight / intrinsicWidth;
+  return RenderBox::computeReplacedLogicalWidth() * intrinsicHeight /
+         intrinsicWidth;
 }
 
 void RenderReplaced::computePreferredLogicalWidths() {
   ASSERT(preferredLogicalWidthsDirty());
 
   int borderAndPadding = borderAndPaddingWidth();
-  m_maxPreferredLogicalWidth = computeReplacedWidth(false) + borderAndPadding;
+  m_maxPreferredLogicalWidth =
+      computeReplacedLogicalWidth(false) + borderAndPadding;
 
   if (style()->maxWidth().isFixed() &&
       style()->maxWidth().value() != undefinedLength)

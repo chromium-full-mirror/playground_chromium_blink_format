@@ -421,8 +421,8 @@ void RenderImage::updateAltText() {
 #endif
 }
 
-bool RenderImage::isWidthSpecified() const {
-  switch (style()->width().type()) {
+bool RenderImage::isLogicalWidthSpecified() const {
+  switch (style()->logicalWidth().type()) {
     case Fixed:
     case Percent:
       return true;
@@ -437,8 +437,8 @@ bool RenderImage::isWidthSpecified() const {
   return false;
 }
 
-bool RenderImage::isHeightSpecified() const {
-  switch (style()->height().type()) {
+bool RenderImage::isLogicalHeightSpecified() const {
+  switch (style()->logicalHeight().type()) {
     case Fixed:
     case Percent:
       return true;
@@ -453,7 +453,7 @@ bool RenderImage::isHeightSpecified() const {
   return false;
 }
 
-int RenderImage::computeReplacedWidth(bool includeMaxWidth) const {
+int RenderImage::computeReplacedLogicalWidth(bool includeMaxWidth) const {
   if (m_imageResource->imageHasRelativeWidth())
     if (RenderObject* cb = isPositioned() ? container() : containingBlock()) {
       if (cb->isBox())
@@ -462,61 +462,73 @@ int RenderImage::computeReplacedWidth(bool includeMaxWidth) const {
                     toRenderBox(cb)->availableHeight()));
     }
 
-  int width;
-  if (isWidthSpecified())
-    width = computeReplacedWidthUsing(style()->width());
-  else if (m_imageResource->usesImageContainerSize())
-    width = m_imageResource->imageSize(style()->effectiveZoom()).width();
-  else if (m_imageResource->imageHasRelativeWidth())
-    width = 0;  // If the image is relatively-sized, set the width to 0 until
-                // there is a set container size.
+  int logicalWidth;
+  if (isLogicalWidthSpecified())
+    logicalWidth = computeReplacedLogicalWidthUsing(style()->logicalWidth());
+  else if (m_imageResource->usesImageContainerSize()) {
+    IntSize size = m_imageResource->imageSize(style()->effectiveZoom());
+    logicalWidth =
+        style()->isVerticalBlockFlow() ? size.width() : size.height();
+  } else if (m_imageResource->imageHasRelativeWidth())
+    logicalWidth = 0;  // If the image is relatively-sized, set the width to 0
+                       // until there is a set container size.
   else
-    width = calcAspectRatioWidth();
+    logicalWidth = calcAspectRatioLogicalWidth();
 
-  int minW = computeReplacedWidthUsing(style()->minWidth());
-  int maxW = !includeMaxWidth || style()->maxWidth().isUndefined()
-                 ? width
-                 : computeReplacedWidthUsing(style()->maxWidth());
+  int minLogicalWidth =
+      computeReplacedLogicalWidthUsing(style()->logicalMinWidth());
+  int maxLogicalWidth =
+      !includeMaxWidth || style()->logicalMaxWidth().isUndefined()
+          ? logicalWidth
+          : computeReplacedLogicalWidthUsing(style()->logicalMaxWidth());
 
-  return max(minW, min(width, maxW));
+  return max(minLogicalWidth, min(logicalWidth, maxLogicalWidth));
 }
 
-int RenderImage::computeReplacedHeight() const {
-  int height;
-  if (isHeightSpecified())
-    height = computeReplacedHeightUsing(style()->height());
-  else if (m_imageResource->usesImageContainerSize())
-    height = m_imageResource->imageSize(style()->effectiveZoom()).height();
-  else if (m_imageResource->imageHasRelativeHeight())
-    height = 0;  // If the image is relatively-sized, set the height to 0 until
-                 // there is a set container size.
+int RenderImage::computeReplacedLogicalHeight() const {
+  int logicalHeight;
+  if (isLogicalHeightSpecified())
+    logicalHeight = computeReplacedLogicalHeightUsing(style()->logicalHeight());
+  else if (m_imageResource->usesImageContainerSize()) {
+    IntSize size = m_imageResource->imageSize(style()->effectiveZoom());
+    logicalHeight =
+        style()->isVerticalBlockFlow() ? size.height() : size.width();
+  } else if (m_imageResource->imageHasRelativeHeight())
+    logicalHeight = 0;  // If the image is relatively-sized, set the height to 0
+                        // until there is a set container size.
   else
-    height = calcAspectRatioHeight();
+    logicalHeight = calcAspectRatioLogicalHeight();
 
-  int minH = computeReplacedHeightUsing(style()->minHeight());
-  int maxH = style()->maxHeight().isUndefined()
-                 ? height
-                 : computeReplacedHeightUsing(style()->maxHeight());
+  int minLogicalHeight =
+      computeReplacedLogicalHeightUsing(style()->logicalMinHeight());
+  int maxLogicalHeight =
+      style()->logicalMaxHeight().isUndefined()
+          ? logicalHeight
+          : computeReplacedLogicalHeightUsing(style()->logicalMaxHeight());
 
-  return max(minH, min(height, maxH));
+  return max(minLogicalHeight, min(logicalHeight, maxLogicalHeight));
 }
 
-int RenderImage::calcAspectRatioWidth() const {
-  IntSize size = intrinsicSize();
-  if (!size.height())
+int RenderImage::calcAspectRatioLogicalWidth() const {
+  int intrinsicWidth = intrinsicLogicalWidth();
+  int intrinsicHeight = intrinsicLogicalHeight();
+  if (!intrinsicHeight)
     return 0;
   if (!m_imageResource->hasImage() || m_imageResource->errorOccurred())
-    return size.width();  // Don't bother scaling.
-  return RenderBox::computeReplacedHeight() * size.width() / size.height();
+    return intrinsicWidth;  // Don't bother scaling.
+  return RenderBox::computeReplacedLogicalHeight() * intrinsicWidth /
+         intrinsicHeight;
 }
 
-int RenderImage::calcAspectRatioHeight() const {
-  IntSize size = intrinsicSize();
-  if (!size.width())
+int RenderImage::calcAspectRatioLogicalHeight() const {
+  int intrinsicWidth = intrinsicLogicalWidth();
+  int intrinsicHeight = intrinsicLogicalHeight();
+  if (!intrinsicWidth)
     return 0;
   if (!m_imageResource->hasImage() || m_imageResource->errorOccurred())
-    return size.height();  // Don't bother scaling.
-  return RenderBox::computeReplacedWidth() * size.height() / size.width();
+    return intrinsicHeight;  // Don't bother scaling.
+  return RenderBox::computeReplacedLogicalWidth() * intrinsicHeight /
+         intrinsicWidth;
 }
 
 }  // namespace WebCore

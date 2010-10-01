@@ -64,7 +64,7 @@ void RenderSVGRoot::computePreferredLogicalWidths() {
   ASSERT(preferredLogicalWidthsDirty());
 
   int borderAndPadding = borderAndPaddingWidth();
-  int width = computeReplacedWidth(false) + borderAndPadding;
+  int width = computeReplacedLogicalWidth(false) + borderAndPadding;
 
   if (style()->maxWidth().isFixed() &&
       style()->maxWidth().value() != undefinedLength)
@@ -83,9 +83,9 @@ void RenderSVGRoot::computePreferredLogicalWidths() {
   setPreferredLogicalWidthsDirty(false);
 }
 
-int RenderSVGRoot::computeReplacedWidth(bool includeMaxWidth) const {
-  int replacedWidth = RenderBox::computeReplacedWidth(includeMaxWidth);
-  if (!style()->width().isPercent())
+int RenderSVGRoot::computeReplacedLogicalWidth(bool includeMaxWidth) const {
+  int replacedWidth = RenderBox::computeReplacedLogicalWidth(includeMaxWidth);
+  if (!style()->logicalWidth().isPercent())
     return replacedWidth;
 
   // FIXME: Investigate in size rounding issues
@@ -93,9 +93,9 @@ int RenderSVGRoot::computeReplacedWidth(bool includeMaxWidth) const {
   return static_cast<int>(roundf(replacedWidth * svg->currentScale()));
 }
 
-int RenderSVGRoot::computeReplacedHeight() const {
-  int replacedHeight = RenderBox::computeReplacedHeight();
-  if (!style()->height().isPercent())
+int RenderSVGRoot::computeReplacedLogicalHeight() const {
+  int replacedHeight = RenderBox::computeReplacedLogicalHeight();
+  if (!style()->logicalHeight().isPercent())
     return replacedHeight;
 
   // FIXME: Investigate in size rounding issues
