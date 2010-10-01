@@ -860,6 +860,21 @@ HWND PluginView::nativeParentWindow() {
 }
 #endif
 
+String PluginView::proxiesForURL(const String& urlString) {
+  // FIXME: Implement.
+  return String();
+}
+
+String PluginView::cookiesForURL(const String& urlString) {
+  // FIXME: Implement.
+  return String();
+}
+
+void PluginView::setCookiesForURL(const String& urlString,
+                                  const String& cookieString) {
+  // FIXME: Implement.
+}
+
 void PluginView::didFinishLoad(WebFrame* webFrame) {
   RefPtr<URLRequest> request = m_pendingFrameLoads.take(webFrame);
   ASSERT(request);

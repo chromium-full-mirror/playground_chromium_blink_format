@@ -102,6 +102,16 @@ class PluginController {
   virtual HWND nativeParentWindow() = 0;
 #endif
 
+  // Returns the proxies for the given URL or null on failure.
+  virtual String proxiesForURL(const String&) = 0;
+
+  // Returns the cookies for the given URL or null on failure.
+  virtual String cookiesForURL(const String&) = 0;
+
+  // Sets the cookies for the given URL.
+  virtual void setCookiesForURL(const String& urlString,
+                                const String& cookieString) = 0;
+
  protected:
   virtual ~PluginController() {}
 };
