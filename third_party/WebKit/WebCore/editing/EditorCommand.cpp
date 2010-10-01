@@ -1758,6 +1758,10 @@ static TriState stateJustifyCenter(Frame* frame, Event*) {
   return stateStyle(frame, CSSPropertyTextAlign, "center");
 }
 
+static TriState stateJustifyFull(Frame* frame, Event*) {
+  return stateStyle(frame, CSSPropertyTextAlign, "justify");
+}
+
 static TriState stateJustifyLeft(Frame* frame, Event*) {
   return stateStyle(frame, CSSPropertyTextAlign, "left");
 }
@@ -1966,8 +1970,9 @@ static const CommandMap& createCommandMap() {
       stateJustifyCenter, valueNull, notTextInsertion,
       doNotAllowExecutionWhenDisabled}},
     {"JustifyFull",
-     {executeJustifyFull, supported, enabledInRichlyEditableText, stateNone,
-      valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
+     {executeJustifyFull, supported, enabledInRichlyEditableText,
+      stateJustifyFull, valueNull, notTextInsertion,
+      doNotAllowExecutionWhenDisabled}},
     {"JustifyLeft",
      {executeJustifyLeft, supported, enabledInRichlyEditableText,
       stateJustifyLeft, valueNull, notTextInsertion,
