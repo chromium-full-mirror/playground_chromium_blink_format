@@ -67,6 +67,7 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   // WebFrame methods:
   virtual WebString name() const;
   virtual void setName(const WebString&);
+  virtual long long identifier() const;
   virtual WebURL url() const;
   virtual WebURL favIconURL() const;
   virtual WebURL openSearchDescriptionURL() const;
@@ -408,6 +409,9 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
 
   // Keeps a reference to the frame's WebAnimationController.
   WebAnimationControllerImpl m_animationController;
+
+  // The identifier of this frame.
+  long long m_identifier;
 };
 
 }  // namespace WebKit
