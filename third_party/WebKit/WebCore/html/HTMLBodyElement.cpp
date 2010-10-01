@@ -34,6 +34,7 @@
 #include "FrameView.h"
 #include "HTMLFrameElementBase.h"
 #include "HTMLNames.h"
+#include "HTMLParserIdioms.h"
 #include "ScriptEventListener.h"
 
 namespace WebCore {
@@ -90,7 +91,7 @@ bool HTMLBodyElement::mapToEntry(const QualifiedName& attrName,
 
 void HTMLBodyElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == backgroundAttr) {
-    String url = deprecatedParseURL(attr->value());
+    String url = stripLeadingAndTrailingHTMLSpaces(attr->value());
     if (!url.isEmpty())
       addCSSImageProperty(attr, CSSPropertyBackgroundImage,
                           document()->completeURL(url).string());

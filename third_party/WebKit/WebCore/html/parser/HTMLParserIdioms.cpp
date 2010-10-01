@@ -45,7 +45,7 @@ String stripLeadingAndTrailingHTMLSpaces(const String& string) {
   }
 
   if (numLeadingSpaces == length)
-    return emptyAtom;
+    return string.isNull() ? string : emptyAtom.string();
 
   unsigned numTrailingSpaces;
   for (numTrailingSpaces = 0; numTrailingSpaces < length; ++numTrailingSpaces) {
@@ -55,7 +55,8 @@ String stripLeadingAndTrailingHTMLSpaces(const String& string) {
 
   ASSERT(numLeadingSpaces + numTrailingSpaces < length);
 
-  return string.substring(numLeadingSpaces, length - numTrailingSpaces);
+  return string.substring(numLeadingSpaces,
+                          length - (numLeadingSpaces + numTrailingSpaces));
 }
 
 String serializeForNumberType(double number) {

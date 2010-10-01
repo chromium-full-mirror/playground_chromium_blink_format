@@ -32,6 +32,7 @@
 #include "CSSValueKeywords.h"
 #include "ExceptionCode.h"
 #include "HTMLNames.h"
+#include "HTMLParserIdioms.h"
 #include "HTMLTableCaptionElement.h"
 #include "HTMLTableRowElement.h"
 #include "HTMLTableRowsCollection.h"
@@ -330,7 +331,7 @@ void HTMLTableElement::parseMappedAttribute(Attribute* attr) {
       m_borderColorAttr = true;
     }
   } else if (attr->name() == backgroundAttr) {
-    String url = deprecatedParseURL(attr->value());
+    String url = stripLeadingAndTrailingHTMLSpaces(attr->value());
     if (!url.isEmpty())
       addCSSImageProperty(attr, CSSPropertyBackgroundImage,
                           document()->completeURL(url).string());

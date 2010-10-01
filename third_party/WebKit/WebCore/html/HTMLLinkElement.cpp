@@ -26,7 +26,6 @@
 #include "HTMLLinkElement.h"
 
 #include "Attribute.h"
-#include "CSSHelper.h"
 #include "CachedCSSStyleSheet.h"
 #include "CachedResourceLoader.h"
 #include "Document.h"
@@ -35,6 +34,7 @@
 #include "FrameLoaderClient.h"
 #include "FrameTree.h"
 #include "HTMLNames.h"
+#include "HTMLParserIdioms.h"
 #include "MediaList.h"
 #include "MediaQueryEvaluator.h"
 #include "Page.h"
@@ -126,7 +126,8 @@ void HTMLLinkElement::parseMappedAttribute(Attribute* attr) {
     tokenizeRelAttribute(attr->value(), m_relAttribute);
     process();
   } else if (attr->name() == hrefAttr) {
-    m_url = document()->completeURL(deprecatedParseURL(attr->value()));
+    m_url = document()->completeURL(
+        stripLeadingAndTrailingHTMLSpaces(attr->value()));
     process();
   } else if (attr->name() == typeAttr) {
     m_type = attr->value();

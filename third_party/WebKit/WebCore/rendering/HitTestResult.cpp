@@ -29,6 +29,7 @@
 #include "HTMLInputElement.h"
 #include "HTMLMediaElement.h"
 #include "HTMLNames.h"
+#include "HTMLParserIdioms.h"
 #include "RenderImage.h"
 #include "Scrollbar.h"
 #include "SelectionController.h"
@@ -307,14 +308,14 @@ KURL HitTestResult::absoluteImageURL() const {
     return KURL();
 
   return m_innerNonSharedNode->document()->completeURL(
-      deprecatedParseURL(urlString));
+      stripLeadingAndTrailingHTMLSpaces(urlString));
 }
 
 KURL HitTestResult::absoluteMediaURL() const {
 #if ENABLE(VIDEO)
   if (HTMLMediaElement* mediaElt = mediaElement())
     return m_innerNonSharedNode->document()->completeURL(
-        deprecatedParseURL(mediaElt->currentSrc()));
+        stripLeadingAndTrailingHTMLSpaces(mediaElt->currentSrc()));
   return KURL();
 #else
   return KURL();
@@ -455,7 +456,7 @@ KURL HitTestResult::absoluteLinkURL() const {
     return KURL();
 
   return m_innerURLElement->document()->completeURL(
-      deprecatedParseURL(urlString));
+      stripLeadingAndTrailingHTMLSpaces(urlString));
 }
 
 bool HitTestResult::isLiveLink() const {

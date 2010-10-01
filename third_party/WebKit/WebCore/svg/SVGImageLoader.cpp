@@ -25,6 +25,7 @@
 
 #include "Event.h"
 #include "EventNames.h"
+#include "HTMLParserIdioms.h"
 #include "SVGImageElement.h"
 #include "RenderImage.h"
 
@@ -44,7 +45,8 @@ void SVGImageLoader::dispatchLoadEvent() {
 }
 
 String SVGImageLoader::sourceURI(const AtomicString& attr) const {
-  return KURL(element()->baseURI(), deprecatedParseURL(attr)).string();
+  return KURL(element()->baseURI(), stripLeadingAndTrailingHTMLSpaces(attr))
+      .string();
 }
 }
 

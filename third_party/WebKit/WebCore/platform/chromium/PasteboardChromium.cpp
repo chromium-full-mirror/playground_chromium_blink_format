@@ -38,6 +38,7 @@
 #include "Element.h"
 #include "Frame.h"
 #include "HTMLNames.h"
+#include "HTMLParserIdioms.h"
 #include "Image.h"
 #include "KURL.h"
 #include "markup.h"
@@ -146,7 +147,8 @@ void Pasteboard::writeImage(Node* node, const KURL&, const String& title) {
   }
   KURL url = urlString.isEmpty()
                  ? KURL()
-                 : node->document()->completeURL(deprecatedParseURL(urlString));
+                 : node->document()->completeURL(
+                       stripLeadingAndTrailingHTMLSpaces(urlString));
 
   ChromiumBridge::clipboardWriteImage(bitmap, url, title);
 }

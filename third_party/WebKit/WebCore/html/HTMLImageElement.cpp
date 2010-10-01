@@ -25,7 +25,6 @@
 #include "HTMLImageElement.h"
 
 #include "Attribute.h"
-#include "CSSHelper.h"
 #include "CSSPropertyNames.h"
 #include "CSSValueKeywords.h"
 #include "EventNames.h"
@@ -33,6 +32,7 @@
 #include "HTMLDocument.h"
 #include "HTMLFormElement.h"
 #include "HTMLNames.h"
+#include "HTMLParserIdioms.h"
 #include "RenderImage.h"
 #include "ScriptEventListener.h"
 
@@ -135,7 +135,9 @@ void HTMLImageElement::parseMappedAttribute(Attribute* attr) {
       usemap = attr->value();
     else
       usemap =
-          document()->completeURL(deprecatedParseURL(attr->value())).string();
+          document()
+              ->completeURL(stripLeadingAndTrailingHTMLSpaces(attr->value()))
+              .string();
     setIsLink(!attr->isNull());
   } else if (attrName == ismapAttr)
     ismap = true;

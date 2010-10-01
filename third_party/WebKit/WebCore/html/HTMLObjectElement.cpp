@@ -26,7 +26,6 @@
 #include "HTMLObjectElement.h"
 
 #include "Attribute.h"
-#include "CSSHelper.h"
 #include "EventNames.h"
 #include "ExceptionCode.h"
 #include "Frame.h"
@@ -35,6 +34,7 @@
 #include "HTMLImageLoader.h"
 #include "HTMLNames.h"
 #include "HTMLParamElement.h"
+#include "HTMLParserIdioms.h"
 #include "MIMETypeRegistry.h"
 #include "RenderEmbeddedObject.h"
 #include "RenderImage.h"
@@ -80,7 +80,7 @@ void HTMLObjectElement::parseMappedAttribute(Attribute* attr) {
     if (!isImageType() && m_imageLoader)
       m_imageLoader.clear();
   } else if (attr->name() == dataAttr) {
-    m_url = deprecatedParseURL(attr->value());
+    m_url = stripLeadingAndTrailingHTMLSpaces(attr->value());
     if (renderer()) {
       setNeedsWidgetUpdate(true);
       if (isImageType()) {
@@ -195,7 +195,7 @@ void HTMLObjectElement::parametersForPlugin(Vector<String>& paramNames,
     if (url.isEmpty() && urlParameter.isEmpty() &&
         (equalIgnoringCase(name, "src") || equalIgnoringCase(name, "movie") ||
          equalIgnoringCase(name, "code") || equalIgnoringCase(name, "url")))
-      urlParameter = deprecatedParseURL(p->value());
+      urlParameter = stripLeadingAndTrailingHTMLSpaces(p->value());
     // FIXME: serviceType calculation does not belong in this function.
     if (serviceType.isEmpty() && equalIgnoringCase(name, "type")) {
       serviceType = p->value();

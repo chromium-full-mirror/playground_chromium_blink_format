@@ -37,6 +37,7 @@
 #include "FileList.h"
 #include "Frame.h"
 #include "HTMLNames.h"
+#include "HTMLParserIdioms.h"
 #include "Image.h"
 #include "MIMETypeRegistry.h"
 #include "NamedNodeMap.h"
@@ -270,7 +271,8 @@ void ClipboardChromium::declareAndWriteDragImage(Element* element,
   if (imageURL.isEmpty())
     return;
 
-  String fullURL = frame->document()->completeURL(deprecatedParseURL(imageURL));
+  String fullURL = frame->document()->completeURL(
+      stripLeadingAndTrailingHTMLSpaces(imageURL));
   if (fullURL.isEmpty())
     return;
 
