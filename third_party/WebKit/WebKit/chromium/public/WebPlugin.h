@@ -105,7 +105,7 @@ class WebPlugin {
   virtual WebString selectionAsMarkup() const { return WebString(); }
 
   // Used for zooming of full page plugins.
-  virtual void setZoomFactor(float scale, bool textOnly) {}
+  virtual void setZoomLevel(double level, bool textOnly) {}
 
   // Find interface.
   // Start a new search.  The plugin should search for a little bit at a time so

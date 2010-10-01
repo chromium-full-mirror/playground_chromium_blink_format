@@ -88,6 +88,7 @@ class WebPluginContainerImpl : public WebCore::Widget,
                                 const WebString& target,
                                 bool notifyNeeded,
                                 void* notifyData);
+  virtual void zoomLevelChanged(double zoomLevel);
 
   // This cannot be null.
   WebPlugin* plugin() { return m_webPlugin; }

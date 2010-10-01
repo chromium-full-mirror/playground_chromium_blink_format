@@ -80,6 +80,9 @@ class WebPluginContainer {
                                 bool notifyNeeded,
                                 void* notifyData) = 0;
 
+  // Notifies that the zoom level has changed.
+  virtual void zoomLevelChanged(double zoomLevel) = 0;
+
   virtual WebPlugin* plugin() = 0;
   virtual void setPlugin(WebPlugin*) = 0;
 

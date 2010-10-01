@@ -146,9 +146,9 @@ namespace WebKit {
 // zooms text in or out (ie., change by 20%).  The min and max values limit
 // text zoom to half and 3x the original text size.  These three values match
 // those in Apple's port in WebKit/WebKit/WebView/WebView.mm
-static const double textSizeMultiplierRatio = 1.2;
-static const double minTextSizeMultiplier = 0.5;
-static const double maxTextSizeMultiplier = 3.0;
+const double WebView::textSizeMultiplierRatio = 1.2;
+const double WebView::minTextSizeMultiplier = 0.5;
+const double WebView::maxTextSizeMultiplier = 3.0;
 
 // The group name identifies a namespace of pages.  Page group is used on OSX
 // for some programs that use HTML views to display things that don't seem like
@@ -255,7 +255,8 @@ WebViewImpl::WebViewImpl(WebViewClient* client,
 #endif
       ,
       m_zoomLevel(0),
-      m_zoomTextOnly(false),
+      m_minimumZoomLevel(zoomFactorToZoomLevel(minTextSizeMultiplier)),
+      m_maximumZoomLevel(zoomFactorToZoomLevel(maxTextSizeMultiplier)),
       m_contextMenuAllowed(false),
       m_doingDragAndDrop(false),
       m_ignoreInputEvents(false),
@@ -1506,36 +1507,56 @@ void WebViewImpl::clearFocusedNode() {
   }
 }
 
-int WebViewImpl::zoomLevel() {
+double WebViewImpl::zoomLevel() {
   return m_zoomLevel;
 }
 
-int WebViewImpl::setZoomLevel(bool textOnly, int zoomLevel) {
-  float zoomFactor = static_cast<float>(
-      std::max(std::min(std::pow(textSizeMultiplierRatio, zoomLevel),
-                        maxTextSizeMultiplier),
-               minTextSizeMultiplier));
-  Frame* frame = mainFrameImpl()->frame();
-
-  float oldZoomFactor =
-      m_zoomTextOnly ? frame->textZoomFactor() : frame->pageZoomFactor();
-
-  if (textOnly)
-    frame->setPageAndTextZoomFactors(1, zoomFactor);
+double WebViewImpl::setZoomLevel(bool textOnly, double zoomLevel) {
+  if (zoomLevel < m_minimumZoomLevel)
+    m_zoomLevel = m_minimumZoomLevel;
+  else if (zoomLevel > m_maximumZoomLevel)
+    m_zoomLevel = m_maximumZoomLevel;
   else
-    frame->setPageAndTextZoomFactors(zoomFactor, 1);
+    m_zoomLevel = zoomLevel;
 
-  if (oldZoomFactor != zoomFactor || textOnly != m_zoomTextOnly) {
-    WebPluginContainerImpl* pluginContainer =
-        WebFrameImpl::pluginContainerFromFrame(frame);
-    if (pluginContainer)
-      pluginContainer->plugin()->setZoomFactor(zoomFactor, textOnly);
+  Frame* frame = mainFrameImpl()->frame();
+  WebPluginContainerImpl* pluginContainer =
+      WebFrameImpl::pluginContainerFromFrame(frame);
+  if (pluginContainer)
+    pluginContainer->plugin()->setZoomLevel(m_zoomLevel, textOnly);
+  else {
+    double zoomFactor = zoomLevelToZoomFactor(m_zoomLevel);
+    if (textOnly)
+      frame->setPageAndTextZoomFactors(1, zoomFactor);
+    else
+      frame->setPageAndTextZoomFactors(zoomFactor, 1);
   }
-
-  m_zoomLevel = zoomLevel;
-  m_zoomTextOnly = textOnly;
-
   return m_zoomLevel;
+}
+
+void WebViewImpl::zoomLimitsChanged(double minimumZoomLevel,
+                                    double maximumZoomLevel) {
+  m_minimumZoomLevel = minimumZoomLevel;
+  m_maximumZoomLevel = maximumZoomLevel;
+  m_client->zoomLimitsChanged(m_minimumZoomLevel, m_maximumZoomLevel);
+}
+
+void WebViewImpl::fullFramePluginZoomLevelChanged(double zoomLevel) {
+  if (zoomLevel == m_zoomLevel)
+    return;
+
+  m_zoomLevel =
+      std::max(std::min(zoomLevel, m_maximumZoomLevel), m_minimumZoomLevel);
+  m_client->zoomLevelChanged();
+}
+
+double WebView::zoomLevelToZoomFactor(double zoomLevel) {
+  return std::pow(textSizeMultiplierRatio, zoomLevel);
+}
+
+double WebView::zoomFactorToZoomLevel(double factor) {
+  // Since factor = 1.2^level, level = log(factor) / log(1.2)
+  return log(factor) / log(textSizeMultiplierRatio);
 }
 
 void WebViewImpl::performMediaPlayerAction(const WebMediaPlayerAction& action,
