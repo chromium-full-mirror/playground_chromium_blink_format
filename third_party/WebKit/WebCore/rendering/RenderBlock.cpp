@@ -1929,7 +1929,7 @@ void RenderBlock::setCollapsedBottomMargin(const MarginInfo& marginInfo) {
     if (!marginInfo.marginAfterQuirk())
       setMarginAfterQuirk(false);
 
-    if (marginInfo.marginAfterQuirk() && marginBottom() == 0)
+    if (marginInfo.marginAfterQuirk() && marginAfter() == 0)
       // We have no bottom margin and our last child has a quirky margin.
       // We will pick up this quirky margin and pass it through.
       // This deals with the <td><div><p> case.
@@ -1937,8 +1937,8 @@ void RenderBlock::setCollapsedBottomMargin(const MarginInfo& marginInfo) {
   }
 }
 
-void RenderBlock::handleAfterSideOfBlock(int top,
-                                         int bottom,
+void RenderBlock::handleAfterSideOfBlock(int beforeSide,
+                                         int afterSide,
                                          MarginInfo& marginInfo) {
   marginInfo.setAtAfterSideOfBlock(true);
 
@@ -1951,13 +1951,13 @@ void RenderBlock::handleAfterSideOfBlock(int top,
     setLogicalHeight(logicalHeight() + marginInfo.margin());
 
   // Now add in our bottom border/padding.
-  setLogicalHeight(logicalHeight() + bottom);
+  setLogicalHeight(logicalHeight() + afterSide);
 
   // Negative margins can cause our height to shrink below our minimal height
   // (border/padding).
   // If this happens, ensure that the computed height is increased to the
   // minimal height.
-  setLogicalHeight(max(logicalHeight(), top + bottom));
+  setLogicalHeight(max(logicalHeight(), beforeSide + afterSide));
 
   // Update our bottom collapsed margin info.
   setCollapsedBottomMargin(marginInfo);
