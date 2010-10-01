@@ -4061,7 +4061,7 @@ void Editor::respondToChangedSelection(const VisibleSelection& oldSelection,
       m_frame->document()->markers()->removeMarkers(wordRange.get(),
                                                     DocumentMarker::Spelling);
       m_frame->document()->markers()->removeMarkers(
-          wordRange.get(), DocumentMarker::Replacement);
+          wordRange.get(), DocumentMarker::CorrectionIndicator);
     }
     if (RefPtr<Range> sentenceRange = newSelectedSentence.toNormalizedRange())
       m_frame->document()->markers()->removeMarkers(sentenceRange.get(),
