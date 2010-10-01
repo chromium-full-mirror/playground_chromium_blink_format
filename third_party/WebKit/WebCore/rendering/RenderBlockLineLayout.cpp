@@ -943,8 +943,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
           ASSERT(f->m_renderer == floats[floatIndex].object);
           // If a float's geometry has changed, give up on syncing with clean
           // lines.
-          if (floats[floatIndex].rect !=
-              IntRect(f->m_left, f->m_top, f->m_width, f->m_bottom - f->m_top))
+          if (floats[floatIndex].rect != f->frameRect())
             checkForEndLineMatch = false;
           floatIndex++;
         }
@@ -1294,7 +1293,7 @@ bool RenderBlock::matchedEndLine(const InlineBidiResolver& resolver,
 
     for (FloatingObject* f = m_floatingObjects->first(); f;
          f = m_floatingObjects->next()) {
-      if (f->m_bottom >= top && f->m_bottom < bottom)
+      if (f->bottom() >= top && f->bottom() < bottom)
         return false;
     }
 
@@ -1332,7 +1331,7 @@ bool RenderBlock::matchedEndLine(const InlineBidiResolver& resolver,
 
         for (FloatingObject* f = m_floatingObjects->first(); f;
              f = m_floatingObjects->next()) {
-          if (f->m_bottom >= top && f->m_bottom < bottom)
+          if (f->bottom() >= top && f->bottom() < bottom)
             return false;
         }
       }
