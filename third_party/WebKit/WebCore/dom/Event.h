@@ -71,9 +71,6 @@ class Event : public RefCounted<Event> {
 
   const AtomicString& type() const { return m_type; }
 
-  const AtomicString& aliasedType() const;
-  bool hasAliasedType() const;
-
   EventTarget* target() const { return m_target.get(); }
   void setTarget(PassRefPtr<EventTarget>);
 
