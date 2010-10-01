@@ -88,7 +88,6 @@
 #include "SecurityOrigin.h"
 #include "SelectionController.h"
 #include "Settings.h"
-#include "SharedGraphicsContext3D.h"
 #include "Timer.h"
 #include "TypingCommand.h"
 #include "UserGestureIndicator.h"
@@ -129,6 +128,10 @@
 #include "RenderThemeChromiumLinux.h"
 #endif
 #include "RenderTheme.h"
+#endif
+
+#if ENABLE(ACCELERATED_2D_CANVAS)
+#include "SharedGraphicsContext3D.h"
 #endif
 
 // Get rid of WTF's pow define so we can use std::pow.
@@ -2365,6 +2368,7 @@ void WebViewImpl::doComposite() {
 #endif
 
 SharedGraphicsContext3D* WebViewImpl::getSharedGraphicsContext3D() {
+#if ENABLE(ACCELERATED_2D_CANVAS)
   if (!m_sharedContext3D) {
     GraphicsContext3D::Attributes attr;
     OwnPtr<GraphicsContext3D> context =
@@ -2375,6 +2379,9 @@ SharedGraphicsContext3D* WebViewImpl::getSharedGraphicsContext3D() {
   }
 
   return m_sharedContext3D.get();
+#else
+  return 0;
+#endif
 }
 
 WebGraphicsContext3D* WebViewImpl::graphicsContext3D() {
