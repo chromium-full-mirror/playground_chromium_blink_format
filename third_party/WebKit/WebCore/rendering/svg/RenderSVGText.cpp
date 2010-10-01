@@ -42,7 +42,7 @@
 #include "SVGRenderSupport.h"
 #include "SVGRootInlineBox.h"
 #include "SVGTextElement.h"
-#include "SVGTextLayoutBuilder.h"
+#include "SVGTextLayoutAttributesBuilder.h"
 #include "SVGTransformList.h"
 #include "SVGURIReference.h"
 #include "SimpleFontData.h"
@@ -87,8 +87,8 @@ void RenderSVGText::layout() {
     updateCachedBoundariesInParents = true;
   }
 
-  SVGTextLayoutBuilder layoutBuilder;
-  layoutBuilder.buildLayoutAttributesForTextSubtree(this);
+  SVGTextLayoutAttributesBuilder layoutAttributesBuilder;
+  layoutAttributesBuilder.buildLayoutAttributesForTextSubtree(this);
 
   // Reduced version of RenderBlock::layoutBlock(), which only takes care of SVG
   // text.

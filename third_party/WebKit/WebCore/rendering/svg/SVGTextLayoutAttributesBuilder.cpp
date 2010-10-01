@@ -20,7 +20,7 @@
 #include "config.h"
 
 #if ENABLE(SVG)
-#include "SVGTextLayoutBuilder.h"
+#include "SVGTextLayoutAttributesBuilder.h"
 
 #include "RenderSVGInlineText.h"
 #include "RenderSVGText.h"
@@ -32,9 +32,9 @@
 
 namespace WebCore {
 
-SVGTextLayoutBuilder::SVGTextLayoutBuilder() {}
+SVGTextLayoutAttributesBuilder::SVGTextLayoutAttributesBuilder() {}
 
-void SVGTextLayoutBuilder::buildLayoutAttributesForTextSubtree(
+void SVGTextLayoutAttributesBuilder::buildLayoutAttributesForTextSubtree(
     RenderSVGText* textRoot) {
   ASSERT(textRoot);
   m_scopes.clear();
@@ -94,8 +94,9 @@ static inline void copyToDestinationVectorIfSourceRangeIsNotEmpty(
                           sourceStartOffset, length);
 }
 
-void SVGTextLayoutBuilder::propagateLayoutAttributes(RenderObject* start,
-                                                     unsigned& atCharacter) {
+void SVGTextLayoutAttributesBuilder::propagateLayoutAttributes(
+    RenderObject* start,
+    unsigned& atCharacter) {
   for (RenderObject* child = start->firstChild(); child;
        child = child->nextSibling()) {
     if (!child->isSVGInlineText()) {
@@ -152,8 +153,8 @@ void SVGTextLayoutBuilder::propagateLayoutAttributes(RenderObject* start,
   }
 }
 
-void SVGTextLayoutBuilder::buildLayoutScopes(RenderObject* start,
-                                             unsigned& atCharacter) {
+void SVGTextLayoutAttributesBuilder::buildLayoutScopes(RenderObject* start,
+                                                       unsigned& atCharacter) {
   for (RenderObject* child = start->firstChild(); child;
        child = child->nextSibling()) {
     if (child->isSVGInlineText()) {
@@ -191,7 +192,7 @@ static inline void fillDestinationVectorWithLastSourceValue(
   }
 }
 
-void SVGTextLayoutBuilder::buildLayoutAttributesFromScopes() {
+void SVGTextLayoutAttributesBuilder::buildLayoutAttributesFromScopes() {
   ASSERT(!m_scopes.isEmpty());
 
   unsigned totalLength = m_scopes.first().textContentLength;
@@ -242,7 +243,7 @@ void SVGTextLayoutBuilder::buildLayoutAttributesFromScopes() {
   }
 }
 
-void SVGTextLayoutBuilder::measureCharacters(
+void SVGTextLayoutAttributesBuilder::measureCharacters(
     RenderSVGInlineText* text,
     SVGTextLayoutAttributes& attributes) {
   ASSERT(text);
@@ -333,10 +334,11 @@ svgTextPositioningElementForInlineRenderer(RenderObject* renderer) {
   return static_cast<SVGTextPositioningElement*>(node);
 }
 
-void SVGTextLayoutBuilder::buildLayoutScope(LayoutScope& scope,
-                                            RenderObject* renderer,
-                                            unsigned textContentStart,
-                                            unsigned textContentLength) {
+void SVGTextLayoutAttributesBuilder::buildLayoutScope(
+    LayoutScope& scope,
+    RenderObject* renderer,
+    unsigned textContentStart,
+    unsigned textContentLength) {
   ASSERT(renderer);
   ASSERT(renderer->style());
 
