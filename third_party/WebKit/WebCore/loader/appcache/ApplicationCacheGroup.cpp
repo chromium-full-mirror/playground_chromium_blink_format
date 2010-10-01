@@ -168,11 +168,11 @@ void ApplicationCacheGroup::selectCache(Frame* frame,
     } else {
       // The main resource was loaded from cache, so the cache must have an
       // entry for it. Mark it as foreign.
-      KURL documentURL(documentLoader->url());
-      if (documentURL.hasFragmentIdentifier())
-        documentURL.removeFragmentIdentifier();
+      KURL resourceURL(documentLoader->responseURL());
+      if (resourceURL.hasFragmentIdentifier())
+        resourceURL.removeFragmentIdentifier();
       ApplicationCacheResource* resource =
-          mainResourceCache->resourceForURL(documentURL);
+          mainResourceCache->resourceForURL(resourceURL);
       bool inStorage = resource->storageID();
       resource->addType(ApplicationCacheResource::Foreign);
       if (inStorage)
