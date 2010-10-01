@@ -246,6 +246,8 @@ Eina_Bool ewk_view_navigation_policy_decision(
     Evas_Object* o,
     Ewk_Frame_Resource_Request* request);
 
+void ewk_view_contents_size_changed(Evas_Object* o, Evas_Coord w, Evas_Coord h);
+
 #ifdef __cplusplus
 }
 #endif
