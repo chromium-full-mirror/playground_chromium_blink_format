@@ -105,27 +105,43 @@ void WebDragData::setFileExtension(const WebString& fileExtension) {
 }
 
 bool WebDragData::hasFileNames() const {
+  return containsFilenames();
+}
+
+void WebDragData::fileNames(WebVector<WebString>& fileNames) const {
+  filenames(fileNames);
+}
+
+void WebDragData::setFileNames(const WebVector<WebString>& fileNames) {
+  return setFilenames(fileNames);
+}
+
+void WebDragData::appendToFileNames(const WebString& fileName) {
+  return appendToFilenames(fileName);
+}
+
+bool WebDragData::containsFilenames() const {
   ASSERT(!isNull());
   return m_private->containsFilenames();
 }
 
-void WebDragData::fileNames(WebVector<WebString>& fileNames) const {
+void WebDragData::filenames(WebVector<WebString>& filenames) const {
   ASSERT(!isNull());
-  fileNames = m_private->filenames();
+  filenames = m_private->filenames();
 }
 
-void WebDragData::setFileNames(const WebVector<WebString>& fileNames) {
+void WebDragData::setFilenames(const WebVector<WebString>& filenames) {
   ensureMutable();
-  Vector<String> fileNamesCopy;
-  fileNamesCopy.append(fileNames.data(), fileNames.size());
-  m_private->setFilenames(fileNamesCopy);
+  Vector<String> filenamesCopy;
+  filenamesCopy.append(filenames.data(), filenames.size());
+  m_private->setFilenames(filenamesCopy);
 }
 
-void WebDragData::appendToFileNames(const WebString& fileName) {
+void WebDragData::appendToFilenames(const WebString& filename) {
   ensureMutable();
-  Vector<String> fileNames = m_private->filenames();
-  fileNames.append(fileName);
-  m_private->setFilenames(fileNames);
+  Vector<String> filenames = m_private->filenames();
+  filenames.append(filename);
+  m_private->setFilenames(filenames);
 }
 
 WebString WebDragData::plainText() const {
@@ -161,13 +177,21 @@ void WebDragData::setHTMLBaseURL(const WebURL& htmlBaseURL) {
 }
 
 WebString WebDragData::fileContentFileName() const {
+  return fileContentFilename();
+}
+
+void WebDragData::setFileContentFileName(const WebString& fileName) {
+  return setFileContentFilename(fileName);
+}
+
+WebString WebDragData::fileContentFilename() const {
   ASSERT(!isNull());
   return m_private->fileContentFilename();
 }
 
-void WebDragData::setFileContentFileName(const WebString& fileName) {
+void WebDragData::setFileContentFilename(const WebString& filename) {
   ensureMutable();
-  m_private->setFileContentFilename(fileName);
+  m_private->setFileContentFilename(filename);
 }
 
 WebData WebDragData::fileContent() const {
