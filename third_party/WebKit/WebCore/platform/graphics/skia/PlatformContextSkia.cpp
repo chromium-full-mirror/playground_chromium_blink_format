@@ -206,8 +206,12 @@ SkColor PlatformContextSkia::State::applyAlpha(SkColor c) const {
 PlatformContextSkia::PlatformContextSkia(skia::PlatformCanvas* canvas)
     : m_canvas(canvas),
       m_drawingToImageBuffer(false),
-      m_useGPU(false),
-      m_gpuCanvas(0),
+      m_useGPU(false)
+#if ENABLE(ACCELERATED_2D_CANVAS)
+      ,
+      m_gpuCanvas(0)
+#endif
+      ,
       m_backingStoreState(None) {
   m_stateStack.append(State());
   m_state = &m_stateStack.last();
