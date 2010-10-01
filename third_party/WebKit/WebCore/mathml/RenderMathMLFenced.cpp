@@ -67,8 +67,8 @@ void RenderMathMLFenced::updateFromElement() {
         characters.append(separators[i]);
     }
     m_separators =
-        !separators.length() ? 0 : StringImpl::create(characters.data(),
-                                                      characters.size());
+        !characters.size() ? 0 : StringImpl::create(characters.data(),
+                                                    characters.size());
   } else {
     // The separator defaults to a single comma.
     m_separators = StringImpl::create(",");
