@@ -53,6 +53,10 @@ static void registerPluginView() {
   ::RegisterClassW(&windowClass);
 }
 
+HWND NetscapePlugin::containingWindow() const {
+  return m_pluginController->nativeParentWindow();
+}
+
 bool NetscapePlugin::platformPostInitialize() {
   if (!m_isWindowed) {
     m_window = 0;
@@ -61,9 +65,8 @@ bool NetscapePlugin::platformPostInitialize() {
 
   registerPluginView();
 
-  m_window =
-      ::CreateWindowExW(0, windowClassName, 0, WS_CHILD | WS_VISIBLE, 0, 0, 0,
-                        0, m_pluginController->nativeParentWindow(), 0, 0, 0);
+  m_window = ::CreateWindowExW(0, windowClassName, 0, WS_CHILD | WS_VISIBLE, 0,
+                               0, 0, 0, containingWindow(), 0, 0, 0);
   if (!m_window)
     return false;
 

@@ -55,6 +55,8 @@ class NetscapePlugin : public Plugin {
 #if PLATFORM(MAC)
   NPError setDrawingModel(NPDrawingModel);
   NPError setEventModel(NPEventModel);
+#elif PLATFORM(WIN)
+  HWND containingWindow() const;
 #endif
 
   void invalidate(const NPRect*);
