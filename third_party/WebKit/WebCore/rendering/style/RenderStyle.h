@@ -322,10 +322,10 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
 
  private:
-  RenderStyle();
+  ALWAYS_INLINE RenderStyle();
   // used to create the default style.
-  RenderStyle(bool);
-  RenderStyle(const RenderStyle&);
+  ALWAYS_INLINE RenderStyle(bool);
+  ALWAYS_INLINE RenderStyle(const RenderStyle&);
 
  public:
   static PassRefPtr<RenderStyle> create();

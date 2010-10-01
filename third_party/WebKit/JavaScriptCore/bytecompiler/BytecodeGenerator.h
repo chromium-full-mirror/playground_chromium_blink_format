@@ -544,8 +544,8 @@ class BytecodeGenerator : public FastAllocBase {
   void emitOpcode(OpcodeID);
   void retrieveLastBinaryOp(int& dstIndex, int& src1Index, int& src2Index);
   void retrieveLastUnaryOp(int& dstIndex, int& srcIndex);
-  void rewindBinaryOp();
-  void rewindUnaryOp();
+  ALWAYS_INLINE void rewindBinaryOp();
+  ALWAYS_INLINE void rewindUnaryOp();
 
   PassRefPtr<Label> emitComplexJumpScopes(Label* target,
                                           ControlFlowContext* topScope,

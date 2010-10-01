@@ -128,7 +128,7 @@ class CSSStyleSelector : public Noncopyable {
                            RenderStyle* parentStyle = 0,
                            PseudoId = NOPSEUDO);
   void initElement(Element*);
-  RenderStyle* locateSharedStyle();
+  ALWAYS_INLINE RenderStyle* locateSharedStyle();
   Node* locateCousinList(Element* parent, unsigned depth = 1);
   bool canShareStyleWithElement(Node*);
 
