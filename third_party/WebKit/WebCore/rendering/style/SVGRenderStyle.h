@@ -360,6 +360,9 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
   bool hasFill() const {
     return fillPaint()->paintType() != SVGPaint::SVG_PAINTTYPE_NONE;
   }
+  bool isVerticalWritingMode() const {
+    return writingMode() == WM_TBRL || writingMode() == WM_TB;
+  }
 
  protected:
   // inherit

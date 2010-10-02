@@ -48,8 +48,6 @@
 #include "RenderSVGShadowTreeRootContainer.cpp"
 #include "RenderSVGTransformableContainer.cpp"
 #include "RenderSVGViewportContainer.cpp"
-#include "SVGCharacterData.cpp"
-#include "SVGCharacterLayoutInfo.cpp"
 #include "SVGImageBufferTools.cpp"
 #include "SVGMarkerLayoutInfo.cpp"
 #include "SVGRenderSupport.cpp"
@@ -58,8 +56,6 @@
 #include "SVGResourcesCache.cpp"
 #include "SVGResourcesCycleSolver.cpp"
 #include "SVGShadowTreeElements.cpp"
-#include "SVGTextChunkLayoutInfo.cpp"
-#include "SVGTextLayoutUtilities.cpp"
 
 // FIXME: As soon as all SVG renderers live in rendering/svg, this file should
 // be moved there as well, removing the need for the svg/ includes below.

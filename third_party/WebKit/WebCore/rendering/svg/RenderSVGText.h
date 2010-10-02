@@ -56,6 +56,7 @@ class RenderSVGText : public RenderSVGBlock {
                                 HitTestResult&,
                                 const FloatPoint& pointInParent,
                                 HitTestAction);
+  virtual VisiblePosition positionForPoint(const IntPoint&);
 
   virtual bool requiresLayer() const { return false; }
   virtual void layout();
