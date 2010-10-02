@@ -158,17 +158,15 @@ void TestController::resetStateToConsistentValues() {
   WKPreferencesSetXSSAuditorEnabled(preferences, false);
 
   static WKStringRef standardFontFamily =
-      WKStringCreateWithCFString(CFSTR("Times"));
+      WKStringCreateWithUTF8CString("Times");
   static WKStringRef cursiveFontFamily =
-      WKStringCreateWithCFString(CFSTR("Apple Chancery"));
+      WKStringCreateWithUTF8CString("Apple Chancery");
   static WKStringRef fantasyFontFamily =
-      WKStringCreateWithCFString(CFSTR("Papyrus"));
-  static WKStringRef fixedFontFamily =
-      WKStringCreateWithCFString(CFSTR("Courier"));
+      WKStringCreateWithUTF8CString("Papyrus");
+  static WKStringRef fixedFontFamily = WKStringCreateWithUTF8CString("Courier");
   static WKStringRef sansSerifFontFamily =
-      WKStringCreateWithCFString(CFSTR("Helvetica"));
-  static WKStringRef serifFontFamily =
-      WKStringCreateWithCFString(CFSTR("Times"));
+      WKStringCreateWithUTF8CString("Helvetica");
+  static WKStringRef serifFontFamily = WKStringCreateWithUTF8CString("Times");
 
   WKPreferencesSetStandardFontFamily(preferences, standardFontFamily);
   WKPreferencesSetCursiveFontFamily(preferences, cursiveFontFamily);
@@ -255,9 +253,8 @@ void TestController::didFinishLoadForFrame(WKPageRef page, WKFrameRef frame) {
     return;
 
   WKRetainPtr<WKURLRef> wkURL(AdoptWK, WKFrameCopyURL(frame));
-  RetainPtr<CFURLRef> cfURL = toCF(wkURL);
-  CFStringRef cfURLString = CFURLGetString(cfURL.get());
-  if (!CFEqual(cfURLString, CFSTR("about:blank")))
+  WKRetainPtr<WKStringRef> wkURLString(AdoptWK, copyURLString(wkURL.get()));
+  if (!WKStringIsEqualToUTF8CString(wkURLString.get(), "about:blank"))
     return;
 
   m_doneResetting = true;

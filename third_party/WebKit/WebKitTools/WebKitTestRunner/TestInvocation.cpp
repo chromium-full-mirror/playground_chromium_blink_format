@@ -30,7 +30,8 @@
 #include "TestController.h"
 #include <WebKit2/WKContextPrivate.h>
 #include <WebKit2/WKRetainPtr.h>
-#include <wtf/RetainPtr.h>
+#include <wtf/OwnArrayPtr.h>
+#include <wtf/PassOwnArrayPtr.h>
 
 using namespace WebKit;
 using namespace std;
@@ -67,11 +68,9 @@ void TestInvocation::invoke() {
   sizeWebViewForCurrentTest(m_pathOrURL);
 
   WKRetainPtr<WKStringRef> messageName(
-      AdoptWK, WKStringCreateWithCFString(CFSTR("BeginTest")));
-  WKRetainPtr<WKStringRef> messageBody(AdoptWK,
-                                       WKStringCreateWithCFString(CFSTR("")));
+      AdoptWK, WKStringCreateWithUTF8CString("BeginTest"));
   WKContextPostMessageToInjectedBundle(TestController::shared().context(),
-                                       messageName.get(), messageBody.get());
+                                       messageName.get(), 0);
 
   TestController::runUntil(m_gotInitialResponse);
   if (m_error) {
@@ -103,9 +102,7 @@ void TestInvocation::dump(const char* stringToDump) {
 void TestInvocation::didReceiveMessageFromInjectedBundle(
     WKStringRef messageName,
     WKTypeRef messageBody) {
-  RetainPtr<CFStringRef> cfMessageName(AdoptCF,
-                                       WKStringCopyCFString(0, messageName));
-  if (CFEqual(cfMessageName.get(), CFSTR("Error"))) {
+  if (WKStringIsEqualToUTF8CString(messageName, "Error")) {
     // Set all states to true to stop spinning the runloop.
     m_gotInitialResponse = true;
     m_gotFinalMessage = true;
@@ -113,13 +110,10 @@ void TestInvocation::didReceiveMessageFromInjectedBundle(
     return;
   }
 
-  if (CFEqual(cfMessageName.get(), CFSTR("Ack"))) {
+  if (WKStringIsEqualToUTF8CString(messageName, "Ack")) {
     ASSERT(WKGetTypeID(messageBody) == WKStringGetTypeID());
-    RetainPtr<CFStringRef> cfMessageBody(
-        AdoptCF,
-        WKStringCopyCFString(0, static_cast<WKStringRef>(messageBody)));
-
-    if (CFEqual(cfMessageBody.get(), CFSTR("BeginTest"))) {
+    WKStringRef messageBodyString = static_cast<WKStringRef>(messageBody);
+    if (WKStringIsEqualToUTF8CString(messageBodyString, "BeginTest")) {
       m_gotInitialResponse = true;
       return;
     }
@@ -127,12 +121,11 @@ void TestInvocation::didReceiveMessageFromInjectedBundle(
     ASSERT_NOT_REACHED();
   }
 
-  if (CFEqual(cfMessageName.get(), CFSTR("Done"))) {
+  if (WKStringIsEqualToUTF8CString(messageName, "Done")) {
     ASSERT(WKGetTypeID(messageBody) == WKStringGetTypeID());
-    ostringstream out;
-    out << static_cast<WKStringRef>(messageBody);
+    WKStringRef messageBodyString = static_cast<WKStringRef>(messageBody);
 
-    dump(out.str().c_str());
+    dump(toSTD(messageBodyString).c_str());
 
     m_gotFinalMessage = true;
     return;
