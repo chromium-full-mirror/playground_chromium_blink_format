@@ -26,11 +26,12 @@
 #ifndef IndentOutdentCommand_h
 #define IndentOutdentCommand_h
 
+#include "ApplyBlockElementCommand.h"
 #include "CompositeEditCommand.h"
 
 namespace WebCore {
 
-class IndentOutdentCommand : public CompositeEditCommand {
+class IndentOutdentCommand : public ApplyBlockElementCommand {
  public:
   enum EIndentType { Indent, Outdent };
   static PassRefPtr<IndentOutdentCommand> create(Document* document,
@@ -44,7 +45,6 @@ class IndentOutdentCommand : public CompositeEditCommand {
  private:
   IndentOutdentCommand(Document*, EIndentType, int marginInPixels);
 
-  virtual void doApply();
   virtual EditAction editingAction() const {
     return m_typeOfAction == Indent ? EditActionIndent : EditActionOutdent;
   }
@@ -53,10 +53,12 @@ class IndentOutdentCommand : public CompositeEditCommand {
   void outdentRegion(const VisiblePosition&, const VisiblePosition&);
   void outdentParagraph();
   bool tryIndentingAsListItem(const VisiblePosition&);
-  void indentIntoBlockquote(const VisiblePosition&,
-                            const VisiblePosition&,
-                            RefPtr<Element>&);
-  bool splitTextNodes(const VisiblePosition& start, int numParagraphs);
+  void indentIntoBlockquote(const VisiblePosition&, RefPtr<Element>&);
+
+  void formatSelection(const VisiblePosition& startOfSelection,
+                       const VisiblePosition& endOfSelection);
+  void formatParagraph(const VisiblePosition& endOfCurrentParagraph,
+                       RefPtr<Element>& blockquoteForNextIndent);
 
   EIndentType m_typeOfAction;
   int m_marginInPixels;

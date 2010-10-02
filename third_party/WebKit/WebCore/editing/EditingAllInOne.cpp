@@ -27,6 +27,7 @@
 // Windows release build.
 
 #include <AppendNodeCommand.cpp>
+#include <ApplyBlockElementCommand.cpp>
 #include <ApplyStyleCommand.cpp>
 #include <BreakBlockquoteCommand.cpp>
 #include <CompositeEditCommand.cpp>
