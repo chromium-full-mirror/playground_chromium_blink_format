@@ -195,6 +195,9 @@ VideoLayerChromium::VideoLayerChromium(GraphicsLayerChromium* owner,
 }
 
 VideoLayerChromium::~VideoLayerChromium() {
+  if (!layerRenderer())
+    return;
+
   GraphicsContext3D* context = layerRendererContext();
   for (unsigned plane = 0; plane < VideoFrameChromium::maxPlanes; plane++) {
     if (m_textures[plane])
