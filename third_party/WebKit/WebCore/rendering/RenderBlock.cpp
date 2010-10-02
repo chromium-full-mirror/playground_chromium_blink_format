@@ -1370,19 +1370,19 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
 
   int repaintTop = 0;
   int repaintBottom = 0;
-  int maxFloatBottom = 0;
+  int maxFloatLogicalBottom = 0;
   if (!firstChild() && !isAnonymousBlock())
     setChildrenInline(true);
   if (childrenInline())
     layoutInlineChildren(relayoutChildren, repaintTop, repaintBottom);
   else
-    layoutBlockChildren(relayoutChildren, maxFloatBottom);
+    layoutBlockChildren(relayoutChildren, maxFloatLogicalBottom);
 
   // Expand our intrinsic height to encompass floats.
   int toAdd = borderAfter() + paddingAfter() + scrollbarLogicalHeight();
-  if (floatBottom() > (logicalHeight() - toAdd) &&
+  if (lowestFloatLogicalBottom() > (logicalHeight() - toAdd) &&
       expandsToEncloseOverhangingFloats())
-    setLogicalHeight(floatBottom() + toAdd);
+    setLogicalHeight(lowestFloatLogicalBottom() + toAdd);
 
   if (layoutColumns(hasSpecifiedPageHeight, pageHeight, statePusher))
     return;
@@ -1392,7 +1392,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
   computeLogicalHeight();
   int newHeight = logicalHeight();
   if (oldHeight != newHeight) {
-    if (oldHeight > newHeight && maxFloatBottom > newHeight &&
+    if (oldHeight > newHeight && maxFloatLogicalBottom > newHeight &&
         !childrenInline()) {
       // One of our children's floats may have become an overhanging float for
       // us. We need to look for it.
@@ -1400,7 +1400,8 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
            child = child->nextSibling()) {
         if (child->isBlockFlow() && !child->isFloatingOrPositioned()) {
           RenderBlock* block = toRenderBlock(child);
-          if (block->floatBottom() + block->logicalTop() > newHeight)
+          if (block->lowestFloatLogicalBottom() + block->logicalTop() >
+              newHeight)
             addOverhangingFloats(block, -block->x(), -block->y(), false);
         }
       }
@@ -1984,7 +1985,7 @@ void RenderBlock::setLogicalTopForChild(RenderBox* child, int logicalTop) {
 }
 
 void RenderBlock::layoutBlockChildren(bool relayoutChildren,
-                                      int& maxFloatBottom) {
+                                      int& maxFloatLogicalBottom) {
   if (gPercentHeightDescendantsMap) {
     if (HashSet<RenderBox*>* descendants =
             gPercentHeightDescendantsMap->get(this)) {
@@ -2021,8 +2022,8 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
   // https://bugs.webkit.org/show_bug.cgi?id=46785
   RenderObject* legend = layoutLegend(relayoutChildren);
 
-  int previousFloatBottom = 0;
-  maxFloatBottom = 0;
+  int previousFloatLogicalBottom = 0;
+  maxFloatLogicalBottom = 0;
 
   RenderBox* next = firstChildBox();
 
@@ -2059,7 +2060,8 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
       continue;
 
     // Lay out the child.
-    layoutBlockChild(child, marginInfo, previousFloatBottom, maxFloatBottom);
+    layoutBlockChild(child, marginInfo, previousFloatLogicalBottom,
+                     maxFloatLogicalBottom);
   }
 
   // Now do the handling of the bottom of the block, adding in our bottom
@@ -2070,8 +2072,8 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
 
 void RenderBlock::layoutBlockChild(RenderBox* child,
                                    MarginInfo& marginInfo,
-                                   int& previousFloatBottom,
-                                   int& maxFloatBottom) {
+                                   int& previousFloatLogicalBottom,
+                                   int& maxFloatLogicalBottom) {
   int oldPosMarginBefore = maxPositiveMarginBefore();
   int oldNegMarginBefore = maxNegativeMarginBefore();
 
@@ -2114,7 +2116,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
     // If an element might be affected by the presence of floats, then always
     // mark it for
     // layout.
-    int fb = max(previousFloatBottom, floatBottom());
+    int fb = max(previousFloatLogicalBottom, lowestFloatLogicalBottom());
     if (fb > logicalTopEstimate)
       markDescendantsWithFloats = true;
   }
@@ -2123,8 +2125,9 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
     if (markDescendantsWithFloats)
       childRenderBlock->markAllDescendantsWithFloatsForLayout();
     if (!child->isBlockFlowRoot())
-      previousFloatBottom = max(
-          previousFloatBottom, oldLogicalTop + childRenderBlock->floatBottom());
+      previousFloatLogicalBottom =
+          max(previousFloatLogicalBottom,
+              oldLogicalTop + childRenderBlock->lowestFloatLogicalBottom());
   }
 
   bool paginated = view()->layoutState()->isPaginated();
@@ -2240,9 +2243,10 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
   // (or possibly out
   // of this block), then the parent gets notified of the floats now.
   if (childRenderBlock && childRenderBlock->containsFloats())
-    maxFloatBottom = max(maxFloatBottom,
-                         addOverhangingFloats(toRenderBlock(child), -child->x(),
-                                              -child->y(), !childNeededLayout));
+    maxFloatLogicalBottom =
+        max(maxFloatLogicalBottom,
+            addOverhangingFloats(toRenderBlock(child), -child->x(), -child->y(),
+                                 !childNeededLayout));
 
   IntSize childOffset(child->x() - oldRect.x(), child->y() - oldRect.y());
   if (childOffset.width() || childOffset.height()) {
@@ -3528,9 +3532,9 @@ bool RenderBlock::positionNewFloats() {
     IntRect oldRect(o->x(), o->y(), o->width(), o->height());
 
     if (o->style()->clear() & CLEFT)
-      y = max(leftBottom(), y);
+      y = max(lowestFloatLogicalBottom(FloatingObject::FloatLeft), y);
     if (o->style()->clear() & CRIGHT)
-      y = max(rightBottom(), y);
+      y = max(lowestFloatLogicalBottom(FloatingObject::FloatRight), y);
 
     if (o->style()->floating() == FLEFT) {
       int heightRemainingLeft = 1;
@@ -3642,13 +3646,13 @@ void RenderBlock::newLine(EClear clear) {
   int newY = 0;
   switch (clear) {
     case CLEFT:
-      newY = leftBottom();
+      newY = lowestFloatLogicalBottom(FloatingObject::FloatLeft);
       break;
     case CRIGHT:
-      newY = rightBottom();
+      newY = lowestFloatLogicalBottom(FloatingObject::FloatRight);
       break;
     case CBOTH:
-      newY = floatBottom();
+      newY = lowestFloatLogicalBottom();
     default:
       break;
   }
@@ -3786,7 +3790,7 @@ int RenderBlock::availableLogicalWidthForLine(int position,
   return (result < 0) ? 0 : result;
 }
 
-int RenderBlock::nextFloatBottomBelow(int height) const {
+int RenderBlock::nextFloatLogicalBottomBelow(int logicalHeight) const {
   if (!m_floatingObjects)
     return 0;
 
@@ -3794,23 +3798,26 @@ int RenderBlock::nextFloatBottomBelow(int height) const {
   FloatingObject* r;
   DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
   for (; (r = it.current()); ++it) {
-    if (r->bottom() > height)
-      bottom = min(r->bottom(), bottom);
+    int floatBottom = logicalBottomForFloat(r);
+    if (floatBottom > logicalHeight)
+      bottom = min(floatBottom, bottom);
   }
 
   return bottom == INT_MAX ? 0 : bottom;
 }
 
-int RenderBlock::floatBottom() const {
+int RenderBlock::lowestFloatLogicalBottom(
+    FloatingObject::Type floatType) const {
   if (!m_floatingObjects)
     return 0;
-  int bottom = 0;
+  int lowestFloatBottom = 0;
   FloatingObject* r;
   DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
-  for (; (r = it.current()); ++it)
-    if (r->bottom() > bottom)
-      bottom = r->bottom();
-  return bottom;
+  for (; (r = it.current()); ++it) {
+    if (r->type() & floatType)
+      lowestFloatBottom = max(lowestFloatBottom, logicalBottomForFloat(r));
+  }
+  return lowestFloatBottom;
 }
 
 int RenderBlock::lowestPosition(bool includeOverflowInterior,
@@ -4133,32 +4140,6 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
   return left;
 }
 
-int RenderBlock::leftBottom() {
-  if (!m_floatingObjects)
-    return 0;
-  int bottom = 0;
-  FloatingObject* r;
-  DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
-  for (; (r = it.current()); ++it)
-    if (r->bottom() > bottom && r->type() == FloatingObject::FloatLeft)
-      bottom = r->bottom();
-
-  return bottom;
-}
-
-int RenderBlock::rightBottom() {
-  if (!m_floatingObjects)
-    return 0;
-  int bottom = 0;
-  FloatingObject* r;
-  DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
-  for (; (r = it.current()); ++it)
-    if (r->bottom() > bottom && r->type() == FloatingObject::FloatRight)
-      bottom = r->bottom();
-
-  return bottom;
-}
-
 void RenderBlock::markLinesDirtyInVerticalRange(int top,
                                                 int bottom,
                                                 RootInlineBox* highest) {
@@ -4249,7 +4230,7 @@ void RenderBlock::clearFloats() {
     return;
 
   RenderBlock* block = toRenderBlock(prev);
-  if (block->m_floatingObjects && block->floatBottom() > offset)
+  if (block->m_floatingObjects && block->lowestFloatLogicalBottom() > offset)
     addIntrudingFloats(block, xoffset, offset);
 
   if (childrenInline()) {
@@ -4306,7 +4287,7 @@ int RenderBlock::addOverhangingFloats(RenderBlock* child,
       child->hasColumns() || child->isBlockFlowRoot())
     return 0;
 
-  int lowestFloatBottom = 0;
+  int lowestFloatLogicalBottom = 0;
 
   // Floats that will remain the child's responsibility to paint should factor
   // into its
@@ -4314,7 +4295,7 @@ int RenderBlock::addOverhangingFloats(RenderBlock* child,
   DeprecatedPtrListIterator<FloatingObject> it(*child->m_floatingObjects);
   for (FloatingObject* r; (r = it.current()); ++it) {
     int bottom = child->y() + r->bottom();
-    lowestFloatBottom = max(lowestFloatBottom, bottom);
+    lowestFloatLogicalBottom = max(lowestFloatLogicalBottom, bottom);
 
     if (bottom > height()) {
       // If the object is not in the list, we add it now.
@@ -4363,7 +4344,7 @@ int RenderBlock::addOverhangingFloats(RenderBlock* child,
           r->m_renderer, IntSize(r->left() + r->m_renderer->marginLeft(),
                                  r->top() + r->m_renderer->marginTop()));
   }
-  return lowestFloatBottom;
+  return lowestFloatLogicalBottom;
 }
 
 void RenderBlock::addIntrudingFloats(RenderBlock* prev, int xoff, int yoff) {
@@ -4517,13 +4498,13 @@ int RenderBlock::getClearDelta(RenderBox* child, int yPos) {
     case CNONE:
       break;
     case CLEFT:
-      bottom = leftBottom();
+      bottom = lowestFloatLogicalBottom(FloatingObject::FloatLeft);
       break;
     case CRIGHT:
-      bottom = rightBottom();
+      bottom = lowestFloatLogicalBottom(FloatingObject::FloatRight);
       break;
     case CBOTH:
-      bottom = floatBottom();
+      bottom = lowestFloatLogicalBottom();
       break;
   }
 
@@ -4552,7 +4533,7 @@ int RenderBlock::getClearDelta(RenderBox* child, int yPos) {
       if (childWidthAtY <= widthAtY)
         return y - yPos;
 
-      y = nextFloatBottomBelow(y);
+      y = nextFloatLogicalBottomBelow(y);
       ASSERT(y >= yPos);
       if (y < yPos)
         break;
