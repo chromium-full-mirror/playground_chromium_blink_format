@@ -105,6 +105,7 @@ class PluginView : public WebCore::PluginViewBase,
   virtual PlatformLayer* platformLayer() const;
 #endif
   virtual JSC::JSObject* scriptObject(JSC::JSGlobalObject*);
+  virtual void privateBrowsingStateChanged(bool);
 
   // WebCore::Widget
   virtual void setFrameRect(const WebCore::IntRect&);
@@ -146,6 +147,7 @@ class PluginView : public WebCore::PluginViewBase,
   virtual String cookiesForURL(const String&);
   virtual void setCookiesForURL(const String& urlString,
                                 const String& cookieString);
+  virtual bool isPrivateBrowsingEnabled();
 
   // WebFrame::LoadListener
   virtual void didFinishLoad(WebFrame*);

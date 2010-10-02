@@ -112,6 +112,9 @@ class PluginController {
   virtual void setCookiesForURL(const String& urlString,
                                 const String& cookieString) = 0;
 
+  // Returns whether private browsing is enabled.
+  virtual bool isPrivateBrowsingEnabled() = 0;
+
  protected:
   virtual ~PluginController() {}
 };

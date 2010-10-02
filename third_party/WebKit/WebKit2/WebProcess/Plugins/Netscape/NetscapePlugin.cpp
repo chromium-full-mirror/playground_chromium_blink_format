@@ -176,6 +176,10 @@ bool NetscapePlugin::evaluate(NPObject* npObject,
                                       allowPopups());
 }
 
+bool NetscapePlugin::isPrivateBrowsingEnabled() {
+  return m_pluginController->isPrivateBrowsingEnabled();
+}
+
 NPObject* NetscapePlugin::windowScriptNPObject() {
   return m_pluginController->windowScriptNPObject();
 }
@@ -283,6 +287,10 @@ void NetscapePlugin::NPP_URLNotify(const char* url,
 
 NPError NetscapePlugin::NPP_GetValue(NPPVariable variable, void* value) {
   return m_pluginModule->pluginFuncs().getvalue(&m_npp, variable, value);
+}
+
+NPError NetscapePlugin::NPP_SetValue(NPNVariable variable, void* value) {
+  return m_pluginModule->pluginFuncs().setvalue(&m_npp, variable, value);
 }
 
 void NetscapePlugin::callSetWindow() {
@@ -546,6 +554,19 @@ NPObject* NetscapePlugin::pluginScriptableNPObject() {
     return 0;
 
   return scriptableNPObject;
+}
+
+void NetscapePlugin::privateBrowsingStateChanged(bool privateBrowsingEnabled) {
+  // From https://wiki.mozilla.org/Plugins:PrivateMode
+  //   When the browser turns private mode on or off it will call NPP_SetValue
+  //   for "NPNVprivateModeBool"
+  //   (assigned enum value 18) with a pointer to an NPBool value on all
+  //   applicable instances.
+  //   Plugins should check the boolean value pointed to, not the pointer
+  //   itself.
+  //   The value will be true when private mode is on.
+  NPBool value = privateBrowsingEnabled;
+  NPP_SetValue(NPNVprivateModeBool, &value);
 }
 
 PluginController* NetscapePlugin::controller() {

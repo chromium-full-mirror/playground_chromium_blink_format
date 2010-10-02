@@ -73,6 +73,7 @@ class NetscapePlugin : public Plugin {
   void setStatusbarText(const String&);
   static void setException(const String&);
   bool evaluate(NPObject*, const String& scriptString, NPVariant* result);
+  bool isPrivateBrowsingEnabled();
 
   // These return retained objects.
   NPObject* windowScriptNPObject();
@@ -107,6 +108,7 @@ class NetscapePlugin : public Plugin {
   int16_t NPP_HandleEvent(void* event);
   void NPP_URLNotify(const char* url, NPReason, void* notifyData);
   NPError NPP_GetValue(NPPVariable, void* value);
+  NPError NPP_SetValue(NPNVariable, void* value);
 
  private:
   NetscapePlugin(PassRefPtr<NetscapePluginModule> pluginModule);
@@ -169,6 +171,7 @@ class NetscapePlugin : public Plugin {
   virtual bool handleMouseEnterEvent(const WebMouseEvent&);
   virtual bool handleMouseLeaveEvent(const WebMouseEvent&);
   virtual void setFocus(bool);
+  virtual NPObject* pluginScriptableNPObject();
 
 #if PLATFORM(MAC)
   virtual void windowFocusChanged(bool);
@@ -176,7 +179,7 @@ class NetscapePlugin : public Plugin {
   virtual void windowVisibilityChanged(bool);
 #endif
 
-  virtual NPObject* pluginScriptableNPObject();
+  virtual void privateBrowsingStateChanged(bool);
 
   virtual PluginController* controller();
 
