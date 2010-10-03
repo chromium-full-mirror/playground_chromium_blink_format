@@ -51,7 +51,8 @@ class PluginControllerProxy : PluginController {
   static PassOwnPtr<PluginControllerProxy> create(
       WebProcessConnection* connection,
       uint64_t pluginInstanceID,
-      const String& userAgent);
+      const String& userAgent,
+      bool isPrivateBrowsingEnabled);
   ~PluginControllerProxy();
 
   uint64_t pluginInstanceID() const { return m_pluginInstanceID; }
@@ -71,7 +72,8 @@ class PluginControllerProxy : PluginController {
  private:
   PluginControllerProxy(WebProcessConnection* connection,
                         uint64_t pluginInstanceID,
-                        const String& userAgent);
+                        const String& userAgent,
+                        bool isPrivateBrowsingEnabled);
 
   void paint();
 
@@ -96,6 +98,11 @@ class PluginControllerProxy : PluginController {
   virtual void setStatusbarText(const String&);
   virtual bool isAcceleratedCompositingEnabled();
   virtual void pluginProcessCrashed();
+  virtual String proxiesForURL(const String&);
+  virtual String cookiesForURL(const String&);
+  virtual void setCookiesForURL(const String& urlString,
+                                const String& cookieString);
+  virtual bool isPrivateBrowsingEnabled();
 
   // Message handlers.
   void geometryDidChange(const WebCore::IntRect& frameRect,
@@ -118,17 +125,20 @@ class PluginControllerProxy : PluginController {
   void handleWheelEvent(const WebWheelEvent&, bool& handled);
   void handleMouseEnterEvent(const WebMouseEvent&, bool& handled);
   void handleMouseLeaveEvent(const WebMouseEvent&, bool& handled);
+  void handleKeyboardEvent(const WebKeyboardEvent&, bool& handled);
   void setFocus(bool);
 #if PLATFORM(MAC)
   void windowFocusChanged(bool);
   void windowFrameChanged(const WebCore::IntRect&);
   void windowVisibilityChanged(bool);
 #endif
+  void privateBrowsingStateChanged(bool);
 
   WebProcessConnection* m_connection;
   uint64_t m_pluginInstanceID;
 
   String m_userAgent;
+  bool m_isPrivateBrowsingEnabled;
 
   RefPtr<Plugin> m_plugin;
 

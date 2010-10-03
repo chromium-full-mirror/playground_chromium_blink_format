@@ -51,6 +51,11 @@ class PluginProxy : public Plugin {
   void didReceivePluginProxyMessage(CoreIPC::Connection*,
                                     CoreIPC::MessageID messageID,
                                     CoreIPC::ArgumentDecoder* arguments);
+  CoreIPC::SyncReplyMode didReceiveSyncPluginProxyMessage(
+      CoreIPC::Connection*,
+      CoreIPC::MessageID,
+      CoreIPC::ArgumentDecoder*,
+      CoreIPC::ArgumentEncoder*);
 
  private:
   explicit PluginProxy(PassRefPtr<PluginProcessConnection>);
@@ -94,6 +99,7 @@ class PluginProxy : public Plugin {
   virtual bool handleWheelEvent(const WebWheelEvent&);
   virtual bool handleMouseEnterEvent(const WebMouseEvent&);
   virtual bool handleMouseLeaveEvent(const WebMouseEvent&);
+  virtual bool handleKeyboardEvent(const WebKeyboardEvent&);
   virtual void setFocus(bool);
   virtual NPObject* pluginScriptableNPObject();
 #if PLATFORM(MAC)
@@ -101,6 +107,8 @@ class PluginProxy : public Plugin {
   virtual void windowFrameChanged(const WebCore::IntRect&);
   virtual void windowVisibilityChanged(bool);
 #endif
+
+  virtual void privateBrowsingStateChanged(bool);
 
   virtual PluginController* controller();
 
@@ -113,6 +121,9 @@ class PluginProxy : public Plugin {
                const Vector<uint8_t>& httpBody,
                bool allowPopups);
   void update(const WebCore::IntRect& paintedRect);
+  void proxiesForURL(const String& urlString, String& proxyString);
+  void cookiesForURL(const String& urlString, String& cookieString);
+  void setCookiesForURL(const String& urlString, const String& cookieString);
 
   RefPtr<PluginProcessConnection> m_connection;
   uint64_t m_pluginInstanceID;
