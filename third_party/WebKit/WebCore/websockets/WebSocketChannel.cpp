@@ -153,7 +153,7 @@ void WebSocketChannel::didOpen(SocketStreamHandle* handle) {
     controller->willSendWebSocketHandshakeRequest(
         identifier(), m_handshake.clientHandshakeRequest());
 #endif
-  const CString& handshakeMessage = m_handshake.clientHandshakeMessage();
+  CString handshakeMessage = m_handshake.clientHandshakeMessage();
   if (!handle->send(handshakeMessage.data(), handshakeMessage.length())) {
     m_context->addMessage(JSMessageSource, LogMessageType, ErrorMessageLevel,
                           "Error sending handshake message.", 0,
