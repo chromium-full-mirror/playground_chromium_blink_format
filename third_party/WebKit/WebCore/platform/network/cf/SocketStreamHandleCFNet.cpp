@@ -664,7 +664,7 @@ void SocketStreamHandle::writeStreamCallback(CFStreamEventType type) {
         break;
       }
 
-      ASSERT(m_state = Open);
+      ASSERT(m_state == Open);
       ASSERT(m_connectingSubstate == Connected);
 
       sendPendingData();
