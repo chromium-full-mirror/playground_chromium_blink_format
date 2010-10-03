@@ -129,6 +129,7 @@ class NetscapePlugin : public Plugin {
   bool platformHandleWheelEvent(const WebWheelEvent&);
   bool platformHandleMouseEnterEvent(const WebMouseEvent&);
   bool platformHandleMouseLeaveEvent(const WebMouseEvent&);
+  bool platformHandleKeyboardEvent(const WebKeyboardEvent&);
   void platformSetFocus(bool);
 
   // Plugin
@@ -170,6 +171,7 @@ class NetscapePlugin : public Plugin {
   virtual bool handleWheelEvent(const WebWheelEvent&);
   virtual bool handleMouseEnterEvent(const WebMouseEvent&);
   virtual bool handleMouseLeaveEvent(const WebMouseEvent&);
+  virtual bool handleKeyboardEvent(const WebKeyboardEvent&);
   virtual void setFocus(bool);
   virtual NPObject* pluginScriptableNPObject();
 

@@ -250,4 +250,9 @@ bool NetscapePlugin::platformHandleMouseLeaveEvent(const WebMouseEvent& event) {
   return true;
 }
 
+bool NetscapePlugin::platformHandleKeyboardEvent(const WebKeyboardEvent&) {
+  notImplemented();
+  return false;
+}
+
 }  // namespace WebKit

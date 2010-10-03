@@ -514,6 +514,13 @@ void PluginView::handleEvent(Event* event) {
     // We have a mouse leave event.
     didHandleEvent = m_plugin->handleMouseLeaveEvent(
         static_cast<const WebMouseEvent&>(*currentEvent));
+  } else if ((event->type() == eventNames().keydownEvent &&
+              currentEvent->type() == WebEvent::KeyDown) ||
+             (event->type() == eventNames().keyupEvent &&
+              currentEvent->type() == WebEvent::KeyUp)) {
+    // We have a keyboard event.
+    didHandleEvent = m_plugin->handleKeyboardEvent(
+        static_cast<const WebKeyboardEvent&>(*currentEvent));
   }
 
   if (didHandleEvent)
