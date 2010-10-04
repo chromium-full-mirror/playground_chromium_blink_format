@@ -205,6 +205,21 @@ static JSValueRef lineForIndexCallback(JSContextRef context,
                            toAXElement(thisObject)->lineForIndex(indexNumber));
 }
 
+static JSValueRef rangeForLineCallback(JSContextRef context,
+                                       JSObjectRef function,
+                                       JSObjectRef thisObject,
+                                       size_t argumentCount,
+                                       const JSValueRef arguments[],
+                                       JSValueRef* exception) {
+  int indexNumber = -1;
+  if (argumentCount == 1)
+    indexNumber = JSValueToNumber(context, arguments[0], exception);
+
+  JSRetainPtr<JSStringRef> rangeLine(
+      Adopt, toAXElement(thisObject)->rangeForLine(indexNumber));
+  return JSValueMakeString(context, rangeLine.get());
+}
+
 static JSValueRef boundsForRangeCallback(JSContextRef context,
                                          JSObjectRef function,
                                          JSObjectRef thisObject,
@@ -1132,6 +1147,9 @@ static JSValueRef removeNotificationListenerCallback(
 JSStringRef AccessibilityUIElement::speak() {
   return 0;
 }
+JSStringRef AccessibilityUIElement::rangeForLine(int line) {
+  return 0;
+}
 #endif
 
 #if !SUPPORTS_AX_TEXTMARKERS
@@ -1297,6 +1315,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"parameterizedAttributeNames", parameterizedAttributeNamesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"lineForIndex", lineForIndexCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"rangeForLine", rangeForLineCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"boundsForRange", boundsForRangeCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
