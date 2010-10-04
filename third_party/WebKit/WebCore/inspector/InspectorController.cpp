@@ -1242,7 +1242,7 @@ void InspectorController::setResourceTrackingEnabled(bool enable,
   m_resourceTrackingEnabled = enable;
 
   if (enable)
-    m_inspectedPage->mainFrame()->redirectScheduler()->scheduleRefresh(true);
+    m_inspectedPage->mainFrame()->navigationScheduler()->scheduleRefresh(true);
 
   updateInspectorStateCookie();
 }
@@ -2259,7 +2259,7 @@ bool InspectorController::resourceContentForURL(const KURL& url,
 }
 
 void InspectorController::reloadPage() {
-  m_inspectedPage->mainFrame()->redirectScheduler()->scheduleRefresh(true);
+  m_inspectedPage->mainFrame()->navigationScheduler()->scheduleRefresh(true);
 }
 
 }  // namespace WebCore

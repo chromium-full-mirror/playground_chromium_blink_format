@@ -267,7 +267,7 @@ void FrameLoader::setDefersLoading(bool defers) {
     m_policyDocumentLoader->setDefersLoading(defers);
 
   if (!defers) {
-    m_frame->redirectScheduler()->startTimer();
+    m_frame->navigationScheduler()->startTimer();
     startCheckCompleteTimer();
   }
 }
@@ -411,7 +411,7 @@ void FrameLoader::submitForm(PassRefPtr<FormSubmission> submission) {
   submission->setReferrer(m_outgoingReferrer);
   submission->setOrigin(outgoingOrigin());
 
-  targetFrame->redirectScheduler()->scheduleFormSubmission(submission);
+  targetFrame->navigationScheduler()->scheduleFormSubmission(submission);
 }
 
 void FrameLoader::stopLoading(UnloadEventPolicy unloadEventPolicy,
@@ -500,7 +500,7 @@ void FrameLoader::stopLoading(UnloadEventPolicy unloadEventPolicy,
 
   // FIXME: This will cancel redirection timer, which really needs to be
   // restarted when restoring the frame from b/f cache.
-  m_frame->redirectScheduler()->cancel();
+  m_frame->navigationScheduler()->cancel();
 }
 
 void FrameLoader::stop() {
@@ -555,13 +555,13 @@ KURL FrameLoader::iconURL() {
 }
 
 bool FrameLoader::didOpenURL(const KURL& url) {
-  if (m_frame->redirectScheduler()->redirectScheduledDuringLoad()) {
+  if (m_frame->navigationScheduler()->redirectScheduledDuringLoad()) {
     // A redirect was scheduled before the document was created.
     // This can happen when one frame changes another frame's location.
     return false;
   }
 
-  m_frame->redirectScheduler()->cancel();
+  m_frame->navigationScheduler()->cancel();
   m_frame->editor()->clearLastEditCommand();
 
   m_isComplete = false;
@@ -603,13 +603,13 @@ void FrameLoader::didExplicitOpen() {
   // from a subsequent window.document.open / window.document.write call.
   // Canceling redirection here works for all cases because document.open
   // implicitly precedes document.write.
-  m_frame->redirectScheduler()->cancel();
+  m_frame->navigationScheduler()->cancel();
   if (m_frame->document()->url() != blankURL())
     m_URL = m_frame->document()->url();
 }
 
 void FrameLoader::cancelAndClear() {
-  m_frame->redirectScheduler()->cancel();
+  m_frame->navigationScheduler()->cancel();
 
   if (!m_isComplete)
     closeURL();
@@ -659,7 +659,7 @@ void FrameLoader::clear(bool clearWindowProperties,
   if (clearScriptObjects)
     m_frame->script()->clearScriptObjects();
 
-  m_frame->redirectScheduler()->clear();
+  m_frame->navigationScheduler()->clear();
 
   m_checkTimer.stop();
   m_shouldCallCheckCompleted = false;
@@ -701,7 +701,7 @@ void FrameLoader::receivedFirstData() {
   else
     url = m_frame->document()->completeURL(url).string();
 
-  m_frame->redirectScheduler()->scheduleRedirect(delay, url);
+  m_frame->navigationScheduler()->scheduleRedirect(delay, url);
 }
 
 void FrameLoader::setURL(const KURL& url) {
@@ -932,7 +932,7 @@ void FrameLoader::checkCompleted() {
   RefPtr<Frame> protect(m_frame);
   checkCallImplicitClose();  // if we didn't do it before
 
-  m_frame->redirectScheduler()->startTimer();
+  m_frame->navigationScheduler()->startTimer();
 
   completed();
   if (m_frame->page())
@@ -1158,7 +1158,7 @@ void FrameLoader::handleFallbackContent() {
 void FrameLoader::provisionalLoadStarted() {
   if (m_stateMachine.firstLayoutDone())
     m_stateMachine.advanceTo(FrameLoaderStateMachine::CommittedFirstRealLoad);
-  m_frame->redirectScheduler()->cancel(true);
+  m_frame->navigationScheduler()->cancel(true);
   m_client->provisionalLoadStarted();
 }
 
@@ -1300,7 +1300,7 @@ void FrameLoader::completed() {
 
   for (Frame* descendant = m_frame->tree()->traverseNext(m_frame); descendant;
        descendant = descendant->tree()->traverseNext(m_frame))
-    descendant->redirectScheduler()->startTimer();
+    descendant->navigationScheduler()->startTimer();
 
   if (Frame* parent = m_frame->tree()->parent())
     parent->loader()->checkCompleted();
@@ -2302,7 +2302,7 @@ void FrameLoader::prepareForCachedPageRestore() {
   ASSERT(m_frame->page());
   ASSERT(m_frame->page()->mainFrame() == m_frame);
 
-  m_frame->redirectScheduler()->cancel();
+  m_frame->navigationScheduler()->cancel();
 
   // We still have to close the previous part page.
   closeURL();

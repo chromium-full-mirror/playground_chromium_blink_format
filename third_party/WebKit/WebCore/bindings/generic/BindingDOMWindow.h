@@ -130,7 +130,7 @@ Frame* BindingDOMWindow<Binding>::createWindow(
       newFrame->loader()->changeLocation(completedUrl, referrer, false, false,
                                          userGesture);
     else if (!url.isEmpty())
-      newFrame->redirectScheduler()->scheduleLocationChange(
+      newFrame->navigationScheduler()->scheduleLocationChange(
           completedUrl.string(), referrer, false, false, userGesture);
   }
 
@@ -200,7 +200,7 @@ WebCore::DOMWindow* BindingDOMWindow<Binding>::open(
       // the outgoingReferrer.  We replicate that behavior here.
       String referrer = firstFrame->loader()->outgoingReferrer();
 
-      frame->redirectScheduler()->scheduleLocationChange(
+      frame->navigationScheduler()->scheduleLocationChange(
           completedUrl, referrer, false, false, userGesture);
     }
     return frame->domWindow();

@@ -102,7 +102,7 @@ class Frame : public RefCounted<Frame>, public TiledBackingStoreClient {
   Editor* editor() const;
   EventHandler* eventHandler() const;
   FrameLoader* loader() const;
-  RedirectScheduler* redirectScheduler() const;
+  NavigationScheduler* navigationScheduler() const;
   SelectionController* selection() const;
   FrameTree* tree() const;
   AnimationController* animation() const;
@@ -223,7 +223,7 @@ class Frame : public RefCounted<Frame>, public TiledBackingStoreClient {
   Page* m_page;
   mutable FrameTree m_treeNode;
   mutable FrameLoader m_loader;
-  mutable RedirectScheduler m_redirectScheduler;
+  mutable NavigationScheduler m_navigationScheduler;
 
   mutable RefPtr<DOMWindow> m_domWindow;
   HashSet<DOMWindow*> m_liveFormerWindows;
@@ -281,8 +281,8 @@ inline FrameLoader* Frame::loader() const {
   return &m_loader;
 }
 
-inline RedirectScheduler* Frame::redirectScheduler() const {
-  return &m_redirectScheduler;
+inline NavigationScheduler* Frame::navigationScheduler() const {
+  return &m_navigationScheduler;
 }
 
 inline FrameView* Frame::view() const {

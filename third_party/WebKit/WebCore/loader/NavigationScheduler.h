@@ -48,10 +48,10 @@ class Frame;
 struct FrameLoadRequest;
 class ScheduledNavigation;
 
-class RedirectScheduler : public Noncopyable {
+class NavigationScheduler : public Noncopyable {
  public:
-  RedirectScheduler(Frame*);
-  ~RedirectScheduler();
+  NavigationScheduler(Frame*);
+  ~NavigationScheduler();
 
   bool redirectScheduledDuringLoad();
   bool locationChangePending();
@@ -72,14 +72,14 @@ class RedirectScheduler : public Noncopyable {
   void clear();
 
  private:
-  void timerFired(Timer<RedirectScheduler>*);
+  void timerFired(Timer<NavigationScheduler>*);
   void schedule(PassOwnPtr<ScheduledNavigation>);
 
   static bool mustLockBackForwardList(Frame* targetFrame,
                                       bool mustLockIfDuringLoad);
 
   Frame* m_frame;
-  Timer<RedirectScheduler> m_timer;
+  Timer<NavigationScheduler> m_timer;
   OwnPtr<ScheduledNavigation> m_redirect;
 };
 

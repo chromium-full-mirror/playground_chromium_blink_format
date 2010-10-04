@@ -589,7 +589,7 @@ void JSDOMWindow::setLocation(ExecState* exec, JSValue value) {
 
   if (!protocolIsJavaScript(url) || allowsAccessFrom(exec)) {
     // We want a new history item if this JS was called via a user gesture
-    frame->redirectScheduler()->scheduleLocationChange(
+    frame->navigationScheduler()->scheduleLocationChange(
         url, lexicalFrame->loader()->outgoingReferrer(),
         !lexicalFrame->script()->anyPageIsProcessingUserGesture(), false,
         processingUserGesture());
@@ -781,7 +781,7 @@ static Frame* createWindow(ExecState* exec,
       newFrame->loader()->changeLocation(completedURL, referrer, false, false,
                                          userGesture);
     else if (!url.isEmpty())
-      newFrame->redirectScheduler()->scheduleLocationChange(
+      newFrame->navigationScheduler()->scheduleLocationChange(
           completedURL.string(), referrer,
           !lexicalFrame->script()->anyPageIsProcessingUserGesture(), false,
           userGesture);
@@ -858,7 +858,7 @@ JSValue JSDOMWindow::open(ExecState* exec) {
       // here.
       String referrer = dynamicFrame->loader()->outgoingReferrer();
 
-      frame->redirectScheduler()->scheduleLocationChange(
+      frame->navigationScheduler()->scheduleLocationChange(
           completedURL, referrer,
           !lexicalFrame->script()->anyPageIsProcessingUserGesture(), false,
           userGesture);
