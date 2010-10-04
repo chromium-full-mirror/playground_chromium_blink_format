@@ -27,15 +27,14 @@
 #include "config.h"
 #include "CSSParser.h"
 
-#include "CSSTimingFunctionValue.h"
 #include "CSSBorderImageValue.h"
 #include "CSSCanvasValue.h"
 #include "CSSCharsetRule.h"
 #include "CSSCursorImageValue.h"
-#include "CSSImageValue.h"
 #include "CSSFontFaceRule.h"
 #include "CSSFontFaceSrcValue.h"
 #include "CSSGradientValue.h"
+#include "CSSImageValue.h"
 #include "CSSImportRule.h"
 #include "CSSInheritedValue.h"
 #include "CSSInitialValue.h"
@@ -52,6 +51,7 @@
 #include "CSSSelector.h"
 #include "CSSStyleRule.h"
 #include "CSSStyleSheet.h"
+#include "CSSTimingFunctionValue.h"
 #include "CSSUnicodeRangeValue.h"
 #include "CSSValueKeywords.h"
 #include "CSSValueList.h"
@@ -63,6 +63,7 @@
 #include "FloatConversion.h"
 #include "FontFamilyValue.h"
 #include "FontValue.h"
+#include "HTMLParserIdioms.h"
 #include "HashTools.h"
 #include "MediaList.h"
 #include "MediaQueryExp.h"
@@ -4015,13 +4016,6 @@ bool CSSParser::parseFontFaceUnicodeRange() {
   return true;
 }
 
-// FIXME: This is the same as isHTMLSpace, so I think we should eliminate this
-// function
-// and use that instead. Pedants who say CSS is not HTML need not apply.
-static inline bool isCSSWhitespace(UChar c) {
-  return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\f';
-}
-
 static inline bool parseColorInt(const UChar*& string,
                                  const UChar* end,
                                  UChar terminator,
@@ -4029,7 +4023,7 @@ static inline bool parseColorInt(const UChar*& string,
   const UChar* current = string;
   int localValue = 0;
   bool negative = false;
-  while (current != end && isCSSWhitespace(*current))
+  while (current != end && isHTMLSpace(*current))
     current++;
   if (current != end && *current == '-') {
     negative = true;
@@ -4048,7 +4042,7 @@ static inline bool parseColorInt(const UChar*& string,
     }
     localValue = newValue;
   }
-  while (current != end && isCSSWhitespace(*current))
+  while (current != end && isHTMLSpace(*current))
     current++;
   if (current == end || *current++ != terminator)
     return false;
@@ -4075,7 +4069,7 @@ static inline bool parseAlphaValue(const UChar*& string,
                                    const UChar* end,
                                    UChar terminator,
                                    int& value) {
-  while (string != end && isCSSWhitespace(*string))
+  while (string != end && isHTMLSpace(*string))
     string++;
 
   value = 0;
@@ -5538,11 +5532,11 @@ UChar* CSSParser::text(int* length) {
       start += 4;
       l -= 5;
       // strip {w}
-      while (l && isCSSWhitespace(*start)) {
+      while (l && isHTMLSpace(*start)) {
         ++start;
         --l;
       }
-      while (l && isCSSWhitespace(start[l - 1]))
+      while (l && isHTMLSpace(start[l - 1]))
         --l;
       if (l && (*start == '"' || *start == '\'')) {
         ASSERT(l >= 2 && start[l - 1] == *start);
@@ -5556,11 +5550,11 @@ UChar* CSSParser::text(int* length) {
       start += 12;
       l -= 13;
       // strip {w}
-      while (l && isCSSWhitespace(*start)) {
+      while (l && isHTMLSpace(*start)) {
         ++start;
         --l;
       }
-      while (l && isCSSWhitespace(start[l - 1]))
+      while (l && isHTMLSpace(start[l - 1]))
         --l;
       break;
     default:
@@ -5612,7 +5606,7 @@ UChar* CSSParser::text(int* length) {
         uc = 0xfffd;
       *out++ = uc;
       escape = 0;
-      if (isCSSWhitespace(*current))
+      if (isHTMLSpace(*current))
         continue;
     }
     if (!escape && *current == '\\') {
