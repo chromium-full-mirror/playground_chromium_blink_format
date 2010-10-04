@@ -53,6 +53,9 @@ ApplicationCacheHost::ApplicationCacheHost(DocumentLoader* documentLoader)
 }
 
 ApplicationCacheHost::~ApplicationCacheHost() {
+  ASSERT(!m_applicationCache || !m_candidateApplicationCacheGroup ||
+         m_applicationCache->group() == m_candidateApplicationCacheGroup);
+
   if (m_applicationCache)
     m_applicationCache->group()->disassociateDocumentLoader(m_documentLoader);
   else if (m_candidateApplicationCacheGroup)
@@ -270,6 +273,16 @@ void ApplicationCacheHost::notifyDOMApplicationCache(EventID id,
     return;
   }
   dispatchDOMEvent(id, total, done);
+}
+
+void ApplicationCacheHost::stopLoadingInFrame(Frame* frame) {
+  ASSERT(!m_applicationCache || !m_candidateApplicationCacheGroup ||
+         m_applicationCache->group() == m_candidateApplicationCacheGroup);
+
+  if (m_candidateApplicationCacheGroup)
+    m_candidateApplicationCacheGroup->stopLoadingInFrame(frame);
+  else if (m_applicationCache)
+    m_applicationCache->group()->stopLoadingInFrame(frame);
 }
 
 void ApplicationCacheHost::stopDeferringEvents() {

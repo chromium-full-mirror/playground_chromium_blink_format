@@ -43,6 +43,7 @@
 namespace WebCore {
 class DOMApplicationCache;
 class DocumentLoader;
+class Frame;
 class ResourceLoader;
 class ResourceError;
 class ResourceRequest;
@@ -167,6 +168,8 @@ class ApplicationCacheHost : public Noncopyable {
 
   void setDOMApplicationCache(DOMApplicationCache*);
   void notifyDOMApplicationCache(EventID, int progressTotal, int progressDone);
+
+  void stopLoadingInFrame(Frame*);
 
   void
   stopDeferringEvents();  // Also raises the events that have been queued up.
