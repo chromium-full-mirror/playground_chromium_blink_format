@@ -322,7 +322,6 @@ class InspectorController : public Noncopyable {
   void setNativeBreakpoint(PassRefPtr<InspectorObject> breakpoint,
                            unsigned int* breakpointId);
   void removeNativeBreakpoint(unsigned int breakpointId);
-
 #endif
 
   void evaluateForTestInFrontend(long testCallId, const String& script);
@@ -359,9 +358,11 @@ class InspectorController : public Noncopyable {
   void releaseFrontendLifetimeAgents();
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
-
   void toggleRecordButton(bool);
   void enableDebuggerFromFrontend(bool always);
+
+  bool shouldBreakOnEvent(const String& eventName);
+  bool shouldBreakOnXMLHttpRequest(const String&);
 #endif
 #if ENABLE(DATABASE)
   void selectDatabase(Database* database);
@@ -389,8 +390,6 @@ class InspectorController : public Noncopyable {
   bool isMainResourceLoader(DocumentLoader* loader, const KURL& requestUrl);
 
   void didEvaluateForTestInFrontend(long callId, const String& jsonResult);
-
-  void instrumentWillSendXMLHttpRequest(const KURL&);
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   friend class InspectorDebuggerAgent;
@@ -453,6 +452,9 @@ class InspectorController : public Noncopyable {
   bool m_attachDebuggerWhenShown;
   OwnPtr<InspectorDebuggerAgent> m_debuggerAgent;
 
+  HashMap<unsigned int, String> m_nativeBreakpoints;
+  HashMap<unsigned int, String> m_eventListenerBreakpoints;
+  HashMap<String, unsigned int> m_eventNameToBreakpointCount;
   HashMap<unsigned int, String> m_XHRBreakpoints;
   unsigned int m_lastBreakpointId;
 

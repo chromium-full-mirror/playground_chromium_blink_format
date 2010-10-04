@@ -60,8 +60,6 @@ PassOwnPtr<InspectorDebuggerAgent> InspectorDebuggerAgent::create(
   return agent.release();
 }
 
-InspectorDebuggerAgent* InspectorDebuggerAgent::s_debuggerAgentOnBreakpoint = 0;
-
 InspectorDebuggerAgent::InspectorDebuggerAgent(
     InspectorController* inspectorController,
     InspectorFrontend* frontend)
@@ -74,9 +72,6 @@ InspectorDebuggerAgent::~InspectorDebuggerAgent() {
   ScriptDebugServer::shared().removeListener(
       this, m_inspectorController->inspectedPage());
   m_pausedScriptState = 0;
-
-  if (this == s_debuggerAgentOnBreakpoint)
-    s_debuggerAgentOnBreakpoint = 0;
 }
 
 bool InspectorDebuggerAgent::isDebuggerAlwaysEnabled() {
@@ -160,8 +155,23 @@ void InspectorDebuggerAgent::getScriptSource(const String& sourceID,
   *scriptSource = m_scriptIDToContent.get(sourceID);
 }
 
+void InspectorDebuggerAgent::schedulePauseOnNextStatement(
+    DebuggerEventType type,
+    PassRefPtr<InspectorValue> data) {
+  m_breakProgramDetails = InspectorObject::create();
+  m_breakProgramDetails->setNumber("eventType", type);
+  m_breakProgramDetails->setValue("eventData", data);
+  ScriptDebugServer::shared().setPauseOnNextStatement(true);
+}
+
+void InspectorDebuggerAgent::cancelPauseOnNextStatement() {
+  m_breakProgramDetails = 0;
+  ScriptDebugServer::shared().setPauseOnNextStatement(false);
+}
+
 void InspectorDebuggerAgent::pause() {
-  ScriptDebugServer::shared().pause();
+  schedulePauseOnNextStatement(JavaScriptPauseEventType,
+                               InspectorObject::create());
 }
 
 void InspectorDebuggerAgent::resume() {
@@ -328,6 +338,7 @@ void InspectorDebuggerAgent::didPause(ScriptState* scriptState) {
 
 void InspectorDebuggerAgent::didContinue() {
   m_pausedScriptState = 0;
+  m_breakProgramDetails = 0;
   m_frontend->resumedScript();
 }
 
@@ -336,14 +347,7 @@ void InspectorDebuggerAgent::breakProgram(DebuggerEventType type,
   m_breakProgramDetails = InspectorObject::create();
   m_breakProgramDetails->setNumber("eventType", type);
   m_breakProgramDetails->setValue("eventData", data);
-  s_debuggerAgentOnBreakpoint = this;
-
   ScriptDebugServer::shared().breakProgram();
-  if (!s_debuggerAgentOnBreakpoint)
-    return;
-
-  s_debuggerAgentOnBreakpoint = 0;
-  m_breakProgramDetails = 0;
 }
 
 }  // namespace WebCore

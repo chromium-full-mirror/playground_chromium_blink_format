@@ -73,7 +73,7 @@ class ScriptDebugServer : public Noncopyable {
   PauseOnExceptionsState pauseOnExceptionsState();
   void setPauseOnExceptionsState(PauseOnExceptionsState pauseOnExceptionsState);
 
-  void pause();
+  void setPauseOnNextStatement(bool pause);
   void breakProgram();
   void continueProgram();
   void stepIntoStatement();

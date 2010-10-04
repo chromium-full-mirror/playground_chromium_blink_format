@@ -83,7 +83,7 @@ class ScriptDebugServer : JSC::Debugger, public Noncopyable {
   }
   void setPauseOnExceptionsState(PauseOnExceptionsState);
 
-  void pause();
+  void setPauseOnNextStatement(bool pause);
   void breakProgram();
   void continueProgram();
   void stepIntoStatement();

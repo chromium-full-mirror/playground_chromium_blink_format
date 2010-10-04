@@ -47,6 +47,7 @@ class InspectorObject;
 class InspectorValue;
 
 enum DebuggerEventType {
+  JavaScriptPauseEventType,
   DOMBreakpointDebuggerEventType,
   NativeBreakpointDebuggerEventType
 };
@@ -76,8 +77,11 @@ class InspectorDebuggerAgent : public ScriptDebugListener, public Noncopyable {
                         RefPtr<InspectorValue>* newCallFrames);
   void getScriptSource(const String& sourceID, String* scriptSource);
 
-  void pause();
+  void schedulePauseOnNextStatement(DebuggerEventType type,
+                                    PassRefPtr<InspectorValue> data);
+  void cancelPauseOnNextStatement();
   void breakProgram(DebuggerEventType type, PassRefPtr<InspectorValue> data);
+  void pause();
   void resume();
   void stepOverStatement();
   void stepIntoStatement();
