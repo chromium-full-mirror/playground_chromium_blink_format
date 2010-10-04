@@ -42,8 +42,12 @@ void WebIDBTransactionCallbacksImpl::onAbort() {
   m_callbacks->onAbort();
 }
 
-int WebIDBTransactionCallbacksImpl::id() const {
-  return m_callbacks->id();
+void WebIDBTransactionCallbacksImpl::onComplete() {
+  m_callbacks->onComplete();
+}
+
+void WebIDBTransactionCallbacksImpl::onTimeout() {
+  m_callbacks->onTimeout();
 }
 
 }  // namespace WebCore

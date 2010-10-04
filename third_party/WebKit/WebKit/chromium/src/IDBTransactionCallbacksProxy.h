@@ -49,8 +49,8 @@ class IDBTransactionCallbacksProxy : public IDBTransactionCallbacks {
   virtual ~IDBTransactionCallbacksProxy();
 
   virtual void onAbort();
-  virtual int id() const;
-  // FIXME: implement onComplete().
+  virtual void onComplete();
+  virtual void onTimeout();
 
  private:
   IDBTransactionCallbacksProxy(PassOwnPtr<WebKit::WebIDBTransactionCallbacks>);
