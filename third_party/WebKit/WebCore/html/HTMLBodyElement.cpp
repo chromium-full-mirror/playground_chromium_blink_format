@@ -226,6 +226,9 @@ void HTMLBodyElement::insertedIntoDocument() {
   // this.
   if (FrameView* view = document()->view())
     view->scheduleRelayout();
+
+  if (document() && document()->page())
+    document()->page()->updateViewportArguments();
 }
 
 bool HTMLBodyElement::isURLAttribute(Attribute* attr) const {

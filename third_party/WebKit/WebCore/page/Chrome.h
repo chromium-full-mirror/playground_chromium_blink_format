@@ -51,6 +51,7 @@ class PopupMenuClient;
 #if ENABLE(NOTIFICATIONS)
 class NotificationPresenter;
 #endif
+class ViewportArguments;
 
 struct FrameLoadRequest;
 struct WindowFeatures;
@@ -143,6 +144,8 @@ class Chrome : public HostWindow {
 
   void runOpenPanel(Frame*, PassRefPtr<FileChooser>);
   void chooseIconForFiles(const Vector<String>&, FileChooser*);
+
+  void dispatchViewportDataDidChange(const ViewportArguments&) const;
 
 #if PLATFORM(MAC)
   void focusNSView(NSView*);

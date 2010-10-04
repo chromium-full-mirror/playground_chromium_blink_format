@@ -336,6 +336,10 @@ QWebPagePrivate::~QWebPagePrivate() {
 #endif
 }
 
+WebCore::ViewportArguments QWebPagePrivate::viewportArguments() {
+  return page ? page->viewportArguments() : WebCore::ViewportArguments();
+}
+
 WebCore::Page* QWebPagePrivate::core(const QWebPage* page) {
   return page->d->page;
 }
@@ -2522,8 +2526,8 @@ QWebPage::ViewportConfiguration QWebPage::viewportConfigurationForSize(
 
   WebCore::ViewportConfiguration conf =
       WebCore::findConfigurationForViewportData(
-          mainFrame()->d->viewportArguments(), desktopWidth, deviceWidth,
-          deviceHeight, deviceDPI, availableSize);
+          d->viewportArguments(), desktopWidth, deviceWidth, deviceHeight,
+          deviceDPI, availableSize);
 
   result.m_isValid = true;
   result.m_size = conf.layoutViewport;

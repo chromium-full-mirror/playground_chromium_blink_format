@@ -24,6 +24,7 @@
 
 #include "FrameLoaderTypes.h"
 #include "PlatformString.h"
+#include "ViewportArguments.h"
 #include <wtf/Forward.h>
 #include <wtf/HashSet.h>
 #include <wtf/Noncopyable.h>
@@ -127,6 +128,9 @@ class Page : public Noncopyable {
   ~Page();
 
   RenderTheme* theme() const { return m_theme.get(); };
+
+  ViewportArguments viewportArguments() const { return m_viewportArguments; }
+  void updateViewportArguments();
 
   static void refreshPlugins(bool reload);
   PluginData* pluginData() const;
@@ -434,6 +438,8 @@ class Page : public Noncopyable {
 #endif
 
   ViewMode m_viewMode;
+
+  ViewportArguments m_viewportArguments;
 };
 
 }  // namespace WebCore
