@@ -718,10 +718,12 @@ bool ApplicationCacheStorage::store(ApplicationCacheGroup* group,
   if (!executeStatement(statement))
     return false;
 
+  unsigned groupStorageID = static_cast<unsigned>(m_database.lastInsertRowID());
+
   if (!ensureOriginRecord(group->origin()))
     return false;
 
-  group->setStorageID(static_cast<unsigned>(m_database.lastInsertRowID()));
+  group->setStorageID(groupStorageID);
   journal->add(group, 0);
   return true;
 }
