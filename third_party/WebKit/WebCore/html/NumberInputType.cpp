@@ -31,6 +31,7 @@
 #include "config.h"
 #include "NumberInputType.h"
 
+#include "HTMLParserIdioms.h"
 #include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
@@ -41,6 +42,15 @@ PassOwnPtr<InputType> NumberInputType::create(HTMLInputElement* element) {
 
 const AtomicString& NumberInputType::formControlType() const {
   return InputTypeNames::number();
+}
+
+double NumberInputType::parseToDouble(const String& src,
+                                      double defaultValue) const {
+  double numberValue;
+  if (!parseToDoubleForNumberType(src, &numberValue))
+    return defaultValue;
+  ASSERT(isfinite(numberValue));
+  return numberValue;
 }
 
 }  // namespace WebCore
