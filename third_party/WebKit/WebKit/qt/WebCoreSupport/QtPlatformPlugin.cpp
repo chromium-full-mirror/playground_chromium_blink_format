@@ -87,21 +87,21 @@ QWebKitPlatformPlugin* QtPlatformPlugin::plugin() {
 
 QWebSelectMethod* QtPlatformPlugin::createSelectInputMethod() {
   QWebKitPlatformPlugin* p = plugin();
-  return p ? qobject_cast<QWebSelectMethod*>(
+  return p ? static_cast<QWebSelectMethod*>(
                  p->createExtension(QWebKitPlatformPlugin::MultipleSelections))
            : 0;
 }
 
 QWebNotificationPresenter* QtPlatformPlugin::createNotificationPresenter() {
   QWebKitPlatformPlugin* p = plugin();
-  return p ? qobject_cast<QWebNotificationPresenter*>(
+  return p ? static_cast<QWebNotificationPresenter*>(
                  p->createExtension(QWebKitPlatformPlugin::Notifications))
            : 0;
 }
 
 QWebHapticFeedbackPlayer* QtPlatformPlugin::createHapticFeedbackPlayer() {
   QWebKitPlatformPlugin* p = plugin();
-  return p ? qobject_cast<QWebHapticFeedbackPlayer*>(
+  return p ? static_cast<QWebHapticFeedbackPlayer*>(
                  p->createExtension(QWebKitPlatformPlugin::Haptics))
            : 0;
 }
