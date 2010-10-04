@@ -31,7 +31,9 @@
 namespace WebCore {
 
 DocumentParser::DocumentParser(Document* document)
-    : m_state(ParsingState), m_document(document) {
+    : m_state(ParsingState),
+      m_documentWasLoadedAsPartOfNavigation(false),
+      m_document(document) {
   ASSERT(document);
 }
 
