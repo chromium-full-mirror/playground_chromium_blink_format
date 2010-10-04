@@ -430,7 +430,8 @@ Document::Document(Frame* frame,
       m_areKeysEnabledInFullScreen(0)
 #endif
       ,
-      m_loadEventDelayCount(0) {
+      m_loadEventDelayCount(0),
+      m_loadEventDelayTimer(this, &Document::loadEventDelayTimerFired) {
   m_document = this;
 
   m_pageGroupUserSheetCacheValid = false;
@@ -4827,7 +4828,12 @@ void Document::decrementLoadEventDelayCount() {
   ASSERT(m_loadEventDelayCount);
   --m_loadEventDelayCount;
 
-  if (frame() && !m_loadEventDelayCount)
+  if (frame() && !m_loadEventDelayCount && !m_loadEventDelayTimer.isActive())
+    m_loadEventDelayTimer.startOneShot(0);
+}
+
+void Document::loadEventDelayTimerFired(Timer<Document>*) {
+  if (frame())
     frame()->loader()->checkCompleted();
 }
 

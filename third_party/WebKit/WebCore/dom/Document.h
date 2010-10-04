@@ -1231,6 +1231,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   PassRefPtr<NodeList> handleZeroPadding(const HitTestRequest&,
                                          HitTestResult&) const;
 
+  void loadEventDelayTimerFired(Timer<Document>*);
+
   OwnPtr<CSSStyleSelector> m_styleSelector;
   bool m_didCalculateStyleSelector;
 
@@ -1490,6 +1492,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 #endif
 
   int m_loadEventDelayCount;
+  Timer<Document> m_loadEventDelayTimer;
 
   ViewportArguments m_viewportArguments;
 };
