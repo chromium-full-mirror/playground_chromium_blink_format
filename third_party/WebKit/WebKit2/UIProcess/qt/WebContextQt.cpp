@@ -27,13 +27,14 @@
 #include "WebContext.h"
 
 #include "ApplicationCacheStorage.h"
+#include "WebProcessCreationParameters.h"
 
 namespace WebKit {
 
-WTF::String WebContext::applicationCacheDirectory() {
+String WebContext::applicationCacheDirectory() {
   return WebCore::cacheStorage().cacheDirectory();
 }
 
-void WebContext::platformSetUpWebProcess() {}
+void WebContext::platformInitializeWebProcess(WebProcessCreationParameters&) {}
 
 }  // namespace WebKit

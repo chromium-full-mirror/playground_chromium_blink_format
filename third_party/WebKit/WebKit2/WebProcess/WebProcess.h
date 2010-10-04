@@ -51,6 +51,7 @@ class WebFrame;
 class WebPage;
 struct WebPageCreationParameters;
 struct WebPreferencesStore;
+struct WebProcessCreationParameters;
 
 class WebProcess : CoreIPC::Connection::Client {
  public:
@@ -88,18 +89,9 @@ class WebProcess : CoreIPC::Connection::Client {
   WebProcess();
   void shutdown();
 
-#if ENABLE(WEB_PROCESS_SANDBOX)
-  void loadInjectedBundle(const String&, const String&);
-#else
-  void loadInjectedBundle(const String&);
-#endif
-  void setApplicationCacheDirectory(const String&);
+  void initializeWebProcess(const WebProcessCreationParameters&);
   void setShouldTrackVisitedLinks(bool);
   void registerURLSchemeAsEmptyDocument(const String&);
-
-#if USE(ACCELERATED_COMPOSITING) && PLATFORM(MAC)
-  void setUpAcceleratedCompositingPort(CoreIPC::MachPort);
-#endif
 #if PLATFORM(WIN)
   void setShouldPaintNativeControls(bool);
 #endif

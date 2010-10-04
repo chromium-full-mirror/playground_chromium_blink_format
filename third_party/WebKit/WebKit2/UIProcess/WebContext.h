@@ -48,6 +48,7 @@ namespace WebKit {
 class WebPageNamespace;
 class WebPageProxy;
 class WebPreferences;
+class WebProcessCreationParameters;
 
 class WebContext : public APIObject {
  public:
@@ -137,7 +138,7 @@ class WebContext : public APIObject {
 
   void ensureWebProcess();
   bool hasValidProcess() const { return m_process && m_process->isValid(); }
-  void platformSetUpWebProcess();
+  void platformInitializeWebProcess(WebProcessCreationParameters&);
 
   ProcessModel m_processModel;
 
