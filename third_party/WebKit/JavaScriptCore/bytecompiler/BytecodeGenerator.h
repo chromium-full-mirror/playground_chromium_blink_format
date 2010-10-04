@@ -665,6 +665,7 @@ class BytecodeGenerator : public FastAllocBase {
   RegisterID* emitThrowExpressionTooDeepException();
 
   void createArgumentsIfNecessary();
+  void createActivationIfNecessary();
   RegisterID* createLazyRegisterIfNecessary(RegisterID*);
 
   bool m_shouldEmitDebugHooks;
@@ -705,6 +706,7 @@ class BytecodeGenerator : public FastAllocBase {
 
   int m_globalVarStorageOffset;
 
+  bool m_hasCreatedActivation;
   int m_firstLazyFunction;
   int m_lastLazyFunction;
   HashMap<unsigned int,

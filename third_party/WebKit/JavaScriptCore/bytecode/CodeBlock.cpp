@@ -34,6 +34,7 @@
 #include "Debugger.h"
 #include "Interpreter.h"
 #include "JIT.h"
+#include "JSActivation.h"
 #include "JSFunction.h"
 #include "JSStaticScopeObject.h"
 #include "JSValue.h"
@@ -584,9 +585,9 @@ void CodeBlock::dump(ExecState* exec,
       printf("[%4d] enter\n", location);
       break;
     }
-    case op_enter_with_activation: {
+    case op_create_activation: {
       int r0 = (++it)->u.operand;
-      printf("[%4d] enter_with_activation %s\n", location,
+      printf("[%4d] create_activation %s\n", location,
              registerName(exec, r0).data());
       break;
     }
@@ -841,12 +842,11 @@ void CodeBlock::dump(ExecState* exec,
       int id0 = (++it)->u.operand;
       JSValue scope = JSValue((++it)->u.jsCell);
       ++it;
-      int depth = it[2].u.operand;
+      int depth = (++it)->u.operand;
       printf("[%4d] resolve_global_dynamic\t %s, %s, %s, %d\n", location,
              registerName(exec, r0).data(),
              valueToSourceString(exec, scope).utf8().data(),
              idName(id0, m_identifiers[id0]).data(), depth);
-      it += 3;
       break;
     }
     case op_get_scoped_var: {
@@ -1786,6 +1786,11 @@ bool CodeBlock::reparseForExceptionInfoIfNecessary(CallFrame* callFrame) {
   ASSERT(!m_rareData || !m_rareData->m_exceptionHandlers.size());
   ScopeChainNode* scopeChain = callFrame->scopeChain();
   if (m_needsFullScopeChain) {
+    if (codeType() == FunctionCode &&
+        !callFrame->r(activationRegister()).jsValue()) {
+      createActivation(callFrame);
+      scopeChain = callFrame->scopeChain();
+    }
     ScopeChain sc(scopeChain);
     int scopeDelta = sc.localDepth();
     if (m_codeType == EvalCode)
@@ -2026,6 +2031,16 @@ void CodeBlock::shrinkToFit() {
     m_rareData->m_functionRegisterInfos.shrinkToFit();
 #endif
   }
+}
+
+void CodeBlock::createActivation(CallFrame* callFrame) {
+  ASSERT(codeType() == FunctionCode);
+  ASSERT(needsFullScopeChain());
+  ASSERT(!callFrame->r(activationRegister()).jsValue());
+  JSActivation* activation = new (callFrame) JSActivation(
+      callFrame, static_cast<FunctionExecutable*>(ownerExecutable()));
+  callFrame->r(activationRegister()) = JSValue(activation);
+  callFrame->setScopeChain(callFrame->scopeChain()->copy()->push(activation));
 }
 
 }  // namespace JSC

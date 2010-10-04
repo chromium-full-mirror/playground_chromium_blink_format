@@ -229,6 +229,7 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
       m_nextGlobalIndex(-1),
       m_nextConstantOffset(0),
       m_globalConstantIndex(0),
+      m_hasCreatedActivation(true),
       m_firstLazyFunction(0),
       m_lastLazyFunction(0),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
@@ -342,6 +343,7 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
       m_codeType(FunctionCode),
       m_nextConstantOffset(0),
       m_globalConstantIndex(0),
+      m_hasCreatedActivation(false),
       m_firstLazyFunction(0),
       m_lastLazyFunction(0),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
@@ -355,12 +357,12 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
 
   codeBlock->setGlobalData(m_globalData);
 
+  emitOpcode(op_enter);
   if (m_codeBlock->needsFullScopeChain()) {
     m_activationRegister = addVar();
-    emitOpcode(op_enter_with_activation);
-    instructions().append(m_activationRegister->index());
-  } else
-    emitOpcode(op_enter);
+    emitInitLazyRegister(m_activationRegister);
+    m_codeBlock->setActivationRegister(m_activationRegister->index());
+  }
 
   // Both op_tear_off_activation and op_tear_off_arguments tear off the
   // 'arguments'
@@ -402,11 +404,17 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
 
   // Captured variables and functions go first so that activations don't have
   // to step over the non-captured locals to mark them.
+  m_hasCreatedActivation = false;
   if (functionBody->hasCapturedVariables()) {
     for (size_t i = 0; i < functionStack.size(); ++i) {
       FunctionBodyNode* function = functionStack[i];
       const Identifier& ident = function->ident();
       if (functionBody->captures(ident)) {
+        if (!m_hasCreatedActivation) {
+          m_hasCreatedActivation = true;
+          emitOpcode(op_create_activation);
+          instructions().append(m_activationRegister->index());
+        }
         m_functions.add(ident.impl());
         emitNewFunction(addVar(ident, false), function);
       }
@@ -418,7 +426,13 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
     }
   }
   bool canLazilyCreateFunctions =
-      !functionBody->needsActivationForMoreThanVariables();
+      !functionBody->needsActivationForMoreThanVariables() && !debugger;
+  if (!canLazilyCreateFunctions && !m_hasCreatedActivation) {
+    m_hasCreatedActivation = true;
+    emitOpcode(op_create_activation);
+    instructions().append(m_activationRegister->index());
+  }
+
   codeBlock->m_numCapturedVars = codeBlock->m_numVars;
   m_firstLazyFunction = codeBlock->m_numVars;
   for (size_t i = 0; i < functionStack.size(); ++i) {
@@ -501,6 +515,7 @@ BytecodeGenerator::BytecodeGenerator(EvalNode* evalNode,
       m_codeType(EvalCode),
       m_nextConstantOffset(0),
       m_globalConstantIndex(0),
+      m_hasCreatedActivation(true),
       m_firstLazyFunction(0),
       m_lastLazyFunction(0),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
@@ -1602,6 +1617,7 @@ RegisterID* BytecodeGenerator::emitLazyNewFunction(RegisterID* dst,
 RegisterID* BytecodeGenerator::emitNewFunctionInternal(RegisterID* dst,
                                                        unsigned index,
                                                        bool doNullCheck) {
+  createActivationIfNecessary();
   emitOpcode(op_new_func);
   instructions().append(dst->index());
   instructions().append(index);
@@ -1622,6 +1638,7 @@ RegisterID* BytecodeGenerator::emitNewFunctionExpression(RegisterID* r0,
   unsigned index =
       m_codeBlock->addFunctionExpr(makeFunction(m_globalData, function));
 
+  createActivationIfNecessary();
   emitOpcode(op_new_func_exp);
   instructions().append(r0->index());
   instructions().append(index);
@@ -1645,6 +1662,15 @@ void BytecodeGenerator::createArgumentsIfNecessary() {
 
   emitOpcode(op_create_arguments);
   instructions().append(m_codeBlock->argumentsRegister());
+}
+
+void BytecodeGenerator::createActivationIfNecessary() {
+  if (m_hasCreatedActivation)
+    return;
+  if (!m_codeBlock->needsFullScopeChain())
+    return;
+  emitOpcode(op_create_activation);
+  instructions().append(m_activationRegister->index());
 }
 
 RegisterID* BytecodeGenerator::emitCallEval(RegisterID* dst,

@@ -415,6 +415,13 @@ class CodeBlock : public FastAllocBase {
     ASSERT(usesArguments());
     return m_argumentsRegister;
   }
+  void setActivationRegister(int activationRegister) {
+    m_activationRegister = activationRegister;
+  }
+  int activationRegister() {
+    ASSERT(needsFullScopeChain());
+    return m_activationRegister;
+  }
   bool usesArguments() const { return m_argumentsRegister != -1; }
 
   CodeType codeType() const { return m_codeType; }
@@ -426,6 +433,8 @@ class CodeBlock : public FastAllocBase {
   void addJumpTarget(unsigned jumpTarget) { m_jumpTargets.append(jumpTarget); }
   unsigned jumpTarget(int index) const { return m_jumpTargets[index]; }
   unsigned lastJumpTarget() const { return m_jumpTargets.last(); }
+
+  void createActivation(CallFrame*);
 
 #if ENABLE(INTERPRETER)
   void addPropertyAccessInstruction(unsigned propertyAccessInstruction) {
@@ -680,6 +689,7 @@ class CodeBlock : public FastAllocBase {
 
   int m_thisRegister;
   int m_argumentsRegister;
+  int m_activationRegister;
 
   bool m_needsFullScopeChain;
   bool m_usesEval;

@@ -117,9 +117,13 @@ void JIT::emit_op_ret(Instruction* currentInstruction) {
 
   // We could JIT generate the deref, only calling out to C when the refcount
   // hits zero.
-  if (m_codeBlock->needsFullScopeChain())
+  if (m_codeBlock->needsFullScopeChain()) {
+    Jump activationNotCreated =
+        branch32(Equal, tagFor(m_codeBlock->activationRegister()),
+                 Imm32(JSValue::EmptyValueTag));
     JITStubCall(this, cti_op_ret_scopeChain).call();
-
+    activationNotCreated.link(this);
+  }
   emitLoad(dst, regT1, regT0);
   emitGetFromCallFrameHeaderPtr(RegisterFile::ReturnPC, regT2);
   emitGetFromCallFrameHeaderPtr(RegisterFile::CallerFrame, callFrameRegister);
@@ -134,8 +138,13 @@ void JIT::emit_op_ret_object_or_this(Instruction* currentInstruction) {
 
   // We could JIT generate the deref, only calling out to C when the refcount
   // hits zero.
-  if (m_codeBlock->needsFullScopeChain())
+  if (m_codeBlock->needsFullScopeChain()) {
+    Jump activationNotCreated =
+        branch32(Equal, tagFor(m_codeBlock->activationRegister()),
+                 Imm32(JSValue::EmptyValueTag));
     JITStubCall(this, cti_op_ret_scopeChain).call();
+    activationNotCreated.link(this);
+  }
 
   emitLoad(result, regT1, regT0);
   Jump notJSCell = branch32(NotEqual, regT1, Imm32(JSValue::CellTag));
