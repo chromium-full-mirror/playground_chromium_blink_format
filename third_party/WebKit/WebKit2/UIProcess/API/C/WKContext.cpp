@@ -98,6 +98,14 @@ void WKContextAddVisitedLink(WKContextRef contextRef, WKStringRef visitedURL) {
   toWK(contextRef)->addVisitedLink(toWK(visitedURL)->string());
 }
 
+void WKContextSetCacheModel(WKContextRef contextRef, WKCacheModel cacheModel) {
+  toWK(contextRef)->setCacheModel(toCacheModel(cacheModel));
+}
+
+WKCacheModel WKContextGetCacheModel(WKContextRef contextRef) {
+  return toRef(toWK(contextRef)->cacheModel());
+}
+
 void _WKContextSetAdditionalPluginsDirectory(WKContextRef contextRef,
                                              WKStringRef pluginsDirectory) {
   toWK(contextRef)
