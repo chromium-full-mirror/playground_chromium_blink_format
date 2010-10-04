@@ -4197,6 +4197,7 @@ void RenderBlock::clearFloats() {
   // objects that may have shifted
   // to avoid floats.
   bool parentHasFloats = false;
+  RenderBlock* parentBlock = toRenderBlock(parent());
   RenderObject* prev = previousSibling();
   while (prev &&
          (prev->isFloatingOrPositioned() || !prev->isBox() ||
@@ -4207,21 +4208,17 @@ void RenderBlock::clearFloats() {
   }
 
   // First add in floats from the parent.
-  int offset = y();
-  if (parentHasFloats) {
-    RenderBlock* parentBlock = toRenderBlock(parent());
-    addIntrudingFloats(parentBlock,
-                       parentBlock->borderLeft() + parentBlock->paddingLeft(),
-                       offset);
-  }
+  int logicalTopOffset = logicalTop();
+  if (parentHasFloats)
+    addIntrudingFloats(parentBlock, parentBlock->logicalLeftOffsetForContent(),
+                       logicalTopOffset);
 
-  int xoffset = 0;
+  int logicalLeftOffset = 0;
   if (prev)
-    offset -= toRenderBox(prev)->y();
-  else if (parent()->isBox()) {
-    prev = parent();
-    xoffset +=
-        toRenderBox(prev)->borderLeft() + toRenderBox(prev)->paddingLeft();
+    logicalTopOffset -= toRenderBox(prev)->logicalTop();
+  else {
+    prev = parentBlock;
+    logicalLeftOffset += parentBlock->logicalLeftOffsetForContent();
   }
 
   // Add overhanging floats from the previous RenderBlock, but only if it has a
@@ -4230,34 +4227,39 @@ void RenderBlock::clearFloats() {
     return;
 
   RenderBlock* block = toRenderBlock(prev);
-  if (block->m_floatingObjects && block->lowestFloatLogicalBottom() > offset)
-    addIntrudingFloats(block, xoffset, offset);
+  if (block->m_floatingObjects &&
+      block->lowestFloatLogicalBottom() > logicalTopOffset)
+    addIntrudingFloats(block, logicalLeftOffset, logicalTopOffset);
 
   if (childrenInline()) {
-    int changeTop = numeric_limits<int>::max();
-    int changeBottom = numeric_limits<int>::min();
+    int changeLogicalTop = numeric_limits<int>::max();
+    int changeLogicalBottom = numeric_limits<int>::min();
     if (m_floatingObjects) {
       for (FloatingObject* f = m_floatingObjects->first(); f;
            f = m_floatingObjects->next()) {
         FloatingObject* oldFloatingObject = floatMap.get(f->m_renderer);
+        int logicalBottom = logicalBottomForFloat(f);
         if (oldFloatingObject) {
-          if (f->width() != oldFloatingObject->width() ||
-              f->left() != oldFloatingObject->left()) {
-            changeTop = 0;
-            changeBottom = max(changeBottom,
-                               max(f->bottom(), oldFloatingObject->bottom()));
-          } else if (f->bottom() != oldFloatingObject->bottom()) {
-            changeTop =
-                min(changeTop, min(f->bottom(), oldFloatingObject->bottom()));
-            changeBottom = max(changeBottom,
-                               max(f->bottom(), oldFloatingObject->bottom()));
+          int oldLogicalBottom = logicalBottomForFloat(oldFloatingObject);
+          if (logicalWidthForFloat(f) !=
+                  logicalWidthForFloat(oldFloatingObject) ||
+              logicalLeftForFloat(f) !=
+                  logicalLeftForFloat(oldFloatingObject)) {
+            changeLogicalTop = 0;
+            changeLogicalBottom =
+                max(changeLogicalBottom, max(logicalBottom, oldLogicalBottom));
+          } else if (logicalBottom != oldLogicalBottom) {
+            changeLogicalTop =
+                min(changeLogicalTop, min(logicalBottom, oldLogicalBottom));
+            changeLogicalBottom =
+                max(changeLogicalBottom, max(logicalBottom, oldLogicalBottom));
           }
 
           floatMap.remove(f->m_renderer);
           delete oldFloatingObject;
         } else {
-          changeTop = 0;
-          changeBottom = max(changeBottom, f->bottom());
+          changeLogicalTop = 0;
+          changeLogicalBottom = max(changeLogicalBottom, logicalBottom);
         }
       }
     }
@@ -4267,13 +4269,14 @@ void RenderBlock::clearFloats() {
          ++it) {
       FloatingObject* floatingObject = (*it).second;
       if (!floatingObject->m_isDescendant) {
-        changeTop = 0;
-        changeBottom = max(changeBottom, floatingObject->bottom());
+        changeLogicalTop = 0;
+        changeLogicalBottom =
+            max(changeLogicalBottom, logicalBottomForFloat(floatingObject));
       }
     }
     deleteAllValues(floatMap);
 
-    markLinesDirtyInVerticalRange(changeTop, changeBottom);
+    markLinesDirtyInVerticalRange(changeLogicalTop, changeLogicalBottom);
   }
 }
 

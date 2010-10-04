@@ -530,8 +530,17 @@ class RenderBlock : public RenderBox {
     bool m_isDescendant : 1;
   };
 
+  int logicalTopForFloat(FloatingObject* child) const {
+    return style()->isVerticalBlockFlow() ? child->top() : child->left();
+  }
   int logicalBottomForFloat(FloatingObject* child) const {
     return style()->isVerticalBlockFlow() ? child->bottom() : child->right();
+  }
+  int logicalLeftForFloat(FloatingObject* child) const {
+    return style()->isVerticalBlockFlow() ? child->left() : child->top();
+  }
+  int logicalWidthForFloat(FloatingObject* child) const {
+    return style()->isVerticalBlockFlow() ? child->width() : child->height();
   }
 
   // The following functions' implementations are in RenderBlockLineLayout.cpp.
