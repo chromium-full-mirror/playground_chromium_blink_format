@@ -214,10 +214,15 @@ bool ScrollbarThemeChromiumLinux::shouldCenterOnThumb(
 
 IntSize ScrollbarThemeChromiumLinux::buttonSize(Scrollbar* scrollbar) {
   if (scrollbar->orientation() == VerticalScrollbar)
-    return IntSize(scrollbarThicknessValue, buttonLength);
+    return IntSize(scrollbarThicknessValue,
+                   scrollbar->height() < 2 * buttonLength
+                       ? scrollbar->height() / 2
+                       : buttonLength);
 
   // HorizontalScrollbar
-  return IntSize(buttonLength, scrollbarThicknessValue);
+  return IntSize(scrollbar->width() < 2 * buttonLength ? scrollbar->width() / 2
+                                                       : buttonLength,
+                 scrollbarThicknessValue);
 }
 
 int ScrollbarThemeChromiumLinux::minimumThumbLength(Scrollbar* scrollbar) {
