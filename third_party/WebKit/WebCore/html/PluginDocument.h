@@ -37,6 +37,8 @@ class PluginDocument : public HTMLDocument {
     return adoptRef(new PluginDocument(frame, url));
   }
 
+  void setPluginNode(Node* pluginNode) { m_pluginNode = pluginNode; }
+
   Widget* pluginWidget();
   Node* pluginNode();
 
@@ -56,6 +58,7 @@ class PluginDocument : public HTMLDocument {
   }
 
   bool m_shouldLoadPluginManually;
+  RefPtr<Node> m_pluginNode;
 };
 
 inline PluginDocument* toPluginDocument(Document* document) {
