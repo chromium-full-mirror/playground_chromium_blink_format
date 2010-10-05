@@ -273,6 +273,10 @@ void ApplicationCacheHost::stopDeferringEvents() {
   m_defersEvents = false;
 }
 
+void ApplicationCacheHost::stopLoadingInFrame(Frame* frame) {
+  // FIXME: Implement this method.
+}
+
 void ApplicationCacheHost::dispatchDOMEvent(EventID id, int total, int done) {
   if (m_domApplicationCache) {
     const AtomicString& eventType = DOMApplicationCache::toEventType(id);
