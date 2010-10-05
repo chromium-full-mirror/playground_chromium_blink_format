@@ -852,7 +852,7 @@ static QString dumpHistoryItem(const QWebHistoryItem& item,
   for (int i = start; i < indent; i++)
     result.append(' ');
 
-  QString url = item.url().toString();
+  QString url = item.url().toEncoded();
   if (url.contains("file://")) {
     static QString layoutTestsString("/LayoutTests/");
     static QString fileTestString("(file test):");

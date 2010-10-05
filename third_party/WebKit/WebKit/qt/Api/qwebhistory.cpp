@@ -105,7 +105,7 @@ QWebHistoryItem::~QWebHistoryItem() {}
 */
 QUrl QWebHistoryItem::originalUrl() const {
   if (d->item)
-    return QUrl(d->item->originalURL().string());
+    return d->item->originalURL();
   return QUrl();
 }
 
@@ -116,7 +116,7 @@ QUrl QWebHistoryItem::originalUrl() const {
 */
 QUrl QWebHistoryItem::url() const {
   if (d->item)
-    return QUrl(d->item->url().string());
+    return d->item->url();
   return QUrl();
 }
 
