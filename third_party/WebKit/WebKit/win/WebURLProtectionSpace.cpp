@@ -170,8 +170,6 @@ HRESULT STDMETHODCALLTYPE WebURLProtectionSpace::initWithHost(
     serverType = ProtectionSpaceServerFTP;
   else if (BString(protocol) == webURLProtectionSpaceFTPSBString)
     serverType = ProtectionSpaceServerFTPS;
-  else
-    ASSERT_NOT_REACHED();
 
   m_protectionSpace = ProtectionSpace(
       String(host, SysStringLen(host)), port, serverType,
