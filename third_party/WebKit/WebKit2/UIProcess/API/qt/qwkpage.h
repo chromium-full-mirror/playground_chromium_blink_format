@@ -88,6 +88,8 @@ class QWEBKIT_EXPORT QWKPage : public QObject {
   typedef QWKPage* (*CreateNewPageFn)(QWKPage*);
   void setCreateNewPageFunction(CreateNewPageFn function);
 
+  void setCustomUserAgent(const QString&);
+
  public:
   Q_SIGNAL void statusBarMessage(const QString&);
   Q_SIGNAL void titleChanged(const QString&);

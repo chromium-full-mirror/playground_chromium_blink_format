@@ -350,6 +350,11 @@ void QWKPage::setCreateNewPageFunction(CreateNewPageFn function) {
   d->createNewPageFn = function;
 }
 
+void QWKPage::setCustomUserAgent(const QString& userAgent) {
+  WKRetainPtr<WKStringRef> wkUserAgent(WKStringCreateWithQString(userAgent));
+  WKPageSetCustomUserAgent(pageRef(), wkUserAgent.get());
+}
+
 void QWKPage::load(const QUrl& url) {
   WKRetainPtr<WKURLRef> wkurl(WKURLCreateWithQUrl(url));
   WKPageLoadURL(pageRef(), wkurl.get());
