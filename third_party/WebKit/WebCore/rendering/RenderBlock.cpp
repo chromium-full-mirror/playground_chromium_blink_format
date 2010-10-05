@@ -1559,9 +1559,9 @@ void RenderBlock::adjustFloatingBlock(const MarginInfo& marginInfo) {
   // an example of this scenario.
   int marginOffset =
       marginInfo.canCollapseWithMarginBefore() ? 0 : marginInfo.margin();
-  setLogicalHeight(height() + marginOffset);
+  setLogicalHeight(logicalHeight() + marginOffset);
   positionNewFloats();
-  setLogicalHeight(height() - marginOffset);
+  setLogicalHeight(logicalHeight() - marginOffset);
 }
 
 bool RenderBlock::handleSpecialChild(RenderBox* child,
@@ -1967,21 +1967,25 @@ void RenderBlock::handleAfterSideOfBlock(int beforeSide,
 
 void RenderBlock::setLogicalLeftForChild(RenderBox* child, int logicalLeft) {
   if (style()->isVerticalBlockFlow()) {
-    view()->addLayoutDelta(IntSize(child->x() - logicalLeft, 0));
-    child->setLocation(logicalLeft, child->y());
+    if (!child->isFloatingOrPositioned())
+      view()->addLayoutDelta(IntSize(child->x() - logicalLeft, 0));
+    child->setX(logicalLeft);
   } else {
-    view()->addLayoutDelta(IntSize(0, child->y() - logicalLeft));
-    child->setLocation(child->x(), logicalLeft);
+    if (!child->isFloatingOrPositioned())
+      view()->addLayoutDelta(IntSize(0, child->y() - logicalLeft));
+    child->setY(logicalLeft);
   }
 }
 
 void RenderBlock::setLogicalTopForChild(RenderBox* child, int logicalTop) {
   if (style()->isVerticalBlockFlow()) {
-    view()->addLayoutDelta(IntSize(0, child->y() - logicalTop));
-    child->setLocation(child->x(), logicalTop);
+    if (!child->isFloatingOrPositioned())
+      view()->addLayoutDelta(IntSize(0, child->y() - logicalTop));
+    child->setY(logicalTop);
   } else {
-    view()->addLayoutDelta(IntSize(child->x() - logicalTop, 0));
-    child->setLocation(logicalTop, child->y());
+    if (!child->isFloatingOrPositioned())
+      view()->addLayoutDelta(IntSize(child->x() - logicalTop, 0));
+    child->setX(logicalTop);
   }
 }
 
@@ -2399,7 +2403,7 @@ void RenderBlock::repaintOverhangingFloats(bool paintAllDescendants) {
       // is our responsibility to paint (m_shouldPaint is set). When
       // paintAllDescendants is true, the latter
       // condition is replaced with being a descendant of us.
-      if (r->bottom() > height() &&
+      if (logicalBottomForFloat(r) > logicalHeight() &&
           ((paintAllDescendants && r->m_renderer->isDescendantOf(this)) ||
            r->m_shouldPaint) &&
           !r->m_renderer->hasSelfPaintingLayer()) {
@@ -3432,13 +3436,16 @@ RenderBlock::FloatingObject* RenderBlock::insertFloatingObject(RenderBox* o) {
   // Just go ahead and lay out the float.
   bool affectedByPagination =
       o->isRenderBlock() && view()->layoutState()->m_pageHeight;
-  if (!affectedByPagination)
+  if (!affectedByPagination ||
+      isBlockFlowRoot())  // We are unsplittable if we're a block flow root.
     o->layoutIfNeeded();
   else {
     o->computeLogicalWidth();
     o->computeBlockDirectionMargins(this);
   }
-  newObj->setWidth(o->width() + o->marginLeft() + o->marginRight());
+  setLogicalWidthForFloat(
+      newObj,
+      logicalWidthForChild(o) + marginStartForChild(o) + marginEndForChild(o));
 
   newObj->m_shouldPaint =
       !o->hasSelfPaintingLayer();  // If a layer exists, the float will paint
@@ -3489,10 +3496,10 @@ bool RenderBlock::positionNewFloats() {
   if (!m_floatingObjects)
     return false;
 
-  FloatingObject* f = m_floatingObjects->last();
+  FloatingObject* floatingObject = m_floatingObjects->last();
 
   // If all floats have already been positioned, then we have no work to do.
-  if (!f || f->isPlaced())
+  if (!floatingObject || floatingObject->isPlaced())
     return false;
 
   // Move backwards through our floating object list until we find a float that
@@ -3502,108 +3509,140 @@ bool RenderBlock::positionNewFloats() {
   // the new floats that need it.
   FloatingObject* lastFloat = m_floatingObjects->getPrev();
   while (lastFloat && !lastFloat->isPlaced()) {
-    f = m_floatingObjects->prev();
+    floatingObject = m_floatingObjects->prev();
     lastFloat = m_floatingObjects->getPrev();
   }
 
-  int y = height();
+  int logicalTop = logicalHeight();
 
-  // The float cannot start above the y position of the last positioned float.
+  // The float cannot start above the top position of the last positioned float.
   if (lastFloat)
-    y = max(lastFloat->top(), y);
+    logicalTop = max(logicalTopForFloat(lastFloat), logicalTop);
 
   // Now walk through the set of unpositioned floats and place them.
-  while (f) {
+  while (floatingObject) {
     // The containing block is responsible for positioning floats, so if we have
     // floats in our
     // list that come from somewhere else, do not attempt to position them.
-    if (f->m_renderer->containingBlock() != this) {
-      f = m_floatingObjects->next();
+    if (floatingObject->renderer()->containingBlock() != this) {
+      floatingObject = m_floatingObjects->next();
       continue;
     }
 
-    RenderBox* o = f->m_renderer;
+    RenderBox* childBox = floatingObject->renderer();
+    int childLogicalLeftMargin = style()->isLeftToRightDirection()
+                                     ? marginStartForChild(childBox)
+                                     : marginEndForChild(childBox);
 
-    int ro = logicalRightOffsetForContent();  // Constant part of right offset.
-    int lo = logicalLeftOffsetForContent();   // Constant part of left offset.
-    int fwidth = f->width();                  // The width we look for.
-    if (ro - lo < fwidth)
-      fwidth = ro - lo;  // Never look for more than what will be available.
+    int rightOffset =
+        logicalRightOffsetForContent();  // Constant part of right offset.
+    int leftOffset =
+        logicalLeftOffsetForContent();  // Constant part of left offset.
+    int floatLogicalWidth =
+        logicalWidthForFloat(floatingObject);  // The width we look for.
+    if (rightOffset - leftOffset < floatLogicalWidth)
+      floatLogicalWidth =
+          rightOffset -
+          leftOffset;  // Never look for more than what will be available.
 
-    IntRect oldRect(o->x(), o->y(), o->width(), o->height());
+    IntRect oldRect(childBox->x(), childBox->y(), childBox->width(),
+                    childBox->height());
 
-    if (o->style()->clear() & CLEFT)
-      y = max(lowestFloatLogicalBottom(FloatingObject::FloatLeft), y);
-    if (o->style()->clear() & CRIGHT)
-      y = max(lowestFloatLogicalBottom(FloatingObject::FloatRight), y);
+    if (childBox->style()->clear() & CLEFT)
+      logicalTop =
+          max(lowestFloatLogicalBottom(FloatingObject::FloatLeft), logicalTop);
+    if (childBox->style()->clear() & CRIGHT)
+      logicalTop =
+          max(lowestFloatLogicalBottom(FloatingObject::FloatRight), logicalTop);
 
-    if (o->style()->floating() == FLEFT) {
+    int floatLogicalLeft;
+    if (childBox->style()->floating() == FLEFT) {
       int heightRemainingLeft = 1;
       int heightRemainingRight = 1;
-      int fx = logicalLeftOffsetForLine(y, lo, false, &heightRemainingLeft);
-      while (logicalRightOffsetForLine(y, ro, false, &heightRemainingRight) -
-                 fx <
-             fwidth) {
-        y += min(heightRemainingLeft, heightRemainingRight);
-        fx = logicalLeftOffsetForLine(y, lo, false, &heightRemainingLeft);
+      floatLogicalLeft = logicalLeftOffsetForLine(logicalTop, leftOffset, false,
+                                                  &heightRemainingLeft);
+      while (logicalRightOffsetForLine(logicalTop, rightOffset, false,
+                                       &heightRemainingRight) -
+                 floatLogicalLeft <
+             floatLogicalWidth) {
+        logicalTop += min(heightRemainingLeft, heightRemainingRight);
+        floatLogicalLeft = logicalLeftOffsetForLine(
+            logicalTop, leftOffset, false, &heightRemainingLeft);
       }
-      fx = max(0, fx);
-      f->setLeft(fx);
-      o->setLocation(fx + o->marginLeft(), y + o->marginTop());
+      floatLogicalLeft = max(0, floatLogicalLeft);
     } else {
       int heightRemainingLeft = 1;
       int heightRemainingRight = 1;
-      int fx = logicalRightOffsetForLine(y, ro, false, &heightRemainingRight);
-      while (fx - logicalLeftOffsetForLine(y, lo, false, &heightRemainingLeft) <
-             fwidth) {
-        y += min(heightRemainingLeft, heightRemainingRight);
-        fx = logicalRightOffsetForLine(y, ro, false, &heightRemainingRight);
+      floatLogicalLeft = logicalRightOffsetForLine(
+          logicalTop, rightOffset, false, &heightRemainingRight);
+      while (floatLogicalLeft - logicalLeftOffsetForLine(logicalTop, leftOffset,
+                                                         false,
+                                                         &heightRemainingLeft) <
+             floatLogicalWidth) {
+        logicalTop += min(heightRemainingLeft, heightRemainingRight);
+        floatLogicalLeft = logicalRightOffsetForLine(
+            logicalTop, rightOffset, false, &heightRemainingRight);
       }
-      f->setLeft(fx - f->width());
-      o->setLocation(fx - o->marginRight() - o->width(), y + o->marginTop());
+      floatLogicalLeft -=
+          logicalWidthForFloat(floatingObject);  // Use the original width of
+                                                 // the float here, since the
+                                                 // local variable
+      // |floatLogicalWidth| was capped to the available line width.
+      // See fast/block/float/clamped-right-float.html.
     }
 
+    setLogicalLeftForFloat(floatingObject, floatLogicalLeft);
+    setLogicalLeftForChild(childBox, floatLogicalLeft + childLogicalLeftMargin);
+    setLogicalTopForChild(childBox,
+                          logicalTop + marginBeforeForChild(childBox));
+
     if (view()->layoutState()->isPaginated()) {
-      RenderBlock* childBlock = o->isRenderBlock() ? toRenderBlock(o) : 0;
+      RenderBlock* childBlock =
+          childBox->isRenderBlock() ? toRenderBlock(childBox) : 0;
 
       if (childBlock && view()->layoutState()->m_pageHeight &&
-          view()->layoutState()->pageY(o->y()) != childBlock->pageY())
+          view()->layoutState()->pageY(childBox->y()) != childBlock->pageY())
         childBlock->markForPaginationRelayout();
-      o->layoutIfNeeded();
+      childBox->layoutIfNeeded();
 
       // If we are unsplittable and don't fit, then we need to move down.
       // We include our margins as part of the unsplittable area.
-      int newY = adjustForUnsplittableChild(o, y, true);
+      int newLogicalTop =
+          adjustForUnsplittableChild(childBox, logicalTop, true);
 
       // See if we have a pagination strut that is making us move down further.
       // Note that an unsplittable child can't also have a pagination strut, so
       // this is
       // exclusive with the case above.
       if (childBlock && childBlock->paginationStrut()) {
-        newY += childBlock->paginationStrut();
+        newLogicalTop += childBlock->paginationStrut();
         childBlock->setPaginationStrut(0);
       }
 
-      if (newY != y) {
-        f->m_paginationStrut = newY - y;
-        y = newY;
-        o->setY(y + o->marginTop());
+      if (newLogicalTop != logicalTop) {
+        floatingObject->m_paginationStrut = newLogicalTop - logicalTop;
+        logicalTop = newLogicalTop;
+        setLogicalTopForChild(childBox,
+                              logicalTop + marginBeforeForChild(childBox));
         if (childBlock)
           childBlock->setChildNeedsLayout(true, false);
-        o->layoutIfNeeded();
+        childBox->layoutIfNeeded();
       }
     }
 
-    f->setTop(y);
-    f->setHeight(o->marginTop() + o->height() + o->marginBottom());
+    setLogicalTopForFloat(floatingObject, logicalTop);
+    setLogicalHeightForFloat(floatingObject,
+                             logicalHeightForChild(childBox) +
+                                 marginBeforeForChild(childBox) +
+                                 marginAfterForChild(childBox));
 
-    f->setIsPlaced();
+    floatingObject->setIsPlaced();
 
     // If the child moved, we have to repaint it.
-    if (o->checkForRepaintDuringLayout())
-      o->repaintDuringLayoutIfMoved(oldRect);
+    if (childBox->checkForRepaintDuringLayout())
+      childBox->repaintDuringLayoutIfMoved(oldRect);
 
-    f = m_floatingObjects->next();
+    floatingObject = m_floatingObjects->next();
   }
   return true;
 }
@@ -3725,7 +3764,7 @@ HashSet<RenderBox*>* RenderBlock::percentHeightDescendants() const {
                                       : 0;
 }
 
-int RenderBlock::logicalLeftOffsetForLine(int y,
+int RenderBlock::logicalLeftOffsetForLine(int logicalTop,
                                           int fixedOffset,
                                           bool applyTextIndent,
                                           int* heightRemaining) const {
@@ -3736,11 +3775,13 @@ int RenderBlock::logicalLeftOffsetForLine(int y,
     FloatingObject* r;
     DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
     for (; (r = it.current()); ++it) {
-      if (r->isPlaced() && r->top() <= y && r->bottom() > y &&
-          r->type() == FloatingObject::FloatLeft && r->right() > left) {
-        left = r->right();
+      if (r->isPlaced() && logicalTopForFloat(r) <= logicalTop &&
+          logicalBottomForFloat(r) > logicalTop &&
+          r->type() == FloatingObject::FloatLeft &&
+          logicalRightForFloat(r) > left) {
+        left = logicalRightForFloat(r);
         if (heightRemaining)
-          *heightRemaining = r->bottom() - y;
+          *heightRemaining = logicalBottomForFloat(r) - logicalTop;
       }
     }
   }
@@ -3755,7 +3796,7 @@ int RenderBlock::logicalLeftOffsetForLine(int y,
   return left;
 }
 
-int RenderBlock::logicalRightOffsetForLine(int y,
+int RenderBlock::logicalRightOffsetForLine(int logicalTop,
                                            int fixedOffset,
                                            bool applyTextIndent,
                                            int* heightRemaining) const {
@@ -3767,11 +3808,13 @@ int RenderBlock::logicalRightOffsetForLine(int y,
     FloatingObject* r;
     DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
     for (; (r = it.current()); ++it) {
-      if (r->isPlaced() && r->top() <= y && r->bottom() > y &&
-          r->type() == FloatingObject::FloatRight && r->left() < right) {
-        right = r->left();
+      if (r->isPlaced() && logicalTopForFloat(r) <= logicalTop &&
+          logicalBottomForFloat(r) > logicalTop &&
+          r->type() == FloatingObject::FloatRight &&
+          logicalLeftForFloat(r) < right) {
+        right = logicalLeftForFloat(r);
         if (heightRemaining)
-          *heightRemaining = r->bottom() - y;
+          *heightRemaining = logicalBottomForFloat(r) - logicalTop;
       }
     }
   }
