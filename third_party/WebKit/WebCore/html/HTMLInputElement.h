@@ -47,6 +47,8 @@ class HTMLInputElement : public HTMLTextFormControlElement,
                                              HTMLFormElement*);
   virtual ~HTMLInputElement();
 
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(webkitspeechchange);
+
   bool autoComplete() const;
 
   // For ValidityState
@@ -114,6 +116,7 @@ class HTMLInputElement : public HTMLTextFormControlElement,
 
 #if ENABLE(INPUT_SPEECH)
   virtual bool isSpeechEnabled() const;
+  void dispatchWebkitSpeechChangeEvent();
 #endif
 
   bool checked() const { return m_checked; }

@@ -1220,7 +1220,9 @@ void HTMLInputElement::parseMappedAttribute(Attribute* attr) {
     if (renderer())
       renderer()->updateFromElement();
     setNeedsStyleRecalc();
-  }
+  } else if (attr->name() == onwebkitspeechchangeAttr)
+    setAttributeEventListener(eventNames().webkitspeechchangeEvent,
+                              createAttributeEventListener(this, attr));
 #endif
   else
     HTMLTextFormControlElement::parseMappedAttribute(attr);
@@ -2898,6 +2900,12 @@ bool HTMLInputElement::isSpeechEnabled() const {
       return false;
   }
   return false;
+}
+
+void HTMLInputElement::dispatchWebkitSpeechChangeEvent() {
+  ASSERT(isSpeechEnabled());
+  dispatchEvent(
+      Event::create(eventNames().webkitspeechchangeEvent, true, false));
 }
 #endif
 
