@@ -31,9 +31,9 @@
 
 namespace JSC {
 
-const int ARMv7Assembler::JumpSizes[] = {0xffffffff, 2 * sizeof(uint16_t),
-                                         2 * sizeof(uint16_t),
-                                         5 * sizeof(uint16_t)};
+const int ARMv7Assembler::JumpSizes[] = {
+    0xffffffff,           sizeof(uint16_t),     sizeof(uint16_t),
+    2 * sizeof(uint16_t), 2 * sizeof(uint16_t), 5 * sizeof(uint16_t)};
 }
 
 #endif
