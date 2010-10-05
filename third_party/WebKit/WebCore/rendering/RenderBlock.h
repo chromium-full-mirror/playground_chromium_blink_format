@@ -788,7 +788,7 @@ class RenderBlock : public RenderBox {
       const;  // Helper function for borderFitAdjust
 
   void markLinesDirtyInBlockRange(int logicalTop,
-                                  int logicalTop,
+                                  int logicalBottom,
                                   RootInlineBox* highest = 0);
 
   void newLine(EClear);
