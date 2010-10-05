@@ -30,6 +30,7 @@
 #include "ResourceRequest.h"
 #include <QDateTime>
 #include <QFile>
+#include <QFileInfo>
 #include <QNetworkReply>
 #include <QNetworkCookie>
 #include <qwebframe.h>
@@ -58,16 +59,32 @@ namespace WebCore {
 FormDataIODevice::FormDataIODevice(FormData* data)
     : m_formElements(data ? data->elements() : Vector<FormDataElement>()),
       m_currentFile(0),
-      m_currentDelta(0) {
+      m_currentDelta(0),
+      m_fileSize(0),
+      m_dataSize(0) {
   setOpenMode(FormDataIODevice::ReadOnly);
 
   if (!m_formElements.isEmpty() &&
       m_formElements[0].m_type == FormDataElement::encodedFile)
     openFileForCurrentElement();
+  computeSize();
 }
 
 FormDataIODevice::~FormDataIODevice() {
   delete m_currentFile;
+}
+
+qint64 FormDataIODevice::computeSize() {
+  for (int i = 0; i < m_formElements.size(); ++i) {
+    const FormDataElement& element = m_formElements[i];
+    if (element.m_type == FormDataElement::data)
+      m_dataSize += element.m_data.size();
+    else {
+      QFileInfo fi(element.m_filename);
+      m_fileSize += fi.size();
+    }
+  }
+  return m_dataSize + m_fileSize;
 }
 
 void FormDataIODevice::moveToNextElement() {
@@ -499,6 +516,11 @@ void QNetworkReplyHandler::start() {
     case QNetworkAccessManager::PostOperation: {
       FormDataIODevice* postDevice =
           new FormDataIODevice(d->m_firstRequest.httpBody());
+      // We may be uploading files so prevent QNR from buffering data
+      m_request.setHeader(QNetworkRequest::ContentLengthHeader,
+                          postDevice->getFormDataSize());
+      m_request.setAttribute(QNetworkRequest::DoNotBufferUploadDataAttribute,
+                             QVariant(true));
       m_reply = manager->post(m_request, postDevice);
       postDevice->setParent(m_reply);
       break;
@@ -509,6 +531,11 @@ void QNetworkReplyHandler::start() {
     case QNetworkAccessManager::PutOperation: {
       FormDataIODevice* putDevice =
           new FormDataIODevice(d->m_firstRequest.httpBody());
+      // We may be uploading files so prevent QNR from buffering data
+      m_request.setHeader(QNetworkRequest::ContentLengthHeader,
+                          putDevice->getFormDataSize());
+      m_request.setAttribute(QNetworkRequest::DoNotBufferUploadDataAttribute,
+                             QVariant(true));
       m_reply = manager->put(m_request, putDevice);
       putDevice->setParent(m_reply);
       break;
