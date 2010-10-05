@@ -55,6 +55,9 @@ class NetscapePlugin : public Plugin {
 #if PLATFORM(MAC)
   NPError setDrawingModel(NPDrawingModel);
   NPError setEventModel(NPEventModel);
+#ifndef NP_NO_CARBON
+  WindowRef windowRef() const;
+#endif
 #elif PLATFORM(WIN)
   HWND containingWindow() const;
 #endif
@@ -213,6 +216,9 @@ class NetscapePlugin : public Plugin {
   NPDrawingModel m_drawingModel;
   NPEventModel m_eventModel;
   RetainPtr<PlatformLayer> m_pluginLayer;
+#ifndef NP_NO_CARBON
+  NP_CGContext m_npCGContext;
+#endif
 #elif PLATFORM(WIN)
   HWND m_window;
 #endif
