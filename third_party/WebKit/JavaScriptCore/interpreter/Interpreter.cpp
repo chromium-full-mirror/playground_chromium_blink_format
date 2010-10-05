@@ -3547,8 +3547,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       }
       if (!arguments) {
         Arguments* arguments = new (globalData) Arguments(callFrame);
-        callFrame->r(dst) = JSValue(arguments);
-        callFrame->r(unmodifiedArgumentsRegister(dst)) = JSValue(arguments);
+        callFrame->r(argumentsRegister) = JSValue(arguments);
+        callFrame->r(unmodifiedArgumentsRegister(argumentsRegister)) =
+            JSValue(arguments);
       }
       // fallthrough
     }
