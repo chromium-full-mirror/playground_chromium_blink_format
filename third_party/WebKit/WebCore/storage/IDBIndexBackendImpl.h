@@ -72,20 +72,20 @@ class IDBIndexBackendImpl : public IDBIndexBackendInterface {
   virtual String keyPath() { return m_keyPath; }
   virtual bool unique() { return m_unique; }
 
-  virtual void openObjectCursor(PassRefPtr<IDBKeyRange>,
-                                unsigned short direction,
-                                PassRefPtr<IDBCallbacks>,
-                                IDBTransactionBackendInterface*);
   virtual void openCursor(PassRefPtr<IDBKeyRange>,
                           unsigned short direction,
                           PassRefPtr<IDBCallbacks>,
                           IDBTransactionBackendInterface*);
-  virtual void getObject(PassRefPtr<IDBKey>,
-                         PassRefPtr<IDBCallbacks>,
-                         IDBTransactionBackendInterface*);
+  virtual void openKeyCursor(PassRefPtr<IDBKeyRange>,
+                             unsigned short direction,
+                             PassRefPtr<IDBCallbacks>,
+                             IDBTransactionBackendInterface*);
   virtual void get(PassRefPtr<IDBKey>,
                    PassRefPtr<IDBCallbacks>,
                    IDBTransactionBackendInterface*);
+  virtual void getKey(PassRefPtr<IDBKey>,
+                      PassRefPtr<IDBCallbacks>,
+                      IDBTransactionBackendInterface*);
 
   IDBObjectStoreBackendImpl* objectStore() const { return m_objectStore.get(); }
 

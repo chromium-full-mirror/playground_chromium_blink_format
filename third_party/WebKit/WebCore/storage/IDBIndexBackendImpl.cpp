@@ -134,7 +134,7 @@ void IDBIndexBackendImpl::openCursorInternal(
   callbacks->onSuccess(cursor.release());
 }
 
-void IDBIndexBackendImpl::openObjectCursor(
+void IDBIndexBackendImpl::openCursor(
     PassRefPtr<IDBKeyRange> prpKeyRange,
     unsigned short direction,
     PassRefPtr<IDBCallbacks> prpCallbacks,
@@ -151,7 +151,7 @@ void IDBIndexBackendImpl::openObjectCursor(
         "Get must be called in the context of a transaction."));
 }
 
-void IDBIndexBackendImpl::openCursor(
+void IDBIndexBackendImpl::openKeyCursor(
     PassRefPtr<IDBKeyRange> prpKeyRange,
     unsigned short direction,
     PassRefPtr<IDBCallbacks> prpCallbacks,
@@ -204,10 +204,9 @@ void IDBIndexBackendImpl::getInternal(ScriptExecutionContext*,
   ASSERT(query.step() != SQLResultRow);
 }
 
-void IDBIndexBackendImpl::getObject(
-    PassRefPtr<IDBKey> prpKey,
-    PassRefPtr<IDBCallbacks> prpCallbacks,
-    IDBTransactionBackendInterface* transaction) {
+void IDBIndexBackendImpl::get(PassRefPtr<IDBKey> prpKey,
+                              PassRefPtr<IDBCallbacks> prpCallbacks,
+                              IDBTransactionBackendInterface* transaction) {
   RefPtr<IDBIndexBackendImpl> index = this;
   RefPtr<IDBKey> key = prpKey;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
@@ -218,9 +217,9 @@ void IDBIndexBackendImpl::getObject(
         "Get must be called in the context of a transaction."));
 }
 
-void IDBIndexBackendImpl::get(PassRefPtr<IDBKey> prpKey,
-                              PassRefPtr<IDBCallbacks> prpCallbacks,
-                              IDBTransactionBackendInterface* transaction) {
+void IDBIndexBackendImpl::getKey(PassRefPtr<IDBKey> prpKey,
+                                 PassRefPtr<IDBCallbacks> prpCallbacks,
+                                 IDBTransactionBackendInterface* transaction) {
   RefPtr<IDBIndexBackendImpl> index = this;
   RefPtr<IDBKey> key = prpKey;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
