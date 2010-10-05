@@ -72,11 +72,9 @@ class CachedResource : public Noncopyable {
   };
 
   enum Status {
-    NotCached,  // this URL is not cached
-    Unknown,    // let cache decide what to do with it
-    New,        // inserting new item
-    Pending,    // only partially loaded
-    Cached      // regular case
+    Unknown,  // let cache decide what to do with it
+    Pending,  // only partially loaded
+    Cached    // regular case
   };
 
   CachedResource(const String& url, Type);
@@ -303,7 +301,7 @@ class CachedResource : public Noncopyable {
   bool m_loading : 1;
 
   unsigned m_type : 3;    // Type
-  unsigned m_status : 3;  // Status
+  unsigned m_status : 2;  // Status
 
 #ifndef NDEBUG
   bool m_deleted;
