@@ -26,6 +26,7 @@
 
 #include "CachedImage.h"
 #include "HTMLNames.h"
+#include "HTMLParserIdioms.h"
 #include "WMLImageElement.h"
 #include "WMLNames.h"
 
