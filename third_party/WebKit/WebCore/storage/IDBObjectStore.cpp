@@ -97,16 +97,14 @@ PassRefPtr<IDBRequest> IDBObjectStore::remove(ScriptExecutionContext* context,
   return request;
 }
 
-PassRefPtr<IDBRequest> IDBObjectStore::createIndex(
-    ScriptExecutionContext* context,
-    const String& name,
-    const String& keyPath,
-    bool unique) {
-  RefPtr<IDBRequest> request =
-      IDBRequest::create(context, IDBAny::create(this), m_transaction.get());
-  m_objectStore->createIndex(name, keyPath, unique, request,
-                             m_transaction.get());
-  return request;
+PassRefPtr<IDBIndex> IDBObjectStore::createIndex(const String& name,
+                                                 const String& keyPath,
+                                                 bool unique) {
+  RefPtr<IDBIndexBackendInterface> index =
+      m_objectStore->createIndex(name, keyPath, unique, m_transaction.get());
+  if (!index)
+    return 0;
+  return IDBIndex::create(index.release(), m_transaction.get());
 }
 
 PassRefPtr<IDBIndex> IDBObjectStore::index(const String& name) {
@@ -117,13 +115,8 @@ PassRefPtr<IDBIndex> IDBObjectStore::index(const String& name) {
   return IDBIndex::create(index.release(), m_transaction.get());
 }
 
-PassRefPtr<IDBRequest> IDBObjectStore::removeIndex(
-    ScriptExecutionContext* context,
-    const String& name) {
-  RefPtr<IDBRequest> request =
-      IDBRequest::create(context, IDBAny::create(this), m_transaction.get());
-  m_objectStore->removeIndex(name, request, m_transaction.get());
-  return request;
+void IDBObjectStore::removeIndex(const String& name) {
+  m_objectStore->removeIndex(name, m_transaction.get());
 }
 
 PassRefPtr<IDBRequest> IDBObjectStore::openCursor(

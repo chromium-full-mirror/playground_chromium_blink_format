@@ -79,12 +79,12 @@ class WebIDBObjectStore {
                            WebIDBCallbacks*) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
-  virtual void createIndex(const WebString& name,
-                           const WebString& keyPath,
-                           bool unique,
-                           WebIDBCallbacks*,
-                           const WebIDBTransaction&) {
+  virtual WebIDBIndex* createIndex(const WebString& name,
+                                   const WebString& keyPath,
+                                   bool unique,
+                                   const WebIDBTransaction&) {
     WEBKIT_ASSERT_NOT_REACHED();
+    return 0;
   }
   // Transfers ownership of the WebIDBIndex to the caller.
   virtual WebIDBIndex* index(const WebString& name) {
@@ -95,9 +95,7 @@ class WebIDBObjectStore {
   virtual void removeIndex(const WebString& name, WebIDBCallbacks*) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
-  virtual void removeIndex(const WebString& name,
-                           WebIDBCallbacks*,
-                           const WebIDBTransaction&) {
+  virtual void removeIndex(const WebString& name, const WebIDBTransaction&) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
   virtual void openCursor(const WebIDBKeyRange&,

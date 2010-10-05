@@ -59,12 +59,10 @@ class IDBDatabase : public RefCounted<IDBDatabase> {
     return m_backend->objectStores();
   }
 
-  PassRefPtr<IDBRequest> createObjectStore(ScriptExecutionContext*,
-                                           const String& name,
-                                           const String& keyPath = String(),
-                                           bool autoIncrement = false);
-  PassRefPtr<IDBRequest> removeObjectStore(ScriptExecutionContext*,
-                                           const String& name);
+  PassRefPtr<IDBObjectStore> createObjectStore(const String& name,
+                                               const String& keyPath = String(),
+                                               bool autoIncrement = false);
+  void removeObjectStore(const String& name);
   PassRefPtr<IDBRequest> setVersion(ScriptExecutionContext*,
                                     const String& version);
   PassRefPtr<IDBTransaction> transaction(

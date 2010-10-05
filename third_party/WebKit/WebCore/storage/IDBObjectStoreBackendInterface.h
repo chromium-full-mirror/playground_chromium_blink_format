@@ -62,14 +62,13 @@ class IDBObjectStoreBackendInterface
                       PassRefPtr<IDBCallbacks>,
                       IDBTransactionBackendInterface*) = 0;
 
-  virtual void createIndex(const String& name,
-                           const String& keyPath,
-                           bool unique,
-                           PassRefPtr<IDBCallbacks>,
-                           IDBTransactionBackendInterface*) = 0;
+  virtual PassRefPtr<IDBIndexBackendInterface> createIndex(
+      const String& name,
+      const String& keyPath,
+      bool unique,
+      IDBTransactionBackendInterface*) = 0;
   virtual PassRefPtr<IDBIndexBackendInterface> index(const String& name) = 0;
   virtual void removeIndex(const String& name,
-                           PassRefPtr<IDBCallbacks>,
                            IDBTransactionBackendInterface*) = 0;
 
   virtual void openCursor(PassRefPtr<IDBKeyRange>,

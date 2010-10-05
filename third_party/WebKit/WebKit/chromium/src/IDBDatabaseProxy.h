@@ -50,16 +50,15 @@ class IDBDatabaseProxy : public IDBDatabaseBackendInterface {
   virtual String version() const;
   virtual PassRefPtr<DOMStringList> objectStores() const;
 
-  virtual void createObjectStore(const String& name,
-                                 const String& keyPath,
-                                 bool autoIncrement,
-                                 PassRefPtr<IDBCallbacks>,
-                                 IDBTransactionBackendInterface*);
+  virtual PassRefPtr<IDBObjectStoreBackendInterface> createObjectStore(
+      const String& name,
+      const String& keyPath,
+      bool autoIncrement,
+      IDBTransactionBackendInterface*);
   virtual PassRefPtr<IDBObjectStoreBackendInterface> objectStore(
       const String& name,
       unsigned short mode);
   virtual void removeObjectStore(const String& name,
-                                 PassRefPtr<IDBCallbacks>,
                                  IDBTransactionBackendInterface*);
   virtual void setVersion(const String& version, PassRefPtr<IDBCallbacks>);
   virtual PassRefPtr<IDBTransactionBackendInterface> transaction(

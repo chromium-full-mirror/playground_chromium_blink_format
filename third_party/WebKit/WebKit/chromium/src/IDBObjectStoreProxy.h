@@ -61,15 +61,13 @@ class IDBObjectStoreProxy : public IDBObjectStoreBackendInterface {
                       PassRefPtr<IDBCallbacks>,
                       IDBTransactionBackendInterface*);
 
-  virtual void createIndex(const String& name,
-                           const String& keyPath,
-                           bool unique,
-                           PassRefPtr<IDBCallbacks>,
-                           IDBTransactionBackendInterface*);
-  virtual PassRefPtr<IDBIndexBackendInterface> index(const String& name);
-  virtual void removeIndex(const String& name,
-                           PassRefPtr<IDBCallbacks>,
-                           IDBTransactionBackendInterface*);
+  PassRefPtr<IDBIndexBackendInterface> createIndex(
+      const String& name,
+      const String& keyPath,
+      bool unique,
+      IDBTransactionBackendInterface*);
+  PassRefPtr<IDBIndexBackendInterface> index(const String& name);
+  void removeIndex(const String& name, IDBTransactionBackendInterface*);
 
   virtual void openCursor(PassRefPtr<IDBKeyRange>,
                           unsigned short direction,

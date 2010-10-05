@@ -62,15 +62,18 @@ WebDOMStringList WebIDBDatabaseImpl::objectStores() const {
   return m_databaseBackend->objectStores();
 }
 
-void WebIDBDatabaseImpl::createObjectStore(
+WebIDBObjectStore* WebIDBDatabaseImpl::createObjectStore(
     const WebString& name,
     const WebString& keyPath,
     bool autoIncrement,
-    WebIDBCallbacks* callbacks,
     const WebIDBTransaction& transaction) {
-  m_databaseBackend->createObjectStore(
-      name, keyPath, autoIncrement, IDBCallbacksProxy::create(callbacks),
-      transaction.getIDBTransactionBackendInterface());
+  RefPtr<IDBObjectStoreBackendInterface> objectStore =
+      m_databaseBackend->createObjectStore(
+          name, keyPath, autoIncrement,
+          transaction.getIDBTransactionBackendInterface());
+  if (!objectStore)
+    return 0;
+  return new WebIDBObjectStoreImpl(objectStore);
 }
 
 WebIDBObjectStore* WebIDBDatabaseImpl::objectStore(const WebString& name,
@@ -84,11 +87,9 @@ WebIDBObjectStore* WebIDBDatabaseImpl::objectStore(const WebString& name,
 
 void WebIDBDatabaseImpl::removeObjectStore(
     const WebString& name,
-    WebIDBCallbacks* callbacks,
     const WebIDBTransaction& transaction) {
   m_databaseBackend->removeObjectStore(
-      name, IDBCallbacksProxy::create(callbacks),
-      transaction.getIDBTransactionBackendInterface());
+      name, transaction.getIDBTransactionBackendInterface());
 }
 
 void WebIDBDatabaseImpl::setVersion(const WebString& version,

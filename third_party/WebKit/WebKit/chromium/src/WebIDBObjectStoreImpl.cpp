@@ -83,14 +83,16 @@ void WebIDBObjectStoreImpl::remove(const WebIDBKey& key,
                         transaction.getIDBTransactionBackendInterface());
 }
 
-void WebIDBObjectStoreImpl::createIndex(const WebString& name,
-                                        const WebString& keyPath,
-                                        bool unique,
-                                        WebIDBCallbacks* callbacks,
-                                        const WebIDBTransaction& transaction) {
-  m_objectStore->createIndex(name, keyPath, unique,
-                             IDBCallbacksProxy::create(callbacks),
-                             transaction.getIDBTransactionBackendInterface());
+WebIDBIndex* WebIDBObjectStoreImpl::createIndex(
+    const WebString& name,
+    const WebString& keyPath,
+    bool unique,
+    const WebIDBTransaction& transaction) {
+  RefPtr<IDBIndexBackendInterface> index = m_objectStore->createIndex(
+      name, keyPath, unique, transaction.getIDBTransactionBackendInterface());
+  if (!index)
+    return 0;
+  return new WebIDBIndexImpl(index);
 }
 
 WebIDBIndex* WebIDBObjectStoreImpl::index(const WebString& name) {
@@ -101,9 +103,8 @@ WebIDBIndex* WebIDBObjectStoreImpl::index(const WebString& name) {
 }
 
 void WebIDBObjectStoreImpl::removeIndex(const WebString& name,
-                                        WebIDBCallbacks* callbacks,
                                         const WebIDBTransaction& transaction) {
-  m_objectStore->removeIndex(name, IDBCallbacksProxy::create(callbacks),
+  m_objectStore->removeIndex(name,
                              transaction.getIDBTransactionBackendInterface());
 }
 
