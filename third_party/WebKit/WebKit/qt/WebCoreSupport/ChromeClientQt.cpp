@@ -540,7 +540,7 @@ void ChromeClientQt::setCursor(const Cursor& cursor) {
     return;
   pageClient->setCursor(*cursor.platformCursor());
 #else
-  UNUSED_PARAM(cursor)
+  UNUSED_PARAM(cursor);
 #endif
 }
 
