@@ -550,6 +550,10 @@ class WebFrame {
                                  double time,
                                  const WebString& elementId) = 0;
 
+  // Dumps the layer tree, used by the accelerated compositor, in
+  // text form. This is used only by layout tests.
+  virtual WebString layerTreeAsText() const = 0;
+
  protected:
   ~WebFrame() {}
 };
