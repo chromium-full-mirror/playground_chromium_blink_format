@@ -231,6 +231,7 @@ class WebPageProxy : public APIObject {
                                                           APIObject*);
   void didFailProvisionalLoadForFrame(WebFrameProxy*, APIObject*);
   void didCommitLoadForFrame(WebFrameProxy*,
+                             const String& mimeType,
                              const PlatformCertificateInfo&,
                              APIObject*);
   void didFinishDocumentLoadForFrame(WebFrameProxy*, APIObject*);

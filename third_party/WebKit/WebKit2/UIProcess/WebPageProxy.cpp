@@ -596,6 +596,7 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
     }
     case WebPageProxyMessage::DidCommitLoadForFrame: {
       uint64_t frameID;
+      String mimeType;
       PlatformCertificateInfo certificateInfo;
 
       RefPtr<APIObject> userData;
@@ -603,11 +604,11 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
                                                   pageNamespace()->context());
 
       if (!arguments->decode(
-              CoreIPC::Out(frameID, certificateInfo, messageDecoder)))
+              CoreIPC::Out(frameID, mimeType, certificateInfo, messageDecoder)))
         return;
 
-      didCommitLoadForFrame(process()->webFrame(frameID), certificateInfo,
-                            userData.get());
+      didCommitLoadForFrame(process()->webFrame(frameID), mimeType,
+                            certificateInfo, userData.get());
       break;
     }
     case WebPageProxyMessage::DidFinishDocumentLoadForFrame: {
@@ -1084,8 +1085,10 @@ void WebPageProxy::didFailProvisionalLoadForFrame(WebFrameProxy* frame,
 
 void WebPageProxy::didCommitLoadForFrame(
     WebFrameProxy* frame,
+    const String& mimeType,
     const PlatformCertificateInfo& certificateInfo,
     APIObject* userData) {
+  frame->setMIMEType(mimeType);
   frame->setCertificateInfo(WebCertificateInfo::create(certificateInfo));
   frame->didCommitLoad();
   m_loaderClient.didCommitLoadForFrame(this, frame, userData);

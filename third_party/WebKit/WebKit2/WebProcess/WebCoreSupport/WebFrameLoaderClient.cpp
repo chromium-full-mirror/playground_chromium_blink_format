@@ -354,7 +354,8 @@ void WebFrameLoaderClient::dispatchDidCommitLoad() {
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidCommitLoadForFrame, webPage->pageID(),
-      CoreIPC::In(m_frame->frameID(), PlatformCertificateInfo(response),
+      CoreIPC::In(m_frame->frameID(), response.mimeType(),
+                  PlatformCertificateInfo(response),
                   InjectedBundleUserMessageEncoder(userData.get())));
 }
 

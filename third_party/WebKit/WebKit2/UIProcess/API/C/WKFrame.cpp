@@ -61,6 +61,10 @@ WKURLRef WKFrameCopyURL(WKFrameRef frameRef) {
   return toCopiedURLRef(toWK(frameRef)->url());
 }
 
+WKStringRef WKFrameCopyMIMEType(WKFrameRef frameRef) {
+  return toCopiedRef(toWK(frameRef)->mimeType());
+}
+
 WKPageRef WKFrameGetPage(WKFrameRef frameRef) {
   return toRef(toWK(frameRef)->page());
 }
