@@ -39,8 +39,10 @@ class Int32Array : public IntegralTypedArrayBase<int> {
                                        unsigned byteOffset,
                                        unsigned length);
 
+#if !COMPILER(RVCT)
   using TypedArrayBase<int>::set;
   using IntegralTypedArrayBase<int>::set;
+#endif
 
  private:
   Int32Array(PassRefPtr<ArrayBuffer> buffer,
