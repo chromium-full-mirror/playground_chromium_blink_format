@@ -131,7 +131,7 @@ CanvasRenderingContext2D::CanvasRenderingContext2D(
     return;
   if (!p->settings()->accelerated2dCanvasEnabled())
     return;
-  m_context3D = p->chrome()->client()->getSharedGraphicsContext3D();
+  m_context3D = p->sharedGraphicsContext3D();
   if (m_context3D) {
     if (GraphicsContext* c = drawingContext()) {
       m_drawingBuffer = DrawingBuffer::create(

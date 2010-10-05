@@ -74,6 +74,7 @@ class RenderTheme;
 class VisibleSelection;
 class SelectionController;
 class Settings;
+class SharedGraphicsContext3D;
 class SpeechInput;
 class SpeechInputClient;
 
@@ -301,6 +302,8 @@ class Page : public Noncopyable {
   static void allVisitedStateChanged(PageGroup*);
   static void visitedStateChanged(PageGroup*, LinkHash visitedHash);
 
+  SharedGraphicsContext3D* sharedGraphicsContext3D();
+
 #if ENABLE(DOM_STORAGE)
   StorageNamespace* sessionStorage(bool optionalCreate = true);
   void setSessionStorage(PassRefPtr<StorageNamespace>);
@@ -359,6 +362,11 @@ class Page : public Noncopyable {
 
   OwnPtr<Chrome> m_chrome;
   OwnPtr<SelectionController> m_dragCaretController;
+
+#if ENABLE(ACCELERATED_2D_CANVAS)
+  RefPtr<SharedGraphicsContext3D> m_sharedGraphicsContext3D;
+#endif
+
 #if ENABLE(DRAG_SUPPORT)
   OwnPtr<DragController> m_dragController;
 #endif
