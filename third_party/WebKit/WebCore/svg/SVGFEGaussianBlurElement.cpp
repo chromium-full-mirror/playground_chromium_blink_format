@@ -43,8 +43,10 @@ PassRefPtr<SVGFEGaussianBlurElement> SVGFEGaussianBlurElement::create(
   return adoptRef(new SVGFEGaussianBlurElement(tagName, document));
 }
 
-void SVGFEGaussianBlurElement::setStdDeviation(float, float) {
-  // FIXME: Needs an implementation.
+void SVGFEGaussianBlurElement::setStdDeviation(float x, float y) {
+  setStdDeviationXBaseValue(x);
+  setStdDeviationYBaseValue(y);
+  invalidate();
 }
 
 void SVGFEGaussianBlurElement::parseMappedAttribute(Attribute* attr) {
@@ -59,6 +61,14 @@ void SVGFEGaussianBlurElement::parseMappedAttribute(Attribute* attr) {
     setIn1BaseValue(value);
   else
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
+}
+
+void SVGFEGaussianBlurElement::svgAttributeChanged(
+    const QualifiedName& attrName) {
+  SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
+
+  if (attrName == SVGNames::inAttr || attrName == SVGNames::stdDeviationAttr)
+    invalidate();
 }
 
 void SVGFEGaussianBlurElement::synchronizeProperty(
