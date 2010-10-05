@@ -55,11 +55,6 @@ class FrameLoaderClientEfl : public FrameLoaderClient {
   void setCustomUserAgent(const String& agent);
   const String& customUserAgent() const;
 
-  void setInitLayoutCompleted(bool completed) {
-    m_initLayoutCompleted = completed;
-  }
-  bool getInitLayoutCompleted() { return m_initLayoutCompleted; }
-
   virtual bool hasWebView() const;
   virtual bool hasFrameView() const;
 
@@ -280,8 +275,6 @@ class FrameLoaderClientEfl : public FrameLoaderClient {
   // Plugin view to redirect data to
   PluginView* m_pluginView;
   bool m_hasSentResponseToPlugin;
-
-  bool m_initLayoutCompleted;
 };
 }
 

@@ -71,8 +71,7 @@ FrameLoaderClientEfl::FrameLoaderClientEfl(Evas_Object* view)
       m_userAgent(""),
       m_customUserAgent(""),
       m_pluginView(0),
-      m_hasSentResponseToPlugin(false),
-      m_initLayoutCompleted(false) {}
+      m_hasSentResponseToPlugin(false) {}
 
 static String agentPlatform() {
   notImplemented();
@@ -606,8 +605,6 @@ void FrameLoaderClientEfl::dispatchDidChangeIcons() {
 }
 
 void FrameLoaderClientEfl::dispatchDidCommitLoad() {
-  m_initLayoutCompleted = false;
-
   ewk_frame_uri_changed(m_frame);
   if (ewk_view_frame_main_get(m_view) != m_frame)
     return;
@@ -625,7 +622,6 @@ void FrameLoaderClientEfl::dispatchDidFinishDocumentLoad() {
 }
 
 void FrameLoaderClientEfl::dispatchDidFirstLayout() {
-  m_initLayoutCompleted = true;
   ewk_frame_load_firstlayout_finished(m_frame);
 }
 

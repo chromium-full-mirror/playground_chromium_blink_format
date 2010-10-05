@@ -149,9 +149,7 @@ class ChromeClientEfl : public ChromeClient {
   virtual void cancelGeolocationPermissionRequestForFrame(Frame*);
   virtual void iconForFiles(const Vector<String, 0u>&, PassRefPtr<FileChooser>);
 
-  virtual void didReceiveViewportArguments(
-      Frame* frame,
-      const ViewportArguments& arguments) const;
+  virtual void dispatchViewportDataDidChange(const ViewportArguments&) const;
 
   virtual bool selectItemWritingDirectionIsNatural();
   virtual PassRefPtr<PopupMenu> createPopupMenu(PopupMenuClient*) const;
