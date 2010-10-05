@@ -121,6 +121,7 @@ class FileWriter : public RefCounted<FileWriter>,
   ReadyState m_readyState;
   long long m_position;
   long long m_length;
+  bool m_startedWriting;
   long long m_bytesWritten;
   long long m_bytesToWrite;
   long long m_truncateLength;
