@@ -662,13 +662,9 @@ void Page::userStyleSheetLocationChanged() {
       url.string().startsWith("data:text/css;charset=utf-8;base64,")) {
     m_didLoadUserStyleSheet = true;
 
-    const unsigned prefixLength = 35;
-    Vector<char> encodedData(url.string().length() - prefixLength);
-    for (unsigned i = prefixLength; i < url.string().length(); ++i)
-      encodedData[i - prefixLength] = static_cast<char>(url.string()[i]);
-
     Vector<char> styleSheetAsUTF8;
-    if (base64Decode(encodedData, styleSheetAsUTF8))
+    if (base64Decode(decodeURLEscapeSequences(url.string().substring(35)),
+                     styleSheetAsUTF8, IgnoreWhitespace))
       m_userStyleSheet =
           String::fromUTF8(styleSheetAsUTF8.data(), styleSheetAsUTF8.size());
   }
