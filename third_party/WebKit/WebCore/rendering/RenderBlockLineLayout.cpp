@@ -1121,7 +1121,7 @@ RootInlineBox* RenderBlock::determineStartPosition(
           if (floats[floatIndex].rect.size() != newSize) {
             int floatTop = floats[floatIndex].rect.y();
             curr->markDirty();
-            markLinesDirtyInVerticalRange(
+            markLinesDirtyInBlockRange(
                 curr->blockHeight(),
                 floatTop +
                     max(floats[floatIndex].rect.height(), newSize.height()),
