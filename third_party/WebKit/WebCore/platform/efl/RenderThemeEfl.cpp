@@ -35,6 +35,7 @@
 #include "Page.h"
 #include "RenderBox.h"
 #include "RenderObject.h"
+#include "RenderProgress.h"
 #include "RenderSlider.h"
 #include <wtf/text/CString.h>
 
@@ -298,6 +299,26 @@ bool RenderThemeEfl::paintThemePart(RenderObject* o,
     msg->val[0] = static_cast<float>(value) / static_cast<float>(max);
     msg->val[1] = 0.1;
     edje_object_message_send(ce->o, EDJE_MESSAGE_FLOAT_SET, 0, msg);
+#if ENABLE(PROGRESS_TAG)
+  } else if (type == ProgressBar) {
+    RenderProgress* renderProgress = toRenderProgress(o);
+    Edje_Message_Float_Set* msg;
+    int max;
+    double value;
+
+    msg = static_cast<Edje_Message_Float_Set*>(
+        alloca(sizeof(Edje_Message_Float_Set) + sizeof(float)));
+    max = rect.width();
+    value = renderProgress->position();
+
+    msg->count = 2;
+    if (o->style()->direction() == RTL)
+      msg->val[0] = (1.0 - value) * max;
+    else
+      msg->val[0] = 0;
+    msg->val[1] = value;
+    edje_object_message_send(ce->o, EDJE_MESSAGE_FLOAT_SET, 0, msg);
+#endif
   }
 
   edje_object_calc_force(ce->o);
@@ -571,20 +592,24 @@ void RenderThemeEfl::applyPartDescription(Evas_Object* o,
 const char* RenderThemeEfl::edjeGroupFromFormType(FormType type) const {
   static const char* groups[] = {
 #define W(n) "webkit/widget/" n
-      W("button"),
-      W("radio"),
-      W("entry"),
-      W("checkbox"),
-      W("combo"),
-      W("search/field"),
-      W("search/decoration"),
-      W("search/results_button"),
-      W("search/results_decoration"),
-      W("search/cancel_button"),
-      W("slider/vertical"),
-      W("slider/horizontal"),
+    W("button"),
+    W("radio"),
+    W("entry"),
+    W("checkbox"),
+    W("combo"),
+#if ENABLE(PROGRESS_TAG)
+    W("progressbar"),
+#endif
+    W("search/field"),
+    W("search/decoration"),
+    W("search/results_button"),
+    W("search/results_decoration"),
+    W("search/cancel_button"),
+    W("slider/vertical"),
+    W("slider/horizontal"),
 #undef W
-      0};
+    0
+  };
   ASSERT(type >= 0);
   ASSERT((size_t)type < sizeof(groups) / sizeof(groups[0]));  // out of sync?
   return groups[type];
@@ -1088,4 +1113,18 @@ void RenderThemeEfl::systemFont(int propId,
   fontDescription.setWeight(FontWeightNormal);
   fontDescription.setItalic(false);
 }
+
+#if ENABLE(PROGRESS_TAG)
+void RenderThemeEfl::adjustProgressBarStyle(CSSStyleSelector*,
+                                            RenderStyle* style,
+                                            Element*) const {
+  style->setBoxShadow(0);
+}
+
+bool RenderThemeEfl::paintProgressBar(RenderObject* o,
+                                      const PaintInfo& i,
+                                      const IntRect& rect) {
+  return paintThemePart(o, ProgressBar, i, rect);
+}
+#endif
 }
