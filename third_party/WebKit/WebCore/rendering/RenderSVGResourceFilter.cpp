@@ -298,7 +298,9 @@ void RenderSVGResourceFilter::postApplyResource(RenderObject* object,
     context = filterData->savedContext;
     filterData->savedContext = 0;
 #if !PLATFORM(CG)
-    filterData->sourceGraphicBuffer->transformColorSpace(DeviceRGB, LinearRGB);
+    if (filterData->sourceGraphicBuffer)
+      filterData->sourceGraphicBuffer->transformColorSpace(DeviceRGB,
+                                                           LinearRGB);
 #endif
   }
 
