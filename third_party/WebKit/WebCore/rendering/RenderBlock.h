@@ -418,9 +418,9 @@ class RenderBlock : public RenderBox {
   // Only used by RenderSVGText, which explicitely overrides
   // RenderBlock::layoutBlock(), do NOT use for anything else.
   void forceLayoutInlineChildren() {
-    int repaintTop = 0;
-    int repaintBottom = 0;
-    layoutInlineChildren(true, repaintTop, repaintBottom);
+    int repaintLogicalTop = 0;
+    int repaintLogicalBottom = 0;
+    layoutInlineChildren(true, repaintLogicalTop, repaintLogicalBottom);
   }
 #endif
 
@@ -470,8 +470,8 @@ class RenderBlock : public RenderBox {
 
   void layoutBlockChildren(bool relayoutChildren, int& maxFloatLogicalBottom);
   void layoutInlineChildren(bool relayoutChildren,
-                            int& repaintTop,
-                            int& repaintBottom);
+                            int& repaintLogicalTop,
+                            int& repaintLogicalBottom);
 
   virtual void positionListMarker() {}
 
@@ -667,6 +667,10 @@ class RenderBlock : public RenderBox {
   void deleteEllipsisLineBoxes();
   void checkLinesForTextOverflow();
   void addOverflowFromInlineChildren();
+  int beforeSideVisibleOverflowForLine(RootInlineBox*) const;
+  int afterSideVisibleOverflowForLine(RootInlineBox*) const;
+  int beforeSideLayoutOverflowForLine(RootInlineBox*) const;
+  int afterSideLayoutOverflowForLine(RootInlineBox*) const;
   // End of functions defined in RenderBlockLineLayout.cpp.
 
   void addOverflowFromBlockChildren();

@@ -174,6 +174,14 @@ class RenderBox : public RenderBoxModelObject {
   int rightLayoutOverflow() const {
     return m_overflow ? m_overflow->rightLayoutOverflow() : width();
   }
+  int logicalLeftLayoutOverflow() const {
+    return style()->isHorizontalWritingMode() ? leftLayoutOverflow()
+                                              : topLayoutOverflow();
+  }
+  int logicalRightLayoutOverflow() const {
+    return style()->isHorizontalWritingMode() ? rightLayoutOverflow()
+                                              : bottomLayoutOverflow();
+  }
 
   IntRect visualOverflowRect() const {
     return m_overflow ? m_overflow->visualOverflowRect() : borderBoxRect();
@@ -189,6 +197,14 @@ class RenderBox : public RenderBoxModelObject {
   }
   int rightVisualOverflow() const {
     return m_overflow ? m_overflow->rightVisualOverflow() : width();
+  }
+  int logicalLeftVisualOverflow() const {
+    return style()->isHorizontalWritingMode() ? leftVisualOverflow()
+                                              : topVisualOverflow();
+  }
+  int logicalRightVisualOverflow() const {
+    return style()->isHorizontalWritingMode() ? rightVisualOverflow()
+                                              : bottomVisualOverflow();
   }
 
   void addLayoutOverflow(const IntRect&);
