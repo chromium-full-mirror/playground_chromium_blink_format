@@ -593,7 +593,7 @@ bool ResourceHandleManager::startScheduledJobs() {
 void ResourceHandleManager::dispatchSynchronousJob(ResourceHandle* job) {
   KURL kurl = job->firstRequest().url();
 
-  if (kurl.protocolIs("data")) {
+  if (kurl.protocolIsData()) {
     handleDataURL(job);
     return;
   }
@@ -624,7 +624,7 @@ void ResourceHandleManager::dispatchSynchronousJob(ResourceHandle* job) {
 void ResourceHandleManager::startJob(ResourceHandle* job) {
   KURL kurl = job->firstRequest().url();
 
-  if (kurl.protocolIs("data")) {
+  if (kurl.protocolIsData()) {
     handleDataURL(job);
     return;
   }
