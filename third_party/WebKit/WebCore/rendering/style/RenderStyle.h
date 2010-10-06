@@ -193,7 +193,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
               other._force_backgrounds_to_white) &&
              (_pointerEvents == other._pointerEvents) &&
              (_insideLink == other._insideLink) &&
-             (_blockFlow == other._blockFlow);
+             (m_writingMode == other.m_writingMode);
     }
 
     bool operator!=(const InheritedFlags& other) const {
@@ -224,8 +224,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
     // 43 bits
 
     // CSS Text Layout Module Level 3: Vertical writing support
-    unsigned _blockFlow : 2;  // EBlockFlowDirection
-                              // 45 bits
+    unsigned m_writingMode : 2;  // WritingMode
+                                 // 45 bits
   } inherited_flags;
 
   // don't inherit
@@ -298,7 +298,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
     inherited_flags._force_backgrounds_to_white = false;
     inherited_flags._pointerEvents = initialPointerEvents();
     inherited_flags._insideLink = NotInsideLink;
-    inherited_flags._blockFlow = initialBlockFlow();
+    inherited_flags.m_writingMode = initialWritingMode();
 
     noninherited_flags._effectiveDisplay = noninherited_flags._originalDisplay =
         initialDisplay();
@@ -1064,12 +1064,12 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return static_cast<ETextSecurity>(rareInheritedData->textSecurity);
   }
 
-  EBlockFlowDirection blockFlow() const {
-    return static_cast<EBlockFlowDirection>(inherited_flags._blockFlow);
+  WritingMode writingMode() const {
+    return static_cast<WritingMode>(inherited_flags.m_writingMode);
   }
-  bool isVerticalBlockFlow() const {
-    return blockFlow() == TopToBottomBlockFlow ||
-           blockFlow() == BottomToTopBlockFlow;
+  bool isHorizontalWritingMode() const {
+    return writingMode() == TopToBottomWritingMode ||
+           writingMode() == BottomToTopWritingMode;
   }
 
   ESpeak speak() { return static_cast<ESpeak>(rareInheritedData->speak); }
@@ -1739,7 +1739,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
            originalDisplay() == INLINE_BOX || originalDisplay() == INLINE_TABLE;
   }
 
-  void setBlockFlow(EBlockFlowDirection v) { inherited_flags._blockFlow = v; }
+  void setWritingMode(WritingMode v) { inherited_flags.m_writingMode = v; }
 
   // To tell if this style matched attribute selectors. This makes it impossible
   // to share.
@@ -1815,7 +1815,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   static ECaptionSide initialCaptionSide() { return CAPTOP; }
   static EClear initialClear() { return CNONE; }
   static TextDirection initialDirection() { return LTR; }
-  static EBlockFlowDirection initialBlockFlow() { return TopToBottomBlockFlow; }
+  static WritingMode initialWritingMode() { return TopToBottomWritingMode; }
   static EDisplay initialDisplay() { return INLINE; }
   static EEmptyCell initialEmptyCells() { return SHOW; }
   static EFloat initialFloating() { return FNONE; }

@@ -468,7 +468,7 @@ int RenderImage::computeReplacedLogicalWidth(bool includeMaxWidth) const {
   else if (m_imageResource->usesImageContainerSize()) {
     IntSize size = m_imageResource->imageSize(style()->effectiveZoom());
     logicalWidth =
-        style()->isVerticalBlockFlow() ? size.width() : size.height();
+        style()->isHorizontalWritingMode() ? size.width() : size.height();
   } else if (m_imageResource->imageHasRelativeWidth())
     logicalWidth = 0;  // If the image is relatively-sized, set the width to 0
                        // until there is a set container size.
@@ -492,7 +492,7 @@ int RenderImage::computeReplacedLogicalHeight() const {
   else if (m_imageResource->usesImageContainerSize()) {
     IntSize size = m_imageResource->imageSize(style()->effectiveZoom());
     logicalHeight =
-        style()->isVerticalBlockFlow() ? size.height() : size.width();
+        style()->isHorizontalWritingMode() ? size.height() : size.width();
   } else if (m_imageResource->imageHasRelativeHeight())
     logicalHeight = 0;  // If the image is relatively-sized, set the height to 0
                         // until there is a set container size.

@@ -63,7 +63,7 @@ class CSSProperty : public FastAllocBase {
 
   static int resolveDirectionAwareProperty(int propertyID,
                                            TextDirection,
-                                           EBlockFlowDirection);
+                                           WritingMode);
 
   friend bool operator==(const CSSProperty&, const CSSProperty&);
 

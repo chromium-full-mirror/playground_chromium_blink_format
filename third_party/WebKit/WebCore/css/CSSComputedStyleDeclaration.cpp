@@ -98,20 +98,20 @@ static const int computedProperties[] = {
     CSSPropertyWebkitAnimationTimingFunction, CSSPropertyWebkitAppearance,
     CSSPropertyWebkitBackfaceVisibility, CSSPropertyWebkitBackgroundClip,
     CSSPropertyWebkitBackgroundComposite, CSSPropertyWebkitBackgroundOrigin,
-    CSSPropertyWebkitBackgroundSize, CSSPropertyWebkitBlockFlow,
-    CSSPropertyWebkitBorderFit, CSSPropertyWebkitBorderHorizontalSpacing,
-    CSSPropertyWebkitBorderImage, CSSPropertyWebkitBorderVerticalSpacing,
-    CSSPropertyWebkitBoxAlign, CSSPropertyWebkitBoxDirection,
-    CSSPropertyWebkitBoxFlex, CSSPropertyWebkitBoxFlexGroup,
-    CSSPropertyWebkitBoxLines, CSSPropertyWebkitBoxOrdinalGroup,
-    CSSPropertyWebkitBoxOrient, CSSPropertyWebkitBoxPack,
-    CSSPropertyWebkitBoxReflect, CSSPropertyWebkitBoxShadow,
-    CSSPropertyWebkitBoxSizing, CSSPropertyWebkitColorCorrection,
-    CSSPropertyWebkitColumnBreakAfter, CSSPropertyWebkitColumnBreakBefore,
-    CSSPropertyWebkitColumnBreakInside, CSSPropertyWebkitColumnCount,
-    CSSPropertyWebkitColumnGap, CSSPropertyWebkitColumnRuleColor,
-    CSSPropertyWebkitColumnRuleStyle, CSSPropertyWebkitColumnRuleWidth,
-    CSSPropertyWebkitColumnSpan, CSSPropertyWebkitColumnWidth,
+    CSSPropertyWebkitBackgroundSize, CSSPropertyWebkitBorderFit,
+    CSSPropertyWebkitBorderHorizontalSpacing, CSSPropertyWebkitBorderImage,
+    CSSPropertyWebkitBorderVerticalSpacing, CSSPropertyWebkitBoxAlign,
+    CSSPropertyWebkitBoxDirection, CSSPropertyWebkitBoxFlex,
+    CSSPropertyWebkitBoxFlexGroup, CSSPropertyWebkitBoxLines,
+    CSSPropertyWebkitBoxOrdinalGroup, CSSPropertyWebkitBoxOrient,
+    CSSPropertyWebkitBoxPack, CSSPropertyWebkitBoxReflect,
+    CSSPropertyWebkitBoxShadow, CSSPropertyWebkitBoxSizing,
+    CSSPropertyWebkitColorCorrection, CSSPropertyWebkitColumnBreakAfter,
+    CSSPropertyWebkitColumnBreakBefore, CSSPropertyWebkitColumnBreakInside,
+    CSSPropertyWebkitColumnCount, CSSPropertyWebkitColumnGap,
+    CSSPropertyWebkitColumnRuleColor, CSSPropertyWebkitColumnRuleStyle,
+    CSSPropertyWebkitColumnRuleWidth, CSSPropertyWebkitColumnSpan,
+    CSSPropertyWebkitColumnWidth,
 #if ENABLE(DASHBOARD_SUPPORT)
     CSSPropertyWebkitDashboardRegion,
 #endif
@@ -133,7 +133,8 @@ static const int computedProperties[] = {
     CSSPropertyWebkitTransformStyle, CSSPropertyWebkitTransitionDelay,
     CSSPropertyWebkitTransitionDuration, CSSPropertyWebkitTransitionProperty,
     CSSPropertyWebkitTransitionTimingFunction, CSSPropertyWebkitUserDrag,
-    CSSPropertyWebkitUserModify, CSSPropertyWebkitUserSelect
+    CSSPropertyWebkitUserModify, CSSPropertyWebkitUserSelect,
+    CSSPropertyWebkitWritingMode
 
 #if ENABLE(SVG)
     ,
@@ -696,7 +697,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     return 0;
 
   propertyID = CSSProperty::resolveDirectionAwareProperty(
-      propertyID, style->direction(), style->blockFlow());
+      propertyID, style->direction(), style->writingMode());
 
   switch (static_cast<CSSPropertyID>(propertyID)) {
     case CSSPropertyInvalid:
@@ -1421,8 +1422,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
           (style->backfaceVisibility() == BackfaceVisibilityHidden)
               ? CSSValueHidden
               : CSSValueVisible);
-    case CSSPropertyWebkitBlockFlow:
-      return CSSPrimitiveValue::create(style->blockFlow());
     case CSSPropertyWebkitBorderImage:
       return valueForNinePieceImage(style->borderImage());
     case CSSPropertyWebkitMaskBoxImage:
@@ -1552,6 +1551,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return CSSPrimitiveValue::create(style->pointerEvents());
     case CSSPropertyWebkitColorCorrection:
       return CSSPrimitiveValue::create(style->colorSpace());
+    case CSSPropertyWebkitWritingMode:
+      return CSSPrimitiveValue::create(style->writingMode());
 
     /* Shorthand properties, currently not supported see bug 13658*/
     case CSSPropertyBackground:
@@ -1568,7 +1569,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyListStyle:
     case CSSPropertyMargin:
     case CSSPropertyPadding:
-    case CSSPropertyWebkitWritingMode:
       break;
 
     /* Unimplemented CSS 3 properties (including CSS3 shorthand properties) */

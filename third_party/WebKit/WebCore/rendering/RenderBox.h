@@ -50,40 +50,44 @@ class RenderBox : public RenderBoxModelObject {
   void setWidth(int width) { m_frameRect.setWidth(width); }
   void setHeight(int height) { m_frameRect.setHeight(height); }
 
-  int logicalLeft() const { return style()->isVerticalBlockFlow() ? x() : y(); }
-  int logicalTop() const { return style()->isVerticalBlockFlow() ? y() : x(); }
+  int logicalLeft() const {
+    return style()->isHorizontalWritingMode() ? x() : y();
+  }
+  int logicalTop() const {
+    return style()->isHorizontalWritingMode() ? y() : x();
+  }
   int logicalWidth() const {
-    return style()->isVerticalBlockFlow() ? width() : height();
+    return style()->isHorizontalWritingMode() ? width() : height();
   }
   int logicalHeight() const {
-    return style()->isVerticalBlockFlow() ? height() : width();
+    return style()->isHorizontalWritingMode() ? height() : width();
   }
   void setLogicalLeft(int left) {
-    if (style()->isVerticalBlockFlow())
+    if (style()->isHorizontalWritingMode())
       setX(left);
     else
       setY(left);
   }
   void setLogicalTop(int top) {
-    if (style()->isVerticalBlockFlow())
+    if (style()->isHorizontalWritingMode())
       setY(top);
     else
       setX(top);
   }
   void setLogicalWidth(int size) {
-    if (style()->isVerticalBlockFlow())
+    if (style()->isHorizontalWritingMode())
       setWidth(size);
     else
       setHeight(size);
   }
   void setLogicalHeight(int size) {
-    if (style()->isVerticalBlockFlow())
+    if (style()->isHorizontalWritingMode())
       setHeight(size);
     else
       setWidth(size);
   }
   void setLogicalLocation(int left, int top) {
-    if (style()->isVerticalBlockFlow())
+    if (style()->isHorizontalWritingMode())
       setLocation(left, top);
     else
       setLocation(top, left);
@@ -204,10 +208,12 @@ class RenderBox : public RenderBoxModelObject {
     return clientHeight() - paddingTop() - paddingBottom();
   }
   int contentLogicalWidth() const {
-    return style()->isVerticalBlockFlow() ? contentWidth() : contentHeight();
+    return style()->isHorizontalWritingMode() ? contentWidth()
+                                              : contentHeight();
   }
   int contentLogicalHeight() const {
-    return style()->isVerticalBlockFlow() ? contentHeight() : contentWidth();
+    return style()->isHorizontalWritingMode() ? contentHeight()
+                                              : contentWidth();
   }
 
   // IE extensions. Used to calculate offsetWidth/Height.  Overridden by inlines
@@ -361,17 +367,17 @@ class RenderBox : public RenderBoxModelObject {
   bool stretchesToViewport() const {
     return document()->inQuirksMode() && style()->logicalHeight().isAuto() &&
            !isFloatingOrPositioned() && (isRoot() || isBody()) &&
-           !isBlockFlowRoot();
+           !isWritingModeRoot();
   }
 
   virtual IntSize intrinsicSize() const { return IntSize(); }
   int intrinsicLogicalWidth() const {
-    return style()->isVerticalBlockFlow() ? intrinsicSize().width()
-                                          : intrinsicSize().height();
+    return style()->isHorizontalWritingMode() ? intrinsicSize().width()
+                                              : intrinsicSize().height();
   }
   int intrinsicLogicalHeight() const {
-    return style()->isVerticalBlockFlow() ? intrinsicSize().height()
-                                          : intrinsicSize().width();
+    return style()->isHorizontalWritingMode() ? intrinsicSize().height()
+                                              : intrinsicSize().width();
   }
 
   // Whether or not the element shrinks to its intrinsic width (rather than
@@ -402,19 +408,19 @@ class RenderBox : public RenderBoxModelObject {
   // Relative positioning is one of those cases, since left/top offsets are
   // physical.
   int availableWidth() const {
-    return style()->isVerticalBlockFlow() ? availableLogicalWidth()
-                                          : availableLogicalHeight();
+    return style()->isHorizontalWritingMode() ? availableLogicalWidth()
+                                              : availableLogicalHeight();
   }
   int availableHeight() const {
-    return style()->isVerticalBlockFlow() ? availableLogicalHeight()
-                                          : availableLogicalWidth();
+    return style()->isHorizontalWritingMode() ? availableLogicalHeight()
+                                              : availableLogicalWidth();
   }
 
   virtual int verticalScrollbarWidth() const;
   int horizontalScrollbarHeight() const;
   int scrollbarLogicalHeight() const {
-    return style()->isVerticalBlockFlow() ? horizontalScrollbarHeight()
-                                          : verticalScrollbarWidth();
+    return style()->isHorizontalWritingMode() ? horizontalScrollbarHeight()
+                                              : verticalScrollbarWidth();
   }
   virtual bool scroll(ScrollDirection,
                       ScrollGranularity,
@@ -494,8 +500,9 @@ class RenderBox : public RenderBoxModelObject {
 
   virtual void markDescendantBlocksAndLinesForLayout(bool inLayout = true);
 
-  bool isBlockFlowRoot() const {
-    return !parent() || parent()->style()->blockFlow() != style()->blockFlow();
+  bool isWritingModeRoot() const {
+    return !parent() ||
+           parent()->style()->writingMode() != style()->writingMode();
   }
 
  protected:

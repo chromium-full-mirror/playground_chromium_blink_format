@@ -43,17 +43,17 @@ enum LogicalBoxSide { BeforeSide, EndSide, AfterSide, StartSide };
 enum PhysicalBoxSide { TopSide, RightSide, BottomSide, LeftSide };
 
 static int resolveToPhysicalProperty(TextDirection direction,
-                                     EBlockFlowDirection blockDirection,
+                                     WritingMode writingMode,
                                      LogicalBoxSide logicalSide,
                                      const int* properties) {
   if (direction == LTR) {
-    if (blockDirection == TopToBottomBlockFlow) {
+    if (writingMode == TopToBottomWritingMode) {
       // The common case. The logical and physical box sides match.
       // Left = Start, Right = End, Before = Top, After = Bottom
       return properties[logicalSide];
     }
 
-    if (blockDirection == BottomToTopBlockFlow) {
+    if (writingMode == BottomToTopWritingMode) {
       // Start = Left, End = Right, Before = Bottom, After = Top.
       switch (logicalSide) {
         case StartSide:
@@ -67,7 +67,7 @@ static int resolveToPhysicalProperty(TextDirection direction,
       }
     }
 
-    if (blockDirection == LeftToRightBlockFlow) {
+    if (writingMode == LeftToRightWritingMode) {
       // Start = Top, End = Bottom, Before = Left, After = Right.
       switch (logicalSide) {
         case StartSide:
@@ -94,7 +94,7 @@ static int resolveToPhysicalProperty(TextDirection direction,
     }
   }
 
-  if (blockDirection == TopToBottomBlockFlow) {
+  if (writingMode == TopToBottomWritingMode) {
     // Start = Right, End = Left, Before = Top, After = Bottom
     switch (logicalSide) {
       case StartSide:
@@ -108,7 +108,7 @@ static int resolveToPhysicalProperty(TextDirection direction,
     }
   }
 
-  if (blockDirection == BottomToTopBlockFlow) {
+  if (writingMode == BottomToTopWritingMode) {
     // Start = Right, End = Left, Before = Bottom, After = Top
     switch (logicalSide) {
       case StartSide:
@@ -122,7 +122,7 @@ static int resolveToPhysicalProperty(TextDirection direction,
     }
   }
 
-  if (blockDirection == LeftToRightBlockFlow) {
+  if (writingMode == LeftToRightWritingMode) {
     // Start = Bottom, End = Top, Before = Left, After = Right
     switch (logicalSide) {
       case StartSide:
@@ -151,217 +151,210 @@ static int resolveToPhysicalProperty(TextDirection direction,
 
 enum LogicalExtent { LogicalWidth, LogicalHeight };
 
-static int resolveToPhysicalProperty(EBlockFlowDirection blockDirection,
+static int resolveToPhysicalProperty(WritingMode writingMode,
                                      LogicalExtent logicalSide,
                                      const int* properties) {
-  if (blockDirection == TopToBottomBlockFlow ||
-      blockDirection == BottomToTopBlockFlow)
+  if (writingMode == TopToBottomWritingMode ||
+      writingMode == BottomToTopWritingMode)
     return properties[logicalSide];
   return logicalSide == LogicalWidth ? properties[1] : properties[0];
 }
 
-int CSSProperty::resolveDirectionAwareProperty(
-    int propertyID,
-    TextDirection direction,
-    EBlockFlowDirection blockDirection) {
+int CSSProperty::resolveDirectionAwareProperty(int propertyID,
+                                               TextDirection direction,
+                                               WritingMode writingMode) {
   switch (static_cast<CSSPropertyID>(propertyID)) {
     case CSSPropertyWebkitMarginEnd: {
       const int properties[4] = {CSSPropertyMarginTop, CSSPropertyMarginRight,
                                  CSSPropertyMarginBottom,
                                  CSSPropertyMarginLeft};
-      return resolveToPhysicalProperty(direction, blockDirection, EndSide,
+      return resolveToPhysicalProperty(direction, writingMode, EndSide,
                                        properties);
     }
     case CSSPropertyWebkitMarginStart: {
       const int properties[4] = {CSSPropertyMarginTop, CSSPropertyMarginRight,
                                  CSSPropertyMarginBottom,
                                  CSSPropertyMarginLeft};
-      return resolveToPhysicalProperty(direction, blockDirection, StartSide,
+      return resolveToPhysicalProperty(direction, writingMode, StartSide,
                                        properties);
     }
     case CSSPropertyWebkitMarginBefore: {
       const int properties[4] = {CSSPropertyMarginTop, CSSPropertyMarginRight,
                                  CSSPropertyMarginBottom,
                                  CSSPropertyMarginLeft};
-      return resolveToPhysicalProperty(direction, blockDirection, BeforeSide,
+      return resolveToPhysicalProperty(direction, writingMode, BeforeSide,
                                        properties);
     }
     case CSSPropertyWebkitMarginAfter: {
       const int properties[4] = {CSSPropertyMarginTop, CSSPropertyMarginRight,
                                  CSSPropertyMarginBottom,
                                  CSSPropertyMarginLeft};
-      return resolveToPhysicalProperty(direction, blockDirection, AfterSide,
+      return resolveToPhysicalProperty(direction, writingMode, AfterSide,
                                        properties);
     }
     case CSSPropertyWebkitPaddingEnd: {
       const int properties[4] = {CSSPropertyPaddingTop, CSSPropertyPaddingRight,
                                  CSSPropertyPaddingBottom,
                                  CSSPropertyPaddingLeft};
-      return resolveToPhysicalProperty(direction, blockDirection, EndSide,
+      return resolveToPhysicalProperty(direction, writingMode, EndSide,
                                        properties);
     }
     case CSSPropertyWebkitPaddingStart: {
       const int properties[4] = {CSSPropertyPaddingTop, CSSPropertyPaddingRight,
                                  CSSPropertyPaddingBottom,
                                  CSSPropertyPaddingLeft};
-      return resolveToPhysicalProperty(direction, blockDirection, StartSide,
+      return resolveToPhysicalProperty(direction, writingMode, StartSide,
                                        properties);
     }
     case CSSPropertyWebkitPaddingBefore: {
       const int properties[4] = {CSSPropertyPaddingTop, CSSPropertyPaddingRight,
                                  CSSPropertyPaddingBottom,
                                  CSSPropertyPaddingLeft};
-      return resolveToPhysicalProperty(direction, blockDirection, BeforeSide,
+      return resolveToPhysicalProperty(direction, writingMode, BeforeSide,
                                        properties);
     }
     case CSSPropertyWebkitPaddingAfter: {
       const int properties[4] = {CSSPropertyPaddingTop, CSSPropertyPaddingRight,
                                  CSSPropertyPaddingBottom,
                                  CSSPropertyPaddingLeft};
-      return resolveToPhysicalProperty(direction, blockDirection, AfterSide,
+      return resolveToPhysicalProperty(direction, writingMode, AfterSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderEnd: {
       const int properties[4] = {CSSPropertyBorderTop, CSSPropertyBorderRight,
                                  CSSPropertyBorderBottom,
                                  CSSPropertyBorderLeft};
-      return resolveToPhysicalProperty(direction, blockDirection, EndSide,
+      return resolveToPhysicalProperty(direction, writingMode, EndSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderStart: {
       const int properties[4] = {CSSPropertyBorderTop, CSSPropertyBorderRight,
                                  CSSPropertyBorderBottom,
                                  CSSPropertyBorderLeft};
-      return resolveToPhysicalProperty(direction, blockDirection, StartSide,
+      return resolveToPhysicalProperty(direction, writingMode, StartSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderBefore: {
       const int properties[4] = {CSSPropertyBorderTop, CSSPropertyBorderRight,
                                  CSSPropertyBorderBottom,
                                  CSSPropertyBorderLeft};
-      return resolveToPhysicalProperty(direction, blockDirection, BeforeSide,
+      return resolveToPhysicalProperty(direction, writingMode, BeforeSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderAfter: {
       const int properties[4] = {CSSPropertyBorderTop, CSSPropertyBorderRight,
                                  CSSPropertyBorderBottom,
                                  CSSPropertyBorderLeft};
-      return resolveToPhysicalProperty(direction, blockDirection, AfterSide,
+      return resolveToPhysicalProperty(direction, writingMode, AfterSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderEndColor: {
       const int properties[4] = {
           CSSPropertyBorderTopColor, CSSPropertyBorderRightColor,
           CSSPropertyBorderBottomColor, CSSPropertyBorderLeftColor};
-      return resolveToPhysicalProperty(direction, blockDirection, EndSide,
+      return resolveToPhysicalProperty(direction, writingMode, EndSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderStartColor: {
       const int properties[4] = {
           CSSPropertyBorderTopColor, CSSPropertyBorderRightColor,
           CSSPropertyBorderBottomColor, CSSPropertyBorderLeftColor};
-      return resolveToPhysicalProperty(direction, blockDirection, StartSide,
+      return resolveToPhysicalProperty(direction, writingMode, StartSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderBeforeColor: {
       const int properties[4] = {
           CSSPropertyBorderTopColor, CSSPropertyBorderRightColor,
           CSSPropertyBorderBottomColor, CSSPropertyBorderLeftColor};
-      return resolveToPhysicalProperty(direction, blockDirection, BeforeSide,
+      return resolveToPhysicalProperty(direction, writingMode, BeforeSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderAfterColor: {
       const int properties[4] = {
           CSSPropertyBorderTopColor, CSSPropertyBorderRightColor,
           CSSPropertyBorderBottomColor, CSSPropertyBorderLeftColor};
-      return resolveToPhysicalProperty(direction, blockDirection, AfterSide,
+      return resolveToPhysicalProperty(direction, writingMode, AfterSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderEndStyle: {
       const int properties[4] = {
           CSSPropertyBorderTopStyle, CSSPropertyBorderRightStyle,
           CSSPropertyBorderBottomStyle, CSSPropertyBorderLeftStyle};
-      return resolveToPhysicalProperty(direction, blockDirection, EndSide,
+      return resolveToPhysicalProperty(direction, writingMode, EndSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderStartStyle: {
       const int properties[4] = {
           CSSPropertyBorderTopStyle, CSSPropertyBorderRightStyle,
           CSSPropertyBorderBottomStyle, CSSPropertyBorderLeftStyle};
-      return resolveToPhysicalProperty(direction, blockDirection, StartSide,
+      return resolveToPhysicalProperty(direction, writingMode, StartSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderBeforeStyle: {
       const int properties[4] = {
           CSSPropertyBorderTopStyle, CSSPropertyBorderRightStyle,
           CSSPropertyBorderBottomStyle, CSSPropertyBorderLeftStyle};
-      return resolveToPhysicalProperty(direction, blockDirection, BeforeSide,
+      return resolveToPhysicalProperty(direction, writingMode, BeforeSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderAfterStyle: {
       const int properties[4] = {
           CSSPropertyBorderTopStyle, CSSPropertyBorderRightStyle,
           CSSPropertyBorderBottomStyle, CSSPropertyBorderLeftStyle};
-      return resolveToPhysicalProperty(direction, blockDirection, AfterSide,
+      return resolveToPhysicalProperty(direction, writingMode, AfterSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderEndWidth: {
       const int properties[4] = {
           CSSPropertyBorderTopWidth, CSSPropertyBorderRightWidth,
           CSSPropertyBorderBottomWidth, CSSPropertyBorderLeftWidth};
-      return resolveToPhysicalProperty(direction, blockDirection, EndSide,
+      return resolveToPhysicalProperty(direction, writingMode, EndSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderStartWidth: {
       const int properties[4] = {
           CSSPropertyBorderTopWidth, CSSPropertyBorderRightWidth,
           CSSPropertyBorderBottomWidth, CSSPropertyBorderLeftWidth};
-      return resolveToPhysicalProperty(direction, blockDirection, StartSide,
+      return resolveToPhysicalProperty(direction, writingMode, StartSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderBeforeWidth: {
       const int properties[4] = {
           CSSPropertyBorderTopWidth, CSSPropertyBorderRightWidth,
           CSSPropertyBorderBottomWidth, CSSPropertyBorderLeftWidth};
-      return resolveToPhysicalProperty(direction, blockDirection, BeforeSide,
+      return resolveToPhysicalProperty(direction, writingMode, BeforeSide,
                                        properties);
     }
     case CSSPropertyWebkitBorderAfterWidth: {
       const int properties[4] = {
           CSSPropertyBorderTopWidth, CSSPropertyBorderRightWidth,
           CSSPropertyBorderBottomWidth, CSSPropertyBorderLeftWidth};
-      return resolveToPhysicalProperty(direction, blockDirection, AfterSide,
+      return resolveToPhysicalProperty(direction, writingMode, AfterSide,
                                        properties);
     }
     case CSSPropertyWebkitLogicalWidth: {
       const int properties[2] = {CSSPropertyWidth, CSSPropertyHeight};
-      return resolveToPhysicalProperty(blockDirection, LogicalWidth,
-                                       properties);
+      return resolveToPhysicalProperty(writingMode, LogicalWidth, properties);
     }
     case CSSPropertyWebkitLogicalHeight: {
       const int properties[2] = {CSSPropertyWidth, CSSPropertyHeight};
-      return resolveToPhysicalProperty(blockDirection, LogicalHeight,
-                                       properties);
+      return resolveToPhysicalProperty(writingMode, LogicalHeight, properties);
     }
     case CSSPropertyWebkitMinLogicalWidth: {
       const int properties[2] = {CSSPropertyMinWidth, CSSPropertyMinHeight};
-      return resolveToPhysicalProperty(blockDirection, LogicalWidth,
-                                       properties);
+      return resolveToPhysicalProperty(writingMode, LogicalWidth, properties);
     }
     case CSSPropertyWebkitMinLogicalHeight: {
       const int properties[2] = {CSSPropertyMinWidth, CSSPropertyMinHeight};
-      return resolveToPhysicalProperty(blockDirection, LogicalHeight,
-                                       properties);
+      return resolveToPhysicalProperty(writingMode, LogicalHeight, properties);
     }
     case CSSPropertyWebkitMaxLogicalWidth: {
       const int properties[2] = {CSSPropertyMaxWidth, CSSPropertyMaxHeight};
-      return resolveToPhysicalProperty(blockDirection, LogicalWidth,
-                                       properties);
+      return resolveToPhysicalProperty(writingMode, LogicalWidth, properties);
     }
     case CSSPropertyWebkitMaxLogicalHeight: {
       const int properties[2] = {CSSPropertyMaxWidth, CSSPropertyMaxHeight};
-      return resolveToPhysicalProperty(blockDirection, LogicalHeight,
-                                       properties);
+      return resolveToPhysicalProperty(writingMode, LogicalHeight, properties);
     }
     default:
       return propertyID;

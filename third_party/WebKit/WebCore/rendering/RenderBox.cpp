@@ -82,14 +82,14 @@ RenderBox::RenderBox(Node* node)
 RenderBox::~RenderBox() {}
 
 int RenderBox::marginBefore() const {
-  switch (style()->blockFlow()) {
-    case TopToBottomBlockFlow:
+  switch (style()->writingMode()) {
+    case TopToBottomWritingMode:
       return m_marginTop;
-    case BottomToTopBlockFlow:
+    case BottomToTopWritingMode:
       return m_marginBottom;
-    case LeftToRightBlockFlow:
+    case LeftToRightWritingMode:
       return m_marginLeft;
-    case RightToLeftBlockFlow:
+    case RightToLeftWritingMode:
       return m_marginRight;
   }
   ASSERT_NOT_REACHED();
@@ -97,14 +97,14 @@ int RenderBox::marginBefore() const {
 }
 
 int RenderBox::marginAfter() const {
-  switch (style()->blockFlow()) {
-    case TopToBottomBlockFlow:
+  switch (style()->writingMode()) {
+    case TopToBottomWritingMode:
       return m_marginBottom;
-    case BottomToTopBlockFlow:
+    case BottomToTopWritingMode:
       return m_marginTop;
-    case LeftToRightBlockFlow:
+    case LeftToRightWritingMode:
       return m_marginRight;
-    case RightToLeftBlockFlow:
+    case RightToLeftWritingMode:
       return m_marginLeft;
   }
   ASSERT_NOT_REACHED();
@@ -112,19 +112,19 @@ int RenderBox::marginAfter() const {
 }
 
 int RenderBox::marginStart() const {
-  if (style()->isVerticalBlockFlow())
+  if (style()->isHorizontalWritingMode())
     return style()->isLeftToRightDirection() ? m_marginLeft : m_marginRight;
   return style()->isLeftToRightDirection() ? m_marginTop : m_marginBottom;
 }
 
 int RenderBox::marginEnd() const {
-  if (style()->isVerticalBlockFlow())
+  if (style()->isHorizontalWritingMode())
     return style()->isLeftToRightDirection() ? m_marginRight : m_marginLeft;
   return style()->isLeftToRightDirection() ? m_marginBottom : m_marginTop;
 }
 
 void RenderBox::setMarginStart(int margin) {
-  if (style()->isVerticalBlockFlow()) {
+  if (style()->isHorizontalWritingMode()) {
     if (style()->isLeftToRightDirection())
       m_marginLeft = margin;
     else
@@ -138,7 +138,7 @@ void RenderBox::setMarginStart(int margin) {
 }
 
 void RenderBox::setMarginEnd(int margin) {
-  if (style()->isVerticalBlockFlow()) {
+  if (style()->isHorizontalWritingMode()) {
     if (style()->isLeftToRightDirection())
       m_marginRight = margin;
     else
@@ -152,34 +152,34 @@ void RenderBox::setMarginEnd(int margin) {
 }
 
 void RenderBox::setMarginBefore(int margin) {
-  switch (style()->blockFlow()) {
-    case TopToBottomBlockFlow:
+  switch (style()->writingMode()) {
+    case TopToBottomWritingMode:
       m_marginTop = margin;
       break;
-    case BottomToTopBlockFlow:
+    case BottomToTopWritingMode:
       m_marginBottom = margin;
       break;
-    case LeftToRightBlockFlow:
+    case LeftToRightWritingMode:
       m_marginLeft = margin;
       break;
-    case RightToLeftBlockFlow:
+    case RightToLeftWritingMode:
       m_marginRight = margin;
       break;
   }
 }
 
 void RenderBox::setMarginAfter(int margin) {
-  switch (style()->blockFlow()) {
-    case TopToBottomBlockFlow:
+  switch (style()->writingMode()) {
+    case TopToBottomWritingMode:
       m_marginBottom = margin;
       break;
-    case BottomToTopBlockFlow:
+    case BottomToTopWritingMode:
       m_marginTop = margin;
       break;
-    case LeftToRightBlockFlow:
+    case LeftToRightWritingMode:
       m_marginRight = margin;
       break;
-    case RightToLeftBlockFlow:
+    case RightToLeftWritingMode:
       m_marginLeft = margin;
       break;
   }
@@ -303,16 +303,16 @@ void RenderBox::styleDidChange(StyleDifference diff,
   if (isBody())
     document()->setTextColor(style()->visitedDependentColor(CSSPropertyColor));
   else if (isRoot() &&
-           (!oldStyle || oldStyle->blockFlow() != style()->blockFlow() ||
+           (!oldStyle || oldStyle->writingMode() != style()->writingMode() ||
             oldStyle->direction() != style()->direction())) {
     // Propagate the new block flow and direction up to the RenderView.
     // FIXME: WinIE seems to propagate from the <body> as well.  We may want to
     // consider doing that at some point.
     RenderView* viewRenderer = view();
     RenderStyle* viewStyle = viewRenderer->style();
-    if (viewStyle->blockFlow() != style()->blockFlow() ||
+    if (viewStyle->writingMode() != style()->writingMode() ||
         viewStyle->direction() != style()->direction()) {
-      viewStyle->setBlockFlow(style()->blockFlow());
+      viewStyle->setWritingMode(style()->writingMode());
       viewStyle->setDirection(style()->direction());
       viewRenderer->setNeedsLayoutAndPrefWidthsRecalc();
     }
@@ -1187,7 +1187,7 @@ int RenderBox::perpendicularContainingBlockLogicalHeight() const {
     // as a constraint.  We do that for now as well even though it's likely
     // being unconstrained is what the spec
     // will decide.
-    return containingBlockStyle->isVerticalBlockFlow()
+    return containingBlockStyle->isHorizontalWritingMode()
                ? view()->frameView()->visibleHeight()
                : view()->frameView()->visibleWidth();
   }
@@ -1585,7 +1585,8 @@ void RenderBox::computeLogicalWidth() {
   RenderBlock* cb = containingBlock();
   int containerLogicalWidth = max(0, containingBlockLogicalWidthForContent());
   bool hasPerpendicularContainingBlock =
-      cb->style()->isVerticalBlockFlow() != style()->isVerticalBlockFlow();
+      cb->style()->isHorizontalWritingMode() !=
+      style()->isHorizontalWritingMode();
   int containerWidthInInlineDirection = containerLogicalWidth;
   if (hasPerpendicularContainingBlock)
     containerWidthInInlineDirection =
@@ -1813,7 +1814,8 @@ void RenderBox::computeLogicalHeight() {
   } else {
     RenderBlock* cb = containingBlock();
     bool hasPerpendicularContainingBlock =
-        cb->style()->isVerticalBlockFlow() != style()->isVerticalBlockFlow();
+        cb->style()->isHorizontalWritingMode() !=
+        style()->isHorizontalWritingMode();
 
     if (!hasPerpendicularContainingBlock)
       computeBlockDirectionMargins(cb);
@@ -1920,7 +1922,7 @@ void RenderBox::computeLogicalHeight() {
     if (document()->printing())
       visHeight = static_cast<int>(view()->pageHeight());
     else {
-      if (style()->isVerticalBlockFlow())
+      if (style()->isHorizontalWritingMode())
         visHeight = view()->viewHeight();
       else
         visHeight = view()->viewWidth();
@@ -2173,7 +2175,7 @@ int RenderBox::availableLogicalHeightUsing(const Length& h) const {
     return computeContentBoxLogicalHeight(h.value());
 
   if (isRenderView())
-    return style()->isVerticalBlockFlow()
+    return style()->isHorizontalWritingMode()
                ? toRenderView(this)->frameView()->visibleHeight()
                : toRenderView(this)->frameView()->visibleWidth();
 
@@ -3408,7 +3410,7 @@ bool RenderBox::shrinkToAvoidFloats() const {
 }
 
 bool RenderBox::avoidsFloats() const {
-  return isReplaced() || hasOverflowClip() || isHR() || isBlockFlowRoot();
+  return isReplaced() || hasOverflowClip() || isHR() || isWritingModeRoot();
 }
 
 void RenderBox::addShadowOverflow() {

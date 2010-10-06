@@ -101,7 +101,7 @@ RenderBlock::MarginInfo::MarginInfo(RenderBlock* block,
       !block->isRenderView() && !block->isRoot() && !block->isPositioned() &&
       !block->isFloating() && !block->isTableCell() &&
       !block->hasOverflowClip() && !block->isInlineBlockOrInlineTable() &&
-      !block->isBlockFlowRoot();
+      !block->isWritingModeRoot();
 
   m_canCollapseMarginBeforeWithChildren =
       m_canCollapseWithChildren && (beforeBorderPadding == 0) &&
@@ -1507,7 +1507,7 @@ void RenderBlock::addOverflowFromFloats() {
 bool RenderBlock::expandsToEncloseOverhangingFloats() const {
   return isInlineBlockOrInlineTable() || isFloatingOrPositioned() ||
          hasOverflowClip() || (parent() && parent()->isFlexibleBox()) ||
-         hasColumns() || isTableCell() || isFieldset() || isBlockFlowRoot();
+         hasColumns() || isTableCell() || isFieldset() || isWritingModeRoot();
 }
 
 void RenderBlock::adjustPositionedBlock(RenderBox* child,
@@ -1970,7 +1970,7 @@ void RenderBlock::handleAfterSideOfBlock(int beforeSide,
 void RenderBlock::setLogicalLeftForChild(RenderBox* child,
                                          int logicalLeft,
                                          ApplyLayoutDeltaMode applyDelta) {
-  if (style()->isVerticalBlockFlow()) {
+  if (style()->isHorizontalWritingMode()) {
     if (applyDelta == ApplyLayoutDelta)
       view()->addLayoutDelta(IntSize(child->x() - logicalLeft, 0));
     child->setX(logicalLeft);
@@ -1984,7 +1984,7 @@ void RenderBlock::setLogicalLeftForChild(RenderBox* child,
 void RenderBlock::setLogicalTopForChild(RenderBox* child,
                                         int logicalTop,
                                         ApplyLayoutDeltaMode applyDelta) {
-  if (style()->isVerticalBlockFlow()) {
+  if (style()->isHorizontalWritingMode()) {
     if (applyDelta == ApplyLayoutDelta)
       view()->addLayoutDelta(IntSize(0, child->y() - logicalTop));
     child->setY(logicalTop);
@@ -2135,7 +2135,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
   if (childRenderBlock) {
     if (markDescendantsWithFloats)
       childRenderBlock->markAllDescendantsWithFloatsForLayout();
-    if (!child->isBlockFlowRoot())
+    if (!child->isWritingModeRoot())
       previousFloatLogicalBottom =
           max(previousFloatLogicalBottom,
               oldLogicalTop + childRenderBlock->lowestFloatLogicalBottom());
@@ -3443,7 +3443,7 @@ RenderBlock::FloatingObject* RenderBlock::insertFloatingObject(RenderBox* o) {
   bool affectedByPagination =
       o->isRenderBlock() && view()->layoutState()->m_pageHeight;
   if (!affectedByPagination ||
-      isBlockFlowRoot())  // We are unsplittable if we're a block flow root.
+      isWritingModeRoot())  // We are unsplittable if we're a block flow root.
     o->layoutIfNeeded();
   else {
     o->computeLogicalWidth();
@@ -4339,7 +4339,7 @@ int RenderBlock::addOverhangingFloats(RenderBlock* child,
   // Prevent floats from being added to the canvas by the root element, e.g.,
   // <html>.
   if (child->hasOverflowClip() || !child->containsFloats() || child->isRoot() ||
-      child->hasColumns() || child->isBlockFlowRoot())
+      child->hasColumns() || child->isWritingModeRoot())
     return 0;
 
   int lowestFloatLogicalBottom = 0;
@@ -4355,10 +4355,10 @@ int RenderBlock::addOverhangingFloats(RenderBlock* child,
     if (logicalBottom > logicalHeight()) {
       // If the object is not in the list, we add it now.
       if (!containsFloat(r->m_renderer)) {
-        int leftOffset = style()->isVerticalBlockFlow() ? logicalLeftOffset
-                                                        : logicalTopOffset;
-        int topOffset = style()->isVerticalBlockFlow() ? logicalTopOffset
-                                                       : logicalLeftOffset;
+        int leftOffset = style()->isHorizontalWritingMode() ? logicalLeftOffset
+                                                            : logicalTopOffset;
+        int topOffset = style()->isHorizontalWritingMode() ? logicalTopOffset
+                                                           : logicalLeftOffset;
         FloatingObject* floatingObj = new FloatingObject(
             r->type(), IntRect(r->left() - leftOffset, r->top() - topOffset,
                                r->width(), r->height()));
@@ -4415,7 +4415,7 @@ void RenderBlock::addIntrudingFloats(RenderBlock* prev,
     return;
 
   logicalLeftOffset +=
-      (style()->isVerticalBlockFlow() ? marginLeft() : marginTop());
+      (style()->isHorizontalWritingMode() ? marginLeft() : marginTop());
 
   DeprecatedPtrListIterator<FloatingObject> it(*prev->m_floatingObjects);
   for (FloatingObject* r; (r = it.current()); ++it) {
@@ -4432,10 +4432,10 @@ void RenderBlock::addIntrudingFloats(RenderBlock* prev,
         }
       }
       if (!f) {
-        int leftOffset = style()->isVerticalBlockFlow() ? logicalLeftOffset
-                                                        : logicalTopOffset;
-        int topOffset = style()->isVerticalBlockFlow() ? logicalTopOffset
-                                                       : logicalLeftOffset;
+        int leftOffset = style()->isHorizontalWritingMode() ? logicalLeftOffset
+                                                            : logicalTopOffset;
+        int topOffset = style()->isHorizontalWritingMode() ? logicalTopOffset
+                                                           : logicalLeftOffset;
 
         FloatingObject* floatingObj = new FloatingObject(
             r->type(), IntRect(r->left() - leftOffset, r->top() - topOffset,
@@ -4452,7 +4452,7 @@ void RenderBlock::addIntrudingFloats(RenderBlock* prev,
         // will get applied twice.
         if (prev != parent())
           floatingObj->setLeft(floatingObj->left() +
-                               (style()->isVerticalBlockFlow()
+                               (style()->isHorizontalWritingMode()
                                     ? prev->marginLeft()
                                     : prev->marginTop()));
 
@@ -6920,14 +6920,15 @@ int RenderBlock::collapsedMarginBeforeForChild(RenderBox* child) const {
   // If the child has the same directionality as we do, then we can just return
   // its
   // collapsed margin.
-  if (!child->isBlockFlowRoot())
+  if (!child->isWritingModeRoot())
     return child->collapsedMarginBefore();
 
   // The child has a different directionality.  If the child is parallel, then
   // it's just
   // flipped relative to us.  We can use the collapsed margin for the opposite
   // edge.
-  if (child->style()->isVerticalBlockFlow() == style()->isVerticalBlockFlow())
+  if (child->style()->isHorizontalWritingMode() ==
+      style()->isHorizontalWritingMode())
     return child->collapsedMarginAfter();
 
   // The child is perpendicular to us, which means its margins don't collapse
@@ -6941,14 +6942,15 @@ int RenderBlock::collapsedMarginAfterForChild(RenderBox* child) const {
   // If the child has the same directionality as we do, then we can just return
   // its
   // collapsed margin.
-  if (!child->isBlockFlowRoot())
+  if (!child->isWritingModeRoot())
     return child->collapsedMarginAfter();
 
   // The child has a different directionality.  If the child is parallel, then
   // it's just
   // flipped relative to us.  We can use the collapsed margin for the opposite
   // edge.
-  if (child->style()->isVerticalBlockFlow() == style()->isVerticalBlockFlow())
+  if (child->style()->isHorizontalWritingMode() ==
+      style()->isHorizontalWritingMode())
     return child->collapsedMarginBefore();
 
   // The child is perpendicular to us, which means its margins don't collapse
@@ -6959,14 +6961,14 @@ int RenderBlock::collapsedMarginAfterForChild(RenderBox* child) const {
 }
 
 int RenderBlock::marginBeforeForChild(RenderBoxModelObject* child) const {
-  switch (style()->blockFlow()) {
-    case TopToBottomBlockFlow:
+  switch (style()->writingMode()) {
+    case TopToBottomWritingMode:
       return child->marginTop();
-    case BottomToTopBlockFlow:
+    case BottomToTopWritingMode:
       return child->marginBottom();
-    case LeftToRightBlockFlow:
+    case LeftToRightWritingMode:
       return child->marginLeft();
-    case RightToLeftBlockFlow:
+    case RightToLeftWritingMode:
       return child->marginRight();
   }
   ASSERT_NOT_REACHED();
@@ -6974,14 +6976,14 @@ int RenderBlock::marginBeforeForChild(RenderBoxModelObject* child) const {
 }
 
 int RenderBlock::marginAfterForChild(RenderBoxModelObject* child) const {
-  switch (style()->blockFlow()) {
-    case TopToBottomBlockFlow:
+  switch (style()->writingMode()) {
+    case TopToBottomWritingMode:
       return child->marginBottom();
-    case BottomToTopBlockFlow:
+    case BottomToTopWritingMode:
       return child->marginTop();
-    case LeftToRightBlockFlow:
+    case LeftToRightWritingMode:
       return child->marginRight();
-    case RightToLeftBlockFlow:
+    case RightToLeftWritingMode:
       return child->marginLeft();
   }
   ASSERT_NOT_REACHED();
@@ -6989,7 +6991,7 @@ int RenderBlock::marginAfterForChild(RenderBoxModelObject* child) const {
 }
 
 int RenderBlock::marginStartForChild(RenderBoxModelObject* child) const {
-  if (style()->isVerticalBlockFlow())
+  if (style()->isHorizontalWritingMode())
     return style()->isLeftToRightDirection() ? child->marginLeft()
                                              : child->marginRight();
   return style()->isLeftToRightDirection() ? child->marginTop()
@@ -6997,7 +6999,7 @@ int RenderBlock::marginStartForChild(RenderBoxModelObject* child) const {
 }
 
 int RenderBlock::marginEndForChild(RenderBoxModelObject* child) const {
-  if (style()->isVerticalBlockFlow())
+  if (style()->isHorizontalWritingMode())
     return style()->isLeftToRightDirection() ? child->marginRight()
                                              : child->marginLeft();
   return style()->isLeftToRightDirection() ? child->marginBottom()
@@ -7005,7 +7007,7 @@ int RenderBlock::marginEndForChild(RenderBoxModelObject* child) const {
 }
 
 void RenderBlock::setMarginStartForChild(RenderBox* child, int margin) {
-  if (style()->isVerticalBlockFlow()) {
+  if (style()->isHorizontalWritingMode()) {
     if (style()->isLeftToRightDirection())
       child->setMarginLeft(margin);
     else
@@ -7019,7 +7021,7 @@ void RenderBlock::setMarginStartForChild(RenderBox* child, int margin) {
 }
 
 void RenderBlock::setMarginEndForChild(RenderBox* child, int margin) {
-  if (style()->isVerticalBlockFlow()) {
+  if (style()->isHorizontalWritingMode()) {
     if (style()->isLeftToRightDirection())
       child->setMarginRight(margin);
     else
@@ -7033,34 +7035,34 @@ void RenderBlock::setMarginEndForChild(RenderBox* child, int margin) {
 }
 
 void RenderBlock::setMarginBeforeForChild(RenderBox* child, int margin) {
-  switch (style()->blockFlow()) {
-    case TopToBottomBlockFlow:
+  switch (style()->writingMode()) {
+    case TopToBottomWritingMode:
       child->setMarginTop(margin);
       break;
-    case BottomToTopBlockFlow:
+    case BottomToTopWritingMode:
       child->setMarginBottom(margin);
       break;
-    case LeftToRightBlockFlow:
+    case LeftToRightWritingMode:
       child->setMarginLeft(margin);
       break;
-    case RightToLeftBlockFlow:
+    case RightToLeftWritingMode:
       child->setMarginRight(margin);
       break;
   }
 }
 
 void RenderBlock::setMarginAfterForChild(RenderBox* child, int margin) {
-  switch (style()->blockFlow()) {
-    case TopToBottomBlockFlow:
+  switch (style()->writingMode()) {
+    case TopToBottomWritingMode:
       child->setMarginBottom(margin);
       break;
-    case BottomToTopBlockFlow:
+    case BottomToTopWritingMode:
       child->setMarginTop(margin);
       break;
-    case LeftToRightBlockFlow:
+    case LeftToRightWritingMode:
       child->setMarginRight(margin);
       break;
-    case RightToLeftBlockFlow:
+    case RightToLeftWritingMode:
       child->setMarginLeft(margin);
       break;
   }
@@ -7081,7 +7083,7 @@ RenderBlock::MarginValues RenderBlock::marginValuesForChild(RenderBox* child) {
   // If the child has the same directionality as we do, then we can just return
   // its
   // margins in the same direction.
-  if (!child->isBlockFlowRoot()) {
+  if (!child->isWritingModeRoot()) {
     if (childRenderBlock) {
       childBeforePositive = childRenderBlock->maxPositiveMarginBefore();
       childBeforeNegative = childRenderBlock->maxNegativeMarginBefore();
@@ -7091,8 +7093,8 @@ RenderBlock::MarginValues RenderBlock::marginValuesForChild(RenderBox* child) {
       beforeMargin = child->marginBefore();
       afterMargin = child->marginAfter();
     }
-  } else if (child->style()->isVerticalBlockFlow() ==
-             style()->isVerticalBlockFlow()) {
+  } else if (child->style()->isHorizontalWritingMode() ==
+             style()->isHorizontalWritingMode()) {
     // The child has a different directionality.  If the child is parallel, then
     // it's just
     // flipped relative to us.  We can use the margins for the opposite edges.

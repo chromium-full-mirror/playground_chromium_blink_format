@@ -73,7 +73,7 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
   static LineJoin initialJoinStyle() { return MiterJoin; }
   static EShapeRendering initialShapeRendering() { return SR_AUTO; }
   static ETextAnchor initialTextAnchor() { return TA_START; }
-  static EWritingMode initialWritingMode() { return WM_LRTB; }
+  static SVGWritingMode initialWritingMode() { return WM_LRTB; }
   static EGlyphOrientation initialGlyphOrientationHorizontal() {
     return GO_0DEG;
   }
@@ -156,7 +156,7 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
     svg_inherited_flags._shapeRendering = val;
   }
   void setTextAnchor(ETextAnchor val) { svg_inherited_flags._textAnchor = val; }
-  void setWritingMode(EWritingMode val) {
+  void setWritingMode(SVGWritingMode val) {
     svg_inherited_flags._writingMode = val;
   }
   void setGlyphOrientationHorizontal(EGlyphOrientation val) {
@@ -314,8 +314,8 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
   ETextAnchor textAnchor() const {
     return (ETextAnchor)svg_inherited_flags._textAnchor;
   }
-  EWritingMode writingMode() const {
-    return (EWritingMode)svg_inherited_flags._writingMode;
+  SVGWritingMode writingMode() const {
+    return (SVGWritingMode)svg_inherited_flags._writingMode;
   }
   EGlyphOrientation glyphOrientationHorizontal() const {
     return (EGlyphOrientation)svg_inherited_flags._glyphOrientationHorizontal;
@@ -397,7 +397,7 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
     unsigned _textAnchor : 2;                  // ETextAnchor
     unsigned _colorInterpolation : 2;          // EColorInterpolation
     unsigned _colorInterpolationFilters : 2;   // EColorInterpolation
-    unsigned _writingMode : 3;                 // EWritingMode
+    unsigned _writingMode : 3;                 // SVGWritingMode
     unsigned _glyphOrientationHorizontal : 3;  // EGlyphOrientation
     unsigned _glyphOrientationVertical : 3;    // EGlyphOrientation
   } svg_inherited_flags;
