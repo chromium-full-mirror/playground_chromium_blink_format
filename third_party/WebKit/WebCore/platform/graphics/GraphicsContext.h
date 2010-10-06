@@ -380,10 +380,10 @@ class GraphicsContext : public Noncopyable {
   float getAlpha();
   void applyPlatformShadow(PassOwnPtr<ImageBuffer> buffer,
                            const Color& shadowColor,
-                           const FloatRect& shadowRect,
+                           FloatRect& shadowRect,
                            float radius);
   PlatformRefPtr<cairo_surface_t> createShadowMask(PassOwnPtr<ImageBuffer>,
-                                                   const FloatRect&,
+                                                   FloatRect&,
                                                    float radius);
 
   static void calculateShadowBufferDimensions(IntSize& shadowBufferSize,

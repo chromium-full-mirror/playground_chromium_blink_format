@@ -27,12 +27,14 @@
 
 namespace WebCore {
 
-ImageBufferFilter::ImageBufferFilter() : Filter() {
-  setFilterResolution(FloatSize(1.f, 1.f));
+ImageBufferFilter::ImageBufferFilter(const FloatRect& sourceImageRect)
+    : Filter(), m_sourceImageRect(sourceImageRect) {
+  setFilterResolution(FloatSize(1, 1));
 }
 
-PassRefPtr<ImageBufferFilter> ImageBufferFilter::create() {
-  return adoptRef(new ImageBufferFilter());
+PassRefPtr<ImageBufferFilter> ImageBufferFilter::create(
+    const FloatRect& sourceImageRect) {
+  return adoptRef(new ImageBufferFilter(sourceImageRect));
 }
 
 }  // namespace WebCore
