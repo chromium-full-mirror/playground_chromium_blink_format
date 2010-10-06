@@ -93,8 +93,12 @@ class VideoLayerChromium : public LayerChromium {
     bool m_initialized;
   };
 
+ protected:
+  virtual void cleanupResources();
+
  private:
   VideoLayerChromium(GraphicsLayerChromium* owner, VideoFrameProvider*);
+
   static unsigned determineTextureFormat(VideoFrameChromium*);
   bool allocateTexturesIfNeeded(GraphicsContext3D*,
                                 VideoFrameChromium*,

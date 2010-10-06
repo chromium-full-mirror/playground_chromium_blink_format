@@ -50,7 +50,6 @@ class ContentLayerChromium : public LayerChromium {
   virtual void updateContents();
   virtual void draw();
   virtual bool drawsContent() { return m_owner && m_owner->drawsContent(); }
-  virtual void setLayerRenderer(LayerRendererChromium*);
 
   // Stores values that are shared between instances of this class that are
   // associated with the same LayerRendererChromium (and hence the same GL
@@ -84,7 +83,7 @@ class ContentLayerChromium : public LayerChromium {
                          const IntRect& updateRect,
                          unsigned textureId);
 
-  void cleanupResources();
+  virtual void cleanupResources();
 
   unsigned m_contentsTexture;
   IntSize m_allocatedTextureSize;
