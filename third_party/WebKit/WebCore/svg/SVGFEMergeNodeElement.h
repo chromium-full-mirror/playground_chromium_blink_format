@@ -36,6 +36,7 @@ class SVGFEMergeNodeElement : public SVGElement {
   SVGFEMergeNodeElement(const QualifiedName&, Document*);
 
   virtual void parseMappedAttribute(Attribute*);
+  virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 
   DECLARE_ANIMATED_PROPERTY(SVGFEMergeNodeElement,
