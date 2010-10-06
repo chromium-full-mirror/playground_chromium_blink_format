@@ -43,7 +43,7 @@ enum ViewportErrorCode {
   TargetDensityDpiTooSmallOrLargeError
 };
 
-struct ViewportConfiguration {
+struct ViewportAttributes {
   IntSize layoutViewport;
 
   float devicePixelRatio;
@@ -93,12 +93,12 @@ struct ViewportArguments {
   }
 };
 
-ViewportConfiguration findConfigurationForViewportData(ViewportArguments args,
-                                                       int desktopWidth,
-                                                       int deviceWidth,
-                                                       int deviceHeight,
-                                                       int deviceDPI,
-                                                       IntSize visibleViewport);
+ViewportAttributes findConfigurationForViewportData(ViewportArguments args,
+                                                    int desktopWidth,
+                                                    int deviceWidth,
+                                                    int deviceHeight,
+                                                    int deviceDPI,
+                                                    IntSize visibleViewport);
 
 void setViewportFeature(const String& keyString,
                         const String& valueString,

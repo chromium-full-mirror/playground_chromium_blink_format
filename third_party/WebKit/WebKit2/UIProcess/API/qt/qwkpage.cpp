@@ -308,10 +308,8 @@ QWKPage::ViewportConfiguration QWKPage::viewportConfigurationForSize(
 
   ViewportArguments args;
 
-  WebCore::ViewportConfiguration conf =
-      WebCore::findConfigurationForViewportData(args, desktopWidth, deviceWidth,
-                                                deviceHeight, deviceDPI,
-                                                availableSize);
+  WebCore::ViewportAttributes conf = WebCore::findConfigurationForViewportData(
+      args, desktopWidth, deviceWidth, deviceHeight, deviceDPI, availableSize);
 
   ViewportConfiguration result;
 
