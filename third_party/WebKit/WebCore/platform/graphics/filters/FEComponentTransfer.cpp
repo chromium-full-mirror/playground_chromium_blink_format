@@ -155,7 +155,7 @@ void FEComponentTransfer::apply(Filter* filter) {
   if (!in->resultImage())
     return;
 
-  if (!effectContext())
+  if (!effectContext(filter))
     return;
 
   unsigned char rValues[256], gValues[256], bValues[256], aValues[256];
@@ -172,7 +172,7 @@ void FEComponentTransfer::apply(Filter* filter) {
                                                   transferFunction[channel]);
 
   IntRect drawingRect =
-      requestedRegionOfInputImageData(in->repaintRectInLocalCoordinates());
+      requestedRegionOfInputImageData(in->absolutePaintRect());
   RefPtr<ImageData> imageData(
       in->resultImage()->getUnmultipliedImageData(drawingRect));
   CanvasPixelArray* srcPixelArray(imageData->data());

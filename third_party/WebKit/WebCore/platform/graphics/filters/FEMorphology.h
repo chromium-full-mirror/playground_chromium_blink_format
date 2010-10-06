@@ -51,6 +51,8 @@ class FEMorphology : public FilterEffect {
   virtual void apply(Filter*);
   virtual void dump();
 
+  virtual void determineAbsolutePaintRect(Filter*);
+
   virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:

@@ -39,22 +39,16 @@ const AtomicString& SourceGraphic::effectName() {
   return s_effectName;
 }
 
-FloatRect SourceGraphic::determineFilterPrimitiveSubregion(Filter* filter) {
-  FloatRect clippedSourceRect = filter->sourceImageRect();
-  if (filter->sourceImageRect().x() < filter->filterRegion().x())
-    clippedSourceRect.setX(filter->filterRegion().x());
-  if (filter->sourceImageRect().y() < filter->filterRegion().y())
-    clippedSourceRect.setY(filter->filterRegion().y());
-  setFilterPrimitiveSubregion(clippedSourceRect);
-  clippedSourceRect.scale(filter->filterResolution().width(),
-                          filter->filterResolution().height());
-  setRepaintRectInLocalCoordinates(clippedSourceRect);
-  return filter->filterRegion();
+void SourceGraphic::determineAbsolutePaintRect(Filter* filter) {
+  FloatRect paintRect = filter->sourceImageRect();
+  paintRect.scale(filter->filterResolution().width(),
+                  filter->filterResolution().height());
+  setAbsolutePaintRect(enclosingIntRect(paintRect));
 }
 
 void SourceGraphic::apply(Filter* filter) {
-  GraphicsContext* filterContext = effectContext();
-  if (!filterContext)
+  GraphicsContext* filterContext = effectContext(filter);
+  if (!filterContext || !filter->sourceImage())
     return;
 
   filterContext->drawImageBuffer(filter->sourceImage(), DeviceColorSpace,

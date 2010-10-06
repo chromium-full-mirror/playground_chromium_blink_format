@@ -163,13 +163,13 @@ void FEColorMatrix::apply(Filter* filter) {
   if (!in->resultImage())
     return;
 
-  GraphicsContext* filterContext = effectContext();
+  GraphicsContext* filterContext = effectContext(filter);
   if (!filterContext)
     return;
 
   filterContext->drawImageBuffer(
       in->resultImage(), DeviceColorSpace,
-      drawingRegionOfInputImage(in->repaintRectInLocalCoordinates()));
+      drawingRegionOfInputImage(in->absolutePaintRect()));
 
   IntRect imageRect(IntPoint(), resultImage()->size());
   PassRefPtr<ImageData> imageData(

@@ -3,6 +3,7 @@
  * Copyright (C) 2004, 2005 Rob Buis <buis@kde.org>
  * Copyright (C) 2005 Eric Seidel <eric@webkit.org>
  * Copyright (C) 2009 Dirk Schulze <krit@webkit.org>
+ * Copyright (C) Research In Motion Limited 2010. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -86,16 +87,16 @@ void FEDisplacementMap::apply(Filter* filter) {
       m_yChannelSelector == CHANNEL_UNKNOWN)
     return;
 
-  if (!effectContext())
+  if (!effectContext(filter))
     return;
 
   IntRect effectADrawingRect =
-      requestedRegionOfInputImageData(in->repaintRectInLocalCoordinates());
+      requestedRegionOfInputImageData(in->absolutePaintRect());
   RefPtr<CanvasPixelArray> srcPixelArrayA(
       in->resultImage()->getPremultipliedImageData(effectADrawingRect)->data());
 
   IntRect effectBDrawingRect =
-      requestedRegionOfInputImageData(in2->repaintRectInLocalCoordinates());
+      requestedRegionOfInputImageData(in2->absolutePaintRect());
   RefPtr<CanvasPixelArray> srcPixelArrayB(
       in2->resultImage()->getUnmultipliedImageData(effectBDrawingRect)->data());
 
@@ -105,12 +106,10 @@ void FEDisplacementMap::apply(Filter* filter) {
 
   ASSERT(srcPixelArrayA->length() == srcPixelArrayB->length());
 
-  float scaleX = m_scale / 255.f * filter->filterResolution().width();
-  float scaleY = m_scale / 255.f * filter->filterResolution().height();
-  float scaleAdjustmentX =
-      (0.5f - 0.5f * m_scale) * filter->filterResolution().width();
-  float scaleAdjustmentY =
-      (0.5f - 0.5f * m_scale) * filter->filterResolution().height();
+  float scaleX = filter->applyHorizontalScale(m_scale / 255);
+  float scaleY = filter->applyVerticalScale(m_scale / 255);
+  float scaleAdjustmentX = filter->applyHorizontalScale(0.5f - 0.5f * m_scale);
+  float scaleAdjustmentY = filter->applyVerticalScale(0.5f - 0.5f * m_scale);
   int stride = imageRect.width() * 4;
   for (int y = 0; y < imageRect.height(); ++y) {
     int line = y * stride;

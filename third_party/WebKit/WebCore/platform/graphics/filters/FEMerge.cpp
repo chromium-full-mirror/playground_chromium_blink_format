@@ -45,7 +45,7 @@ void FEMerge::apply(Filter* filter) {
       return;
   }
 
-  GraphicsContext* filterContext = effectContext();
+  GraphicsContext* filterContext = effectContext(filter);
   if (!filterContext)
     return;
 
@@ -53,7 +53,7 @@ void FEMerge::apply(Filter* filter) {
     FilterEffect* in = inputEffect(i);
     filterContext->drawImageBuffer(
         in->resultImage(), DeviceColorSpace,
-        drawingRegionOfInputImage(in->repaintRectInLocalCoordinates()));
+        drawingRegionOfInputImage(in->absolutePaintRect()));
   }
 }
 

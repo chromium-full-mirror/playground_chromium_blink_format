@@ -41,12 +41,13 @@
 namespace WebCore {
 
 struct FilterData {
-  FilterData() : builded(false) {}
+  FilterData() : savedContext(0), builded(false) {}
 
   RefPtr<SVGFilter> filter;
   RefPtr<SVGFilterBuilder> builder;
   OwnPtr<ImageBuffer> sourceGraphicBuffer;
   GraphicsContext* savedContext;
+  AffineTransform shearFreeAbsoluteTransform;
   FloatRect boundaries;
   FloatSize scale;
   bool builded;

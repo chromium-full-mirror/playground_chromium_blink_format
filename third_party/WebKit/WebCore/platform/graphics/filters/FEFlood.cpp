@@ -54,15 +54,14 @@ void FEFlood::setFloodOpacity(float floodOpacity) {
   m_floodOpacity = floodOpacity;
 }
 
-void FEFlood::apply(Filter*) {
-  GraphicsContext* filterContext = effectContext();
+void FEFlood::apply(Filter* filter) {
+  GraphicsContext* filterContext = effectContext(filter);
   if (!filterContext)
     return;
 
   Color color = colorWithOverrideAlpha(floodColor().rgb(), floodOpacity());
-  filterContext->fillRect(
-      FloatRect(FloatPoint(), repaintRectInLocalCoordinates().size()), color,
-      DeviceColorSpace);
+  filterContext->fillRect(FloatRect(FloatPoint(), absolutePaintRect().size()),
+                          color, DeviceColorSpace);
 }
 
 void FEFlood::dump() {}

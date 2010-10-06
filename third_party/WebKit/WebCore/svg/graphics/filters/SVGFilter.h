@@ -21,6 +21,7 @@
 #define SVGFilter_h
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
+#include "AffineTransform.h"
 #include "Filter.h"
 #include "FilterEffect.h"
 #include "FloatRect.h"
@@ -34,27 +35,47 @@ namespace WebCore {
 
 class SVGFilter : public Filter {
  public:
-  static PassRefPtr<SVGFilter> create(const FloatRect&, const FloatRect&, bool);
+  static PassRefPtr<SVGFilter> create(const AffineTransform&,
+                                      const FloatRect&,
+                                      const FloatRect&,
+                                      const FloatRect&,
+                                      bool);
 
   virtual bool effectBoundingBoxMode() const { return m_effectBBoxMode; }
 
-  virtual FloatRect filterRegion() const { return m_filterRect; }
+  virtual FloatRect filterRegionInUserSpace() const { return m_filterRegion; }
+  virtual FloatRect filterRegion() const { return m_absoluteFilterRegion; }
 
-  virtual FloatRect sourceImageRect() const { return m_targetBoundingBox; }
+  virtual FloatPoint mapAbsolutePointToLocalPoint(
+      const FloatPoint& point) const {
+    return m_absoluteTransform.inverse().mapPoint(point);
+  }
+
+  virtual float applyHorizontalScale(float value) const;
+  virtual float applyVerticalScale(float value) const;
+
+  virtual FloatRect sourceImageRect() const {
+    return m_absoluteSourceDrawingRegion;
+  }
 
   virtual FloatSize maxImageSize() const { return m_maxImageSize; }
   virtual void determineFilterPrimitiveSubregion(FilterEffect*,
                                                  const FloatRect&);
 
  private:
-  SVGFilter(const FloatRect& targetBoundingBox,
-            const FloatRect& filterRect,
+  SVGFilter(const AffineTransform& absoluteTransform,
+            const FloatRect& absoluteSourceDrawingRegion,
+            const FloatRect& targetBoundingBox,
+            const FloatRect& filterRegion,
             bool effectBBoxMode);
 
-  FloatSize m_maxImageSize;
+  AffineTransform m_absoluteTransform;
+  FloatRect m_absoluteSourceDrawingRegion;
   FloatRect m_targetBoundingBox;
-  FloatRect m_filterRect;
+  FloatRect m_absoluteFilterRegion;
+  FloatRect m_filterRegion;
   bool m_effectBBoxMode;
+  FloatSize m_maxImageSize;
 };
 
 }  // namespace WebCore

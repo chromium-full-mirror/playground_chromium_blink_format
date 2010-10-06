@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 Dirk Schulze <krit@webkit.org>
+ * Copyright (C) Research In Motion Limited 2010. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -24,13 +25,19 @@
 
 namespace WebCore {
 
-SVGFilter::SVGFilter(const FloatRect& targetBoundingBox,
-                     const FloatRect& filterRect,
+SVGFilter::SVGFilter(const AffineTransform& absoluteTransform,
+                     const FloatRect& absoluteSourceDrawingRegion,
+                     const FloatRect& targetBoundingBox,
+                     const FloatRect& filterRegion,
                      bool effectBBoxMode)
     : Filter(),
+      m_absoluteTransform(absoluteTransform),
+      m_absoluteSourceDrawingRegion(absoluteSourceDrawingRegion),
       m_targetBoundingBox(targetBoundingBox),
-      m_filterRect(filterRect),
-      m_effectBBoxMode(effectBBoxMode) {}
+      m_filterRegion(filterRegion),
+      m_effectBBoxMode(effectBBoxMode) {
+  m_absoluteFilterRegion = absoluteTransform.mapRect(filterRegion);
+}
 
 void SVGFilter::determineFilterPrimitiveSubregion(
     FilterEffect* effect,
@@ -71,10 +78,9 @@ void SVGFilter::determineFilterPrimitiveSubregion(
   }
 
   // clip every filter effect to the filter region
-  newSubRegion.intersect(m_filterRect);
+  newSubRegion.intersect(m_filterRegion);
 
   effect->setFilterPrimitiveSubregion(newSubRegion);
-
   // TODO: Everything above should be moved to a first phase of layout in
   // RenderSVGResourceFilterPrimitive.
   // The scaling of the subregion to the repaint rect should be merged with a
@@ -82,15 +88,36 @@ void SVGFilter::determineFilterPrimitiveSubregion(
   // and moved to the second phase of layout in
   // RenderSVGResourceFilterPrimitive.
   // See bug https://bugs.webkit.org/show_bug.cgi?id=45614.
+  newSubRegion = m_absoluteTransform.mapRect(newSubRegion);
   newSubRegion.scale(filterResolution().width(), filterResolution().height());
-  effect->setRepaintRectInLocalCoordinates(newSubRegion);
-  m_maxImageSize = m_maxImageSize.expandedTo(newSubRegion.size());
+  effect->setMaxEffectRect(enclosingIntRect(newSubRegion));
+  if (!effect->isSourceInput())
+    m_maxImageSize = m_maxImageSize.expandedTo(newSubRegion.size());
 }
 
-PassRefPtr<SVGFilter> SVGFilter::create(const FloatRect& targetBoundingBox,
-                                        const FloatRect& filterRect,
-                                        bool effectBBoxMode) {
-  return adoptRef(new SVGFilter(targetBoundingBox, filterRect, effectBBoxMode));
+float SVGFilter::applyHorizontalScale(float value) const {
+  if (m_effectBBoxMode)
+    value *= m_targetBoundingBox.width();
+  return Filter::applyHorizontalScale(value) * m_absoluteFilterRegion.width() /
+         m_filterRegion.width();
+}
+
+float SVGFilter::applyVerticalScale(float value) const {
+  if (m_effectBBoxMode)
+    value *= m_targetBoundingBox.height();
+  return Filter::applyVerticalScale(value) * m_absoluteFilterRegion.height() /
+         m_filterRegion.height();
+}
+
+PassRefPtr<SVGFilter> SVGFilter::create(
+    const AffineTransform& absoluteTransform,
+    const FloatRect& absoluteSourceDrawingRegion,
+    const FloatRect& targetBoundingBox,
+    const FloatRect& filterRegion,
+    bool effectBBoxMode) {
+  return adoptRef(new SVGFilter(absoluteTransform, absoluteSourceDrawingRegion,
+                                targetBoundingBox, filterRegion,
+                                effectBBoxMode));
 }
 
 }  // namespace WebCore

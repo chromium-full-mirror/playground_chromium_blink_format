@@ -109,16 +109,16 @@ void FEBlend::apply(Filter* filter) {
   if (m_mode == FEBLEND_MODE_UNKNOWN)
     return;
 
-  if (!effectContext())
+  if (!effectContext(filter))
     return;
 
   IntRect effectADrawingRect =
-      requestedRegionOfInputImageData(in->repaintRectInLocalCoordinates());
+      requestedRegionOfInputImageData(in->absolutePaintRect());
   RefPtr<CanvasPixelArray> srcPixelArrayA(
       in->resultImage()->getPremultipliedImageData(effectADrawingRect)->data());
 
   IntRect effectBDrawingRect =
-      requestedRegionOfInputImageData(in2->repaintRectInLocalCoordinates());
+      requestedRegionOfInputImageData(in2->absolutePaintRect());
   RefPtr<CanvasPixelArray> srcPixelArrayB(
       in2->resultImage()
           ->getPremultipliedImageData(effectBDrawingRect)
