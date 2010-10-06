@@ -27,7 +27,7 @@
 
 #include "WebCoreArgumentCoders.h"
 #include "WebPage.h"
-#include "WebPageProxyMessages.h"
+#include "WebPageProxyMessageKinds.h"
 #include "WebProcess.h"
 #include "WebProcessProxyMessageKinds.h"
 #include <WebCore/HistoryItem.h>
@@ -112,7 +112,8 @@ void WebBackForwardListProxy::addItem(PassRefPtr<HistoryItem> prpItem) {
   RefPtr<HistoryItem> item = prpItem;
   uint64_t itemID = historyItemToIDMap().get(item);
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::BackForwardAddItem(itemID), m_page->pageID());
+      WebPageProxyMessage::BackForwardAddItem, m_page->pageID(),
+      CoreIPC::In(itemID));
 }
 
 void WebBackForwardListProxy::goBack() {
@@ -126,15 +127,16 @@ void WebBackForwardListProxy::goForward() {
 void WebBackForwardListProxy::goToItem(HistoryItem* item) {
   uint64_t itemID = historyItemToIDMap().get(item);
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::BackForwardGoToItem(itemID), m_page->pageID());
+      WebPageProxyMessage::BackForwardGoToItem, m_page->pageID(),
+      CoreIPC::In(itemID));
 }
 
 HistoryItem* WebBackForwardListProxy::backItem() {
   uint64_t backItemID = 0;
   if (!WebProcess::shared().connection()->sendSync(
-          Messages::WebPageProxy::BackForwardBackItem(),
-          Messages::WebPageProxy::BackForwardBackItem::Reply(backItemID),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout)) {
+          WebPageProxyMessage::BackForwardBackItem, m_page->pageID(),
+          CoreIPC::In(), CoreIPC::Out(backItemID),
+          CoreIPC::Connection::NoTimeout)) {
     return 0;
   }
 
@@ -148,9 +150,9 @@ HistoryItem* WebBackForwardListProxy::backItem() {
 HistoryItem* WebBackForwardListProxy::currentItem() {
   uint64_t currentItemID = 0;
   if (!WebProcess::shared().connection()->sendSync(
-          Messages::WebPageProxy::BackForwardCurrentItem(),
-          Messages::WebPageProxy::BackForwardCurrentItem::Reply(currentItemID),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout)) {
+          WebPageProxyMessage::BackForwardCurrentItem, m_page->pageID(),
+          CoreIPC::In(), CoreIPC::Out(currentItemID),
+          CoreIPC::Connection::NoTimeout)) {
     return 0;
   }
 
@@ -164,9 +166,9 @@ HistoryItem* WebBackForwardListProxy::currentItem() {
 HistoryItem* WebBackForwardListProxy::forwardItem() {
   uint64_t forwardItemID = 0;
   if (!WebProcess::shared().connection()->sendSync(
-          Messages::WebPageProxy::BackForwardForwardItem(),
-          Messages::WebPageProxy::BackForwardForwardItem::Reply(forwardItemID),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout)) {
+          WebPageProxyMessage::BackForwardForwardItem, m_page->pageID(),
+          CoreIPC::In(), CoreIPC::Out(forwardItemID),
+          CoreIPC::Connection::NoTimeout)) {
     return 0;
   }
 
@@ -180,9 +182,9 @@ HistoryItem* WebBackForwardListProxy::forwardItem() {
 HistoryItem* WebBackForwardListProxy::itemAtIndex(int itemIndex) {
   uint64_t itemID = 0;
   if (!WebProcess::shared().connection()->sendSync(
-          Messages::WebPageProxy::BackForwardItemAtIndex(itemIndex),
-          Messages::WebPageProxy::BackForwardItemAtIndex::Reply(itemID),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout)) {
+          WebPageProxyMessage::BackForwardItemAtIndex, m_page->pageID(),
+          CoreIPC::In(itemIndex), CoreIPC::Out(itemID),
+          CoreIPC::Connection::NoTimeout)) {
     return 0;
   }
 
@@ -220,10 +222,9 @@ void WebBackForwardListProxy::setEnabled(bool enabled) {
 int WebBackForwardListProxy::backListCount() {
   int backListCount = 0;
   if (!WebProcess::shared().connection()->sendSync(
-          Messages::WebPageProxy::BackForwardBackListCount(),
-          Messages::WebPageProxy::BackForwardBackListCount::Reply(
-              backListCount),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout)) {
+          WebPageProxyMessage::BackForwardBackListCount, m_page->pageID(),
+          CoreIPC::In(), CoreIPC::Out(backListCount),
+          CoreIPC::Connection::NoTimeout)) {
     return 0;
   }
 
@@ -233,10 +234,9 @@ int WebBackForwardListProxy::backListCount() {
 int WebBackForwardListProxy::forwardListCount() {
   int forwardListCount = 0;
   if (!WebProcess::shared().connection()->sendSync(
-          Messages::WebPageProxy::BackForwardForwardListCount(),
-          Messages::WebPageProxy::BackForwardForwardListCount::Reply(
-              forwardListCount),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout)) {
+          WebPageProxyMessage::BackForwardForwardListCount, m_page->pageID(),
+          CoreIPC::In(), CoreIPC::Out(forwardListCount),
+          CoreIPC::Connection::NoTimeout)) {
     return 0;
   }
 

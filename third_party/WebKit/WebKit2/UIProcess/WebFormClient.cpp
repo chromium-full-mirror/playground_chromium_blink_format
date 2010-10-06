@@ -47,7 +47,7 @@ bool WebFormClient::willSubmitForm(
     WebPageProxy* page,
     WebFrameProxy* frame,
     WebFrameProxy* sourceFrame,
-    const Vector<std::pair<String, String>>& textFieldValues,
+    Vector<std::pair<String, String>>& textFieldValues,
     APIObject* userData,
     WebFormSubmissionListenerProxy* listener) {
   if (!m_pageFormClient.willSubmitForm)

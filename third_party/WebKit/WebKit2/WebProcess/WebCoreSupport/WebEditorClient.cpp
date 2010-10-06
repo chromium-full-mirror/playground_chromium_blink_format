@@ -30,7 +30,7 @@
 
 #include "WebFrameLoaderClient.h"
 #include "WebPage.h"
-#include "WebPageProxyMessages.h"
+#include "WebPageProxyMessageKinds.h"
 #include "WebProcess.h"
 #include <WebCore/ArchiveResource.h>
 #include <WebCore/DocumentFragment.h>
@@ -210,16 +210,16 @@ void WebEditorClient::registerCommandForUndo(PassRefPtr<EditCommand> command) {
       static_cast<uint32_t>(webCommand->command()->editingAction());
 
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::RegisterEditCommandForUndo(
-          webCommand->commandID(), editAction),
-      m_page->pageID());
+      WebPageProxyMessage::RegisterEditCommandForUndo, m_page->pageID(),
+      CoreIPC::In(webCommand->commandID(), editAction));
 }
 
 void WebEditorClient::registerCommandForRedo(PassRefPtr<EditCommand>) {}
 
 void WebEditorClient::clearUndoRedoOperations() {
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::ClearAllEditCommands(), m_page->pageID());
+      WebPageProxyMessage::ClearAllEditCommands, m_page->pageID(),
+      CoreIPC::In());
 }
 
 bool WebEditorClient::canUndo() const {

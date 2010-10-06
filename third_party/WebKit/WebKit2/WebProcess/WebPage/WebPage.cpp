@@ -46,7 +46,7 @@
 #include "WebFrame.h"
 #include "WebInspectorClient.h"
 #include "WebPageCreationParameters.h"
-#include "WebPageProxyMessages.h"
+#include "WebPageProxyMessageKinds.h"
 #include "WebProcessProxyMessageKinds.h"
 #include "WebPreferencesStore.h"
 #include "WebProcess.h"
@@ -157,8 +157,8 @@ WebPage::WebPage(uint64_t pageID, const WebPageCreationParameters& parameters)
 
   m_mainFrame = WebFrame::createMainFrame(this);
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidCreateMainFrame(m_mainFrame->frameID()),
-      m_pageID);
+      WebPageProxyMessage::DidCreateMainFrame, m_pageID,
+      CoreIPC::In(m_mainFrame->frameID()));
 
 #ifndef NDEBUG
   webPageCounter.increment();
@@ -260,12 +260,10 @@ void WebPage::changeAcceleratedCompositingMode(WebCore::GraphicsLayer* layer) {
   // changing
   // drawing area types.
   DrawingArea::DrawingAreaInfo newDrawingAreaInfo;
-
   WebProcess::shared().connection()->sendSync(
-      Messages::WebPageProxy::DidChangeAcceleratedCompositing(compositing),
-      Messages::WebPageProxy::DidChangeAcceleratedCompositing::Reply(
-          newDrawingAreaInfo),
-      m_pageID, CoreIPC::Connection::NoTimeout);
+      WebPageProxyMessage::DidChangeAcceleratedCompositing, m_pageID,
+      CoreIPC::In(compositing), CoreIPC::Out(newDrawingAreaInfo),
+      CoreIPC::Connection::NoTimeout);
 
   if (newDrawingAreaInfo.type != drawingArea()->info().type) {
     m_drawingArea = 0;
@@ -279,7 +277,10 @@ void WebPage::changeAcceleratedCompositingMode(WebCore::GraphicsLayer* layer) {
 
 void WebPage::enterAcceleratedCompositingMode(GraphicsLayer* layer) {
   changeAcceleratedCompositingMode(layer);
+
+#if USE(ACCELERATED_COMPOSITING)
   m_drawingArea->setRootCompositingLayer(layer);
+#endif
 }
 
 void WebPage::exitAcceleratedCompositingMode() {
@@ -306,8 +307,8 @@ void WebPage::tryClose() {
 }
 
 void WebPage::sendClose() {
-  WebProcess::shared().connection()->send(Messages::WebPageProxy::ClosePage(),
-                                          m_pageID);
+  WebProcess::shared().connection()->send(WebPageProxyMessage::ClosePage,
+                                          m_pageID, CoreIPC::In());
 }
 
 void WebPage::loadURL(const String& url) {
@@ -481,10 +482,10 @@ void WebPage::mouseEvent(const WebMouseEvent& mouseEvent) {
   CurrentEvent currentEvent(mouseEvent);
 
   bool handled = handleMouseEvent(mouseEvent, m_page.get());
+
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidReceiveEvent(
-          static_cast<uint32_t>(mouseEvent.type()), handled),
-      m_pageID);
+      WebPageProxyMessage::DidReceiveEvent, m_pageID,
+      CoreIPC::In(static_cast<uint32_t>(mouseEvent.type()), handled));
 }
 
 static bool handleWheelEvent(const WebWheelEvent& wheelEvent, Page* page) {
@@ -501,9 +502,8 @@ void WebPage::wheelEvent(const WebWheelEvent& wheelEvent) {
 
   bool handled = handleWheelEvent(wheelEvent, m_page.get());
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidReceiveEvent(
-          static_cast<uint32_t>(wheelEvent.type()), handled),
-      m_pageID);
+      WebPageProxyMessage::DidReceiveEvent, m_pageID,
+      CoreIPC::In(static_cast<uint32_t>(wheelEvent.type()), handled));
 }
 
 static bool handleKeyEvent(const WebKeyboardEvent& keyboardEvent, Page* page) {
@@ -524,14 +524,13 @@ void WebPage::keyEvent(const WebKeyboardEvent& keyboardEvent) {
     handled = performDefaultBehaviorForKeyEvent(keyboardEvent);
 
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidReceiveEvent(
-          static_cast<uint32_t>(keyboardEvent.type()), handled),
-      m_pageID);
+      WebPageProxyMessage::DidReceiveEvent, m_pageID,
+      CoreIPC::In(static_cast<uint32_t>(keyboardEvent.type()), handled));
 }
 
 void WebPage::validateMenuItem(const String& commandName) {
   bool isEnabled = false;
-  int32_t state = 0;
+  int state = 0;
   Frame* frame = m_page->focusController()->focusedOrMainFrame();
   if (frame) {
     Editor::Command command = frame->editor()->command(commandName);
@@ -540,9 +539,8 @@ void WebPage::validateMenuItem(const String& commandName) {
   }
 
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidValidateMenuItem(commandName, isEnabled,
-                                                  state),
-      m_pageID);
+      WebPageProxyMessage::DidValidateMenuItem, m_pageID,
+      CoreIPC::In(commandName, isEnabled, state));
 }
 
 void WebPage::executeEditCommand(const String& commandName) {
@@ -564,9 +562,8 @@ void WebPage::touchEvent(const WebTouchEvent& touchEvent) {
   bool handled = handleTouchEvent(touchEvent, m_page.get());
 
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidReceiveEvent(
-          static_cast<uint32_t>(touchEvent.type()), handled),
-      m_pageID);
+      WebPageProxyMessage::DidReceiveEvent, m_pageID,
+      CoreIPC::In(static_cast<uint32_t>(touchEvent.type()), handled));
 }
 #endif
 
@@ -621,8 +618,8 @@ void WebPage::didReceivePolicyDecision(uint64_t frameID,
 }
 
 void WebPage::show() {
-  WebProcess::shared().connection()->send(Messages::WebPageProxy::ShowPage(),
-                                          m_pageID);
+  WebProcess::shared().connection()->send(WebPageProxyMessage::ShowPage,
+                                          m_pageID, CoreIPC::In());
 }
 
 void WebPage::setCustomUserAgent(const String& customUserAgent) {
@@ -669,27 +666,24 @@ void WebPage::runJavaScriptInMainFrame(const String& script,
                                ->globalExec()));
 
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidRunJavaScriptInMainFrame(resultString,
-                                                          callbackID),
-      m_pageID);
+      WebPageProxyMessage::DidRunJavaScriptInMainFrame, m_pageID,
+      CoreIPC::In(resultString, callbackID));
 }
 
 void WebPage::getRenderTreeExternalRepresentation(uint64_t callbackID) {
   String resultString = renderTreeExternalRepresentation();
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidGetRenderTreeExternalRepresentation(
-          resultString, callbackID),
-      m_pageID);
+      WebPageProxyMessage::DidGetRenderTreeExternalRepresentation, m_pageID,
+      CoreIPC::In(resultString, callbackID));
 }
 
 void WebPage::getSourceForFrame(uint64_t frameID, uint64_t callbackID) {
   String resultString;
   if (WebFrame* frame = WebProcess::shared().webFrame(frameID))
     resultString = frame->source();
-
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidGetSourceForFrame(resultString, callbackID),
-      m_pageID);
+      WebPageProxyMessage::DidGetSourceForFrame, m_pageID,
+      CoreIPC::In(resultString, callbackID));
 }
 
 void WebPage::preferencesDidChange(const WebPreferencesStore& store) {

@@ -36,7 +36,7 @@
 #include "WebFrameLoaderClient.h"
 #include "WebPage.h"
 #include "WebPageCreationParameters.h"
-#include "WebPageProxyMessages.h"
+#include "WebPageProxyMessageKinds.h"
 #include "WebPopupMenu.h"
 #include "WebPreferencesStore.h"
 #include "WebProcess.h"
@@ -56,7 +56,7 @@ void WebChromeClient::chromeDestroyed() {
   delete this;
 }
 
-void WebChromeClient::setWindowRect(const FloatRect& windowRect) {
+void WebChromeClient::setWindowRect(const FloatRect&) {
   notImplemented();
 }
 
@@ -90,9 +90,8 @@ bool WebChromeClient::canTakeFocus(FocusDirection) {
 
 void WebChromeClient::takeFocus(FocusDirection direction) {
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::TakeFocus(
-          direction == FocusDirectionForward ? true : false),
-      m_page->pageID());
+      WebPageProxyMessage::TakeFocus, m_page->pageID(),
+      direction == FocusDirectionForward ? true : false);
 }
 
 void WebChromeClient::focusedNodeChanged(Node*) {
@@ -105,9 +104,9 @@ Page* WebChromeClient::createWindow(Frame*,
   uint64_t newPageID = 0;
   WebPageCreationParameters parameters;
   if (!WebProcess::shared().connection()->sendSync(
-          Messages::WebPageProxy::CreateNewPage(),
-          Messages::WebPageProxy::CreateNewPage::Reply(newPageID, parameters),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout)) {
+          WebPageProxyMessage::CreateNewPage, m_page->pageID(), CoreIPC::In(),
+          CoreIPC::Out(newPageID, parameters),
+          CoreIPC::Connection::NoTimeout)) {
     return 0;
   }
 
@@ -223,9 +222,8 @@ void WebChromeClient::runJavaScriptAlert(Frame* frame,
                                                           webFrame);
 
   WebProcess::shared().connection()->sendSync(
-      Messages::WebPageProxy::RunJavaScriptAlert(webFrame->frameID(),
-                                                 alertText),
-      Messages::WebPageProxy::RunJavaScriptAlert::Reply(), m_page->pageID(),
+      WebPageProxyMessage::RunJavaScriptAlert, m_page->pageID(),
+      CoreIPC::In(webFrame->frameID(), alertText), CoreIPC::Out(),
       CoreIPC::Connection::NoTimeout);
 }
 
@@ -240,11 +238,11 @@ bool WebChromeClient::runJavaScriptConfirm(Frame* frame,
 
   bool result = false;
   if (!WebProcess::shared().connection()->sendSync(
-          Messages::WebPageProxy::RunJavaScriptConfirm(webFrame->frameID(),
-                                                       message),
-          Messages::WebPageProxy::RunJavaScriptConfirm::Reply(result),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout))
+          WebPageProxyMessage::RunJavaScriptConfirm, m_page->pageID(),
+          CoreIPC::In(webFrame->frameID(), message), CoreIPC::Out(result),
+          CoreIPC::Connection::NoTimeout)) {
     return false;
+  }
 
   return result;
 }
@@ -261,11 +259,11 @@ bool WebChromeClient::runJavaScriptPrompt(Frame* frame,
       m_page, message, defaultValue, webFrame);
 
   if (!WebProcess::shared().connection()->sendSync(
-          Messages::WebPageProxy::RunJavaScriptPrompt(webFrame->frameID(),
-                                                      message, defaultValue),
-          Messages::WebPageProxy::RunJavaScriptPrompt::Reply(result),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout))
+          WebPageProxyMessage::RunJavaScriptPrompt, m_page->pageID(),
+          CoreIPC::In(webFrame->frameID(), message, defaultValue),
+          CoreIPC::Out(result), CoreIPC::Connection::NoTimeout)) {
     return false;
+  }
 
   return !result.isNull();
 }
@@ -274,8 +272,8 @@ void WebChromeClient::setStatusbarText(const String& statusbarText) {
   // Notify the bundle client.
   m_page->injectedBundleUIClient().willSetStatusbarText(m_page, statusbarText);
 
-  WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::SetStatusText(statusbarText), m_page->pageID());
+  WebProcess::shared().connection()->send(WebPageProxyMessage::SetStatusText,
+                                          m_page->pageID(), statusbarText);
 }
 
 bool WebChromeClient::shouldInterruptJavaScript() {
@@ -331,10 +329,9 @@ void WebChromeClient::contentsSizeChanged(Frame* frame,
                                           const IntSize& size) const {
   WebFrame* webFrame =
       static_cast<WebFrameLoaderClient*>(frame->loader()->client())->webFrame();
-
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::ContentsSizeChanged(webFrame->frameID(), size),
-      m_page->pageID());
+      WebPageProxyMessage::ContentsSizeChanged, m_page->pageID(),
+      CoreIPC::In(webFrame->frameID(), size));
 }
 
 void WebChromeClient::scrollRectIntoView(const IntRect&,
@@ -358,9 +355,9 @@ void WebChromeClient::mouseDidMoveOverElement(
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::MouseDidMoveOverElement(
-          modifierFlags, InjectedBundleUserMessageEncoder(userData.get())),
-      m_page->pageID());
+      WebPageProxyMessage::MouseDidMoveOverElement, m_page->pageID(),
+      CoreIPC::In(modifierFlags,
+                  InjectedBundleUserMessageEncoder(userData.get())));
 }
 
 void WebChromeClient::setToolTip(const String& toolTip, TextDirection) {
@@ -371,8 +368,9 @@ void WebChromeClient::setToolTip(const String& toolTip, TextDirection) {
     return;
   m_cachedToolTip = toolTip;
 
-  WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::SetToolTip(m_cachedToolTip), m_page->pageID());
+  WebProcess::shared().connection()->send(WebPageProxyMessage::SetToolTip,
+                                          m_page->pageID(),
+                                          CoreIPC::In(m_cachedToolTip));
 }
 
 void WebChromeClient::print(Frame*) {
@@ -472,7 +470,7 @@ void WebChromeClient::chooseIconForFiles(const Vector<String>&, FileChooser*) {
 void WebChromeClient::setCursor(const Cursor& cursor) {
 #if USE(LAZY_NATIVE_CURSOR)
   WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::SetCursor(cursor), m_page->pageID());
+      WebPageProxyMessage::SetCursor, m_page->pageID(), CoreIPC::In(cursor));
 #endif
 }
 

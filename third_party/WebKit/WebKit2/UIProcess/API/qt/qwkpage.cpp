@@ -77,7 +77,7 @@ void QWKPagePrivate::toolTipChanged(const String&, const String& newTooltip) {
 }
 
 void QWKPagePrivate::registerEditCommand(PassRefPtr<WebEditCommandProxy>,
-                                         WebPageProxy::UndoOrRedo) {}
+                                         UndoOrRedo) {}
 
 void QWKPagePrivate::clearAllEditCommands() {}
 
