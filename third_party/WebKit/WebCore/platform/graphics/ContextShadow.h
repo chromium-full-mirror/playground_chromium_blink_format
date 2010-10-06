@@ -62,7 +62,7 @@ class ContextShadow {
   enum { NoShadow, SolidShadow, BlurShadow } m_type;
 
   Color m_color;
-  int m_blurRadius;
+  int m_blurDistance;
   FloatSize m_offset;
 
   ContextShadow();

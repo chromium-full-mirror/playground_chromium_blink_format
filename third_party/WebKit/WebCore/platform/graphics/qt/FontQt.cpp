@@ -148,8 +148,8 @@ static void drawTextCommon(GraphicsContext* ctx,
           dy1 = -ctxShadow->offset().y();
         // expand the clip rect to include the text shadow as well
         clip.adjust(dx1, dx2, dy1, dy2);
-        clip.adjust(-ctxShadow->m_blurRadius, -ctxShadow->m_blurRadius,
-                    ctxShadow->m_blurRadius, ctxShadow->m_blurRadius);
+        clip.adjust(-ctxShadow->m_blurDistance, -ctxShadow->m_blurDistance,
+                    ctxShadow->m_blurDistance, ctxShadow->m_blurDistance);
       }
       p->save();
       p->setClipRect(clip.toRect(), Qt::IntersectClip);

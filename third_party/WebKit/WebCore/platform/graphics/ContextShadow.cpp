@@ -37,15 +37,15 @@ using WTF::max;
 
 namespace WebCore {
 
-ContextShadow::ContextShadow() : m_type(NoShadow), m_blurRadius(0) {}
+ContextShadow::ContextShadow() : m_type(NoShadow), m_blurDistance(0) {}
 
 ContextShadow::ContextShadow(const Color& color,
                              float radius,
                              const FloatSize& offset)
-    : m_color(color), m_blurRadius(round(radius)), m_offset(offset) {
+    : m_color(color), m_blurDistance(round(radius)), m_offset(offset) {
   // See comments in http://webkit.org/b/40793, it seems sensible
   // to follow Skia's limit of 128 pixels of blur radius
-  m_blurRadius = min(m_blurRadius, 128);
+  m_blurDistance = min(m_blurDistance, 128);
 
   // The type of shadow is decided by the blur radius, shadow offset, and shadow
   // color.
@@ -66,7 +66,7 @@ ContextShadow::ContextShadow(const Color& color,
 void ContextShadow::clear() {
   m_type = NoShadow;
   m_color = Color();
-  m_blurRadius = 0;
+  m_blurDistance = 0;
   m_offset = FloatSize();
 }
 
@@ -81,8 +81,9 @@ void ContextShadow::blurLayerImage(unsigned char* imageData,
                                    const IntSize& size,
                                    int rowStride) {
   int channels[4] = {3, 0, 1, 3};
-  int dmax = m_blurRadius >> 1;
-  int dmin = dmax - 1 + (m_blurRadius & 1);
+  int d = max(2, static_cast<int>(floorf((2 / 3.f) * m_blurDistance)));
+  int dmax = d >> 1;
+  int dmin = dmax - 1 + (d & 1);
   if (dmin < 0)
     dmin = 0;
 
@@ -148,9 +149,9 @@ void ContextShadow::calculateLayerBoundingRect(const FloatRect& layerArea,
   destinationRect.move(m_offset);
   m_layerRect = enclosingIntRect(destinationRect);
 
-  // We expand the area by the blur radius * 2 to give extra space for the blur
+  // We expand the area by the blur radius to give extra space for the blur
   // transition.
-  m_layerRect.inflate((m_type == BlurShadow) ? m_blurRadius * 2 : 0);
+  m_layerRect.inflate(m_type == BlurShadow ? m_blurDistance : 0);
 
   if (!clipRect.contains(m_layerRect)) {
     // No need to have the buffer larger than the clip.
@@ -163,7 +164,7 @@ void ContextShadow::calculateLayerBoundingRect(const FloatRect& layerArea,
     // We adjust again because the pixels at the borders are still
     // potentially affected by the pixels outside the buffer.
     if (m_type == BlurShadow)
-      m_layerRect.inflate((m_type == BlurShadow) ? m_blurRadius * 2 : 0);
+      m_layerRect.inflate(m_type == BlurShadow ? m_blurDistance : 0);
   }
 }
 
