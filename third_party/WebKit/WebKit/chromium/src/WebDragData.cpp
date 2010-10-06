@@ -104,6 +104,22 @@ void WebDragData::setFileExtension(const WebString& fileExtension) {
   m_private->setFileExtension(fileExtension);
 }
 
+bool WebDragData::hasFileNames() const {
+  return containsFilenames();
+}
+
+void WebDragData::fileNames(WebVector<WebString>& fileNames) const {
+  filenames(fileNames);
+}
+
+void WebDragData::setFileNames(const WebVector<WebString>& fileNames) {
+  return setFilenames(fileNames);
+}
+
+void WebDragData::appendToFileNames(const WebString& fileName) {
+  return appendToFilenames(fileName);
+}
+
 bool WebDragData::containsFilenames() const {
   ASSERT(!isNull());
   return m_private->containsFilenames();
@@ -158,6 +174,14 @@ WebURL WebDragData::htmlBaseURL() const {
 void WebDragData::setHTMLBaseURL(const WebURL& htmlBaseURL) {
   ensureMutable();
   m_private->setHtmlBaseUrl(htmlBaseURL);
+}
+
+WebString WebDragData::fileContentFileName() const {
+  return fileContentFilename();
+}
+
+void WebDragData::setFileContentFileName(const WebString& fileName) {
+  return setFileContentFilename(fileName);
 }
 
 WebString WebDragData::fileContentFilename() const {

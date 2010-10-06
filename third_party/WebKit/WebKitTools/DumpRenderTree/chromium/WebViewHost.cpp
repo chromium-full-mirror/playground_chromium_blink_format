@@ -121,7 +121,7 @@ static string descriptionSuitableForTestResult(const string& url) {
 // Adds a file called "DRTFakeFile" to |data_object| (CF_HDROP).  Use to fake
 // dragging a file.
 static void addDRTFakeFileToDataObject(WebDragData* dragData) {
-  dragData->appendToFilenames(WebString::fromUTF8("DRTFakeFile"));
+  dragData->appendToFileNames(WebString::fromUTF8("DRTFakeFile"));
 }
 
 // Get a debugging string from a WebNavigationType.
