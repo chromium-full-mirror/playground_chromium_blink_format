@@ -78,7 +78,7 @@ bool InjectedBundle::load() {
   if (!initializeFunction)
     return false;
 
-  initializeFunction(toRef(this));
+  initializeFunction(toAPI(this));
   return true;
 }
 

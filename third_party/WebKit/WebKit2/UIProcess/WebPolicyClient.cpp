@@ -55,8 +55,8 @@ bool WebPolicyClient::decidePolicyForNavigationAction(
     return false;
 
   m_pagePolicyClient.decidePolicyForNavigationAction(
-      toRef(page), toRef(type), toRef(modifiers), toRef(mouseButton),
-      toURLRef(url.impl()), toRef(frame), toRef(listener),
+      toAPI(page), toAPI(type), toAPI(modifiers), toAPI(mouseButton),
+      toURLRef(url.impl()), toAPI(frame), toAPI(listener),
       m_pagePolicyClient.clientInfo);
   return true;
 }
@@ -73,8 +73,8 @@ bool WebPolicyClient::decidePolicyForNewWindowAction(
     return false;
 
   m_pagePolicyClient.decidePolicyForNewWindowAction(
-      toRef(page), toRef(type), toRef(modifiers), toRef(mouseButton),
-      toURLRef(url.impl()), toRef(frame), toRef(listener),
+      toAPI(page), toAPI(type), toAPI(modifiers), toAPI(mouseButton),
+      toURLRef(url.impl()), toAPI(frame), toAPI(listener),
       m_pagePolicyClient.clientInfo);
   return true;
 }
@@ -89,8 +89,8 @@ bool WebPolicyClient::decidePolicyForMIMEType(
     return false;
 
   m_pagePolicyClient.decidePolicyForMIMEType(
-      toRef(page), toRef(MIMEType.impl()), toURLRef(url.impl()), toRef(frame),
-      toRef(listener), m_pagePolicyClient.clientInfo);
+      toAPI(page), toAPI(MIMEType.impl()), toURLRef(url.impl()), toAPI(frame),
+      toAPI(listener), m_pagePolicyClient.clientInfo);
   return true;
 }
 

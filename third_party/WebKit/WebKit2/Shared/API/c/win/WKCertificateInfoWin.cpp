@@ -32,7 +32,7 @@ using namespace WebKit;
 
 PCCERT_CONTEXT WKCertificateInfoGetCertificateContext(
     WKCertificateInfoRef certificateInfoRef) {
-  return toWK(certificateInfoRef)
+  return toImpl(certificateInfoRef)
       ->platformCertificateInfo()
       .certificateContext();
 }

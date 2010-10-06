@@ -37,11 +37,11 @@ using namespace WebKit;
 
 WKURLRef WKURLCreateWithCFURL(CFURLRef cfURL) {
   String urlString(CFURLGetString(cfURL));
-  return toCopiedURLRef(urlString);
+  return toCopiedURLAPI(urlString);
 }
 
 CFURLRef WKURLCopyCFURL(CFAllocatorRef allocatorRef, WKURLRef URLRef) {
-  ASSERT(!toWK(URLRef)->string().isNull());
+  ASSERT(!toImpl(URLRef)->string().isNull());
 
   // We first create a CString and then create the CFURL from it. This will
   // ensure that the CFURL is stored in
@@ -53,7 +53,7 @@ CFURLRef WKURLCopyCFURL(CFAllocatorRef allocatorRef, WKURLRef URLRef) {
   // chops off the high bits of the UTF-16
   // character sequence.
 
-  CString buffer = toWK(URLRef)->string().utf8();
+  CString buffer = toImpl(URLRef)->string().utf8();
   CFURLRef result = CFURLCreateAbsoluteURLWithBytes(
       kCFAllocatorDefault, reinterpret_cast<const UInt8*>(buffer.data()),
       buffer.length(), kCFStringEncodingUTF8, 0, true);

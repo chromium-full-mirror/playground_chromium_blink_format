@@ -55,7 +55,7 @@ void WebHistoryClient::didNavigateWithNavigationData(
   RefPtr<WebNavigationData> navigationData =
       WebNavigationData::create(navigationDataStore);
   m_contextHistoryClient.didNavigateWithNavigationData(
-      toRef(context), toRef(page), toRef(navigationData.get()), toRef(frame),
+      toAPI(context), toAPI(page), toAPI(navigationData.get()), toAPI(frame),
       m_contextHistoryClient.clientInfo);
 }
 
@@ -68,8 +68,8 @@ void WebHistoryClient::didPerformClientRedirect(WebContext* context,
     return;
 
   m_contextHistoryClient.didPerformClientRedirect(
-      toRef(context), toRef(page), toURLRef(sourceURL.impl()),
-      toURLRef(destinationURL.impl()), toRef(frame),
+      toAPI(context), toAPI(page), toURLRef(sourceURL.impl()),
+      toURLRef(destinationURL.impl()), toAPI(frame),
       m_contextHistoryClient.clientInfo);
 }
 
@@ -82,8 +82,8 @@ void WebHistoryClient::didPerformServerRedirect(WebContext* context,
     return;
 
   m_contextHistoryClient.didPerformServerRedirect(
-      toRef(context), toRef(page), toURLRef(sourceURL.impl()),
-      toURLRef(destinationURL.impl()), toRef(frame),
+      toAPI(context), toAPI(page), toURLRef(sourceURL.impl()),
+      toURLRef(destinationURL.impl()), toAPI(frame),
       m_contextHistoryClient.clientInfo);
 }
 
@@ -96,8 +96,8 @@ void WebHistoryClient::didUpdateHistoryTitle(WebContext* context,
     return;
 
   m_contextHistoryClient.didUpdateHistoryTitle(
-      toRef(context), toRef(page), toRef(title.impl()), toURLRef(url.impl()),
-      toRef(frame), m_contextHistoryClient.clientInfo);
+      toAPI(context), toAPI(page), toAPI(title.impl()), toURLRef(url.impl()),
+      toAPI(frame), m_contextHistoryClient.clientInfo);
 }
 
 void WebHistoryClient::populateVisitedLinks(WebContext* context) {
@@ -105,7 +105,7 @@ void WebHistoryClient::populateVisitedLinks(WebContext* context) {
     return;
 
   m_contextHistoryClient.populateVisitedLinks(
-      toRef(context), m_contextHistoryClient.clientInfo);
+      toAPI(context), m_contextHistoryClient.clientInfo);
 }
 
 }  // namespace WebKit

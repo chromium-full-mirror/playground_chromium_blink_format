@@ -59,9 +59,9 @@ bool WebFormClient::willSubmitForm(
             WebString::create(textFieldValues[i].second));
   RefPtr<ImmutableDictionary> textFieldsMap = ImmutableDictionary::adopt(map);
 
-  m_pageFormClient.willSubmitForm(toRef(page), toRef(frame), toRef(sourceFrame),
-                                  toRef(textFieldsMap.get()), toRef(userData),
-                                  toRef(listener), m_pageFormClient.clientInfo);
+  m_pageFormClient.willSubmitForm(toAPI(page), toAPI(frame), toAPI(sourceFrame),
+                                  toAPI(textFieldsMap.get()), toAPI(userData),
+                                  toAPI(listener), m_pageFormClient.clientInfo);
   return true;
 }
 

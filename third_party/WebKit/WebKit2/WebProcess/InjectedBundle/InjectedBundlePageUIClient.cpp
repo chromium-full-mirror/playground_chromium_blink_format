@@ -49,7 +49,7 @@ void InjectedBundlePageUIClient::willAddMessageToConsole(WebPage* page,
                                                          const String& message,
                                                          int32_t lineNumber) {
   if (m_client.willAddMessageToConsole)
-    m_client.willAddMessageToConsole(toRef(page), toRef(message.impl()),
+    m_client.willAddMessageToConsole(toAPI(page), toAPI(message.impl()),
                                      lineNumber, m_client.clientInfo);
 }
 
@@ -57,7 +57,7 @@ void InjectedBundlePageUIClient::willSetStatusbarText(
     WebPage* page,
     const String& statusbarText) {
   if (m_client.willSetStatusbarText)
-    m_client.willSetStatusbarText(toRef(page), toRef(statusbarText.impl()),
+    m_client.willSetStatusbarText(toAPI(page), toAPI(statusbarText.impl()),
                                   m_client.clientInfo);
 }
 
@@ -65,16 +65,16 @@ void InjectedBundlePageUIClient::willRunJavaScriptAlert(WebPage* page,
                                                         const String& alertText,
                                                         WebFrame* frame) {
   if (m_client.willRunJavaScriptAlert)
-    m_client.willRunJavaScriptAlert(toRef(page), toRef(alertText.impl()),
-                                    toRef(frame), m_client.clientInfo);
+    m_client.willRunJavaScriptAlert(toAPI(page), toAPI(alertText.impl()),
+                                    toAPI(frame), m_client.clientInfo);
 }
 
 void InjectedBundlePageUIClient::willRunJavaScriptConfirm(WebPage* page,
                                                           const String& message,
                                                           WebFrame* frame) {
   if (m_client.willRunJavaScriptConfirm)
-    m_client.willRunJavaScriptConfirm(toRef(page), toRef(message.impl()),
-                                      toRef(frame), m_client.clientInfo);
+    m_client.willRunJavaScriptConfirm(toAPI(page), toAPI(message.impl()),
+                                      toAPI(frame), m_client.clientInfo);
 }
 
 void InjectedBundlePageUIClient::willRunJavaScriptPrompt(
@@ -83,8 +83,8 @@ void InjectedBundlePageUIClient::willRunJavaScriptPrompt(
     const String& defaultValue,
     WebFrame* frame) {
   if (m_client.willRunJavaScriptPrompt)
-    m_client.willRunJavaScriptPrompt(toRef(page), toRef(message.impl()),
-                                     toRef(defaultValue.impl()), toRef(frame),
+    m_client.willRunJavaScriptPrompt(toAPI(page), toAPI(message.impl()),
+                                     toAPI(defaultValue.impl()), toAPI(frame),
                                      m_client.clientInfo);
 }
 
@@ -100,10 +100,10 @@ void InjectedBundlePageUIClient::mouseDidMoveOverElement(
       InjectedBundleHitTestResult::create(coreHitTestResult);
 
   WKTypeRef userDataToPass = 0;
-  m_client.mouseDidMoveOverElement(toRef(page), toRef(hitTestResult.get()),
-                                   toRef(modifiers), &userDataToPass,
+  m_client.mouseDidMoveOverElement(toAPI(page), toAPI(hitTestResult.get()),
+                                   toAPI(modifiers), &userDataToPass,
                                    m_client.clientInfo);
-  userData = adoptRef(toWK(userDataToPass));
+  userData = adoptRef(toImpl(userDataToPass));
 }
 
 }  // namespace WebKit

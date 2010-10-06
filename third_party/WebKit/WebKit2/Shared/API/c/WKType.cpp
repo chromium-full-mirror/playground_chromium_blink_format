@@ -31,7 +31,7 @@
 using namespace WebKit;
 
 WKTypeID WKGetTypeID(WKTypeRef typeRef) {
-  return toRef(static_cast<APIObject*>(const_cast<void*>(typeRef))->type());
+  return toAPI(static_cast<APIObject*>(const_cast<void*>(typeRef))->type());
 }
 
 WKTypeRef WKRetain(WKTypeRef typeRef) {

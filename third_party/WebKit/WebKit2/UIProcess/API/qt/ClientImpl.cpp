@@ -62,7 +62,7 @@ void qt_wk_didCommitLoadForFrame(WKPageRef page,
                                  const void* clientInfo) {
   if (!WKFrameIsMainFrame(frame))
     return;
-  WebFrameProxy* wkframe = toWK(frame);
+  WebFrameProxy* wkframe = toImpl(frame);
   QString urlStr(wkframe->url());
   QUrl qUrl = urlStr;
   emit toQWKPage(clientInfo)->urlChanged(qUrl);

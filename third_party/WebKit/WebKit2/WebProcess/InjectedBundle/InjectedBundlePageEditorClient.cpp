@@ -52,7 +52,7 @@ bool InjectedBundlePageEditorClient::shouldBeginEditing(WebPage* page,
   if (m_client.shouldBeginEditing) {
     RefPtr<InjectedBundleRangeHandle> rangeHandle =
         InjectedBundleRangeHandle::getOrCreate(range);
-    return m_client.shouldBeginEditing(toRef(page), toRef(rangeHandle.get()),
+    return m_client.shouldBeginEditing(toAPI(page), toAPI(rangeHandle.get()),
                                        m_client.clientInfo);
   }
   return true;
@@ -63,7 +63,7 @@ bool InjectedBundlePageEditorClient::shouldEndEditing(WebPage* page,
   if (m_client.shouldEndEditing) {
     RefPtr<InjectedBundleRangeHandle> rangeHandle =
         InjectedBundleRangeHandle::getOrCreate(range);
-    return m_client.shouldEndEditing(toRef(page), toRef(rangeHandle.get()),
+    return m_client.shouldEndEditing(toAPI(page), toAPI(rangeHandle.get()),
                                      m_client.clientInfo);
   }
   return true;
@@ -79,9 +79,9 @@ bool InjectedBundlePageEditorClient::shouldInsertNode(
         InjectedBundleNodeHandle::getOrCreate(node);
     RefPtr<InjectedBundleRangeHandle> rangeToReplaceHandle =
         InjectedBundleRangeHandle::getOrCreate(rangeToReplace);
-    return m_client.shouldInsertNode(toRef(page), toRef(nodeHandle.get()),
-                                     toRef(rangeToReplaceHandle.get()),
-                                     toWK(action), m_client.clientInfo);
+    return m_client.shouldInsertNode(toAPI(page), toAPI(nodeHandle.get()),
+                                     toAPI(rangeToReplaceHandle.get()),
+                                     toAPI(action), m_client.clientInfo);
   }
   return true;
 }
@@ -94,9 +94,9 @@ bool InjectedBundlePageEditorClient::shouldInsertText(
   if (m_client.shouldInsertText) {
     RefPtr<InjectedBundleRangeHandle> rangeToReplaceHandle =
         InjectedBundleRangeHandle::getOrCreate(rangeToReplace);
-    return m_client.shouldInsertText(toRef(page), toRef(text),
-                                     toRef(rangeToReplaceHandle.get()),
-                                     toWK(action), m_client.clientInfo);
+    return m_client.shouldInsertText(toAPI(page), toAPI(text),
+                                     toAPI(rangeToReplaceHandle.get()),
+                                     toAPI(action), m_client.clientInfo);
   }
   return true;
 }
@@ -106,7 +106,7 @@ bool InjectedBundlePageEditorClient::shouldDeleteRange(WebPage* page,
   if (m_client.shouldDeleteRange) {
     RefPtr<InjectedBundleRangeHandle> rangeHandle =
         InjectedBundleRangeHandle::getOrCreate(range);
-    return m_client.shouldDeleteRange(toRef(page), toRef(rangeHandle.get()),
+    return m_client.shouldDeleteRange(toAPI(page), toAPI(rangeHandle.get()),
                                       m_client.clientInfo);
   }
   return true;
@@ -124,8 +124,8 @@ bool InjectedBundlePageEditorClient::shouldChangeSelectedRange(
     RefPtr<InjectedBundleRangeHandle> toRangeHandle =
         InjectedBundleRangeHandle::getOrCreate(toRange);
     return m_client.shouldChangeSelectedRange(
-        toRef(page), toRef(fromRangeHandle.get()), toRef(toRangeHandle.get()),
-        toWK(affinity), stillSelecting, m_client.clientInfo);
+        toAPI(page), toAPI(fromRangeHandle.get()), toAPI(toRangeHandle.get()),
+        toAPI(affinity), stillSelecting, m_client.clientInfo);
   }
   return true;
 }
@@ -137,8 +137,8 @@ bool InjectedBundlePageEditorClient::shouldApplyStyle(
   if (m_client.shouldApplyStyle) {
     RefPtr<InjectedBundleRangeHandle> rangeHandle =
         InjectedBundleRangeHandle::getOrCreate(range);
-    return m_client.shouldApplyStyle(toRef(page), toRef(style),
-                                     toRef(rangeHandle.get()),
+    return m_client.shouldApplyStyle(toAPI(page), toAPI(style),
+                                     toAPI(rangeHandle.get()),
                                      m_client.clientInfo);
   }
   return true;
@@ -148,7 +148,7 @@ void InjectedBundlePageEditorClient::didBeginEditing(
     WebPage* page,
     StringImpl* notificationName) {
   if (m_client.didBeginEditing)
-    m_client.didBeginEditing(toRef(page), toRef(notificationName),
+    m_client.didBeginEditing(toAPI(page), toAPI(notificationName),
                              m_client.clientInfo);
 }
 
@@ -156,14 +156,14 @@ void InjectedBundlePageEditorClient::didEndEditing(
     WebPage* page,
     StringImpl* notificationName) {
   if (m_client.didEndEditing)
-    m_client.didEndEditing(toRef(page), toRef(notificationName),
+    m_client.didEndEditing(toAPI(page), toAPI(notificationName),
                            m_client.clientInfo);
 }
 
 void InjectedBundlePageEditorClient::didChange(WebPage* page,
                                                StringImpl* notificationName) {
   if (m_client.didChange)
-    m_client.didChange(toRef(page), toRef(notificationName),
+    m_client.didChange(toAPI(page), toAPI(notificationName),
                        m_client.clientInfo);
 }
 
@@ -171,7 +171,7 @@ void InjectedBundlePageEditorClient::didChangeSelection(
     WebPage* page,
     StringImpl* notificationName) {
   if (m_client.didChangeSelection)
-    m_client.didChangeSelection(toRef(page), toRef(notificationName),
+    m_client.didChangeSelection(toAPI(page), toAPI(notificationName),
                                 m_client.clientInfo);
 }
 

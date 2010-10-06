@@ -52,7 +52,7 @@ void WebContextInjectedBundleClient::didReceiveMessageFromInjectedBundle(
     return;
 
   m_client.didReceiveMessageFromInjectedBundle(
-      toRef(context), toRef(messageName.impl()), toRef(messageBody),
+      toAPI(context), toAPI(messageName.impl()), toAPI(messageBody),
       m_client.clientInfo);
 }
 
@@ -67,9 +67,9 @@ void WebContextInjectedBundleClient::
 
   WKTypeRef returnDataRef = 0;
   m_client.didReceiveSynchronousMessageFromInjectedBundle(
-      toRef(context), toRef(messageName.impl()), toRef(messageBody),
+      toAPI(context), toAPI(messageName.impl()), toAPI(messageBody),
       &returnDataRef, m_client.clientInfo);
-  returnData = adoptRef(toWK(returnDataRef));
+  returnData = adoptRef(toImpl(returnDataRef));
 }
 
 }  // namespace WebKit

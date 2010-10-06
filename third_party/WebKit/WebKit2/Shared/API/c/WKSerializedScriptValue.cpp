@@ -31,7 +31,7 @@
 using namespace WebKit;
 
 WKTypeID WKSerializedScriptValueGetTypeID() {
-  return toRef(WebSerializedScriptValue::APIType);
+  return toAPI(WebSerializedScriptValue::APIType);
 }
 
 WKSerializedScriptValueRef WKSerializedScriptValueCreate(
@@ -40,12 +40,12 @@ WKSerializedScriptValueRef WKSerializedScriptValueCreate(
     JSValueRef* exception) {
   RefPtr<WebSerializedScriptValue> serializedValue =
       WebSerializedScriptValue::create(context, value, exception);
-  return toRef(serializedValue.release().leakRef());
+  return toAPI(serializedValue.release().leakRef());
 }
 
 JSValueRef WKSerializedScriptValueDeserialize(
     WKSerializedScriptValueRef scriptValueRef,
     JSContextRef contextRef,
     JSValueRef* exception) {
-  return toWK(scriptValueRef)->deserialize(contextRef, exception);
+  return toImpl(scriptValueRef)->deserialize(contextRef, exception);
 }

@@ -31,5 +31,5 @@
 using namespace WebKit;
 
 WKTypeID WKCertificateInfoGetTypeID() {
-  return toRef(WebCertificateInfo::APIType);
+  return toAPI(WebCertificateInfo::APIType);
 }
