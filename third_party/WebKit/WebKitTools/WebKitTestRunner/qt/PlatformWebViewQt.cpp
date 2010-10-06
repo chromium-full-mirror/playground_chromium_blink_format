@@ -25,27 +25,50 @@
  */
 
 #include "PlatformWebView.h"
-#include "NotImplemented.h"
+#include "qgraphicswkview.h"
+#include <QtGui>
 
 namespace WTR {
 
-PlatformWebView::PlatformWebView(WKPageNamespaceRef namespaceRef) {
-  notImplemented();
+class WebView : public QGraphicsView {
+ public:
+  WebView(WKPageNamespaceRef);
+
+  QGraphicsWKView* wkView() const { return m_item; }
+
+  virtual ~WebView() { delete m_item; }
+
+ private:
+  QGraphicsWKView* m_item;
+};
+
+WebView::WebView(WKPageNamespaceRef namespaceRef)
+    : QGraphicsView(), m_item(new QGraphicsWKView(namespaceRef)) {
+  setScene(new QGraphicsScene(this));
+  scene()->addItem(m_item);
 }
 
-PlatformWebView::~PlatformWebView() {}
+PlatformWebView::PlatformWebView(WKPageNamespaceRef namespaceRef)
+    : m_view(new WebView(namespaceRef)), m_window(new QMainWindow()) {
+  m_view->setParent(m_window);
+  m_window->setCentralWidget(m_view);
+  m_window->setGeometry(0, 0, 800, 600);
+}
+
+PlatformWebView::~PlatformWebView() {
+  delete m_window;
+}
 
 void PlatformWebView::resizeTo(unsigned width, unsigned height) {
-  notImplemented();
+  m_window->resize(width, height);
 }
 
 WKPageRef PlatformWebView::page() {
-  notImplemented();
-  return 0;
+  return m_view->wkView()->page()->pageRef();
 }
 
 void PlatformWebView::focus() {
-  notImplemented();
+  m_view->setFocus(Qt::OtherFocusReason);
 }
 
 }  // namespace WTR
