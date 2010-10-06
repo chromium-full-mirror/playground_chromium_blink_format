@@ -41,6 +41,7 @@ namespace WTF {
 //   IsSameType<T, U>::value
 //
 //   RemovePointer<T>::Type
+//   RemoveReference<T>::Type
 //   RemoveConst<T>::Type
 //   RemoveVolatile<T>::Type
 //   RemoveConstVolatile<T>::Type
@@ -255,6 +256,16 @@ struct RemovePointer {
 
 template <typename T>
 struct RemovePointer<T*> {
+  typedef T Type;
+};
+
+template <typename T>
+struct RemoveReference {
+  typedef T Type;
+};
+
+template <typename T>
+struct RemoveReference<T&> {
   typedef T Type;
 };
 
