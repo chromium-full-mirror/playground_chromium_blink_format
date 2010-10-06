@@ -54,6 +54,7 @@ class HTMLAreaElement : public HTMLAnchorElement {
   virtual bool supportsFocus() const;
   virtual String target() const;
   virtual bool isKeyboardFocusable(KeyboardEvent*) const;
+  virtual bool isMouseFocusable() const;
   virtual bool isFocusable() const;
   virtual void updateFocusAppearance(bool /*restorePreviousSelection*/);
   virtual void dispatchBlurEvent();
