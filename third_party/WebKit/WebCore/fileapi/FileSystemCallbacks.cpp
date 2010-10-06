@@ -171,7 +171,7 @@ void EntriesCallbacks::didReadDirectoryEntry(const String& name,
 }
 
 void EntriesCallbacks::didReadDirectoryEntries(bool hasMore) {
-  m_directoryReader->setHasMore(hasMore);
+  m_directoryReader->setHasMoreEntries(hasMore);
   if (m_successCallback)
     m_successCallback->handleEvent(m_entries.get());
 }

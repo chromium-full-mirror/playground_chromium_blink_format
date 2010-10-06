@@ -56,11 +56,8 @@ namespace WebCore {
 DOMFileSystem::DOMFileSystem(ScriptExecutionContext* context,
                              const String& name,
                              PassOwnPtr<AsyncFileSystem> asyncFileSystem)
-    : ActiveDOMObject(context, this),
-      m_name(name),
-      m_asyncFileSystem(asyncFileSystem) {}
-
-DOMFileSystem::~DOMFileSystem() {}
+    : DOMFileSystemBase(name, asyncFileSystem),
+      ActiveDOMObject(context, this) {}
 
 PassRefPtr<DirectoryEntry> DOMFileSystem::root() {
   return DirectoryEntry::create(this, DOMFilePath::root);
