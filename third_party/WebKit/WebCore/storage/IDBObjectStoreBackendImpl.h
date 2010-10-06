@@ -141,6 +141,14 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
                                  PassRefPtr<IDBCallbacks>,
                                  PassRefPtr<IDBTransactionBackendInterface>);
 
+  // These are used as setVersion transaction abort tasks.
+  static void removeIndexFromMap(ScriptExecutionContext*,
+                                 PassRefPtr<IDBObjectStoreBackendImpl>,
+                                 PassRefPtr<IDBIndexBackendImpl>);
+  static void addIndexToMap(ScriptExecutionContext*,
+                            PassRefPtr<IDBObjectStoreBackendImpl>,
+                            PassRefPtr<IDBIndexBackendImpl>);
+
   static const int64_t InvalidId = 0;
 
   RefPtr<IDBDatabaseBackendImpl> m_database;

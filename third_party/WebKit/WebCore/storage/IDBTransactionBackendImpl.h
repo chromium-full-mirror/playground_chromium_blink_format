@@ -53,7 +53,8 @@ class IDBTransactionBackendImpl : public IDBTransactionBackendInterface {
   virtual PassRefPtr<IDBObjectStoreBackendInterface> objectStore(
       const String& name);
   virtual unsigned short mode() const { return m_mode; }
-  virtual bool scheduleTask(PassOwnPtr<ScriptExecutionContext::Task>);
+  virtual bool scheduleTask(PassOwnPtr<ScriptExecutionContext::Task> task,
+                            PassOwnPtr<ScriptExecutionContext::Task> abortTask);
   virtual void didCompleteTaskEvents();
   virtual void abort();
   virtual int id() const { return m_id; }
@@ -94,6 +95,7 @@ class IDBTransactionBackendImpl : public IDBTransactionBackendInterface {
 
   typedef Deque<OwnPtr<ScriptExecutionContext::Task>> TaskQueue;
   TaskQueue m_taskQueue;
+  TaskQueue m_abortTaskQueue;
 
   OwnPtr<SQLiteTransaction> m_transaction;
 

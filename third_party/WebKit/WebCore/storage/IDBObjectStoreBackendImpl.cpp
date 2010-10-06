@@ -352,15 +352,18 @@ PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreBackendImpl::createIndex(
   RefPtr<IDBIndexBackendImpl> index =
       IDBIndexBackendImpl::create(this, name, keyPath, unique);
   ASSERT(index->name() == name);
-  m_indexes.set(name, index);
 
   RefPtr<IDBObjectStoreBackendImpl> objectStore = this;
   RefPtr<IDBTransactionBackendInterface> transactionPtr = transaction;
   if (!transaction->scheduleTask(
           createCallbackTask(&IDBObjectStoreBackendImpl::createIndexInternal,
-                             objectStore, index, transaction)))
+                             objectStore, index, transaction),
+          createCallbackTask(&IDBObjectStoreBackendImpl::removeIndexFromMap,
+                             objectStore, index))) {
     return 0;
+  }
 
+  m_indexes.set(name, index);
   return index.release();
 }
 
@@ -407,13 +410,18 @@ void IDBObjectStoreBackendImpl::removeIndex(
     // FIXME: Raise NOT_FOUND_ERR.
     return;
   }
-  m_indexes.remove(name);
+
   RefPtr<IDBObjectStoreBackendImpl> objectStore = this;
   RefPtr<IDBTransactionBackendInterface> transactionPtr = transaction;
-  transaction->scheduleTask(
-      createCallbackTask(&IDBObjectStoreBackendImpl::removeIndexInternal,
-                         objectStore, index, transactionPtr));
-  // FIXME: Raise NOT_ALLOWED_ERR if the above statement fails.
+  if (!transaction->scheduleTask(
+          createCallbackTask(&IDBObjectStoreBackendImpl::removeIndexInternal,
+                             objectStore, index, transactionPtr),
+          createCallbackTask(&IDBObjectStoreBackendImpl::addIndexToMap,
+                             objectStore, index))) {
+    // FIXME: Raise NOT_ALLOWED_ERR if the above statement fails.
+    return;
+  }
+  m_indexes.remove(name);
 }
 
 void IDBObjectStoreBackendImpl::removeIndexInternal(
@@ -520,6 +528,23 @@ void IDBObjectStoreBackendImpl::loadIndexes() {
 
 SQLiteDatabase& IDBObjectStoreBackendImpl::sqliteDatabase() const {
   return m_database->sqliteDatabase();
+}
+
+void IDBObjectStoreBackendImpl::removeIndexFromMap(
+    ScriptExecutionContext*,
+    PassRefPtr<IDBObjectStoreBackendImpl> objectStore,
+    PassRefPtr<IDBIndexBackendImpl> index) {
+  ASSERT(objectStore->m_indexes.contains(index->name()));
+  objectStore->m_indexes.remove(index->name());
+}
+
+void IDBObjectStoreBackendImpl::addIndexToMap(
+    ScriptExecutionContext*,
+    PassRefPtr<IDBObjectStoreBackendImpl> objectStore,
+    PassRefPtr<IDBIndexBackendImpl> index) {
+  RefPtr<IDBIndexBackendImpl> indexPtr = index;
+  ASSERT(!objectStore->m_indexes.contains(indexPtr->name()));
+  objectStore->m_indexes.set(indexPtr->name(), indexPtr);
 }
 
 }  // namespace WebCore

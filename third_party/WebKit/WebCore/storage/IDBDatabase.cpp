@@ -55,7 +55,11 @@ void IDBDatabase::setSetVersionTransaction(
 PassRefPtr<IDBObjectStore> IDBDatabase::createObjectStore(const String& name,
                                                           const String& keyPath,
                                                           bool autoIncrement) {
-  // FIXME: Raise a NOT_ALLOWED_ERR if m_setVersionTransaction is 0.
+  if (!m_setVersionTransaction) {
+    // FIXME: Raise a NOT_ALLOWED_ERR if m_setVersionTransaction is 0.
+    return 0
+  }
+
   RefPtr<IDBObjectStoreBackendInterface> objectStore =
       m_backend->createObjectStore(name, keyPath, autoIncrement,
                                    m_setVersionTransaction.get());
@@ -66,6 +70,9 @@ PassRefPtr<IDBObjectStore> IDBDatabase::createObjectStore(const String& name,
 }
 
 void IDBDatabase::removeObjectStore(const String& name) {
+  // FIXME: Raise a NOT_ALLOWED_ERR if m_setVersionTransaction is 0.
+  if (!m_setVersionTransaction)
+    return;
   m_backend->removeObjectStore(name, m_setVersionTransaction.get());
 }
 

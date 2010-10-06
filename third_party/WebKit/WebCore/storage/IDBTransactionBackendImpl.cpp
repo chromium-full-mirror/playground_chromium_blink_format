@@ -70,11 +70,15 @@ IDBTransactionBackendImpl::objectStore(const String& name) {
 }
 
 bool IDBTransactionBackendImpl::scheduleTask(
-    PassOwnPtr<ScriptExecutionContext::Task> task) {
+    PassOwnPtr<ScriptExecutionContext::Task> task,
+    PassOwnPtr<ScriptExecutionContext::Task> abortTask) {
   if (m_state == Finished)
     return false;
 
   m_taskQueue.append(task);
+  if (abortTask)
+    m_abortTaskQueue.prepend(abortTask);
+
   if (m_state == Unused)
     start();
 
@@ -89,6 +93,15 @@ void IDBTransactionBackendImpl::abort() {
   m_taskTimer.stop();
   m_taskEventTimer.stop();
   m_transaction->rollback();
+
+  // Run the abort tasks, if any.
+  while (!m_abortTaskQueue.isEmpty()) {
+    OwnPtr<ScriptExecutionContext::Task> task(
+        m_abortTaskQueue.first().release());
+    m_abortTaskQueue.removeFirst();
+    task->performTask(0);
+  }
+
   m_callbacks->onAbort();
   m_database->transactionCoordinator()->didFinishTransaction(this);
 }
