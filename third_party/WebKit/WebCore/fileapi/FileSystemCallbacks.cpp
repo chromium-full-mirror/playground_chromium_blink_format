@@ -36,7 +36,7 @@
 #include "AsyncFileSystem.h"
 #include "AsyncFileWriter.h"
 #include "DOMFilePath.h"
-#include "DOMFileSystem.h"
+#include "DOMFileSystemBase.h"
 #include "DirectoryEntry.h"
 #include "DirectoryReader.h"
 #include "EntriesCallback.h"
@@ -106,7 +106,7 @@ void FileSystemCallbacksBase::didFail(int code) {
 PassOwnPtr<EntryCallbacks> EntryCallbacks::create(
     PassRefPtr<EntryCallback> successCallback,
     PassRefPtr<ErrorCallback> errorCallback,
-    DOMFileSystem* fileSystem,
+    DOMFileSystemBase* fileSystem,
     const String& expectedPath,
     bool isDirectory) {
   return adoptPtr(new EntryCallbacks(successCallback, errorCallback, fileSystem,
@@ -115,7 +115,7 @@ PassOwnPtr<EntryCallbacks> EntryCallbacks::create(
 
 EntryCallbacks::EntryCallbacks(PassRefPtr<EntryCallback> successCallback,
                                PassRefPtr<ErrorCallback> errorCallback,
-                               DOMFileSystem* fileSystem,
+                               DOMFileSystemBase* fileSystem,
                                const String& expectedPath,
                                bool isDirectory)
     : FileSystemCallbacksBase(errorCallback),
@@ -141,7 +141,7 @@ void EntryCallbacks::didSucceed() {
 PassOwnPtr<EntriesCallbacks> EntriesCallbacks::create(
     PassRefPtr<EntriesCallback> successCallback,
     PassRefPtr<ErrorCallback> errorCallback,
-    DirectoryReader* directoryReader,
+    DirectoryReaderBase* directoryReader,
     const String& basePath) {
   return adoptPtr(new EntriesCallbacks(successCallback, errorCallback,
                                        directoryReader, basePath));
@@ -149,7 +149,7 @@ PassOwnPtr<EntriesCallbacks> EntriesCallbacks::create(
 
 EntriesCallbacks::EntriesCallbacks(PassRefPtr<EntriesCallback> successCallback,
                                    PassRefPtr<ErrorCallback> errorCallback,
-                                   DirectoryReader* directoryReader,
+                                   DirectoryReaderBase* directoryReader,
                                    const String& basePath)
     : FileSystemCallbacksBase(errorCallback),
       m_successCallback(successCallback),

@@ -107,7 +107,8 @@ class WebWorkerBase : public WebCore::WorkerObjectProxy,
   // implementation for WebFrameClient::openFileSystem.)
   void openFileSystem(WebFileSystem::Type,
                       long long size,
-                      WebFileSystemCallbacks*);
+                      WebFileSystemCallbacks*,
+                      bool synchronous);
 #endif
 
   // Executes the given task on the main thread.

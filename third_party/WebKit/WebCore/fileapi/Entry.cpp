@@ -32,46 +32,63 @@
 
 #if ENABLE(FILE_SYSTEM)
 
-#include "DOMFilePath.h"
-#include "DOMFileSystem.h"
+#include "DirectoryEntry.h"
 #include "EntryCallback.h"
 #include "ErrorCallback.h"
 #include "FileError.h"
+#include "FileSystemCallbacks.h"
 #include "MetadataCallback.h"
 #include "VoidCallback.h"
 
 namespace WebCore {
 
-Entry::Entry(DOMFileSystem* fileSystem, const String& fullPath)
+Entry::Entry(DOMFileSystemBase* fileSystem, const String& fullPath)
     : EntryBase(fileSystem, fullPath) {}
 
 void Entry::getMetadata(PassRefPtr<MetadataCallback> successCallback,
-                        PassRefPtr<ErrorCallback> errorCallback) {
-  filesystem()->getMetadata(this, successCallback, errorCallback);
+                        PassRefPtr<ErrorCallback> errorCallbackRef) {
+  RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
+  if (!m_fileSystem->getMetadata(this, successCallback, errorCallback))
+    filesystem()->scheduleCallback(errorCallback.release(),
+                                   FileError::create(INVALID_MODIFICATION_ERR));
 }
 
-void Entry::moveTo(PassRefPtr<Entry> parent,
+void Entry::moveTo(PassRefPtr<DirectoryEntry> parent,
                    const String& name,
                    PassRefPtr<EntryCallback> successCallback,
-                   PassRefPtr<ErrorCallback> errorCallback) const {
-  filesystem()->move(this, parent, name, successCallback, errorCallback);
+                   PassRefPtr<ErrorCallback> errorCallbackRef) const {
+  RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
+  if (!m_fileSystem->move(this, parent.get(), name, successCallback,
+                          errorCallback))
+    filesystem()->scheduleCallback(errorCallback.release(),
+                                   FileError::create(INVALID_MODIFICATION_ERR));
 }
 
-void Entry::copyTo(PassRefPtr<Entry> parent,
+void Entry::copyTo(PassRefPtr<DirectoryEntry> parent,
                    const String& name,
                    PassRefPtr<EntryCallback> successCallback,
-                   PassRefPtr<ErrorCallback> errorCallback) const {
-  filesystem()->copy(this, parent, name, successCallback, errorCallback);
+                   PassRefPtr<ErrorCallback> errorCallbackRef) const {
+  RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
+  if (!m_fileSystem->copy(this, parent.get(), name, successCallback,
+                          errorCallback))
+    filesystem()->scheduleCallback(errorCallback.release(),
+                                   FileError::create(INVALID_MODIFICATION_ERR));
 }
 
 void Entry::remove(PassRefPtr<VoidCallback> successCallback,
-                   PassRefPtr<ErrorCallback> errorCallback) const {
-  filesystem()->remove(this, successCallback, errorCallback);
+                   PassRefPtr<ErrorCallback> errorCallbackRef) const {
+  RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
+  if (!m_fileSystem->remove(this, successCallback, errorCallback))
+    filesystem()->scheduleCallback(errorCallback.release(),
+                                   FileError::create(INVALID_MODIFICATION_ERR));
 }
 
 void Entry::getParent(PassRefPtr<EntryCallback> successCallback,
-                      PassRefPtr<ErrorCallback> errorCallback) const {
-  filesystem()->getParent(this, successCallback, errorCallback);
+                      PassRefPtr<ErrorCallback> errorCallbackRef) const {
+  RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
+  if (!m_fileSystem->getParent(this, successCallback, errorCallback))
+    filesystem()->scheduleCallback(errorCallback.release(),
+                                   FileError::create(INVALID_MODIFICATION_ERR));
 }
 
 String Entry::toURI(const String&) {

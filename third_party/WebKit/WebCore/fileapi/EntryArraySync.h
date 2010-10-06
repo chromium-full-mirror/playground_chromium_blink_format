@@ -47,6 +47,8 @@ class EntryArraySync : public RefCounted<EntryArraySync> {
     return adoptRef(new EntryArraySync());
   }
 
+  static PassRefPtr<EntryArraySync> create(EntryArray*);
+
   unsigned length() const { return m_entries.size(); }
   EntrySync* item(unsigned index) const;
 

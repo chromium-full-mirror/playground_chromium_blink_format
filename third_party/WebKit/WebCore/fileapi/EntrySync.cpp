@@ -34,37 +34,66 @@
 #if ENABLE(FILE_SYSTEM)
 
 #include "DOMFilePath.h"
+#include "DOMFileSystemSync.h"
+#include "DirectoryEntry.h"
 #include "DirectoryEntrySync.h"
+#include "FileEntrySync.h"
 #include "Metadata.h"
-#include "NotImplemented.h"
+#include "SyncCallbackHelper.h"
 
 namespace WebCore {
 
-PassRefPtr<Metadata> EntrySync::getMetadata(ExceptionCode&) {
-  // FIXME: to be implemented.
-  notImplemented();
-  return 0;
+PassRefPtr<EntrySync> EntrySync::create(EntryBase* entry) {
+  if (entry->isFile())
+    return adoptRef(new FileEntrySync(entry->m_fileSystem, entry->m_fullPath));
+  return adoptRef(
+      new DirectoryEntrySync(entry->m_fileSystem, entry->m_fullPath));
 }
 
-PassRefPtr<EntrySync> EntrySync::moveTo(PassRefPtr<DirectoryEntrySync>,
-                                        const String&,
-                                        ExceptionCode&) const {
-  // FIXME: to be implemented.
-  notImplemented();
-  return 0;
+PassRefPtr<Metadata> EntrySync::getMetadata(ExceptionCode& ec) {
+  ec = 0;
+  MetadataSyncCallbackHelper helper(m_fileSystem->asyncFileSystem());
+  if (!m_fileSystem->getMetadata(this, helper.successCallback(),
+                                 helper.errorCallback())) {
+    ec = INVALID_MODIFICATION_ERR;
+    return 0;
+  }
+  return helper.getResult(ec);
 }
 
-PassRefPtr<EntrySync> EntrySync::copyTo(PassRefPtr<DirectoryEntrySync>,
-                                        const String&,
-                                        ExceptionCode&) const {
-  // FIXME: to be implemented.
-  notImplemented();
-  return 0;
+PassRefPtr<EntrySync> EntrySync::moveTo(PassRefPtr<DirectoryEntrySync> parent,
+                                        const String& name,
+                                        ExceptionCode& ec) const {
+  ec = 0;
+  EntrySyncCallbackHelper helper(m_fileSystem->asyncFileSystem());
+  if (!m_fileSystem->move(this, parent.get(), name, helper.successCallback(),
+                          helper.errorCallback())) {
+    ec = INVALID_MODIFICATION_ERR;
+    return 0;
+  }
+  return helper.getResult(ec);
 }
 
-void EntrySync::remove(ExceptionCode&) const {
-  // FIXME: to be implemented.
-  notImplemented();
+PassRefPtr<EntrySync> EntrySync::copyTo(PassRefPtr<DirectoryEntrySync> parent,
+                                        const String& name,
+                                        ExceptionCode& ec) const {
+  ec = 0;
+  EntrySyncCallbackHelper helper(m_fileSystem->asyncFileSystem());
+  if (!m_fileSystem->copy(this, parent.get(), name, helper.successCallback(),
+                          helper.errorCallback())) {
+    ec = INVALID_MODIFICATION_ERR;
+    return 0;
+  }
+  return helper.getResult(ec);
+}
+
+void EntrySync::remove(ExceptionCode& ec) const {
+  ec = 0;
+  VoidSyncCallbackHelper helper(m_fileSystem->asyncFileSystem());
+  if (!m_fileSystem->remove(this, helper.successCallback(),
+                            helper.errorCallback()))
+    ec = INVALID_MODIFICATION_ERR;
+  helper.getResult(ec);
 }
 
 PassRefPtr<EntrySync> EntrySync::getParent() const {

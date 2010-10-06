@@ -33,9 +33,14 @@
 
 #if ENABLE(FILE_SYSTEM)
 
+#include "DirectoryEntry.h"
+#include "DirectoryEntrySync.h"
 #include "EntryArraySync.h"
+#include "EntrySync.h"
 #include "ExceptionCode.h"
-#include "NotImplemented.h"
+#include "FileEntrySync.h"
+#include "FileError.h"
+#include "SyncCallbackHelper.h"
 
 namespace WebCore {
 
@@ -43,9 +48,19 @@ DirectoryReaderSync::DirectoryReaderSync(DOMFileSystemBase* fileSystem,
                                          const String& fullPath)
     : DirectoryReaderBase(fileSystem, fullPath) {}
 
-PassRefPtr<EntryArraySync> DirectoryReaderSync::readEntries(ExceptionCode&) {
-  notImplemented();
-  return 0;
+PassRefPtr<EntryArraySync> DirectoryReaderSync::readEntries(ExceptionCode& ec) {
+  ec = 0;
+  if (!m_hasMoreEntries)
+    return EntryArraySync::create();
+
+  EntriesSyncCallbackHelper helper(m_fileSystem->asyncFileSystem());
+  if (!m_fileSystem->readDirectory(this, m_fullPath, helper.successCallback(),
+                                   helper.errorCallback())) {
+    ec = INVALID_MODIFICATION_ERR;
+    setHasMoreEntries(false);
+    return 0;
+  }
+  return helper.getResult(ec);
 }
 
 }  // namespace

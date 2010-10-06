@@ -87,7 +87,8 @@ void LocalFileSystem::requestFileSystem(
     ScriptExecutionContext* context,
     AsyncFileSystem::Type type,
     long long,
-    PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
+    PassOwnPtr<AsyncFileSystemCallbacks> callbacks,
+    bool) {
   // AsyncFileSystem::openFileSystem calls callbacks synchronously, so the
   // method needs to be called asynchronously.
   context->postTask(createCallbackTask(

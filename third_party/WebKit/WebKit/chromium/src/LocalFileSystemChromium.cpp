@@ -61,7 +61,8 @@ void LocalFileSystem::requestFileSystem(
     ScriptExecutionContext* context,
     AsyncFileSystem::Type type,
     long long size,
-    PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
+    PassOwnPtr<AsyncFileSystemCallbacks> callbacks,
+    bool synchronous) {
   ASSERT(context);
   if (context->isDocument()) {
     Document* document = static_cast<Document*>(context);
@@ -76,7 +77,8 @@ void LocalFileSystem::requestFileSystem(
     WebWorkerBase* webWorker = static_cast<WebWorkerBase*>(workerLoaderProxy);
     webWorker->openFileSystem(
         static_cast<WebFileSystem::Type>(type), size,
-        new WebFileSystemCallbacksImpl(callbacks, context));
+        new WebFileSystemCallbacksImpl(callbacks, context, synchronous),
+        synchronous);
   }
 }
 

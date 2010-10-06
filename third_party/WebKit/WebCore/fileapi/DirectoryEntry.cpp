@@ -36,10 +36,11 @@
 #include "DirectoryReader.h"
 #include "EntryCallback.h"
 #include "ErrorCallback.h"
+#include "FileError.h"
 
 namespace WebCore {
 
-DirectoryEntry::DirectoryEntry(DOMFileSystem* fileSystem,
+DirectoryEntry::DirectoryEntry(DOMFileSystemBase* fileSystem,
                                const String& fullPath)
     : Entry(fileSystem, fullPath) {}
 
@@ -50,17 +51,23 @@ PassRefPtr<DirectoryReader> DirectoryEntry::createReader() {
 void DirectoryEntry::getFile(const String& path,
                              PassRefPtr<Flags> flags,
                              PassRefPtr<EntryCallback> successCallback,
-                             PassRefPtr<ErrorCallback> errorCallback) {
-  filesystem()->getFile(this, path, flags, successCallback, errorCallback);
+                             PassRefPtr<ErrorCallback> errorCallbackRef) {
+  RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
+  if (!m_fileSystem->getFile(this, path, flags, successCallback, errorCallback))
+    filesystem()->scheduleCallback(errorCallback.release(),
+                                   FileError::create(INVALID_MODIFICATION_ERR));
 }
 
 void DirectoryEntry::getDirectory(const String& path,
                                   PassRefPtr<Flags> flags,
                                   PassRefPtr<EntryCallback> successCallback,
-                                  PassRefPtr<ErrorCallback> errorCallback) {
-  filesystem()->getDirectory(this, path, flags, successCallback, errorCallback);
+                                  PassRefPtr<ErrorCallback> errorCallbackRef) {
+  RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
+  if (!m_fileSystem->getDirectory(this, path, flags, successCallback,
+                                  errorCallback))
+    filesystem()->scheduleCallback(errorCallback.release(),
+                                   FileError::create(INVALID_MODIFICATION_ERR));
 }
-
-}  // namespace
+}
 
 #endif  // ENABLE(FILE_SYSTEM)

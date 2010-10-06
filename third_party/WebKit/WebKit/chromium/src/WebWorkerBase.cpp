@@ -255,14 +255,25 @@ bool WebWorkerBase::allowDatabase(WebFrame*,
 #if ENABLE(FILE_SYSTEM)
 void WebWorkerBase::openFileSystem(WebFileSystem::Type type,
                                    long long size,
-                                   WebFileSystemCallbacks* callbacks) {
+                                   WebFileSystemCallbacks* callbacks,
+                                   bool synchronous) {
+  WorkerRunLoop& runLoop = m_workerThread->runLoop();
   WorkerScriptController* controller =
       WorkerScriptController::controllerForContext();
+  WorkerContext* workerContext = controller->workerContext();
+
+  // Create a unique mode for this openFileSystem call.
+  String mode = openFileSystemMode;
+  mode.append(String::number(runLoop.createUniqueId()));
+
   RefPtr<WorkerFileSystemCallbacksBridge> bridge =
-      WorkerFileSystemCallbacksBridge::create(this, controller->workerContext(),
-                                              callbacks);
-  bridge->postOpenFileSystemToMainThread(commonClient(), type, size,
-                                         openFileSystemMode);
+      WorkerFileSystemCallbacksBridge::create(this, workerContext, callbacks);
+  bridge->postOpenFileSystemToMainThread(commonClient(), type, size, mode);
+
+  if (synchronous) {
+    if (runLoop.runInMode(workerContext, mode) == MessageQueueTerminated)
+      bridge->stop();
+  }
 }
 #endif
 

@@ -43,6 +43,10 @@ class Metadata : public RefCounted<Metadata> {
     return adoptRef(new Metadata(modificationTime));
   }
 
+  static PassRefPtr<Metadata> create(Metadata* metadata) {
+    return adoptRef(new Metadata(metadata->m_modificationTime));
+  }
+
   // Needs to return epoch time in milliseconds for Date.
   double modificationTime() const { return m_modificationTime * 1000.0; }
 

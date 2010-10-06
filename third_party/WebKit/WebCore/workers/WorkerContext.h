@@ -45,6 +45,7 @@
 namespace WebCore {
 
 class Blob;
+class DOMFileSystemSync;
 class Database;
 class DatabaseCallback;
 class DatabaseSync;
@@ -155,6 +156,9 @@ class WorkerContext : public RefCounted<WorkerContext>,
                          long long size,
                          PassRefPtr<FileSystemCallback>,
                          PassRefPtr<ErrorCallback>);
+  PassRefPtr<DOMFileSystemSync> requestFileSystemSync(int type,
+                                                      long long size,
+                                                      ExceptionCode&);
 #endif
 
   // These methods are used for GC marking. See

@@ -39,11 +39,11 @@
 
 namespace WebCore {
 
-class DOMFileSystem;
+class DOMFileSystemBase;
 
 class FileEntry : public Entry {
  public:
-  static PassRefPtr<FileEntry> create(DOMFileSystem* fileSystem,
+  static PassRefPtr<FileEntry> create(DOMFileSystemBase* fileSystem,
                                       const String& fullPath) {
     return adoptRef(new FileEntry(fileSystem, fullPath));
   }
@@ -55,7 +55,7 @@ class FileEntry : public Entry {
   virtual bool isFile() const { return true; }
 
  private:
-  FileEntry(DOMFileSystem* fileSystem, const String& fullPath);
+  FileEntry(DOMFileSystemBase* fileSystem, const String& fullPath);
 };
 
 }  // namespace

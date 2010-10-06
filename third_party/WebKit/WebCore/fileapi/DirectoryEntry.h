@@ -41,13 +41,14 @@
 
 namespace WebCore {
 
+class DOMFileSystemBase;
 class DirectoryReader;
 class EntryCallback;
 class ErrorCallback;
 
 class DirectoryEntry : public Entry {
  public:
-  static PassRefPtr<DirectoryEntry> create(DOMFileSystem* fileSystem,
+  static PassRefPtr<DirectoryEntry> create(DOMFileSystemBase* fileSystem,
                                            const String& fullPath) {
     return adoptRef(new DirectoryEntry(fileSystem, fullPath));
   }
@@ -64,7 +65,7 @@ class DirectoryEntry : public Entry {
                     PassRefPtr<ErrorCallback> = 0);
 
  private:
-  DirectoryEntry(DOMFileSystem* fileSystem, const String& fullPath);
+  DirectoryEntry(DOMFileSystemBase*, const String& fullPath);
 };
 
 }  // namespace

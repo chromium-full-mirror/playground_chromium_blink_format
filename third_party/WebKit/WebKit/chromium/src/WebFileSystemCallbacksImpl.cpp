@@ -47,8 +47,9 @@ namespace WebKit {
 
 WebFileSystemCallbacksImpl::WebFileSystemCallbacksImpl(
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks,
-    WebCore::ScriptExecutionContext* context)
-    : m_callbacks(callbacks), m_context(context) {
+    WebCore::ScriptExecutionContext* context,
+    bool synchronous)
+    : m_callbacks(callbacks), m_context(context), m_synchronous(synchronous) {
   ASSERT(m_callbacks);
 }
 
@@ -76,8 +77,8 @@ void WebFileSystemCallbacksImpl::didReadDirectory(
 void WebFileSystemCallbacksImpl::didOpenFileSystem(const WebString& name,
                                                    const WebString& path) {
   if (m_context && m_context->isWorkerContext())
-    m_callbacks->didOpenFileSystem(
-        name, WorkerAsyncFileSystemChromium::create(m_context, path));
+    m_callbacks->didOpenFileSystem(name, WorkerAsyncFileSystemChromium::create(
+                                             m_context, path, m_synchronous));
   else
     m_callbacks->didOpenFileSystem(name, AsyncFileSystemChromium::create(path));
   delete this;

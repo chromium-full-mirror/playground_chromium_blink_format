@@ -180,7 +180,6 @@ class RuntimeEnabledFeatures {
   static void setFileSystemEnabled(bool isEnabled) {
     isFileSystemEnabled = isEnabled;
   }
-  static bool requestFileSystemEnabled() { return isFileSystemEnabled; }
 #endif
 
  private:
