@@ -25,16 +25,53 @@
  */
 
 #include "TestController.h"
+
 #include "NotImplemented.h"
+#include <QCoreApplication>
+#include <QEventLoop>
+#include <QObject>
 
 namespace WTR {
 
-void TestController::runUntil(bool& done) {
-  notImplemented();
-}
+static const unsigned kTimerIntervalMS = 50;
 
-void TestController::platformInitialize() {
-  notImplemented();
+class RunUntilLoop : public QObject {
+  Q_OBJECT
+
+ public:
+  static void start(bool& done) {
+    static RunUntilLoop* instance = new RunUntilLoop;
+    instance->run(done);
+  }
+
+ private:
+  RunUntilLoop() {}
+
+  void run(bool& done) {
+    m_condition = &done;
+    m_timerID = startTimer(kTimerIntervalMS);
+    ASSERT(m_timerID);
+    m_eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
+  }
+
+  virtual void timerEvent(QTimerEvent*) {
+    if (!*m_condition)
+      return;
+
+    killTimer(m_timerID);
+    m_eventLoop.exit();
+  }
+
+  QEventLoop m_eventLoop;
+  bool* m_condition;
+  int m_timerID;
+};
+
+void TestController::platformInitialize() {}
+
+void TestController::runUntil(bool& done) {
+  RunUntilLoop::start(done);
+  ASSERT(done);
 }
 
 void TestController::initializeInjectedBundlePath() {
@@ -48,5 +85,7 @@ void TestController::initializeTestPluginDirectory() {
 void TestController::platformInitializeContext() {
   notImplemented();
 }
+
+#include "TestControllerQt.moc"
 
 }  // namespace WTR
