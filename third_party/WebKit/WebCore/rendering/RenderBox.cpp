@@ -680,7 +680,7 @@ bool RenderBox::nodeAtPoint(const HitTestRequest& request,
   // foreground phase (which is true for replaced elements like images).
   IntRect boundsRect = IntRect(tx, ty, width(), height());
   if (visibleToHitTesting() && action == HitTestForeground &&
-      boundsRect.intersects(result.rectFromPoint(xPos, yPos))) {
+      boundsRect.intersects(result.rectForPoint(xPos, yPos))) {
     updateHitTestResult(result, IntPoint(xPos - tx, yPos - ty));
     if (!result.addNodeToRectBasedTestResult(node(), xPos, yPos, boundsRect))
       return true;

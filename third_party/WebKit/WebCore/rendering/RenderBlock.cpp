@@ -4640,7 +4640,7 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
     // Check if we need to do anything at all.
     IntRect overflowBox = visibleOverflowRect();
     overflowBox.move(tx, ty);
-    if (!overflowBox.intersects(result.rectFromPoint(_x, _y)))
+    if (!overflowBox.intersects(result.rectForPoint(_x, _y)))
       return false;
   }
 
@@ -4656,7 +4656,7 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
   // If we have clipping, then we can't have any spillout.
   bool useOverflowClip = hasOverflowClip() && !hasSelfPaintingLayer();
   bool useClip = (hasControlClip() || useOverflowClip);
-  IntRect hitTestArea(result.rectFromPoint(_x, _y));
+  IntRect hitTestArea(result.rectForPoint(_x, _y));
   bool checkChildren =
       !useClip ||
       (hasControlClip() ? controlClipRect(tx, ty).intersects(hitTestArea)
@@ -4693,7 +4693,7 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
       hitTestAction == HitTestChildBlockBackground) {
     IntRect boundsRect(tx, ty, width(), height());
     if (visibleToHitTesting() &&
-        boundsRect.intersects(result.rectFromPoint(_x, _y))) {
+        boundsRect.intersects(result.rectForPoint(_x, _y))) {
       updateHitTestResult(result, IntPoint(_x - tx, _y - ty));
       if (!result.addNodeToRectBasedTestResult(node(), _x, _y, boundsRect))
         return true;
@@ -4762,14 +4762,14 @@ bool RenderBlock::hitTestColumns(const HitTestRequest& request,
     currYOffset += colRect.height();
     colRect.move(tx, ty);
 
-    if (colRect.intersects(result.rectFromPoint(x, y))) {
+    if (colRect.intersects(result.rectForPoint(x, y))) {
       // The point is inside this column.
       // Adjust tx and ty to change where we hit test.
 
       int finalX = tx + currXOffset;
       int finalY = ty + currYOffset;
       if (result.isRectBasedTest() &&
-          !colRect.contains(result.rectFromPoint(x, y)))
+          !colRect.contains(result.rectForPoint(x, y)))
         hitTestContents(request, result, x, y, finalX, finalY, hitTestAction);
       else
         return hitTestContents(request, result, x, y, finalX, finalY,

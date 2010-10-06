@@ -1189,7 +1189,7 @@ bool RenderTable::nodeAtPoint(const HitTestRequest& request,
 
   // Check kids first.
   if (!hasOverflowClip() ||
-      overflowClipRect(tx, ty).intersects(result.rectFromPoint(xPos, yPos))) {
+      overflowClipRect(tx, ty).intersects(result.rectForPoint(xPos, yPos))) {
     for (RenderObject* child = lastChild(); child;
          child = child->previousSibling()) {
       if (child->isBox() && !toRenderBox(child)->hasSelfPaintingLayer() &&
@@ -1205,7 +1205,7 @@ bool RenderTable::nodeAtPoint(const HitTestRequest& request,
   IntRect boundsRect = IntRect(tx, ty, width(), height());
   if (visibleToHitTesting() && (action == HitTestBlockBackground ||
                                 action == HitTestChildBlockBackground) &&
-      boundsRect.intersects(result.rectFromPoint(xPos, yPos))) {
+      boundsRect.intersects(result.rectForPoint(xPos, yPos))) {
     updateHitTestResult(result, IntPoint(xPos - tx, yPos - ty));
     if (!result.addNodeToRectBasedTestResult(node(), xPos, yPos, boundsRect))
       return true;

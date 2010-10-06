@@ -1109,8 +1109,8 @@ PassRefPtr<NodeList> Document::nodesFromRect(int centerX,
   if (ignoreClipping)
     type |= HitTestRequest::IgnoreClipping;
   else if (!frameView->visibleContentRect().intersects(
-               HitTestResult::rectFromPoint(point, topPadding, rightPadding,
-                                            bottomPadding, leftPadding)))
+               HitTestResult::rectForPoint(point, topPadding, rightPadding,
+                                           bottomPadding, leftPadding)))
     return 0;
 
   HitTestRequest request(type);
