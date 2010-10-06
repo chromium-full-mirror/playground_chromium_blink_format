@@ -55,7 +55,7 @@ typedef HashMap<CSSStyleDeclaration*, long> StyleToIdMap;
 typedef HashMap<long, RefPtr<CSSStyleDeclaration>> IdToStyleMap;
 typedef HashMap<CSSStyleRule*, long> RuleToIdMap;
 typedef HashMap<long, RefPtr<CSSStyleRule>> IdToRuleMap;
-typedef HashMap<CSSStyleSheet*, Vector<RefPtr<CSSStyleSourceData>>*>
+typedef HashMap<CSSStyleSheet*, Vector<RefPtr<CSSRuleSourceData>>*>
     StyleSheetToOffsetsMap;
 typedef HashMap<CSSStyleSheet*, long> StyleSheetToIdMap;
 typedef HashMap<long, RefPtr<CSSStyleSheet>> IdToStyleSheetMap;
@@ -72,8 +72,8 @@ class InspectorCSSStore {
   InspectorCSSStore(InspectorController* inspectorController);
   ~InspectorCSSStore();
   void reset();
-  bool getStyleSourceData(CSSStyleDeclaration*,
-                          RefPtr<CSSStyleSourceData>* result);
+  bool getRuleSourceData(CSSStyleDeclaration*,
+                         RefPtr<CSSRuleSourceData>* result);
   CSSStyleDeclaration* styleForId(long styleId);
   CSSStyleSheet* styleSheetForId(long styleSheetId);
   CSSStyleRule* ruleForId(long styleRuleId);
@@ -94,7 +94,7 @@ class InspectorCSSStore {
   bool resourceStyleSheetText(CSSStyleSheet*, String* result);
   void extractRanges(CSSStyleSheet*,
                      const StyleRuleRangeMap&,
-                     Vector<RefPtr<CSSStyleSourceData>>* rangesVector);
+                     Vector<RefPtr<CSSRuleSourceData>>* rangesVector);
   bool getStyleAttributeRanges(Node* parentNode,
                                RefPtr<CSSStyleSourceData>* result);
 

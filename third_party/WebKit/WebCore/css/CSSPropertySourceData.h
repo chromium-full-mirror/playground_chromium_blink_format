@@ -44,7 +44,6 @@ class CSSStyleRule;
 struct SourceRange {
   SourceRange();
   SourceRange(unsigned start, unsigned end);
-  SourceRange& operator=(const SourceRange& other);
 
   unsigned start;
   unsigned end;
@@ -60,9 +59,7 @@ struct CSSPropertySourceData {
                         const SourceRange& range);
   CSSPropertySourceData(const CSSPropertySourceData& other);
   CSSPropertySourceData();
-  ALWAYS_INLINE ~CSSPropertySourceData() {}
 
-  CSSPropertySourceData& operator=(const CSSPropertySourceData& other);
   String toString() const;
   unsigned hash() const;
 
@@ -86,7 +83,17 @@ struct CSSStyleSourceData : public RefCounted<CSSStyleSourceData> {
   SourceRange styleBodyRange;
   Vector<CSSPropertySourceData> propertyData;
 };
-typedef HashMap<CSSStyleRule*, RefPtr<CSSStyleSourceData>> StyleRuleRangeMap;
+
+struct CSSRuleSourceData : public RefCounted<CSSRuleSourceData> {
+  static PassRefPtr<CSSRuleSourceData> create() {
+    return adoptRef(new CSSRuleSourceData());
+  }
+
+  // Range of the selector list in the enclosing source.
+  SourceRange selectorListRange;
+  RefPtr<CSSStyleSourceData> styleSourceData;
+};
+typedef HashMap<CSSStyleRule*, RefPtr<CSSRuleSourceData>> StyleRuleRangeMap;
 
 }  // namespace WebCore
 

@@ -153,19 +153,21 @@ String InspectorCSSStore::inlineStyleSheetText(CSSStyleSheet* styleSheet) {
 }
 
 // All ranges are: [start; end) (start - inclusive, end - exclusive).
-bool InspectorCSSStore::getStyleSourceData(CSSStyleDeclaration* style,
-                                           RefPtr<CSSStyleSourceData>* result) {
+bool InspectorCSSStore::getRuleSourceData(CSSStyleDeclaration* style,
+                                          RefPtr<CSSRuleSourceData>* result) {
   if (!style)
     return false;
 
   Element* element = inlineStyleElement(style);
   if (element) {
     // Inline: style="...".
+    RefPtr<CSSRuleSourceData> ruleSourceData = CSSRuleSourceData::create();
     RefPtr<CSSStyleSourceData> styleSourceData = CSSStyleSourceData::create();
     bool success = getStyleAttributeRanges(element, &styleSourceData);
     if (!success)
       return false;
-    *result = styleSourceData;
+    ruleSourceData->styleSourceData = styleSourceData.release();
+    *result = ruleSourceData;
     return true;
   }
 
@@ -173,7 +175,7 @@ bool InspectorCSSStore::getStyleSourceData(CSSStyleDeclaration* style,
   if (!styleSheet)
     return false;
 
-  Vector<RefPtr<CSSStyleSourceData>>* rangesVector = 0;
+  Vector<RefPtr<CSSRuleSourceData>>* rangesVector = 0;
   StyleSheetToOffsetsMap::iterator it = m_styleSheetToOffsets.find(styleSheet);
   if (it == m_styleSheetToOffsets.end()) {
     String text = styleSheetText(bindStyleSheet(styleSheet));
@@ -183,7 +185,7 @@ bool InspectorCSSStore::getStyleSourceData(CSSStyleDeclaration* style,
       CSSParser p;
       StyleRuleRangeMap ruleRangeMap;
       p.parseSheet(newStyleSheet.get(), text, 0, &ruleRangeMap);
-      rangesVector = new Vector<RefPtr<CSSStyleSourceData>>;
+      rangesVector = new Vector<RefPtr<CSSRuleSourceData>>;
       extractRanges(newStyleSheet.get(), ruleRangeMap, rangesVector);
       m_styleSheetToOffsets.set(styleSheet, rangesVector);
     }
@@ -210,7 +212,7 @@ bool InspectorCSSStore::getStyleSourceData(CSSStyleDeclaration* style,
 void InspectorCSSStore::extractRanges(
     CSSStyleSheet* styleSheet,
     const StyleRuleRangeMap& ruleRangeMap,
-    Vector<RefPtr<CSSStyleSourceData>>* rangesVector) {
+    Vector<RefPtr<CSSRuleSourceData>>* rangesVector) {
   for (unsigned i = 0, length = styleSheet->length(); i < length; ++i) {
     CSSStyleRule* rule = asCSSStyleRule(styleSheet->item(i));
     if (!rule)
@@ -237,7 +239,7 @@ bool InspectorCSSStore::getStyleAttributeRanges(
   RefPtr<CSSMutableStyleDeclaration> tempDeclaration =
       CSSMutableStyleDeclaration::create();
   CSSParser p;
-  p.parseDeclaration(tempDeclaration.get(), styleText, result->get());
+  p.parseDeclaration(tempDeclaration.get(), styleText, result);
   return true;
 }
 
