@@ -155,7 +155,9 @@ class SharedGraphicsContext3D : public RefCounted<SharedGraphicsContext3D> {
   PassRefPtr<Texture> createTexture(Texture::Format, int width, int height);
 
  private:
-  explicit SharedGraphicsContext3D(PassOwnPtr<GraphicsContext3D> context);
+  SharedGraphicsContext3D(PassOwnPtr<GraphicsContext3D>,
+                          PassOwnPtr<SolidFillShader>,
+                          PassOwnPtr<TexShader>);
 
   // Used to implement removeTexturesFor(), see the comment above.
   static HashSet<SharedGraphicsContext3D*>* allContexts();
