@@ -27,6 +27,7 @@
 #include "config.h"
 #include "ResourceHandle.h"
 
+#include "DataURL.h"
 #include "HTTPParsers.h"
 #include "MIMETypeRegistry.h"
 #include "MainThread.h"
@@ -273,7 +274,8 @@ bool ResourceHandle::onRequestComplete() {
 }
 
 bool ResourceHandle::start(NetworkingContext* context) {
-  if (request().url().isLocalFile()) {
+  if (firstRequest().url().isLocalFile() ||
+      firstRequest().url().protocolIs("data")) {
     ref();  // balanced by deref in fileLoadTimer
     if (d->m_loadSynchronously)
       fileLoadTimer(0);
@@ -371,6 +373,11 @@ bool ResourceHandle::start(NetworkingContext* context) {
 void ResourceHandle::fileLoadTimer(Timer<ResourceHandle>*) {
   RefPtr<ResourceHandle> protector(this);
   deref();  // balances ref in start
+
+  if (firstRequest().url().protocolIs("data")) {
+    handleDataURL(this);
+    return;
+  }
 
   String fileName = firstRequest().url().fileSystemPath();
   HANDLE fileHandle =
