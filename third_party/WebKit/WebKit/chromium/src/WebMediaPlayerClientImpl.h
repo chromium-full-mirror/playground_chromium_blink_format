@@ -36,6 +36,7 @@
 #include "MediaPlayerPrivate.h"
 #include "VideoFrameChromium.h"
 #include "VideoFrameProvider.h"
+#include "VideoLayerChromium.h"
 #include "WebMediaPlayerClient.h"
 #include <wtf/OwnPtr.h>
 
@@ -61,6 +62,7 @@ class WebMediaPlayerClientImpl : public WebCore::MediaPlayerPrivateInterface,
   WebMediaPlayer* mediaPlayer() const;
 
   // WebMediaPlayerClient methods:
+  virtual ~WebMediaPlayerClientImpl();
   virtual void networkStateChanged();
   virtual void readyStateChanged();
   virtual void volumeChanged(float);
@@ -130,7 +132,7 @@ class WebMediaPlayerClientImpl : public WebCore::MediaPlayerPrivateInterface,
   WebCore::MediaPlayer* m_mediaPlayer;
   OwnPtr<WebMediaPlayer> m_webMediaPlayer;
 #if USE(ACCELERATED_COMPOSITING)
-  RefPtr<WebCore::PlatformLayer> m_videoLayer;
+  RefPtr<WebCore::VideoLayerChromium> m_videoLayer;
   bool m_supportsAcceleratedCompositing;
 #endif
   static bool m_isEnabled;

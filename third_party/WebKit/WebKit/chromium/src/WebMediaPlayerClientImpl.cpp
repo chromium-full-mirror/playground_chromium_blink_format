@@ -90,6 +90,13 @@ WebMediaPlayer* WebMediaPlayerClientImpl::mediaPlayer() const {
 
 // WebMediaPlayerClient --------------------------------------------------------
 
+WebMediaPlayerClientImpl::~WebMediaPlayerClientImpl() {
+  // VideoLayerChromium may outlive this object so make sure all frames are
+  // released.
+  if (m_videoLayer.get())
+    m_videoLayer->releaseCurrentFrame();
+}
+
 void WebMediaPlayerClientImpl::networkStateChanged() {
   ASSERT(m_mediaPlayer);
   m_mediaPlayer->networkStateChanged();
@@ -161,6 +168,11 @@ void WebMediaPlayerClientImpl::load(const String& url) {
       static_cast<HTMLMediaElement*>(m_mediaPlayer->mediaPlayerClient())
           ->document()
           ->frame();
+
+  // Video frame object is owned by WebMediaPlayer. Before destroying
+  // WebMediaPlayer all frames need to be released.
+  if (m_videoLayer.get())
+    m_videoLayer->releaseCurrentFrame();
 
   m_webMediaPlayer.set(createWebMediaPlayer(this, frame));
   if (m_webMediaPlayer.get())
