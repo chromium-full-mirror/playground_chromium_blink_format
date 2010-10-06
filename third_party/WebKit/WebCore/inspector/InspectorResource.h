@@ -108,6 +108,7 @@ class InspectorResource : public RefCounted<InspectorResource> {
   void setOverrideContent(const ScriptString& data, Type);
 
   String sourceString() const;
+  String sourceBytes() const;
   PassRefPtr<SharedBuffer> resourceData(String* textEncodingName) const;
 
   bool isSameLoader(DocumentLoader* loader) const { return loader == m_loader; }
