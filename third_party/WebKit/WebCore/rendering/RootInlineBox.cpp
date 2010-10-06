@@ -45,7 +45,8 @@ RootInlineBox::RootInlineBox(RenderBlock* block)
       m_lineBreakPos(0),
       m_lineTop(0),
       m_lineBottom(0),
-      m_paginationStrut(0) {
+      m_paginationStrut(0),
+      m_blockLogicalHeight(0) {
   setIsVertical(!block->style()->isHorizontalWritingMode());
 }
 
@@ -227,7 +228,7 @@ void RootInlineBox::adjustPosition(int dx, int dy) {
   InlineFlowBox::adjustPosition(dx, dy);
   m_lineTop += dy;
   m_lineBottom += dy;
-  m_blockHeight += dy;
+  m_blockLogicalHeight += dy;
 }
 
 void RootInlineBox::childRemoved(InlineBox* box) {
