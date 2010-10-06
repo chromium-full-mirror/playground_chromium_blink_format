@@ -53,7 +53,8 @@ class PageClientImpl : public PageClient {
                               const String& newToolTip);
   virtual void setCursor(const WebCore::Cursor&);
 
-  void registerEditCommand(PassRefPtr<WebEditCommandProxy>, UndoOrRedo);
+  void registerEditCommand(PassRefPtr<WebEditCommandProxy>,
+                           WebPageProxy::UndoOrRedo);
   void clearAllEditCommands();
   void setEditCommandState(const String& commandName,
                            bool isEnabled,

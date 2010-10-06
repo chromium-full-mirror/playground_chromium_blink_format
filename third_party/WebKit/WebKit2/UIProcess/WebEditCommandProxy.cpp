@@ -51,7 +51,7 @@ void WebEditCommandProxy::unapply() {
 
   m_page->process()->send(Messages::WebPage::UnapplyEditCommand(m_commandID),
                           m_page->pageID());
-  m_page->registerEditCommandForRedo(this);
+  m_page->registerEditCommand(this, WebPageProxy::Undo);
 }
 
 void WebEditCommandProxy::reapply() {
@@ -60,7 +60,7 @@ void WebEditCommandProxy::reapply() {
 
   m_page->process()->send(Messages::WebPage::ReapplyEditCommand(m_commandID),
                           m_page->pageID());
-  m_page->registerEditCommandForUndo(this);
+  m_page->registerEditCommand(this, WebPageProxy::Redo);
 }
 
 }  // namespace WebKit
