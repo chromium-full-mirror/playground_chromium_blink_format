@@ -1710,7 +1710,7 @@ void HTMLTreeBuilder::processEndTagForInCell(AtomicHTMLToken& token) {
   if (token.name() == tableTag || token.name() == trTag ||
       isTableBodyContextTag(token.name())) {
     if (!m_tree.openElements()->inTableScope(token.name())) {
-      ASSERT(isParsingFragment());
+      ASSERT(isTableBodyContextTag(token.name()) || isParsingFragment());
       parseError(token);
       return;
     }
