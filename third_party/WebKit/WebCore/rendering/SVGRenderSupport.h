@@ -94,7 +94,6 @@ class SVGRenderSupport {
                                         const RenderObject*);
 
   // FIXME: These methods do not belong here.
-  static const RenderObject* findTextRootObject(const RenderObject* start);
   static const RenderSVGRoot* findTreeRootObject(const RenderObject* start);
 
  private:

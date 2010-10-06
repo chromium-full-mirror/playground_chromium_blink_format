@@ -389,16 +389,6 @@ void SVGRenderSupport::applyStrokeStyleToContext(GraphicsContext* context,
                          svgStyle->strokeDashOffset().value(lengthContext));
   }
 }
-
-const RenderObject* SVGRenderSupport::findTextRootObject(
-    const RenderObject* start) {
-  while (start && !start->isSVGText())
-    start = start->parent();
-  ASSERT(start);
-  ASSERT(start->isSVGText());
-
-  return start;
-}
 }
 
 #endif

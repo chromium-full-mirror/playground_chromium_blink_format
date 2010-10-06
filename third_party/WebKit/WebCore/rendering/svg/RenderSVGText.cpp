@@ -1,12 +1,11 @@
 /*
- * This file is part of the WebKit project.
- *
  * Copyright (C) 2006 Apple Computer, Inc.
- *               2006 Alexander Kellett <lypanov@kde.org>
- *               2006 Oliver Hunt <ojh16@student.canterbury.ac.nz>
- *               2007 Nikolas Zimmermann <zimmermann@kde.org>
- *               2008 Rob Buis <buis@kde.org>
- *               2009 Dirk Schulze <krit@webkit.org>
+ * Copyright (C) 2006 Alexander Kellett <lypanov@kde.org>
+ * Copyright (C) 2006 Oliver Hunt <ojh16@student.canterbury.ac.nz>
+ * Copyright (C) 2007 Nikolas Zimmermann <zimmermann@kde.org>
+ * Copyright (C) 2008 Rob Buis <buis@kde.org>
+ * Copyright (C) 2009 Dirk Schulze <krit@webkit.org>
+ * Copyright (C) Research In Motion Limited 2010. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -52,7 +51,28 @@
 namespace WebCore {
 
 RenderSVGText::RenderSVGText(SVGTextElement* node)
-    : RenderSVGBlock(node), m_needsTransformUpdate(true) {}
+    : RenderSVGBlock(node),
+      m_needsPositioningValuesUpdate(true),
+      m_needsTransformUpdate(true) {}
+
+RenderSVGText* RenderSVGText::locateRenderSVGTextAncestor(RenderObject* start) {
+  ASSERT(start);
+  while (start && !start->isSVGText())
+    start = start->parent();
+  if (!start || !start->isSVGText())
+    return 0;
+  return toRenderSVGText(start);
+}
+
+const RenderSVGText* RenderSVGText::locateRenderSVGTextAncestor(
+    const RenderObject* start) {
+  ASSERT(start);
+  while (start && !start->isSVGText())
+    start = start->parent();
+  if (!start || !start->isSVGText())
+    return 0;
+  return toRenderSVGText(start);
+}
 
 IntRect RenderSVGText::clippedOverflowRectForRepaint(
     RenderBoxModelObject* repaintContainer) {
@@ -88,10 +108,14 @@ void RenderSVGText::layout() {
     updateCachedBoundariesInParents = true;
   }
 
-  // Perform SVG text layout phase one (see SVGTextLayoutAttributesBuilder for
-  // details).
-  SVGTextLayoutAttributesBuilder layoutAttributesBuilder;
-  layoutAttributesBuilder.buildLayoutAttributesForTextSubtree(this);
+  if (m_needsPositioningValuesUpdate) {
+    // Perform SVG text layout phase one (see SVGTextLayoutAttributesBuilder for
+    // details).
+    SVGTextLayoutAttributesBuilder layoutAttributesBuilder;
+    layoutAttributesBuilder.buildLayoutAttributesForTextSubtree(this);
+    m_needsPositioningValuesUpdate = false;
+    updateCachedBoundariesInParents = true;
+  }
 
   // Reduced version of RenderBlock::layoutBlock(), which only takes care of SVG
   // text.
