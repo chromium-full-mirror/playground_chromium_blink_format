@@ -1078,8 +1078,8 @@ RootInlineBox* RenderBlock::determineStartPosition(
     Vector<FloatWithRect>& floats,
     unsigned& numCleanFloats,
     bool& useRepaintBounds,
-    int& repaintTop,
-    int& repaintBottom) {
+    int& repaintLogicalTop,
+    int& repaintLogicalBottom) {
   RootInlineBox* curr = 0;
   RootInlineBox* last = 0;
 
@@ -1106,10 +1106,12 @@ RootInlineBox* RenderBlock::determineStartPosition(
           if (!useRepaintBounds)
             useRepaintBounds = true;
 
-          repaintTop = min(
-              repaintTop, curr->topVisibleOverflow() + min(paginationDelta, 0));
-          repaintBottom = max(repaintBottom, curr->bottomVisibleOverflow() +
-                                                 max(paginationDelta, 0));
+          repaintLogicalTop =
+              min(repaintLogicalTop, beforeSideVisibleOverflowForLine(curr) +
+                                         min(paginationDelta, 0));
+          repaintLogicalBottom =
+              max(repaintLogicalBottom, afterSideVisibleOverflowForLine(curr) +
+                                            max(paginationDelta, 0));
           curr->adjustPosition(0, paginationDelta);
         }
       }
@@ -1131,13 +1133,16 @@ RootInlineBox* RenderBlock::determineStartPosition(
             break;
           }
           if (floats[floatIndex].rect.size() != newSize) {
-            int floatTop = floats[floatIndex].rect.y();
+            int floatTop = style()->isHorizontalWritingMode()
+                               ? floats[floatIndex].rect.y()
+                               : floats[floatIndex].rect.x();
+            int floatHeight =
+                style()->isHorizontalWritingMode()
+                    ? max(floats[floatIndex].rect.height(), newSize.height())
+                    : max(floats[floatIndex].rect.width(), newSize.width());
             curr->markDirty();
-            markLinesDirtyInBlockRange(
-                curr->blockLogicalHeight(),
-                floatTop +
-                    max(floats[floatIndex].rect.height(), newSize.height()),
-                curr);
+            markLinesDirtyInBlockRange(curr->blockLogicalHeight(),
+                                       floatTop + floatHeight, curr);
             floats[floatIndex].rect.setSize(newSize);
             dirtiedByFloat = true;
           }
@@ -1191,7 +1196,7 @@ RootInlineBox* RenderBlock::determineStartPosition(
 
   numCleanFloats = 0;
   if (!floats.isEmpty()) {
-    int savedHeight = height();
+    int savedLogicalHeight = logicalHeight();
     // Restore floats from clean lines.
     RootInlineBox* line = firstRootBox();
     while (line != curr) {
@@ -1200,7 +1205,7 @@ RootInlineBox* RenderBlock::determineStartPosition(
         for (Vector<RenderBox*>::iterator f = cleanLineFloats->begin();
              f != end; ++f) {
           insertFloatingObject(*f);
-          setLogicalHeight((*f)->y() - (*f)->marginTop());
+          setLogicalHeight(logicalTopForChild(*f) - marginBeforeForChild(*f));
           positionNewFloats();
           ASSERT(floats[numCleanFloats].object == *f);
           numCleanFloats++;
@@ -1208,7 +1213,7 @@ RootInlineBox* RenderBlock::determineStartPosition(
       }
       line = line->nextRootBox();
     }
-    setLogicalHeight(savedHeight);
+    setLogicalHeight(savedLogicalHeight);
   }
 
   firstLine = !last;
@@ -1247,7 +1252,7 @@ RootInlineBox* RenderBlock::determineEndPosition(
     RootInlineBox* startLine,
     InlineIterator& cleanLineStart,
     BidiStatus& cleanLineBidiStatus,
-    int& yPos) {
+    int& logicalTop) {
   RootInlineBox* last = 0;
   if (!startLine)
     last = 0;
@@ -1268,7 +1273,7 @@ RootInlineBox* RenderBlock::determineEndPosition(
   cleanLineStart =
       InlineIterator(this, prev->lineBreakObj(), prev->lineBreakPos());
   cleanLineBidiStatus = prev->lineBreakBidiStatus();
-  yPos = prev->blockLogicalHeight();
+  logicalTop = prev->blockLogicalHeight();
 
   for (RootInlineBox* line = last; line; line = line->nextRootBox())
     line->extractLine();  // Disconnect all line boxes from their render objects
@@ -1282,30 +1287,31 @@ bool RenderBlock::matchedEndLine(const InlineBidiResolver& resolver,
                                  const InlineIterator& endLineStart,
                                  const BidiStatus& endLineStatus,
                                  RootInlineBox*& endLine,
-                                 int& endYPos,
-                                 int& repaintBottom,
-                                 int& repaintTop) {
+                                 int& endLogicalTop,
+                                 int& repaintLogicalBottom,
+                                 int& repaintLogicalTop) {
   if (resolver.position() == endLineStart) {
     if (resolver.status() != endLineStatus)
       return false;
 
-    int delta = height() - endYPos;
+    int delta = logicalHeight() - endLogicalTop;
     if (!delta || !m_floatingObjects)
       return true;
 
     // See if any floats end in the range along which we want to shift the lines
     // vertically.
-    int top = min(height(), endYPos);
+    int logicalTop = min(logicalHeight(), endLogicalTop);
 
     RootInlineBox* lastLine = endLine;
     while (RootInlineBox* nextLine = lastLine->nextRootBox())
       lastLine = nextLine;
 
-    int bottom = lastLine->blockLogicalHeight() + abs(delta);
+    int logicalBottom = lastLine->blockLogicalHeight() + abs(delta);
 
     for (FloatingObject* f = m_floatingObjects->first(); f;
          f = m_floatingObjects->next()) {
-      if (f->bottom() >= top && f->bottom() < bottom)
+      if (logicalBottomForFloat(f) >= logicalTop &&
+          logicalBottomForFloat(f) < logicalBottom)
         return false;
     }
 
@@ -1325,25 +1331,26 @@ bool RenderBlock::matchedEndLine(const InlineBidiResolver& resolver,
         return false;  // ...but the bidi state doesn't match.
       RootInlineBox* result = line->nextRootBox();
 
-      // Set our yPos to be the block height of endLine.
+      // Set our logical top to be the block height of endLine.
       if (result)
-        endYPos = line->blockLogicalHeight();
+        endLogicalTop = line->blockLogicalHeight();
 
-      int delta = height() - endYPos;
+      int delta = logicalHeight() - endLogicalTop;
       if (delta && m_floatingObjects) {
         // See if any floats end in the range along which we want to shift the
         // lines vertically.
-        int top = min(height(), endYPos);
+        int logicalTop = min(logicalHeight(), endLogicalTop);
 
         RootInlineBox* lastLine = endLine;
         while (RootInlineBox* nextLine = lastLine->nextRootBox())
           lastLine = nextLine;
 
-        int bottom = lastLine->blockLogicalHeight() + abs(delta);
+        int logicalBottom = lastLine->blockLogicalHeight() + abs(delta);
 
         for (FloatingObject* f = m_floatingObjects->first(); f;
              f = m_floatingObjects->next()) {
-          if (f->bottom() >= top && f->bottom() < bottom)
+          if (logicalBottomForFloat(f) >= logicalTop &&
+              logicalBottomForFloat(f) < logicalBottom)
             return false;
         }
       }
@@ -1352,9 +1359,10 @@ bool RenderBlock::matchedEndLine(const InlineBidiResolver& resolver,
       RootInlineBox* boxToDelete = endLine;
       RenderArena* arena = renderArena();
       while (boxToDelete && boxToDelete != result) {
-        repaintTop = min(repaintTop, boxToDelete->topVisibleOverflow());
-        repaintBottom =
-            max(repaintBottom, boxToDelete->bottomVisibleOverflow());
+        repaintLogicalTop = min(repaintLogicalTop,
+                                beforeSideVisibleOverflowForLine(boxToDelete));
+        repaintLogicalBottom = max(
+            repaintLogicalBottom, afterSideVisibleOverflowForLine(boxToDelete));
         RootInlineBox* next = boxToDelete->nextRootBox();
         boxToDelete->deleteLine(arena);
         boxToDelete = next;
