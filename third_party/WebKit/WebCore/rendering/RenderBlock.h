@@ -232,6 +232,7 @@ class RenderBlock : public RenderBox {
 
   // Accessors for logical width/height and margins in the containing block's
   // block-flow direction.
+  enum ApplyLayoutDeltaMode { ApplyLayoutDelta, DoNotApplyLayoutDelta };
   int logicalWidthForChild(RenderBox* child) {
     return style()->isVerticalBlockFlow() ? child->width() : child->height();
   }
@@ -241,8 +242,12 @@ class RenderBlock : public RenderBox {
   int logicalTopForChild(RenderBox* child) {
     return style()->isVerticalBlockFlow() ? child->y() : child->x();
   }
-  void setLogicalLeftForChild(RenderBox* child, int logicalLeft);
-  void setLogicalTopForChild(RenderBox* child, int logicalTop);
+  void setLogicalLeftForChild(RenderBox* child,
+                              int logicalLeft,
+                              ApplyLayoutDeltaMode = DoNotApplyLayoutDelta);
+  void setLogicalTopForChild(RenderBox* child,
+                             int logicalTop,
+                             ApplyLayoutDeltaMode = DoNotApplyLayoutDelta);
   int marginBeforeForChild(RenderBoxModelObject* child) const;
   int marginAfterForChild(RenderBoxModelObject* child) const;
   int marginStartForChild(RenderBoxModelObject* child) const;
