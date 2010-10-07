@@ -4749,6 +4749,12 @@ bool Document::isXHTMLMPDocument() const {
 }
 #endif
 
+#if ENABLE(INSPECTOR)
+InspectorController* Document::inspectorController() const {
+  return page() ? page()->inspectorController() : 0;
+}
+#endif
+
 #if ENABLE(FULLSCREEN_API)
 void Document::webkitRequestFullScreenForElement(Element* element,
                                                  unsigned short flags) {
