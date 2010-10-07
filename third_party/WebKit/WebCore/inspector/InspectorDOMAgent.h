@@ -80,6 +80,12 @@ struct EventListenerInfo {
 
 class InspectorDOMAgent : public EventListener {
  public:
+  struct DOMListener {
+    virtual ~DOMListener() {}
+    virtual void didRemoveDocument(Document*) = 0;
+    virtual void didRemoveDOMNode(Node*) = 0;
+  };
+
   static PassRefPtr<InspectorDOMAgent> create(InspectorCSSStore* cssStore,
                                               InspectorFrontend* frontend) {
     return adoptRef(new InspectorDOMAgent(cssStore, frontend));
@@ -176,6 +182,10 @@ class InspectorDOMAgent : public EventListener {
   void pushNodeByPathToFrontend(const String& path, long* nodeId);
   long inspectedNode(unsigned long num);
   void copyNode(long nodeId);
+  const ListHashSet<RefPtr<Document>>& documents() { return m_documents; }
+  void setDOMListener(DOMListener*);
+
+  String documentURLString(Document* document) const;
 
  private:
   void startListening(Document* document);
@@ -227,7 +237,6 @@ class InspectorDOMAgent : public EventListener {
   bool isWhitespace(Node* node);
 
   Document* mainFrameDocument() const;
-  String documentURLString(Document* document) const;
   InspectorCSSStore* cssStore() { return m_cssStore; }
 
   void onMatchJobsTimer(Timer<InspectorDOMAgent>*);
@@ -256,6 +265,7 @@ class InspectorDOMAgent : public EventListener {
 
   InspectorCSSStore* m_cssStore;
   InspectorFrontend* m_frontend;
+  DOMListener* m_domListener;
   NodeToIdMap m_documentNodeToIdMap;
   // Owns node mappings for dangling nodes.
   Vector<NodeToIdMap*> m_danglingNodeToIdMaps;
