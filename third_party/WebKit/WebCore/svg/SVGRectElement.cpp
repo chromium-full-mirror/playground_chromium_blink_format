@@ -24,7 +24,7 @@
 #include "SVGRectElement.h"
 
 #include "Attribute.h"
-#include "RenderPath.h"
+#include "RenderSVGPath.h"
 #include "RenderSVGResource.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
@@ -93,7 +93,7 @@ void SVGRectElement::svgAttributeChanged(const QualifiedName& attrName) {
   if (isLengthAttribute)
     updateRelativeLengthsInformation();
 
-  RenderPath* renderer = static_cast<RenderPath*>(this->renderer());
+  RenderSVGPath* renderer = static_cast<RenderSVGPath*>(this->renderer());
   if (!renderer)
     return;
 

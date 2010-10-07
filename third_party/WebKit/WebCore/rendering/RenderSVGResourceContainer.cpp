@@ -178,7 +178,7 @@ void RenderSVGResourceContainer::registerResource() {
 AffineTransform RenderSVGResourceContainer::transformOnNonScalingStroke(
     RenderObject* object,
     const AffineTransform& resourceTransform) {
-  if (!object->isRenderPath())
+  if (!object->isSVGPath())
     return resourceTransform;
 
   SVGStyledTransformableElement* element =

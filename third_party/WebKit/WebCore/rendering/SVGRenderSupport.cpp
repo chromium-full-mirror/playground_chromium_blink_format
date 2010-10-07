@@ -32,7 +32,7 @@
 #include "ImageBuffer.h"
 #include "NodeRenderStyle.h"
 #include "RenderLayer.h"
-#include "RenderPath.h"
+#include "RenderSVGPath.h"
 #include "RenderSVGResource.h"
 #include "RenderSVGResourceClipper.h"
 #include "RenderSVGResourceFilter.h"
@@ -255,9 +255,9 @@ void SVGRenderSupport::layoutChildren(RenderObject* start,
         if (element->isStyled() &&
             static_cast<SVGStyledElement*>(element)->hasRelativeLengths()) {
           // When the layout size changed and when using relative values tell
-          // the RenderPath to update its Path object
-          if (child->isRenderPath())
-            toRenderPath(child)->setNeedsPathUpdate();
+          // the RenderSVGPath to update its Path object
+          if (child->isSVGPath())
+            toRenderSVGPath(child)->setNeedsPathUpdate();
 
           needsLayout = true;
         }

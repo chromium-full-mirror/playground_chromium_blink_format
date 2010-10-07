@@ -93,7 +93,7 @@ void RenderSVGResourceSolidColor::postApplyResource(
 #if PLATFORM(SKIA)
   // FIXME: Move this into the GraphicsContext
   // WebKit implicitly expects us to reset the path.
-  // For example in fillAndStrokePath() of RenderPath.cpp the path is
+  // For example in fillAndStrokePath() of RenderSVGPath.cpp the path is
   // added back to the context after filling. This is because internally it
   // calls CGContextFillPath() which closes the path.
   context->beginPath();

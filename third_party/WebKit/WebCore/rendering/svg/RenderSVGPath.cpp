@@ -26,7 +26,7 @@
 #include "config.h"
 
 #if ENABLE(SVG)
-#include "RenderPath.h"
+#include "RenderSVGPath.h"
 
 #include "FloatPoint.h"
 #include "FloatQuad.h"
@@ -62,7 +62,7 @@ class BoundingRectStrokeStyleApplier : public StrokeStyleApplier {
   RenderStyle* m_style;
 };
 
-RenderPath::RenderPath(SVGStyledTransformableElement* node)
+RenderSVGPath::RenderSVGPath(SVGStyledTransformableElement* node)
     : RenderSVGModelObject(node),
       m_needsBoundariesUpdate(false)  // default is false, the cached rects are
                                       // empty from the beginning
@@ -75,9 +75,9 @@ RenderPath::RenderPath(SVGStyledTransformableElement* node)
                                     // SVGStyledTransformableElement
 {}
 
-bool RenderPath::fillContains(const FloatPoint& point,
-                              bool requiresFill,
-                              WindRule fillRule) {
+bool RenderSVGPath::fillContains(const FloatPoint& point,
+                                 bool requiresFill,
+                                 WindRule fillRule) {
   if (!m_fillBoundingBox.contains(point))
     return false;
 
@@ -87,7 +87,8 @@ bool RenderPath::fillContains(const FloatPoint& point,
   return m_path.contains(point, fillRule);
 }
 
-bool RenderPath::strokeContains(const FloatPoint& point, bool requiresStroke) {
+bool RenderSVGPath::strokeContains(const FloatPoint& point,
+                                   bool requiresStroke) {
   if (!m_strokeAndMarkerBoundingBox.contains(point))
     return false;
 
@@ -99,7 +100,7 @@ bool RenderPath::strokeContains(const FloatPoint& point, bool requiresStroke) {
   return m_path.strokeContains(&strokeStyle, point);
 }
 
-void RenderPath::layout() {
+void RenderSVGPath::layout() {
   LayoutRepainter repainter(*this,
                             checkForRepaintDuringLayout() && selfNeedsLayout());
   SVGStyledTransformableElement* element =
@@ -142,7 +143,7 @@ void RenderPath::layout() {
   setNeedsLayout(false);
 }
 
-void RenderPath::fillAndStrokePath(GraphicsContext* context) {
+void RenderSVGPath::fillAndStrokePath(GraphicsContext* context) {
   context->beginPath();
   RenderStyle* style = this->style();
 
@@ -186,7 +187,7 @@ void RenderPath::fillAndStrokePath(GraphicsContext* context) {
     context->restore();
 }
 
-void RenderPath::paint(PaintInfo& paintInfo, int, int) {
+void RenderSVGPath::paint(PaintInfo& paintInfo, int, int) {
   if (paintInfo.context->paintingDisabled() ||
       style()->visibility() == HIDDEN || m_path.isEmpty())
     return;
@@ -234,16 +235,16 @@ void RenderPath::paint(PaintInfo& paintInfo, int, int) {
 
 // This method is called from inside paintOutline() since we call paintOutline()
 // while transformed to our coord system, return local coords
-void RenderPath::addFocusRingRects(Vector<IntRect>& rects, int, int) {
+void RenderSVGPath::addFocusRingRects(Vector<IntRect>& rects, int, int) {
   IntRect rect = enclosingIntRect(repaintRectInLocalCoordinates());
   if (!rect.isEmpty())
     rects.append(rect);
 }
 
-bool RenderPath::nodeAtFloatPoint(const HitTestRequest& request,
-                                  HitTestResult& result,
-                                  const FloatPoint& pointInParent,
-                                  HitTestAction hitTestAction) {
+bool RenderSVGPath::nodeAtFloatPoint(const HitTestRequest& request,
+                                     HitTestResult& result,
+                                     const FloatPoint& pointInParent,
+                                     HitTestAction hitTestAction) {
   // We only draw in the forground phase, so we only hit-test then.
   if (hitTestAction != HitTestForeground)
     return false;
@@ -274,7 +275,7 @@ bool RenderPath::nodeAtFloatPoint(const HitTestRequest& request,
   return false;
 }
 
-FloatRect RenderPath::calculateMarkerBoundsIfNeeded() {
+FloatRect RenderSVGPath::calculateMarkerBoundsIfNeeded() {
   SVGElement* svgElement = static_cast<SVGElement*>(node());
   ASSERT(svgElement && svgElement->document());
   if (!svgElement->isStyled())
@@ -303,7 +304,7 @@ FloatRect RenderPath::calculateMarkerBoundsIfNeeded() {
       svgStyle->strokeWidth().value(svgElement), m_path);
 }
 
-void RenderPath::updateCachedBoundaries() {
+void RenderSVGPath::updateCachedBoundaries() {
   if (m_path.isEmpty()) {
     m_fillBoundingBox = FloatRect();
     m_strokeAndMarkerBoundingBox = FloatRect();

@@ -284,7 +284,7 @@ bool RenderSVGResourceClipper::drawContentIntoMaskImage(
     }
 
     // Only shapes, paths and texts are allowed for clipping.
-    if (!renderer->isRenderPath() && !renderer->isSVGText())
+    if (!renderer->isSVGPath() && !renderer->isSVGText())
       continue;
 
     // Save the old RenderStyle of the current object for restoring after
@@ -339,7 +339,7 @@ void RenderSVGResourceClipper::calculateClipContentRepaintRect() {
     if (!childNode->isSVGElement() ||
         !static_cast<SVGElement*>(childNode)->isStyled() || !renderer)
       continue;
-    if (!renderer->isRenderPath() && !renderer->isSVGText() &&
+    if (!renderer->isSVGPath() && !renderer->isSVGText() &&
         !renderer->isSVGShadowTreeRootContainer())
       continue;
     RenderStyle* style = renderer->style();
@@ -372,7 +372,7 @@ bool RenderSVGResourceClipper::hitTestClipContent(
     if (!childNode->isSVGElement() ||
         !static_cast<SVGElement*>(childNode)->isStyled() || !renderer)
       continue;
-    if (!renderer->isRenderPath() && !renderer->isSVGText() &&
+    if (!renderer->isSVGPath() && !renderer->isSVGText() &&
         !renderer->isSVGShadowTreeRootContainer())
       continue;
     IntPoint hitPoint;
