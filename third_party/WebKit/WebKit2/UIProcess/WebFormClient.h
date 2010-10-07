@@ -46,7 +46,7 @@ class WebFormClient {
   bool willSubmitForm(WebPageProxy*,
                       WebFrameProxy*,
                       WebFrameProxy*,
-                      Vector<std::pair<String, String>>& textFieldValues,
+                      const Vector<std::pair<String, String>>& textFieldValues,
                       APIObject* userData,
                       WebFormSubmissionListenerProxy*);
 
