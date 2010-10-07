@@ -504,7 +504,8 @@ void MainResourceLoader::didFinishLoading(double finishTime) {
 #endif
 
   ASSERT(!documentLoader()->timing()->responseEnd);
-  documentLoader()->timing()->responseEnd = m_timeOfLastDataReceived;
+  documentLoader()->timing()->responseEnd =
+      finishTime ? finishTime : m_timeOfLastDataReceived;
   frameLoader()->finishedLoading();
   ResourceLoader::didFinishLoading(finishTime);
 
