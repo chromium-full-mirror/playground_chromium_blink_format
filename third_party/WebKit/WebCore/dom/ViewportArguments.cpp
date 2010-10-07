@@ -167,6 +167,12 @@ ViewportAttributes computeViewportAttributes(ViewportArguments args,
   result.minimumScale = max(result.minimumScale, max(availableWidth / width,
                                                      availableHeight / height));
 
+  result.userScalable = args.userScalable;
+  // Make maximum and minimum scale equal to the initial scale if user is not
+  // allowed to zoom in/out.
+  if (!args.userScalable)
+    result.maximumScale = result.minimumScale = result.initialScale;
+
   return result;
 }
 
