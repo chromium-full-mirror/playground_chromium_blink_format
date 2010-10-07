@@ -477,6 +477,23 @@ void WebPageProxy::setPageAndTextZoomFactors(double pageZoomFactor,
                   m_pageID);
 }
 
+void WebPageProxy::findString(const String&,
+                              WKFindDirection,
+                              WKFindOptions,
+                              unsigned maxNumMatches) {
+  // FIXME: Implement.
+}
+
+void WebPageProxy::hideFindUI() {
+  // FIXME: Implement.
+}
+
+void WebPageProxy::countStringMatches(const String& string,
+                                      bool caseInsensitive,
+                                      unsigned maxNumMatches) {
+  // FIXME: Implement.
+}
+
 void WebPageProxy::runJavaScriptInMainFrame(
     const String& script,
     PassRefPtr<ScriptReturnValueCallback> prpCallback) {
