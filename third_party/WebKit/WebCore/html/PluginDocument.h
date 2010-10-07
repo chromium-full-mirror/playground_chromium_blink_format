@@ -44,6 +44,8 @@ class PluginDocument : public HTMLDocument {
 
   virtual bool isPluginDocument() const { return true; }
 
+  virtual void detach();
+
   void cancelManualPluginLoad();
 
   bool shouldLoadPluginManually() { return m_shouldLoadPluginManually; }
