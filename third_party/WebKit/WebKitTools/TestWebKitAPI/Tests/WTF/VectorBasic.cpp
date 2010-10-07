@@ -29,11 +29,11 @@
 
 namespace TestWebKitAPI {
 
-TEST(VectorBasic) {
+TEST(WTF, VectorBasic) {
   Vector<int> intVector;
   TEST_ASSERT(intVector.isEmpty());
   TEST_ASSERT(intVector.size() == 0);
-  TEST_ASSERT(intVector.capacity() == 0);
+  TEST_ASSERT(intVector.capacity() == 1);
 }
 
 }  // namespace TestWebKitAPI

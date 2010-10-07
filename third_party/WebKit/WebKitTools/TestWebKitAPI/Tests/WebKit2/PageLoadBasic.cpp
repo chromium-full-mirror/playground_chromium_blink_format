@@ -118,7 +118,7 @@ static void decidePolicyForMIMEType(WKPageRef page,
   WKFramePolicyListenerUse(listener);
 }
 
-TEST(PageLoadBasic) {
+TEST(WebKit2, PageLoadBasic) {
   State state;
 
   WKRetainPtr<WKContextRef> context(AdoptWK, WKContextCreate());
