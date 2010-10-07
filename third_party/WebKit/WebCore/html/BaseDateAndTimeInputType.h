@@ -41,6 +41,7 @@ class BaseDateAndTimeInputType : public TextFieldInputType {
  protected:
   BaseDateAndTimeInputType(HTMLInputElement* element)
       : TextFieldInputType(element) {}
+  virtual double parseToDouble(const String&, double) const;
   virtual bool parseToDateComponents(const String&, DateComponents*) const;
   // A helper for parseToDateComponents().
   virtual bool parseToDateComponentsInternal(const UChar*,
@@ -48,7 +49,10 @@ class BaseDateAndTimeInputType : public TextFieldInputType {
                                              DateComponents*) const = 0;
 
  private:
-  virtual double parseToDouble(const String&, double) const;
+  virtual bool rangeUnderflow(const String&) const;
+  virtual bool rangeOverflow(const String&) const;
+  virtual bool stepMismatch(const String&, double) const;
+  virtual double stepBase() const;
 };
 
 }  // namespace WebCore
