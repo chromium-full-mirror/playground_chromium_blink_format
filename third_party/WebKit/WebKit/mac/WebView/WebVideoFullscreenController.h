@@ -50,6 +50,7 @@ class HTMLMediaElement;
   BOOL _forceDisableAnimation;
   uint32_t _idleDisplaySleepAssertion;
   uint32_t _idleSystemSleepAssertion;
+  NSTimer* _tickleTimer;
   SystemUIMode _savedUIMode;
   SystemUIOptions _savedUIOptions;
 }
