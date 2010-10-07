@@ -722,7 +722,8 @@ void DOMWindow::requestFileSystem(
 
   LocalFileSystem::localFileSystem().requestFileSystem(
       document, fileSystemType, size,
-      FileSystemCallbacks::create(successCallback, errorCallback, document));
+      FileSystemCallbacks::create(successCallback, errorCallback, document),
+      false);
 }
 
 COMPILE_ASSERT(static_cast<int>(DOMWindow::TEMPORARY) ==

@@ -389,7 +389,7 @@ void WorkerContext::requestFileSystem(
 
   LocalFileSystem::localFileSystem().requestFileSystem(
       this, fileSystemType, size,
-      FileSystemCallbacks::create(successCallback, errorCallback, this));
+      FileSystemCallbacks::create(successCallback, errorCallback, this), false);
 }
 
 PassRefPtr<DOMFileSystemSync> WorkerContext::requestFileSystemSync(
