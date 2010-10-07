@@ -2611,8 +2611,8 @@ bool Node::dispatchGenericEvent(PassRefPtr<Event> prpEvent) {
           static_cast<Document*>(topLevelContainer)->domWindow();
   }
 
-  int instrumentationCookie =
-      InspectorInstrumentation::instrumentWillDispatchEvent(
+  InspectorInstrumentationCookie cookie =
+      InspectorInstrumentation::willDispatchEvent(
           document(), *event, targetForWindowEvents, this, ancestors);
 
   // Give the target node a chance to do some work before DOM event handlers get
@@ -2703,8 +2703,7 @@ doneDispatching:
 
 doneWithDefault:
 
-  InspectorInstrumentation::instrumentDidDispatchEvent(document(),
-                                                       instrumentationCookie);
+  InspectorInstrumentation::didDispatchEvent(document(), cookie);
 
   return !event->defaultPrevented();
 }

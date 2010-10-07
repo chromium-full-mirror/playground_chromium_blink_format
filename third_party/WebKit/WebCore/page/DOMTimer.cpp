@@ -27,7 +27,7 @@
 #include "config.h"
 #include "DOMTimer.h"
 
-#include "InspectorTimelineAgent.h"
+#include "InspectorInstrumentation.h"
 #include "ScheduledAction.h"
 #include "ScriptExecutionContext.h"
 #include <wtf/HashSet.h>
@@ -86,11 +86,8 @@ int DOMTimer::install(ScriptExecutionContext* context,
   // or if it is a one-time timer and it has fired (DOMTimer::fired).
   DOMTimer* timer = new DOMTimer(context, action, timeout, singleShot);
 
-#if ENABLE(INSPECTOR)
-  if (InspectorTimelineAgent* timelineAgent =
-          InspectorTimelineAgent::retrieve(context))
-    timelineAgent->didInstallTimer(timer->m_timeoutId, timeout, singleShot);
-#endif
+  InspectorInstrumentation::didInstallTimer(context, timer->m_timeoutId,
+                                            timeout, singleShot);
 
   return timer->m_timeoutId;
 }
@@ -102,11 +99,7 @@ void DOMTimer::removeById(ScriptExecutionContext* context, int timeoutId) {
   if (timeoutId <= 0)
     return;
 
-#if ENABLE(INSPECTOR)
-  if (InspectorTimelineAgent* timelineAgent =
-          InspectorTimelineAgent::retrieve(context))
-    timelineAgent->didRemoveTimer(timeoutId);
-#endif
+  InspectorInstrumentation::didRemoveTimer(context, timeoutId);
 
   delete context->findTimeout(timeoutId);
 }
@@ -115,11 +108,8 @@ void DOMTimer::fired() {
   ScriptExecutionContext* context = scriptExecutionContext();
   timerNestingLevel = m_nestingLevel;
 
-#if ENABLE(INSPECTOR)
-  if (InspectorTimelineAgent* timelineAgent =
-          InspectorTimelineAgent::retrieve(context))
-    timelineAgent->willFireTimer(m_timeoutId);
-#endif
+  InspectorInstrumentationCookie cookie =
+      InspectorInstrumentation::willFireTimer(context, m_timeoutId);
 
   // Simple case for non-one-shot timers.
   if (isActive()) {
@@ -131,11 +121,9 @@ void DOMTimer::fired() {
 
     // No access to member variables after this point, it can delete the timer.
     m_action->execute(context);
-#if ENABLE(INSPECTOR)
-    if (InspectorTimelineAgent* timelineAgent =
-            InspectorTimelineAgent::retrieve(context))
-      timelineAgent->didFireTimer();
-#endif
+
+    InspectorInstrumentation::didFireTimer(context, cookie);
+
     return;
   }
 
@@ -147,11 +135,7 @@ void DOMTimer::fired() {
 
   action->execute(context);
 
-#if ENABLE(INSPECTOR)
-  if (InspectorTimelineAgent* timelineAgent =
-          InspectorTimelineAgent::retrieve(context))
-    timelineAgent->didFireTimer();
-#endif
+  InspectorInstrumentation::didFireTimer(context, cookie);
 
   timerNestingLevel = 0;
 }

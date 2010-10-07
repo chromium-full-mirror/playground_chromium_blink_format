@@ -44,12 +44,10 @@
 
 namespace WebCore {
 
-int InspectorTimelineAgent::s_instanceCount = 0;
 int InspectorTimelineAgent::s_id = 0;
 
 InspectorTimelineAgent::InspectorTimelineAgent(InspectorFrontend* frontend)
     : m_frontend(frontend), m_id(++s_id) {
-  ++s_instanceCount;
   ScriptGCEvent::addEventListener(this);
   ASSERT(m_frontend);
 }
@@ -77,8 +75,6 @@ void InspectorTimelineAgent::didGC(double startTime,
 }
 
 InspectorTimelineAgent::~InspectorTimelineAgent() {
-  ASSERT(s_instanceCount);
-  --s_instanceCount;
   ScriptGCEvent::removeEventListener(this);
 }
 

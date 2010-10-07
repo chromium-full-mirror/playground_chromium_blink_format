@@ -114,7 +114,7 @@ v8::Handle<v8::Value> V8XMLHttpRequest::sendCallback(
   INC_STATS("DOM.XMLHttpRequest.send()");
   XMLHttpRequest* xmlHttpRequest = V8XMLHttpRequest::toNative(args.Holder());
 
-  InspectorInstrumentation::instrumentWillSendXMLHttpRequest(
+  InspectorInstrumentation::willSendXMLHttpRequest(
       xmlHttpRequest->scriptExecutionContext(), xmlHttpRequest->url());
 
   ExceptionCode ec = 0;

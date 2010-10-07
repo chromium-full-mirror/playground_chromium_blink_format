@@ -114,9 +114,6 @@ class HTMLDocumentParser : public ScriptableDocumentParser,
   // CachedResourceClient
   virtual void notifyFinished(CachedResource*);
 
-  void willPumpLexer();
-  void didPumpLexer();
-
   enum SynchronousMode {
     AllowYield,
     ForceSynchronous,

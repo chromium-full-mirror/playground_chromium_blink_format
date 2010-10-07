@@ -45,7 +45,7 @@
 #include "HTMLFrameSetElement.h"
 #include "HTMLNames.h"
 #include "HTMLPlugInImageElement.h"
-#include "InspectorTimelineAgent.h"
+#include "InspectorInstrumentation.h"
 #include "OverflowEvent.h"
 #include "RenderEmbeddedObject.h"
 #include "RenderLayer.h"
@@ -613,10 +613,8 @@ void FrameView::layout(bool allowSubtree) {
   if (isPainting())
     return;
 
-#if ENABLE(INSPECTOR)
-  if (InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent())
-    timelineAgent->willLayout();
-#endif
+  InspectorInstrumentationCookie cookie =
+      InspectorInstrumentation::willLayout(m_frame.get());
 
   if (!allowSubtree && m_layoutRoot) {
     m_layoutRoot->markContainingBlocksForLayout(false);
@@ -860,10 +858,7 @@ void FrameView::layout(bool allowSubtree) {
     ASSERT(m_enqueueEvents);
   }
 
-#if ENABLE(INSPECTOR)
-  if (InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent())
-    timelineAgent->didLayout();
-#endif
+  InspectorInstrumentation::didLayout(m_frame.get(), cookie);
 
   m_nestedLayoutCount--;
 }
@@ -1934,10 +1929,8 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect) {
   if (!frame())
     return;
 
-#if ENABLE(INSPECTOR)
-  if (InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent())
-    timelineAgent->willPaint(rect);
-#endif
+  InspectorInstrumentationCookie cookie =
+      InspectorInstrumentation::willPaint(m_frame.get(), rect);
 
   Document* document = frame()->document();
 
@@ -2014,10 +2007,7 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect) {
   if (isTopLevelPainter)
     sCurrentPaintTimeStamp = 0;
 
-#if ENABLE(INSPECTOR)
-  if (InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent())
-    timelineAgent->didPaint();
-#endif
+  InspectorInstrumentation::didPaint(m_frame.get(), cookie);
 }
 
 void FrameView::setPaintBehavior(PaintBehavior behavior) {

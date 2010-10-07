@@ -57,7 +57,6 @@ class FloatRect;
 class Frame;
 class History;
 class IDBFactory;
-class InspectorTimelineAgent;
 class Location;
 class StyleMedia;
 class Navigator;
@@ -459,7 +458,6 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   virtual void derefEventTarget() { deref(); }
   virtual EventTargetData* eventTargetData();
   virtual EventTargetData* ensureEventTargetData();
-  InspectorTimelineAgent* inspectorTimelineAgent();
 
   RefPtr<SecurityOrigin> m_securityOrigin;
   KURL m_url;

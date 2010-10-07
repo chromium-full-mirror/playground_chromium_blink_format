@@ -62,7 +62,6 @@ class HaltablePlugin;
 class HistoryItem;
 class InspectorClient;
 class InspectorController;
-class InspectorTimelineAgent;
 class MediaCanStartListener;
 class Node;
 class PageGroup;
@@ -338,10 +337,6 @@ class Page : public Noncopyable {
 
   void setJavaScriptURLsAreAllowed(bool);
   bool javaScriptURLsAreAllowed() const;
-
-#if ENABLE(INSPECTOR)
-  InspectorTimelineAgent* inspectorTimelineAgent() const;
-#endif
 
   // Don't allow more than a certain number of frames in a page.
   // This seems like a reasonable upper bound, and otherwise mutually

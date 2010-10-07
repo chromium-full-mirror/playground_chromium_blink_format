@@ -47,7 +47,6 @@
 #include "HTMLElement.h"
 #include "HistoryItem.h"
 #include "InspectorController.h"
-#include "InspectorTimelineAgent.h"
 #include "Logging.h"
 #include "MediaCanStartListener.h"
 #include "Navigator.h"
@@ -856,12 +855,6 @@ void Page::setJavaScriptURLsAreAllowed(bool areAllowed) {
 bool Page::javaScriptURLsAreAllowed() const {
   return m_javaScriptURLsAreAllowed;
 }
-
-#if ENABLE(INSPECTOR)
-InspectorTimelineAgent* Page::inspectorTimelineAgent() const {
-  return m_inspectorController->timelineAgent();
-}
-#endif
 
 #if ENABLE(INPUT_SPEECH)
 SpeechInput* Page::speechInput() {

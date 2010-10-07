@@ -39,6 +39,7 @@
 #include "InspectorDOMAgent.h"
 #include "InspectorDebuggerAgent.h"
 #include "InspectorTimelineAgent.h"
+#include "XMLHttpRequest.h"
 
 namespace WebCore {
 
@@ -68,8 +69,6 @@ void InspectorInstrumentation::willInsertDOMNodeImpl(
     Node* node,
     Node* parent) {
 #if ENABLE(JAVASCRIPT_DEBUGGER)
-  if (!inspectorController->hasFrontend())
-    return;
   InspectorDebuggerAgent* debuggerAgent =
       inspectorController->m_debuggerAgent.get();
   if (!debuggerAgent)
@@ -86,8 +85,6 @@ void InspectorInstrumentation::willInsertDOMNodeImpl(
 void InspectorInstrumentation::didInsertDOMNodeImpl(
     InspectorController* inspectorController,
     Node* node) {
-  if (!inspectorController->hasFrontend())
-    return;
   if (InspectorDOMAgent* domAgent = inspectorController->m_domAgent.get())
     domAgent->didInsertDOMNode(node);
 }
@@ -96,8 +93,6 @@ void InspectorInstrumentation::willRemoveDOMNodeImpl(
     InspectorController* inspectorController,
     Node* node) {
 #if ENABLE(JAVASCRIPT_DEBUGGER)
-  if (!inspectorController->hasFrontend())
-    return;
   InspectorDebuggerAgent* debuggerAgent =
       inspectorController->m_debuggerAgent.get();
   if (!debuggerAgent)
@@ -114,8 +109,6 @@ void InspectorInstrumentation::willRemoveDOMNodeImpl(
 void InspectorInstrumentation::didRemoveDOMNodeImpl(
     InspectorController* inspectorController,
     Node* node) {
-  if (!inspectorController->hasFrontend())
-    return;
   if (InspectorDOMAgent* domAgent = inspectorController->m_domAgent.get())
     domAgent->didRemoveDOMNode(node);
 }
@@ -124,8 +117,6 @@ void InspectorInstrumentation::willModifyDOMAttrImpl(
     InspectorController* inspectorController,
     Element* element) {
 #if ENABLE(JAVASCRIPT_DEBUGGER)
-  if (!inspectorController->hasFrontend())
-    return;
   InspectorDebuggerAgent* debuggerAgent =
       inspectorController->m_debuggerAgent.get();
   if (!debuggerAgent)
@@ -142,8 +133,6 @@ void InspectorInstrumentation::willModifyDOMAttrImpl(
 void InspectorInstrumentation::didModifyDOMAttrImpl(
     InspectorController* inspectorController,
     Element* element) {
-  if (!inspectorController->hasFrontend())
-    return;
   if (InspectorDOMAgent* domAgent = inspectorController->m_domAgent.get())
     domAgent->didModifyDOMAttr(element);
 }
@@ -151,23 +140,104 @@ void InspectorInstrumentation::didModifyDOMAttrImpl(
 void InspectorInstrumentation::characterDataModifiedImpl(
     InspectorController* inspectorController,
     CharacterData* characterData) {
-  if (!inspectorController->hasFrontend())
-    return;
   if (InspectorDOMAgent* domAgent = inspectorController->m_domAgent.get())
     domAgent->characterDataModified(characterData);
 }
 
-int InspectorInstrumentation::instrumentWillDispatchEventImpl(
+void InspectorInstrumentation::willSendXMLHttpRequestImpl(
+    InspectorController* inspectorController,
+    const String& url) {
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+  InspectorDebuggerAgent* debuggerAgent =
+      inspectorController->m_debuggerAgent.get();
+  if (!debuggerAgent)
+    return;
+
+  if (!inspectorController->shouldBreakOnXMLHttpRequest(url))
+    return;
+
+  RefPtr<InspectorObject> eventData = InspectorObject::create();
+  eventData->setString("type", "XHR");
+  eventData->setString("url", url);
+  debuggerAgent->breakProgram(NativeBreakpointDebuggerEventType, eventData);
+#endif
+}
+
+void InspectorInstrumentation::didScheduleResourceRequestImpl(
+    InspectorController* inspectorController,
+    const String& url) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController))
+    timelineAgent->didScheduleResourceRequest(url);
+}
+
+void InspectorInstrumentation::didInstallTimerImpl(
+    InspectorController* inspectorController,
+    int timerId,
+    int timeout,
+    bool singleShot) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController))
+    timelineAgent->didInstallTimer(timerId, timeout, singleShot);
+}
+
+void InspectorInstrumentation::didRemoveTimerImpl(
+    InspectorController* inspectorController,
+    int timerId) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController))
+    timelineAgent->didRemoveTimer(timerId);
+}
+
+InspectorInstrumentationCookie InspectorInstrumentation::willCallFunctionImpl(
+    InspectorController* inspectorController,
+    const String& scriptName,
+    int scriptLine) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController)) {
+    timelineAgent->willCallFunction(scriptName, scriptLine);
+    return timelineAgent->id();
+  }
+  return 0;
+}
+
+void InspectorInstrumentation::didCallFunctionImpl(
+    InspectorController* inspectorController,
+    InspectorInstrumentationCookie cookie) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
+    timelineAgent->didCallFunction();
+}
+
+InspectorInstrumentationCookie
+InspectorInstrumentation::willChangeXHRReadyStateImpl(
+    InspectorController* inspectorController,
+    XMLHttpRequest* request) {
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent &&
+      request->hasEventListeners(eventNames().readystatechangeEvent)) {
+    timelineAgent->willChangeXHRReadyState(request->url().string(),
+                                           request->readyState());
+    return timelineAgent->id();
+  }
+  return 0;
+}
+
+void InspectorInstrumentation::didChangeXHRReadyStateImpl(
+    InspectorController* inspectorController,
+    InspectorInstrumentationCookie cookie) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
+    timelineAgent->didChangeXHRReadyState();
+}
+
+InspectorInstrumentationCookie InspectorInstrumentation::willDispatchEventImpl(
     InspectorController* inspectorController,
     const Event& event,
     DOMWindow* window,
     Node* node,
     const Vector<RefPtr<ContainerNode>>& ancestors) {
-  int instrumentationCookie = 0;
-
-  if (!inspectorController->hasFrontend())
-    return instrumentationCookie;
-
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   if (InspectorDebuggerAgent* debuggerAgent =
           inspectorController->m_debuggerAgent.get()) {
@@ -182,53 +252,246 @@ int InspectorInstrumentation::instrumentWillDispatchEventImpl(
 #endif
 
   InspectorTimelineAgent* timelineAgent =
-      inspectorController->m_timelineAgent.get();
+      retrieveTimelineAgent(inspectorController);
   if (timelineAgent &&
       eventHasListeners(event.type(), window, node, ancestors)) {
     timelineAgent->willDispatchEvent(event);
-    instrumentationCookie = timelineAgent->id();
+    return timelineAgent->id();
   }
-  return instrumentationCookie;
+  return 0;
 }
 
-void InspectorInstrumentation::instrumentDidDispatchEventImpl(
+void InspectorInstrumentation::didDispatchEventImpl(
     InspectorController* inspectorController,
-    int instrumentationCookie) {
-  if (!inspectorController->hasFrontend())
-    return;
-
+    InspectorInstrumentationCookie cookie) {
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   if (InspectorDebuggerAgent* debuggerAgent =
           inspectorController->m_debuggerAgent.get())
     debuggerAgent->cancelPauseOnNextStatement();
 #endif
 
-  InspectorTimelineAgent* timelineAgent =
-      inspectorController->m_timelineAgent.get();
-  if (timelineAgent && timelineAgent->id() == instrumentationCookie)
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
     timelineAgent->didDispatchEvent();
 }
 
-void InspectorInstrumentation::instrumentWillSendXMLHttpRequestImpl(
+InspectorInstrumentationCookie
+InspectorInstrumentation::willDispatchEventOnWindowImpl(
     InspectorController* inspectorController,
-    const String& url) {
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-  if (!inspectorController->hasFrontend())
-    return;
+    const Event& event,
+    DOMWindow* window) {
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent && window->hasEventListeners(event.type())) {
+    timelineAgent->willDispatchEvent(event);
+    return timelineAgent->id();
+  }
+  return 0;
+}
 
-  InspectorDebuggerAgent* debuggerAgent =
-      inspectorController->m_debuggerAgent.get();
-  if (!debuggerAgent)
-    return;
+void InspectorInstrumentation::didDispatchEventOnWindowImpl(
+    InspectorController* inspectorController,
+    InspectorInstrumentationCookie cookie) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
+    timelineAgent->didDispatchEvent();
+}
 
-  if (!inspectorController->shouldBreakOnXMLHttpRequest(url))
-    return;
+InspectorInstrumentationCookie InspectorInstrumentation::willEvaluateScriptImpl(
+    InspectorController* inspectorController,
+    const String& url,
+    int lineNumber) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController)) {
+    timelineAgent->willEvaluateScript(url, lineNumber);
+    return timelineAgent->id();
+  }
+  return 0;
+}
 
-  RefPtr<InspectorObject> eventData = InspectorObject::create();
-  eventData->setString("type", "XHR");
-  eventData->setString("url", url);
-  debuggerAgent->breakProgram(NativeBreakpointDebuggerEventType, eventData);
-#endif
+void InspectorInstrumentation::didEvaluateScriptImpl(
+    InspectorController* inspectorController,
+    InspectorInstrumentationCookie cookie) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
+    timelineAgent->didEvaluateScript();
+}
+
+InspectorInstrumentationCookie InspectorInstrumentation::willFireTimerImpl(
+    InspectorController* inspectorController,
+    int timerId) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController)) {
+    timelineAgent->willFireTimer(timerId);
+    return timelineAgent->id();
+  }
+  return 0;
+}
+
+void InspectorInstrumentation::didFireTimerImpl(
+    InspectorController* inspectorController,
+    InspectorInstrumentationCookie cookie) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
+    timelineAgent->didFireTimer();
+}
+
+InspectorInstrumentationCookie InspectorInstrumentation::willLayoutImpl(
+    InspectorController* inspectorController) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController)) {
+    timelineAgent->willLayout();
+    return timelineAgent->id();
+  }
+  return 0;
+}
+
+void InspectorInstrumentation::didLayoutImpl(
+    InspectorController* inspectorController,
+    InspectorInstrumentationCookie cookie) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
+    timelineAgent->didLayout();
+}
+
+InspectorInstrumentationCookie InspectorInstrumentation::willLoadXHRImpl(
+    InspectorController* inspectorController,
+    XMLHttpRequest* request) {
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent && request->hasEventListeners(eventNames().loadEvent)) {
+    timelineAgent->willLoadXHR(request->url().string());
+    return timelineAgent->id();
+  }
+  return 0;
+}
+
+void InspectorInstrumentation::didLoadXHRImpl(
+    InspectorController* inspectorController,
+    InspectorInstrumentationCookie cookie) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
+    timelineAgent->didLoadXHR();
+}
+
+InspectorInstrumentationCookie InspectorInstrumentation::willPaintImpl(
+    InspectorController* inspectorController,
+    const IntRect& rect) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController)) {
+    timelineAgent->willPaint(rect);
+    return timelineAgent->id();
+  }
+  return 0;
+}
+
+void InspectorInstrumentation::didPaintImpl(
+    InspectorController* inspectorController,
+    InspectorInstrumentationCookie cookie) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
+    timelineAgent->didPaint();
+}
+
+InspectorInstrumentationCookie
+InspectorInstrumentation::willRecalculateStyleImpl(
+    InspectorController* inspectorController) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController)) {
+    timelineAgent->willRecalculateStyle();
+    return timelineAgent->id();
+  }
+  return 0;
+}
+
+void InspectorInstrumentation::didRecalculateStyleImpl(
+    InspectorController* inspectorController,
+    InspectorInstrumentationCookie cookie) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
+    timelineAgent->didRecalculateStyle();
+}
+
+InspectorInstrumentationCookie
+InspectorInstrumentation::willReceiveResourceDataImpl(
+    InspectorController* inspectorController,
+    unsigned long identifier) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController)) {
+    timelineAgent->willReceiveResourceData(identifier);
+    return timelineAgent->id();
+  }
+  return 0;
+}
+
+void InspectorInstrumentation::didReceiveResourceDataImpl(
+    InspectorController* inspectorController,
+    InspectorInstrumentationCookie cookie) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
+    timelineAgent->didReceiveResourceData();
+}
+
+InspectorInstrumentationCookie
+InspectorInstrumentation::willReceiveResourceResponseImpl(
+    InspectorController* inspectorController,
+    unsigned long identifier,
+    const ResourceResponse& response) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController)) {
+    timelineAgent->willReceiveResourceResponse(identifier, response);
+    return timelineAgent->id();
+  }
+  return 0;
+}
+
+void InspectorInstrumentation::didReceiveResourceResponseImpl(
+    InspectorController* inspectorController,
+    InspectorInstrumentationCookie cookie) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
+    timelineAgent->didReceiveResourceResponse();
+}
+
+InspectorInstrumentationCookie InspectorInstrumentation::willWriteHTMLImpl(
+    InspectorController* inspectorController,
+    unsigned int length,
+    unsigned int startLine) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController)) {
+    timelineAgent->willWriteHTML(length, startLine);
+    return timelineAgent->id();
+  }
+  return 0;
+}
+
+void InspectorInstrumentation::didWriteHTMLImpl(
+    InspectorController* inspectorController,
+    unsigned int endLine,
+    InspectorInstrumentationCookie cookie) {
+  if (InspectorTimelineAgent* timelineAgent =
+          retrieveTimelineAgent(inspectorController, cookie))
+    timelineAgent->didWriteHTML(endLine);
+}
+
+bool InspectorInstrumentation::hasFrontend(
+    InspectorController* inspectorController) {
+  return inspectorController->hasFrontend();
+}
+
+InspectorTimelineAgent* InspectorInstrumentation::retrieveTimelineAgent(
+    InspectorController* inspectorController) {
+  return inspectorController->m_timelineAgent.get();
+}
+
+InspectorTimelineAgent* InspectorInstrumentation::retrieveTimelineAgent(
+    InspectorController* inspectorController,
+    InspectorInstrumentationCookie cookie) {
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent && timelineAgent->id() == cookie)
+    return timelineAgent;
+  return 0;
 }
 
 }  // namespace WebCore
