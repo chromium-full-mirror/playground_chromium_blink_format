@@ -6109,6 +6109,25 @@ static RenderStyle* styleForFirstLetter(RenderObject* firstLetterBlock,
   return pseudoStyle;
 }
 
+// CSS 2.1 http://www.w3.org/TR/CSS21/selector.html#first-letter
+// "Punctuation (i.e, characters defined in Unicode [UNICODE] in the "open"
+// (Ps), "close" (Pe),
+// "initial" (Pi). "final" (Pf) and "other" (Po) punctuation classes), that
+// precedes or follows the first letter should be included"
+static inline bool isPunctuationForFirstLetter(UChar c) {
+  CharCategory charCategory = category(c);
+  return charCategory == Punctuation_Open ||
+         charCategory == Punctuation_Close ||
+         charCategory == Punctuation_InitialQuote ||
+         charCategory == Punctuation_FinalQuote ||
+         charCategory == Punctuation_Other;
+}
+
+static inline bool shouldSkipForFirstLetter(UChar c) {
+  return isSpaceOrNewline(c) || c == noBreakSpace ||
+         isPunctuationForFirstLetter(c);
+}
+
 void RenderBlock::updateFirstLetter() {
   if (!document()->usesFirstLetterRules())
     return;
@@ -6249,17 +6268,29 @@ void RenderBlock::updateFirstLetter() {
   if (oldText && oldText->length() > 0) {
     unsigned length = 0;
 
-    // account for leading spaces and punctuation
+    // Account for leading spaces and punctuation.
     while (length < oldText->length() &&
-           (isSpaceOrNewline((*oldText)[length]) ||
-            Unicode::isPunct((*oldText)[length])))
+           shouldSkipForFirstLetter((*oldText)[length]))
       length++;
 
-    // account for first letter
+    // Account for first letter.
     length++;
 
-    // construct text fragment for the text after the first letter
-    // NOTE: this might empty
+    // Keep looking for whitespace and allowed punctuation, but avoid
+    // accumulating just whitespace into the :first-letter.
+    for (unsigned scanLength = length; scanLength < oldText->length();
+         ++scanLength) {
+      UChar c = (*oldText)[scanLength];
+
+      if (!shouldSkipForFirstLetter(c))
+        break;
+
+      if (isPunctuationForFirstLetter(c))
+        length = scanLength + 1;
+    }
+
+    // Construct a text fragment for the text after the first letter.
+    // This text fragment might be empty.
     RenderTextFragment* remainingText = new (renderArena()) RenderTextFragment(
         textObj->node() ? textObj->node() : textObj->document(), oldText.get(),
         length, oldText->length() - length);
