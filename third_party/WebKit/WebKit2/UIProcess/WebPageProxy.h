@@ -32,6 +32,7 @@
 #include "GenericCallback.h"
 #include "WKBase.h"
 #include "WebEvent.h"
+#include "WebFindClient.h"
 #include "WebFormClient.h"
 #include "WebFrameProxy.h"
 #include "WebHistoryClient.h"
@@ -107,7 +108,7 @@ class WebPageProxy : public APIObject {
   void initializePolicyClient(const WKPagePolicyClient*);
   void initializeFormClient(const WKPageFormClient*);
   void initializeUIClient(const WKPageUIClient*);
-
+  void initializeFindClient(const WKPageFindClient*);
   void revive();
 
   void initializeWebPage(const WebCore::IntSize&);
@@ -174,8 +175,8 @@ class WebPageProxy : public APIObject {
 
   // Find.
   void findString(const String&,
-                  WKFindDirection,
-                  WKFindOptions,
+                  FindDirection,
+                  FindOptions,
                   unsigned maxNumMatches);
   void hideFindUI();
   void countStringMatches(const String&,
@@ -323,6 +324,9 @@ class WebPageProxy : public APIObject {
   void registerEditCommandForUndo(uint64_t commandID, uint32_t editAction);
   void clearAllEditCommands();
 
+  // Find.
+  void didCountStringMatches(const String&, uint32_t numMatches);
+
   void takeFocus(bool direction);
   void setToolTip(const String&);
   void setCursor(const WebCore::Cursor&);
@@ -348,6 +352,7 @@ class WebPageProxy : public APIObject {
   WebPolicyClient m_policyClient;
   WebFormClient m_formClient;
   WebUIClient m_uiClient;
+  WebFindClient m_findClient;
 
   OwnPtr<DrawingAreaProxy> m_drawingArea;
   RefPtr<WebPageNamespace> m_pageNamespace;

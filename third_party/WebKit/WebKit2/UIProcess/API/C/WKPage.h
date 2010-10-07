@@ -260,6 +260,19 @@ struct WKPageUIClient {
 };
 typedef struct WKPageUIClient WKPageUIClient;
 
+// Find client.
+typedef void (*WKPageDidCountStringMatchesCallback)(WKPageRef page,
+                                                    WKStringRef string,
+                                                    unsigned numMatches,
+                                                    const void* clientInfo);
+
+struct WKPageFindClient {
+  int version;
+  const void* clientInfo;
+  WKPageDidCountStringMatchesCallback didCountStringMatches;
+};
+typedef struct WKPageFindClient WKPageFindClient;
+
 WK_EXPORT WKTypeID WKPageGetTypeID();
 
 WK_EXPORT WKPageNamespaceRef WKPageGetPageNamespace(WKPageRef page);
@@ -340,6 +353,8 @@ WK_EXPORT void WKPageSetPageFormClient(WKPageRef page,
                                        const WKPageFormClient* client);
 WK_EXPORT void WKPageSetPageUIClient(WKPageRef page,
                                      const WKPageUIClient* client);
+WK_EXPORT void WKPageSetPageFindClient(WKPageRef page,
+                                       const WKPageFindClient* client);
 
 typedef void (*WKPageRunJavaScriptFunction)(WKStringRef, WKErrorRef, void*);
 WK_EXPORT void WKPageRunJavaScriptInMainFrame(

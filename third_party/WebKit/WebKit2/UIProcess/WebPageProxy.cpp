@@ -130,6 +130,10 @@ void WebPageProxy::initializeUIClient(const WKPageUIClient* client) {
   m_uiClient.initialize(client);
 }
 
+void WebPageProxy::initializeFindClient(const WKPageFindClient* client) {
+  m_findClient.initialize(client);
+}
+
 void WebPageProxy::revive() {
   m_valid = true;
   m_pageNamespace->reviveIfNecessary();
@@ -477,21 +481,25 @@ void WebPageProxy::setPageAndTextZoomFactors(double pageZoomFactor,
                   m_pageID);
 }
 
-void WebPageProxy::findString(const String&,
-                              WKFindDirection,
-                              WKFindOptions,
+void WebPageProxy::findString(const String& string,
+                              FindDirection findDirection,
+                              FindOptions findOptions,
                               unsigned maxNumMatches) {
-  // FIXME: Implement.
+  process()->send(Messages::WebPage::FindString(string, findDirection,
+                                                findOptions, maxNumMatches),
+                  m_pageID);
 }
 
 void WebPageProxy::hideFindUI() {
-  // FIXME: Implement.
+  process()->send(Messages::WebPage::HideFindUI(), m_pageID);
 }
 
 void WebPageProxy::countStringMatches(const String& string,
                                       bool caseInsensitive,
                                       unsigned maxNumMatches) {
-  // FIXME: Implement.
+  process()->send(Messages::WebPage::CountStringMatches(string, caseInsensitive,
+                                                        maxNumMatches),
+                  m_pageID);
 }
 
 void WebPageProxy::runJavaScriptInMainFrame(
@@ -965,6 +973,11 @@ void WebPageProxy::registerEditCommandForUndo(uint64_t commandID,
 
 void WebPageProxy::clearAllEditCommands() {
   m_pageClient->clearAllEditCommands();
+}
+
+void WebPageProxy::didCountStringMatches(const String& string,
+                                         uint32_t numMatches) {
+  m_findClient.didCountStringMatches(this, string, numMatches);
 }
 
 void WebPageProxy::registerEditCommand(
