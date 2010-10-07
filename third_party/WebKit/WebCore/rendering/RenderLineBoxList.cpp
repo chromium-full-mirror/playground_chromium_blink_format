@@ -216,6 +216,12 @@ void RenderLineBoxList::paint(RenderBoxModelObject* renderer,
       if (bottomForPaginationCheck - topForPaginationCheck <=
           v->printRect().height()) {
         if (ty + bottomForPaginationCheck > v->printRect().bottom()) {
+          if (RootInlineBox* nextRootBox = curr->root()->nextRootBox())
+            bottomForPaginationCheck = min(
+                bottomForPaginationCheck,
+                min(nextRootBox->topVisibleOverflow(), nextRootBox->lineTop()));
+        }
+        if (ty + bottomForPaginationCheck > v->printRect().bottom()) {
           if (ty + topForPaginationCheck < v->truncatedAt())
             v->setBestTruncatedAt(ty + topForPaginationCheck, renderer);
           // If we were able to truncate, don't paint.
