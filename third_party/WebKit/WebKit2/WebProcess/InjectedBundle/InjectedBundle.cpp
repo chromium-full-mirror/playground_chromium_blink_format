@@ -37,6 +37,7 @@
 #include "WebPage.h"
 #include "WebPreferencesStore.h"
 #include "WebProcess.h"
+#include <JavaScriptCore/APICast.h>
 #include <JavaScriptCore/JSLock.h>
 #include <WebCore/GCController.h>
 #include <WebCore/JSDOMWindow.h>
@@ -230,6 +231,22 @@ void InjectedBundle::didReceiveMessage(CoreIPC::Connection* connection,
   }
 
   ASSERT_NOT_REACHED();
+}
+
+void InjectedBundle::reportException(JSContextRef context,
+                                     JSValueRef exception) {
+  if (!context || !exception)
+    return;
+
+  JSLock lock(JSC::SilenceAssertionsOnly);
+  JSC::ExecState* execState = toJS(context);
+
+  // Make sure the context has a DOMWindow global object, otherwise this context
+  // didn't originate from a Page.
+  if (!toJSDOMWindow(execState->lexicalGlobalObject()))
+    return;
+
+  WebCore::reportException(execState, toJS(execState, exception));
 }
 
 }  // namespace WebKit
