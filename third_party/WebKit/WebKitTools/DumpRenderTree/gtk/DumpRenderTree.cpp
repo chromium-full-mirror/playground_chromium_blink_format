@@ -208,6 +208,10 @@ static void initializeFonts() {
           "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf",
           "/usr/share/fonts/dejavu/DejaVuSans.ttf",
       },
+      {
+          "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif.ttf",
+          "/usr/share/fonts/dejavu/DejaVuSerif.ttf",
+      },
   };
 
   // TODO: Some tests use Lucida. We should load these as well, once it becomes
