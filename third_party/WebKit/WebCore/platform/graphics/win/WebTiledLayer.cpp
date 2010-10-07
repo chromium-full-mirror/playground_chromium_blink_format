@@ -194,7 +194,7 @@ void WebTiledLayer::addTile() {
                           sublayers ? CFArrayGetCount(sublayers) : 0);
 
   if (m_owner->showDebugBorders()) {
-    CGColorRef borderColor = createCGColor(Color(128, 0, 128, 180));
+    CGColorRef borderColor = CGColorCreateGenericRGB(0.5, 0, 0.5, 0.7);
     CACFLayerSetBorderColor(newLayer.get(), borderColor);
     CGColorRelease(borderColor);
     CACFLayerSetBorderWidth(newLayer.get(), 2);

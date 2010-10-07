@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010 Apple Inc. All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -152,6 +152,9 @@ void GraphicsContext::drawFocusRing(const Vector<Path>& paths,
   // FIXME: implement
 }
 
+// FIXME: This is nearly identical to the GraphicsContext::drawFocusRing
+// function in GraphicsContextMac.mm.
+// The code could move to GraphicsContextCG.cpp and be shared.
 void GraphicsContext::drawFocusRing(const Vector<IntRect>& rects,
                                     int width,
                                     int offset,
@@ -161,7 +164,8 @@ void GraphicsContext::drawFocusRing(const Vector<IntRect>& rects,
 
   float radius = (width - 1) / 2.0f;
   offset += radius;
-  CGColorRef colorRef = color.isValid() ? createCGColor(color) : 0;
+  CGColorRef colorRef =
+      color.isValid() ? cachedCGColor(color, DeviceColorSpace) : 0;
 
   CGMutablePathRef focusRingPath = CGPathCreateMutable();
   unsigned rectCount = rects.size();
@@ -175,8 +179,6 @@ void GraphicsContext::drawFocusRing(const Vector<IntRect>& rects,
   CGContextAddPath(context, focusRingPath);
 
   wkDrawFocusRing(context, colorRef, radius);
-
-  CGColorRelease(colorRef);
 
   CGPathRelease(focusRingPath);
 
