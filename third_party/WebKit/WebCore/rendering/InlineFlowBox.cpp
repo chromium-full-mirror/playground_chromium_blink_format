@@ -516,7 +516,7 @@ void InlineFlowBox::computeLogicalBoxHeights(
         maxPositionBottom = lineHeight;
     } else if ((!isInlineFlow ||
                 static_cast<InlineFlowBox*>(curr)->hasTextChildren()) ||
-               curr->boxModelObject()->hasHorizontalBordersOrPadding() ||
+               curr->boxModelObject()->hasInlineDirectionBordersOrPadding() ||
                strictMode) {
       int ascent = baseline - curr->y();
       int descent = lineHeight - ascent;
@@ -563,7 +563,7 @@ void InlineFlowBox::placeBoxesInBlockDirection(int yPos,
     else {
       if ((isInlineFlow &&
            !static_cast<InlineFlowBox*>(curr)->hasTextChildren()) &&
-          !curr->boxModelObject()->hasHorizontalBordersOrPadding() &&
+          !curr->boxModelObject()->hasInlineDirectionBordersOrPadding() &&
           !strictMode)
         childAffectsTopBottomPos = false;
       int posAdjust = maxAscent - curr->baselinePosition(false);
