@@ -38,6 +38,7 @@
 #include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
+#include <wtf/UnusedParam.h>
 
 class ParsedStyleSheet;
 
@@ -133,6 +134,7 @@ class InspectorStyleSheetForInlineStyle : public InspectorStyleSheet {
                                     const String& origin);
   virtual CSSStyleDeclaration* styleForId(const String& id) const {
     ASSERT(id == "0");
+    UNUSED_PARAM(id);
     return inlineStyle();
   }
   virtual bool setStyleText(const String& styleId, const String& text);
@@ -142,6 +144,7 @@ class InspectorStyleSheetForInlineStyle : public InspectorStyleSheet {
   virtual RefPtr<CSSRuleSourceData> ruleSourceDataFor(
       CSSStyleDeclaration* style) const {
     ASSERT(style == inlineStyle());
+    UNUSED_PARAM(style);
     return m_ruleSourceData;
   }
   virtual unsigned ruleIndexByStyle(CSSStyleDeclaration*) const { return 0; }
