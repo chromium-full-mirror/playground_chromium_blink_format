@@ -308,13 +308,13 @@ QWKPage::ViewportConfiguration QWKPage::viewportConfigurationForSize(
 
   ViewportArguments args;
 
-  WebCore::ViewportAttributes conf = WebCore::findConfigurationForViewportData(
+  WebCore::ViewportAttributes conf = WebCore::computeViewportAttributes(
       args, desktopWidth, deviceWidth, deviceHeight, deviceDPI, availableSize);
 
   ViewportConfiguration result;
 
   result.m_isValid = true;
-  result.m_size = conf.layoutViewport;
+  result.m_size = conf.layoutSize;
   result.m_initialScaleFactor = conf.initialScale;
   result.m_minimumScaleFactor = conf.minimumScale;
   result.m_maximumScaleFactor = conf.maximumScale;

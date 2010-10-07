@@ -42,12 +42,12 @@ using namespace std;
 
 namespace WebCore {
 
-ViewportAttributes findConfigurationForViewportData(ViewportArguments args,
-                                                    int desktopWidth,
-                                                    int deviceWidth,
-                                                    int deviceHeight,
-                                                    int deviceDPI,
-                                                    IntSize visibleViewport) {
+ViewportAttributes computeViewportAttributes(ViewportArguments args,
+                                             int desktopWidth,
+                                             int deviceWidth,
+                                             int deviceHeight,
+                                             int deviceDPI,
+                                             IntSize visibleViewport) {
   ViewportAttributes result;
 
   float availableWidth = visibleViewport.width();
@@ -160,8 +160,8 @@ ViewportAttributes findConfigurationForViewportData(ViewportArguments args,
   // initial-scale.
   width = max(width, availableWidth / result.initialScale);
   height = max(height, availableHeight / result.initialScale);
-  result.layoutViewport.setWidth(width);
-  result.layoutViewport.setHeight(height);
+  result.layoutSize.setWidth(width);
+  result.layoutSize.setHeight(height);
 
   // Update minimum scale factor, to never allow zooming out more than viewport
   result.minimumScale = max(result.minimumScale, max(availableWidth / width,
