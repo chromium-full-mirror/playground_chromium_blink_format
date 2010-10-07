@@ -50,9 +50,15 @@ class ApplyBlockElementCommand : public CompositeEditCommand {
 
  private:
   virtual void doApply();
-  virtual void formatParagraph(const VisiblePosition& endOfCurrentParagraph,
-                               RefPtr<Element>&) = 0;
-  bool splitTextNodes(const VisiblePosition& start, int numParagraphs);
+  virtual void formatRange(const Position& start,
+                           const Position&,
+                           RefPtr<Element>&) = 0;
+  void rangeForParagraphSplittingTextNodesIfNeeded(const VisiblePosition&,
+                                                   Position&,
+                                                   Position&);
+  VisiblePosition endOfNextParagrahSplittingTextNodesIfNeeded(VisiblePosition&,
+                                                              Position&,
+                                                              Position&);
 
   QualifiedName m_tagName;
   AtomicString m_className;

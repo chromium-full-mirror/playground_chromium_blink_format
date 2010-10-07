@@ -61,11 +61,10 @@ IndentOutdentCommand::IndentOutdentCommand(Document* document,
       m_typeOfAction(typeOfAction),
       m_marginInPixels(marginInPixels) {}
 
-bool IndentOutdentCommand::tryIndentingAsListItem(
-    const VisiblePosition& endOfCurrentParagraph) {
+bool IndentOutdentCommand::tryIndentingAsListItem(const Position& start,
+                                                  const Position& end) {
   // If our selection is not inside a list, bail out.
-  Node* lastNodeInSelectedParagraph =
-      endOfCurrentParagraph.deepEquivalent().node();
+  Node* lastNodeInSelectedParagraph = start.node();
   RefPtr<Element> listNode = enclosingList(lastNodeInSelectedParagraph);
   if (!listNode)
     return false;
@@ -88,9 +87,7 @@ bool IndentOutdentCommand::tryIndentingAsListItem(
       document()->createElement(listNode->tagQName(), false);
   insertNodeBefore(newList, selectedListItem);
 
-  moveParagraphWithClones(startOfParagraph(endOfCurrentParagraph),
-                          endOfCurrentParagraph, newList.get(),
-                          selectedListItem);
+  moveParagraphWithClones(start, end, newList.get(), selectedListItem);
 
   if (canMergeLists(previousList, newList.get()))
     mergeIdenticalElements(previousList, newList);
@@ -101,9 +98,9 @@ bool IndentOutdentCommand::tryIndentingAsListItem(
 }
 
 void IndentOutdentCommand::indentIntoBlockquote(
-    const VisiblePosition& endOfCurrentParagraph,
+    const Position& start,
+    const Position& end,
     RefPtr<Element>& targetBlockquote) {
-  Position start = startOfParagraph(endOfCurrentParagraph).deepEquivalent();
   Node* enclosingCell = enclosingNodeOfType(start, &isTableCell);
   Node* nodeToSplitTo;
   if (enclosingCell)
@@ -125,9 +122,7 @@ void IndentOutdentCommand::indentIntoBlockquote(
     insertNodeBefore(targetBlockquote, outerBlock);
   }
 
-  moveParagraphWithClones(startOfParagraph(endOfCurrentParagraph),
-                          endOfCurrentParagraph, targetBlockquote.get(),
-                          outerBlock.get());
+  moveParagraphWithClones(start, end, targetBlockquote.get(), outerBlock.get());
 }
 
 void IndentOutdentCommand::outdentParagraph() {
@@ -275,12 +270,13 @@ void IndentOutdentCommand::formatSelection(
     outdentRegion(startOfSelection, endOfSelection);
 }
 
-void IndentOutdentCommand::formatParagraph(
-    const VisiblePosition& endOfCurrentParagraph,
+void IndentOutdentCommand::formatRange(
+    const Position& start,
+    const Position& end,
     RefPtr<Element>& blockquoteForNextIndent) {
-  if (tryIndentingAsListItem(endOfCurrentParagraph))
+  if (tryIndentingAsListItem(start, end))
     blockquoteForNextIndent = 0;
   else
-    indentIntoBlockquote(endOfCurrentParagraph, blockquoteForNextIndent);
+    indentIntoBlockquote(start, end, blockquoteForNextIndent);
 }
 }
