@@ -65,7 +65,11 @@ class DragClient : public WebCore::DragClient {
 
   virtual void dragControllerDestroyed();
 
+#ifdef GTK_API_VERSION_2
   void dragIconWindowExposeEvent(GtkWidget*, GdkEventExpose*);
+#else
+  void dragIconWindowDraw(GtkWidget*, cairo_t*);
+#endif
 
  private:
   WebKitWebView* m_webView;
