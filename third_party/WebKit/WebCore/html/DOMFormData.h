@@ -39,12 +39,13 @@
 namespace WebCore {
 
 class Blob;
+class HTMLFormElement;
 class TextEncoding;
 
 class DOMFormData : public FormDataList, public RefCounted<DOMFormData> {
  public:
-  static PassRefPtr<DOMFormData> create() {
-    return adoptRef(new DOMFormData(UTF8Encoding()));
+  static PassRefPtr<DOMFormData> create(HTMLFormElement* form) {
+    return adoptRef(new DOMFormData(form));
   }
   static PassRefPtr<DOMFormData> create(const TextEncoding& encoding) {
     return adoptRef(new DOMFormData(encoding));
@@ -54,7 +55,8 @@ class DOMFormData : public FormDataList, public RefCounted<DOMFormData> {
   void append(const String& name, Blob*);
 
  private:
-  DOMFormData(const TextEncoding&);
+  explicit DOMFormData(const TextEncoding&);
+  explicit DOMFormData(HTMLFormElement*);
 };
 
 }  // namespace WebCore
