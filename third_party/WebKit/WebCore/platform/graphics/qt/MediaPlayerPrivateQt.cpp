@@ -132,6 +132,7 @@ MediaPlayerPrivateQt::MediaPlayerPrivateQt(MediaPlayer* player)
 }
 
 MediaPlayerPrivateQt::~MediaPlayerPrivateQt() {
+  m_mediaPlayer->disconnect(this);
   m_mediaPlayer->stop();
   m_mediaPlayer->setMedia(QMediaContent());
 
