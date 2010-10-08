@@ -36,12 +36,13 @@
 
 namespace WebCore {
 
-PassRefPtr<WritableDataObject> WritableDataObject::create(bool isForDragging) {
-  return adoptRef(new WritableDataObject(isForDragging));
+PassRefPtr<WritableDataObject> WritableDataObject::create(
+    Clipboard::ClipboardType clipboardType) {
+  return adoptRef(new WritableDataObject(clipboardType));
 }
 
-WritableDataObject::WritableDataObject(bool isForDragging)
-    : m_isForDragging(isForDragging) {}
+WritableDataObject::WritableDataObject(Clipboard::ClipboardType clipboardType)
+    : m_clipboardType(clipboardType) {}
 
 void WritableDataObject::clearData(const String& type) {
   m_dataMap.remove(type);
@@ -69,7 +70,7 @@ void WritableDataObject::clearAll() {
 }
 
 bool WritableDataObject::setData(const String& type, const String& data) {
-  if (!m_isForDragging) {
+  if (m_clipboardType == Clipboard::CopyAndPaste) {
     ChromiumBridge::clipboardWriteData(type, data, "");
     return true;
   }
@@ -79,56 +80,6 @@ bool WritableDataObject::setData(const String& type, const String& data) {
   else if (type == mimeTypeTextHTML)
     m_htmlBaseURL = KURL();
   return true;
-}
-
-void WritableDataObject::setURL(const String& url, const String& title) {
-  setData(mimeTypeTextURIList, url);
-  m_urlTitle = title;
-}
-
-void WritableDataObject::setHTML(const String& html, const KURL& baseURL) {
-  setData(mimeTypeTextHTML, html);
-  m_htmlBaseURL = baseURL;
-}
-
-// Accessors used when transferring drag data from the renderer to the
-// browser.
-HashMap<String, String> WritableDataObject::dataMap() const {
-  return m_dataMap;
-}
-
-String WritableDataObject::urlTitle() const {
-  return m_urlTitle;
-}
-
-KURL WritableDataObject::htmlBaseURL() const {
-  return m_htmlBaseURL;
-}
-
-// Used for transferring file data from the renderer to the browser.
-String WritableDataObject::fileExtension() const {
-  return m_fileExtension;
-}
-
-String WritableDataObject::fileContentFilename() const {
-  return m_fileContentFilename;
-}
-
-PassRefPtr<SharedBuffer> WritableDataObject::fileContent() const {
-  return m_fileContent;
-}
-
-void WritableDataObject::setFileExtension(const String& fileExtension) {
-  m_fileExtension = fileExtension;
-}
-
-void WritableDataObject::setFileContentFilename(
-    const String& fileContentFilename) {
-  m_fileContentFilename = fileContentFilename;
-}
-
-void WritableDataObject::setFileContent(PassRefPtr<SharedBuffer> fileContent) {
-  m_fileContent = fileContent;
 }
 
 }  // namespace WebCore
