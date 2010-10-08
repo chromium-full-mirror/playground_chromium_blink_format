@@ -97,7 +97,7 @@ class InjectedBundle {
 
   std::ostringstream m_outputStream;
 
-  enum State { Idle, Testing };
+  enum State { Idle, Testing, Stopping };
   State m_state;
 };
 
