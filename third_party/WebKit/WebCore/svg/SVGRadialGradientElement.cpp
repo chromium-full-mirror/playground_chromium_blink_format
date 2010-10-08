@@ -124,8 +124,8 @@ RenderObject* SVGRadialGradientElement::createRenderer(RenderArena* arena,
   return new (arena) RenderSVGResourceRadialGradient(this);
 }
 
-RadialGradientAttributes SVGRadialGradientElement::collectGradientProperties() {
-  RadialGradientAttributes attributes;
+void SVGRadialGradientElement::collectGradientAttributes(
+    RadialGradientAttributes& attributes) {
   HashSet<SVGGradientElement*> processedGradients;
 
   bool isRadial = true;
@@ -199,8 +199,6 @@ RadialGradientAttributes SVGRadialGradientElement::collectGradientProperties() {
 
   if (!attributes.hasFy())
     attributes.setFy(attributes.cy());
-
-  return attributes;
 }
 
 void SVGRadialGradientElement::calculateFocalCenterPointsAndRadius(

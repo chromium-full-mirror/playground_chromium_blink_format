@@ -35,6 +35,7 @@
 #include "PointerEventsHitRules.h"
 #include "RenderSVGContainer.h"
 #include "RenderSVGResourceMarker.h"
+#include "RenderSVGResourceSolidColor.h"
 #include "SVGRenderSupport.h"
 #include "SVGResources.h"
 #include "SVGStyledTransformableElement.h"
@@ -81,7 +82,9 @@ bool RenderSVGPath::fillContains(const FloatPoint& point,
   if (!m_fillBoundingBox.contains(point))
     return false;
 
-  if (requiresFill && !RenderSVGResource::fillPaintingResource(this, style()))
+  Color fallbackColor;
+  if (requiresFill &&
+      !RenderSVGResource::fillPaintingResource(this, style(), fallbackColor))
     return false;
 
   return m_path.contains(point, fillRule);
@@ -92,8 +95,9 @@ bool RenderSVGPath::strokeContains(const FloatPoint& point,
   if (!m_strokeAndMarkerBoundingBox.contains(point))
     return false;
 
+  Color fallbackColor;
   if (requiresStroke &&
-      !RenderSVGResource::strokePaintingResource(this, style()))
+      !RenderSVGResource::strokePaintingResource(this, style(), fallbackColor))
     return false;
 
   BoundingRectStrokeStyleApplier strokeStyle(this, style());
@@ -147,16 +151,26 @@ void RenderSVGPath::fillAndStrokePath(GraphicsContext* context) {
   context->beginPath();
   RenderStyle* style = this->style();
 
+  Color fallbackColor;
   if (RenderSVGResource* fillPaintingResource =
-          RenderSVGResource::fillPaintingResource(this, style)) {
+          RenderSVGResource::fillPaintingResource(this, style, fallbackColor)) {
     context->addPath(m_path);
     if (fillPaintingResource->applyResource(this, style, context,
                                             ApplyToFillMode))
       fillPaintingResource->postApplyResource(this, context, ApplyToFillMode);
+    else if (fallbackColor.isValid()) {
+      RenderSVGResourceSolidColor* fallbackResource =
+          RenderSVGResource::sharedSolidPaintingResource();
+      fallbackResource->setColor(fallbackColor);
+      if (fallbackResource->applyResource(this, style, context,
+                                          ApplyToFillMode))
+        fallbackResource->postApplyResource(this, context, ApplyToFillMode);
+    }
   }
 
+  fallbackColor = Color();
   RenderSVGResource* strokePaintingResource =
-      RenderSVGResource::strokePaintingResource(this, style);
+      RenderSVGResource::strokePaintingResource(this, style, fallbackColor);
   if (!strokePaintingResource)
     return;
 
@@ -182,6 +196,14 @@ void RenderSVGPath::fillAndStrokePath(GraphicsContext* context) {
   if (strokePaintingResource->applyResource(this, style, context,
                                             ApplyToStrokeMode))
     strokePaintingResource->postApplyResource(this, context, ApplyToStrokeMode);
+  else if (fallbackColor.isValid()) {
+    RenderSVGResourceSolidColor* fallbackResource =
+        RenderSVGResource::sharedSolidPaintingResource();
+    fallbackResource->setColor(fallbackColor);
+    if (fallbackResource->applyResource(this, style, context,
+                                        ApplyToStrokeMode))
+      fallbackResource->postApplyResource(this, context, ApplyToStrokeMode);
+  }
 
   if (restoreContext)
     context->restore();

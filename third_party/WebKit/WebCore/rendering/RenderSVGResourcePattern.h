@@ -27,6 +27,7 @@
 #include "FloatRect.h"
 #include "ImageBuffer.h"
 #include "Pattern.h"
+#include "PatternAttributes.h"
 #include "RenderSVGResourceContainer.h"
 #include "SVGPatternElement.h"
 #include "SVGUnitTypes.h"
@@ -40,8 +41,6 @@ struct PatternData {
   RefPtr<Pattern> pattern;
   AffineTransform transform;
 };
-
-struct PatternAttributes;
 
 class RenderSVGResourcePattern : public RenderSVGResourceContainer {
  public:
@@ -67,10 +66,11 @@ class RenderSVGResourcePattern : public RenderSVGResourceContainer {
   static RenderSVGResourceType s_resourceType;
 
  private:
-  AffineTransform buildTileImageTransform(RenderObject*,
-                                          const PatternAttributes&,
-                                          const SVGPatternElement*,
-                                          FloatRect& patternBoundaries) const;
+  bool buildTileImageTransform(RenderObject*,
+                               const PatternAttributes&,
+                               const SVGPatternElement*,
+                               FloatRect& patternBoundaries,
+                               AffineTransform& tileImageTransform) const;
 
   PassOwnPtr<ImageBuffer> createTileImage(
       RenderObject*,
@@ -79,6 +79,8 @@ class RenderSVGResourcePattern : public RenderSVGResourceContainer {
       const FloatRect& absoluteTileBoundaries,
       const AffineTransform& tileImageTransform) const;
 
+  bool m_shouldCollectPatternAttributes : 1;
+  PatternAttributes m_attributes;
   HashMap<RenderObject*, PatternData*> m_pattern;
 };
 }

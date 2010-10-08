@@ -113,8 +113,8 @@ RenderObject* SVGLinearGradientElement::createRenderer(RenderArena* arena,
   return new (arena) RenderSVGResourceLinearGradient(this);
 }
 
-LinearGradientAttributes SVGLinearGradientElement::collectGradientProperties() {
-  LinearGradientAttributes attributes;
+void SVGLinearGradientElement::collectGradientAttributes(
+    LinearGradientAttributes& attributes) {
   HashSet<SVGGradientElement*> processedGradients;
 
   bool isLinear = true;
@@ -178,8 +178,6 @@ LinearGradientAttributes SVGLinearGradientElement::collectGradientProperties() {
     } else
       current = 0;
   }
-
-  return attributes;
 }
 
 void SVGLinearGradientElement::calculateStartEndPoints(

@@ -30,6 +30,7 @@
 #include "RenderBlock.h"
 #include "RenderSVGInlineText.h"
 #include "RenderSVGResource.h"
+#include "RenderSVGResourceSolidColor.h"
 #include "SVGRootInlineBox.h"
 
 using namespace std;
@@ -316,12 +317,13 @@ bool SVGInlineTextBox::acquirePaintingResource(GraphicsContext*& context,
   ASSERT(style);
   ASSERT(m_paintingResourceMode != ApplyToDefaultMode);
 
+  Color fallbackColor;
   if (m_paintingResourceMode & ApplyToFillMode)
     m_paintingResource =
-        RenderSVGResource::fillPaintingResource(renderer, style);
+        RenderSVGResource::fillPaintingResource(renderer, style, fallbackColor);
   else if (m_paintingResourceMode & ApplyToStrokeMode)
-    m_paintingResource =
-        RenderSVGResource::strokePaintingResource(renderer, style);
+    m_paintingResource = RenderSVGResource::strokePaintingResource(
+        renderer, style, fallbackColor);
   else {
     // We're either called for stroking or filling.
     ASSERT_NOT_REACHED();
@@ -330,8 +332,19 @@ bool SVGInlineTextBox::acquirePaintingResource(GraphicsContext*& context,
   if (!m_paintingResource)
     return false;
 
-  m_paintingResource->applyResource(renderer, style, context,
-                                    m_paintingResourceMode);
+  if (!m_paintingResource->applyResource(renderer, style, context,
+                                         m_paintingResourceMode)) {
+    if (fallbackColor.isValid()) {
+      RenderSVGResourceSolidColor* fallbackResource =
+          RenderSVGResource::sharedSolidPaintingResource();
+      fallbackResource->setColor(fallbackColor);
+
+      m_paintingResource = fallbackResource;
+      m_paintingResource->applyResource(renderer, style, context,
+                                        m_paintingResourceMode);
+    }
+  }
+
   return true;
 }
 

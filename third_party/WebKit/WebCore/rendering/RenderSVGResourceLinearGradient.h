@@ -23,6 +23,7 @@
 #define RenderSVGResourceLinearGradient_h
 
 #if ENABLE(SVG)
+#include "LinearGradientAttributes.h"
 #include "RenderSVGResourceGradient.h"
 
 namespace WebCore {
@@ -41,7 +42,17 @@ class RenderSVGResourceLinearGradient : public RenderSVGResourceGradient {
   virtual RenderSVGResourceType resourceType() const { return s_resourceType; }
   static RenderSVGResourceType s_resourceType;
 
+  virtual bool boundingBoxMode() const {
+    return m_attributes.boundingBoxMode();
+  }
+  virtual void calculateGradientTransform(AffineTransform& transform) {
+    transform = m_attributes.gradientTransform();
+  }
+  virtual void collectGradientAttributes(SVGGradientElement*);
   virtual void buildGradient(GradientData*, SVGGradientElement*) const;
+
+ private:
+  LinearGradientAttributes m_attributes;
 };
 }
 
