@@ -53,7 +53,8 @@ class IDBFactoryBackendImpl : public IDBFactoryBackendInterface {
                     PassRefPtr<IDBCallbacks>,
                     PassRefPtr<SecurityOrigin>,
                     Frame*,
-                    const String& dataDir);
+                    const String& dataDir,
+                    int64_t maximumSize);
 
   static String databaseFileName(const String& name, SecurityOrigin*);
 

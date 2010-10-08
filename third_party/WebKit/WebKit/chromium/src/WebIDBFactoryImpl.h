@@ -49,7 +49,8 @@ class WebIDBFactoryImpl : public WebIDBFactory {
                     WebIDBCallbacks*,
                     const WebSecurityOrigin&,
                     WebFrame*,
-                    const WebString& dataDir);
+                    const WebString& dataDir,
+                    unsigned long long maximumSize);
 
  private:
   WTF::RefPtr<WebCore::IDBFactoryBackendInterface> m_idbFactoryBackend;

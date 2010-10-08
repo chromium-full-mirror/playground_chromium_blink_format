@@ -58,10 +58,11 @@ void WebIDBFactoryImpl::open(const WebString& name,
                              WebIDBCallbacks* callbacks,
                              const WebSecurityOrigin& origin,
                              WebFrame*,
-                             const WebString& dataDir) {
+                             const WebString& dataDir,
+                             unsigned long long maximumSize) {
   m_idbFactoryBackend->open(name, description,
                             IDBCallbacksProxy::create(callbacks), origin, 0,
-                            dataDir);
+                            dataDir, maximumSize);
 }
 
 }  // namespace WebKit

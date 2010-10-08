@@ -58,6 +58,16 @@ class WebIDBFactory {
                     WebIDBCallbacks* callbacks,
                     const WebSecurityOrigin& origin,
                     WebFrame* webFrame,
+                    const WebString& dataDir,
+                    unsigned long long maximumSize) {
+    WEBKIT_ASSERT_NOT_REACHED();
+  }
+  // FIXME: Remove once we update Chromium side.
+  virtual void open(const WebString& name,
+                    const WebString& description,
+                    WebIDBCallbacks* callbacks,
+                    const WebSecurityOrigin& origin,
+                    WebFrame* webFrame,
                     const WebString& dataDir) {
     WEBKIT_ASSERT_NOT_REACHED();
   }

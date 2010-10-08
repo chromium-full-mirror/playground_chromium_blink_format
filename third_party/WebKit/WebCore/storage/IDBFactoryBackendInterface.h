@@ -59,7 +59,8 @@ class IDBFactoryBackendInterface
                     PassRefPtr<IDBCallbacks>,
                     PassRefPtr<SecurityOrigin>,
                     Frame*,
-                    const String& dataDir) = 0;
+                    const String& dataDir,
+                    int64_t maximumSize) = 0;
 };
 
 }  // namespace WebCore

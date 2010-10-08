@@ -121,7 +121,8 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
                           PassRefPtr<SerializedScriptValue> value,
                           PassRefPtr<IDBKey> key,
                           bool addOnly,
-                          PassRefPtr<IDBCallbacks>);
+                          PassRefPtr<IDBCallbacks>,
+                          PassRefPtr<IDBTransactionBackendInterface>);
   static void removeInternal(ScriptExecutionContext*,
                              PassRefPtr<IDBObjectStoreBackendImpl>,
                              PassRefPtr<IDBKey> key,

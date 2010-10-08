@@ -144,7 +144,7 @@ IDBDatabaseBackendImpl::createObjectStore(
     const String& name,
     const String& keyPath,
     bool autoIncrement,
-    IDBTransactionBackendInterface* transaction) {
+    IDBTransactionBackendInterface* transactionPtr) {
   if (m_objectStores.contains(name)) {
     // FIXME: Throw CONSTRAINT_ERR in this case.
     return 0;
@@ -155,10 +155,10 @@ IDBDatabaseBackendImpl::createObjectStore(
   ASSERT(objectStore->name() == name);
 
   RefPtr<IDBDatabaseBackendImpl> database = this;
-  RefPtr<IDBTransactionBackendInterface> transactionPtr = transaction;
+  RefPtr<IDBTransactionBackendInterface> transaction = transactionPtr;
   if (!transaction->scheduleTask(
           createCallbackTask(&IDBDatabaseBackendImpl::createObjectStoreInternal,
-                             database, objectStore, transactionPtr),
+                             database, objectStore, transaction),
           createCallbackTask(&IDBDatabaseBackendImpl::removeObjectStoreFromMap,
                              database, objectStore))) {
     return 0;
@@ -176,13 +176,17 @@ void IDBDatabaseBackendImpl::createObjectStoreInternal(
   SQLiteStatement insert(database->sqliteDatabase(),
                          "INSERT INTO ObjectStores (name, keyPath, "
                          "doAutoIncrement) VALUES (?, ?, ?)");
-  bool ok = insert.prepare() == SQLResultOk;
-  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
+  if (insert.prepare() != SQLResultOk) {
+    transaction->abort();
+    return;
+  }
   insert.bindText(1, objectStore->name());
   insert.bindText(2, objectStore->keyPath());
   insert.bindInt(3, static_cast<int>(objectStore->autoIncrement()));
-  ok = insert.step() == SQLResultDone;
-  ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
+  if (insert.step() != SQLResultDone) {
+    transaction->abort();
+    return;
+  }
   int64_t id = database->sqliteDatabase().lastInsertRowID();
   objectStore->setId(id);
   transaction->didCompleteTaskEvents();
@@ -209,17 +213,17 @@ static void doDelete(SQLiteDatabase& db, const char* sql, int64_t id) {
 
 void IDBDatabaseBackendImpl::removeObjectStore(
     const String& name,
-    IDBTransactionBackendInterface* transaction) {
+    IDBTransactionBackendInterface* transactionPtr) {
   RefPtr<IDBObjectStoreBackendImpl> objectStore = m_objectStores.get(name);
   if (!objectStore) {
     // FIXME: Raise NOT_FOUND_ERR.
     return;
   }
   RefPtr<IDBDatabaseBackendImpl> database = this;
-  RefPtr<IDBTransactionBackendInterface> transactionPtr = transaction;
+  RefPtr<IDBTransactionBackendInterface> transaction = transactionPtr;
   if (!transaction->scheduleTask(
           createCallbackTask(&IDBDatabaseBackendImpl::removeObjectStoreInternal,
-                             database, objectStore, transactionPtr),
+                             database, objectStore, transaction),
           createCallbackTask(&IDBDatabaseBackendImpl::addObjectStoreToMap,
                              database, objectStore))) {
     // FIXME: Raise NOT_ALLOWED_ERR if the above fails.
@@ -274,8 +278,16 @@ void IDBDatabaseBackendImpl::setVersionInternal(
     PassRefPtr<IDBCallbacks> callbacks,
     PassRefPtr<IDBTransactionBackendInterface> transaction) {
   database->m_version = version;
-  setMetaData(database->m_sqliteDatabase.get(), database->m_name,
-              database->m_description, database->m_version);
+  if (!setMetaData(database->m_sqliteDatabase.get(), database->m_name,
+                   database->m_description, database->m_version)) {
+    // FIXME: The Indexed Database specification does not have an error code
+    // dedicated to I/O errors.
+    callbacks->onError(
+        IDBDatabaseError::create(IDBDatabaseException::UNKNOWN_ERR,
+                                 "Error writing data to stable storage."));
+    transaction->abort();
+    return;
+  }
   callbacks->onSuccess(transaction);
 }
 

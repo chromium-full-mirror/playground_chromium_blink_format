@@ -51,7 +51,8 @@ IDBFactoryBackendImpl::~IDBFactoryBackendImpl() {}
 static PassOwnPtr<SQLiteDatabase> openSQLiteDatabase(
     SecurityOrigin* securityOrigin,
     String name,
-    const String& pathBase) {
+    const String& pathBase,
+    int64_t maximumSize) {
   String path = ":memory:";
   if (!pathBase.isEmpty()) {
     if (!makeAllDirectories(pathBase)) {
@@ -76,6 +77,7 @@ static PassOwnPtr<SQLiteDatabase> openSQLiteDatabase(
     return 0;
   }
 
+  sqliteDatabase->setMaximumSize(maximumSize);
   return sqliteDatabase.release();
 }
 
@@ -142,7 +144,8 @@ void IDBFactoryBackendImpl::open(const String& name,
                                  PassRefPtr<IDBCallbacks> callbacks,
                                  PassRefPtr<SecurityOrigin> securityOrigin,
                                  Frame*,
-                                 const String& dataDir) {
+                                 const String& dataDir,
+                                 int64_t maximumSize) {
   IDBDatabaseBackendMap::iterator it = m_databaseBackendMap.find(name);
   if (it != m_databaseBackendMap.end()) {
     if (!description.isNull())
@@ -155,7 +158,7 @@ void IDBFactoryBackendImpl::open(const String& name,
   // FIXME: Everything from now on should be done on another thread.
 
   OwnPtr<SQLiteDatabase> sqliteDatabase =
-      openSQLiteDatabase(securityOrigin.get(), name, dataDir);
+      openSQLiteDatabase(securityOrigin.get(), name, dataDir, maximumSize);
   if (!sqliteDatabase || !createTables(sqliteDatabase.get())) {
     callbacks->onError(IDBDatabaseError::create(
         IDBDatabaseException::UNKNOWN_ERR, "Internal error."));
