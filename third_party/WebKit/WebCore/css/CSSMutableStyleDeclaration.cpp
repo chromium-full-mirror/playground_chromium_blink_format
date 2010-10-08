@@ -440,18 +440,16 @@ String CSSMutableStyleDeclaration::getCommonValue(const int* properties,
                                                   int number) const {
   String res;
   for (int i = 0; i < number; ++i) {
-    if (!isPropertyImplicit(properties[i])) {
-      RefPtr<CSSValue> value = getPropertyCSSValue(properties[i]);
-      if (!value)
-        return String();
-      String text = value->cssText();
-      if (text.isNull())
-        return String();
-      if (res.isNull())
-        res = text;
-      else if (res != text)
-        return String();
-    }
+    RefPtr<CSSValue> value = getPropertyCSSValue(properties[i]);
+    if (!value)
+      return String();
+    String text = value->cssText();
+    if (text.isNull())
+      return String();
+    if (res.isNull())
+      res = text;
+    else if (res != text)
+      return String();
   }
   return res;
 }
