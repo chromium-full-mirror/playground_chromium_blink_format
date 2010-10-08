@@ -183,7 +183,7 @@ class StringImpl : public StringImplBase {
       return empty();
     }
 
-    if (length > ((std::numeric_limits<size_t>::max() - sizeof(StringImpl)) /
+    if (length > ((std::numeric_limits<unsigned>::max() - sizeof(StringImpl)) /
                   sizeof(UChar))) {
       output = 0;
       return 0;
@@ -208,6 +208,8 @@ class StringImpl : public StringImplBase {
   static PassRefPtr<StringImpl> adopt(Vector<UChar, inlineCapacity>& vector) {
     if (size_t size = vector.size()) {
       ASSERT(vector.data());
+      if (size > std::numeric_limits<unsigned>::max())
+        CRASH();
       return adoptRef(new StringImpl(vector.releaseBuffer(), size));
     }
     return empty();
