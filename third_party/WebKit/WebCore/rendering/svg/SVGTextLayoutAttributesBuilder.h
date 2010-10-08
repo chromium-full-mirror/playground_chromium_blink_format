@@ -69,7 +69,13 @@ class SVGTextLayoutAttributesBuilder : public Noncopyable {
                                  unsigned& atCharacter,
                                  UChar& lastCharacter) const;
 
-  enum LayoutValueType { XValue, YValue, DxValue, DyValue, RotateValue };
+  enum LayoutValueType {
+    XValueAttribute,
+    YValueAttribute,
+    DxValueAttribute,
+    DyValueAttribute,
+    RotateValueAttribute
+  };
 
   float nextLayoutValue(LayoutValueType, unsigned atCharacter) const;
   void assignLayoutAttributesForCharacter(SVGTextLayoutAttributes&,
