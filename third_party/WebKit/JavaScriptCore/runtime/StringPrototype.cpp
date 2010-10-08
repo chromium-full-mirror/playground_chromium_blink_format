@@ -221,8 +221,9 @@ substituteBackreferencesSlow(const UString& replacement,
                                     i - offset);
     i += 1 + advance;
     offset = i + 1;
-    substitutedReplacement.append(source.characters() + backrefStart,
-                                  backrefLength);
+    if (backrefStart >= 0)
+      substitutedReplacement.append(source.characters() + backrefStart,
+                                    backrefLength);
   } while ((i = replacement.find('$', i + 1)) != notFound);
 
   if (replacement.length() - offset)
