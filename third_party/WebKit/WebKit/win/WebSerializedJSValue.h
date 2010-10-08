@@ -37,7 +37,9 @@ namespace WebCore {
 class SerializedScriptValue;
 }
 
-class WebSerializedJSValue : public Noncopyable, public IWebSerializedJSValue {
+class WebSerializedJSValue : public Noncopyable,
+                             public IWebSerializedJSValue,
+                             public IWebSerializedJSValuePrivate {
  public:
   static COMPtr<WebSerializedJSValue> createInstance();
 
@@ -49,6 +51,8 @@ class WebSerializedJSValue : public Noncopyable, public IWebSerializedJSValue {
                                               JSValueRef* exception);
   virtual HRESULT STDMETHODCALLTYPE deserialize(JSContextRef,
                                                 JSValueRef* result);
+  virtual HRESULT STDMETHODCALLTYPE
+  setInternalRepresentation(void* internalRepresentation);
 
  private:
   WebSerializedJSValue();

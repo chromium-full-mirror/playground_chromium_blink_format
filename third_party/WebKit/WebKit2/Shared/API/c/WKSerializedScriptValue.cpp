@@ -24,6 +24,7 @@
  */
 
 #include "WKSerializedScriptValue.h"
+#include "WKSerializedScriptValuePrivate.h"
 
 #include "WKAPICast.h"
 #include "WebSerializedScriptValue.h"
@@ -48,4 +49,9 @@ JSValueRef WKSerializedScriptValueDeserialize(
     JSContextRef contextRef,
     JSValueRef* exception) {
   return toImpl(scriptValueRef)->deserialize(contextRef, exception);
+}
+
+void* WKSerializedScriptValueGetInternalRepresentation(
+    WKSerializedScriptValueRef scriptValueRef) {
+  return toImpl(scriptValueRef)->internalRepresentation();
 }

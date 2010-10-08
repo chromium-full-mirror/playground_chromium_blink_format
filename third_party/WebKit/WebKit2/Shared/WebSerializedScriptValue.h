@@ -63,6 +63,8 @@ class WebSerializedScriptValue : public APIObject {
 
   const Vector<uint8_t>& data() { return m_serializedScriptValue->data(); }
 
+  void* internalRepresentation() { return m_serializedScriptValue.get(); }
+
  private:
   explicit WebSerializedScriptValue(
       PassRefPtr<WebCore::SerializedScriptValue> serializedScriptValue)
