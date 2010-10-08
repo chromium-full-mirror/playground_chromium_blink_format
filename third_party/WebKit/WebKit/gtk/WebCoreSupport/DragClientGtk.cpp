@@ -1,5 +1,5 @@
 /*
- * Copyright (C) Igalia S.L.
+ * Copyright (C) 2009, 2010 Igalia S.L.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -43,21 +43,21 @@ using namespace WebCore;
 namespace WebKit {
 
 #ifdef GTK_API_VERSION_2
-static gboolean dragIconWindowExposeEventCallback(GtkWidget* widget,
-                                                  GdkEventExpose* event,
-                                                  DragClient* client) {
-  client->dragIconWindowExposeEvent(widget, event);
+static gboolean dragIconWindowDrawEventCallback(GtkWidget* widget,
+                                                GdkEventExpose* event,
+                                                DragClient* client) {
+  PlatformRefPtr<cairo_t> context =
+      adoptPlatformRef(gdk_cairo_create(event->window));
+  client->drawDragIconWindow(widget, context.get());
   return TRUE;
 }
 #else
-static gboolean dragIconWindowDrawCallback(GtkWidget* widget,
-                                           cairo_t* cr,
-                                           DragClient* client) {
-  GdkRectangle clipRect;
-
-  if (!gdk_cairo_get_clip_rectangle(cr, &clipRect))
+static gboolean dragIconWindowDrawEventCallback(GtkWidget* widget,
+                                                cairo_t* context,
+                                                DragClient* client) {
+  if (!gdk_cairo_get_clip_rectangle(context, 0))
     return FALSE;
-  client->dragIconWindowDraw(widget, cr);
+  client->drawDragIconWindow(widget, context);
   return TRUE;
 }
 #endif  // GTK_API_VERSION_2
@@ -68,22 +68,16 @@ DragClient::DragClient(WebKitWebView* webView)
       m_dragIconWindow(gtk_window_new(GTK_WINDOW_POPUP)) {
 #ifdef GTK_API_VERSION_2
   g_signal_connect(m_dragIconWindow.get(), "expose-event",
-                   G_CALLBACK(dragIconWindowExposeEventCallback), this);
+                   G_CALLBACK(dragIconWindowDrawEventCallback), this);
 #else
   g_signal_connect(m_dragIconWindow.get(), "draw",
-                   G_CALLBACK(dragIconWindowDrawCallback), this);
+                   G_CALLBACK(dragIconWindowDrawEventCallback), this);
 #endif
 }
 
 DragClient::~DragClient() {
-#ifdef GTK_API_VERSION_2
   g_signal_handlers_disconnect_by_func(
-      m_dragIconWindow.get(), (gpointer)dragIconWindowExposeEventCallback,
-      this);
-#else
-  g_signal_handlers_disconnect_by_func(
-      m_dragIconWindow.get(), (gpointer)dragIconWindowDrawCallback, this);
-#endif
+      m_dragIconWindow.get(), (gpointer)dragIconWindowDrawEventCallback, this);
 }
 
 void DragClient::willPerformDragDestinationAction(DragDestinationAction,
@@ -159,27 +153,15 @@ void DragClient::startDrag(DragImageRef image,
   } else
     gtk_drag_set_icon_default(context);
 }
-#ifdef GTK_API_VERSION_2
-void DragClient::dragIconWindowExposeEvent(GtkWidget* widget,
-                                           GdkEventExpose* event) {
-  PlatformRefPtr<cairo_t> context =
-      adoptPlatformRef(gdk_cairo_create(event->window));
-  cairo_rectangle(context.get(), 0, 0,
+
+void DragClient::drawDragIconWindow(GtkWidget* widget, cairo_t* context) {
+  cairo_rectangle(context, 0, 0,
                   cairo_image_surface_get_width(m_dragImage.get()),
                   cairo_image_surface_get_height(m_dragImage.get()));
-  cairo_set_operator(context.get(), CAIRO_OPERATOR_SOURCE);
-  cairo_set_source_surface(context.get(), m_dragImage.get(), 0, 0);
-  cairo_fill(context.get());
+  cairo_set_operator(context, CAIRO_OPERATOR_SOURCE);
+  cairo_set_source_surface(context, m_dragImage.get(), 0, 0);
+  cairo_fill(context);
 }
-#else
-void DragClient::dragIconWindowDraw(GtkWidget* widget, cairo_t* cr) {
-  cairo_rectangle(cr, 0, 0, cairo_image_surface_get_width(m_dragImage.get()),
-                  cairo_image_surface_get_height(m_dragImage.get()));
-  cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-  cairo_set_source_surface(cr, m_dragImage.get(), 0, 0);
-  cairo_fill(cr);
-}
-#endif  // GTK_API_VERSION_2
 
 DragImageRef DragClient::createDragImageForLink(KURL&, const String&, Frame*) {
   notImplemented();
