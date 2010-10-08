@@ -52,6 +52,19 @@ const AtomicString& DateTimeLocalInputType::formControlType() const {
   return InputTypeNames::datetimelocal();
 }
 
+double DateTimeLocalInputType::valueAsDate() const {
+  // valueAsDate doesn't work for the datetime-local type according to the
+  // standard.
+  return DateComponents::invalidMilliseconds();
+}
+
+void DateTimeLocalInputType::setValueAsDate(double value,
+                                            ExceptionCode& ec) const {
+  // valueAsDate doesn't work for the datetime-local type according to the
+  // standard.
+  InputType::setValueAsDate(value, ec);
+}
+
 double DateTimeLocalInputType::minimum() const {
   return parseToDouble(element()->fastGetAttribute(minAttr),
                        DateComponents::minimumDateTime());
@@ -81,6 +94,13 @@ bool DateTimeLocalInputType::parseToDateComponentsInternal(
   ASSERT(out);
   unsigned end;
   return out->parseDateTimeLocal(characters, length, 0, end) && end == length;
+}
+
+bool DateTimeLocalInputType::setMillisecondToDateComponents(
+    double value,
+    DateComponents* date) const {
+  ASSERT(date);
+  return date->setMillisecondsSinceEpochForDateTimeLocal(value);
 }
 
 }  // namespace WebCore

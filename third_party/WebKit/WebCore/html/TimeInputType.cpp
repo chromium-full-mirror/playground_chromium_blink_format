@@ -81,4 +81,10 @@ bool TimeInputType::parseToDateComponentsInternal(const UChar* characters,
   return out->parseTime(characters, length, 0, end) && end == length;
 }
 
+bool TimeInputType::setMillisecondToDateComponents(double value,
+                                                   DateComponents* date) const {
+  ASSERT(date);
+  return date->setMillisecondsSinceMidnight(value);
+}
+
 }  // namespace WebCore

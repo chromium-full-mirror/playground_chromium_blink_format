@@ -42,6 +42,8 @@ class NumberInputType : public TextFieldInputType {
  private:
   NumberInputType(HTMLInputElement* element) : TextFieldInputType(element) {}
   virtual const AtomicString& formControlType() const;
+  virtual double valueAsNumber() const;
+  virtual void setValueAsNumber(double, ExceptionCode&) const;
   virtual bool rangeUnderflow(const String&) const;
   virtual bool rangeOverflow(const String&) const;
   virtual double minimum() const;
@@ -51,6 +53,7 @@ class NumberInputType : public TextFieldInputType {
   virtual double defaultStep() const;
   virtual double stepScaleFactor() const;
   virtual double parseToDouble(const String&, double) const;
+  virtual String serialize(double) const;
 };
 
 }  // namespace WebCore

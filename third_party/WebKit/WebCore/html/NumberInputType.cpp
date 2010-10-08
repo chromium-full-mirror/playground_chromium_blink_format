@@ -60,6 +60,14 @@ const AtomicString& NumberInputType::formControlType() const {
   return InputTypeNames::number();
 }
 
+double NumberInputType::valueAsNumber() const {
+  return parseToDouble(element()->value(), numeric_limits<double>::quiet_NaN());
+}
+
+void NumberInputType::setValueAsNumber(double newValue, ExceptionCode&) const {
+  element()->setValue(serialize(newValue));
+}
+
 bool NumberInputType::rangeUnderflow(const String& value) const {
   const double nan = numeric_limits<double>::quiet_NaN();
   double doubleValue = parseToDouble(value, nan);
@@ -118,6 +126,12 @@ double NumberInputType::parseToDouble(const String& src,
     return defaultValue;
   ASSERT(isfinite(numberValue));
   return numberValue;
+}
+
+String NumberInputType::serialize(double value) const {
+  if (!isfinite(value))
+    return String();
+  return serializeForNumberType(value);
 }
 
 }  // namespace WebCore

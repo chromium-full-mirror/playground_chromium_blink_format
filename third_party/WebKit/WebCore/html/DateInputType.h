@@ -51,6 +51,7 @@ class DateInputType : public BaseDateAndTimeInputType {
   virtual bool parseToDateComponentsInternal(const UChar*,
                                              unsigned length,
                                              DateComponents*) const;
+  virtual bool setMillisecondToDateComponents(double, DateComponents*) const;
 };
 
 }  // namespace WebCore

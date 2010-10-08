@@ -31,6 +31,7 @@
 #include "ButtonInputType.h"
 #include "CheckboxInputType.h"
 #include "ColorInputType.h"
+#include "DateComponents.h"
 #include "DateInputType.h"
 #include "DateTimeInputType.h"
 #include "DateTimeLocalInputType.h"
@@ -121,6 +122,22 @@ bool InputType::isTextType() const {
   return false;
 }
 
+double InputType::valueAsDate() const {
+  return DateComponents::invalidMilliseconds();
+}
+
+void InputType::setValueAsDate(double, ExceptionCode& ec) const {
+  ec = INVALID_STATE_ERR;
+}
+
+double InputType::valueAsNumber() const {
+  return numeric_limits<double>::quiet_NaN();
+}
+
+void InputType::setValueAsNumber(double, ExceptionCode& ec) const {
+  ec = INVALID_STATE_ERR;
+}
+
 bool InputType::patternMismatch(const String&) const {
   return false;
 }
@@ -178,6 +195,11 @@ double InputType::parseToDouble(const String&, double defaultValue) const {
 bool InputType::parseToDateComponents(const String&, DateComponents*) const {
   ASSERT_NOT_REACHED();
   return false;
+}
+
+String InputType::serialize(double) const {
+  ASSERT_NOT_REACHED();
+  return String();
 }
 
 namespace InputTypeNames {

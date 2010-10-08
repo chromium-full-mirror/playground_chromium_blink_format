@@ -82,4 +82,11 @@ bool DateTimeInputType::parseToDateComponentsInternal(
   return out->parseDateTime(characters, length, 0, end) && end == length;
 }
 
+bool DateTimeInputType::setMillisecondToDateComponents(
+    double value,
+    DateComponents* date) const {
+  ASSERT(date);
+  return date->setMillisecondsSinceEpochForDateTime(value);
+}
+
 }  // namespace WebCore

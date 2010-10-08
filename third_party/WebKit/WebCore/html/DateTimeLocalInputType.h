@@ -43,6 +43,8 @@ class DateTimeLocalInputType : public BaseDateAndTimeInputType {
   DateTimeLocalInputType(HTMLInputElement* element)
       : BaseDateAndTimeInputType(element) {}
   virtual const AtomicString& formControlType() const;
+  virtual double valueAsDate() const;
+  virtual void setValueAsDate(double, ExceptionCode&) const;
   virtual double minimum() const;
   virtual double maximum() const;
   virtual double defaultStep() const;
@@ -51,6 +53,7 @@ class DateTimeLocalInputType : public BaseDateAndTimeInputType {
   virtual bool parseToDateComponentsInternal(const UChar*,
                                              unsigned length,
                                              DateComponents*) const;
+  virtual bool setMillisecondToDateComponents(double, DateComponents*) const;
 };
 
 }  // namespace WebCore
