@@ -1774,6 +1774,7 @@ static JSValueRef setSpatialNavigationEnabledCallback(
     size_t argumentCount,
     const JSValueRef arguments[],
     JSValueRef* exception) {
+  // Has mac implementation.
   if (argumentCount < 1)
     return JSValueMakeUndefined(context);
 
