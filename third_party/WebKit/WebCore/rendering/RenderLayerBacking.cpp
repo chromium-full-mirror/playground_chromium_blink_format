@@ -1167,8 +1167,7 @@ void RenderLayerBacking::paintContents(const GraphicsLayer*,
   paintIntoLayer(m_owningLayer, &context, dirtyRect, PaintBehaviorNormal,
                  paintingPhase, renderer());
 
-  InspectorInstrumentation::didPaint(m_owningLayer->renderer()->frame(),
-                                     cookie);
+  InspectorInstrumentation::didPaint(cookie);
 }
 
 bool RenderLayerBacking::showDebugBorders() const {

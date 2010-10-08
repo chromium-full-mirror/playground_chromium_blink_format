@@ -1535,7 +1535,7 @@ bool DOMWindow::dispatchEvent(PassRefPtr<Event> prpEvent,
 
   bool result = fireEventListeners(event.get());
 
-  InspectorInstrumentation::didDispatchEventOnWindow(frame(), cookie);
+  InspectorInstrumentation::didDispatchEventOnWindow(cookie);
 
   return result;
 }

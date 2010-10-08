@@ -2703,7 +2703,7 @@ doneDispatching:
 
 doneWithDefault:
 
-  InspectorInstrumentation::didDispatchEvent(document(), cookie);
+  InspectorInstrumentation::didDispatchEvent(cookie);
 
   return !event->defaultPrevented();
 }

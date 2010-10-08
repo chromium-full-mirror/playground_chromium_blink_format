@@ -155,7 +155,7 @@ ScriptValue ScriptController::evaluateInWorld(
       shell);
   exec->globalData().timeoutChecker.stop();
 
-  InspectorInstrumentation::didEvaluateScript(m_frame, cookie);
+  InspectorInstrumentation::didEvaluateScript(cookie);
 
   // Evaluating the JavaScript could cause the frame to be deallocated
   // so we start the keep alive timer here.

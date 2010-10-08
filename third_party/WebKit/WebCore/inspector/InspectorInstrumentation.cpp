@@ -195,19 +195,19 @@ InspectorInstrumentationCookie InspectorInstrumentation::willCallFunctionImpl(
     InspectorController* inspectorController,
     const String& scriptName,
     int scriptLine) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController)) {
+  int timelineAgentId = 0;
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent) {
     timelineAgent->willCallFunction(scriptName, scriptLine);
-    return timelineAgent->id();
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didCallFunctionImpl(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+    const InspectorInstrumentationCookie& cookie) {
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didCallFunction();
 }
 
@@ -215,22 +215,21 @@ InspectorInstrumentationCookie
 InspectorInstrumentation::willChangeXHRReadyStateImpl(
     InspectorController* inspectorController,
     XMLHttpRequest* request) {
+  int timelineAgentId = 0;
   InspectorTimelineAgent* timelineAgent =
       retrieveTimelineAgent(inspectorController);
   if (timelineAgent &&
       request->hasEventListeners(eventNames().readystatechangeEvent)) {
     timelineAgent->willChangeXHRReadyState(request->url().string(),
                                            request->readyState());
-    return timelineAgent->id();
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didChangeXHRReadyStateImpl(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+    const InspectorInstrumentationCookie& cookie) {
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didChangeXHRReadyState();
 }
 
@@ -256,27 +255,26 @@ InspectorInstrumentationCookie InspectorInstrumentation::willDispatchEventImpl(
   }
 #endif
 
+  int timelineAgentId = 0;
   InspectorTimelineAgent* timelineAgent =
       retrieveTimelineAgent(inspectorController);
   if (timelineAgent &&
       eventHasListeners(event.type(), window, node, ancestors)) {
     timelineAgent->willDispatchEvent(event);
-    return timelineAgent->id();
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didDispatchEventImpl(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
+    const InspectorInstrumentationCookie& cookie) {
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   if (InspectorDebuggerAgent* debuggerAgent =
-          inspectorController->m_debuggerAgent.get())
+          cookie.first->m_debuggerAgent.get())
     debuggerAgent->cancelPauseOnNextStatement();
 #endif
 
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didDispatchEvent();
 }
 
@@ -285,20 +283,19 @@ InspectorInstrumentation::willDispatchEventOnWindowImpl(
     InspectorController* inspectorController,
     const Event& event,
     DOMWindow* window) {
+  int timelineAgentId = 0;
   InspectorTimelineAgent* timelineAgent =
       retrieveTimelineAgent(inspectorController);
   if (timelineAgent && window->hasEventListeners(event.type())) {
     timelineAgent->willDispatchEvent(event);
-    return timelineAgent->id();
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didDispatchEventOnWindowImpl(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+    const InspectorInstrumentationCookie& cookie) {
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didDispatchEvent();
 }
 
@@ -306,114 +303,113 @@ InspectorInstrumentationCookie InspectorInstrumentation::willEvaluateScriptImpl(
     InspectorController* inspectorController,
     const String& url,
     int lineNumber) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController)) {
+  int timelineAgentId = 0;
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent) {
     timelineAgent->willEvaluateScript(url, lineNumber);
-    return timelineAgent->id();
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didEvaluateScriptImpl(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+    const InspectorInstrumentationCookie& cookie) {
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didEvaluateScript();
 }
 
 InspectorInstrumentationCookie InspectorInstrumentation::willFireTimerImpl(
     InspectorController* inspectorController,
     int timerId) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController)) {
+  int timelineAgentId = 0;
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent) {
     timelineAgent->willFireTimer(timerId);
-    return timelineAgent->id();
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didFireTimerImpl(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+    const InspectorInstrumentationCookie& cookie) {
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didFireTimer();
 }
 
 InspectorInstrumentationCookie InspectorInstrumentation::willLayoutImpl(
     InspectorController* inspectorController) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController)) {
+  int timelineAgentId = 0;
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent) {
     timelineAgent->willLayout();
-    return timelineAgent->id();
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didLayoutImpl(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+    const InspectorInstrumentationCookie& cookie) {
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didLayout();
 }
 
 InspectorInstrumentationCookie InspectorInstrumentation::willLoadXHRImpl(
     InspectorController* inspectorController,
     XMLHttpRequest* request) {
+  int timelineAgentId = 0;
   InspectorTimelineAgent* timelineAgent =
       retrieveTimelineAgent(inspectorController);
   if (timelineAgent && request->hasEventListeners(eventNames().loadEvent)) {
-    timelineAgent->willLoadXHR(request->url().string());
-    return timelineAgent->id();
+    timelineAgent->willLoadXHR(request->url());
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didLoadXHRImpl(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+    const InspectorInstrumentationCookie& cookie) {
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didLoadXHR();
 }
 
 InspectorInstrumentationCookie InspectorInstrumentation::willPaintImpl(
     InspectorController* inspectorController,
     const IntRect& rect) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController)) {
+  int timelineAgentId = 0;
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent) {
     timelineAgent->willPaint(rect);
-    return timelineAgent->id();
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didPaintImpl(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+    const InspectorInstrumentationCookie& cookie) {
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didPaint();
 }
 
 InspectorInstrumentationCookie
 InspectorInstrumentation::willRecalculateStyleImpl(
     InspectorController* inspectorController) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController)) {
+  int timelineAgentId = 0;
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent) {
     timelineAgent->willRecalculateStyle();
-    return timelineAgent->id();
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didRecalculateStyleImpl(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+    const InspectorInstrumentationCookie& cookie) {
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didRecalculateStyle();
 }
 
@@ -421,19 +417,19 @@ InspectorInstrumentationCookie
 InspectorInstrumentation::willReceiveResourceDataImpl(
     InspectorController* inspectorController,
     unsigned long identifier) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController)) {
+  int timelineAgentId = 0;
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent) {
     timelineAgent->willReceiveResourceData(identifier);
-    return timelineAgent->id();
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didReceiveResourceDataImpl(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+    const InspectorInstrumentationCookie& cookie) {
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didReceiveResourceData();
 }
 
@@ -442,19 +438,19 @@ InspectorInstrumentation::willReceiveResourceResponseImpl(
     InspectorController* inspectorController,
     unsigned long identifier,
     const ResourceResponse& response) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController)) {
+  int timelineAgentId = 0;
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent) {
     timelineAgent->willReceiveResourceResponse(identifier, response);
-    return timelineAgent->id();
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didReceiveResourceResponseImpl(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+    const InspectorInstrumentationCookie& cookie) {
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didReceiveResourceResponse();
 }
 
@@ -462,20 +458,20 @@ InspectorInstrumentationCookie InspectorInstrumentation::willWriteHTMLImpl(
     InspectorController* inspectorController,
     unsigned int length,
     unsigned int startLine) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController)) {
+  int timelineAgentId = 0;
+  InspectorTimelineAgent* timelineAgent =
+      retrieveTimelineAgent(inspectorController);
+  if (timelineAgent) {
     timelineAgent->willWriteHTML(length, startLine);
-    return timelineAgent->id();
+    timelineAgentId = timelineAgent->id();
   }
-  return 0;
+  return InspectorInstrumentationCookie(inspectorController, timelineAgentId);
 }
 
 void InspectorInstrumentation::didWriteHTMLImpl(
-    InspectorController* inspectorController,
-    unsigned int endLine,
-    InspectorInstrumentationCookie cookie) {
-  if (InspectorTimelineAgent* timelineAgent =
-          retrieveTimelineAgent(inspectorController, cookie))
+    const InspectorInstrumentationCookie& cookie,
+    unsigned int endLine) {
+  if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
     timelineAgent->didWriteHTML(endLine);
 }
 
@@ -490,11 +486,9 @@ InspectorTimelineAgent* InspectorInstrumentation::retrieveTimelineAgent(
 }
 
 InspectorTimelineAgent* InspectorInstrumentation::retrieveTimelineAgent(
-    InspectorController* inspectorController,
-    InspectorInstrumentationCookie cookie) {
-  InspectorTimelineAgent* timelineAgent =
-      retrieveTimelineAgent(inspectorController);
-  if (timelineAgent && timelineAgent->id() == cookie)
+    const InspectorInstrumentationCookie& cookie) {
+  InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie.first);
+  if (timelineAgent && timelineAgent->id() == cookie.second)
     return timelineAgent;
   return 0;
 }

@@ -300,15 +300,14 @@ void XMLHttpRequest::callReadyStateChangeListener() {
         XMLHttpRequestProgressEvent::create(eventNames().readystatechangeEvent),
         m_state == DONE ? FlushProgressEvent : DoNotFlushProgressEvent);
 
-  InspectorInstrumentation::didChangeXHRReadyState(scriptExecutionContext(),
-                                                   cookie);
+  InspectorInstrumentation::didChangeXHRReadyState(cookie);
 
   if (m_state == DONE && !m_error) {
     InspectorInstrumentationCookie cookie =
         InspectorInstrumentation::willLoadXHR(scriptExecutionContext(), this);
     m_progressEventThrottle.dispatchEvent(
         XMLHttpRequestProgressEvent::create(eventNames().loadEvent));
-    InspectorInstrumentation::didLoadXHR(scriptExecutionContext(), cookie);
+    InspectorInstrumentation::didLoadXHR(cookie);
   }
 }
 
