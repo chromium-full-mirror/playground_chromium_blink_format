@@ -1529,6 +1529,7 @@ PassRefPtr<Widget> FrameLoaderClientQt::createPlugin(
   else {  // NPAPI Plugins
     Vector<String> params = paramNames;
     Vector<String> values = paramValues;
+#if !OS(SYMBIAN)
     if (mimeType == "application/x-shockwave-flash") {
       QWebPageClient* client = m_webFrame->page()->d->client;
       const bool isQWebView =
@@ -1556,6 +1557,7 @@ PassRefPtr<Widget> FrameLoaderClientQt::createPlugin(
       }
 #endif
     }
+#endif
 
     RefPtr<PluginView> pluginView =
         PluginView::create(m_frame, pluginSize, element, url, params, values,
