@@ -78,6 +78,9 @@ class QWEBKIT_EXPORT QGraphicsWKView : public QGraphicsWidget {
 
   Q_SLOT void updateCursor(const QCursor&);
 
+  virtual void focusInEvent(QFocusEvent*);
+  virtual void focusOutEvent(QFocusEvent*);
+
  private:
   QGraphicsWKViewPrivate* d;
   friend class QGraphicsWKViewPrivate;
