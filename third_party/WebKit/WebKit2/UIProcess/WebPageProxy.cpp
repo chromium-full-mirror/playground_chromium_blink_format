@@ -649,6 +649,7 @@ void WebPageProxy::didFailProvisionalLoadForFrame(
 
   WebFrameProxy* frame = process()->webFrame(frameID);
 
+  frame->didFailProvisionalLoad();
   m_loaderClient.didFailProvisionalLoadWithErrorForFrame(this, frame,
                                                          userData.get());
 }
@@ -709,6 +710,7 @@ void WebPageProxy::didFailLoadForFrame(uint64_t frameID,
     return;
 
   WebFrameProxy* frame = process()->webFrame(frameID);
+  frame->didFailLoad();
 
   m_loaderClient.didFailLoadWithErrorForFrame(this, frame, userData.get());
 }

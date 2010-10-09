@@ -84,8 +84,10 @@ class WebFrameProxy : public APIObject {
 
   void didStartProvisionalLoad(const String& url);
   void didReceiveServerRedirectForProvisionalLoad(const String& url);
+  void didFailProvisionalLoad();
   void didCommitLoad();
   void didFinishLoad();
+  void didFailLoad();
   void didReceiveTitle(const String&);
 
   void receivedPolicyDecision(WebCore::PolicyAction, uint64_t listenerID);
