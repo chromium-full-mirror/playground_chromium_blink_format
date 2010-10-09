@@ -64,6 +64,10 @@ void RangeInputType::setValueAsNumber(double newValue, ExceptionCode&) const {
   element()->setValue(serialize(newValue));
 }
 
+bool RangeInputType::supportsRequired() const {
+  return false;
+}
+
 bool RangeInputType::rangeUnderflow(const String& value) const {
   // Guaranteed by sanitization.
   ASSERT_UNUSED(
