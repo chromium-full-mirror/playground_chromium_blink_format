@@ -43,4 +43,8 @@ const AtomicString& IsIndexInputType::formControlType() const {
   return emptyAtom;
 }
 
+bool IsIndexInputType::supportsRequired() const {
+  return false;
+}
+
 }  // namespace WebCore

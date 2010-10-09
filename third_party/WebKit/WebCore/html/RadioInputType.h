@@ -42,6 +42,7 @@ class RadioInputType : public InputType {
  private:
   RadioInputType(HTMLInputElement* element) : InputType(element) {}
   virtual const AtomicString& formControlType() const;
+  virtual bool valueMissing(const String&) const;
 };
 
 }  // namespace WebCore

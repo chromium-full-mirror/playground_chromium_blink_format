@@ -43,4 +43,8 @@ const AtomicString& ImageInputType::formControlType() const {
   return InputTypeNames::image();
 }
 
+bool ImageInputType::supportsValidation() const {
+  return false;
+}
+
 }  // namespace WebCore

@@ -31,6 +31,7 @@
 #include "config.h"
 #include "RadioInputType.h"
 
+#include "HTMLInputElement.h"
 #include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
@@ -41,6 +42,11 @@ PassOwnPtr<InputType> RadioInputType::create(HTMLInputElement* element) {
 
 const AtomicString& RadioInputType::formControlType() const {
   return InputTypeNames::radio();
+}
+
+bool RadioInputType::valueMissing(const String&) const {
+  return !element()->checkedRadioButtons().checkedButtonForGroup(
+      element()->name());
 }
 
 }  // namespace WebCore

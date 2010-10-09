@@ -31,6 +31,7 @@
 #include "config.h"
 #include "CheckboxInputType.h"
 
+#include "HTMLInputElement.h"
 #include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
@@ -41,6 +42,10 @@ PassOwnPtr<InputType> CheckboxInputType::create(HTMLInputElement* element) {
 
 const AtomicString& CheckboxInputType::formControlType() const {
   return InputTypeNames::checkbox();
+}
+
+bool CheckboxInputType::valueMissing(const String&) const {
+  return !element()->checked();
 }
 
 }  // namespace WebCore

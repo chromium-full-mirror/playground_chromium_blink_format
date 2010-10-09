@@ -42,6 +42,8 @@ class URLInputType : public BaseTextInputType {
  private:
   URLInputType(HTMLInputElement* element) : BaseTextInputType(element) {}
   virtual const AtomicString& formControlType() const;
+  virtual bool typeMismatchFor(const String&) const;
+  virtual bool typeMismatch() const;
 };
 
 }  // namespace WebCore

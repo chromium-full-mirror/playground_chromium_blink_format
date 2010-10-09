@@ -32,6 +32,7 @@
 #include "FileInputType.h"
 
 #include <wtf/PassOwnPtr.h>
+#include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
@@ -41,6 +42,10 @@ PassOwnPtr<InputType> FileInputType::create(HTMLInputElement* element) {
 
 const AtomicString& FileInputType::formControlType() const {
   return InputTypeNames::file();
+}
+
+bool FileInputType::valueMissing(const String& value) const {
+  return value.isEmpty();
 }
 
 }  // namespace WebCore

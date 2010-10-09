@@ -43,4 +43,8 @@ const AtomicString& SubmitInputType::formControlType() const {
   return InputTypeNames::submit();
 }
 
+bool SubmitInputType::supportsValidation() const {
+  return false;
+}
+
 }  // namespace WebCore

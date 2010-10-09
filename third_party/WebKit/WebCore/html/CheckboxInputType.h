@@ -42,6 +42,7 @@ class CheckboxInputType : public InputType {
  private:
   CheckboxInputType(HTMLInputElement* element) : InputType(element) {}
   virtual const AtomicString& formControlType() const;
+  virtual bool valueMissing(const String&) const;
 };
 
 }  // namespace WebCore

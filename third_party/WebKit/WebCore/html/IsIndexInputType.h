@@ -43,6 +43,7 @@ class IsIndexInputType : public TextFieldInputType {
  private:
   IsIndexInputType(HTMLInputElement* element) : TextFieldInputType(element){};
   virtual const AtomicString& formControlType() const;
+  virtual bool supportsRequired() const;
 };
 
 }  // namespace WebCore
