@@ -57,6 +57,8 @@ class QWKPagePrivate : WebKit::PageClient {
   virtual void registerEditCommand(PassRefPtr<WebKit::WebEditCommandProxy>,
                                    WebKit::WebPageProxy::UndoOrRedo);
   virtual void clearAllEditCommands();
+  virtual WebCore::FloatRect transformToDeviceSpace(const WebCore::FloatRect&);
+  virtual WebCore::FloatRect transformToUserSpace(const WebCore::FloatRect&);
 
   void paint(QPainter* painter, QRect);
 

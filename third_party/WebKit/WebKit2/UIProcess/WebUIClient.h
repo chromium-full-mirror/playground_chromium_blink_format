@@ -63,6 +63,9 @@ class WebUIClient {
                            WebFrameProxy*);
   void didNotHandleKeyEvent(WebPageProxy*, const NativeWebKeyboardEvent&);
 
+  void setWindowFrame(WebPageProxy*, const WebCore::FloatRect&);
+  WebCore::FloatRect windowFrame(WebPageProxy*);
+
  private:
   WKPageUIClient m_pageUIClient;
 };

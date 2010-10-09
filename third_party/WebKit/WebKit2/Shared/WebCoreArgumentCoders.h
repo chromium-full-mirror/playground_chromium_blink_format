@@ -50,6 +50,16 @@ struct ArgumentCoder<WebCore::IntRect> : SimpleArgumentCoder<WebCore::IntRect> {
 };
 
 template <>
+struct ArgumentCoder<WebCore::FloatPoint>
+    : SimpleArgumentCoder<WebCore::FloatPoint> {};
+template <>
+struct ArgumentCoder<WebCore::FloatSize>
+    : SimpleArgumentCoder<WebCore::FloatSize> {};
+template <>
+struct ArgumentCoder<WebCore::FloatRect>
+    : SimpleArgumentCoder<WebCore::FloatRect> {};
+
+template <>
 struct ArgumentCoder<WebCore::MimeClassInfo> {
   static void encode(ArgumentEncoder* encoder,
                      const WebCore::MimeClassInfo& mimeClassInfo) {

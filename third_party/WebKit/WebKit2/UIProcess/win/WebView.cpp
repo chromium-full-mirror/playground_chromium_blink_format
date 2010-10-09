@@ -33,6 +33,7 @@
 #include "WebPageNamespace.h"
 #include "WebPageProxy.h"
 #include <Commctrl.h>
+#include <WebCore/FloatRect.h>
 #include <WebCore/IntRect.h>
 #include <WebCore/WebCoreInstanceHandle.h>
 #include <WebCore/WindowMessageBroadcaster.h>
@@ -618,7 +619,15 @@ void WebView::registerEditCommand(PassRefPtr<WebEditCommandProxy>,
 
 void WebView::clearAllEditCommands() {}
 
-void WebView::setEditCommandState(const WTF::String&, bool, int) {}
+void WebView::setEditCommandState(const String&, bool, int) {}
+
+FloatRect WebView::transformToDeviceSpace(const FloatRect& rect) {
+  return rect;
+}
+
+FloatRect WebView::transformToUserSpace(const FloatRect& rect) {
+  return rect;
+}
 
 #if USE(ACCELERATED_COMPOSITING)
 void WebView::pageDidEnterAcceleratedCompositing() {}

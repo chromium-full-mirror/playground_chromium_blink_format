@@ -56,8 +56,9 @@ class MessageID;
 }
 
 namespace WebCore {
-class IntSize;
 class Cursor;
+class FloatRect;
+class IntSize;
 }
 
 struct WKContextStatistics;
@@ -144,8 +145,8 @@ class WebPageProxy : public APIObject {
 
 // These are only used on Mac currently.
 #if PLATFORM(MAC)
-  void setWindowIsVisible(bool windowIsVisible);
-  void setWindowFrame(const WebCore::IntRect&);
+  void updateWindowIsVisible(bool windowIsVisible);
+  void updateWindowFrame(const WebCore::IntRect&);
 #endif
 
   void handleMouseEvent(const WebMouseEvent&);
@@ -333,6 +334,9 @@ class WebPageProxy : public APIObject {
   void didValidateMenuItem(const String& commandName,
                            bool isEnabled,
                            int32_t state);
+
+  void setWindowFrame(const WebCore::FloatRect&);
+  void getWindowFrame(WebCore::FloatRect&);
 
   void didReceiveEvent(uint32_t opaqueType, bool handled);
 
