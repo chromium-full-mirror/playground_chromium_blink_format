@@ -38,6 +38,7 @@ class CSSBorderImageValue : public CSSValue {
     return adoptRef(new CSSBorderImageValue(image, sliceRect, horizontalRule,
                                             verticalRule));
   }
+  virtual ~CSSBorderImageValue();
 
   virtual String cssText() const;
 

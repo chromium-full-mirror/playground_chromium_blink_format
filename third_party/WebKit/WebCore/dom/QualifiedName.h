@@ -68,7 +68,7 @@ class QualifiedName : public FastAllocBase {
   bool isHashTableDeletedValue() const {
     return m_impl == hashTableDeletedValue();
   }
-  ~QualifiedName() { deref(); }
+  ~QualifiedName();
 #ifdef QNAME_DEFAULT_CONSTRUCTOR
   QualifiedName() : m_impl(0) {}
 #endif

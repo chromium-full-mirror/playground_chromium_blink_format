@@ -43,6 +43,8 @@ RenderTextFragment::RenderTextFragment(Node* node, StringImpl* str)
       m_contentString(str),
       m_firstLetter(0) {}
 
+RenderTextFragment::~RenderTextFragment() {}
+
 PassRefPtr<StringImpl> RenderTextFragment::originalText() const {
   Node* e = node();
   RefPtr<StringImpl> result =

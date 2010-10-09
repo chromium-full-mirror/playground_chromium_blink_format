@@ -38,6 +38,8 @@ SVGStyledTransformableElement::SVGStyledTransformableElement(
     : SVGStyledLocatableElement(tagName, document),
       m_transform(SVGTransformList::create(SVGNames::transformAttr)) {}
 
+SVGStyledTransformableElement::~SVGStyledTransformableElement() {}
+
 AffineTransform SVGStyledTransformableElement::getCTM(
     StyleUpdateStrategy styleUpdateStrategy) const {
   return SVGLocatable::computeCTM(this, SVGLocatable::NearestViewportScope,

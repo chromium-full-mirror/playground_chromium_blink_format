@@ -36,6 +36,8 @@ class SerializedScriptValue;
 
 class PopStateEvent : public Event {
  public:
+  virtual ~PopStateEvent();
+
   static PassRefPtr<PopStateEvent> create(
       PassRefPtr<SerializedScriptValue> stateObject) {
     return adoptRef(new PopStateEvent(stateObject));
@@ -50,7 +52,7 @@ class PopStateEvent : public Event {
   SerializedScriptValue* state() const { return m_stateObject.get(); }
 
  private:
-  PopStateEvent(PassRefPtr<SerializedScriptValue>);
+  explicit PopStateEvent(PassRefPtr<SerializedScriptValue>);
 
   RefPtr<SerializedScriptValue> m_stateObject;
 };

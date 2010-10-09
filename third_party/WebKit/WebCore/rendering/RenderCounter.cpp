@@ -338,6 +338,8 @@ RenderCounter::RenderCounter(Document* node, const CounterContent& counter)
       m_counter(counter),
       m_counterNode(0) {}
 
+RenderCounter::~RenderCounter() {}
+
 const char* RenderCounter::renderName() const {
   return "RenderCounter";
 }

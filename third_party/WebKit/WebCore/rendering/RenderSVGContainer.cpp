@@ -41,6 +41,8 @@ RenderSVGContainer::RenderSVGContainer(SVGStyledElement* node)
       m_drawsContents(true),
       m_needsBoundariesUpdate(true) {}
 
+RenderSVGContainer::~RenderSVGContainer() {}
+
 void RenderSVGContainer::layout() {
   ASSERT(needsLayout());
 

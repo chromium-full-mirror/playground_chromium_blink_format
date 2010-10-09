@@ -30,6 +30,8 @@ namespace WebCore {
 BeforeUnloadEvent::BeforeUnloadEvent()
     : Event(eventNames().beforeunloadEvent, false, true) {}
 
+BeforeUnloadEvent::~BeforeUnloadEvent() {}
+
 bool BeforeUnloadEvent::storesResultAsString() const {
   return true;
 }

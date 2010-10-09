@@ -35,6 +35,8 @@ CSSBorderImageValue::CSSBorderImageValue(PassRefPtr<CSSValue> image,
       m_horizontalSizeRule(horizontalRule),
       m_verticalSizeRule(verticalRule) {}
 
+CSSBorderImageValue::~CSSBorderImageValue() {}
+
 String CSSBorderImageValue::cssText() const {
   // Image first.
   String text(m_image->cssText());

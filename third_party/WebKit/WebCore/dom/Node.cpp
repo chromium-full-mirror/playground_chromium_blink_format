@@ -712,6 +712,14 @@ inline void Node::markAncestorsWithChildNeedsStyleRecalc() {
     document()->scheduleStyleRecalc();
 }
 
+void Node::refEventTarget() {
+  ref();
+}
+
+void Node::derefEventTarget() {
+  deref();
+}
+
 void Node::setNeedsStyleRecalc(StyleChangeType changeType) {
   ASSERT(changeType != NoStyleChange);
   if (!attached())  // changed compared to what?

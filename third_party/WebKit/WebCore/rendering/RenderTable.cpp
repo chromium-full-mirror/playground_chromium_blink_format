@@ -64,6 +64,8 @@ RenderTable::RenderTable(Node* node)
   m_columns.fill(ColumnStruct(), 1);
 }
 
+RenderTable::~RenderTable() {}
+
 void RenderTable::styleDidChange(StyleDifference diff,
                                  const RenderStyle* oldStyle) {
   RenderBlock::styleDidChange(diff, oldStyle);

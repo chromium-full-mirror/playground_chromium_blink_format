@@ -61,6 +61,7 @@ struct Token {
 class Parser : public Noncopyable {
  public:
   Parser();
+  ~Parser();
 
   XPathNSResolver* resolver() const { return m_resolver.get(); }
   bool expandQName(const String& qName,

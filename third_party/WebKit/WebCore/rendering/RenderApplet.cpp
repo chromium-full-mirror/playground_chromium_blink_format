@@ -38,6 +38,8 @@ RenderApplet::RenderApplet(HTMLAppletElement* applet,
   setInline(true);
 }
 
+RenderApplet::~RenderApplet() {}
+
 IntSize RenderApplet::intrinsicSize() const {
   // FIXME: This doesn't make sense. We can't just start returning
   // a different size once we've created the widget and expect

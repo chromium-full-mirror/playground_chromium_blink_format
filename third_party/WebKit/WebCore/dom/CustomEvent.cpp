@@ -32,6 +32,8 @@ namespace WebCore {
 
 CustomEvent::CustomEvent() {}
 
+CustomEvent::~CustomEvent() {}
+
 void CustomEvent::initCustomEvent(const AtomicString& type,
                                   bool canBubble,
                                   bool cancelable,

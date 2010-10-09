@@ -33,4 +33,6 @@ namespace WebCore {
 BeforeTextInsertedEvent::BeforeTextInsertedEvent(const String& text)
     : Event(eventNames().webkitBeforeTextInsertedEvent, false, true),
       m_text(text) {}
+
+BeforeTextInsertedEvent::~BeforeTextInsertedEvent() {}
 }

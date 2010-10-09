@@ -34,7 +34,7 @@ namespace WebCore {
 // RenderSVGTransformableContainer
 class RenderSVGViewportContainer : public RenderSVGContainer {
  public:
-  RenderSVGViewportContainer(SVGStyledElement*);
+  explicit RenderSVGViewportContainer(SVGStyledElement*);
 
  private:
   virtual bool isSVGContainer() const { return true; }

@@ -38,6 +38,8 @@ namespace WebCore {
 RenderForeignObject::RenderForeignObject(SVGForeignObjectElement* node)
     : RenderSVGBlock(node), m_needsTransformUpdate(true) {}
 
+RenderForeignObject::~RenderForeignObject() {}
+
 void RenderForeignObject::paint(PaintInfo& paintInfo, int, int) {
   if (paintInfo.context->paintingDisabled())
     return;

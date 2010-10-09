@@ -63,6 +63,8 @@ bool eventDispatchForbidden() {
 }
 #endif  // NDEBUG
 
+EventTargetData::EventTargetData() {}
+
 EventTargetData::~EventTargetData() {
   deleteAllValues(eventListenerMap);
 }

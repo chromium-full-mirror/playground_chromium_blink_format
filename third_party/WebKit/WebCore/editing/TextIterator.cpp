@@ -113,6 +113,8 @@ static const unsigned bitInWordMask = bitsInWord - 1;
 
 BitStack::BitStack() : m_size(0) {}
 
+BitStack::~BitStack() {}
+
 void BitStack::push(bool bit) {
   unsigned index = m_size / bitsInWord;
   unsigned shift = m_size & bitInWordMask;
@@ -337,6 +339,8 @@ TextIterator::TextIterator(const Range* r, TextIteratorBehavior behavior)
   // identify the first run
   advance();
 }
+
+TextIterator::~TextIterator() {}
 
 void TextIterator::advance() {
   // reset the run information
@@ -1483,6 +1487,8 @@ WordAwareIterator::WordAwareIterator(const Range* r)
       m_textIterator(r) {
   advance();  // get in position over the first chunk of text
 }
+
+WordAwareIterator::~WordAwareIterator() {}
 
 // We're always in one of these modes:
 // - The current chunk in the text iterator is our current chunk

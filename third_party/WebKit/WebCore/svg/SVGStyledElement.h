@@ -37,6 +37,8 @@ void mapAttributeToCSSProperty(
 
 class SVGStyledElement : public SVGElement, public SVGStylable {
  public:
+  virtual ~SVGStyledElement();
+
   virtual String title() const;
 
   bool hasRelativeLengths() const {

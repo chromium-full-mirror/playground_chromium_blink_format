@@ -33,6 +33,8 @@ ClipboardEvent::ClipboardEvent(const AtomicString& eventType,
                                PassRefPtr<Clipboard> clipboard)
     : Event(eventType, canBubble, cancelable), m_clipboard(clipboard) {}
 
+ClipboardEvent::~ClipboardEvent() {}
+
 bool ClipboardEvent::isClipboardEvent() const {
   return true;
 }

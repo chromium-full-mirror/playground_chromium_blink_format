@@ -163,7 +163,7 @@ class InspectorObject : public InspectorValue {
   static PassRefPtr<InspectorObject> create() {
     return adoptRef(new InspectorObject());
   }
-  ~InspectorObject() {}
+  ~InspectorObject();
 
   virtual bool asObject(RefPtr<InspectorObject>* output);
   virtual PassRefPtr<InspectorObject> asObject();
@@ -191,7 +191,7 @@ class InspectorObject : public InspectorValue {
   const_iterator end() const { return m_data.end(); }
 
  private:
-  InspectorObject() : InspectorValue(TypeObject) {}
+  InspectorObject();
   Dictionary m_data;
   Vector<String> m_order;
 };
@@ -201,7 +201,7 @@ class InspectorArray : public InspectorValue {
   static PassRefPtr<InspectorArray> create() {
     return adoptRef(new InspectorArray());
   }
-  ~InspectorArray() {}
+  ~InspectorArray();
 
   virtual bool asArray(RefPtr<InspectorArray>* output);
   virtual PassRefPtr<InspectorArray> asArray();
@@ -219,7 +219,7 @@ class InspectorArray : public InspectorValue {
   virtual void writeJSON(Vector<UChar>* output) const;
 
  private:
-  InspectorArray() : InspectorValue(TypeArray) {}
+  InspectorArray();
   Vector<RefPtr<InspectorValue>> m_data;
 };
 

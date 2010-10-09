@@ -36,7 +36,7 @@ namespace WebCore {
 
 class RenderSVGResourceFilterPrimitive : public RenderSVGHiddenContainer {
  public:
-  RenderSVGResourceFilterPrimitive(
+  explicit RenderSVGResourceFilterPrimitive(
       SVGFilterPrimitiveStandardAttributes* filterPrimitiveElement);
 
  private:

@@ -1062,6 +1062,8 @@ SelectElementData::SelectElementData()
       m_repeatingChar(0),
       m_lastCharTime(0) {}
 
+SelectElementData::~SelectElementData() {}
+
 void SelectElementData::checkListItems(const Element* element) const {
 #if !ASSERT_DISABLED
   Vector<Element*> items = m_listItems;

@@ -76,6 +76,8 @@ RenderSVGPath::RenderSVGPath(SVGStyledTransformableElement* node)
                                     // SVGStyledTransformableElement
 {}
 
+RenderSVGPath::~RenderSVGPath() {}
+
 bool RenderSVGPath::fillContains(const FloatPoint& point,
                                  bool requiresFill,
                                  WindRule fillRule) {

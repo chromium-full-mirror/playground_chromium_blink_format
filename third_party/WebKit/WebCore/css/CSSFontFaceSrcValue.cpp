@@ -31,6 +31,8 @@
 
 namespace WebCore {
 
+CSSFontFaceSrcValue::~CSSFontFaceSrcValue() {}
+
 #if ENABLE(SVG_FONTS)
 bool CSSFontFaceSrcValue::isSVGFontFaceSrc() const {
   return equalIgnoringCase(m_format, "svg");

@@ -788,8 +788,8 @@ class Node : public EventTarget,
   // Used to share code between lazyAttach and setNeedsStyleRecalc.
   void markAncestorsWithChildNeedsStyleRecalc();
 
-  virtual void refEventTarget() { ref(); }
-  virtual void derefEventTarget() { deref(); }
+  virtual void refEventTarget();
+  virtual void derefEventTarget();
 
   virtual NodeRareData* createRareData();
   Node* containerChildNode(unsigned index) const;

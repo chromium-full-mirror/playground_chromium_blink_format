@@ -61,6 +61,8 @@ SVGStyledElement::SVGStyledElement(const QualifiedName& tagName,
                                    Document* document)
     : SVGElement(tagName, document) {}
 
+SVGStyledElement::~SVGStyledElement() {}
+
 String SVGStyledElement::title() const {
   // According to spec, we should not return titles when hovering over <svg>
   // elements (those

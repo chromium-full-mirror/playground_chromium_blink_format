@@ -122,6 +122,7 @@ class InputElement {
 class InputElementData {
  public:
   InputElementData();
+  ~InputElementData();
 
   const AtomicString& name() const;
   void setName(const AtomicString& value) { m_name = value; }

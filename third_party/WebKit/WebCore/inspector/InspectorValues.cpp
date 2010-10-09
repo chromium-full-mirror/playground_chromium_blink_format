@@ -619,6 +619,8 @@ void InspectorString::writeJSON(Vector<UChar>* output) const {
   doubleQuoteString(m_stringValue, output);
 }
 
+InspectorObject::~InspectorObject() {}
+
 bool InspectorObject::asObject(RefPtr<InspectorObject>* output) {
   *output = this;
   return true;
@@ -685,6 +687,11 @@ void InspectorObject::writeJSON(Vector<UChar>* output) const {
   output->append('}');
 }
 
+InspectorObject::InspectorObject()
+    : InspectorValue(TypeObject), m_data(), m_order() {}
+
+InspectorArray::~InspectorArray() {}
+
 bool InspectorArray::asArray(RefPtr<InspectorArray>* output) {
   *output = this;
   return true;
@@ -704,6 +711,8 @@ void InspectorArray::writeJSON(Vector<UChar>* output) const {
   }
   output->append(']');
 }
+
+InspectorArray::InspectorArray() : InspectorValue(TypeArray), m_data() {}
 
 PassRefPtr<InspectorValue> InspectorArray::get(size_t index) {
   ASSERT(index < m_data.size());

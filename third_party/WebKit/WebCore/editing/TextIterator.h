@@ -74,6 +74,7 @@ PassRefPtr<Range> findPlainText(const Range*,
 class BitStack {
  public:
   BitStack();
+  ~BitStack();
 
   void push(bool);
   void pop();
@@ -95,6 +96,7 @@ class BitStack {
 class TextIterator {
  public:
   TextIterator();
+  ~TextIterator();
   explicit TextIterator(const Range*,
                         TextIteratorBehavior = TextIteratorDefaultBehavior);
 
@@ -338,6 +340,7 @@ class WordAwareIterator {
  public:
   WordAwareIterator();
   explicit WordAwareIterator(const Range*);
+  ~WordAwareIterator();
 
   bool atEnd() const { return !m_didLookAhead && m_textIterator.atEnd(); }
   void advance();

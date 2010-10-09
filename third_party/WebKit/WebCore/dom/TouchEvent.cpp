@@ -31,6 +31,8 @@
 
 namespace WebCore {
 
+TouchEvent::TouchEvent() {}
+
 TouchEvent::TouchEvent(TouchList* touches,
                        TouchList* targetTouches,
                        TouchList* changedTouches,
@@ -60,6 +62,8 @@ TouchEvent::TouchEvent(TouchList* touches,
       m_touches(touches),
       m_targetTouches(targetTouches),
       m_changedTouches(changedTouches) {}
+
+TouchEvent::~TouchEvent() {}
 
 void TouchEvent::initTouchEvent(TouchList* touches,
                                 TouchList* targetTouches,

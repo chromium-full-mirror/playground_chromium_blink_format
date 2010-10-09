@@ -39,14 +39,14 @@ class CSSFunctionValue : public CSSValue {
     return adoptRef(new CSSFunctionValue(function));
   }
 
-  ~CSSFunctionValue();
+  virtual ~CSSFunctionValue();
 
   virtual String cssText() const;
 
   virtual CSSParserValue parserValue() const;
 
  private:
-  CSSFunctionValue(CSSParserFunction*);
+  explicit CSSFunctionValue(CSSParserFunction*);
 
   String m_name;
   RefPtr<CSSValueList> m_args;

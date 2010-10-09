@@ -75,6 +75,8 @@ using namespace HTMLNames;
 CompositeEditCommand::CompositeEditCommand(Document* document)
     : EditCommand(document) {}
 
+CompositeEditCommand::~CompositeEditCommand() {}
+
 void CompositeEditCommand::doUnapply() {
   size_t size = m_commands.size();
   for (size_t i = size; i != 0; --i)

@@ -83,6 +83,10 @@ QualifiedName::QualifiedName(const AtomicString& p,
   init(p, AtomicString(l), n);
 }
 
+QualifiedName::~QualifiedName() {
+  deref();
+}
+
 void QualifiedName::deref() {
 #ifdef QNAME_DEFAULT_CONSTRUCTOR
   if (!m_impl)
