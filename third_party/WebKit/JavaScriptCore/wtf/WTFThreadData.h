@@ -96,11 +96,6 @@ class WTFThreadData : public Noncopyable {
   AtomicStringTable* atomicStringTable() { return m_atomicStringTable; }
 
 #if USE(JSC)
-  void initializeIdentifierTable(JSC::IdentifierTable* identifierTable) {
-    m_defaultIdentifierTable = identifierTable;
-    m_currentIdentifierTable = identifierTable;
-  }
-
   JSC::IdentifierTable* currentIdentifierTable() {
     return m_currentIdentifierTable;
   }
