@@ -217,10 +217,6 @@ static void webkit_web_view_set_window_features(
 
 static GtkIMContext* webkit_web_view_get_im_context(WebKitWebView*);
 
-static void destroy_menu_cb(GtkObject* object, gpointer data) {
-  WEBKIT_WEB_VIEW(data)->priv->currentMenu = 0;
-}
-
 static void PopupMenuPositionFunc(GtkMenu* menu,
                                   gint* x,
                                   gint* y,
@@ -321,8 +317,6 @@ static gboolean webkit_web_view_forward_context_menu_event(
   priv->currentMenu = menu;
   priv->lastPopupXPosition = event.globalX();
   priv->lastPopupYPosition = event.globalY();
-
-  g_signal_connect(menu, "destroy", G_CALLBACK(destroy_menu_cb), NULL);
 
   gtk_menu_popup(menu, NULL, NULL, &PopupMenuPositionFunc, webView,
                  event.button() + 1, gtk_get_current_event_time());
