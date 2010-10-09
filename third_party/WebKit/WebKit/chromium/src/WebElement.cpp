@@ -46,6 +46,10 @@ bool WebElement::isFormControlElement() const {
   return constUnwrap<Element>()->isFormControlElement();
 }
 
+bool WebElement::isTextFormControlElement() const {
+  return constUnwrap<Element>()->isTextFormControl();
+}
+
 WebString WebElement::tagName() const {
   return constUnwrap<Element>()->tagName();
 }

@@ -156,6 +156,9 @@ class WebView : public WebWidget {
   // send it.
   virtual void clearFocusedNode() = 0;
 
+  // Scrolls the node currently in focus into view.
+  virtual void scrollFocusedNodeIntoView() = 0;
+
   // Zoom ----------------------------------------------------------------
 
   // Returns the current zoom level.  0 is "original size", and each increment
