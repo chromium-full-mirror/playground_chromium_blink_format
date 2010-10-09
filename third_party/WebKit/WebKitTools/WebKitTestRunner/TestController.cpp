@@ -117,7 +117,8 @@ static WKPageRef createOtherPage(WKPageRef oldPage, const void*) {
                                       0,
                                       0,
                                       getWindowFrameOtherPage,
-                                      setWindowFrameOtherPage};
+                                      setWindowFrameOtherPage,
+                                      0};
   WKPageSetPageUIClient(newPage, &otherPageUIClient);
 
   WKRetain(newPage);
@@ -183,20 +184,23 @@ void TestController::initialize(int argc, const char* argv[]) {
   m_pageNamespace.adopt(WKPageNamespaceCreate(m_context.get()));
   m_mainWebView = adoptPtr(new PlatformWebView(m_pageNamespace.get()));
 
-  WKPageUIClient pageUIClient = {0,
-                                 this,
-                                 createOtherPage,
-                                 0,
-                                 0,
-                                 0,
-                                 0,
-                                 0,
-                                 0,
-                                 0,
-                                 0,
-                                 0,
-                                 getWindowFrameMainPage,
-                                 setWindowFrameMainPage};
+  WKPageUIClient pageUIClient = {
+      0,
+      this,
+      createOtherPage,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      getWindowFrameMainPage,
+      setWindowFrameMainPage,
+      0,
+  };
   WKPageSetPageUIClient(m_mainWebView->page(), &pageUIClient);
 
   WKPageLoaderClient pageLoaderClient = {

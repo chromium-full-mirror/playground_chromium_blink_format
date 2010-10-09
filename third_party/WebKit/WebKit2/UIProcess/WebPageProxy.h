@@ -298,6 +298,7 @@ class WebPageProxy : public APIObject {
                       uint64_t listenerID,
                       CoreIPC::ArgumentDecoder*);
 
+  // UI client
   void createNewPage(uint64_t& newPageID, WebPageCreationParameters&);
   void showPage();
   void closePage();
@@ -310,6 +311,12 @@ class WebPageProxy : public APIObject {
   void setStatusText(const String&);
   void mouseDidMoveOverElement(uint32_t modifiers, CoreIPC::ArgumentDecoder*);
   void contentsSizeChanged(uint64_t frameID, const WebCore::IntSize&);
+  void setWindowFrame(const WebCore::FloatRect&);
+  void getWindowFrame(WebCore::FloatRect&);
+  void canRunBeforeUnloadConfirmPanel(bool& canRun);
+  void runBeforeUnloadConfirmPanel(const String& message,
+                                   uint64_t frameID,
+                                   bool& shouldClose);
 
   // Back/Forward list management
   void backForwardAddItem(uint64_t itemID);
@@ -334,9 +341,6 @@ class WebPageProxy : public APIObject {
   void didValidateMenuItem(const String& commandName,
                            bool isEnabled,
                            int32_t state);
-
-  void setWindowFrame(const WebCore::FloatRect&);
-  void getWindowFrame(WebCore::FloatRect&);
 
   void didReceiveEvent(uint32_t opaqueType, bool handled);
 
