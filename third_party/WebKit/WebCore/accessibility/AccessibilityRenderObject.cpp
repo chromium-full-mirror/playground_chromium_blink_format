@@ -3130,6 +3130,11 @@ AccessibilityRole AccessibilityRenderObject::determineAccessibilityRole() {
   if (m_renderer->isBlockFlow() || (node && node->hasTagName(labelTag)))
     return GroupRole;
 
+  // If the element does not have role, but it has ARIA attributes,
+  // accessibility should fallback to exposing it as a group.
+  if (supportsARIAAttributes())
+    return GroupRole;
+
   return UnknownRole;
 }
 
