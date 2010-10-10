@@ -468,6 +468,10 @@ DumpRenderTree::DumpRenderTree()
     view->setPage(m_page);
     m_mainView = view;
   }
+  // Use a frame group name for all pages created by DumpRenderTree to allow
+  // testing of cross-page frame lookup.
+  DumpRenderTreeSupportQt::webPageSetGroupName(m_page,
+                                               "org.webkit.qt.DumpRenderTree");
 
   m_mainView->setContextMenuPolicy(Qt::NoContextMenu);
   m_mainView->resize(QSize(LayoutTestController::maxViewWidth,
@@ -1097,6 +1101,12 @@ QWebPage* DumpRenderTree::createWindow() {
           SLOT(maybeDump(bool)));
   connect(page, SIGNAL(windowCloseRequested()), this,
           SLOT(windowCloseRequested()));
+
+  // Use a frame group name for all pages created by DumpRenderTree to allow
+  // testing of cross-page frame lookup.
+  DumpRenderTreeSupportQt::webPageSetGroupName(page,
+                                               "org.webkit.qt.DumpRenderTree");
+
   return page;
 }
 
