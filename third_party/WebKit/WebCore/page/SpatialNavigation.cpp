@@ -489,7 +489,6 @@ bool scrollInDirection(Frame* frame,
     return frame->eventHandler()->scrollRecursively(
         scrollDirection, ScrollByLine, candidate.enclosingScrollableBox);
 
-  printf("%s", __FUNCTION__);
   return frame->eventHandler()->scrollRecursively(scrollDirection,
                                                   ScrollByLine);
 }
