@@ -104,7 +104,7 @@ class CaseFoldingHash {
 
  public:
   static unsigned hash(const UChar* data, unsigned length) {
-    return StringHasher::createHash<UChar, foldCase>(data, length);
+    return StringHasher::createHash<UChar, foldCase<UChar>>(data, length);
   }
 
   static unsigned hash(StringImpl* str) {
@@ -112,7 +112,7 @@ class CaseFoldingHash {
   }
 
   static unsigned hash(const char* data, unsigned length) {
-    return StringHasher::createHash<char, foldCase>(data, length);
+    return StringHasher::createHash<char, foldCase<char>>(data, length);
   }
 
   static bool equal(const StringImpl* a, const StringImpl* b) {
