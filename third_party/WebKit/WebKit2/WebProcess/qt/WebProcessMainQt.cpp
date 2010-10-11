@@ -51,6 +51,7 @@ using namespace WebCore;
 namespace WebKit {
 
 QWEBKIT_EXPORT int WebProcessMainQt(int argc, char** argv) {
+  QApplication::setGraphicsSystem("raster");
   QApplication* app = new QApplication(argc, argv);
 
 #if USE(MEEGOTOUCH)
