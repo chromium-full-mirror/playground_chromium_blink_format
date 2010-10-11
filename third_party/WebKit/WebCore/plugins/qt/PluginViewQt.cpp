@@ -249,39 +249,8 @@ void PluginView::paintUsingImageSurfaceExtension(QPainter* painter,
 }
 #endif
 
-void PluginView::paint(GraphicsContext* context, const IntRect& rect) {
-  if (!m_isStarted) {
-    paintMissingPluginIcon(context, rect);
-    return;
-  }
-
-  if (context->paintingDisabled())
-    return;
-
-  setNPWindowIfNeeded();
-
-  if (m_isWindowed)
-    return;
-
-  if (!m_drawable
-#if defined(MOZ_PLATFORM_MAEMO) && (MOZ_PLATFORM_MAEMO >= 5)
-      && m_image.isNull()
-#endif
-          )
-    return;
-
-  QPainter* painter = context->platformContext();
-  IntRect exposedRect(rect);
-  exposedRect.intersect(frameRect());
-  exposedRect.move(-frameRect().x(), -frameRect().y());
-
-#if defined(MOZ_PLATFORM_MAEMO) && (MOZ_PLATFORM_MAEMO >= 5)
-  if (!m_image.isNull()) {
-    paintUsingImageSurfaceExtension(painter, exposedRect);
-    return;
-  }
-#endif
-
+void PluginView::paintUsingXPixmap(QPainter* painter,
+                                   const QRect& exposedRect) {
   QPixmap qtDrawable =
       QPixmap::fromX11Pixmap(m_drawable, QPixmap::ExplicitlyShared);
   const int drawableDepth =
@@ -360,9 +329,46 @@ void PluginView::paint(GraphicsContext* context, const IntRect& rect) {
   if (syncX)
     XSync(m_pluginDisplay, false);  // sync changes by plugin
 
-  painter->drawPixmap(QPoint(frameRect().x() + exposedRect.x(),
-                             frameRect().y() + exposedRect.y()),
-                      qtDrawable, exposedRect);
+  painter->drawPixmap(QPoint(exposedRect.x(), exposedRect.y()), qtDrawable,
+                      exposedRect);
+}
+
+void PluginView::paint(GraphicsContext* context, const IntRect& rect) {
+  if (!m_isStarted) {
+    paintMissingPluginIcon(context, rect);
+    return;
+  }
+
+  if (context->paintingDisabled())
+    return;
+
+  setNPWindowIfNeeded();
+
+  if (m_isWindowed)
+    return;
+
+  if (!m_drawable
+#if defined(MOZ_PLATFORM_MAEMO) && (MOZ_PLATFORM_MAEMO >= 5)
+      && m_image.isNull()
+#endif
+          )
+    return;
+
+  QPainter* painter = context->platformContext();
+  IntRect exposedRect(rect);
+  exposedRect.intersect(frameRect());
+  exposedRect.move(-frameRect().x(), -frameRect().y());
+
+#if defined(MOZ_PLATFORM_MAEMO) && (MOZ_PLATFORM_MAEMO >= 5)
+  if (!m_image.isNull()) {
+    paintUsingImageSurfaceExtension(painter, exposedRect);
+    return;
+  }
+#endif
+
+  painter->translate(frameRect().x(), frameRect().y());
+  paintUsingXPixmap(painter, exposedRect);
+  painter->translate(-frameRect().x(), -frameRect().y());
 }
 
 // TODO: Unify across ports.
