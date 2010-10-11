@@ -111,11 +111,6 @@ bool Path::strokeContains(StrokeStyleApplier*, const FloatPoint&) const {
   return false;
 }
 
-String Path::debugString() const {
-  notImplemented();
-  return String();
-}
-
 Path& Path::operator=(const Path& path) {
   *m_path = *path.platformPath();
   return *this;

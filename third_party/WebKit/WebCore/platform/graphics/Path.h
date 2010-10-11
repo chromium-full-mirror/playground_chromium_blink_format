@@ -146,8 +146,6 @@ class Path : public FastAllocBase {
 
   void translate(const FloatSize&);
 
-  String debugString() const;
-
   PlatformPathPtr platformPath() const { return m_path; }
 
   static Path createRoundedRectangle(const FloatRect&,

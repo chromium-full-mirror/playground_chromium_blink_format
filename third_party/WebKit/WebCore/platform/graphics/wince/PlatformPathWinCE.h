@@ -184,7 +184,6 @@ class PlatformPath {
                   bool anticlockwise);
   void addRect(const FloatRect& r);
   void addEllipse(const FloatRect& r);
-  String debugString() const;
   void apply(void* info, PathApplierFunction function) const;
 
  private:

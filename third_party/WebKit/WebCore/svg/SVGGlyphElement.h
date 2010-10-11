@@ -64,7 +64,6 @@ struct SVGGlyphIdentifier {
            verticalOriginX == other.verticalOriginX &&
            verticalOriginY == other.verticalOriginY &&
            verticalAdvanceY == other.verticalAdvanceY &&
-           pathData.debugString() == other.pathData.debugString() &&
            languages == other.languages;
   }
 
