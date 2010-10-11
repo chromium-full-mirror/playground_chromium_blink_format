@@ -61,8 +61,8 @@ class PageClientImpl : public PageClient {
                            bool isEnabled,
                            int state);
 
-  WebCore::FloatRect transformToDeviceSpace(const WebCore::FloatRect&);
-  WebCore::FloatRect transformToUserSpace(const WebCore::FloatRect&);
+  WebCore::FloatRect convertToDeviceSpace(const WebCore::FloatRect&);
+  WebCore::FloatRect convertToUserSpace(const WebCore::FloatRect&);
 
 #if USE(ACCELERATED_COMPOSITING)
   void pageDidEnterAcceleratedCompositing();

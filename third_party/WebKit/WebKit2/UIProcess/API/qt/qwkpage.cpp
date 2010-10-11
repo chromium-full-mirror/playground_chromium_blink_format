@@ -87,11 +87,11 @@ void QWKPagePrivate::registerEditCommand(PassRefPtr<WebEditCommandProxy>,
 
 void QWKPagePrivate::clearAllEditCommands() {}
 
-FloatRect QWKPagePrivate::transformToDeviceSpace(const FloatRect& rect) {
+FloatRect QWKPagePrivate::convertToDeviceSpace(const FloatRect& rect) {
   return rect;
 }
 
-FloatRect QWKPagePrivate::transformToUserSpace(const FloatRect& rect) {
+FloatRect QWKPagePrivate::convertToUserSpace(const FloatRect& rect) {
   return rect;
 }
 
