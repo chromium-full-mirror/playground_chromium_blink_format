@@ -25,7 +25,7 @@
 
 #include "config.h"
 
-#if ENABLE(3D_CANVAS)
+#if ENABLE(3D_CANVAS) || ENABLE(BLOB)
 
 #include "JSArrayBufferViewHelper.h"
 #include "JSUint32Array.h"
@@ -67,4 +67,4 @@ JSUint32ArrayConstructor::constructJSUint32Array(ExecState* exec) {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(3D_CANVAS)
+#endif  // ENABLE(3D_CANVAS) || ENABLE(BLOB)
