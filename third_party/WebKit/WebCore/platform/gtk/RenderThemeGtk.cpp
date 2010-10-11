@@ -548,15 +548,34 @@ void RenderThemeGtk::adjustSearchFieldResultsDecorationStyle(
   style->setHeight(Length(size.height(), Fixed));
 }
 
-bool RenderThemeGtk::paintSearchFieldResultsDecoration(RenderObject* o,
+static IntRect centerRectVerticallyInParentInputElement(RenderObject* object,
+                                                        const IntRect& rect) {
+  IntRect centeredRect(rect);
+  Node* input =
+      object->node()
+          ->shadowAncestorNode();  // Get the renderer of <input> element.
+  if (!input->renderer()->isBox())
+    return centeredRect;
+
+  // If possible center the y-coordinate of the rect vertically in the parent
+  // input element.
+  // We also add one pixel here to ensure that the y coordinate is rounded up
+  // for box heights
+  // that are even, which looks in relation to the box text.
+  IntRect inputContentBox =
+      toRenderBox(input->renderer())->absoluteContentBox();
+  centeredRect.setY(inputContentBox.y() +
+                    (inputContentBox.height() - centeredRect.height() + 1) / 2);
+  return centeredRect;
+}
+
+bool RenderThemeGtk::paintSearchFieldResultsDecoration(RenderObject* object,
                                                        const PaintInfo& i,
                                                        const IntRect& rect) {
-  GraphicsContext* context = i.context;
-
   static Image* searchImage =
       Image::loadPlatformThemeIcon(GTK_STOCK_FIND, rect.width()).releaseRef();
-  context->drawImage(searchImage, DeviceColorSpace, rect);
-
+  IntRect centeredRect(centerRectVerticallyInParentInputElement(object, rect));
+  i.context->drawImage(searchImage, DeviceColorSpace, centeredRect);
   return false;
 }
 
@@ -573,16 +592,14 @@ void RenderThemeGtk::adjustSearchFieldCancelButtonStyle(
   style->setHeight(Length(size.height(), Fixed));
 }
 
-bool RenderThemeGtk::paintSearchFieldCancelButton(RenderObject* o,
+bool RenderThemeGtk::paintSearchFieldCancelButton(RenderObject* object,
                                                   const PaintInfo& i,
                                                   const IntRect& rect) {
-  GraphicsContext* context = i.context;
-
   // TODO: Brightening up the image on hover is desirable here, I believe.
   static Image* cancelImage =
       Image::loadPlatformThemeIcon(GTK_STOCK_CLEAR, rect.width()).releaseRef();
-  context->drawImage(cancelImage, DeviceColorSpace, rect);
-
+  IntRect centeredRect(centerRectVerticallyInParentInputElement(object, rect));
+  i.context->drawImage(cancelImage, DeviceColorSpace, centeredRect);
   return false;
 }
 
