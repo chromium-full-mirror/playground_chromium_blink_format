@@ -971,7 +971,7 @@ void JIT::emit_op_get_pnames(Instruction* currentInstruction) {
   emitGetVirtualRegister(base, regT0);
   if (!m_codeBlock->isKnownNotImmediate(base))
     isNotObject.append(emitJumpIfNotJSCell(regT0));
-  if (base != m_codeBlock->thisRegister()) {
+  if (base != m_codeBlock->thisRegister() || m_codeBlock->isStrictMode()) {
     loadPtr(Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)), regT2);
     isNotObject.append(branch8(
         NotEqual, Address(regT2, OBJECT_OFFSETOF(Structure, m_typeInfo.m_type)),
@@ -1337,6 +1337,26 @@ void JIT::emit_op_convert_this(Instruction* currentInstruction) {
       Imm32(NeedsThisConversion)));
 }
 
+void JIT::emit_op_convert_this_strict(Instruction* currentInstruction) {
+  emitGetVirtualRegister(currentInstruction[1].u.operand, regT0);
+  Jump notNull = branchTestPtr(NonZero, regT0);
+  move(ImmPtr(JSValue::encode(jsNull())), regT0);
+  emitPutVirtualRegister(currentInstruction[1].u.operand, regT0);
+  Jump setThis = jump();
+  notNull.link(this);
+  Jump isImmediate = emitJumpIfNotJSCell(regT0);
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)), regT1);
+  Jump notAnObject = branch8(
+      NotEqual, Address(regT3, OBJECT_OFFSETOF(Structure, m_typeInfo.m_type)),
+      Imm32(ObjectType));
+  addSlowCase(branchTest8(
+      NonZero, Address(regT1, OBJECT_OFFSETOF(Structure, m_typeInfo.m_flags)),
+      Imm32(NeedsThisConversion)));
+  isImmediate.link(this);
+  notAnObject.link(this);
+  setThis.link(this);
+}
+
 void JIT::emit_op_get_callee(Instruction* currentInstruction) {
   unsigned result = currentInstruction[1].u.operand;
   emitGetFromCallFrameHeaderPtr(RegisterFile::Callee, regT0);
@@ -1378,6 +1398,15 @@ void JIT::emitSlow_op_convert_this(Instruction* currentInstruction,
   linkSlowCase(iter);
   linkSlowCase(iter);
   JITStubCall stubCall(this, cti_op_convert_this);
+  stubCall.addArgument(regT0);
+  stubCall.call(currentInstruction[1].u.operand);
+}
+
+void JIT::emitSlow_op_convert_this_strict(
+    Instruction* currentInstruction,
+    Vector<SlowCaseEntry>::iterator& iter) {
+  linkSlowCase(iter);
+  JITStubCall stubCall(this, cti_op_convert_this_strict);
   stubCall.addArgument(regT0);
   stubCall.call(currentInstruction[1].u.operand);
 }

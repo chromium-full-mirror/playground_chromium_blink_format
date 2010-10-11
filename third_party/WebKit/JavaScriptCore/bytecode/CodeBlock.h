@@ -286,6 +286,8 @@ class CodeBlock : public FastAllocBase {
   void printStructure(const char* name, const Instruction*, int operand) const;
 #endif
 
+  bool isStrictMode() const { return m_isStrictMode; }
+
   inline bool isKnownNotImmediate(int index) {
     if (index == m_thisRegister)
       return true;
@@ -694,6 +696,7 @@ class CodeBlock : public FastAllocBase {
   bool m_needsFullScopeChain;
   bool m_usesEval;
   bool m_isNumericCompareFunction;
+  bool m_isStrictMode;
 
   CodeType m_codeType;
 

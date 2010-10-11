@@ -61,6 +61,7 @@ class CommonIdentifiers : public Noncopyable {
   const Identifier emptyIdentifier;
   const Identifier underscoreProto;
   const Identifier thisIdentifier;
+  const Identifier useStrictIdentifier;
 
 #define JSC_IDENTIFIER_DECLARE_PROPERTY_NAME_GLOBAL(name) const Identifier name;
   JSC_COMMON_IDENTIFIERS_EACH_PROPERTY_NAME(

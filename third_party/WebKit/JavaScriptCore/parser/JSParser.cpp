@@ -29,6 +29,7 @@
 
 using namespace JSC;
 
+#include "CodeBlock.h"
 #include "JSGlobalData.h"
 #include "NodeInfo.h"
 #include "ASTBuilder.h"
@@ -53,6 +54,16 @@ namespace JSC {
   do {                   \
     if ((cond))          \
       fail();            \
+  } while (0)
+#define failIfTrueIfStrict(cond) \
+  do {                           \
+    if ((cond) && strictMode())  \
+      fail();                    \
+  } while (0)
+#define failIfFalseIfStrict(cond)  \
+  do {                             \
+    if ((!(cond)) && strictMode()) \
+      fail();                      \
   } while (0)
 #define consumeOrFail(tokenType) \
   do {                           \
@@ -90,8 +101,13 @@ static const ptrdiff_t kMaxParserStackUsage = 128 * sizeof(void*) * 1024;
 
 class JSParser {
  public:
-  JSParser(Lexer*, JSGlobalData*, FunctionParameters*, SourceProvider*);
-  bool parseProgram();
+  JSParser(Lexer*,
+           JSGlobalData*,
+           FunctionParameters*,
+           bool isStrictContext,
+           bool isFunction,
+           SourceProvider*);
+  bool parseProgram(JSGlobalObject*);
 
  private:
   struct AllowInOverride {
@@ -108,7 +124,8 @@ class JSParser {
     m_lastLine = m_token.m_info.line;
     m_lastTokenEnd = m_token.m_info.endOffset;
     m_lexer->setLastLineNumber(m_lastLine);
-    m_token.m_type = m_lexer->lex(&m_token.m_data, &m_token.m_info, lexType);
+    m_token.m_type =
+        m_lexer->lex(&m_token.m_data, &m_token.m_info, lexType, strictMode());
     m_tokenCount++;
   }
 
@@ -127,10 +144,28 @@ class JSParser {
 
   int tokenEnd() { return m_token.m_info.endOffset; }
 
-  template <class TreeBuilder>
+  void startLoop() { currentScope()->startLoop(); }
+  void endLoop() { currentScope()->endLoop(); }
+  void startSwitch() { currentScope()->startSwitch(); }
+  void endSwitch() { currentScope()->endSwitch(); }
+  void setStrictMode() { currentScope()->setStrictMode(); }
+  bool strictMode() { return currentScope()->strictMode(); }
+  bool isValidStrictMode() { return currentScope()->isValidStrictMode(); }
+  bool declareParameter(const Identifier* ident) {
+    return currentScope()->declareParameter(ident);
+  }
+  bool breakIsValid() { return currentScope()->breakIsValid(); }
+  void pushLabel(const Identifier* label) { currentScope()->pushLabel(label); }
+  void popLabel() { currentScope()->popLabel(); }
+  bool hasLabel(const Identifier* label) {
+    return currentScope()->hasLabel(label);
+  }
+
+  enum SourceElementsMode { CheckForStrictMode, DontCheckForStrictMode };
+  template <SourceElementsMode mode, class TreeBuilder>
   TreeSourceElements parseSourceElements(TreeBuilder&);
   template <class TreeBuilder>
-  TreeStatement parseStatement(TreeBuilder&);
+  TreeStatement parseStatement(TreeBuilder&, const Identifier*& directive);
   template <class TreeBuilder>
   TreeStatement parseFunctionDeclaration(TreeBuilder&);
   template <class TreeBuilder>
@@ -255,28 +290,108 @@ class JSParser {
   int m_assignmentCount;
   int m_nonLHSCount;
   bool m_syntaxAlreadyValidated;
+  int m_statementDepth;
+  int m_nonTrivialExpressionCount;
+  const Identifier* m_lastIdentifier;
+
+  struct DepthManager {
+    DepthManager(int* depth) : m_originalDepth(*depth), m_depth(depth) {}
+
+    ~DepthManager() { *m_depth = m_originalDepth; }
+
+   private:
+    int m_originalDepth;
+    int* m_depth;
+  };
 
   struct Scope {
-    Scope()
-        : m_usesEval(false),
+    Scope(JSGlobalData* globalData, bool isFunction, bool strictMode)
+        : m_globalData(globalData),
+          m_usesEval(false),
           m_needsFullActivation(false),
-          m_allowsNewDecls(true) {}
+          m_allowsNewDecls(true),
+          m_strictMode(strictMode),
+          m_isFunction(isFunction),
+          m_isValidStrictMode(true),
+          m_loopDepth(0),
+          m_switchDepth(0),
+          m_labels(0) {}
 
-    void declareVariable(const Identifier* ident) {
+    void startSwitch() { m_switchDepth++; }
+    void endSwitch() { m_switchDepth--; }
+    void startLoop() { m_loopDepth++; }
+    void endLoop() {
+      ASSERT(m_loopDepth);
+      m_loopDepth--;
+    }
+    bool inLoop() { return !!m_loopDepth; }
+    bool breakIsValid() { return m_loopDepth || m_switchDepth; }
+
+    void pushLabel(const Identifier* label) {
+      if (!m_labels)
+        m_labels = new LabelStack;
+      m_labels->append(label->impl());
+    }
+
+    void popLabel() {
+      ASSERT(m_labels);
+      ASSERT(m_labels->size());
+      m_labels->removeLast();
+    }
+
+    bool hasLabel(const Identifier* label) {
+      if (!m_labels)
+        return false;
+      for (int i = m_labels->size(); i > 0; i--) {
+        if (m_labels->at(i - 1) == label->impl())
+          return true;
+      }
+      return false;
+    }
+
+    void setIsFunction() { m_isFunction = true; }
+    bool isFunction() { return m_isFunction; }
+
+    bool declareVariable(const Identifier* ident) {
+      bool isValidStrictMode = m_globalData->propertyNames->eval != *ident &&
+                               m_globalData->propertyNames->arguments != *ident;
+      m_isValidStrictMode = m_isValidStrictMode && isValidStrictMode;
       m_declaredVariables.add(ident->ustring().impl());
+      return isValidStrictMode;
+    }
+
+    void declareWrite(const Identifier* ident) {
+      ASSERT(m_strictMode);
+      m_writtenVariables.add(ident->impl());
+    }
+
+    bool deleteProperty(const Identifier* ident) {
+      if (m_declaredVariables.contains(ident->impl()))
+        return false;
+      m_deletedVariables.add(ident->impl());
+      return true;
     }
 
     void preventNewDecls() { m_allowsNewDecls = false; }
     bool allowsNewDecls() const { return m_allowsNewDecls; }
+
+    bool declareParameter(const Identifier* ident) {
+      bool isValidStrictMode =
+          m_declaredVariables.add(ident->ustring().impl()).second &&
+          m_globalData->propertyNames->eval != *ident &&
+          m_globalData->propertyNames->arguments != *ident;
+      m_isValidStrictMode = m_isValidStrictMode && isValidStrictMode;
+      return isValidStrictMode;
+    }
 
     void useVariable(const Identifier* ident, bool isEval) {
       m_usesEval |= isEval;
       m_usedVariables.add(ident->ustring().impl());
     }
 
-    void needsFullActivation() { m_needsFullActivation = true; }
+    void setNeedsFullActivation() { m_needsFullActivation = true; }
 
-    void collectFreeVariables(Scope* nestedScope,
+    bool collectFreeVariables(Scope* nestedScope,
                               bool shouldTrackClosedVariables) {
       if (nestedScope->m_usesEval)
         m_usesEval = true;
@@ -289,6 +404,49 @@ class JSParser {
         if (shouldTrackClosedVariables)
           m_closedVariables.add(*ptr);
       }
+      if (nestedScope->m_writtenVariables.size()) {
+        IdentifierSet::iterator end = nestedScope->m_writtenVariables.end();
+        for (IdentifierSet::iterator ptr =
+                 nestedScope->m_writtenVariables.begin();
+             ptr != end; ++ptr) {
+          if (nestedScope->m_declaredVariables.contains(*ptr))
+            continue;
+          m_writtenVariables.add(*ptr);
+        }
+      }
+      if (nestedScope->m_deletedVariables.size()) {
+        IdentifierSet::iterator end = nestedScope->m_deletedVariables.end();
+        for (IdentifierSet::iterator ptr =
+                 nestedScope->m_deletedVariables.begin();
+             ptr != end; ++ptr) {
+          if (nestedScope->m_declaredVariables.contains(*ptr))
+            return false;
+          if (m_declaredVariables.contains(*ptr))
+            return false;
+          m_deletedVariables.add(*ptr);
+        }
+      }
+      return true;
+    }
+
+    void getUncapturedWrittenVariables(IdentifierSet& writtenVariables) {
+      IdentifierSet::iterator end = m_writtenVariables.end();
+      for (IdentifierSet::iterator ptr = m_writtenVariables.begin(); ptr != end;
+           ++ptr) {
+        if (!m_declaredVariables.contains(*ptr))
+          writtenVariables.add(*ptr);
+      }
+    }
+
+    bool getDeletedVariables(IdentifierSet& deletedVariables) {
+      IdentifierSet::iterator end = m_deletedVariables.end();
+      for (IdentifierSet::iterator ptr = m_deletedVariables.begin(); ptr != end;
+           ++ptr) {
+        if (m_declaredVariables.contains(*ptr))
+          return false;
+      }
+      deletedVariables.swap(m_deletedVariables);
+      return true;
     }
 
     void getCapturedVariables(IdentifierSet& capturedVariables) {
@@ -303,14 +461,27 @@ class JSParser {
         capturedVariables.add(*ptr);
       }
     }
+    void setStrictMode() { m_strictMode = true; }
+    bool strictMode() const { return m_strictMode; }
+    bool isValidStrictMode() const { return m_isValidStrictMode; }
 
    private:
-    bool m_usesEval;
-    bool m_needsFullActivation;
-    bool m_allowsNewDecls;
+    JSGlobalData* m_globalData;
+    bool m_usesEval : 1;
+    bool m_needsFullActivation : 1;
+    bool m_allowsNewDecls : 1;
+    bool m_strictMode : 1;
+    bool m_isFunction : 1;
+    bool m_isValidStrictMode : 1;
+    int m_loopDepth;
+    int m_switchDepth;
+    typedef Vector<StringImpl*, 2> LabelStack;
+    LabelStack* m_labels;
     IdentifierSet m_declaredVariables;
     IdentifierSet m_usedVariables;
     IdentifierSet m_closedVariables;
+    IdentifierSet m_writtenVariables;
+    IdentifierSet m_deletedVariables;
   };
 
   typedef Vector<Scope, 10> ScopeStack;
@@ -331,42 +502,66 @@ class JSParser {
   }
 
   ScopeRef pushScope() {
-    m_scopeStack.append(Scope());
+    bool isFunction = false;
+    bool isStrict = false;
+    if (!m_scopeStack.isEmpty()) {
+      isStrict = m_scopeStack.last().strictMode();
+      isFunction = m_scopeStack.last().isFunction();
+    }
+    m_scopeStack.append(Scope(m_globalData, isFunction, isStrict));
     return currentScope();
   }
 
-  void popScope(ScopeRef scope, bool shouldTrackClosedVariables) {
+  bool popScope(ScopeRef scope, bool shouldTrackClosedVariables) {
     ASSERT_UNUSED(scope, scope.index() == m_scopeStack.size() - 1);
     ASSERT(m_scopeStack.size() > 1);
-    m_scopeStack[m_scopeStack.size() - 2].collectFreeVariables(
+    bool result = m_scopeStack[m_scopeStack.size() - 2].collectFreeVariables(
         &m_scopeStack.last(), shouldTrackClosedVariables);
     m_scopeStack.removeLast();
+    return result;
   }
 
-  void declareVariable(const Identifier* ident) {
+  bool declareVariable(const Identifier* ident) {
     unsigned i = m_scopeStack.size() - 1;
     ASSERT(i < m_scopeStack.size());
     while (!m_scopeStack[i].allowsNewDecls()) {
       i--;
       ASSERT(i < m_scopeStack.size());
     }
-    m_scopeStack[i].declareVariable(ident);
+    return m_scopeStack[i].declareVariable(ident);
+  }
+
+  void declareWrite(const Identifier* ident) {
+    if (!m_syntaxAlreadyValidated)
+      m_scopeStack.last().declareWrite(ident);
+  }
+
+  bool deleteProperty(const Identifier* ident) {
+    if (!m_syntaxAlreadyValidated)
+      return m_scopeStack.last().deleteProperty(ident);
+    return true;
   }
 
   ScopeStack m_scopeStack;
 };
 
-int jsParse(JSGlobalData* globalData,
+int jsParse(JSGlobalObject* lexicalGlobalObject,
             FunctionParameters* parameters,
+            JSParserStrictness strictness,
+            JSParserMode parserMode,
             const SourceCode* source) {
-  JSParser parser(globalData->lexer, globalData, parameters,
-                  source->provider());
-  return parser.parseProgram();
+  JSParser parser(lexicalGlobalObject->globalData()->lexer,
+                  lexicalGlobalObject->globalData(), parameters,
+                  strictness == JSParseStrict,
+                  parserMode == JSParseFunctionCode, source->provider());
+  return parser.parseProgram(lexicalGlobalObject);
 }
 
 JSParser::JSParser(Lexer* lexer,
                    JSGlobalData* globalData,
                    FunctionParameters* parameters,
+                   bool inStrictContext,
+                   bool isFunction,
                    SourceProvider* provider)
     : m_lexer(lexer),
       m_endAddress(0),
@@ -378,30 +573,63 @@ JSParser::JSParser(Lexer* lexer,
       m_lastTokenEnd(0),
       m_assignmentCount(0),
       m_nonLHSCount(0),
-      m_syntaxAlreadyValidated(provider->isValid()) {
+      m_syntaxAlreadyValidated(provider->isValid()),
+      m_statementDepth(0),
+      m_nonTrivialExpressionCount(0),
+      m_lastIdentifier(0) {
   m_endAddress =
       wtfThreadData().approximatedStackStart() - kMaxParserStackUsage;
-  next();
-  m_lexer->setLastLineNumber(tokenLine());
   ScopeRef scope = pushScope();
+  if (isFunction)
+    scope->setIsFunction();
+  if (inStrictContext)
+    scope->setStrictMode();
   if (parameters) {
     for (unsigned i = 0; i < parameters->size(); i++)
-      scope->declareVariable(&parameters->at(i));
+      scope->declareParameter(&parameters->at(i));
   }
+  next();
+  m_lexer->setLastLineNumber(tokenLine());
 }
 
-bool JSParser::parseProgram() {
+bool JSParser::parseProgram(JSGlobalObject* lexicalGlobalObject) {
   ASTBuilder context(m_globalData, m_lexer);
+  if (m_lexer->isReparsing())
+    m_statementDepth--;
   ScopeRef scope = currentScope();
-  SourceElements* sourceElements = parseSourceElements<ASTBuilder>(context);
+  SourceElements* sourceElements =
+      parseSourceElements<CheckForStrictMode>(context);
   if (!sourceElements || !consume(EOFTOK))
     return true;
+  if (!m_syntaxAlreadyValidated) {
+    IdentifierSet writtenVariables;
+    scope->getUncapturedWrittenVariables(writtenVariables);
+    IdentifierSet::const_iterator end = writtenVariables.end();
+    for (IdentifierSet::const_iterator ptr = writtenVariables.begin();
+         ptr != end; ++ptr) {
+      PropertySlot slot(lexicalGlobalObject);
+      if (!lexicalGlobalObject->getPropertySlot(
+              lexicalGlobalObject->globalExec(), Identifier(m_globalData, *ptr),
+              slot))
+        return true;
+    }
+    IdentifierSet deletedVariables;
+    if (!scope->getDeletedVariables(deletedVariables))
+      return true;
+    end = deletedVariables.end();
+    SymbolTable& globalEnvRecord = lexicalGlobalObject->symbolTable();
+    for (IdentifierSet::const_iterator ptr = deletedVariables.begin();
+         ptr != end; ++ptr) {
+      if (!globalEnvRecord.get(*ptr).isNull())
+        return true;
+    }
+  }
   IdentifierSet capturedVariables;
   scope->getCapturedVariables(capturedVariables);
   m_globalData->parser->didFinishParsing(
       sourceElements, context.varDeclarations(), context.funcDeclarations(),
-      context.features(), m_lastLine, context.numConstants(),
-      capturedVariables);
+      context.features() | (scope->strictMode() ? StrictModeFeature : 0),
+      m_lastLine, context.numConstants(), capturedVariables);
   return false;
 }
 
@@ -409,11 +637,31 @@ bool JSParser::allowAutomaticSemicolon() {
   return match(CLOSEBRACE) || match(EOFTOK) || m_lexer->prevTerminator();
 }
 
-template <class TreeBuilder>
+template <JSParser::SourceElementsMode mode, class TreeBuilder>
 TreeSourceElements JSParser::parseSourceElements(TreeBuilder& context) {
   TreeSourceElements sourceElements = context.createSourceElements();
-  while (TreeStatement statement = parseStatement(context))
+  bool seenNonDirective = false;
+  const Identifier* directive = 0;
+  unsigned startOffset = m_token.m_info.startOffset;
+  bool hasSetStrict = false;
+  while (TreeStatement statement = parseStatement(context, directive)) {
+    if (mode == CheckForStrictMode && !seenNonDirective) {
+      if (directive) {
+        if (!hasSetStrict &&
+            m_globalData->propertyNames->useStrictIdentifier == *directive) {
+          setStrictMode();
+          hasSetStrict = true;
+          failIfFalse(isValidStrictMode());
+          m_lexer->setOffset(startOffset);
+          next();
+          failIfTrue(m_error);
+          continue;
+        }
+      } else
+        seenNonDirective = true;
+    }
     context.appendStatement(sourceElements, statement);
+  }
 
   if (m_error)
     fail();
@@ -454,7 +702,10 @@ TreeStatement JSParser::parseDoWhileStatement(TreeBuilder& context) {
   ASSERT(match(DO));
   int startLine = tokenLine();
   next();
-  TreeStatement statement = parseStatement(context);
+  const Identifier* unused = 0;
+  startLoop();
+  TreeStatement statement = parseStatement(context, unused);
+  endLoop();
   failIfFalse(statement);
   int endLine = tokenLine();
   consumeOrFail(WHILE);
@@ -477,7 +728,10 @@ TreeStatement JSParser::parseWhileStatement(TreeBuilder& context) {
   failIfFalse(expr);
   int endLine = tokenLine();
   consumeOrFail(CLOSEPAREN);
-  TreeStatement statement = parseStatement(context);
+  const Identifier* unused = 0;
+  startLoop();
+  TreeStatement statement = parseStatement(context, unused);
+  endLoop();
   failIfFalse(statement);
   return context.createWhileStatement(expr, statement, startLine, endLine);
 }
@@ -503,7 +757,7 @@ TreeExpression JSParser::parseVarDeclarationList(
     lastIdent = name;
     next();
     bool hasInitializer = match(EQUAL);
-    declareVariable(name);
+    failIfFalseIfStrict(declareVariable(name));
     context.addVar(name, (hasInitializer || (!m_allowsIn && match(INTOKEN)))
                              ? DeclarationStacks::HasInitializer
                              : 0);
@@ -531,6 +785,7 @@ TreeExpression JSParser::parseVarDeclarationList(
 
 template <class TreeBuilder>
 TreeConstDeclList JSParser::parseConstDeclarationList(TreeBuilder& context) {
+  failIfTrue(strictMode());
   TreeConstDeclList constDecls = 0;
   TreeConstDeclList tail = 0;
   do {
@@ -602,7 +857,10 @@ TreeStatement JSParser::parseForStatement(TreeBuilder& context) {
     int endLine = tokenLine();
     consumeOrFail(CLOSEPAREN);
 
-    TreeStatement statement = parseStatement(context);
+    const Identifier* unused = 0;
+    startLoop();
+    TreeStatement statement = parseStatement(context, unused);
+    endLoop();
     failIfFalse(statement);
 
     return context.createForInLoop(forInTarget, forInInitializer, expr,
@@ -638,7 +896,10 @@ TreeStatement JSParser::parseForStatement(TreeBuilder& context) {
     }
     int endLine = tokenLine();
     consumeOrFail(CLOSEPAREN);
-    TreeStatement statement = parseStatement(context);
+    const Identifier* unused = 0;
+    startLoop();
+    TreeStatement statement = parseStatement(context, unused);
+    endLoop();
     failIfFalse(statement);
     return context.createForLoop(decls, condition, increment, statement,
                                  hasDeclaration, startLine, endLine);
@@ -652,7 +913,10 @@ TreeStatement JSParser::parseForStatement(TreeBuilder& context) {
   int exprEnd = lastTokenEnd();
   int endLine = tokenLine();
   consumeOrFail(CLOSEPAREN);
-  TreeStatement statement = parseStatement(context);
+  const Identifier* unused = 0;
+  startLoop();
+  TreeStatement statement = parseStatement(context, unused);
+  endLoop();
   failIfFalse(statement);
 
   return context.createForInLoop(decls, expr, statement, declsStart, declsEnd,
@@ -668,10 +932,13 @@ TreeStatement JSParser::parseBreakStatement(TreeBuilder& context) {
   int endLine = tokenLine();
   next();
 
-  if (autoSemiColon())
+  if (autoSemiColon()) {
+    failIfFalseIfStrict(breakIsValid());
     return context.createBreakStatement(startCol, endCol, startLine, endLine);
+  }
   matchOrFail(IDENT);
   const Identifier* ident = m_token.m_data.ident;
+  failIfFalseIfStrict(hasLabel(ident));
   endCol = tokenEnd();
   endLine = tokenLine();
   next();
@@ -689,11 +956,14 @@ TreeStatement JSParser::parseContinueStatement(TreeBuilder& context) {
   int endLine = tokenLine();
   next();
 
-  if (autoSemiColon())
+  if (autoSemiColon()) {
+    failIfFalseIfStrict(breakIsValid());
     return context.createContinueStatement(startCol, endCol, startLine,
                                            endLine);
+  }
   matchOrFail(IDENT);
   const Identifier* ident = m_token.m_data.ident;
+  failIfFalseIfStrict(hasLabel(ident));
   endCol = tokenEnd();
   endLine = tokenLine();
   next();
@@ -705,6 +975,7 @@ TreeStatement JSParser::parseContinueStatement(TreeBuilder& context) {
 template <class TreeBuilder>
 TreeStatement JSParser::parseReturnStatement(TreeBuilder& context) {
   ASSERT(match(RETURN));
+  failIfFalseIfStrict(currentScope()->isFunction());
   int startLine = tokenLine();
   int endLine = startLine;
   int start = tokenStart();
@@ -745,7 +1016,8 @@ TreeStatement JSParser::parseThrowStatement(TreeBuilder& context) {
 template <class TreeBuilder>
 TreeStatement JSParser::parseWithStatement(TreeBuilder& context) {
   ASSERT(match(WITH));
-  currentScope()->needsFullActivation();
+  failIfTrue(strictMode());
+  currentScope()->setNeedsFullActivation();
   int startLine = tokenLine();
   next();
   consumeOrFail(OPENPAREN);
@@ -756,8 +1028,8 @@ TreeStatement JSParser::parseWithStatement(TreeBuilder& context) {
 
   int endLine = tokenLine();
   consumeOrFail(CLOSEPAREN);
-
-  TreeStatement statement = parseStatement(context);
+  const Identifier* unused = 0;
+  TreeStatement statement = parseStatement(context, unused);
   failIfFalse(statement);
 
   return context.createWithStatement(expr, statement, start, end, startLine,
@@ -775,7 +1047,7 @@ TreeStatement JSParser::parseSwitchStatement(TreeBuilder& context) {
   int endLine = tokenLine();
   consumeOrFail(CLOSEPAREN);
   consumeOrFail(OPENBRACE);
-
+  startSwitch();
   TreeClauseList firstClauses = parseSwitchClauses(context);
   failIfTrue(m_error);
 
@@ -784,6 +1056,7 @@ TreeStatement JSParser::parseSwitchStatement(TreeBuilder& context) {
 
   TreeClauseList secondClauses = parseSwitchClauses(context);
   failIfTrue(m_error);
+  endSwitch();
   consumeOrFail(CLOSEBRACE);
 
   return context.createSwitchStatement(expr, firstClauses, defaultClause,
@@ -798,7 +1071,8 @@ TreeClauseList JSParser::parseSwitchClauses(TreeBuilder& context) {
   TreeExpression condition = parseExpression(context);
   failIfFalse(condition);
   consumeOrFail(COLON);
-  TreeSourceElements statements = parseSourceElements(context);
+  TreeSourceElements statements =
+      parseSourceElements<DontCheckForStrictMode>(context);
   failIfFalse(statements);
   TreeClause clause = context.createClause(condition, statements);
   TreeClauseList clauseList = context.createClauseList(clause);
@@ -809,7 +1083,8 @@ TreeClauseList JSParser::parseSwitchClauses(TreeBuilder& context) {
     TreeExpression condition = parseExpression(context);
     failIfFalse(condition);
     consumeOrFail(COLON);
-    TreeSourceElements statements = parseSourceElements(context);
+    TreeSourceElements statements =
+        parseSourceElements<DontCheckForStrictMode>(context);
     failIfFalse(statements);
     clause = context.createClause(condition, statements);
     tail = context.createClauseList(tail, clause);
@@ -823,7 +1098,8 @@ TreeClause JSParser::parseSwitchDefaultClause(TreeBuilder& context) {
     return 0;
   next();
   consumeOrFail(COLON);
-  TreeSourceElements statements = parseSourceElements(context);
+  TreeSourceElements statements =
+      parseSourceElements<DontCheckForStrictMode>(context);
   failIfFalse(statements);
   return context.createClause(0, statements);
 }
@@ -845,14 +1121,14 @@ TreeStatement JSParser::parseTryStatement(TreeBuilder& context) {
   int lastLine = m_lastLine;
 
   if (match(CATCH)) {
-    currentScope()->needsFullActivation();
+    currentScope()->setNeedsFullActivation();
     next();
     consumeOrFail(OPENPAREN);
     matchOrFail(IDENT);
     ident = m_token.m_data.ident;
     next();
     ScopeRef catchScope = pushScope();
-    catchScope->declareVariable(ident);
+    failIfFalseIfStrict(catchScope->declareVariable(ident));
     catchScope->preventNewDecls();
     consumeOrFail(CLOSEPAREN);
     matchOrFail(OPENBRACE);
@@ -860,7 +1136,7 @@ TreeStatement JSParser::parseTryStatement(TreeBuilder& context) {
     catchBlock = parseBlockStatement(context);
     failIfFalse(catchBlock);
     catchHasEval = initialEvalCount != context.evalCount();
-    popScope(catchScope, TreeBuilder::NeedsFreeVariableInfo);
+    failIfFalse(popScope(catchScope, TreeBuilder::NeedsFreeVariableInfo));
   }
 
   if (match(FINALLY)) {
@@ -895,7 +1171,8 @@ TreeStatement JSParser::parseBlockStatement(TreeBuilder& context) {
     next();
     return context.createBlockStatement(0, start, m_lastLine);
   }
-  TreeSourceElements subtree = parseSourceElements(context);
+  TreeSourceElements subtree =
+      parseSourceElements<DontCheckForStrictMode>(context);
   failIfFalse(subtree);
   matchOrFail(CLOSEBRACE);
   next();
@@ -903,7 +1180,12 @@ TreeStatement JSParser::parseBlockStatement(TreeBuilder& context) {
 }
 
 template <class TreeBuilder>
-TreeStatement JSParser::parseStatement(TreeBuilder& context) {
+TreeStatement JSParser::parseStatement(TreeBuilder& context,
+                                       const Identifier*& directive) {
+  DepthManager statementDepth(&m_statementDepth);
+  m_statementDepth++;
+  directive = 0;
+  int nonTrivialExpressionCount = 0;
   failIfStackOverflow();
   switch (m_token.m_type) {
     case OPENBRACE:
@@ -913,6 +1195,7 @@ TreeStatement JSParser::parseStatement(TreeBuilder& context) {
     case CONSTTOKEN:
       return parseConstDeclaration(context);
     case FUNCTION:
+      failIfFalseIfStrict(m_statementDepth == 1);
       return parseFunctionDeclaration(context);
     case SEMICOLON:
       next();
@@ -949,8 +1232,14 @@ TreeStatement JSParser::parseStatement(TreeBuilder& context) {
       return 0;
     case IDENT:
       return parseExpressionOrLabelStatement(context);
+    case STRING:
+      directive = m_token.m_data.ident;
+      nonTrivialExpressionCount = m_nonTrivialExpressionCount;
     default:
-      return parseExpressionStatement(context);
+      TreeStatement exprStatement = parseExpressionStatement(context);
+      if (directive && nonTrivialExpressionCount != m_nonTrivialExpressionCount)
+        directive = 0;
+      return exprStatement;
   }
 }
 
@@ -960,7 +1249,7 @@ TreeFormalParameterList JSParser::parseFormalParameters(TreeBuilder& context,
   matchOrFail(IDENT);
   usesArguments =
       m_globalData->propertyNames->arguments == *m_token.m_data.ident;
-  declareVariable(m_token.m_data.ident);
+  failIfFalseIfStrict(declareParameter(m_token.m_data.ident));
   TreeFormalParameterList list =
       context.createFormalParameterList(*m_token.m_data.ident);
   TreeFormalParameterList tail = list;
@@ -969,7 +1258,9 @@ TreeFormalParameterList JSParser::parseFormalParameters(TreeBuilder& context,
     next();
     matchOrFail(IDENT);
     const Identifier* ident = m_token.m_data.ident;
-    declareVariable(ident);
+    usesArguments |=
+        m_globalData->propertyNames->arguments == *m_token.m_data.ident;
+    failIfFalseIfStrict(declareParameter(ident));
     next();
     usesArguments =
         usesArguments || m_globalData->propertyNames->arguments == *ident;
@@ -981,10 +1272,12 @@ TreeFormalParameterList JSParser::parseFormalParameters(TreeBuilder& context,
 template <class TreeBuilder>
 TreeFunctionBody JSParser::parseFunctionBody(TreeBuilder& context) {
   if (match(CLOSEBRACE))
-    return context.createFunctionBody();
+    return context.createFunctionBody(strictMode());
+  DepthManager statementDepth(&m_statementDepth);
+  m_statementDepth = 0;
   typename TreeBuilder::FunctionBodyBuilder bodyBuilder(m_globalData, m_lexer);
-  failIfFalse(parseSourceElements(bodyBuilder));
-  return context.createFunctionBody();
+  failIfFalse(parseSourceElements<CheckForStrictMode>(bodyBuilder));
+  return context.createFunctionBody(strictMode());
 }
 
 template <JSParser::FunctionRequirements requirements,
@@ -998,11 +1291,12 @@ bool JSParser::parseFunctionInfo(TreeBuilder& context,
                                  int& closeBracePos,
                                  int& bodyStartLine) {
   ScopeRef functionScope = pushScope();
+  functionScope->setIsFunction();
   if (match(IDENT)) {
     name = m_token.m_data.ident;
     next();
     if (!nameIsInContainingScope)
-      functionScope->declareVariable(name);
+      failIfFalseIfStrict(functionScope->declareVariable(name));
   } else if (requirements == FunctionNeedsName)
     return false;
   consumeOrFail(OPENPAREN);
@@ -1022,7 +1316,11 @@ bool JSParser::parseFunctionInfo(TreeBuilder& context,
   failIfFalse(body);
   if (usesArguments)
     context.setUsesArguments(body);
-  popScope(functionScope, TreeBuilder::NeedsFreeVariableInfo);
+  if (functionScope->strictMode() && name) {
+    failIfTrue(m_globalData->propertyNames->arguments == *name);
+    failIfTrue(m_globalData->propertyNames->eval == *name);
+  }
+  failIfFalse(popScope(functionScope, TreeBuilder::NeedsFreeVariableInfo));
   matchOrFail(CLOSEBRACE);
   closeBracePos = m_token.m_data.intValue;
   next();
@@ -1043,7 +1341,7 @@ TreeStatement JSParser::parseFunctionDeclaration(TreeBuilder& context) {
       context, name, parameters, body, openBracePos, closeBracePos,
       bodyStartLine)));
   failIfFalse(name);
-  declareVariable(name);
+  failIfFalseIfStrict(declareVariable(name));
   return context.createFuncDeclStatement(name, body, parameters, openBracePos,
                                          closeBracePos, bodyStartLine,
                                          m_lastLine);
@@ -1067,7 +1365,12 @@ TreeStatement JSParser::parseExpressionOrLabelStatement(TreeBuilder& context) {
   failIfFalse(currentToken + 1 == m_tokenCount);
   int end = tokenEnd();
   consumeOrFail(COLON);
-  TreeStatement statement = parseStatement(context);
+  const Identifier* unused = 0;
+  if (strictMode() && !m_syntaxAlreadyValidated)
+    pushLabel(ident);
+  TreeStatement statement = parseStatement(context, unused);
+  if (strictMode() && !m_syntaxAlreadyValidated)
+    popLabel();
   failIfFalse(statement);
   return context.createLabelStatement(ident, statement, start, end);
 }
@@ -1095,7 +1398,8 @@ TreeStatement JSParser::parseIfStatement(TreeBuilder& context) {
   int end = tokenLine();
   consumeOrFail(CLOSEPAREN);
 
-  TreeStatement trueBlock = parseStatement(context);
+  const Identifier* unused = 0;
+  TreeStatement trueBlock = parseStatement(context, unused);
   failIfFalse(trueBlock);
 
   if (!match(ELSE))
@@ -1108,7 +1412,8 @@ TreeStatement JSParser::parseIfStatement(TreeBuilder& context) {
   do {
     next();
     if (!match(IF)) {
-      TreeStatement block = parseStatement(context);
+      const Identifier* unused = 0;
+      TreeStatement block = parseStatement(context, unused);
       failIfFalse(block);
       statementStack.append(block);
       trailingElse = true;
@@ -1123,8 +1428,8 @@ TreeStatement JSParser::parseIfStatement(TreeBuilder& context) {
     failIfFalse(innerCondition);
     int innerEnd = tokenLine();
     consumeOrFail(CLOSEPAREN);
-
-    TreeStatement innerTrueBlock = parseStatement(context);
+    const Identifier* unused = 0;
+    TreeStatement innerTrueBlock = parseStatement(context, unused);
     failIfFalse(innerTrueBlock);
     exprStack.append(innerCondition);
     posStack.append(make_pair(innerStart, innerEnd));
@@ -1167,6 +1472,7 @@ TreeExpression JSParser::parseExpression(TreeBuilder& context) {
   if (!match(COMMA))
     return node;
   next();
+  m_nonTrivialExpressionCount++;
   m_nonLHSCount++;
   TreeExpression right = parseAssignmentExpression(context);
   failIfFalse(right);
@@ -1235,12 +1541,19 @@ TreeExpression JSParser::parseAssignmentExpression(TreeBuilder& context) {
       default:
         goto end;
     }
+    m_nonTrivialExpressionCount++;
     hadAssignment = true;
     context.assignmentStackAppend(assignmentStack, lhs, start, tokenStart(),
                                   m_assignmentCount, op);
     start = tokenStart();
     m_assignmentCount++;
     next();
+    if (strictMode() && m_lastIdentifier && context.isResolve(lhs)) {
+      failIfTrueIfStrict(m_globalData->propertyNames->eval ==
+                         *m_lastIdentifier);
+      declareWrite(m_lastIdentifier);
+      m_lastIdentifier = 0;
+    }
     lhs = parseConditionalExpression(context);
     failIfFalse(lhs);
     if (initialNonLHSCount != m_nonLHSCount)
@@ -1266,6 +1579,7 @@ TreeExpression JSParser::parseConditionalExpression(TreeBuilder& context) {
   failIfFalse(cond);
   if (!match(QUESTION))
     return cond;
+  m_nonTrivialExpressionCount++;
   m_nonLHSCount++;
   next();
   TreeExpression lhs = parseAssignmentExpression(context);
@@ -1303,6 +1617,7 @@ TreeExpression JSParser::parseBinaryExpression(TreeBuilder& context) {
     int precedence = isBinaryOperator(m_token.m_type);
     if (!precedence)
       break;
+    m_nonTrivialExpressionCount++;
     m_nonLHSCount++;
     int operatorToken = m_token.m_type;
     next();
@@ -1321,7 +1636,6 @@ TreeExpression JSParser::parseBinaryExpression(TreeBuilder& context) {
     }
     context.operatorStackAppend(operatorStackDepth, operatorToken, precedence);
   }
-
   while (operatorStackDepth) {
     ASSERT(operandStackDepth > 1);
 
@@ -1464,6 +1778,7 @@ TreeExpression JSParser::parseStrictObjectLiteral(TreeBuilder& context) {
           objectValidator.add(context.getName(property).impl(),
                               context.getType(property));
       if (!propertyEntryIter.second) {
+        failIfTrue(strictMode());
         if ((context.getType(property) & propertyEntryIter.first->second) !=
             PropertyNode::Constant) {
           // Can't have multiple getters or setters with the same name, nor can
@@ -1532,6 +1847,8 @@ template <class TreeBuilder>
 TreeExpression JSParser::parsePrimaryExpression(TreeBuilder& context) {
   switch (m_token.m_type) {
     case OPENBRACE:
+      if (strictMode())
+        return parseStrictObjectLiteral(context);
       return parseObjectLiteral(context);
     case OPENBRACKET:
       return parseArrayLiteral(context);
@@ -1554,6 +1871,7 @@ TreeExpression JSParser::parsePrimaryExpression(TreeBuilder& context) {
       next();
       currentScope()->useVariable(ident,
                                   m_globalData->propertyNames->eval == *ident);
+      m_lastIdentifier = ident;
       return context.createResolve(ident, start);
     }
     case STRING: {
@@ -1629,6 +1947,7 @@ TreeExpression JSParser::parseMemberExpression(TreeBuilder& context) {
     next();
     newCount++;
   }
+
   if (match(FUNCTION)) {
     const Identifier* name = &m_globalData->propertyNames->nullIdentifier;
     TreeFormalParameterList parameters = 0;
@@ -1649,6 +1968,7 @@ TreeExpression JSParser::parseMemberExpression(TreeBuilder& context) {
   while (true) {
     switch (m_token.m_type) {
       case OPENBRACKET: {
+        m_nonTrivialExpressionCount++;
         int expressionEnd = lastTokenEnd();
         next();
         int nonLHSCount = m_nonLHSCount;
@@ -1664,6 +1984,7 @@ TreeExpression JSParser::parseMemberExpression(TreeBuilder& context) {
         break;
       }
       case OPENPAREN: {
+        m_nonTrivialExpressionCount++;
         if (newCount) {
           newCount--;
           if (match(OPENPAREN)) {
@@ -1686,6 +2007,7 @@ TreeExpression JSParser::parseMemberExpression(TreeBuilder& context) {
         break;
       }
       case DOT: {
+        m_nonTrivialExpressionCount++;
         int expressionEnd = lastTokenEnd();
         next(Lexer::IgnoreReservedWords);
         matchOrFail(IDENT);
@@ -1709,27 +2031,61 @@ template <class TreeBuilder>
 TreeExpression JSParser::parseUnaryExpression(TreeBuilder& context) {
   AllowInOverride allowInOverride(this);
   int tokenStackDepth = 0;
+  bool modifiesExpr = false;
+  bool requiresLExpr = false;
   while (isUnaryOp(m_token.m_type)) {
+    if (strictMode()) {
+      switch (m_token.m_type) {
+        case PLUSPLUS:
+        case MINUSMINUS:
+        case AUTOPLUSPLUS:
+        case AUTOMINUSMINUS:
+          failIfTrue(requiresLExpr);
+          modifiesExpr = true;
+          requiresLExpr = true;
+          break;
+        case DELETETOKEN:
+          failIfTrue(requiresLExpr);
+          requiresLExpr = true;
+          break;
+        default:
+          failIfTrue(requiresLExpr);
+          break;
+      }
+    }
     m_nonLHSCount++;
     context.appendUnaryToken(tokenStackDepth, m_token.m_type, tokenStart());
     next();
+    m_nonTrivialExpressionCount++;
   }
   int subExprStart = tokenStart();
   TreeExpression expr = parseMemberExpression(context);
   failIfFalse(expr);
+  bool isEval = false;
+  if (strictMode() && !m_syntaxAlreadyValidated) {
+    if (context.isResolve(expr))
+      isEval = m_globalData->propertyNames->eval == *m_lastIdentifier;
+  }
+  failIfTrueIfStrict(isEval && modifiesExpr);
   switch (m_token.m_type) {
     case PLUSPLUS:
+      m_nonTrivialExpressionCount++;
       m_nonLHSCount++;
       expr = context.makePostfixNode(expr, OpPlusPlus, subExprStart,
                                      lastTokenEnd(), tokenEnd());
       m_assignmentCount++;
+      failIfTrueIfStrict(isEval);
+      failIfTrueIfStrict(requiresLExpr);
       next();
       break;
     case MINUSMINUS:
+      m_nonTrivialExpressionCount++;
       m_nonLHSCount++;
       expr = context.makePostfixNode(expr, OpMinusMinus, subExprStart,
                                      lastTokenEnd(), tokenEnd());
       m_assignmentCount++;
+      failIfTrueIfStrict(isEval);
+      failIfTrueIfStrict(requiresLExpr);
       next();
       break;
     default:
@@ -1738,7 +2094,7 @@ TreeExpression JSParser::parseUnaryExpression(TreeBuilder& context) {
 
   int end = lastTokenEnd();
 
-  if (!TreeBuilder::CreatesAST)
+  if (!TreeBuilder::CreatesAST && (m_syntaxAlreadyValidated || !strictMode()))
     return expr;
 
   while (tokenStackDepth) {
@@ -1777,6 +2133,8 @@ TreeExpression JSParser::parseUnaryExpression(TreeBuilder& context) {
         expr = context.createVoid(expr);
         break;
       case DELETETOKEN:
+        if (strictMode() && context.isResolve(expr))
+          failIfFalse(deleteProperty(m_lastIdentifier));
         expr = context.makeDeleteNode(
             expr, context.unaryTokenStackLastStart(tokenStackDepth), end, end);
         break;

@@ -49,10 +49,14 @@ class Lexer : public Noncopyable {
   // Functions to set up parsing.
   void setCode(const SourceCode&, ParserArena&);
   void setIsReparsing() { m_isReparsing = true; }
+  bool isReparsing() const { return m_isReparsing; }
 
   // Functions for the parser itself.
   enum LexType { IdentifyReservedWords, IgnoreReservedWords };
-  JSTokenType lex(JSTokenData* lvalp, JSTokenInfo* llocp, LexType);
+  JSTokenType lex(JSTokenData* lvalp,
+                  JSTokenInfo* llocp,
+                  LexType,
+                  bool strictMode);
   int lineNumber() const { return m_lineNumber; }
   void setLastLineNumber(int lastLineNumber) {
     m_lastLineNumber = lastLineNumber;
@@ -100,7 +104,7 @@ class Lexer : public Noncopyable {
   ALWAYS_INLINE bool lastTokenWasRestrKeyword() const;
 
   ALWAYS_INLINE JSTokenType parseIdentifier(JSTokenData*, LexType);
-  ALWAYS_INLINE bool parseString(JSTokenData* lvalp);
+  ALWAYS_INLINE bool parseString(JSTokenData* lvalp, bool strictMode);
   ALWAYS_INLINE void parseHex(double& returnValue);
   ALWAYS_INLINE bool parseOctal(double& returnValue);
   ALWAYS_INLINE bool parseDecimal(double& returnValue);

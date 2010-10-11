@@ -31,7 +31,8 @@ CommonIdentifiers::CommonIdentifiers(JSGlobalData* globalData)
     : nullIdentifier(globalData, nullCString),
       emptyIdentifier(globalData, ""),
       underscoreProto(globalData, "__proto__"),
-      thisIdentifier(globalData, "this")
+      thisIdentifier(globalData, "this"),
+      useStrictIdentifier(globalData, "use strict")
           JSC_COMMON_IDENTIFIERS_EACH_PROPERTY_NAME(INITIALIZE_PROPERTY_NAME) {}
 
 }  // namespace JSC

@@ -1148,9 +1148,11 @@ static NEVER_INLINE void throwStackOverflowError(
     VM_THROW_EXCEPTION_AT_END(); \
     return 0;                    \
   } while (0)
-#define VM_THROW_EXCEPTION_AT_END()                                   \
-  returnToThrowTrampoline(stackFrame.globalData, STUB_RETURN_ADDRESS, \
-                          STUB_RETURN_ADDRESS)
+#define VM_THROW_EXCEPTION_AT_END()                                     \
+  do {                                                                  \
+    returnToThrowTrampoline(stackFrame.globalData, STUB_RETURN_ADDRESS, \
+                            STUB_RETURN_ADDRESS);                       \
+  } while (0)
 
 #define CHECK_FOR_EXCEPTION()                       \
   do {                                              \
@@ -1392,6 +1394,17 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_convert_this) {
   return JSValue::encode(result);
 }
 
+DEFINE_STUB_FUNCTION(EncodedJSValue, op_convert_this_strict) {
+  STUB_INIT_STACK_FRAME(stackFrame);
+
+  JSValue v1 = stackFrame.args[0].jsValue();
+  CallFrame* callFrame = stackFrame.callFrame;
+
+  JSValue result = v1.toStrictThisObject(callFrame);
+  CHECK_FOR_EXCEPTION_AT_END();
+  return JSValue::encode(result);
+}
+
 DEFINE_STUB_FUNCTION(void, op_end) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
@@ -1492,7 +1505,7 @@ DEFINE_STUB_FUNCTION(JSObject*, op_new_object) {
 DEFINE_STUB_FUNCTION(void, op_put_by_id_generic) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
-  PutPropertySlot slot;
+  PutPropertySlot slot(stackFrame.callFrame->codeBlock()->isStrictMode());
   stackFrame.args[0].jsValue().put(stackFrame.callFrame,
                                    stackFrame.args[1].identifier(),
                                    stackFrame.args[2].jsValue(), slot);
@@ -1502,7 +1515,7 @@ DEFINE_STUB_FUNCTION(void, op_put_by_id_generic) {
 DEFINE_STUB_FUNCTION(void, op_put_by_id_direct_generic) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
-  PutPropertySlot slot;
+  PutPropertySlot slot(stackFrame.callFrame->codeBlock()->isStrictMode());
   stackFrame.args[0].jsValue().putDirect(stackFrame.callFrame,
                                          stackFrame.args[1].identifier(),
                                          stackFrame.args[2].jsValue(), slot);
@@ -1530,7 +1543,7 @@ DEFINE_STUB_FUNCTION(void, op_put_by_id) {
   CallFrame* callFrame = stackFrame.callFrame;
   Identifier& ident = stackFrame.args[1].identifier();
 
-  PutPropertySlot slot;
+  PutPropertySlot slot(callFrame->codeBlock()->isStrictMode());
   stackFrame.args[0].jsValue().put(callFrame, ident,
                                    stackFrame.args[2].jsValue(), slot);
 
@@ -1551,7 +1564,7 @@ DEFINE_STUB_FUNCTION(void, op_put_by_id_direct) {
   CallFrame* callFrame = stackFrame.callFrame;
   Identifier& ident = stackFrame.args[1].identifier();
 
-  PutPropertySlot slot;
+  PutPropertySlot slot(callFrame->codeBlock()->isStrictMode());
   stackFrame.args[0].jsValue().putDirect(callFrame, ident,
                                          stackFrame.args[2].jsValue(), slot);
 
@@ -1573,7 +1586,7 @@ DEFINE_STUB_FUNCTION(void, op_put_by_id_fail) {
   CallFrame* callFrame = stackFrame.callFrame;
   Identifier& ident = stackFrame.args[1].identifier();
 
-  PutPropertySlot slot;
+  PutPropertySlot slot(callFrame->codeBlock()->isStrictMode());
   stackFrame.args[0].jsValue().put(callFrame, ident,
                                    stackFrame.args[2].jsValue(), slot);
 
@@ -1586,7 +1599,7 @@ DEFINE_STUB_FUNCTION(void, op_put_by_id_direct_fail) {
   CallFrame* callFrame = stackFrame.callFrame;
   Identifier& ident = stackFrame.args[1].identifier();
 
-  PutPropertySlot slot;
+  PutPropertySlot slot(callFrame->codeBlock()->isStrictMode());
   stackFrame.args[0].jsValue().putDirect(callFrame, ident,
                                          stackFrame.args[2].jsValue(), slot);
 
@@ -2024,8 +2037,13 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_del_by_id) {
 
   JSObject* baseObj = stackFrame.args[0].jsValue().toObject(callFrame);
 
-  JSValue result = jsBoolean(
-      baseObj->deleteProperty(callFrame, stackFrame.args[1].identifier()));
+  bool couldDelete =
+      baseObj->deleteProperty(callFrame, stackFrame.args[1].identifier());
+  JSValue result = jsBoolean(couldDelete);
+  if (!couldDelete && callFrame->codeBlock()->isStrictMode())
+    stackFrame.globalData->exception =
+        createTypeError(stackFrame.callFrame, "Unable to delete property.");
+
   CHECK_FOR_EXCEPTION_AT_END();
   return JSValue::encode(result);
 }
@@ -2406,8 +2424,10 @@ DEFINE_STUB_FUNCTION(void, op_tear_off_activation) {
   }
   JSActivation* activation = asActivation(stackFrame.args[0].jsValue());
   activation->copyRegisters();
-  if (JSValue v = stackFrame.args[1].jsValue())
-    asArguments(v)->setActivation(activation);
+  if (JSValue v = stackFrame.args[1].jsValue()) {
+    if (!stackFrame.callFrame->codeBlock()->isStrictMode())
+      asArguments(v)->setActivation(activation);
+  }
 }
 
 DEFINE_STUB_FUNCTION(void, op_tear_off_arguments) {
@@ -2705,7 +2725,7 @@ DEFINE_STUB_FUNCTION(void, op_put_by_val) {
     Identifier property(callFrame, subscript.toString(callFrame));
     if (!stackFrame.globalData->exception) {  // Don't put to an object if
                                               // toString threw an exception.
-      PutPropertySlot slot;
+      PutPropertySlot slot(callFrame->codeBlock()->isStrictMode());
       baseValue.put(callFrame, property, value, slot);
     }
   }
@@ -2751,7 +2771,7 @@ DEFINE_STUB_FUNCTION(void, op_put_by_val_byte_array) {
     Identifier property(callFrame, subscript.toString(callFrame));
     if (!stackFrame.globalData->exception) {  // Don't put to an object if
                                               // toString threw an exception.
-      PutPropertySlot slot;
+      PutPropertySlot slot(callFrame->codeBlock()->isStrictMode());
       baseValue.put(callFrame, property, value, slot);
     }
   }
@@ -3759,19 +3779,23 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_del_by_val) {
   JSObject* baseObj = baseValue.toObject(callFrame);  // may throw
 
   JSValue subscript = stackFrame.args[1].jsValue();
-  JSValue result;
+  bool result;
   uint32_t i;
   if (subscript.getUInt32(i))
-    result = jsBoolean(baseObj->deleteProperty(callFrame, i));
+    result = baseObj->deleteProperty(callFrame, i);
   else {
     CHECK_FOR_EXCEPTION();
     Identifier property(callFrame, subscript.toString(callFrame));
     CHECK_FOR_EXCEPTION();
-    result = jsBoolean(baseObj->deleteProperty(callFrame, property));
+    result = baseObj->deleteProperty(callFrame, property);
   }
 
+  if (!result && callFrame->codeBlock()->isStrictMode())
+    stackFrame.globalData->exception =
+        createTypeError(stackFrame.callFrame, "Unable to delete property.");
+
   CHECK_FOR_EXCEPTION_AT_END();
-  return JSValue::encode(result);
+  return JSValue::encode(jsBoolean(result));
 }
 
 DEFINE_STUB_FUNCTION(void, op_put_getter) {

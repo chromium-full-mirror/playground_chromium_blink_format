@@ -55,6 +55,9 @@ class PropertyNameArray;
 class Structure;
 struct HashTable;
 
+JSObject* throwTypeError(ExecState*, const UString&);
+extern const char* StrictModeReadonlyPropertyWriteError;
+
 // ECMA 262-3 8.6.1
 // Property attributes
 enum Attribute {
@@ -186,6 +189,7 @@ class JSObject : public JSCell {
   virtual JSObject* toObject(ExecState*) const;
 
   virtual JSObject* toThisObject(ExecState*) const;
+  virtual JSValue toStrictThisObject(ExecState*) const;
   virtual JSObject* unwrappedObject();
 
   bool getPropertySpecificValue(ExecState* exec,
@@ -223,7 +227,7 @@ class JSObject : public JSCell {
     return m_structure->hasGetterSetterProperties();
   }
 
-  void putDirect(const Identifier& propertyName,
+  bool putDirect(const Identifier& propertyName,
                  JSValue value,
                  unsigned attr,
                  bool checkReadOnly,
@@ -231,7 +235,7 @@ class JSObject : public JSCell {
   void putDirect(const Identifier& propertyName,
                  JSValue value,
                  unsigned attr = 0);
-  void putDirect(const Identifier& propertyName,
+  bool putDirect(const Identifier& propertyName,
                  JSValue value,
                  PutPropertySlot&);
 
@@ -292,6 +296,7 @@ class JSObject : public JSCell {
   virtual bool isVariableObject() const { return false; }
   virtual bool isActivationObject() const { return false; }
   virtual bool isNotAnObjectErrorStub() const { return false; }
+  virtual bool isStrictModeFunction() const { return false; }
 
   virtual ComplType exceptionType() const { return Throw; }
 
@@ -355,13 +360,13 @@ class JSObject : public JSCell {
     return reinterpret_cast<JSValue*>(&propertyStorage()[offset]);
   }
 
-  void putDirectInternal(const Identifier& propertyName,
+  bool putDirectInternal(const Identifier& propertyName,
                          JSValue value,
                          unsigned attr,
                          bool checkReadOnly,
                          PutPropertySlot& slot,
                          JSCell*);
-  void putDirectInternal(JSGlobalData&,
+  bool putDirectInternal(JSGlobalData&,
                          const Identifier& propertyName,
                          JSValue value,
                          unsigned attr,
@@ -556,7 +561,7 @@ inline JSValue JSObject::get(ExecState* exec, unsigned propertyName) const {
   return jsUndefined();
 }
 
-inline void JSObject::putDirectInternal(const Identifier& propertyName,
+inline bool JSObject::putDirectInternal(const Identifier& propertyName,
                                         JSValue value,
                                         unsigned attributes,
                                         bool checkReadOnly,
@@ -577,7 +582,8 @@ inline void JSObject::putDirectInternal(const Identifier& propertyName,
           (specificFunction != currentSpecificFunction))
         m_structure->despecifyDictionaryFunction(propertyName);
       if (checkReadOnly && currentAttributes & ReadOnly)
-        return;
+        return false;
+
       putDirectOffset(offset, value);
       // At this point, the objects structure only has a specific value set if
       // previously there
@@ -593,7 +599,7 @@ inline void JSObject::putDirectInternal(const Identifier& propertyName,
       if (!currentSpecificFunction ||
           (specificFunction != currentSpecificFunction))
         slot.setExistingProperty(this, offset);
-      return;
+      return true;
     }
 
     size_t currentCapacity = m_structure->propertyStorageCapacity();
@@ -608,7 +614,7 @@ inline void JSObject::putDirectInternal(const Identifier& propertyName,
     // See comment on setNewProperty call below.
     if (!specificFunction)
       slot.setNewProperty(this, offset);
-    return;
+    return true;
   }
 
   size_t offset;
@@ -629,7 +635,7 @@ inline void JSObject::putDirectInternal(const Identifier& propertyName,
     // so leave the slot in an uncachable state.
     if (!specificFunction)
       slot.setNewProperty(this, offset);
-    return;
+    return true;
   }
 
   unsigned currentAttributes;
@@ -638,7 +644,7 @@ inline void JSObject::putDirectInternal(const Identifier& propertyName,
                             currentSpecificFunction);
   if (offset != WTF::notFound) {
     if (checkReadOnly && currentAttributes & ReadOnly)
-      return;
+      return false;
 
     // There are three possibilities here:
     //  (1) There is an existing specific value set, and we're overwriting with
@@ -658,7 +664,7 @@ inline void JSObject::putDirectInternal(const Identifier& propertyName,
       // case (1) Do the put, then return leaving the slot uncachable.
       if (specificFunction == currentSpecificFunction) {
         putDirectOffset(offset, value);
-        return;
+        return true;
       }
       // case (2) Despecify, fall through to (3).
       setStructure(
@@ -668,7 +674,7 @@ inline void JSObject::putDirectInternal(const Identifier& propertyName,
     // case (3) set the slot, do the put, return.
     slot.setExistingProperty(this, offset);
     putDirectOffset(offset, value);
-    return;
+    return true;
   }
 
   // If we have a specific function, we may have got to this point if there is
@@ -696,9 +702,10 @@ inline void JSObject::putDirectInternal(const Identifier& propertyName,
   // so leave the slot in an uncachable state.
   if (!specificFunction)
     slot.setNewProperty(this, offset);
+  return true;
 }
 
-inline void JSObject::putDirectInternal(JSGlobalData& globalData,
+inline bool JSObject::putDirectInternal(JSGlobalData& globalData,
                                         const Identifier& propertyName,
                                         JSValue value,
                                         unsigned attributes,
@@ -707,8 +714,8 @@ inline void JSObject::putDirectInternal(JSGlobalData& globalData,
   ASSERT(value);
   ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
 
-  putDirectInternal(propertyName, value, attributes, checkReadOnly, slot,
-                    getJSFunction(globalData, value));
+  return putDirectInternal(propertyName, value, attributes, checkReadOnly, slot,
+                           getJSFunction(globalData, value));
 }
 
 inline void JSObject::putDirectInternal(JSGlobalData& globalData,
@@ -720,7 +727,7 @@ inline void JSObject::putDirectInternal(JSGlobalData& globalData,
                     getJSFunction(globalData, value));
 }
 
-inline void JSObject::putDirect(const Identifier& propertyName,
+inline bool JSObject::putDirect(const Identifier& propertyName,
                                 JSValue value,
                                 unsigned attributes,
                                 bool checkReadOnly,
@@ -728,7 +735,8 @@ inline void JSObject::putDirect(const Identifier& propertyName,
   ASSERT(value);
   ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
 
-  putDirectInternal(propertyName, value, attributes, checkReadOnly, slot, 0);
+  return putDirectInternal(propertyName, value, attributes, checkReadOnly, slot,
+                           0);
 }
 
 inline void JSObject::putDirect(const Identifier& propertyName,
@@ -738,10 +746,10 @@ inline void JSObject::putDirect(const Identifier& propertyName,
   putDirectInternal(propertyName, value, attributes, false, slot, 0);
 }
 
-inline void JSObject::putDirect(const Identifier& propertyName,
+inline bool JSObject::putDirect(const Identifier& propertyName,
                                 JSValue value,
                                 PutPropertySlot& slot) {
-  putDirectInternal(propertyName, value, 0, false, slot, 0);
+  return putDirectInternal(propertyName, value, 0, false, slot, 0);
 }
 
 inline void JSObject::putDirectFunction(const Identifier& propertyName,
@@ -863,12 +871,14 @@ inline void JSValue::put(ExecState* exec,
   asCell()->put(exec, propertyName, value, slot);
 }
 
-inline void JSValue::putDirect(ExecState*,
+inline void JSValue::putDirect(ExecState* exec,
                                const Identifier& propertyName,
                                JSValue value,
                                PutPropertySlot& slot) {
   ASSERT(isCell() && isObject());
-  asObject(asCell())->putDirect(propertyName, value, slot);
+  if (!asObject(asCell())->putDirect(propertyName, value, slot) &&
+      slot.isStrictMode())
+    throwTypeError(exec, StrictModeReadonlyPropertyWriteError);
 }
 
 inline void JSValue::put(ExecState* exec,
@@ -922,6 +932,12 @@ ALWAYS_INLINE UString JSValue::toThisString(ExecState* exec) const {
 inline JSString* JSValue::toThisJSString(ExecState* exec) const {
   return isString() ? static_cast<JSString*>(asCell())
                     : jsString(exec, toThisObject(exec)->toString(exec));
+}
+
+inline JSValue JSValue::toStrictThisObject(ExecState* exec) const {
+  if (!isObject())
+    return *this;
+  return asObject(asCell())->toStrictThisObject(exec);
 }
 
 }  // namespace JSC

@@ -161,6 +161,32 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
       exec, Identifier(exec, UString::number(i)), slot);
 }
 
+void Arguments::createStrictModeCallerIfNecessary(ExecState* exec) {
+  if (d->overrodeCaller)
+    return;
+
+  d->overrodeCaller = true;
+  PropertyDescriptor descriptor;
+  JSValue thrower = createTypeErrorFunction(
+      exec, "Unable to access caller of strict mode function");
+  descriptor.setAccessorDescriptor(thrower, thrower,
+                                   DontEnum | DontDelete | Getter | Setter);
+  defineOwnProperty(exec, exec->propertyNames().caller, descriptor, false);
+}
+
+void Arguments::createStrictModeCalleeIfNecessary(ExecState* exec) {
+  if (d->overrodeCallee)
+    return;
+
+  d->overrodeCallee = true;
+  PropertyDescriptor descriptor;
+  JSValue thrower = createTypeErrorFunction(
+      exec, "Unable to access callee of strict mode function");
+  descriptor.setAccessorDescriptor(thrower, thrower,
+                                   DontEnum | DontDelete | Getter | Setter);
+  defineOwnProperty(exec, exec->propertyNames().callee, descriptor, false);
+}
+
 bool Arguments::getOwnPropertySlot(ExecState* exec,
                                    const Identifier& propertyName,
                                    PropertySlot& slot) {
@@ -183,9 +209,15 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
 
   if (propertyName == exec->propertyNames().callee &&
       LIKELY(!d->overrodeCallee)) {
-    slot.setValue(d->callee);
-    return true;
+    if (!d->isStrictMode) {
+      slot.setValue(d->callee);
+      return true;
+    }
+    createStrictModeCalleeIfNecessary(exec);
   }
+
+  if (propertyName == exec->propertyNames().caller && d->isStrictMode)
+    createStrictModeCallerIfNecessary(exec);
 
   return JSObject::getOwnPropertySlot(exec, propertyName, slot);
 }
@@ -214,9 +246,15 @@ bool Arguments::getOwnPropertyDescriptor(ExecState* exec,
 
   if (propertyName == exec->propertyNames().callee &&
       LIKELY(!d->overrodeCallee)) {
-    descriptor.setDescriptor(d->callee, DontEnum);
-    return true;
+    if (!d->isStrictMode) {
+      descriptor.setDescriptor(d->callee, DontEnum);
+      return true;
+    }
+    createStrictModeCalleeIfNecessary(exec);
   }
+
+  if (propertyName == exec->propertyNames().caller && d->isStrictMode)
+    createStrictModeCallerIfNecessary(exec);
 
   return JSObject::getOwnPropertyDescriptor(exec, propertyName, descriptor);
 }
@@ -273,10 +311,16 @@ void Arguments::put(ExecState* exec,
   }
 
   if (propertyName == exec->propertyNames().callee && !d->overrodeCallee) {
-    d->overrodeCallee = true;
-    putDirect(propertyName, value, DontEnum);
-    return;
+    if (!d->isStrictMode) {
+      d->overrodeCallee = true;
+      putDirect(propertyName, value, DontEnum);
+      return;
+    }
+    createStrictModeCalleeIfNecessary(exec);
   }
+
+  if (propertyName == exec->propertyNames().caller && d->isStrictMode)
+    createStrictModeCallerIfNecessary(exec);
 
   JSObject::put(exec, propertyName, value, slot);
 }
@@ -317,9 +361,15 @@ bool Arguments::deleteProperty(ExecState* exec,
   }
 
   if (propertyName == exec->propertyNames().callee && !d->overrodeCallee) {
-    d->overrodeCallee = true;
-    return true;
+    if (!d->isStrictMode) {
+      d->overrodeCallee = true;
+      return true;
+    }
+    createStrictModeCalleeIfNecessary(exec);
   }
+
+  if (propertyName == exec->propertyNames().caller && !d->isStrictMode)
+    createStrictModeCallerIfNecessary(exec);
 
   return JSObject::deleteProperty(exec, propertyName);
 }

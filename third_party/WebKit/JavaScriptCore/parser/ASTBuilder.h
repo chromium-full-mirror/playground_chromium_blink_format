@@ -327,9 +327,9 @@ class ASTBuilder {
     return result;
   }
 
-  FunctionBodyNode* createFunctionBody() {
+  FunctionBodyNode* createFunctionBody(bool inStrictContext) {
     usesClosures();
-    return FunctionBodyNode::create(m_globalData);
+    return FunctionBodyNode::create(m_globalData, inStrictContext);
   }
 
   template <bool>
@@ -815,6 +815,8 @@ class ASTBuilder {
 
   const Identifier& getName(Property property) { return property->name(); }
   PropertyNode::Type getType(Property property) { return property->type(); }
+
+  bool isResolve(ExpressionNode* expr) { return expr->isResolveNode(); }
 
  private:
   struct Scope {

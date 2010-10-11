@@ -540,6 +540,8 @@ class BytecodeGenerator : public FastAllocBase {
 
   bool shouldEmitProfileHooks() { return m_shouldEmitProfileHooks; }
 
+  bool isStrictMode() const { return m_codeBlock->isStrictMode(); }
+
  private:
   void emitOpcode(OpcodeID);
   void retrieveLastBinaryOp(int& dstIndex, int& src1Index, int& src2Index);
@@ -639,14 +641,16 @@ class BytecodeGenerator : public FastAllocBase {
                                               FunctionBodyNode* body) {
     return FunctionExecutable::create(exec, body->ident(), body->source(),
                                       body->usesArguments(), body->parameters(),
-                                      body->lineNo(), body->lastLine());
+                                      body->isStrictMode(), body->lineNo(),
+                                      body->lastLine());
   }
 
   PassRefPtr<FunctionExecutable> makeFunction(JSGlobalData* globalData,
                                               FunctionBodyNode* body) {
     return FunctionExecutable::create(globalData, body->ident(), body->source(),
                                       body->usesArguments(), body->parameters(),
-                                      body->lineNo(), body->lastLine());
+                                      body->isStrictMode(), body->lineNo(),
+                                      body->lastLine());
   }
 
   RegisterID* emitInitLazyRegister(RegisterID*);

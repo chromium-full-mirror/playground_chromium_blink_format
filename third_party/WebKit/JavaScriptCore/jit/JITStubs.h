@@ -351,6 +351,7 @@ EncodedJSValue JIT_STUB cti_op_call_eval(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_construct_NotJSConstruct(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_create_this(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_convert_this(STUB_ARGS_DECLARATION);
+EncodedJSValue JIT_STUB cti_op_convert_this_strict(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_create_arguments(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB
     cti_op_create_arguments_no_params(STUB_ARGS_DECLARATION);

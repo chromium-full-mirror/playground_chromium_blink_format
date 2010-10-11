@@ -77,6 +77,7 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
   virtual bool allowsAccessFrom(const JSC::JSGlobalObject*) const;
 
   virtual JSC::JSObject* toThisObject(JSC::ExecState*) const;
+  virtual JSC::JSValue toStrictThisObject(JSC::ExecState*) const;
   JSDOMWindowShell* shell() const;
 
   static JSC::JSGlobalData* commonJSGlobalData();

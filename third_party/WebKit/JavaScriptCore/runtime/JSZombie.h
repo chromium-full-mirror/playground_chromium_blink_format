@@ -104,6 +104,10 @@ class JSZombie : public JSCell {
     ASSERT_NOT_REACHED();
     return 0;
   }
+  virtual JSValue toStrictThisObject(ExecState*) const {
+    ASSERT_NOT_REACHED();
+    return JSValue();
+  }
   virtual JSValue getJSNumber() {
     ASSERT_NOT_REACHED();
     return jsNull();

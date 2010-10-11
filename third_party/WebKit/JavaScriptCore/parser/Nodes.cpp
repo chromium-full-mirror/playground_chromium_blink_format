@@ -90,10 +90,10 @@ ScopeNodeData::ScopeNodeData(ParserArena& arena,
 
 // ------------------------------ ScopeNode -----------------------------
 
-ScopeNode::ScopeNode(JSGlobalData* globalData)
+ScopeNode::ScopeNode(JSGlobalData* globalData, bool inStrictContext)
     : StatementNode(globalData),
       ParserArenaRefCounted(globalData),
-      m_features(NoFeatures) {}
+      m_features(inStrictContext ? StrictModeFeature : NoFeatures) {}
 
 ScopeNode::ScopeNode(JSGlobalData* globalData,
                      const SourceCode& source,
@@ -202,8 +202,9 @@ FunctionParameters::FunctionParameters(ParameterNode* firstParameter) {
     append(parameter->ident());
 }
 
-inline FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData)
-    : ScopeNode(globalData) {}
+inline FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
+                                          bool inStrictContext)
+    : ScopeNode(globalData, inStrictContext) {}
 
 inline FunctionBodyNode::FunctionBodyNode(JSGlobalData* globalData,
                                           SourceElements* children,
@@ -236,8 +237,9 @@ void FunctionBodyNode::finishParsing(PassRefPtr<FunctionParameters> parameters,
   m_ident = ident;
 }
 
-FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData) {
-  return new FunctionBodyNode(globalData);
+FunctionBodyNode* FunctionBodyNode::create(JSGlobalData* globalData,
+                                           bool inStrictContext) {
+  return new FunctionBodyNode(globalData, inStrictContext);
 }
 
 PassRefPtr<FunctionBodyNode> FunctionBodyNode::create(

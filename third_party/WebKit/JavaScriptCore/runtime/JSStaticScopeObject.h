@@ -54,6 +54,7 @@ class JSStaticScopeObject : public JSVariableObject {
   virtual void markChildren(MarkStack&);
   bool isDynamicScope(bool& requiresDynamicChecks) const;
   virtual JSObject* toThisObject(ExecState*) const;
+  virtual JSValue toStrictThisObject(ExecState*) const;
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*, const Identifier&, JSValue, PutPropertySlot&);
   void putWithAttributes(ExecState*,

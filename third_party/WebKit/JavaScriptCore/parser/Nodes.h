@@ -58,6 +58,7 @@ const CodeFeatures ArgumentsFeature = 1 << 3;
 const CodeFeatures WithFeature = 1 << 4;
 const CodeFeatures CatchFeature = 1 << 5;
 const CodeFeatures ThisFeature = 1 << 6;
+const CodeFeatures StrictModeFeature = 1 << 7;
 const CodeFeatures AllFeatures = EvalFeature | ClosureFeature | AssignFeature |
                                  ArgumentsFeature | WithFeature | CatchFeature |
                                  ThisFeature;
@@ -1718,7 +1719,7 @@ class ScopeNode : public StatementNode, public ParserArenaRefCounted {
   typedef DeclarationStacks::VarStack VarStack;
   typedef DeclarationStacks::FunctionStack FunctionStack;
 
-  ScopeNode(JSGlobalData*);
+  ScopeNode(JSGlobalData*, bool inStrictContext);
   ScopeNode(JSGlobalData*,
             const SourceCode&,
             SourceElements*,
@@ -1742,6 +1743,7 @@ class ScopeNode : public StatementNode, public ParserArenaRefCounted {
 
   bool usesEval() const { return m_features & EvalFeature; }
   bool usesArguments() const { return m_features & ArgumentsFeature; }
+  bool isStrictMode() const { return m_features & StrictModeFeature; }
   void setUsesArguments() { m_features |= ArgumentsFeature; }
   bool usesThis() const { return m_features & ThisFeature; }
   bool needsActivationForMoreThanVariables() const {
@@ -1794,6 +1796,7 @@ class ScopeNode : public StatementNode, public ParserArenaRefCounted {
 
 class ProgramNode : public ScopeNode {
  public:
+  static const bool isFunctionNode = false;
   static PassRefPtr<ProgramNode> create(JSGlobalData*,
                                         SourceElements*,
                                         VarStack*,
@@ -1820,6 +1823,7 @@ class ProgramNode : public ScopeNode {
 
 class EvalNode : public ScopeNode {
  public:
+  static const bool isFunctionNode = false;
   static PassRefPtr<EvalNode> create(JSGlobalData*,
                                      SourceElements*,
                                      VarStack*,
@@ -1857,7 +1861,8 @@ class FunctionParameters : public Vector<Identifier>,
 
 class FunctionBodyNode : public ScopeNode {
  public:
-  static FunctionBodyNode* create(JSGlobalData*);
+  static const bool isFunctionNode = true;
+  static FunctionBodyNode* create(JSGlobalData*, bool isStrictMode);
   static PassRefPtr<FunctionBodyNode> create(JSGlobalData*,
                                              SourceElements*,
                                              VarStack*,
@@ -1880,7 +1885,7 @@ class FunctionBodyNode : public ScopeNode {
   static const bool scopeIsFunction = true;
 
  private:
-  FunctionBodyNode(JSGlobalData*);
+  FunctionBodyNode(JSGlobalData*, bool inStrictContext);
   FunctionBodyNode(JSGlobalData*,
                    SourceElements*,
                    VarStack*,

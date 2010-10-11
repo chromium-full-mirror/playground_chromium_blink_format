@@ -147,6 +147,7 @@ class JSGlobalObject : public JSVariableObject {
     RefPtr<Structure> regExpMatchesArrayStructure;
     RefPtr<Structure> regExpStructure;
     RefPtr<Structure> stringObjectStructure;
+    RefPtr<Structure> internalFunctionStructure;
 
     SymbolTable symbolTable;
     unsigned profileGroup;
@@ -288,6 +289,9 @@ class JSGlobalObject : public JSVariableObject {
   }
   Structure* prototypeFunctionStructure() const {
     return d()->prototypeFunctionStructure.get();
+  }
+  Structure* internalFunctionStructure() const {
+    return d()->internalFunctionStructure.get();
   }
   Structure* regExpMatchesArrayStructure() const {
     return d()->regExpMatchesArrayStructure.get();
