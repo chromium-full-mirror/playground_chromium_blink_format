@@ -542,6 +542,7 @@ void HTMLMediaElement::prepareForLoad() {
 
   // 1 - Abort any already-running instance of the resource selection algorithm
   // for this element.
+  m_loadState = WaitingForSource;
   m_currentSourceNode = 0;
 
   // 2 - If there are any tasks from the media element's media element event
@@ -910,6 +911,10 @@ void HTMLMediaElement::setNetworkState(MediaPlayer::NetworkState state) {
     // <source> children, schedule the next one
     if (m_readyState < HAVE_METADATA &&
         m_loadState == LoadingFromSourceElement) {
+      ASSERT(m_currentSourceNode);
+      if (!m_currentSourceNode)
+        return;
+
       m_currentSourceNode->scheduleErrorEvent();
       if (havePotentialSourceChild()) {
         LOG(Media,
