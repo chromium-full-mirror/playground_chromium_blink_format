@@ -4520,10 +4520,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
                          .jsValue())
         asArguments(argumentsValue)->copyRegisters();
 
-      if (JSValue arguments =
-              callFrame->r(unmodifiedArgumentsRegister(src2)).jsValue()) {
+      if (JSValue argumentsValue =
+              callFrame->r(unmodifiedArgumentsRegister(arguments)).jsValue()) {
         if (!codeBlock->isStrictMode())
-          asArguments(arguments)->setActivation(activation);
+          asArguments(argumentsValue)
+              ->setActivation(asActivation(activationValue));
       }
 
       vPC += OPCODE_LENGTH(op_tear_off_activation);
