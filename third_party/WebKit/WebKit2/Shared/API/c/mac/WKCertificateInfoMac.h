@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 WK_EXPORT CFArrayRef
-WKCertificateInfoGetPeerCertificates(WKCertificateInfoRef certificateInfo);
+WKCertificateInfoGetCertificateChain(WKCertificateInfoRef certificateInfo);
 
 #ifdef __cplusplus
 }

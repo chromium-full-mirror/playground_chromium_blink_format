@@ -41,7 +41,7 @@ class PlatformCertificateInfo {
   PlatformCertificateInfo();
   explicit PlatformCertificateInfo(const WebCore::ResourceResponse&);
 
-  CFArrayRef peerCertificates() const { return m_peerCertificates.get(); }
+  CFArrayRef certificateChain() const { return m_certificateChain.get(); }
 
   void encode(CoreIPC::ArgumentEncoder* encoder) const;
   static bool decode(CoreIPC::ArgumentDecoder* decoder,
@@ -52,7 +52,7 @@ class PlatformCertificateInfo {
 #endif
 
  private:
-  RetainPtr<CFArrayRef> m_peerCertificates;
+  RetainPtr<CFArrayRef> m_certificateChain;
 };
 
 }  // namespace WebKit
