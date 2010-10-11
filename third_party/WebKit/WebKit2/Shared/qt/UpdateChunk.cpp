@@ -79,6 +79,7 @@ static MappedMemory* mapFile(QString fileName, size_t size) {
   newMap.data = newMap.file->map(0, size);
   ASSERT(!newMap.isFree());
   newMap.file->close();
+  newMap.file->remove();  // The map stays alive even when the file is unlinked.
   return &pool->append(newMap);
 }
 
