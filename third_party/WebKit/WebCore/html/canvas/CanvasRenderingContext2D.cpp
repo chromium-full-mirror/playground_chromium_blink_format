@@ -131,9 +131,9 @@ CanvasRenderingContext2D::CanvasRenderingContext2D(
     return;
   if (!p->settings()->accelerated2dCanvasEnabled())
     return;
-  m_context3D = p->sharedGraphicsContext3D();
-  if (m_context3D) {
-    if (GraphicsContext* c = drawingContext()) {
+  if (GraphicsContext* c = drawingContext()) {
+    m_context3D = p->sharedGraphicsContext3D();
+    if (m_context3D) {
       m_drawingBuffer = DrawingBuffer::create(
           m_context3D.get(), IntSize(canvas->width(), canvas->height()));
       c->setSharedGraphicsContext3D(m_context3D.get(), m_drawingBuffer.get(),
@@ -166,8 +166,8 @@ void CanvasRenderingContext2D::reset() {
   m_stateStack.first() = State();
   m_path.clear();
 #if ENABLE(ACCELERATED_2D_CANVAS)
-  if (m_context3D) {
-    if (GraphicsContext* c = drawingContext()) {
+  if (GraphicsContext* c = drawingContext()) {
+    if (m_context3D) {
       m_drawingBuffer->reset(IntSize(canvas()->width(), canvas()->height()));
       c->setSharedGraphicsContext3D(
           m_context3D.get(), m_drawingBuffer.get(),
