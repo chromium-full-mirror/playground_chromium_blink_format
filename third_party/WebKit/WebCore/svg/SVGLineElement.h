@@ -47,7 +47,7 @@ class SVGLineElement : public SVGStyledTransformableElement,
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 
-  virtual Path toPathData() const;
+  virtual void toPathData(Path&) const;
 
   virtual bool supportsMarkers() const { return true; }
 

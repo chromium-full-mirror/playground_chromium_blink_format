@@ -37,20 +37,18 @@ PassRefPtr<SVGPolylineElement> SVGPolylineElement::create(
   return adoptRef(new SVGPolylineElement(tagName, document));
 }
 
-Path SVGPolylineElement::toPathData() const {
-  Path polyData;
+void SVGPolylineElement::toPathData(Path& path) const {
+  ASSERT(path.isEmpty());
 
   int len = points()->numberOfItems();
   if (len < 1)
-    return polyData;
+    return;
 
   ExceptionCode ec = 0;
-  polyData.moveTo(points()->getItem(0, ec));
+  path.moveTo(points()->getItem(0, ec));
 
   for (int i = 1; i < len; ++i)
-    polyData.addLineTo(points()->getItem(i, ec));
-
-  return polyData;
+    path.addLineTo(points()->getItem(i, ec));
 }
 }
 

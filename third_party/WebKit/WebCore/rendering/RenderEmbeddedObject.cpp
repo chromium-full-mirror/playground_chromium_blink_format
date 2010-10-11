@@ -223,9 +223,9 @@ bool RenderEmbeddedObject::getReplacementTextGeometry(
             contentRect.location().y();
   replacementTextRect.setLocation(FloatPoint(x, y));
 
-  path = Path::createRoundedRectangle(
-      replacementTextRect, FloatSize(replacementTextRoundedRectRadius,
-                                     replacementTextRoundedRectRadius));
+  path.addRoundedRect(replacementTextRect,
+                      FloatSize(replacementTextRoundedRectRadius,
+                                replacementTextRoundedRectRadius));
 
   return true;
 }

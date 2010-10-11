@@ -127,7 +127,7 @@ class SVGPathElement : public SVGStyledTransformableElement,
   virtual SVGPathSegList* animatedPathSegList() const;
   virtual SVGPathSegList* animatedNormalizedPathSegList() const;
 
-  virtual Path toPathData() const;
+  virtual void toPathData(Path&) const;
 
  private:
   SVGPathElement(const QualifiedName&, Document*);

@@ -33,7 +33,7 @@ class SVGPolylineElement : public SVGPolyElement {
  private:
   SVGPolylineElement(const QualifiedName&, Document*);
 
-  virtual Path toPathData() const;
+  virtual void toPathData(Path&) const;
 };
 
 }  // namespace WebCore

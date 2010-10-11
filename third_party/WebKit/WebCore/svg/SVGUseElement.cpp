@@ -664,12 +664,14 @@ static bool isDirectReference(Node* n) {
          n->hasTagName(SVGNames::textTag);
 }
 
-Path SVGUseElement::toClipPath() const {
+void SVGUseElement::toClipPath(Path& path) const {
+  ASSERT(path.isEmpty());
+
   Node* n = m_targetElementInstance
                 ? m_targetElementInstance->shadowTreeElement()
                 : 0;
   if (!n)
-    return Path();
+    return;
 
   if (n->isSVGElement() &&
       static_cast<SVGElement*>(n)->isStyledTransformable()) {
@@ -678,15 +680,11 @@ Path SVGUseElement::toClipPath() const {
       document()->accessSVGExtensions()->reportError(
           "Not allowed to use indirect reference in <clip-path>");
     else {
-      Path clipPath =
-          static_cast<SVGStyledTransformableElement*>(n)->toClipPath();
-      clipPath.translate(FloatSize(x().value(this), y().value(this)));
-      clipPath.transform(animatedLocalTransform());
-      return clipPath;
+      static_cast<SVGStyledTransformableElement*>(n)->toClipPath(path);
+      path.translate(FloatSize(x().value(this), y().value(this)));
+      path.transform(animatedLocalTransform());
     }
   }
-
-  return Path();
 }
 
 RenderObject* SVGUseElement::rendererClipChild() const {

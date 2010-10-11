@@ -121,9 +121,11 @@ void SVGLineElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeExternalResourcesRequired();
 }
 
-Path SVGLineElement::toPathData() const {
-  return Path::createLine(FloatPoint(x1().value(this), y1().value(this)),
-                          FloatPoint(x2().value(this), y2().value(this)));
+void SVGLineElement::toPathData(Path& path) const {
+  ASSERT(path.isEmpty());
+
+  path.moveTo(FloatPoint(x1().value(this), y1().value(this)));
+  path.addLineTo(FloatPoint(x2().value(this), y2().value(this)));
 }
 
 bool SVGLineElement::selfHasRelativeLengths() const {

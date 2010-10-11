@@ -56,14 +56,18 @@ PassRefPtr<SVGPathElement> SVGPathElement::create(const QualifiedName& tagName,
 float SVGPathElement::getTotalLength() {
   // FIXME: this may wish to use the pathSegList instead of the pathdata if
   // that's cheaper to build (or cached)
-  return toPathData().length();
+  Path path;
+  toPathData(path);
+  return path.length();
 }
 
 FloatPoint SVGPathElement::getPointAtLength(float length) {
   // FIXME: this may wish to use the pathSegList instead of the pathdata if
   // that's cheaper to build (or cached)
   bool ok = false;
-  return toPathData().pointAtLength(length, ok);
+  Path path;
+  toPathData(path);
+  return path.pointAtLength(length, ok);
 }
 
 unsigned long SVGPathElement::getPathSegAtLength(float length) {
@@ -294,11 +298,11 @@ SVGPathSegList* SVGPathElement::animatedNormalizedPathSegList() const {
   return 0;
 }
 
-Path SVGPathElement::toPathData() const {
-  Path result;
+void SVGPathElement::toPathData(Path& path) const {
+  ASSERT(path.isEmpty());
+
   SVGPathParserFactory* factory = SVGPathParserFactory::self();
-  factory->buildPathFromSVGPathSegList(pathSegList(), result);
-  return result;
+  factory->buildPathFromSVGPathSegList(pathSegList(), path);
 }
 }
 

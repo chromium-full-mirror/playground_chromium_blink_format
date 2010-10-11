@@ -68,7 +68,7 @@ class SVGUseElement : public SVGStyledTransformableElement,
   virtual void attach();
   virtual void detach();
 
-  virtual Path toClipPath() const;
+  virtual void toClipPath(Path&) const;
 
   static void removeDisallowedElementsFromSubtree(Node* element);
 

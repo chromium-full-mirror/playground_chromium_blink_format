@@ -696,8 +696,9 @@ void GraphicsContext::fillRoundedRect(const IntRect& rect,
   if (oldFillColor != color || oldColorSpace != colorSpace)
     setCGFillColor(context, color, colorSpace);
 
-  addPath(Path::createRoundedRectangle(rect, topLeft, topRight, bottomLeft,
-                                       bottomRight));
+  Path path;
+  path.addRoundedRect(rect, topLeft, topRight, bottomLeft, bottomRight);
+  addPath(path);
   fillPath();
 
   if (oldFillColor != color || oldColorSpace != colorSpace)
