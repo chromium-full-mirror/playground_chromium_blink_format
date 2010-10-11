@@ -59,6 +59,7 @@ class DirectoryEntrySync : public EntrySync {
   PassRefPtr<DirectoryEntrySync> getDirectory(const String& path,
                                               PassRefPtr<Flags>,
                                               ExceptionCode&);
+  void removeRecursively(ExceptionCode&);
 
  private:
   friend class EntrySync;

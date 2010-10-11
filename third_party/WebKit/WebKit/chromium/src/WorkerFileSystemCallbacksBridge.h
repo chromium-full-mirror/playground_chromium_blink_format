@@ -104,6 +104,9 @@ class WorkerFileSystemCallbacksBridge
   void postRemoveToMainThread(WebFileSystem*,
                               const String& path,
                               const String& mode);
+  void postRemoveRecursivelyToMainThread(WebFileSystem*,
+                                         const String& path,
+                                         const String& mode);
   void postReadMetadataToMainThread(WebFileSystem*,
                                     const String& path,
                                     const String& mode);
@@ -165,6 +168,11 @@ class WorkerFileSystemCallbacksBridge
                                  const String& path,
                                  WorkerFileSystemCallbacksBridge*,
                                  const String& mode);
+  static void removeRecursivelyOnMainThread(WebCore::ScriptExecutionContext*,
+                                            WebFileSystem*,
+                                            const String& path,
+                                            WorkerFileSystemCallbacksBridge*,
+                                            const String& mode);
   static void readMetadataOnMainThread(WebCore::ScriptExecutionContext*,
                                        WebFileSystem*,
                                        const String& path,

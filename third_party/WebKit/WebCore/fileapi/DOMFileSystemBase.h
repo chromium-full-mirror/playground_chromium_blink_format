@@ -84,6 +84,9 @@ class DOMFileSystemBase : public RefCounted<DOMFileSystemBase> {
   bool remove(const EntryBase*,
               PassRefPtr<VoidCallback>,
               PassRefPtr<ErrorCallback>);
+  bool removeRecursively(const EntryBase*,
+                         PassRefPtr<VoidCallback>,
+                         PassRefPtr<ErrorCallback>);
   bool getParent(const EntryBase*,
                  PassRefPtr<EntryCallback>,
                  PassRefPtr<ErrorCallback>);

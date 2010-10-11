@@ -75,6 +75,17 @@ PassRefPtr<DirectoryEntrySync> DirectoryEntrySync::getDirectory(
   }
   return static_pointer_cast<DirectoryEntrySync>(helper.getResult(ec));
 }
+
+void DirectoryEntrySync::removeRecursively(ExceptionCode& ec) {
+  ec = 0;
+  VoidSyncCallbackHelper helper(m_fileSystem->asyncFileSystem());
+  if (!m_fileSystem->removeRecursively(this, helper.successCallback(),
+                                       helper.errorCallback())) {
+    ec = INVALID_MODIFICATION_ERR;
+    return;
+  }
+  helper.getResult(ec);
+}
 }
 
 #endif  // ENABLE(FILE_SYSTEM)

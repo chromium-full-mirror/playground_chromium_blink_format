@@ -80,6 +80,13 @@ void AsyncFileSystemChromium::remove(
                           new WebKit::WebFileSystemCallbacksImpl(callbacks));
 }
 
+void AsyncFileSystemChromium::removeRecursively(
+    const String& path,
+    PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
+  m_webFileSystem->removeRecursively(
+      path, new WebKit::WebFileSystemCallbacksImpl(callbacks));
+}
+
 void AsyncFileSystemChromium::readMetadata(
     const String& path,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {

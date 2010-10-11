@@ -91,11 +91,19 @@ class AsyncFileSystem : public Noncopyable {
                     PassOwnPtr<AsyncFileSystemCallbacks>) = 0;
 
   // Deletes a file or directory at a given path.
+  // It is an error to try to remove a directory that is not empty.
   // AsyncFileSystemCallbacks::didSucceed() is called when the operation is
   // completed successfully.
   // AsyncFileSystemCallbacks::didFail() is called otherwise.
   virtual void remove(const String& path,
                       PassOwnPtr<AsyncFileSystemCallbacks>) = 0;
+
+  // Recursively deletes a directory at a given path.
+  // AsyncFileSystemCallbacks::didSucceed() is called when the operation is
+  // completed successfully.
+  // AsyncFileSystemCallbacks::didFail() is called otherwise.
+  virtual void removeRecursively(const String& path,
+                                 PassOwnPtr<AsyncFileSystemCallbacks>) = 0;
 
   // Retrieves the metadata information of the file or directory at a given
   // path.

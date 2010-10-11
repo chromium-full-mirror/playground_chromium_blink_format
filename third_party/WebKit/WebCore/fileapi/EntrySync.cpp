@@ -91,8 +91,10 @@ void EntrySync::remove(ExceptionCode& ec) const {
   ec = 0;
   VoidSyncCallbackHelper helper(m_fileSystem->asyncFileSystem());
   if (!m_fileSystem->remove(this, helper.successCallback(),
-                            helper.errorCallback()))
+                            helper.errorCallback())) {
     ec = INVALID_MODIFICATION_ERR;
+    return;
+  }
   helper.getResult(ec);
 }
 

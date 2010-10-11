@@ -37,6 +37,7 @@
 #include "EntryCallback.h"
 #include "ErrorCallback.h"
 #include "FileError.h"
+#include "VoidCallback.h"
 
 namespace WebCore {
 
@@ -65,6 +66,15 @@ void DirectoryEntry::getDirectory(const String& path,
   RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
   if (!m_fileSystem->getDirectory(this, path, flags, successCallback,
                                   errorCallback))
+    filesystem()->scheduleCallback(errorCallback.release(),
+                                   FileError::create(INVALID_MODIFICATION_ERR));
+}
+
+void DirectoryEntry::removeRecursively(
+    PassRefPtr<VoidCallback> successCallback,
+    PassRefPtr<ErrorCallback> errorCallbackRef) const {
+  RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
+  if (!m_fileSystem->removeRecursively(this, successCallback, errorCallback))
     filesystem()->scheduleCallback(errorCallback.release(),
                                    FileError::create(INVALID_MODIFICATION_ERR));
 }

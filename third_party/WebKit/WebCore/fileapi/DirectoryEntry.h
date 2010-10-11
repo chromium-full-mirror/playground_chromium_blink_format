@@ -45,6 +45,7 @@ class DOMFileSystemBase;
 class DirectoryReader;
 class EntryCallback;
 class ErrorCallback;
+class VoidCallback;
 
 class DirectoryEntry : public Entry {
  public:
@@ -63,6 +64,8 @@ class DirectoryEntry : public Entry {
                     PassRefPtr<Flags> = 0,
                     PassRefPtr<EntryCallback> = 0,
                     PassRefPtr<ErrorCallback> = 0);
+  void removeRecursively(PassRefPtr<VoidCallback> successCallback = 0,
+                         PassRefPtr<ErrorCallback> = 0) const;
 
  private:
   DirectoryEntry(DOMFileSystemBase*, const String& fullPath);

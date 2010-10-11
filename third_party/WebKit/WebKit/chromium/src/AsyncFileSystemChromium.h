@@ -59,6 +59,8 @@ class AsyncFileSystemChromium : public AsyncFileSystem {
                     const String& destinationPath,
                     PassOwnPtr<AsyncFileSystemCallbacks>);
   virtual void remove(const String& path, PassOwnPtr<AsyncFileSystemCallbacks>);
+  virtual void removeRecursively(const String& path,
+                                 PassOwnPtr<AsyncFileSystemCallbacks>);
   virtual void readMetadata(const String& path,
                             PassOwnPtr<AsyncFileSystemCallbacks>);
   virtual void createFile(const String& path,

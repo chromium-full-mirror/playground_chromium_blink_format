@@ -110,6 +110,14 @@ void WorkerAsyncFileSystemChromium::remove(
       m_webFileSystem, path, m_modeForCurrentOperation);
 }
 
+void WorkerAsyncFileSystemChromium::removeRecursively(
+    const String& path,
+    PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
+  createWorkerFileSystemCallbacksBridge(callbacks)
+      ->postRemoveRecursivelyToMainThread(m_webFileSystem, path,
+                                          m_modeForCurrentOperation);
+}
+
 void WorkerAsyncFileSystemChromium::readMetadata(
     const String& path,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
