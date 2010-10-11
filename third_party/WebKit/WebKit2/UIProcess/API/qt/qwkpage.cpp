@@ -73,6 +73,11 @@ void QWKPagePrivate::setCursor(const WebCore::Cursor& cursor) {
 #endif
 }
 
+void QWKPagePrivate::setViewportArguments(const ViewportArguments& args) {
+  viewportArguments = args;
+  emit q->viewportChangeRequested();
+}
+
 void QWKPagePrivate::toolTipChanged(const String&, const String& newTooltip) {
   emit q->statusBarMessage(QString(newTooltip));
 }
@@ -270,7 +275,7 @@ QWKPage::~QWKPage() {
   delete d;
 }
 
-QWKPage::ViewportConfiguration::ViewportConfiguration()
+QWKPage::ViewportAttributes::ViewportAttributes()
     : d(0),
       m_initialScaleFactor(-1.0),
       m_minimumScaleFactor(-1.0),
@@ -279,8 +284,8 @@ QWKPage::ViewportConfiguration::ViewportConfiguration()
       m_isUserScalable(true),
       m_isValid(false) {}
 
-QWKPage::ViewportConfiguration::ViewportConfiguration(
-    const QWKPage::ViewportConfiguration& other)
+QWKPage::ViewportAttributes::ViewportAttributes(
+    const QWKPage::ViewportAttributes& other)
     : d(other.d),
       m_initialScaleFactor(other.m_initialScaleFactor),
       m_minimumScaleFactor(other.m_minimumScaleFactor),
@@ -290,10 +295,10 @@ QWKPage::ViewportConfiguration::ViewportConfiguration(
       m_isValid(other.m_isValid),
       m_size(other.m_size) {}
 
-QWKPage::ViewportConfiguration::~ViewportConfiguration() {}
+QWKPage::ViewportAttributes::~ViewportAttributes() {}
 
-QWKPage::ViewportConfiguration& QWKPage::ViewportConfiguration::operator=(
-    const QWKPage::ViewportConfiguration& other) {
+QWKPage::ViewportAttributes& QWKPage::ViewportAttributes::operator=(
+    const QWKPage::ViewportAttributes& other) {
   if (this != &other) {
     d = other.d;
     m_initialScaleFactor = other.m_initialScaleFactor;
@@ -308,7 +313,7 @@ QWKPage::ViewportConfiguration& QWKPage::ViewportConfiguration::operator=(
   return *this;
 }
 
-QWKPage::ViewportConfiguration QWKPage::viewportConfigurationForSize(
+QWKPage::ViewportAttributes QWKPage::viewportAttributesForSize(
     QSize availableSize) const {
   static int desktopWidth = 980;
   static int deviceDPI = 160;
@@ -318,12 +323,11 @@ QWKPage::ViewportConfiguration QWKPage::viewportConfigurationForSize(
   int deviceWidth = 480;
   int deviceHeight = 864;
 
-  ViewportArguments args;
-
   WebCore::ViewportAttributes conf = WebCore::computeViewportAttributes(
-      args, desktopWidth, deviceWidth, deviceHeight, deviceDPI, availableSize);
+      d->viewportArguments, desktopWidth, deviceWidth, deviceHeight, deviceDPI,
+      availableSize);
 
-  ViewportConfiguration result;
+  ViewportAttributes result;
 
   result.m_isValid = true;
   result.m_size = conf.layoutSize;

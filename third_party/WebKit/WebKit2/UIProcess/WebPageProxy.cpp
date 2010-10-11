@@ -946,6 +946,10 @@ void WebPageProxy::runBeforeUnloadConfirmPanel(const String& message,
       this, message, process()->webFrame(frameID));
 }
 
+void WebPageProxy::didChangeViewportData(const ViewportArguments& args) {
+  m_pageClient->setViewportArguments(args);
+}
+
 // BackForwardList
 
 void WebPageProxy::backForwardAddItem(uint64_t itemID) {

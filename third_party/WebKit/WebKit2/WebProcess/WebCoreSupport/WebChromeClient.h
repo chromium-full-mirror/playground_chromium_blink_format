@@ -28,6 +28,7 @@
 #define WebChromeClient_h
 
 #include <WebCore/ChromeClient.h>
+#include <WebCore/ViewportArguments.h>
 #include <wtf/text/WTFString.h>
 
 namespace WebKit {
@@ -226,6 +227,9 @@ class WebChromeClient : public WebCore::ChromeClient {
 #if PLATFORM(WIN)
   virtual void setLastSetCursorToCurrentCursor();
 #endif
+
+  virtual void dispatchViewportDataDidChange(
+      const WebCore::ViewportArguments&) const;
 
   String m_cachedToolTip;
   WebPage* m_page;
