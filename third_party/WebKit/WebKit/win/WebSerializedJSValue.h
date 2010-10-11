@@ -53,6 +53,8 @@ class WebSerializedJSValue : public Noncopyable,
                                                 JSValueRef* result);
   virtual HRESULT STDMETHODCALLTYPE
   setInternalRepresentation(void* internalRepresentation);
+  virtual HRESULT STDMETHODCALLTYPE
+  getInternalRepresentation(void** internalRepresentation);
 
  private:
   WebSerializedJSValue();

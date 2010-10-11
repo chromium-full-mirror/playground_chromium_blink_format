@@ -114,3 +114,12 @@ HRESULT WebSerializedJSValue::setInternalRepresentation(
 
   return S_OK;
 }
+
+HRESULT WebSerializedJSValue::getInternalRepresentation(
+    void** internalRepresentation) {
+  if (!m_value)
+    return E_POINTER;
+
+  *internalRepresentation = m_value.get();
+  return S_OK;
+}
