@@ -26,6 +26,8 @@
 #ifndef RenderMediaControls_h
 #define RenderMediaControls_h
 
+#if ENABLE(VIDEO)
+
 #include "RenderObject.h"
 #include "MediaControlElements.h"
 
@@ -43,5 +45,7 @@ class RenderMediaControls {
 };
 
 }  // namespace WebCore
+
+#endif  // ENABLE(VIDEO)
 
 #endif  // RenderMediaControls_h
