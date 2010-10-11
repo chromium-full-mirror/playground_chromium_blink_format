@@ -55,6 +55,8 @@ class SharedMemory : public RefCounted<SharedMemory> {
     friend class SharedMemory;
 #if PLATFORM(MAC)
     mutable mach_port_t m_port;
+#elif PLATFORM(WIN)
+    mutable HANDLE m_handle;
 #endif
     size_t m_size;
   };
@@ -80,6 +82,9 @@ class SharedMemory : public RefCounted<SharedMemory> {
  private:
   size_t m_size;
   void* m_data;
+#if PLATFORM(WIN)
+  HANDLE m_handle;
+#endif
 };
 };
 
