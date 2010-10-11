@@ -25,7 +25,7 @@
 
 #include "config.h"
 
-#if ENABLE(3D_CANVAS)
+#if ENABLE(3D_CANVAS) || ENABLE(BLOB)
 
 #include "ArrayBuffer.h"
 
@@ -84,4 +84,4 @@ void* ArrayBuffer::tryAllocate(unsigned numElements, unsigned elementByteSize) {
 }
 }
 
-#endif  // ENABLE(3D_CANVAS)
+#endif  // ENABLE(3D_CANVAS) || ENABLE(BLOB)
