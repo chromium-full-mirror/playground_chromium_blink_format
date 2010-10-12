@@ -96,8 +96,8 @@ bool WebBackForwardList::restoreFromCFDictionaryRepresentation(
     return false;
   }
 
-  unsigned currentIndex;
-  if (!CFNumberGetValue(cfIndex, kCFNumberIntType, &currentIndex)) {
+  CFIndex currentIndex;
+  if (!CFNumberGetValue(cfIndex, kCFNumberCFIndexType, &currentIndex)) {
     LOG(SessionState,
         "WebBackForwardList dictionary representation does not have a valid "
         "integer current index");
