@@ -125,6 +125,7 @@ class FileWriter : public RefCounted<FileWriter>,
   long long m_bytesWritten;
   long long m_bytesToWrite;
   long long m_truncateLength;
+  RefPtr<Blob> m_blobBeingWritten;
 };
 
 }  // namespace WebCore
