@@ -615,6 +615,10 @@ void WebViewHost::show(WebNavigationPolicy) {
 void WebViewHost::closeWidgetSoon() {
   m_hasWindow = false;
   m_shell->closeWindow(this);
+  if (m_inModalLoop) {
+    m_inModalLoop = false;
+    webkit_support::QuitMessageLoop();
+  }
 }
 
 void WebViewHost::didChangeCursor(const WebCursorInfo& cursorInfo) {
@@ -651,7 +655,11 @@ WebRect WebViewHost::windowResizerRect() {
 }
 
 void WebViewHost::runModal() {
-  // FIXME: Should we implement this in DRT?
+  bool oldState = webkit_support::MessageLoopNestableTasksAllowed();
+  webkit_support::MessageLoopSetNestableTasksAllowed(true);
+  m_inModalLoop = true;
+  webkit_support::RunMessageLoop();
+  webkit_support::MessageLoopSetNestableTasksAllowed(oldState);
 }
 
 // WebFrameClient ------------------------------------------------------------
@@ -1026,6 +1034,7 @@ WebViewHost::WebViewHost(TestShell* shell)
       m_pageId(-1),
       m_lastPageIdUpdated(-1),
       m_hasWindow(false),
+      m_inModalLoop(false),
       m_smartInsertDeleteEnabled(true)
 #if OS(WINDOWS)
       ,

@@ -320,6 +320,7 @@ class WebViewHost : public WebKit::WebViewClient,
   WebKit::WebCursorInfo m_currentCursor;
 
   bool m_hasWindow;
+  bool m_inModalLoop;
   WebKit::WebRect m_windowRect;
 
   // true if we want to enable smart insert/delete.
