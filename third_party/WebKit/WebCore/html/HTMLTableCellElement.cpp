@@ -157,4 +157,21 @@ void HTMLTableCellElement::addSubresourceAttributeURLs(
   addSubresourceURL(urls,
                     document()->completeURL(getAttribute(backgroundAttr)));
 }
+
+HTMLTableCellElement* HTMLTableCellElement::cellAbove() const {
+  RenderObject* cellRenderer = renderer();
+  if (!cellRenderer)
+    return 0;
+  if (!cellRenderer->isTableCell())
+    return 0;
+
+  RenderTableCell* tableCellRenderer = toRenderTableCell(cellRenderer);
+  RenderTableCell* cellAboveRenderer =
+      tableCellRenderer->table()->cellAbove(tableCellRenderer);
+  if (!cellAboveRenderer)
+    return 0;
+
+  return static_cast<HTMLTableCellElement*>(cellAboveRenderer->node());
 }
+
+}  // namespace WebCore
