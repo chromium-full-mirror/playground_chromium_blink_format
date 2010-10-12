@@ -110,6 +110,7 @@ WebPage::WebPage(uint64_t pageID, const WebPageCreationParameters& parameters)
       m_nativeWindow(parameters.nativeWindow)
 #endif
       ,
+      m_findController(this),
       m_pageID(pageID) {
   ASSERT(m_pageID);
 
@@ -780,15 +781,17 @@ void WebPage::didRemoveEditCommand(uint64_t commandID) {
   removeWebEditCommand(commandID);
 }
 
-void WebPage::findString(const String&,
+void WebPage::findString(const String& string,
                          uint32_t findDirection,
-                         uint32_t findOption,
+                         uint32_t findOptions,
                          uint32_t maxNumMatches) {
-  // FIXME: Implement.
+  m_findController.findString(string, static_cast<FindDirection>(findDirection),
+                              static_cast<FindOptions>(findOptions),
+                              maxNumMatches);
 }
 
 void WebPage::hideFindUI() {
-  // FIXME: Implement.
+  m_findController.hideFindUI();
 }
 
 void WebPage::countStringMatches(const String& string,
