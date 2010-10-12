@@ -39,7 +39,6 @@
 @class DOMDocumentFragment;
 @class DOMNode;
 @class DOMRange;
-@class WebIconFetcher;
 @class WebScriptObject;
 @class WebScriptWorld;
 
@@ -92,8 +91,6 @@ typedef enum {
 - (BOOL)_isDisplayingStandaloneImage;
 
 - (unsigned)_pendingFrameUnloadEventCount;
-
-- (WebIconFetcher*)fetchApplicationIcon:(id)target selector:(SEL)selector;
 
 - (void)_setIsDisconnected:(bool)isDisconnected;
 - (void)_setExcludeFromTextSearch:(bool)exclude;
