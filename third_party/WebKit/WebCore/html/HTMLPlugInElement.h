@@ -62,6 +62,8 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(Attribute*);
 
+  bool m_inBeforeLoadEventHandler;
+
  private:
   virtual void defaultEventHandler(Event*);
 
