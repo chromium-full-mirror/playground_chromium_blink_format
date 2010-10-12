@@ -795,7 +795,7 @@ void GraphicsContext::clipPath(WindRule clipRule) {
   QPainterPath newPath = m_data->currentPath;
   newPath.setFillRule(clipRule == RULE_EVENODD ? Qt::OddEvenFill
                                                : Qt::WindingFill);
-  p->setClipPath(newPath);
+  p->setClipPath(newPath, Qt::IntersectClip);
 }
 
 void GraphicsContext::drawFocusRing(const Vector<Path>& paths,
