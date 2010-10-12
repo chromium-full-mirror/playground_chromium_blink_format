@@ -32,16 +32,16 @@ namespace WebKit {
 
 DEFINE_STATIC_GETTER(CFStringRef,
                      SessionHistoryCurrentIndexKey,
-                     CFSTR("SessionHistoryCurrentIndex"));
+                     (CFSTR("SessionHistoryCurrentIndex")));
 DEFINE_STATIC_GETTER(CFStringRef,
                      SessionHistoryEntriesKey,
-                     CFSTR("SessionHistoryEntries"));
+                     (CFSTR("SessionHistoryEntries")));
 DEFINE_STATIC_GETTER(CFStringRef,
                      SessionHistoryEntryTitleKey,
-                     CFSTR("SessionHistoryEntryTitle"));
+                     (CFSTR("SessionHistoryEntryTitle")));
 DEFINE_STATIC_GETTER(CFStringRef,
                      SessionHistoryEntryURLKey,
-                     CFSTR("SessionHistoryEntryURL"));
+                     (CFSTR("SessionHistoryEntryURL")));
 
 CFDictionaryRef WebBackForwardList::createCFDictionaryRepresentation(
     WebPageProxy::WebPageProxySessionStateFilterCallback filter,
