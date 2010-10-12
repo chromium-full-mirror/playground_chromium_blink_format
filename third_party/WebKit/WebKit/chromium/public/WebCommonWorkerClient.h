@@ -103,6 +103,14 @@ class WebCommonWorkerClient {
   // Called on the main webkit thread before opening a file system.
   virtual void openFileSystem(WebFileSystem::Type,
                               long long size,
+                              bool create,
+                              WebFileSystemCallbacks*) {
+    WEBKIT_ASSERT_NOT_REACHED();
+  }
+
+  // This will be removed once changes in chromium use the new method above.
+  virtual void openFileSystem(WebFileSystem::Type,
+                              long long size,
                               WebFileSystemCallbacks*) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
