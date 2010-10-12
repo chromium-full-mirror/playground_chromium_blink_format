@@ -153,6 +153,11 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
       const WebPoint& clientPoint,
       const WebPoint& screenPoint,
       WebDragOperationsMask operationsAllowed);
+  virtual WebDragOperation dragTargetDragEnterNew(
+      int identity,
+      const WebPoint& clientPoint,
+      const WebPoint& screenPoint,
+      WebDragOperationsMask operationsAllowed);
   virtual WebDragOperation dragTargetDragOver(
       const WebPoint& clientPoint,
       const WebPoint& screenPoint,

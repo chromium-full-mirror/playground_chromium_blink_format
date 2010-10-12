@@ -133,9 +133,10 @@ bool EventHandler::eventActivatedView(const PlatformMouseEvent& event) const {
 }
 
 PassRefPtr<Clipboard> EventHandler::createDraggingClipboard() const {
-  RefPtr<ChromiumDataObject> dataObject =
-      ChromiumDataObject::create(Clipboard::DragAndDrop);
-  return ClipboardChromium::create(Clipboard::DragAndDrop, dataObject.get(),
+  RefPtr<ChromiumDataObjectLegacy> dataObject =
+      ChromiumDataObjectLegacy::create(Clipboard::DragAndDrop);
+  return ClipboardChromium::create(Clipboard::DragAndDrop,
+                                   ChromiumDataObject::create(dataObject),
                                    ClipboardWritable, m_frame);
 }
 
