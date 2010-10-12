@@ -980,7 +980,7 @@ HRESULT STDMETHODCALLTYPE WebFrame::pendingFrameUnloadEventCount(
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebFrame::unused1() {
+HRESULT STDMETHODCALLTYPE WebFrame::unused2() {
   return E_NOTIMPL;
 }
 

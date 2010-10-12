@@ -192,7 +192,7 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   virtual HRESULT STDMETHODCALLTYPE pendingFrameUnloadEventCount(
       /* [retval][out] */ UINT* result);
 
-  virtual HRESULT STDMETHODCALLTYPE unused1();
+  virtual HRESULT STDMETHODCALLTYPE unused2();
 
   virtual HRESULT STDMETHODCALLTYPE setInPrintingMode(
       /* [in] */ BOOL value,
