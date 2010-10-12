@@ -441,6 +441,7 @@ class Editor {
   OwnPtr<KillRing> m_killRing;
   RefPtr<Range> m_rangeToBeReplacedByCorrection;
   String m_stringToBeReplacedByCorrection;
+  String m_correctionReplacementString;
   Timer<Editor> m_correctionPanelTimer;
   VisibleSelection m_mark;
   bool m_areMarkedTextMatchesHighlighted;
