@@ -27,48 +27,52 @@
 #define StringBuilder_h
 
 #include <wtf/Vector.h>
+#include <wtf/text/WTFString.h>
 
-namespace JSC {
+namespace WTF {
 
 class StringBuilder {
  public:
-  void append(const UChar u) { buffer.append(u); }
+  void append(const UChar u) { m_buffer.append(u); }
 
   void append(const char* str) { append(str, strlen(str)); }
 
   void append(const char* str, size_t len) {
-    reserveCapacity(buffer.size() + len);
+    reserveCapacity(m_buffer.size() + len);
     for (size_t i = 0; i < len; i++)
-      buffer.append(static_cast<unsigned char>(str[i]));
+      m_buffer.append(static_cast<unsigned char>(str[i]));
   }
 
-  void append(const UChar* str, size_t len) { buffer.append(str, len); }
+  void append(const UChar* str, size_t len) { m_buffer.append(str, len); }
 
-  void append(const UString& str) {
-    buffer.append(str.characters(), str.length());
+  void append(const String& str) {
+    m_buffer.append(str.characters(), str.length());
   }
 
-  bool isEmpty() { return buffer.isEmpty(); }
+  bool isEmpty() const { return m_buffer.isEmpty(); }
   void reserveCapacity(size_t newCapacity) {
-    if (newCapacity < buffer.capacity())
+    if (newCapacity < m_buffer.capacity())
       return;
-    buffer.reserveCapacity(
-        std::max(newCapacity, buffer.capacity() + buffer.capacity() / 4 + 1));
+    m_buffer.reserveCapacity(std::max(
+        newCapacity, m_buffer.capacity() + m_buffer.capacity() / 4 + 1));
   }
-  void resize(size_t size) { buffer.resize(size); }
-  size_t size() const { return buffer.size(); }
+  void resize(size_t size) { m_buffer.resize(size); }
+  size_t size() const { return m_buffer.size(); }
 
-  UChar operator[](size_t i) const { return buffer.at(i); }
+  UChar operator[](size_t i) const { return m_buffer.at(i); }
 
-  UString build() {
-    buffer.shrinkToFit();
-    ASSERT(buffer.data() || !buffer.size());
-    return UString::adopt(buffer);
+  String toString() {
+    m_buffer.shrinkToFit();
+    ASSERT(m_buffer.data() || !m_buffer.size());
+    return String::adopt(m_buffer);
   }
 
  protected:
-  Vector<UChar, 64> buffer;
+  Vector<UChar, 64> m_buffer;
 };
-}
 
-#endif
+}  // namespace WTF
+
+using WTF::StringBuilder;
+
+#endif  // StringBuilder_h

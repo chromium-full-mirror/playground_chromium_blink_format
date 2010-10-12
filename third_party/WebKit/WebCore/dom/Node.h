@@ -71,7 +71,6 @@ class RenderBox;
 class RenderBoxModelObject;
 class RenderObject;
 class RenderStyle;
-class StringBuilder;
 class TagNodeList;
 
 typedef int ExceptionCode;
@@ -807,7 +806,6 @@ class Node : public EventTarget,
 
   Element* ancestorElement() const;
 
-  void appendTextContent(bool convertBRsToNewlines, StringBuilder&) const;
   void trackForDebugging();
 
   Document* m_document;

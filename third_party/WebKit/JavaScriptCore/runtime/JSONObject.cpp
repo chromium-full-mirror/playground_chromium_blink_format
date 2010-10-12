@@ -34,7 +34,7 @@
 #include "LiteralParser.h"
 #include "Lookup.h"
 #include "PropertyNameArray.h"
-#include "StringBuilder.h"
+#include "UStringBuilder.h"
 #include "StringConcatenate.h"
 #include <wtf/MathExtras.h>
 
@@ -84,7 +84,7 @@ class Stringifier : public Noncopyable {
 
     JSObject* object() const { return m_object; }
 
-    bool appendNextProperty(Stringifier&, StringBuilder&);
+    bool appendNextProperty(Stringifier&, UStringBuilder&);
 
    private:
     JSObject* const m_object;
@@ -97,7 +97,7 @@ class Stringifier : public Noncopyable {
 
   friend class Holder;
 
-  static void appendQuotedString(StringBuilder&, const UString&);
+  static void appendQuotedString(UStringBuilder&, const UString&);
 
   JSValue toJSON(JSValue, const PropertyNameForFunctionCall&);
 
@@ -106,7 +106,7 @@ class Stringifier : public Noncopyable {
     StringifySucceeded,
     StringifyFailedDueToUndefinedValue
   };
-  StringifyResult appendStringifiedValue(StringBuilder&,
+  StringifyResult appendStringifiedValue(UStringBuilder&,
                                          JSValue,
                                          JSObject* holder,
                                          const PropertyNameForFunctionCall&);
@@ -114,7 +114,7 @@ class Stringifier : public Noncopyable {
   bool willIndent() const;
   void indent();
   void unindent();
-  void startNewLine(StringBuilder&) const;
+  void startNewLine(UStringBuilder&) const;
 
   Stringifier* const m_nextStringifierToMark;
   ExecState* const m_exec;
@@ -273,17 +273,17 @@ JSValue Stringifier::stringify(JSValue value) {
       m_exec->globalData().propertyNames->emptyIdentifier);
   object->putDirect(m_exec->globalData().propertyNames->emptyIdentifier, value);
 
-  StringBuilder result;
+  UStringBuilder result;
   if (appendStringifiedValue(result, value, object, emptyPropertyName) !=
       StringifySucceeded)
     return jsUndefined();
   if (m_exec->hadException())
     return jsNull();
 
-  return jsString(m_exec, result.build());
+  return jsString(m_exec, result.toUString());
 }
 
-void Stringifier::appendQuotedString(StringBuilder& builder,
+void Stringifier::appendQuotedString(UStringBuilder& builder,
                                      const UString& value) {
   int length = value.length();
 
@@ -376,7 +376,7 @@ inline JSValue Stringifier::toJSON(
 }
 
 Stringifier::StringifyResult Stringifier::appendStringifiedValue(
-    StringBuilder& builder,
+    UStringBuilder& builder,
     JSValue value,
     JSObject* holder,
     const PropertyNameForFunctionCall& propertyName) {
@@ -499,7 +499,7 @@ inline void Stringifier::unindent() {
       m_repeatedGap.substringSharingImpl(0, m_indent.length() - m_gap.length());
 }
 
-inline void Stringifier::startNewLine(StringBuilder& builder) const {
+inline void Stringifier::startNewLine(UStringBuilder& builder) const {
   if (m_gap.isEmpty())
     return;
   builder.append('\n');
@@ -512,7 +512,7 @@ inline Stringifier::Holder::Holder(JSObject* object)
       m_index(0) {}
 
 bool Stringifier::Holder::appendNextProperty(Stringifier& stringifier,
-                                             StringBuilder& builder) {
+                                             UStringBuilder& builder) {
   ASSERT(m_index <= m_size);
 
   ExecState* exec = stringifier.m_exec;

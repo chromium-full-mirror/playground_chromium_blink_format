@@ -26,7 +26,7 @@
 #include "Page.h"
 #include "PluginData.h"
 #include "Settings.h"
-#include "StringBuilder.h"
+#include <wtf/text/StringBuilder.h>
 
 namespace WebCore {
 

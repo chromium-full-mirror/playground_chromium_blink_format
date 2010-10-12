@@ -32,7 +32,7 @@
 #include "HTMLNames.h"
 #include "HTMLParserIdioms.h"
 #include "SpaceSplitString.h"
-#include "StringBuilder.h"
+#include <wtf/text/StringBuilder.h>
 
 namespace WebCore {
 
