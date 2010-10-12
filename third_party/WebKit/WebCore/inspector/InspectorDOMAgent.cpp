@@ -206,7 +206,12 @@ class MatchPlainTextJob : public MatchXPathJob {
   virtual ~MatchPlainTextJob() {}
 };
 
-enum DOMBreakpointType { SubtreeModified = 0, AttributeModified, NodeRemoved };
+enum DOMBreakpointType {
+  SubtreeModified = 0,
+  AttributeModified,
+  NodeRemoved,
+  DOMBreakpointTypesCount
+};
 
 const uint32_t inheritableDOMBreakpointTypesMask = (1 << SubtreeModified);
 const int domBreakpointDerivedTypeShift = 16;
@@ -783,10 +788,16 @@ void InspectorDOMAgent::searchCanceled() {
   m_searchResults.clear();
 }
 
-void InspectorDOMAgent::setDOMBreakpoint(long nodeId, long type) {
+String InspectorDOMAgent::setDOMBreakpoint(long nodeId, long type) {
   Node* node = nodeForId(nodeId);
   if (!node)
-    return;
+    return "";
+
+  String breakpointId = createBreakpointId(nodeId, type);
+  if (m_idToBreakpoint.contains(breakpointId))
+    return "";
+
+  m_idToBreakpoint.set(breakpointId, std::make_pair(nodeId, type));
 
   uint32_t rootBit = 1 << type;
   m_breakpoints.set(node, m_breakpoints.get(node) | rootBit);
@@ -795,14 +806,18 @@ void InspectorDOMAgent::setDOMBreakpoint(long nodeId, long type) {
          child = innerNextSibling(child))
       updateSubtreeBreakpoints(child, rootBit, true);
   }
+
+  return breakpointId;
 }
 
-void InspectorDOMAgent::removeDOMBreakpoint(long nodeId, long type) {
-  Node* node = nodeForId(nodeId);
+void InspectorDOMAgent::removeDOMBreakpoint(const String& breakpointId) {
+  Breakpoint breakpoint = m_idToBreakpoint.take(breakpointId);
+
+  Node* node = nodeForId(breakpoint.first);
   if (!node)
     return;
 
-  uint32_t rootBit = 1 << type;
+  uint32_t rootBit = 1 << breakpoint.second;
   uint32_t mask = m_breakpoints.get(node) & ~rootBit;
   if (mask)
     m_breakpoints.set(node, mask);
@@ -883,11 +898,9 @@ PassRefPtr<InspectorValue> InspectorDOMAgent::descriptionForDOMEvent(
 
   long breakpointOwnerNodeId = m_documentNodeToIdMap.get(breakpointOwner);
   ASSERT(breakpointOwnerNodeId);
-
-  RefPtr<InspectorObject> breakpoint = InspectorObject::create();
-  breakpoint->setNumber("nodeId", breakpointOwnerNodeId);
-  breakpoint->setNumber("type", breakpointType);
-  description->setObject("breakpoint", breakpoint);
+  description->setString(
+      "breakpointId",
+      createBreakpointId(breakpointOwnerNodeId, breakpointType));
 
   return description;
 }
@@ -1141,14 +1154,14 @@ void InspectorDOMAgent::didRemoveDOMNode(Node* node) {
 
   if (m_breakpoints.size()) {
     // Remove subtree breakpoints.
-    m_breakpoints.remove(node);
+    removeBreakpointsForNode(node);
     Vector<Node*> stack(1, innerFirstChild(node));
     do {
       Node* node = stack.last();
       stack.removeLast();
       if (!node)
         continue;
-      m_breakpoints.remove(node);
+      removeBreakpointsForNode(node);
       stack.append(innerFirstChild(node));
       stack.append(innerNextSibling(node));
     } while (!stack.isEmpty());
@@ -1212,6 +1225,23 @@ void InspectorDOMAgent::updateSubtreeBreakpoints(Node* node,
   for (Node* child = innerFirstChild(node); child;
        child = innerNextSibling(child))
     updateSubtreeBreakpoints(child, newRootMask, set);
+}
+
+void InspectorDOMAgent::removeBreakpointsForNode(Node* node) {
+  uint32_t mask = m_breakpoints.take(node);
+  if (!mask)
+    return;
+  long nodeId = m_documentNodeToIdMap.get(node);
+  if (!nodeId)
+    return;
+  for (int type = 0; type < DOMBreakpointTypesCount; ++type) {
+    if (mask && (1 << type))
+      m_idToBreakpoint.remove(createBreakpointId(nodeId, type));
+  }
+}
+
+String InspectorDOMAgent::createBreakpointId(long nodeId, long type) {
+  return String::format("dom:%ld:%ld", nodeId, type);
 }
 
 void InspectorDOMAgent::getStyles(long nodeId,

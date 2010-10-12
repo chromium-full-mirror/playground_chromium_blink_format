@@ -123,8 +123,6 @@ class InspectorDOMAgent : public EventListener {
   void performSearch(const String& whitespaceTrimmedQuery,
                      bool runSynchronously);
   void searchCanceled();
-  void setDOMBreakpoint(long nodeId, long type);
-  void removeDOMBreakpoint(long nodeId, long type);
   bool shouldBreakOnNodeInsertion(Node* node,
                                   Node* parent,
                                   PassRefPtr<InspectorValue>* details);
@@ -187,6 +185,9 @@ class InspectorDOMAgent : public EventListener {
 
   String documentURLString(Document* document) const;
 
+  String setDOMBreakpoint(long nodeId, long type);
+  void removeDOMBreakpoint(const String& breakpointId);
+
  private:
   void startListening(Document* document);
   void stopListening(Document* document);
@@ -202,9 +203,11 @@ class InspectorDOMAgent : public EventListener {
 
   bool hasBreakpoint(Node* node, long type);
   void updateSubtreeBreakpoints(Node* root, uint32_t rootMask, bool value);
+  void removeBreakpointsForNode(Node* node);
   PassRefPtr<InspectorValue> descriptionForDOMEvent(Node* target,
                                                     long breakpointType,
                                                     bool insertion);
+  String createBreakpointId(long nodeId, long type);
 
   PassRefPtr<InspectorObject> buildObjectForAttributeStyles(Element* element);
   PassRefPtr<InspectorArray> buildArrayForCSSRules(Document* ownerDocument,
@@ -279,6 +282,8 @@ class InspectorDOMAgent : public EventListener {
   HashSet<RefPtr<Node>> m_searchResults;
   Vector<long> m_inspectedNodes;
   HashMap<Node*, uint32_t> m_breakpoints;
+  typedef pair<long, long> Breakpoint;
+  HashMap<String, Breakpoint> m_idToBreakpoint;
 };
 
 #endif
