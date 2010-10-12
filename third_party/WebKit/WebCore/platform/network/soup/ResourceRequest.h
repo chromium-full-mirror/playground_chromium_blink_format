@@ -61,8 +61,9 @@ class ResourceRequest : public ResourceRequestBase {
     updateFromSoupMessage(soupMessage);
   }
 
+  void updateSoupMessage(SoupMessage*) const;
   SoupMessage* toSoupMessage() const;
-  void updateFromSoupMessage(SoupMessage* soupMessage);
+  void updateFromSoupMessage(SoupMessage*);
 
   SoupMessageFlags soupMessageFlags() const { return m_soupFlags; }
   void setSoupMessageFlags(SoupMessageFlags soupFlags) {
