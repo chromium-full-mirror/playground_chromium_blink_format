@@ -117,3 +117,8 @@ void _WKContextRegisterURLSchemeAsEmptyDocument(WKContextRef contextRef,
   toImpl(contextRef)
       ->registerURLSchemeAsEmptyDocument(toImpl(urlScheme)->string());
 }
+
+void WKContextRegisterURLSchemeAsSecure(WKContextRef contextRef,
+                                        WKStringRef urlScheme) {
+  toImpl(contextRef)->registerURLSchemeAsSecure(toImpl(urlScheme)->string());
+}

@@ -92,6 +92,7 @@ class WebProcess : CoreIPC::Connection::Client {
   void initializeWebProcess(const WebProcessCreationParameters&);
   void setShouldTrackVisitedLinks(bool);
   void registerURLSchemeAsEmptyDocument(const String&);
+  void registerURLSchemeAsSecure(const String&) const;
 #if PLATFORM(WIN)
   void setShouldPaintNativeControls(bool);
 #endif

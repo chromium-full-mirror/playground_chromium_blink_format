@@ -112,6 +112,7 @@ class WebContext : public APIObject {
   String applicationCacheDirectory();
 
   void registerURLSchemeAsEmptyDocument(const String&);
+  void registerURLSchemeAsSecure(const String&);
 
   void addVisitedLink(const String&);
   void addVisitedLink(WebCore::LinkHash);
@@ -157,6 +158,7 @@ class WebContext : public APIObject {
   VisitedLinkProvider m_visitedLinkProvider;
 
   HashSet<String> m_schemesToRegisterAsEmptyDocument;
+  HashSet<String> m_schemesToRegisterAsSecure;
   Vector<pair<String, RefPtr<APIObject>>>
       m_pendingMessagesToPostToInjectedBundle;
 

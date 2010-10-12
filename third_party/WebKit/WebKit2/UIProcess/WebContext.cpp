@@ -158,6 +158,8 @@ void WebContext::ensureWebProcess() {
 
   copyToVector(m_schemesToRegisterAsEmptyDocument,
                parameters.urlSchemesRegistererdAsEmptyDocument);
+  copyToVector(m_schemesToRegisterAsSecure,
+               parameters.urlSchemesRegisteredAsSecure);
 
   // Add any platform specific parameters
   platformInitializeWebProcess(parameters);
@@ -326,6 +328,16 @@ void WebContext::registerURLSchemeAsEmptyDocument(const String& urlScheme) {
 
   m_process->send(
       Messages::WebProcess::RegisterURLSchemeAsEmptyDocument(urlScheme), 0);
+}
+
+void WebContext::registerURLSchemeAsSecure(const String& urlScheme) {
+  m_schemesToRegisterAsSecure.add(urlScheme);
+
+  if (!hasValidProcess())
+    return;
+
+  m_process->send(Messages::WebProcess::RegisterURLSchemeAsSecure(urlScheme),
+                  0);
 }
 
 void WebContext::addVisitedLink(const String& visitedURL) {
