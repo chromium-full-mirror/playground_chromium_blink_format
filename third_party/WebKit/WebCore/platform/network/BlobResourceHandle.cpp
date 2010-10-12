@@ -371,7 +371,7 @@ int BlobResourceHandle::readDataSync(const BlobDataItem& item,
   int bytesToRead = (length > remaining) ? static_cast<int>(remaining) : length;
   if (bytesToRead > m_totalRemainingSize)
     bytesToRead = static_cast<int>(m_totalRemainingSize);
-  memcpy(buf, item.data.data() + item.offset + m_currentItemReadSize,
+  memcpy(buf, item.data->data() + item.offset + m_currentItemReadSize,
          bytesToRead);
   m_totalRemainingSize -= bytesToRead;
 
@@ -448,7 +448,7 @@ void BlobResourceHandle::readDataAsync(const BlobDataItem& item) {
   long long bytesToRead = item.length - m_currentItemReadSize;
   if (bytesToRead > m_totalRemainingSize)
     bytesToRead = m_totalRemainingSize;
-  consumeData(item.data.data() + item.offset + m_currentItemReadSize,
+  consumeData(item.data->data() + item.offset + m_currentItemReadSize,
               static_cast<int>(bytesToRead));
   m_currentItemReadSize = 0;
 }

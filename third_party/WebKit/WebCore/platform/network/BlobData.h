@@ -33,11 +33,26 @@
 
 #include "KURL.h"
 #include "PlatformString.h"
-#include <wtf/PassOwnPtr.h>
-#include <wtf/Vector.h>
-#include <wtf/text/CString.h>
+#include <wtf/Forward.h>
+#include <wtf/ThreadSafeShared.h>
 
 namespace WebCore {
+
+class RawData : public ThreadSafeShared<RawData> {
+ public:
+  static PassRefPtr<RawData> create() { return adoptRef(new RawData()); }
+
+  void detachFromCurrentThread();
+
+  const char* data() const { return m_data.data(); }
+  size_t length() const { return m_data.size(); }
+  Vector<char>* mutableData() { return &m_data; }
+
+ private:
+  RawData();
+
+  Vector<char> m_data;
+};
 
 struct BlobDataItem {
   static const long long toEndOfFile;
@@ -51,19 +66,11 @@ struct BlobDataItem {
         expectedModificationTime(doNotCheckFileChange) {}
 
   // Constructor for String type (complete string).
-  explicit BlobDataItem(const CString& data)
+  explicit BlobDataItem(PassRefPtr<RawData> data)
       : type(Data),
         data(data),
         offset(0),
         length(toEndOfFile),
-        expectedModificationTime(doNotCheckFileChange) {}
-
-  // Constructor for String type (partial string).
-  BlobDataItem(const CString& data, long long offset, long long length)
-      : type(Data),
-        data(data),
-        offset(offset),
-        length(length),
         expectedModificationTime(doNotCheckFileChange) {}
 
   // Constructor for File type (complete file).
@@ -93,13 +100,13 @@ struct BlobDataItem {
         length(length),
         expectedModificationTime(doNotCheckFileChange) {}
 
-  // Gets a copy of the data suitable for passing to another thread.
-  void copy(const BlobDataItem&);
+  // Detaches from current thread so that it can be passed to another thread.
+  void detachFromCurrentThread();
 
   enum { Data, File, Blob } type;
 
   // For Data type.
-  CString data;
+  RefPtr<RawData> data;
 
   // For File type.
   String path;
@@ -110,16 +117,27 @@ struct BlobDataItem {
   long long offset;
   long long length;
   double expectedModificationTime;
+
+ private:
+  friend class BlobData;
+
+  // Constructor for String type (partial string).
+  BlobDataItem(PassRefPtr<RawData> data, long long offset, long long length)
+      : type(Data),
+        data(data),
+        offset(offset),
+        length(length),
+        expectedModificationTime(doNotCheckFileChange) {}
 };
 
 typedef Vector<BlobDataItem> BlobDataItemList;
 
 class BlobData {
  public:
-  static PassOwnPtr<BlobData> create() { return adoptPtr(new BlobData()); }
+  static PassOwnPtr<BlobData> create();
 
-  // Gets a copy of the data suitable for passing to another thread.
-  PassOwnPtr<BlobData> copy() const;
+  // Detaches from current thread so that it can be passed to another thread.
+  void detachFromCurrentThread();
 
   const String& contentType() const { return m_contentType; }
   void setContentType(const String& contentType) {
@@ -134,7 +152,7 @@ class BlobData {
   const BlobDataItemList& items() const { return m_items; }
   void swapItems(BlobDataItemList&);
 
-  void appendData(const CString&);
+  void appendData(PassRefPtr<RawData>, long long offset, long long length);
   void appendFile(const String& path);
   void appendFile(const String& path,
                   long long offset,
@@ -149,7 +167,7 @@ class BlobData {
   BlobData() {}
 
   // This is only exposed to BlobStorageData.
-  void appendData(const CString&, long long offset, long long length);
+  void appendData(const RawData&, long long offset, long long length);
 
   String m_contentType;
   String m_contentDisposition;

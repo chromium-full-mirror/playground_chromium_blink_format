@@ -151,7 +151,7 @@ void BlobRegistryImpl::registerBlobURL(const KURL& url,
        iter != blobData->items().end(); ++iter) {
     switch (iter->type) {
       case BlobDataItem::Data:
-        blobStorageData->m_data.appendData(iter->data, 0, iter->data.length());
+        blobStorageData->m_data.appendData(iter->data, 0, iter->data->length());
         break;
       case BlobDataItem::File:
         blobStorageData->m_data.appendFile(iter->path, iter->offset,
@@ -178,11 +178,7 @@ void BlobRegistryImpl::registerBlobURL(const KURL& url, const KURL& srcURL) {
   if (!src)
     return;
 
-  RefPtr<BlobStorageData> blobStorageData =
-      BlobStorageData::create(src->contentType(), src->contentDisposition());
-  appendStorageItems(blobStorageData.get(), src->items());
-
-  m_blobs.set(url.string(), blobStorageData);
+  m_blobs.set(url.string(), src);
 }
 
 void BlobRegistryImpl::unregisterBlobURL(const KURL& url) {
