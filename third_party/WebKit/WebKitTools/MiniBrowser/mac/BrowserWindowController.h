@@ -32,6 +32,8 @@
   IBOutlet NSTextField* urlText;
   IBOutlet NSView* containerView;
 
+  IBOutlet NSWindow* findPanelWindow;
+
   WKPageNamespaceRef _pageNamespace;
   WKView* _webView;
   BOOL _zoomTextOnly;
@@ -59,5 +61,7 @@
 - (IBAction)toggleZoomMode:(id)sender;
 
 - (IBAction)dumpSourceToConsole:(id)sender;
+
+- (IBAction)find:(id)sender;
 
 @end
