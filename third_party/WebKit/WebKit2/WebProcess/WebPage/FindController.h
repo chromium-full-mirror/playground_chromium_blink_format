@@ -36,6 +36,7 @@ class Frame;
 
 namespace WebKit {
 
+class FindPageOverlay;
 class WebPage;
 
 class FindController {
@@ -50,8 +51,11 @@ class FindController {
                   unsigned maxNumMatches);
   void hideFindUI();
 
+  void findPageOverlayDestroyed();
+
  private:
   WebPage* m_webPage;
+  FindPageOverlay* m_findPageOverlay;
 };
 
 }  // namespace WebKit

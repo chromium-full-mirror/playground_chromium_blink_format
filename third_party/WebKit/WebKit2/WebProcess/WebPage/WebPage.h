@@ -64,6 +64,7 @@ class SharedBuffer;
 namespace WebKit {
 
 class DrawingArea;
+class PageOverlay;
 class PluginView;
 class WebEvent;
 class WebFrame;
@@ -166,6 +167,9 @@ class WebPage : public APIObject {
 #elif PLATFORM(WIN)
   HWND nativeWindow() const { return m_nativeWindow; }
 #endif
+
+  void installPageOverlay(PassOwnPtr<PageOverlay>);
+  void uninstallPageOverlay();
 
   static const WebEvent* currentEvent();
 
@@ -275,6 +279,7 @@ class WebPage : public APIObject {
   InjectedBundlePageUIClient m_uiClient;
 
   FindController m_findController;
+  OwnPtr<PageOverlay> m_pageOverlay;
 
   uint64_t m_pageID;
 };

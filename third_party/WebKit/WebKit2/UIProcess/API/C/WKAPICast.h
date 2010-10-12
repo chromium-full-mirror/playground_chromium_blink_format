@@ -134,6 +134,8 @@ inline FindOptions toFindOptions(WKFindOptions wkFindOptions) {
     findOptions |= FindOptionsWrapAround;
   if (wkFindOptions & kWKFindOptionsShowOverlay)
     findOptions |= FindOptionsShowOverlay;
+  if (wkFindOptions & kWKFindOptionsShowFindIndicator)
+    findOptions |= FindOptionsShowFindIndicator;
 
   return static_cast<FindOptions>(findOptions);
 }
