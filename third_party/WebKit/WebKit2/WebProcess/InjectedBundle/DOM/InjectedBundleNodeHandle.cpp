@@ -25,6 +25,8 @@
 
 #include "InjectedBundleNodeHandle.h"
 
+#include <JavaScriptCore/APICast.h>
+#include <WebCore/JSNode.h>
 #include <WebCore/Node.h>
 #include <wtf/HashMap.h>
 
@@ -37,6 +39,13 @@ typedef HashMap<Node*, InjectedBundleNodeHandle*> DOMHandleCache;
 static DOMHandleCache& domHandleCache() {
   DEFINE_STATIC_LOCAL(DOMHandleCache, cache, ());
   return cache;
+}
+
+PassRefPtr<InjectedBundleNodeHandle> InjectedBundleNodeHandle::getOrCreate(
+    JSContextRef,
+    JSObjectRef object) {
+  Node* node = toNode(toJS(object));
+  return getOrCreate(node);
 }
 
 PassRefPtr<InjectedBundleNodeHandle> InjectedBundleNodeHandle::getOrCreate(
