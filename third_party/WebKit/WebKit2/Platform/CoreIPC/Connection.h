@@ -30,6 +30,7 @@
 #include "ArgumentDecoder.h"
 #include "ArgumentEncoder.h"
 #include "Arguments.h"
+#include "BinarySemaphore.h"
 #include "MessageID.h"
 #include "WorkQueue.h"
 #include <wtf/HashMap.h>
@@ -242,10 +243,9 @@ class Connection : public ThreadSafeShared<Connection> {
     }
   };
 
-  Mutex m_waitForSyncReplyMutex;
-  ThreadCondition m_waitForSyncReplyCondition;
+  BinarySemaphore m_waitForSyncReplySemaphore;
 
-  // This is protected by the m_waitForSyncReply mutex.
+  Mutex m_pendingSyncRepliesMutex;
   Vector<PendingSyncReply> m_pendingSyncReplies;
 
 #if PLATFORM(MAC)
