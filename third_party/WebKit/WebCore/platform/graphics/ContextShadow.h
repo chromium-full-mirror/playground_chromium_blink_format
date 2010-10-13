@@ -98,10 +98,10 @@ class ContextShadow {
 #if PLATFORM(CAIRO)
   void drawRectShadow(GraphicsContext* context,
                       const IntRect& rect,
-                      const IntSize& topLeftRadius,
-                      const IntSize& topRightRadius,
-                      const IntSize& bottomLeftRadius,
-                      const IntSize& bottomRightRadius);
+                      const IntSize& topLeftRadius = IntSize(),
+                      const IntSize& topRightRadius = IntSize(),
+                      const IntSize& bottomLeftRadius = IntSize(),
+                      const IntSize& bottomRightRadius = IntSize());
 #endif
 
 #if PLATFORM(QT)

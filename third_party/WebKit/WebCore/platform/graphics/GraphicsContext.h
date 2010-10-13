@@ -41,6 +41,9 @@
 typedef struct CGContext PlatformGraphicsContext;
 #elif PLATFORM(CAIRO)
 #include "PlatformRefPtrCairo.h"
+namespace WebCore {
+class ContextShadow;
+}
 typedef struct _cairo PlatformGraphicsContext;
 #elif PLATFORM(OPENVG)
 namespace WebCore {
@@ -378,26 +381,6 @@ class GraphicsContext : public Noncopyable {
   void setAlpha(float);
 #if PLATFORM(CAIRO)
   float getAlpha();
-  void applyPlatformShadow(PassOwnPtr<ImageBuffer> buffer,
-                           const Color& shadowColor,
-                           FloatRect& shadowRect,
-                           float radius);
-  PlatformRefPtr<cairo_surface_t> createShadowMask(PassOwnPtr<ImageBuffer>,
-                                                   FloatRect&,
-                                                   float radius);
-
-  static void calculateShadowBufferDimensions(IntSize& shadowBufferSize,
-                                              FloatRect& shadowRect,
-                                              float& radius,
-                                              const FloatRect& sourceRect,
-                                              const FloatSize& shadowOffset,
-                                              float shadowBlur);
-  void drawTiledShadow(const IntRect& rect,
-                       const FloatSize& topLeftRadius,
-                       const FloatSize& topRightRadius,
-                       const FloatSize& bottomLeftRadius,
-                       const FloatSize& bottomRightRadius,
-                       ColorSpace colorSpace);
 #endif
 
   void setCompositeOperation(CompositeOperator);
@@ -549,6 +532,9 @@ class GraphicsContext : public Noncopyable {
                                      QPixmap& alphaMask);
   QPen pen();
   static QPainter::CompositionMode toQtCompositionMode(CompositeOperator op);
+#endif
+
+#if PLATFORM(QT) || PLATFORM(CAIRO)
   ContextShadow* contextShadow();
 #endif
 
