@@ -167,7 +167,8 @@ void SelectElement::updateListBoxSelection(SelectElementData& data,
                                            bool deselectOtherOptions) {
   ASSERT(element->renderer() &&
          (element->renderer()->isListBox() || data.multiple()));
-  ASSERT(data.activeSelectionAnchorIndex() >= 0);
+  ASSERT(!data.listItems(element).size() ||
+         data.activeSelectionAnchorIndex() >= 0);
 
   unsigned start =
       min(data.activeSelectionAnchorIndex(), data.activeSelectionEndIndex());
@@ -840,8 +841,9 @@ void SelectElement::listBoxDefaultEventHandler(SelectElementData& data,
       // dispatching change events immediately after making the new selection.
       saveLastSelection(data, element);
 
-      ASSERT_UNUSED(listItems,
-                    endIndex >= 0 && (unsigned)endIndex < listItems.size());
+      ASSERT_UNUSED(listItems, !listItems.size() ||
+                                   (endIndex >= 0 &&
+                                    (unsigned)endIndex < listItems.size()));
       setActiveSelectionEndIndex(data, endIndex);
 
       // If the anchor is unitialized, or if we're going to deselect all other
