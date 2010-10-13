@@ -538,7 +538,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
  private:
   friend class WebGLObject;
 
-  WebGLRenderingContext(HTMLCanvasElement*, PassOwnPtr<GraphicsContext3D>);
+  WebGLRenderingContext(HTMLCanvasElement*, PassRefPtr<GraphicsContext3D>);
 
   void addObject(WebGLObject*);
   void detachAndRemoveAllObjects();
@@ -582,7 +582,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
 
   PassRefPtr<Image> videoFrameToImage(HTMLVideoElement* video);
 
-  OwnPtr<GraphicsContext3D> m_context;
+  RefPtr<GraphicsContext3D> m_context;
   bool m_needsUpdate;
   bool m_markedCanvasDirty;
   // FIXME: I think this is broken -- it does not increment any

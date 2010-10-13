@@ -52,7 +52,7 @@ namespace WebCore {
 PassRefPtr<SharedGraphicsContext3D> SharedGraphicsContext3D::create(
     HostWindow* hostWindow) {
   GraphicsContext3D::Attributes attr;
-  OwnPtr<GraphicsContext3D> context =
+  RefPtr<GraphicsContext3D> context =
       GraphicsContext3D::create(attr, hostWindow);
   if (!context)
     return 0;
@@ -68,7 +68,7 @@ PassRefPtr<SharedGraphicsContext3D> SharedGraphicsContext3D::create(
 }
 
 SharedGraphicsContext3D::SharedGraphicsContext3D(
-    PassOwnPtr<GraphicsContext3D> context,
+    PassRefPtr<GraphicsContext3D> context,
     PassOwnPtr<SolidFillShader> solidFillShader,
     PassOwnPtr<TexShader> texShader)
     : m_context(context),

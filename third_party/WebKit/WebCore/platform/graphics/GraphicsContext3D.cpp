@@ -31,6 +31,7 @@
 #include "GraphicsContext3D.h"
 
 #include "ArrayBufferView.h"
+#include "DrawingBuffer.h"
 #include "Image.h"
 #include "ImageData.h"
 
@@ -38,6 +39,11 @@ namespace WebCore {
 
 static uint8_t convertColor16To8(uint16_t value) {
   return value >> 8;
+}
+
+PassRefPtr<DrawingBuffer> GraphicsContext3D::createDrawingBuffer(
+    const IntSize& size) {
+  return DrawingBuffer::create(this, size);
 }
 
 bool GraphicsContext3D::computeFormatAndTypeParameters(
