@@ -301,7 +301,11 @@ class RenderObject : public CachedResourceClient {
 
   bool isHTMLMarquee() const;
 
+  inline bool isBeforeContent() const;
   inline bool isAfterContent() const;
+  static inline bool isBeforeContent(const RenderObject* obj) {
+    return obj && obj->isBeforeContent();
+  }
   static inline bool isAfterContent(const RenderObject* obj) {
     return obj && obj->isAfterContent();
   }
@@ -1064,6 +1068,15 @@ class RenderObject : public CachedResourceClient {
 
 inline bool RenderObject::documentBeingDestroyed() const {
   return !document()->renderer();
+}
+
+inline bool RenderObject::isBeforeContent() const {
+  if (style()->styleType() != BEFORE)
+    return false;
+  // Text nodes don't have their own styles, so ignore the style on a text node.
+  if (isText() && !isBR())
+    return false;
+  return true;
 }
 
 inline bool RenderObject::isAfterContent() const {
