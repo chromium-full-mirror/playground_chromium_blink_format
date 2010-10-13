@@ -116,7 +116,7 @@ class FrameLoaderClientEfl : public FrameLoaderClient {
                                                       int length);
   virtual void dispatchDidLoadResourceByXMLHttpRequest(
       unsigned long identifier,
-      const WebCore::String& sourceString);
+      const String& sourceString);
 
   virtual void dispatchDidHandleOnloadEvents();
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad();
