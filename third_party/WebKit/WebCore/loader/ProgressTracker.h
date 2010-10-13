@@ -41,7 +41,7 @@ class ProgressTracker : public Noncopyable {
   ProgressTracker();
   ~ProgressTracker();
 
-  unsigned long createUniqueIdentifier();
+  static unsigned long createUniqueIdentifier();
 
   double estimatedProgress() const;
 
@@ -61,7 +61,7 @@ class ProgressTracker : public Noncopyable {
   void reset();
   void finalProgressComplete();
 
-  unsigned long m_uniqueIdentifier;
+  static unsigned long s_uniqueIdentifier;
 
   long long m_totalPageAndResourceBytesToLoad;
   long long m_totalBytesReceived;
