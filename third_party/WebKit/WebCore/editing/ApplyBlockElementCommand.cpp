@@ -120,10 +120,8 @@ void ApplyBlockElementCommand::formatSelection(
   VisiblePosition endOfLastParagraph = endOfParagraph(endOfSelection);
 
   bool atEnd = false;
+  Position end;
   while (endOfCurrentParagraph != endAfterSelection && !atEnd) {
-    Position start;
-    Position end;
-
     if (endOfCurrentParagraph == endOfLastParagraph)
       atEnd = true;
 

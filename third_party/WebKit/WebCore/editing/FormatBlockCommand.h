@@ -38,11 +38,14 @@ class FormatBlockCommand : public ApplyBlockElementCommand {
     return adoptRef(new FormatBlockCommand(document, tagName));
   }
 
+  static bool isElementToApplyInFormatBlockCommand(
+      const QualifiedName& tagName);
+
  private:
   FormatBlockCommand(Document*, const QualifiedName& tagName);
 
-  virtual void formatRange(const Position&, const Position&, RefPtr<Element>&);
-  virtual EditAction editingAction() const { return EditActionFormatBlock; }
+  void formatRange(const Position&, const Position&, RefPtr<Element>&);
+  EditAction editingAction() const { return EditActionFormatBlock; }
 };
 
 }  // namespace WebCore
