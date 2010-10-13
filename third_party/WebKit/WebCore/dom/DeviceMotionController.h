@@ -46,6 +46,8 @@ class DeviceMotionController {
 
   void didChangeDeviceMotion(DeviceMotionData*);
 
+  bool isActive() { return !m_listeners.isEmpty(); }
+
  private:
   void timerFired(Timer<DeviceMotionController>*);
 
