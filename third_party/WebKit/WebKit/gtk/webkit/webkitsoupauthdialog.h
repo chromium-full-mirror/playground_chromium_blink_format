@@ -47,7 +47,7 @@ typedef struct { GObject parent_instance; } WebKitSoupAuthDialog;
 typedef struct {
   GObjectClass parent_class;
 
-  GtkWidget* (*current_toplevel)(WebKitSoupAuthDialog* feature,
+  GtkWidget* (*current_toplevel)(WebKitSoupAuthDialog* authDialog,
                                  SoupMessage* message);
 } WebKitSoupAuthDialogClass;
 

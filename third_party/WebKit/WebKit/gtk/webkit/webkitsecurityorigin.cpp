@@ -224,7 +224,7 @@ static void webkit_security_origin_init(WebKitSecurityOrigin* securityOrigin) {
 
 /**
  * webkit_security_origin_get_protocol:
- * @security_origin: a #WebKitSecurityOrigin
+ * @securityOrigin: a #WebKitSecurityOrigin
  *
  * Returns the protocol for the security origin.
  *
@@ -247,7 +247,7 @@ G_CONST_RETURN gchar* webkit_security_origin_get_protocol(
 
 /**
  * webkit_security_origin_get_host:
- * @security_origin: a #WebKitSecurityOrigin
+ * @securityOrigin: a #WebKitSecurityOrigin
  *
  * Returns the hostname for the security origin.
  *
@@ -270,7 +270,7 @@ G_CONST_RETURN gchar* webkit_security_origin_get_host(
 
 /**
  * webkit_security_origin_get_port:
- * @security_origin: a #WebKitSecurityOrigin
+ * @securityOrigin: a #WebKitSecurityOrigin
  *
  * Returns the port for the security origin.
  *
@@ -287,7 +287,7 @@ guint webkit_security_origin_get_port(WebKitSecurityOrigin* securityOrigin) {
 
 /**
  * webkit_security_origin_get_web_database_usage:
- * @security_origin: a #WebKitSecurityOrigin
+ * @securityOrigin: a #WebKitSecurityOrigin
  *
  * Returns the cumulative size of all Web Database database's in the origin
  * in bytes.
@@ -310,7 +310,7 @@ guint64 webkit_security_origin_get_web_database_usage(
 
 /**
  * webkit_security_origin_get_web_database_quota:
- * @security_origin: a #WebKitSecurityOrigin
+ * @securityOrigin: a #WebKitSecurityOrigin
  *
  * Returns the quota for Web Database storage of the security origin
  * in bytes.
@@ -333,7 +333,7 @@ guint64 webkit_security_origin_get_web_database_quota(
 
 /**
  * webkit_security_origin_set_web_database_quota:
- * @security_origin: a #WebKitSecurityOrigin
+ * @securityOrigin: a #WebKitSecurityOrigin
  * @quota: a new Web Database quota in bytes
  *
  * Adjust the quota for Web Database storage of the security origin
@@ -353,7 +353,7 @@ void webkit_security_origin_set_web_database_quota(
 
 /**
  * webkit_security_origin_get_all_web_databases:
- * @security_origin: a #WebKitSecurityOrigin
+ * @securityOrigin: a #WebKitSecurityOrigin
  *
  * Returns a list of all Web Databases in the security origin.
  *

@@ -286,7 +286,7 @@ static void webkit_web_database_set_name(WebKitWebDatabase* webDatabase,
 
 /**
  * webkit_web_database_get_security_origin:
- * @web_database: a #WebKitWebDatabase
+ * @webDatabase: a #WebKitWebDatabase
  *
  * Returns the security origin of the #WebKitWebDatabase.
  *
@@ -304,7 +304,7 @@ WebKitSecurityOrigin* webkit_web_database_get_security_origin(
 
 /**
  * webkit_web_database_get_name:
- * @web_database: a #WebKitWebDatabase
+ * @webDatabase: a #WebKitWebDatabase
  *
  * Returns the canonical name of the #WebKitWebDatabase.
  *
@@ -322,7 +322,7 @@ G_CONST_RETURN gchar* webkit_web_database_get_name(
 
 /**
  * webkit_web_database_get_display_name:
- * @web_database: a #WebKitWebDatabase
+ * @webDatabase: a #WebKitWebDatabase
  *
  * Returns the name of the #WebKitWebDatabase as seen by the user.
  *
@@ -354,7 +354,7 @@ G_CONST_RETURN gchar* webkit_web_database_get_display_name(
 
 /**
  * webkit_web_database_get_expected_size:
- * @web_database: a #WebKitWebDatabase
+ * @webDatabase: a #WebKitWebDatabase
  *
  * Returns the expected size of the #WebKitWebDatabase in bytes as defined by
  *the
@@ -382,7 +382,7 @@ guint64 webkit_web_database_get_expected_size(WebKitWebDatabase* webDatabase) {
 
 /**
  * webkit_web_database_get_size:
- * @web_database: a #WebKitWebDatabase
+ * @webDatabase: a #WebKitWebDatabase
  *
  * Returns the actual size of the #WebKitWebDatabase space on disk in bytes.
  *
@@ -406,7 +406,7 @@ guint64 webkit_web_database_get_size(WebKitWebDatabase* webDatabase) {
 
 /**
  * webkit_web_database_get_filename:
- * @web_database: a #WebKitWebDatabase
+ * @webDatabase: a #WebKitWebDatabase
  *
  * Returns the absolute filename to the #WebKitWebDatabase file on disk.
  *
@@ -439,7 +439,7 @@ G_CONST_RETURN gchar* webkit_web_database_get_filename(
 
 /**
  * webkit_web_database_remove:
- * @web_database: a #WebKitWebDatabase
+ * @webDatabase: a #WebKitWebDatabase
  *
  * Removes the #WebKitWebDatabase from its security origin and destroys all data
  * stored in the database.
@@ -531,7 +531,7 @@ guint64 webkit_get_default_web_database_quota() {
 
 /**
  * webkit_set_default_web_database_quota:
- * @default_quota: the new default database quota
+ * @defaultQuota: the new default database quota
  *
  * Sets the current path to the directory WebKit will write Web
  * Database databases.
