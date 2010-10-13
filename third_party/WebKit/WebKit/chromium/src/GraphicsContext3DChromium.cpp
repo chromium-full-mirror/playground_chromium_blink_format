@@ -869,8 +869,8 @@ PassRefPtr<GraphicsContext3D> GraphicsContext3D::create(
                             renderStyle == RenderDirectlyToHostWindow)) {
     return 0;
   }
-  RefPtr<GraphicsContext3D> result = new GraphicsContext3D(
-      attrs, hostWindow, renderStyle == RenderDirectlyToHostWindow);
+  RefPtr<GraphicsContext3D> result = adoptRef(new GraphicsContext3D(
+      attrs, hostWindow, renderStyle == RenderDirectlyToHostWindow));
   result->m_internal = internal.release();
   return result.release();
 }
