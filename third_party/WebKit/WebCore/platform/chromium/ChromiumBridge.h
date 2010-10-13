@@ -177,10 +177,11 @@ class ChromiumBridge {
   // Forms --------------------------------------------------------------
   static void notifyFormStateChanged(const Document*);
 
+#if !ENABLE(CLIENT_BASED_GEOLOCATION)
   // Geolocation --------------------------------------------------------
   static GeolocationServiceBridge* createGeolocationServiceBridge(
       GeolocationServiceChromium*);
-
+#endif
   // Databases ----------------------------------------------------------
   // Returns a handle to the DB file and ooptionally a handle to its containing
   // directory

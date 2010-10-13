@@ -160,7 +160,9 @@ class WebViewHost : public WebKit::WebViewClient,
       const WebKit::WebAccessibilityObject&,
       WebKit::WebAccessibilityNotification);
   virtual WebKit::WebNotificationPresenter* notificationPresenter();
+#if !ENABLE(CLIENT_BASED_GEOLOCATION)
   virtual WebKit::WebGeolocationService* geolocationService();
+#endif
   virtual WebKit::WebSpeechInputController* speechInputController(
       WebKit::WebSpeechInputListener*);
   virtual WebKit::WebDeviceOrientationClient* deviceOrientationClient();
@@ -350,8 +352,10 @@ class WebViewHost : public WebKit::WebViewClient,
   WebKit::WebRect m_paintRect;
   bool m_isPainting;
 
+#if !ENABLE(CLIENT_BASED_GEOLOCATION)
   // Geolocation
   OwnPtr<WebKit::WebGeolocationServiceMock> m_geolocationServiceMock;
+#endif
 
   OwnPtr<TestNavigationController*> m_navigationController;
 };
