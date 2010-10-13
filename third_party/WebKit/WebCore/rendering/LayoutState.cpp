@@ -38,6 +38,7 @@ LayoutState::LayoutState(LayoutState* prev,
                          RenderBox* renderer,
                          const IntSize& offset,
                          int pageHeight,
+                         bool pageHeightChanged,
                          ColumnInfo* columnInfo)
     : m_columnInfo(columnInfo),
       m_next(prev)
@@ -99,10 +100,12 @@ LayoutState::LayoutState(LayoutState* prev,
                                renderer->paddingLeft(),
                            m_layoutOffset.height() + renderer->borderTop() +
                                renderer->paddingTop());
+    m_pageHeightChanged = pageHeightChanged;
   } else {
     // If we don't establish a new page height, then propagate the old page
     // height and offset down.
     m_pageHeight = m_next->m_pageHeight;
+    m_pageHeightChanged = m_next->m_pageHeightChanged;
     m_pageOffset = m_next->m_pageOffset;
 
     // Disable pagination for objects we don't support.  For now this includes
@@ -123,6 +126,7 @@ LayoutState::LayoutState(LayoutState* prev,
 LayoutState::LayoutState(RenderObject* root)
     : m_clipped(false),
       m_pageHeight(0),
+      m_pageHeightChanged(false),
       m_columnInfo(0),
       m_next(0)
 #ifndef NDEBUG

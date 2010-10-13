@@ -161,7 +161,7 @@ class RenderView : public RenderBlock {
   void setPageHeight(unsigned height) {
     if (m_pageHeight != height) {
       m_pageHeight = height;
-      markDescendantBlocksAndLinesForLayout();
+      m_pageHeightChanged = true;
     }
   }
 
@@ -211,13 +211,15 @@ class RenderView : public RenderBlock {
   bool pushLayoutState(RenderBox* renderer,
                        const IntSize& offset,
                        int pageHeight = 0,
+                       bool pageHeightChanged = false,
                        ColumnInfo* colInfo = 0) {
     // We push LayoutState even if layoutState is disabled because it stores
     // layoutDelta too.
     if (!doingFullRepaint() || renderer->hasColumns() ||
         m_layoutState->isPaginated()) {
       m_layoutState = new (renderArena())
-          LayoutState(m_layoutState, renderer, offset, pageHeight, colInfo);
+          LayoutState(m_layoutState, renderer, offset, pageHeight,
+                      pageHeightChanged, colInfo);
       return true;
     }
     return false;
@@ -265,6 +267,7 @@ class RenderView : public RenderBlock {
 
  private:
   unsigned m_pageHeight;
+  bool m_pageHeightChanged;
   LayoutState* m_layoutState;
   unsigned m_layoutStateDisableCount;
 #if USE(ACCELERATED_COMPOSITING)
@@ -294,13 +297,14 @@ class LayoutStateMaintainer : public Noncopyable {
                         IntSize offset,
                         bool disableState = false,
                         int pageHeight = 0,
+                        bool pageHeightChanged = false,
                         ColumnInfo* colInfo = 0)
       : m_view(view),
         m_disabled(disableState),
         m_didStart(false),
         m_didEnd(false),
         m_didCreateLayoutState(false) {
-    push(root, offset, pageHeight, colInfo);
+    push(root, offset, pageHeight, pageHeightChanged, colInfo);
   }
 
   // ctor to maybe push later
@@ -319,12 +323,13 @@ class LayoutStateMaintainer : public Noncopyable {
   void push(RenderBox* root,
             IntSize offset,
             int pageHeight = 0,
+            bool pageHeightChanged = false,
             ColumnInfo* colInfo = 0) {
     ASSERT(!m_didStart);
     // We push state even if disabled, because we still need to store
     // layoutDelta
-    m_didCreateLayoutState =
-        m_view->pushLayoutState(root, offset, pageHeight, colInfo);
+    m_didCreateLayoutState = m_view->pushLayoutState(
+        root, offset, pageHeight, pageHeightChanged, colInfo);
     if (m_disabled && m_didCreateLayoutState)
       m_view->disableLayoutState();
     m_didStart = true;

@@ -1295,6 +1295,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
   int previousHeight = logicalHeight();
   setLogicalHeight(0);
   bool hasSpecifiedPageHeight = false;
+  bool pageHeightChanged = false;
   ColumnInfo* colInfo = columnInfo();
   if (hasColumns()) {
     if (!pageHeight) {
@@ -1311,10 +1312,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
     }
     if (colInfo->columnHeight() != pageHeight && m_everHadLayout) {
       colInfo->setColumnHeight(pageHeight);
-      markDescendantBlocksAndLinesForLayout();  // We need to dirty all
-                                                // descendant blocks and lines,
-                                                // since the column height is
-                                                // different now.
+      pageHeightChanged = true;
     }
 
     if (!hasSpecifiedPageHeight && !pageHeight)
@@ -1323,7 +1321,8 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
 
   LayoutStateMaintainer statePusher(
       view(), this, IntSize(x(), y()),
-      hasColumns() || hasTransform() || hasReflection(), pageHeight, colInfo);
+      hasColumns() || hasTransform() || hasReflection(), pageHeight,
+      pageHeightChanged, colInfo);
 
   // We use four values, maxTopPos, maxTopNeg, maxBottomPos, and maxBottomNeg,
   // to track
@@ -2152,11 +2151,8 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
               oldLogicalTop + childRenderBlock->lowestFloatLogicalBottom());
   }
 
-  bool paginated = view()->layoutState()->isPaginated();
-  if (!child->needsLayout() && paginated &&
-      view()->layoutState()->m_pageHeight && childRenderBlock &&
-      view()->layoutState()->pageY(child->y()) != childRenderBlock->pageY())
-    childRenderBlock->markForPaginationRelayout();
+  if (!child->needsLayout())
+    child->markForPaginationRelayoutIfNeeded();
 
   bool childHadLayout = child->m_everHadLayout;
   bool childNeededLayout = child->needsLayout();
@@ -2175,6 +2171,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
       clearFloatsIfNeeded(child, marginInfo, oldPosMarginBefore,
                           oldNegMarginBefore, logicalTopBeforeClear);
 
+  bool paginated = view()->layoutState()->isPaginated();
   if (paginated) {
     int oldTop = logicalTopAfterClear;
 
@@ -2235,10 +2232,8 @@ void RenderBlock::layoutBlockChild(RenderBox* child,
     if (childRenderBlock) {
       if (!child->avoidsFloats() && childRenderBlock->containsFloats())
         childRenderBlock->markAllDescendantsWithFloatsForLayout();
-      if (paginated && !child->needsLayout() &&
-          view()->layoutState()->m_pageHeight &&
-          view()->layoutState()->pageY(child->y()) != childRenderBlock->pageY())
-        childRenderBlock->markForPaginationRelayout();
+      if (!child->needsLayout())
+        child->markForPaginationRelayoutIfNeeded();
     }
 
     // Our guess was wrong. Make the child lay itself out again.
@@ -2335,8 +2330,6 @@ void RenderBlock::layoutPositionedObjects(bool relayoutChildren) {
                                                             // paginate with the
                                                             // columns.
 
-    bool paginated = view()->layoutState()->isPaginated();
-
     RenderBox* r;
     Iterator end = m_positionedObjects->end();
     for (Iterator it = m_positionedObjects->begin(); it != end; ++it) {
@@ -2359,15 +2352,8 @@ void RenderBlock::layoutPositionedObjects(bool relayoutChildren) {
       // r->style()->paddingRight().isPercent()))
       r->setPreferredLogicalWidthsDirty(true, false);
 
-      if (!r->needsLayout() && paginated &&
-          view()->layoutState()->m_pageHeight) {
-        RenderBlock* childRenderBlock =
-            r->isRenderBlock() ? toRenderBlock(r) : 0;
-        if (childRenderBlock &&
-            view()->layoutState()->pageY(childRenderBlock->y()) !=
-                childRenderBlock->pageY())
-          childRenderBlock->markForPaginationRelayout();
-      }
+      if (!r->needsLayout())
+        r->markForPaginationRelayoutIfNeeded();
 
       // We don't have to do a full layout.  We just have to update our
       // position. Try that first. If we have shrink-to-fit width
@@ -2394,6 +2380,17 @@ void RenderBlock::markPositionedObjectsForLayout() {
       r->setChildNeedsLayout(true);
     }
   }
+}
+
+void RenderBlock::markForPaginationRelayoutIfNeeded() {
+  ASSERT(!needsLayout());
+  if (needsLayout())
+    return;
+
+  if (view()->layoutState()->pageHeightChanged() ||
+      (view()->layoutState()->pageHeight() &&
+       view()->layoutState()->pageY(y()) != pageY()))
+    setChildNeedsLayout(true, false);
 }
 
 void RenderBlock::repaintOverhangingFloats(bool paintAllDescendants) {
@@ -3451,8 +3448,13 @@ RenderBlock::FloatingObject* RenderBlock::insertFloatingObject(RenderBox* o) {
   // Our location is irrelevant if we're unsplittable or no pagination is in
   // effect.
   // Just go ahead and lay out the float.
+  bool isChildRenderBlock = o->isRenderBlock();
+  if (isChildRenderBlock && !o->needsLayout() &&
+      view()->layoutState()->pageHeightChanged())
+    o->setChildNeedsLayout(true, false);
+
   bool affectedByPagination =
-      o->isRenderBlock() && view()->layoutState()->m_pageHeight;
+      isChildRenderBlock && view()->layoutState()->m_pageHeight;
   if (!affectedByPagination ||
       isWritingModeRoot())  // We are unsplittable if we're a block flow root.
     o->layoutIfNeeded();
@@ -3617,9 +3619,9 @@ bool RenderBlock::positionNewFloats() {
       RenderBlock* childBlock =
           childBox->isRenderBlock() ? toRenderBlock(childBox) : 0;
 
-      if (childBlock && view()->layoutState()->m_pageHeight &&
-          view()->layoutState()->pageY(childBox->y()) != childBlock->pageY())
-        childBlock->markForPaginationRelayout();
+      if (!childBox->needsLayout())
+        childBox->markForPaginationRelayoutIfNeeded();
+      ;
       childBox->layoutIfNeeded();
 
       // If we are unsplittable and don't fit, then we need to move down.
@@ -4529,44 +4531,6 @@ void RenderBlock::markAllDescendantsWithFloatsForLayout(
         childBlock->markAllDescendantsWithFloatsForLayout(floatToRemove,
                                                           inLayout);
     }
-  }
-}
-
-void RenderBlock::markDescendantBlocksAndLinesForLayout(bool inLayout) {
-  if (!m_everHadLayout)
-    return;
-
-  setChildNeedsLayout(true, !inLayout);
-
-  // Iterate over our children and mark them as needed.
-  if (!childrenInline()) {
-    for (RenderBox* child = firstChildBox(); child;
-         child = child->nextSiblingBox()) {
-      if (child->isFloatingOrPositioned())
-        continue;
-      child->markDescendantBlocksAndLinesForLayout(inLayout);
-    }
-  }
-
-  // Walk our floating objects and mark them too.
-  if (m_floatingObjects) {
-    DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
-    while (it.current()) {
-      if (it.current()->m_renderer->isRenderBlock())
-        it.current()->m_renderer->markDescendantBlocksAndLinesForLayout(
-            inLayout);
-      ++it;
-    }
-  }
-
-  if (m_positionedObjects) {
-    // FIXME: Technically we don't have to mark the positioned objects if we're
-    // the block
-    // that established the columns, but we don't really have that information
-    // here.
-    Iterator end = m_positionedObjects->end();
-    for (Iterator it = m_positionedObjects->begin(); it != end; ++it)
-      (*it)->markDescendantBlocksAndLinesForLayout();
   }
 }
 

@@ -42,6 +42,7 @@ class LayoutState : public Noncopyable {
   LayoutState()
       : m_clipped(false),
         m_pageHeight(0),
+        m_pageHeightChanged(false),
         m_columnInfo(0),
         m_next(0)
 #ifndef NDEBUG
@@ -55,6 +56,7 @@ class LayoutState : public Noncopyable {
               RenderBox*,
               const IntSize& offset,
               int pageHeight,
+              bool pageHeightChanged,
               ColumnInfo*);
   LayoutState(RenderObject*);
 
@@ -71,6 +73,9 @@ class LayoutState : public Noncopyable {
   bool isPaginated() const { return m_pageHeight || m_columnInfo; }
   int pageY(int childY) const;
   void addForcedColumnBreak(int childY);
+
+  bool pageHeight() const { return m_pageHeight; }
+  bool pageHeightChanged() const { return m_pageHeightChanged; }
 
  private:
   // The normal operator new is disallowed.
@@ -90,6 +95,8 @@ class LayoutState : public Noncopyable {
 
   int m_pageHeight;  // The current page height for the pagination model that
                      // encloses us.
+  bool m_pageHeightChanged;  // If our page height has changed, this will force
+                             // all blocks to relayout.
   IntSize m_pageOffset;      // The offset of the start of the first page in the
                              // nearest enclosing pagination model.
   ColumnInfo* m_columnInfo;  // If the enclosing pagination model is a column
