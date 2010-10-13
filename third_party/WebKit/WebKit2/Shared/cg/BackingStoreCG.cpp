@@ -31,32 +31,39 @@ using namespace WebCore;
 
 namespace WebKit {
 
-PassOwnPtr<GraphicsContext> BackingStore::createGraphicsContext()
-{
-    RetainPtr<CGColorSpaceRef> colorSpace(AdoptCF, CGColorSpaceCreateDeviceRGB());
-    RetainPtr<CGContextRef> bitmapContext(AdoptCF, CGBitmapContextCreate(data(), m_size.width(), m_size.height(), 8,  m_size.width() * 4, colorSpace.get(), 
-                                                                         kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host));
+PassOwnPtr<GraphicsContext> BackingStore::createGraphicsContext() {
+  RetainPtr<CGColorSpaceRef> colorSpace(AdoptCF, CGColorSpaceCreateDeviceRGB());
+  RetainPtr<CGContextRef> bitmapContext(
+      AdoptCF, CGBitmapContextCreate(
+                   data(), m_size.width(), m_size.height(), 8,
+                   m_size.width() * 4, colorSpace.get(),
+                   kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host));
 
-    // We want the origin to be in the top left corner so flip the backing store context.
-    CGContextTranslateCTM(bitmapContext.get(), 0, m_size.height());
-    CGContextScaleCTM(bitmapContext.get(), 1, -1);
+  // We want the origin to be in the top left corner so flip the backing store
+  // context.
+  CGContextTranslateCTM(bitmapContext.get(), 0, m_size.height());
+  CGContextScaleCTM(bitmapContext.get(), 1, -1);
 
-    return adoptPtr(new GraphicsContext(bitmapContext.get()));
+  return adoptPtr(new GraphicsContext(bitmapContext.get()));
 }
 
-void BackingStore::paint(WebCore::GraphicsContext* context, const WebCore::IntRect& clipRect)
-{
-    // FIXME: Honor the clip rect!
-    OwnPtr<GraphicsContext> sourceContext(createGraphicsContext());
+void BackingStore::paint(WebCore::GraphicsContext* context,
+                         const WebCore::IntRect& clipRect) {
+  // FIXME: Honor the clip rect!
+  OwnPtr<GraphicsContext> sourceContext(createGraphicsContext());
 
-    // FIXME: This creates an extra copy.
-    RetainPtr<CGImageRef> image(AdoptCF, CGBitmapContextCreateImage(sourceContext->platformContext()));
+  // FIXME: This creates an extra copy.
+  RetainPtr<CGImageRef> image(
+      AdoptCF, CGBitmapContextCreateImage(sourceContext->platformContext()));
 
-    CGContextRef cgContext = context->platformContext();
-    
-    CGContextSaveGState(cgContext);
-    CGContextDrawImage(context->platformContext(), CGRectMake(0, 0, CGImageGetWidth(image.get()), CGImageGetHeight(image.get())), image.get());
-    CGContextRestoreGState(cgContext);
+  CGContextRef cgContext = context->platformContext();
+
+  CGContextSaveGState(cgContext);
+  CGContextDrawImage(context->platformContext(),
+                     CGRectMake(0, 0, CGImageGetWidth(image.get()),
+                                CGImageGetHeight(image.get())),
+                     image.get());
+  CGContextRestoreGState(cgContext);
 }
-        
-} // namespace WebKit
+
+}  // namespace WebKit
