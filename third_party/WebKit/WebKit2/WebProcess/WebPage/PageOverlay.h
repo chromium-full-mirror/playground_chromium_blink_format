@@ -51,6 +51,8 @@ class PageOverlay {
  protected:
   PageOverlay();
 
+  WebPage* webPage() const { return m_webPage; }
+
  private:
   WebPage* m_webPage;
 };
