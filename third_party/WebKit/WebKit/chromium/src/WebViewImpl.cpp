@@ -2298,7 +2298,7 @@ void WebViewImpl::setIsAcceleratedCompositingActive(bool active) {
     return;
   }
 
-  OwnPtr<GraphicsContext3D> context =
+  RefPtr<GraphicsContext3D> context =
       m_temporaryOnscreenGraphicsContext3D.release();
   if (!context) {
     context = GraphicsContext3D::create(

@@ -77,7 +77,7 @@ static inline bool compareLayerZ(const LayerChromium* a,
 }
 
 PassRefPtr<LayerRendererChromium> LayerRendererChromium::create(
-    PassOwnPtr<GraphicsContext3D> context) {
+    PassRefPtr<GraphicsContext3D> context) {
   if (!context)
     return 0;
 
@@ -90,7 +90,7 @@ PassRefPtr<LayerRendererChromium> LayerRendererChromium::create(
 }
 
 LayerRendererChromium::LayerRendererChromium(
-    PassOwnPtr<GraphicsContext3D> context)
+    PassRefPtr<GraphicsContext3D> context)
     : m_rootLayerTextureId(0),
       m_rootLayerTextureWidth(0),
       m_rootLayerTextureHeight(0),
