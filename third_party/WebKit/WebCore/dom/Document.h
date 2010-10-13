@@ -265,6 +265,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   DEFINE_ATTRIBUTE_EVENT_LISTENER(error);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(focus);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(load);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(readystatechange);
 
   // WebKit extensions
   DEFINE_ATTRIBUTE_EVENT_LISTENER(beforecut);
