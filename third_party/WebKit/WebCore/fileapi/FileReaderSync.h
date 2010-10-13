@@ -34,9 +34,9 @@
 #if ENABLE(BLOB)
 
 #include "ExceptionCode.h"
-#include "ScriptString.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
+#include <wtf/text/StringBuilder.h>
 
 namespace WebCore {
 
@@ -51,42 +51,27 @@ class FileReaderSync : public RefCounted<FileReaderSync> {
 
   virtual ~FileReaderSync() {}
 
-  const ScriptString& readAsBinaryString(ScriptExecutionContext*,
-                                         Blob*,
-                                         ExceptionCode&);
-  const ScriptString& readAsText(ScriptExecutionContext* scriptExecutionContext,
-                                 Blob* blob,
-                                 ExceptionCode& ec) {
+  String readAsBinaryString(ScriptExecutionContext*, Blob*, ExceptionCode&);
+  String readAsText(ScriptExecutionContext* scriptExecutionContext,
+                    Blob* blob,
+                    ExceptionCode& ec) {
     return readAsText(scriptExecutionContext, blob, "", ec);
   }
-  const ScriptString& readAsText(ScriptExecutionContext*,
-                                 Blob*,
-                                 const String& encoding,
-                                 ExceptionCode&);
-  const ScriptString& readAsDataURL(ScriptExecutionContext*,
-                                    Blob*,
-                                    ExceptionCode&);
+  String readAsText(ScriptExecutionContext*,
+                    Blob*,
+                    const String& encoding,
+                    ExceptionCode&);
+  String readAsDataURL(ScriptExecutionContext*, Blob*, ExceptionCode&);
 
  private:
   enum ReadType { ReadAsBinaryString, ReadAsText, ReadAsDataURL };
 
-  FileReaderSync();
+  FileReaderSync() {}
 
   void read(ScriptExecutionContext*, Blob*, ReadType, ExceptionCode&);
-  void convertToText(const char* data, int size, ScriptString& result);
+  void convertToText(const char* data, int size, StringBuilder&);
 
-  // Like XMLHttpRequest.m_responseText, we keep this as a ScriptString, not a
-  // WTF::String.
-  // That's because these strings can easily get huge (they are filled from the
-  // file) and
-  // because JS can easily observe many intermediate states, so it's very useful
-  // to be
-  // able to share the buffer with JavaScript versions of the whole or partial
-  // string.
-  // In contrast, this string doesn't interact much with the rest of the engine
-  // so it's not that
-  // big a cost that it isn't a String.
-  ScriptString m_result;
+  StringBuilder m_builder;
 
   String m_encoding;
 };

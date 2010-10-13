@@ -487,6 +487,12 @@ JSValue jsStringOrNull(ExecState* exec, const String& s) {
   return jsString(exec, s);
 }
 
+JSValue jsOwnedStringOrNull(ExecState* exec, const String& s) {
+  if (s.isNull())
+    return jsNull();
+  return jsOwnedString(exec, stringToUString(s));
+}
+
 JSValue jsOwnedStringOrNull(ExecState* exec, const UString& s) {
   if (s.isNull())
     return jsNull();

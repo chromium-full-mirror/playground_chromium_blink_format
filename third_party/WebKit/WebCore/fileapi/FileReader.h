@@ -37,14 +37,14 @@
 #include "EventTarget.h"
 #include "FileError.h"
 #include "KURL.h"
-#include "PlatformString.h"
-#include "ScriptString.h"
 #include "TextEncoding.h"
 #include "ThreadableLoaderClient.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
+#include <wtf/text/StringBuilder.h>
+#include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
@@ -75,13 +75,13 @@ class FileReader : public RefCounted<FileReader>,
 
   ReadyState readyState() const;
   PassRefPtr<FileError> error() { return m_error; }
-  const ScriptString& result();
+  String result();
 
   // Helper methods, also used by FileReaderSync.
   static ExceptionCode httpStatusCodeToExceptionCode(int httpStatusCode);
   static void convertToDataURL(const Vector<char>& rawData,
                                const String& fileType,
-                               ScriptString& result);
+                               StringBuilder&);
 
   // ActiveDOMObject
   virtual bool canSuspend() const;
@@ -141,18 +141,7 @@ class FileReader : public RefCounted<FileReader>,
   ReadType m_readType;
   TextEncoding m_encoding;
 
-  // Like XMLHttpRequest.m_responseText, we keep this as a ScriptString, not a
-  // WTF::String.
-  // That's because these strings can easily get huge (they are filled from the
-  // file) and
-  // because JS can easily observe many intermediate states, so it's very useful
-  // to be
-  // able to share the buffer with JavaScript versions of the whole or partial
-  // string.
-  // In contrast, this string doesn't interact much with the rest of the engine
-  // so it's not that
-  // big a cost that it isn't a String.
-  ScriptString m_result;
+  StringBuilder m_builder;
 
   // The raw data. We have to keep track of all the raw data for it to be
   // converted to text or data URL data.

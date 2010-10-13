@@ -82,7 +82,6 @@ class ResourceResponse;
 class ResourceError;
 class ScriptCallStack;
 class ScriptProfile;
-class ScriptString;
 class SharedBuffer;
 class Storage;
 class StorageArea;
@@ -195,7 +194,7 @@ class InspectorController : public Noncopyable {
   void didFinishLoading(unsigned long identifier, double finishTime);
   void didFailLoading(unsigned long identifier, const ResourceError&);
   void resourceRetrievedByXMLHttpRequest(unsigned long identifier,
-                                         const ScriptString& sourceString,
+                                         const String& sourceString,
                                          const String& url,
                                          const String& sendURL,
                                          unsigned sendLineNumber);

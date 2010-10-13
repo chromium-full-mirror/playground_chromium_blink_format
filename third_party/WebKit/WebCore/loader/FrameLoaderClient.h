@@ -73,7 +73,6 @@ class ResourceHandle;
 class ResourceLoader;
 class ResourceRequest;
 class ResourceResponse;
-class ScriptString;
 class SecurityOrigin;
 class SharedBuffer;
 class SubstituteData;

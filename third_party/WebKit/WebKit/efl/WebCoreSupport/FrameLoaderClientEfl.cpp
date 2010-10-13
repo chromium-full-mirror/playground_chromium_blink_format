@@ -740,7 +740,7 @@ bool FrameLoaderClientEfl::dispatchDidLoadResourceFromMemoryCache(
 
 void FrameLoaderClientEfl::dispatchDidLoadResourceByXMLHttpRequest(
     unsigned long,
-    const ScriptString&) {
+    const String&) {
   notImplemented();
 }
 

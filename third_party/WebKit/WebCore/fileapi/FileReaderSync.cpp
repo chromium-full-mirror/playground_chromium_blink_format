@@ -39,6 +39,7 @@
 #include "BlobURL.h"
 #include "FileReader.h"
 #include "ResourceRequest.h"
+#include "ResourceResponse.h"
 #include "ScriptExecutionContext.h"
 #include "TextEncoding.h"
 #include "TextResourceDecoder.h"
@@ -51,7 +52,7 @@ class FileReaderSyncLoader : public ThreadableLoaderClient {
  public:
   // If the output result is provided, use it. Otherwise, save it as the raw
   // data.
-  FileReaderSyncLoader(ScriptString* result);
+  FileReaderSyncLoader(StringBuilder*);
 
   // Returns the http status code.
   void start(ScriptExecutionContext*, const ResourceRequest&, ExceptionCode&);
@@ -67,7 +68,7 @@ class FileReaderSyncLoader : public ThreadableLoaderClient {
  private:
   // The output result. The caller provides this in order to load the binary
   // data directly.
-  ScriptString* m_result;
+  StringBuilder* m_builder;
 
   // The raw data. The caller does not provide the above output result and we
   // need to save it here.
@@ -76,8 +77,8 @@ class FileReaderSyncLoader : public ThreadableLoaderClient {
   int m_httpStatusCode;
 };
 
-FileReaderSyncLoader::FileReaderSyncLoader(ScriptString* result)
-    : m_result(result), m_httpStatusCode(0) {}
+FileReaderSyncLoader::FileReaderSyncLoader(StringBuilder* builder)
+    : m_builder(builder), m_httpStatusCode(0) {}
 
 void FileReaderSyncLoader::start(ScriptExecutionContext* scriptExecutionContext,
                                  const ResourceRequest& request,
@@ -104,8 +105,8 @@ void FileReaderSyncLoader::didReceiveResponse(
 
 void FileReaderSyncLoader::didReceiveData(const char* data,
                                           int lengthReceived) {
-  if (m_result)
-    *m_result += String(data, static_cast<unsigned>(lengthReceived));
+  if (m_builder)
+    m_builder->append(data, static_cast<unsigned>(lengthReceived));
   else
     m_rawData.append(data, static_cast<unsigned>(lengthReceived));
 }
@@ -117,41 +118,39 @@ void FileReaderSyncLoader::didFail(const ResourceError&) {
   m_httpStatusCode = 500;
 }
 
-FileReaderSync::FileReaderSync() : m_result("") {}
-
-const ScriptString& FileReaderSync::readAsBinaryString(
+String FileReaderSync::readAsBinaryString(
     ScriptExecutionContext* scriptExecutionContext,
     Blob* blob,
     ExceptionCode& ec) {
   if (!blob)
-    return m_result;
+    return m_builder.toString();
 
   read(scriptExecutionContext, blob, ReadAsBinaryString, ec);
-  return m_result;
+  return m_builder.toString();
 }
 
-const ScriptString& FileReaderSync::readAsText(
+String FileReaderSync::readAsText(
     ScriptExecutionContext* scriptExecutionContext,
     Blob* blob,
     const String& encoding,
     ExceptionCode& ec) {
   if (!blob)
-    return m_result;
+    return m_builder.toString();
 
   m_encoding = encoding;
   read(scriptExecutionContext, blob, ReadAsText, ec);
-  return m_result;
+  return m_builder.toString();
 }
 
-const ScriptString& FileReaderSync::readAsDataURL(
+String FileReaderSync::readAsDataURL(
     ScriptExecutionContext* scriptExecutionContext,
     Blob* blob,
     ExceptionCode& ec) {
   if (!blob)
-    return m_result;
+    return m_builder.toString();
 
   read(scriptExecutionContext, blob, ReadAsDataURL, ec);
-  return m_result;
+  return m_builder.toString();
 }
 
 void FileReaderSync::read(ScriptExecutionContext* scriptExecutionContext,
@@ -167,7 +166,8 @@ void FileReaderSync::read(ScriptExecutionContext* scriptExecutionContext,
   ResourceRequest request(urlForReading);
   request.setHTTPMethod("GET");
 
-  FileReaderSyncLoader loader((readType == ReadAsBinaryString) ? &m_result : 0);
+  FileReaderSyncLoader loader((readType == ReadAsBinaryString) ? &m_builder
+                                                               : 0);
   loader.start(scriptExecutionContext, request, ec);
   ThreadableBlobRegistry::unregisterBlobURL(urlForReading);
   if (ec)
@@ -178,10 +178,11 @@ void FileReaderSync::read(ScriptExecutionContext* scriptExecutionContext,
       // Nothing to do since we need no conversion.
       return;
     case ReadAsText:
-      convertToText(loader.rawData().data(), loader.rawData().size(), m_result);
+      convertToText(loader.rawData().data(), loader.rawData().size(),
+                    m_builder);
       return;
     case ReadAsDataURL:
-      FileReader::convertToDataURL(loader.rawData(), blob->type(), m_result);
+      FileReader::convertToDataURL(loader.rawData(), blob->type(), m_builder);
       return;
   }
 
@@ -190,7 +191,7 @@ void FileReaderSync::read(ScriptExecutionContext* scriptExecutionContext,
 
 void FileReaderSync::convertToText(const char* data,
                                    int size,
-                                   ScriptString& result) {
+                                   StringBuilder& builder) {
   if (!size)
     return;
 
@@ -204,8 +205,9 @@ void FileReaderSync::convertToText(const char* data,
   RefPtr<TextResourceDecoder> decoder = TextResourceDecoder::create(
       "text/plain",
       m_encoding.isEmpty() ? UTF8Encoding() : TextEncoding(m_encoding));
-  result = decoder->decode(data, size);
-  result += decoder->flush();
+  builder.clear();
+  builder.append(decoder->decode(data, size));
+  builder.append(decoder->flush());
 }
 
 }  // namespace WebCore

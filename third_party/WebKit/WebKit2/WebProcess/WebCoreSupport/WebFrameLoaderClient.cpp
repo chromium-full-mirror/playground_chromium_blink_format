@@ -206,7 +206,7 @@ bool WebFrameLoaderClient::dispatchDidLoadResourceFromMemoryCache(
 
 void WebFrameLoaderClient::dispatchDidLoadResourceByXMLHttpRequest(
     unsigned long identifier,
-    const ScriptString&) {
+    const String&) {
   notImplemented();
 }
 

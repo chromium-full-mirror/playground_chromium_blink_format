@@ -328,6 +328,7 @@ JSC::JSValue jsStringOrFalse(JSC::ExecState*,
 // already owned by another
 // object, to let the engine know that collecting the JSString wrapper is
 // unlikely to save memory.
+JSC::JSValue jsOwnedStringOrNull(JSC::ExecState*, const String&);
 JSC::JSValue jsOwnedStringOrNull(JSC::ExecState*, const JSC::UString&);
 
 String identifierToString(const JSC::Identifier&);

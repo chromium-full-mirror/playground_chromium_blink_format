@@ -43,7 +43,7 @@ ScriptCallFrame::ScriptCallFrame(const UString& functionName,
                                  int lineNumber,
                                  ExecState* exec,
                                  unsigned skipArgumentCount)
-    : m_functionName(functionName),
+    : m_functionName(ustringToString(functionName)),
       m_sourceURL(ustringToString(urlString)),
       m_lineNumber(lineNumber) {
   if (!exec)

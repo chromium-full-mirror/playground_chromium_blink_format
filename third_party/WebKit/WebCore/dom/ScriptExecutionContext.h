@@ -57,7 +57,6 @@ class FileThread;
 #endif
 class MessagePort;
 class SecurityOrigin;
-class ScriptString;
 #if ENABLE(INSPECTOR)
 class InspectorController;
 #endif
