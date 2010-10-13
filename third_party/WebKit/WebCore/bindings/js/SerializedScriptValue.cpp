@@ -797,7 +797,12 @@ class CloneDeserializer : CloneBase {
     if (sizeof(T) == 1)
       value = *ptr++;
     else {
-      value = *reinterpret_cast_ptr<const T*>(ptr);
+#if CPU(ARMV5_OR_LOWER)
+      // To protect misaligned memory access.
+      memcpy(&value, ptr, sizeof(T));
+#else
+      value = *reinterpret_cast<const T*>(ptr);
+#endif
       ptr += sizeof(T);
     }
     return true;
@@ -874,7 +879,14 @@ class CloneDeserializer : CloneBase {
       return false;
 
 #if ASSUME_LITTLE_ENDIAN
-    str = UString(reinterpret_cast_ptr<const UChar*>(ptr), length);
+#if CPU(ARMV5_OR_LOWER)
+    // To protect misaligned memory access.
+    Vector<UChar> alignedBuffer(length);
+    memcpy(alignedBuffer.data(), ptr, length * sizeof(UChar));
+    str = UString::adopt(alignedBuffer);
+#else
+    str = UString(reinterpret_cast<const UChar*>(ptr), length);
+#endif
     ptr += length * sizeof(UChar);
 #else
     Vector<UChar> buffer;
