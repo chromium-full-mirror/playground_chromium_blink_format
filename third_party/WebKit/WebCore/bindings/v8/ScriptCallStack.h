@@ -48,6 +48,7 @@ class InspectorArray;
 class ScriptCallStack : public Noncopyable {
  public:
   static const int maxCallStackSizeToCapture;
+  static const v8::StackTrace::StackTraceOptions stackTraceOptions;
 
   static PassOwnPtr<ScriptCallStack> create(const v8::Arguments&,
                                             unsigned skipArgumentCount = 0,

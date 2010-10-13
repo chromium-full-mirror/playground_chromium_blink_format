@@ -66,7 +66,8 @@ v8::Handle<v8::Value> V8Console::traceCallback(const v8::Arguments& args) {
   v8::HandleScope handleScope;
   ScriptState* scriptState = ScriptState::current();
   v8::Local<v8::StackTrace> stackTrace = v8::StackTrace::CurrentStackTrace(
-      ScriptCallStack::maxCallStackSizeToCapture);
+      ScriptCallStack::maxCallStackSizeToCapture,
+      ScriptCallStack::stackTraceOptions);
   OwnPtr<ScriptCallStack> callStack(
       ScriptCallStack::create(scriptState, stackTrace));
   imp->trace(callStack.get());

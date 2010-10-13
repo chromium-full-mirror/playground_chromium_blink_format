@@ -60,7 +60,7 @@ class ScriptCallFrame {
   ~ScriptCallFrame();
 
   const ScriptString& functionName() const { return m_functionName; }
-  const KURL& sourceURL() const { return m_sourceURL; }
+  const String& sourceURL() const { return m_sourceURL; }
   unsigned lineNumber() const { return m_lineNumber; }
 
   // argument retrieval methods
@@ -69,7 +69,7 @@ class ScriptCallFrame {
 
  private:
   ScriptString m_functionName;
-  KURL m_sourceURL;
+  String m_sourceURL;
   unsigned m_lineNumber;
 
   Vector<ScriptValue> m_arguments;

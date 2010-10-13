@@ -61,7 +61,7 @@ PassRefPtr<InspectorObject> ConsoleMessage::CallFrame::buildInspectorObject()
     const {
   RefPtr<InspectorObject> frame = InspectorObject::create();
   frame->setString("functionName", m_functionName);
-  frame->setString("sourceURL", m_sourceURL.string());
+  frame->setString("sourceURL", m_sourceURL);
   frame->setNumber("lineNumber", m_lineNumber);
   return frame;
 }
@@ -105,7 +105,7 @@ ConsoleMessage::ConsoleMessage(MessageSource s,
       m_repeatCount(1) {
   const ScriptCallFrame& lastCaller = callStack->at(0);
   m_line = lastCaller.lineNumber();
-  m_url = lastCaller.sourceURL().string();
+  m_url = lastCaller.sourceURL();
 
   if (storeTrace) {
     for (unsigned i = 0; i < callStack->size(); ++i)

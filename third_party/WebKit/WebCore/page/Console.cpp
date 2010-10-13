@@ -191,7 +191,7 @@ void Console::addMessage(MessageType type,
   if (getFirstArgumentAsString(callStack->state(), lastCaller, message))
     page->chrome()->client()->addMessageToConsole(
         JSMessageSource, type, level, message, lastCaller.lineNumber(),
-        lastCaller.sourceURL().prettyURL());
+        lastCaller.sourceURL());
 
 #if ENABLE(INSPECTOR)
   page->inspectorController()->addMessageToConsole(JSMessageSource, type, level,
@@ -201,7 +201,7 @@ void Console::addMessage(MessageType type,
   if (!Console::shouldPrintExceptions())
     return;
 
-  printSourceURLAndLine(lastCaller.sourceURL().prettyURL(), 0);
+  printSourceURLAndLine(lastCaller.sourceURL(), 0);
   printMessageSourceAndLevelPrefix(JSMessageSource, level);
 
   for (unsigned i = 0; i < lastCaller.argumentCount(); ++i) {
@@ -272,7 +272,7 @@ void Console::count(ScriptCallStack* callStack) {
   getFirstArgumentAsString(callStack->state(), lastCaller, title);
 
   page->inspectorController()->count(title, lastCaller.lineNumber(),
-                                     lastCaller.sourceURL().string());
+                                     lastCaller.sourceURL());
 #else
   UNUSED_PARAM(callStack);
 #endif
@@ -418,7 +418,7 @@ void Console::timeEnd(const String& title, ScriptCallStack* callStack) {
   const ScriptCallFrame& lastCaller = callStack->at(0);
   page->inspectorController()->addMessageToConsole(
       JSMessageSource, LogMessageType, LogMessageLevel, message,
-      lastCaller.lineNumber(), lastCaller.sourceURL().string());
+      lastCaller.lineNumber(), lastCaller.sourceURL());
 #else
   UNUSED_PARAM(title);
   UNUSED_PARAM(callStack);

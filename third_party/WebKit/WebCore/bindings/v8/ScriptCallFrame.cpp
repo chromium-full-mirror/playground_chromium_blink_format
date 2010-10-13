@@ -46,7 +46,7 @@ ScriptCallFrame::ScriptCallFrame(const String& functionName,
                                  const v8::Arguments& arguments,
                                  unsigned skipArgumentCount)
     : m_functionName(functionName),
-      m_sourceURL(ParsedURLString, urlString),
+      m_sourceURL(urlString),
       m_lineNumber(lineNumber) {
   for (int i = skipArgumentCount; i < arguments.Length(); ++i)
     m_arguments.append(ScriptValue(arguments[i]));
@@ -56,7 +56,7 @@ ScriptCallFrame::ScriptCallFrame(const String& functionName,
                                  const String& urlString,
                                  int lineNumber)
     : m_functionName(functionName),
-      m_sourceURL(ParsedURLString, urlString),
+      m_sourceURL(urlString),
       m_lineNumber(lineNumber) {}
 
 ScriptCallFrame::~ScriptCallFrame() {}
