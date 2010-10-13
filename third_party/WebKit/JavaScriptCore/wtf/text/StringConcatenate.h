@@ -26,9 +26,9 @@
 #ifndef StringConcatenate_h
 #define StringConcatenate_h
 
-#include "UString.h"
+#include <wtf/text/WTFString.h>
 
-namespace JSC {
+namespace WTF {
 
 template <typename StringType>
 class StringTypeAdapter {};
@@ -70,9 +70,9 @@ class StringTypeAdapter<const char*> {
 };
 
 template <>
-class StringTypeAdapter<UString> {
+class StringTypeAdapter<String> {
  public:
-  StringTypeAdapter<UString>(UString& string)
+  StringTypeAdapter<String>(String& string)
       : m_data(string.characters()), m_length(string.length()) {}
 
   unsigned length() { return m_length; }
@@ -399,7 +399,7 @@ PassRefPtr<StringImpl> tryMakeString(StringType1 string1,
 }
 
 template <typename StringType1, typename StringType2>
-UString makeString(StringType1 string1, StringType2 string2) {
+String makeString(StringType1 string1, StringType2 string2) {
   PassRefPtr<StringImpl> resultImpl = tryMakeString(string1, string2);
   if (!resultImpl)
     CRASH();
@@ -407,9 +407,9 @@ UString makeString(StringType1 string1, StringType2 string2) {
 }
 
 template <typename StringType1, typename StringType2, typename StringType3>
-UString makeString(StringType1 string1,
-                   StringType2 string2,
-                   StringType3 string3) {
+String makeString(StringType1 string1,
+                  StringType2 string2,
+                  StringType3 string3) {
   PassRefPtr<StringImpl> resultImpl = tryMakeString(string1, string2, string3);
   if (!resultImpl)
     CRASH();
@@ -420,10 +420,10 @@ template <typename StringType1,
           typename StringType2,
           typename StringType3,
           typename StringType4>
-UString makeString(StringType1 string1,
-                   StringType2 string2,
-                   StringType3 string3,
-                   StringType4 string4) {
+String makeString(StringType1 string1,
+                  StringType2 string2,
+                  StringType3 string3,
+                  StringType4 string4) {
   PassRefPtr<StringImpl> resultImpl =
       tryMakeString(string1, string2, string3, string4);
   if (!resultImpl)
@@ -436,11 +436,11 @@ template <typename StringType1,
           typename StringType3,
           typename StringType4,
           typename StringType5>
-UString makeString(StringType1 string1,
-                   StringType2 string2,
-                   StringType3 string3,
-                   StringType4 string4,
-                   StringType5 string5) {
+String makeString(StringType1 string1,
+                  StringType2 string2,
+                  StringType3 string3,
+                  StringType4 string4,
+                  StringType5 string5) {
   PassRefPtr<StringImpl> resultImpl =
       tryMakeString(string1, string2, string3, string4, string5);
   if (!resultImpl)
@@ -454,12 +454,12 @@ template <typename StringType1,
           typename StringType4,
           typename StringType5,
           typename StringType6>
-UString makeString(StringType1 string1,
-                   StringType2 string2,
-                   StringType3 string3,
-                   StringType4 string4,
-                   StringType5 string5,
-                   StringType6 string6) {
+String makeString(StringType1 string1,
+                  StringType2 string2,
+                  StringType3 string3,
+                  StringType4 string4,
+                  StringType5 string5,
+                  StringType6 string6) {
   PassRefPtr<StringImpl> resultImpl =
       tryMakeString(string1, string2, string3, string4, string5, string6);
   if (!resultImpl)
@@ -474,13 +474,13 @@ template <typename StringType1,
           typename StringType5,
           typename StringType6,
           typename StringType7>
-UString makeString(StringType1 string1,
-                   StringType2 string2,
-                   StringType3 string3,
-                   StringType4 string4,
-                   StringType5 string5,
-                   StringType6 string6,
-                   StringType7 string7) {
+String makeString(StringType1 string1,
+                  StringType2 string2,
+                  StringType3 string3,
+                  StringType4 string4,
+                  StringType5 string5,
+                  StringType6 string6,
+                  StringType7 string7) {
   PassRefPtr<StringImpl> resultImpl = tryMakeString(
       string1, string2, string3, string4, string5, string6, string7);
   if (!resultImpl)
@@ -496,14 +496,14 @@ template <typename StringType1,
           typename StringType6,
           typename StringType7,
           typename StringType8>
-UString makeString(StringType1 string1,
-                   StringType2 string2,
-                   StringType3 string3,
-                   StringType4 string4,
-                   StringType5 string5,
-                   StringType6 string6,
-                   StringType7 string7,
-                   StringType8 string8) {
+String makeString(StringType1 string1,
+                  StringType2 string2,
+                  StringType3 string3,
+                  StringType4 string4,
+                  StringType5 string5,
+                  StringType6 string6,
+                  StringType7 string7,
+                  StringType8 string8) {
   PassRefPtr<StringImpl> resultImpl = tryMakeString(
       string1, string2, string3, string4, string5, string6, string7, string8);
   if (!resultImpl)
@@ -511,6 +511,6 @@ UString makeString(StringType1 string1,
   return resultImpl;
 }
 
-}  // namespace JSC
+}  // namespace WTF
 
 #endif

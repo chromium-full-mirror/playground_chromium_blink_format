@@ -36,7 +36,7 @@
 #include "JSNotAnObject.h"
 #include "Interpreter.h"
 #include "Nodes.h"
-#include "StringConcatenate.h"
+#include "UStringConcatenate.h"
 
 namespace JSC {
 
@@ -89,7 +89,7 @@ JSValue createUndefinedVariableError(ExecState* exec,
   int divotPoint = 0;
   int line = codeBlock->expressionRangeForBytecodeOffset(
       exec, bytecodeOffset, divotPoint, startOffset, endOffset);
-  UString message(makeString("Can't find variable: ", ident.ustring()));
+  UString message(makeUString("Can't find variable: ", ident.ustring()));
   JSObject* exception =
       addErrorInfo(exec, createReferenceError(exec, message), line,
                    codeBlock->ownerExecutable()->source(), divotPoint,
@@ -105,9 +105,9 @@ static UString createErrorMessage(ExecState* exec,
                                   JSValue value,
                                   UString error) {
   if (!expressionStop || expressionStart > codeBlock->source()->length())
-    return makeString(value.toString(exec), " is ", error);
+    return makeUString(value.toString(exec), " is ", error);
   if (expressionStart < expressionStop)
-    return makeString(
+    return makeUString(
         "Result of expression '",
         codeBlock->source()->getRange(expressionStart, expressionStop), "' [",
         value.toString(exec), "] is ", error, ".");
@@ -129,9 +129,9 @@ static UString createErrorMessage(ExecState* exec,
     stop++;
   while (stop > expressionStart && isStrWhiteSpace(data[stop]))
     stop--;
-  return makeString("Result of expression near '...",
-                    codeBlock->source()->getRange(start, stop), "...' [",
-                    value.toString(exec), "] is ", error, ".");
+  return makeUString("Result of expression near '...",
+                     codeBlock->source()->getRange(start, stop), "...' [",
+                     value.toString(exec), "] is ", error, ".");
 }
 
 JSObject* createInvalidParamError(ExecState* exec,
@@ -146,7 +146,7 @@ JSObject* createInvalidParamError(ExecState* exec,
       exec, bytecodeOffset, divotPoint, startOffset, endOffset);
   UString errorMessage = createErrorMessage(
       exec, codeBlock, line, divotPoint, divotPoint + endOffset, value,
-      makeString("not a valid argument for '", op, "'"));
+      makeUString("not a valid argument for '", op, "'"));
   JSObject* exception =
       addErrorInfo(exec, createTypeError(exec, errorMessage), line,
                    codeBlock->ownerExecutable()->source(), divotPoint,

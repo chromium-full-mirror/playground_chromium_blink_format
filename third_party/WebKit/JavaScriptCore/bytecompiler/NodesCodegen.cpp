@@ -43,7 +43,7 @@
 #include "RegExpCache.h"
 #include "RegExpObject.h"
 #include "SamplingTool.h"
-#include "StringConcatenate.h"
+#include "UStringConcatenate.h"
 #include <wtf/Assertions.h>
 #include <wtf/RefCountedLeakCounter.h>
 #include <wtf/Threading.h>
@@ -84,8 +84,8 @@ namespace JSC {
 static void substitute(UString& string, const UString& substring) {
   size_t position = string.find("%s");
   ASSERT(position != notFound);
-  string = makeString(string.substringSharingImpl(0, position), substring,
-                      string.substringSharingImpl(position + 2));
+  string = makeUString(string.substringSharingImpl(0, position), substring,
+                       string.substringSharingImpl(position + 2));
 }
 
 RegisterID* ThrowableExpressionData::emitThrowError(

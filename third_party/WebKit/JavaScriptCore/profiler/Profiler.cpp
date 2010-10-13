@@ -39,7 +39,7 @@
 #include "Profile.h"
 #include "ProfileGenerator.h"
 #include "ProfileNode.h"
-#include "StringConcatenate.h"
+#include "UStringConcatenate.h"
 #include <stdio.h>
 
 namespace JSC {
@@ -176,7 +176,7 @@ CallIdentifier Profiler::createCallIdentifier(ExecState* exec,
         static_cast<InternalFunction*>(asObject(functionValue))->name(exec),
         defaultSourceURL, defaultLineNumber);
   return CallIdentifier(
-      makeString("(", asObject(functionValue)->className(), " object)"),
+      makeUString("(", asObject(functionValue)->className(), " object)"),
       defaultSourceURL, defaultLineNumber);
 }
 
