@@ -35,7 +35,7 @@
 #include "locationedit.h"
 #include "utils.h"
 
-MainWindow::MainWindow() : m_page(new WebPage(this)), m_toolBar(0) {
+MainWindow::MainWindow() : m_page(new WebPage(this)), m_toolBar(0), urlEdit(0) {
   setAttribute(Qt::WA_DeleteOnClose);
   if (qgetenv("QTTESTBROWSER_USE_ARGB_VISUALS").toInt() == 1)
     setAttribute(Qt::WA_TranslucentBackground);
@@ -44,6 +44,9 @@ MainWindow::MainWindow() : m_page(new WebPage(this)), m_toolBar(0) {
 }
 
 void MainWindow::buildUI() {
+#if defined(Q_OS_SYMBIAN)
+  delete urlEdit;
+#endif
   delete m_toolBar;
 
   m_toolBar = addToolBar("Navigation");
