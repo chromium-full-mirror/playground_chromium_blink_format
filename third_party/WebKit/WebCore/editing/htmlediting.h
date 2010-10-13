@@ -243,6 +243,7 @@ VisibleSelection selectionForParagraphIteration(const VisibleSelection&);
 
 String stringWithRebalancedWhitespace(const String&, bool, bool);
 const String& nonBreakingSpaceString();
+bool validBlockTag(const AtomicString&);
 }
 
 #endif

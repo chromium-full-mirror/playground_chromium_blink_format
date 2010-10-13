@@ -679,7 +679,7 @@ bool setEnd(Range* r, const VisiblePosition& visiblePosition) {
   return code == 0;
 }
 
-Element* enclosingBlockFlowElement(const VisiblePosition& visiblePosition) {
+Node* enclosingBlockFlowElement(const VisiblePosition& visiblePosition) {
   if (visiblePosition.isNull())
     return NULL;
 
