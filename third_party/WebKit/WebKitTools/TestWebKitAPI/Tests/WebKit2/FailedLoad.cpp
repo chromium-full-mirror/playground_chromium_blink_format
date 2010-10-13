@@ -42,6 +42,13 @@ static void didFailProvisionalLoadWithErrorForFrame(WKPageRef page,
                                                     WKTypeRef userData,
                                                     const void* clientInfo) {
   TEST_ASSERT(WKFrameGetFrameLoadState(frame) == kWKFrameLoadStateFinished);
+
+  WKURLRef url = WKFrameCopyProvisionalURL(frame);
+  WKURLRef emptyURL = WKURLCreateWithUTF8CString("");
+  TEST_ASSERT(WKURLIsEqual(url, emptyURL));
+  WKRelease(url);
+  WKRelease(emptyURL);
+
   testDone = true;
 }
 
