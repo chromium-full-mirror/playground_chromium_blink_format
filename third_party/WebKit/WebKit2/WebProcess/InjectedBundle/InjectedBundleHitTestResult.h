@@ -49,7 +49,8 @@ class InjectedBundleHitTestResult : public APIObject {
   }
 
   PassRefPtr<InjectedBundleNodeHandle> nodeHandle() const;
-  WebFrame* webFrame() const;
+  WebFrame* frame() const;
+  WebFrame* targetFrame() const;
   const String& absoluteLinkURL() const;
 
  private:
