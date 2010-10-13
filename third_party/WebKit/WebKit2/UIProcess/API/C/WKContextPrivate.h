@@ -56,6 +56,10 @@ WK_EXPORT void _WKContextRegisterURLSchemeAsEmptyDocument(
 WK_EXPORT void WKContextRegisterURLSchemeAsSecure(WKContextRef context,
                                                   WKStringRef urlScheme);
 
+WK_EXPORT void WKContextSetDomainRelaxationForbiddenForURLScheme(
+    WKContextRef context,
+    WKStringRef urlScheme);
+
 #ifdef __cplusplus
 }
 #endif

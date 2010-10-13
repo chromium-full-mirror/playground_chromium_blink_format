@@ -93,6 +93,7 @@ class WebProcess : CoreIPC::Connection::Client {
   void setShouldTrackVisitedLinks(bool);
   void registerURLSchemeAsEmptyDocument(const String&);
   void registerURLSchemeAsSecure(const String&) const;
+  void setDomainRelaxationForbiddenForURLScheme(const String&) const;
 #if PLATFORM(WIN)
   void setShouldPaintNativeControls(bool);
 #endif

@@ -160,6 +160,8 @@ void WebContext::ensureWebProcess() {
                parameters.urlSchemesRegistererdAsEmptyDocument);
   copyToVector(m_schemesToRegisterAsSecure,
                parameters.urlSchemesRegisteredAsSecure);
+  copyToVector(m_schemesToSetDomainRelaxationForbiddenFor,
+               parameters.urlSchemesForWhichDomainRelaxationIsForbidden);
 
   // Add any platform specific parameters
   platformInitializeWebProcess(parameters);
@@ -338,6 +340,18 @@ void WebContext::registerURLSchemeAsSecure(const String& urlScheme) {
 
   m_process->send(Messages::WebProcess::RegisterURLSchemeAsSecure(urlScheme),
                   0);
+}
+
+void WebContext::setDomainRelaxationForbiddenForURLScheme(
+    const String& urlScheme) {
+  m_schemesToSetDomainRelaxationForbiddenFor.add(urlScheme);
+
+  if (!hasValidProcess())
+    return;
+
+  m_process->send(
+      Messages::WebProcess::SetDomainRelaxationForbiddenForURLScheme(urlScheme),
+      0);
 }
 
 void WebContext::addVisitedLink(const String& visitedURL) {

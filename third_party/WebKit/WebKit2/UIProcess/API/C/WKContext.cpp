@@ -122,3 +122,9 @@ void WKContextRegisterURLSchemeAsSecure(WKContextRef contextRef,
                                         WKStringRef urlScheme) {
   toImpl(contextRef)->registerURLSchemeAsSecure(toImpl(urlScheme)->string());
 }
+
+void WKContextSetDomainRelaxationForbiddenForURLScheme(WKContextRef contextRef,
+                                                       WKStringRef urlScheme) {
+  toImpl(contextRef)
+      ->setDomainRelaxationForbiddenForURLScheme(toImpl(urlScheme)->string());
+}
