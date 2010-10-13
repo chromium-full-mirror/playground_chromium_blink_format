@@ -1010,6 +1010,13 @@ void WebPageProxy::didCountStringMatches(const String& string,
   m_findClient.didCountStringMatches(this, string, numMatches);
 }
 
+void WebPageProxy::setFindIndicator(
+    const FloatRect& selectionRect,
+    const Vector<FloatRect>& textRects,
+    const SharedMemory::Handle& contentImageHandle) {
+  // FIXME: Implement.
+}
+
 void WebPageProxy::registerEditCommand(
     PassRefPtr<WebEditCommandProxy> commandProxy,
     UndoOrRedo undoOrRedo) {
