@@ -211,12 +211,6 @@ bool WebPage::performDefaultBehaviorForKeyEvent(
       else
         m_page->goBack();
       break;
-    case VK_SPACE:
-      if (keyboardEvent.shiftKey())
-        scroll(m_page.get(), ScrollUp, ScrollByPage);
-      else
-        scroll(m_page.get(), ScrollDown, ScrollByPage);
-      break;
     case VK_LEFT:
       scroll(m_page.get(), ScrollLeft, ScrollByLine);
       break;
