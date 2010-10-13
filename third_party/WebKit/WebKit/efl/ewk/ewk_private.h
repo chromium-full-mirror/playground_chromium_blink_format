@@ -157,13 +157,9 @@ void ewk_view_popup_new(Evas_Object* o,
                         WebCore::PopupMenuClient* client,
                         int selected,
                         const WebCore::IntRect& rect);
-void ewk_view_viewport_set(Evas_Object* o,
-                           float w,
-                           float h,
-                           float init_scale,
-                           float max_scale,
-                           float min_scale,
-                           float user_scalable);
+void ewk_view_viewport_attributes_set(
+    Evas_Object* o,
+    const WebCore::ViewportArguments& arguments);
 
 void ewk_view_download_request(Evas_Object* o, Ewk_Download* download);
 
