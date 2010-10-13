@@ -32,7 +32,6 @@
 #define ScriptCallFrame_h
 
 #include "KURL.h"
-#include "ScriptString.h"
 
 #include <wtf/Vector.h>
 
@@ -59,7 +58,7 @@ class ScriptCallFrame {
                   int lineNumber);
   ~ScriptCallFrame();
 
-  const ScriptString& functionName() const { return m_functionName; }
+  const String& functionName() const { return m_functionName; }
   const String& sourceURL() const { return m_sourceURL; }
   unsigned lineNumber() const { return m_lineNumber; }
 
@@ -68,7 +67,7 @@ class ScriptCallFrame {
   unsigned argumentCount() const { return m_arguments.size(); }
 
  private:
-  ScriptString m_functionName;
+  String m_functionName;
   String m_sourceURL;
   unsigned m_lineNumber;
 

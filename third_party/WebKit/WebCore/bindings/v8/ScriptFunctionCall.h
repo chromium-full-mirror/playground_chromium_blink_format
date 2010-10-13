@@ -39,7 +39,6 @@
 namespace WebCore {
 class ScriptValue;
 class ScriptState;
-class ScriptString;
 
 class ScriptCallArgumentHandler {
  public:
@@ -47,7 +46,6 @@ class ScriptCallArgumentHandler {
       : m_scriptState(scriptState) {}
 
   void appendArgument(const ScriptObject&);
-  void appendArgument(const ScriptString&);
   void appendArgument(const ScriptValue&);
   void appendArgument(const String&);
   void appendArgument(const char*);
