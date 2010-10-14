@@ -77,6 +77,7 @@
 #include "markup.h"
 
 #include <wtf/text/CString.h>
+#include <wtf/text/StringConcatenate.h>
 #include <wtf/HashSet.h>
 #include <wtf/ListHashSet.h>
 #include <wtf/OwnPtr.h>
@@ -1241,7 +1242,7 @@ void InspectorDOMAgent::removeBreakpointsForNode(Node* node) {
 }
 
 String InspectorDOMAgent::createBreakpointId(long nodeId, long type) {
-  return String::format("dom:%ld:%ld", nodeId, type);
+  return makeString("dom:", String::number(nodeId), ':', String::number(type));
 }
 
 void InspectorDOMAgent::getStyles(long nodeId,

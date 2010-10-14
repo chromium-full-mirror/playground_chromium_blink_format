@@ -33,10 +33,9 @@
 #include "GraphicsContext.h"
 #include "ImageData.h"
 #include "MIMETypeRegistry.h"
-#include "PlatformString.h"
 #include <ApplicationServices/ApplicationServices.h>
 #include <wtf/Assertions.h>
-#include <wtf/text/CString.h>
+#include <wtf/text/StringConcatenate.h>
 #include <wtf/OwnArrayPtr.h>
 #include <wtf/RetainPtr.h>
 #include <wtf/Threading.h>
@@ -409,8 +408,7 @@ String ImageBuffer::toDataURL(const String& mimeType,
                CFDataGetLength(data.get()), out);
   out.append('\0');
 
-  return String::format("data:%s;base64,%s", mimeType.utf8().data(),
-                        out.data());
+  return makeString("data:", mimeType, ";base64,", out.data());
 }
 
 }  // namespace WebCore

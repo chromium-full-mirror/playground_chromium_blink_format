@@ -52,7 +52,7 @@
 #include "ScriptValue.h"
 #include "TextResourceDecoder.h"
 #include "TreeDepthLimit.h"
-#include <wtf/text/CString.h>
+#include <wtf/text/StringConcatenate.h>
 #include <wtf/StringExtras.h>
 #include <wtf/Threading.h>
 #include <wtf/Vector.h>
@@ -150,13 +150,15 @@ void XMLDocumentParser::handleError(ErrorType type,
        m_lastErrorColumn != columnNumber)) {
     switch (type) {
       case warning:
-        m_errorMessages += String::format("warning on line %d at column %d: %s",
-                                          lineNumber, columnNumber, m);
+        m_errorMessages +=
+            makeString("warning on line ", String::number(lineNumber),
+                       " at column ", String::number(columnNumber), ": ", m);
         break;
       case fatal:
       case nonFatal:
-        m_errorMessages += String::format("error on line %d at column %d: %s",
-                                          lineNumber, columnNumber, m);
+        m_errorMessages +=
+            makeString("error on line ", String::number(lineNumber),
+                       " at column ", String::number(columnNumber), ": ", m);
     }
 
     m_lastErrorLine = lineNumber;

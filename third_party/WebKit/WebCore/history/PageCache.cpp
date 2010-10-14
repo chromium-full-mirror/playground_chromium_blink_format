@@ -47,6 +47,7 @@
 #include "SystemTime.h"
 #include <wtf/CurrentTime.h>
 #include <wtf/text/CString.h>
+#include <wtf/text/StringConcatenate.h>
 
 using namespace std;
 
@@ -75,7 +76,7 @@ static void pageCacheLog(const String& prefix, const String& message) {
 }
 
 #define PCLOG(...) \
-  pageCacheLog(pageCacheLogPrefix(indentLevel), String::format(__VA_ARGS__))
+  pageCacheLog(pageCacheLogPrefix(indentLevel), makeString(__VA_ARGS__))
 
 static bool logCanCacheFrameDecision(Frame* frame, int indentLevel) {
   // Only bother logging for frames that have actually loaded and have content.
@@ -92,11 +93,11 @@ static bool logCanCacheFrameDecision(Frame* frame, int indentLevel) {
                     ? frame->loader()->provisionalDocumentLoader()->url()
                     : KURL();
   if (!newURL.isEmpty())
-    PCLOG(" Determining if frame can be cached navigating from (%s) to (%s):",
-          currentURL.string().utf8().data(), newURL.string().utf8().data());
+    PCLOG(" Determining if frame can be cached navigating from (",
+          currentURL.string(), ") to (", newURL.string(), "):");
   else
-    PCLOG(" Determining if subframe with URL (%s) can be cached:",
-          currentURL.string().utf8().data());
+    PCLOG(" Determining if subframe with URL (", currentURL.string(),
+          ") can be cached:");
 
   bool cannotCache = false;
 

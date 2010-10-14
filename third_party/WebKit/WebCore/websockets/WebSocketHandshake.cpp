@@ -52,6 +52,7 @@
 #include <wtf/text/AtomicString.h>
 #include <wtf/text/CString.h>
 #include <wtf/text/StringBuilder.h>
+#include <wtf/text/StringConcatenate.h>
 
 namespace WebCore {
 
@@ -308,7 +309,7 @@ int WebSocketHandshake::readServerHandshake(const char* header, size_t len) {
     m_mode = Failed;
     m_context->addMessage(
         JSMessageSource, LogMessageType, ErrorMessageLevel,
-        String::format("Unexpected response code: %d", statusCode), 0,
+        makeString("Unexpected response code: ", String::number(statusCode)), 0,
         clientOrigin());
     return len;
   }

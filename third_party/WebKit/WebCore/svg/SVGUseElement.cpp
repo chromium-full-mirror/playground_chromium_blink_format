@@ -48,6 +48,8 @@
 #include "XMLDocumentParser.h"
 #include "XMLSerializer.h"
 
+#include <wtf/text/StringConcatenate.h>
+
 // Dump SVGElementInstance object tree - useful to debug instanceRoot problems
 // #define DUMP_INSTANCE_TREE
 
@@ -398,9 +400,9 @@ void dumpInstanceTree(unsigned int& depth,
 
   const HashSet<SVGElementInstance*>& elementInstances =
       element->instancesForElement();
-  text += String::format(
-      "Corresponding element is associated with %i instance(s):\n",
-      elementInstances.size());
+  text +=
+      makeString("Corresponding element is associated with ",
+                 String::number(elementInstances.size()), " instance(s):\n");
 
   const HashSet<SVGElementInstance*>::const_iterator end =
       elementInstances.end();

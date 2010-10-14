@@ -29,6 +29,8 @@
 #include "config.h"
 #include "ExceptionBase.h"
 
+#include <wtf/text/StringConcatenate.h>
+
 namespace WebCore {
 
 ExceptionBase::ExceptionBase(const ExceptionCodeDescription& description)
@@ -36,11 +38,11 @@ ExceptionBase::ExceptionBase(const ExceptionCodeDescription& description)
       m_name(description.name),
       m_description(description.description) {
   if (description.name)
-    m_message = String::format("%s: %s Exception %d", description.name,
-                               description.typeName, description.code);
+    m_message = makeString(description.name, ": ", description.typeName,
+                           " Exception ", String::number(description.code));
   else
-    m_message = String::format("%s Exception %d", description.typeName,
-                               description.code);
+    m_message = makeString(description.typeName, " Exception ",
+                           String::number(description.code));
 }
 
 String ExceptionBase::toString() const {

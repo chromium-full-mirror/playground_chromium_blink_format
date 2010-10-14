@@ -101,6 +101,7 @@
 #include <wtf/CurrentTime.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/text/CString.h>
+#include <wtf/text/StringConcatenate.h>
 
 #if ENABLE(SHARED_WORKERS)
 #include "SharedWorkerRepository.h"
@@ -1105,8 +1106,8 @@ void FrameLoader::checkIfDisplayInsecureContent(SecurityOrigin* context,
     return;
 
   String message =
-      String::format("The page at %s displayed insecure content from %s.\n",
-                     m_URL.string().utf8().data(), url.string().utf8().data());
+      makeString("The page at ", m_URL.string(),
+                 " displayed insecure content from ", url.string(), ".\n");
   m_frame->domWindow()->console()->addMessage(HTMLMessageSource, LogMessageType,
                                               WarningMessageLevel, message, 1,
                                               String());
@@ -1120,8 +1121,8 @@ void FrameLoader::checkIfRunInsecureContent(SecurityOrigin* context,
     return;
 
   String message =
-      String::format("The page at %s ran insecure content from %s.\n",
-                     m_URL.string().utf8().data(), url.string().utf8().data());
+      makeString("The page at ", m_URL.string(), " ran insecure content from ",
+                 url.string(), ".\n");
   m_frame->domWindow()->console()->addMessage(HTMLMessageSource, LogMessageType,
                                               WarningMessageLevel, message, 1,
                                               String());
@@ -1840,11 +1841,11 @@ bool FrameLoader::shouldAllowNavigation(Frame* targetFrame) const {
     Document* targetDocument = targetFrame->document();
     // FIXME: this error message should contain more specifics of why the
     // navigation change is not allowed.
-    String message = String::format(
+    String message = makeString(
         "Unsafe JavaScript attempt to initiate a navigation change for frame "
-        "with URL %s from frame with URL %s.\n",
-        targetDocument->url().string().utf8().data(),
-        activeDocument->url().string().utf8().data());
+        "with URL ",
+        targetDocument->url().string(), " from frame with URL ",
+        activeDocument->url().string(), ".\n");
 
     // FIXME: should we print to the console of the activeFrame as well?
     targetFrame->domWindow()->console()->addMessage(
