@@ -143,6 +143,10 @@ typedef enum {
   WKMediaControllerFlagFocused = 1 << 4
 } WKMediaControllerThemeState;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 bool WKMediaControllerThemeAvailable(int themeStyle);
 bool WKHitTestMediaUIPart(int part,
                           int themeStyle,
@@ -164,5 +168,9 @@ void WKDrawMediaSliderTrack(int themeStyle,
                             float currentTime,
                             float duration,
                             unsigned state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // WebKitSystemInterface_h
