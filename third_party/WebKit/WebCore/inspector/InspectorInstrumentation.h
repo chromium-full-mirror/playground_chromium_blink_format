@@ -211,6 +211,11 @@ class InspectorInstrumentation {
   static InspectorController* inspectorControllerForPage(Page*);
 
   static bool hasFrontend(InspectorController*);
+  static void pauseOnNativeEventIfNeeded(InspectorController*,
+                                         const String& categoryType,
+                                         const String& eventName,
+                                         bool synchronous);
+  static void cancelPauseOnNativeEvent(InspectorController*);
   static InspectorTimelineAgent* retrieveTimelineAgent(InspectorController*);
   static InspectorTimelineAgent* retrieveTimelineAgent(
       const InspectorInstrumentationCookie&);
