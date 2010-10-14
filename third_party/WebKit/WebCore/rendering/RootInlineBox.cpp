@@ -276,7 +276,11 @@ int RootInlineBox::alignBoxesInBlockDirection(
                                 textBoxDataMap);
   setLineTopBottomPositions(lineTop, lineBottom);
 
-  heightOfBlock += maxHeight;
+  // Detect integer overflow.
+  if (heightOfBlock > numeric_limits<int>::max() - maxHeight)
+    return numeric_limits<int>::max();
+
+  heightOfBlock = heightOfBlock + maxHeight;
 
   return heightOfBlock;
 }
