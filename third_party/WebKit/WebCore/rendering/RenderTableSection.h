@@ -137,6 +137,8 @@ class RenderTableSection : public RenderBox {
 
   virtual void removeChild(RenderObject* oldChild);
 
+  virtual int topmostPosition(bool includeOverflowInterior,
+                              bool includeSelf) const;
   virtual int lowestPosition(bool includeOverflowInterior,
                              bool includeSelf) const;
   virtual int rightmostPosition(bool includeOverflowInterior,

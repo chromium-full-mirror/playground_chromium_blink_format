@@ -3279,6 +3279,16 @@ IntRect RenderBox::localCaretRect(InlineBox* box,
   return rect;
 }
 
+int RenderBox::topmostPosition(bool /*includeOverflowInterior*/,
+                               bool includeSelf) const {
+  if (!includeSelf || !width())
+    return 0;
+  int top = 0;
+  if (isRelPositioned())
+    top += relativePositionOffsetY();
+  return top;
+}
+
 int RenderBox::lowestPosition(bool /*includeOverflowInterior*/,
                               bool includeSelf) const {
   if (!includeSelf || !width())
