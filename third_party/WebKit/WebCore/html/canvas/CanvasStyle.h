@@ -29,12 +29,14 @@
 
 #include "Color.h"
 #include "PlatformString.h"
+#include <wtf/Assertions.h>
 
 namespace WebCore {
 
 class CanvasGradient;
 class CanvasPattern;
 class GraphicsContext;
+class HTMLCanvasElement;
 
 class CanvasStyle : public RefCounted<CanvasStyle> {
  public:
@@ -65,7 +67,21 @@ class CanvasStyle : public RefCounted<CanvasStyle> {
   static PassRefPtr<CanvasStyle> createFromGradient(PassRefPtr<CanvasGradient>);
   static PassRefPtr<CanvasStyle> createFromPattern(PassRefPtr<CanvasPattern>);
 
-  String color() const { return Color(m_rgba).serialized(); }
+  bool isCurrentColor() const {
+    return m_type == CurrentColor || m_type == CurrentColorWithOverrideAlpha;
+  }
+  bool hasOverrideAlpha() const {
+    return m_type == CurrentColorWithOverrideAlpha;
+  }
+  float overrideAlpha() const {
+    ASSERT(m_type == CurrentColorWithOverrideAlpha);
+    return m_overrideAlpha;
+  }
+
+  String color() const {
+    ASSERT(m_type == RGBA || m_type == CMYKA);
+    return Color(m_rgba).serialized();
+  }
   CanvasGradient* canvasGradient() const { return m_gradient.get(); }
   CanvasPattern* canvasPattern() const { return m_pattern.get(); }
 
@@ -77,6 +93,16 @@ class CanvasStyle : public RefCounted<CanvasStyle> {
   bool isEquivalentCMYKA(float c, float m, float y, float k, float a) const;
 
  private:
+  enum Type {
+    RGBA,
+    CMYKA,
+    Gradient,
+    ImagePattern,
+    CurrentColor,
+    CurrentColorWithOverrideAlpha
+  };
+
+  CanvasStyle(Type, float overrideAlpha = 0);
   CanvasStyle(RGBA32 rgba);
   CanvasStyle(float grayLevel, float alpha);
   CanvasStyle(float r, float g, float b, float a);
@@ -84,11 +110,12 @@ class CanvasStyle : public RefCounted<CanvasStyle> {
   CanvasStyle(PassRefPtr<CanvasGradient>);
   CanvasStyle(PassRefPtr<CanvasPattern>);
 
-  enum Type { RGBA, CMYKA, Gradient, ImagePattern };
-
   Type m_type;
 
-  RGBA32 m_rgba;
+  union {
+    RGBA32 m_rgba;
+    float m_overrideAlpha;
+  };
 
   RefPtr<CanvasGradient> m_gradient;
   RefPtr<CanvasPattern> m_pattern;
@@ -108,6 +135,11 @@ class CanvasStyle : public RefCounted<CanvasStyle> {
     float a;
   } m_cmyka;
 };
+
+RGBA32 currentColor(HTMLCanvasElement*);
+bool parseColorOrCurrentColor(RGBA32& parsedColor,
+                              const String& colorString,
+                              HTMLCanvasElement*);
 
 }  // namespace WebCore
 
