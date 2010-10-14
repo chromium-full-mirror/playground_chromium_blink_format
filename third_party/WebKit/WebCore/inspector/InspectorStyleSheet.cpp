@@ -41,7 +41,7 @@
 #include "Element.h"
 #include "HTMLHeadElement.h"
 #include "InspectorCSSAgent.h"
-#include "InspectorResourceAgent.h"
+#include "InspectorUtilities.h"
 #include "InspectorValues.h"
 #include "Node.h"
 #include "StyleSheetList.h"
@@ -465,8 +465,8 @@ bool InspectorStyleSheet::resourceStyleSheetText(String* result) const {
   if (!m_pageStyleSheet)
     return false;
 
-  return InspectorResourceAgent::resourceContent(
-      ownerDocument(), m_pageStyleSheet->finalURL(), result);
+  return InspectorUtilities::resourceContentForURL(m_pageStyleSheet->finalURL(),
+                                                   ownerDocument(), result);
 }
 
 bool InspectorStyleSheet::inlineStyleSheetText(String* result) const {
