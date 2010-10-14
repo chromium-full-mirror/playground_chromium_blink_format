@@ -33,6 +33,8 @@ QT_END_NAMESPACE
 
 namespace WebCore {
 
+class TextureMapperVideoLayer;
+
 class MediaPlayerPrivateQt : public QObject,
                              public MediaPlayerPrivateInterface {
   Q_OBJECT
@@ -91,6 +93,7 @@ class MediaPlayerPrivateQt : public QObject,
   bool supportsFullscreen() const { return false; }
 
 #if USE(ACCELERATED_COMPOSITING)
+#if USE(TEXTURE_MAPPER)
   // whether accelerated rendering is supported by the media engine for the
   // current media.
   virtual bool supportsAcceleratedRendering() const { return true; }
@@ -100,6 +103,11 @@ class MediaPlayerPrivateQt : public QObject,
   // returns an object that can be directly composited via GraphicsLayerQt
   // (essentially a QGraphicsItem*)
   virtual PlatformLayer* platformLayer() const;
+#else
+  virtual bool supportsAcceleratedRendering() const { return false; }
+  virtual void acceleratedRenderingStateChanged() {}
+  virtual PlatformLayer* platformLayer() const { return 0; }
+#endif
 #endif
 
   virtual PlatformMedia platformMedia() const;
@@ -128,6 +136,9 @@ class MediaPlayerPrivateQt : public QObject,
   QMediaPlayerControl* m_mediaPlayerControl;
   QGraphicsVideoItem* m_videoItem;
   QGraphicsScene* m_videoScene;
+#if USE(ACCELERATED_COMPOSITING) && USE(TEXTURE_MAPPER)
+  OwnPtr<TextureMapperVideoLayer> m_platformLayer;
+#endif
 
   mutable MediaPlayer::NetworkState m_networkState;
   mutable MediaPlayer::ReadyState m_readyState;
