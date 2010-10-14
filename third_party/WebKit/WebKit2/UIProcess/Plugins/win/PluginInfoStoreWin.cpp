@@ -29,9 +29,7 @@
 #include "NotImplemented.h"
 #include <WebCore/FileSystem.h>
 #include <shlwapi.h>
-#include <wtf/HashSet.h>
 #include <wtf/OwnArrayPtr.h>
-#include <wtf/text/StringHash.h>
 
 using namespace WebCore;
 
@@ -336,9 +334,7 @@ Vector<String> PluginInfoStore::pluginPathsInDirectory(
   return paths;
 }
 
-static void addPluginPathsFromRegistry(
-    HKEY rootKey,
-    HashSet<String, CaseFoldingHash>& paths) {
+static void addPluginPathsFromRegistry(HKEY rootKey, Vector<String>& paths) {
   HKEY key;
   if (::RegOpenKeyExW(rootKey, L"Software\\MozillaPlugins", 0,
                       KEY_ENUMERATE_SUB_KEYS, &key) != ERROR_SUCCESS)
@@ -360,21 +356,19 @@ static void addPluginPathsFromRegistry(
     if (type != REG_SZ)
       continue;
 
-    paths.add(path);
+    paths.append(path);
   }
 
   ::RegCloseKey(key);
 }
 
 Vector<String> PluginInfoStore::individualPluginPaths() {
-  HashSet<String, CaseFoldingHash> paths;
+  Vector<String> paths;
 
   addPluginPathsFromRegistry(HKEY_LOCAL_MACHINE, paths);
   addPluginPathsFromRegistry(HKEY_CURRENT_USER, paths);
 
-  Vector<String> result;
-  copyToVector(paths, result);
-  return result;
+  return paths;
 }
 
 static String getVersionInfo(const LPVOID versionInfoData, const String& info) {
