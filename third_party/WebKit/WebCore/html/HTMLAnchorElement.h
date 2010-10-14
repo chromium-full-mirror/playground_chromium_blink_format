@@ -84,6 +84,8 @@ class HTMLAnchorElement : public HTMLElement {
 
   String origin() const;
 
+  String getParameter(const String&) const;
+
   String text() const;
 
   String toString() const;

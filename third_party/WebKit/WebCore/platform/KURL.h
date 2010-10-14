@@ -28,6 +28,7 @@
 #define KURL_h
 
 #include "PlatformString.h"
+#include <wtf/HashMap.h>
 
 #if PLATFORM(CF)
 typedef const struct __CFURL* CFURLRef;
@@ -59,6 +60,8 @@ namespace WebCore {
 
 class TextEncoding;
 struct KURLHash;
+
+typedef HashMap<String, String> ParsedURLParameters;
 
 enum ParsedURLStringTag { ParsedURLString };
 
@@ -135,6 +138,8 @@ class KURL {
   String query() const;
   String fragmentIdentifier() const;
   bool hasFragmentIdentifier() const;
+
+  void copyParsedQueryTo(ParsedURLParameters&) const;
 
   String baseAsString() const;
 

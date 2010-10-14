@@ -61,6 +61,8 @@ class Location : public RefCounted<Location> {
 
   String toString() const;
 
+  String getParameter(const String&) const;
+
  private:
   Location(Frame*);
 
