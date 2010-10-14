@@ -67,7 +67,7 @@ class ConsoleMessage : public Noncopyable {
   void updateRepeatCountInConsole(InspectorFrontend* frontend);
 #endif
   void incrementCount() { ++m_repeatCount; }
-  bool isEqual(ScriptState*, ConsoleMessage* msg) const;
+  bool isEqual(ConsoleMessage* msg) const;
 
   MessageSource source() const { return m_source; }
   const String& message() const { return m_message; }

@@ -86,6 +86,7 @@
 #include "ScriptProfile.h"
 #include "ScriptProfiler.h"
 #include "ScriptSourceCode.h"
+#include "ScriptState.h"
 #include "SecurityOrigin.h"
 #include "Settings.h"
 #include "SharedBuffer.h"
@@ -363,8 +364,7 @@ void InspectorController::addMessageToConsole(MessageSource source,
   bool storeStackTrace = type == TraceMessageType ||
                          type == UncaughtExceptionMessageType ||
                          type == AssertMessageType;
-  addConsoleMessage(callStack->state(),
-                    new ConsoleMessage(source, type, level, message, callStack,
+  addConsoleMessage(new ConsoleMessage(source, type, level, message, callStack,
                                        m_groupLevel, storeStackTrace));
 }
 
@@ -377,18 +377,16 @@ void InspectorController::addMessageToConsole(MessageSource source,
   if (!enabled())
     return;
 
-  addConsoleMessage(0, new ConsoleMessage(source, type, level, message,
-                                          lineNumber, sourceID, m_groupLevel));
+  addConsoleMessage(new ConsoleMessage(source, type, level, message, lineNumber,
+                                       sourceID, m_groupLevel));
 }
 
 void InspectorController::addConsoleMessage(
-    ScriptState* scriptState,
     PassOwnPtr<ConsoleMessage> consoleMessage) {
   ASSERT(enabled());
   ASSERT_ARG(consoleMessage, consoleMessage);
 
-  if (m_previousMessage &&
-      m_previousMessage->isEqual(scriptState, consoleMessage.get())) {
+  if (m_previousMessage && m_previousMessage->isEqual(consoleMessage.get())) {
     m_previousMessage->incrementCount();
     if (m_frontend)
       m_previousMessage->updateRepeatCountInConsole(m_frontend.get());
@@ -424,11 +422,10 @@ void InspectorController::startGroup(MessageSource source,
                                      bool collapsed) {
   ++m_groupLevel;
 
-  addConsoleMessage(
-      callStack->state(),
-      new ConsoleMessage(source, collapsed ? StartGroupCollapsedMessageType
-                                           : StartGroupMessageType,
-                         LogMessageLevel, String(), callStack, m_groupLevel));
+  addConsoleMessage(new ConsoleMessage(
+      source,
+      collapsed ? StartGroupCollapsedMessageType : StartGroupMessageType,
+      LogMessageLevel, String(), callStack, m_groupLevel));
 }
 
 void InspectorController::endGroup(MessageSource source,
@@ -439,9 +436,9 @@ void InspectorController::endGroup(MessageSource source,
 
   --m_groupLevel;
 
-  addConsoleMessage(
-      0, new ConsoleMessage(source, EndGroupMessageType, LogMessageLevel,
-                            String(), lineNumber, sourceURL, m_groupLevel));
+  addConsoleMessage(new ConsoleMessage(source, EndGroupMessageType,
+                                       LogMessageLevel, String(), lineNumber,
+                                       sourceURL, m_groupLevel));
 }
 
 void InspectorController::markTimeline(const String& message) {

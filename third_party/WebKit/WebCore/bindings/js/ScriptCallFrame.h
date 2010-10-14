@@ -31,21 +31,17 @@
 #ifndef ScriptCallFrame_h
 #define ScriptCallFrame_h
 
-#include <runtime/ArgList.h>
+#include "PlatformString.h"
 #include "ScriptValue.h"
 #include <wtf/Vector.h>
 
 namespace JSC {
 class ExecState;
-class InternalFunction;
+class UString;
 }
 
 namespace WebCore {
 
-// FIXME: Implement retrieving line number and source URL and storing here
-// for all call frames, not just the first one.
-// See <https://bugs.webkit.org/show_bug.cgi?id=22556> and
-// <https://bugs.webkit.org/show_bug.cgi?id=21180>
 class ScriptCallFrame {
  public:
   ScriptCallFrame(const JSC::UString& functionName,
