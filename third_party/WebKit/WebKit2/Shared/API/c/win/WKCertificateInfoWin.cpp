@@ -30,9 +30,20 @@
 
 using namespace WebKit;
 
-PCCERT_CONTEXT WKCertificateInfoGetCertificateContext(
+size_t WKCertificateInfoGetCertificateChainLength(
     WKCertificateInfoRef certificateInfoRef) {
   return toImpl(certificateInfoRef)
       ->platformCertificateInfo()
-      .certificateContext();
+      .certificateChain()
+      .size();
+}
+
+PCCERT_CONTEXT WKCertificateInfoGetCertificateContextAtIndex(
+    WKCertificateInfoRef certificateInfoRef,
+    size_t index) {
+  const Vector<PCCERT_CONTEXT>& certificateChain =
+      toImpl(certificateInfoRef)->platformCertificateInfo().certificateChain();
+  if (index >= certificateChain.size())
+    return 0;
+  return certificateChain[index];
 }

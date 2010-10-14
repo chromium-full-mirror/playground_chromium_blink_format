@@ -33,8 +33,11 @@
 extern "C" {
 #endif
 
-WK_EXPORT PCCERT_CONTEXT
-WKCertificateInfoGetCertificateContext(WKCertificateInfoRef certificateInfo);
+WK_EXPORT size_t WKCertificateInfoGetCertificateChainLength(
+    WKCertificateInfoRef certificateInfo);
+WK_EXPORT PCCERT_CONTEXT WKCertificateInfoGetCertificateContextAtIndex(
+    WKCertificateInfoRef certificateInfo,
+    size_t index);
 
 #ifdef __cplusplus
 }
