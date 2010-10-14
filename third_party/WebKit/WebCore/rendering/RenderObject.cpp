@@ -1248,6 +1248,20 @@ void RenderObject::drawArcForBoxSide(GraphicsContext* graphicsContext,
 }
 #endif
 
+void RenderObject::paintFocusRing(GraphicsContext* context,
+                                  int tx,
+                                  int ty,
+                                  RenderStyle* style) {
+  Vector<IntRect> focusRingRects;
+  addFocusRingRects(focusRingRects, tx, ty);
+  if (style->outlineStyleIsAuto())
+    context->drawFocusRing(
+        focusRingRects, style->outlineWidth(), style->outlineOffset(),
+        style->visitedDependentColor(CSSPropertyOutlineColor));
+  else
+    addPDFURLRect(context, unionRect(focusRingRects));
+}
+
 void RenderObject::addPDFURLRect(GraphicsContext* context,
                                  const IntRect& rect) {
   if (rect.isEmpty())
@@ -1281,12 +1295,7 @@ void RenderObject::paintOutline(GraphicsContext* graphicsContext,
     if (!theme()->supportsFocusRing(styleToUse)) {
       // Only paint the focus ring by hand if the theme isn't able to draw the
       // focus ring.
-      Vector<IntRect> focusRingRects;
-      addFocusRingRects(focusRingRects, tx, ty);
-      if (styleToUse->outlineStyleIsAuto())
-        graphicsContext->drawFocusRing(focusRingRects, ow, offset, oc);
-      else
-        addPDFURLRect(graphicsContext, unionRect(focusRingRects));
+      paintFocusRing(graphicsContext, tx, ty, styleToUse);
     }
   }
 
