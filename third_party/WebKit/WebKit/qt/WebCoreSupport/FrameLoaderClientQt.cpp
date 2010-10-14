@@ -641,14 +641,7 @@ void FrameLoaderClientQt::frameLoaderDestroyed() {
 }
 
 bool FrameLoaderClientQt::canHandleRequest(
-    const WebCore::ResourceRequest& request) const {
-  if (QWebPagePrivate::drtRun) {
-    // Just reject the scheme used in
-    // LayoutTests/http/tests/misc/redirect-to-external-url.html
-    QUrl url = QUrl(request.url());
-    if (url.scheme() == "spaceballs")
-      return false;
-  }
+    const WebCore::ResourceRequest&) const {
   return true;
 }
 
@@ -1213,17 +1206,8 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
 }
 
 void FrameLoaderClientQt::dispatchUnableToImplementPolicy(
-    const WebCore::ResourceError& error) {
-  if (!m_webFrame)
-    return;
-
-  if (QWebPagePrivate::drtRun) {
-    printf(
-        "Policy delegate: unable to implement policy with error domain '%s', "
-        "error code %d, in frame '%s'\n",
-        error.domain().utf8().data(), error.errorCode(),
-        m_webFrame->frameName().toUtf8().data());
-  }
+    const WebCore::ResourceError&) {
+  notImplemented();
 }
 
 void FrameLoaderClientQt::startDownload(
