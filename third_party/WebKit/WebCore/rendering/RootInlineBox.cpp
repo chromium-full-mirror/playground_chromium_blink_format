@@ -280,9 +280,7 @@ int RootInlineBox::alignBoxesInBlockDirection(
   if (heightOfBlock > numeric_limits<int>::max() - maxHeight)
     return numeric_limits<int>::max();
 
-  heightOfBlock = heightOfBlock + maxHeight;
-
-  return heightOfBlock;
+  return heightOfBlock + maxHeight;
 }
 
 GapRects RootInlineBox::fillLineSelectionGap(int selTop,
