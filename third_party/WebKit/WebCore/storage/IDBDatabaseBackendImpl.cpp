@@ -144,7 +144,8 @@ IDBDatabaseBackendImpl::createObjectStore(
     const String& name,
     const String& keyPath,
     bool autoIncrement,
-    IDBTransactionBackendInterface* transactionPtr) {
+    IDBTransactionBackendInterface* transactionPtr,
+    ExceptionCode& ec) {
   if (m_objectStores.contains(name)) {
     // FIXME: Throw CONSTRAINT_ERR in this case.
     return 0;
@@ -192,14 +193,9 @@ void IDBDatabaseBackendImpl::createObjectStoreInternal(
   transaction->didCompleteTaskEvents();
 }
 
-// FIXME: Do not expose this method via IDL.
 PassRefPtr<IDBObjectStoreBackendInterface> IDBDatabaseBackendImpl::objectStore(
-    const String& name,
-    unsigned short mode) {
-  ASSERT_UNUSED(mode, !mode);  // FIXME: Remove the mode parameter. Transactions
-                               // have modes, not object stores.
-  RefPtr<IDBObjectStoreBackendInterface> objectStore = m_objectStores.get(name);
-  return objectStore.release();
+    const String& name) {
+  return m_objectStores.get(name);
 }
 
 static void doDelete(SQLiteDatabase& db, const char* sql, int64_t id) {
@@ -213,10 +209,11 @@ static void doDelete(SQLiteDatabase& db, const char* sql, int64_t id) {
 
 void IDBDatabaseBackendImpl::removeObjectStore(
     const String& name,
-    IDBTransactionBackendInterface* transactionPtr) {
+    IDBTransactionBackendInterface* transactionPtr,
+    ExceptionCode& ec) {
   RefPtr<IDBObjectStoreBackendImpl> objectStore = m_objectStores.get(name);
   if (!objectStore) {
-    // FIXME: Raise NOT_FOUND_ERR.
+    ec = IDBDatabaseException::NOT_FOUND_ERR;
     return;
   }
   RefPtr<IDBDatabaseBackendImpl> database = this;
@@ -226,7 +223,7 @@ void IDBDatabaseBackendImpl::removeObjectStore(
                              database, objectStore, transaction),
           createCallbackTask(&IDBDatabaseBackendImpl::addObjectStoreToMap,
                              database, objectStore))) {
-    // FIXME: Raise NOT_ALLOWED_ERR if the above fails.
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
     return;
   }
   m_objectStores.remove(name);
@@ -253,7 +250,8 @@ void IDBDatabaseBackendImpl::removeObjectStoreInternal(
 }
 
 void IDBDatabaseBackendImpl::setVersion(const String& version,
-                                        PassRefPtr<IDBCallbacks> prpCallbacks) {
+                                        PassRefPtr<IDBCallbacks> prpCallbacks,
+                                        ExceptionCode& ec) {
   RefPtr<IDBDatabaseBackendImpl> database = this;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
   RefPtr<DOMStringList> objectStores = DOMStringList::create();
@@ -265,9 +263,7 @@ void IDBDatabaseBackendImpl::setVersion(const String& version,
                              database, version, callbacks, transaction),
           createCallbackTask(&IDBDatabaseBackendImpl::resetVersion, database,
                              m_version))) {
-    callbacks->onError(IDBDatabaseError::create(
-        IDBDatabaseException::NOT_ALLOWED_ERR,
-        "setVersion must be called from within a setVersion transaction."));
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
   }
 }
 
@@ -294,7 +290,9 @@ void IDBDatabaseBackendImpl::setVersionInternal(
 PassRefPtr<IDBTransactionBackendInterface> IDBDatabaseBackendImpl::transaction(
     DOMStringList* objectStores,
     unsigned short mode,
-    unsigned long timeout) {
+    unsigned long timeout,
+    ExceptionCode&) {
+  // FIXME: Return not allowed err if close has been called.
   return m_transactionCoordinator->createTransaction(objectStores, mode,
                                                      timeout, this);
 }

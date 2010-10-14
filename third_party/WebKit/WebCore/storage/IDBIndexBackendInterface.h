@@ -26,6 +26,7 @@
 #ifndef IDBIndexBackendInterface_h
 #define IDBIndexBackendInterface_h
 
+#include "ExceptionCode.h"
 #include "PlatformString.h"
 #include <wtf/Forward.h>
 
@@ -51,17 +52,21 @@ class IDBIndexBackendInterface
   virtual void openCursor(PassRefPtr<IDBKeyRange>,
                           unsigned short direction,
                           PassRefPtr<IDBCallbacks>,
-                          IDBTransactionBackendInterface*) = 0;
+                          IDBTransactionBackendInterface*,
+                          ExceptionCode&) = 0;
   virtual void openKeyCursor(PassRefPtr<IDBKeyRange>,
                              unsigned short direction,
                              PassRefPtr<IDBCallbacks>,
-                             IDBTransactionBackendInterface*) = 0;
+                             IDBTransactionBackendInterface*,
+                             ExceptionCode&) = 0;
   virtual void get(PassRefPtr<IDBKey>,
                    PassRefPtr<IDBCallbacks>,
-                   IDBTransactionBackendInterface*) = 0;
+                   IDBTransactionBackendInterface*,
+                   ExceptionCode&) = 0;
   virtual void getKey(PassRefPtr<IDBKey>,
                       PassRefPtr<IDBCallbacks>,
-                      IDBTransactionBackendInterface*) = 0;
+                      IDBTransactionBackendInterface*,
+                      ExceptionCode&) = 0;
 };
 
 }  // namespace WebCore

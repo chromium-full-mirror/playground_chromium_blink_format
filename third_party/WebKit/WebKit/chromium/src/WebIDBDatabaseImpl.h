@@ -27,6 +27,7 @@
 #define WebIDBDatabaseImpl_h
 
 #include "WebCommon.h"
+#include "WebExceptionCode.h"
 #include "WebIDBDatabase.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
@@ -54,15 +55,18 @@ class WebIDBDatabaseImpl : public WebIDBDatabase {
   virtual WebIDBObjectStore* createObjectStore(const WebString& name,
                                                const WebString& keyPath,
                                                bool autoIncrement,
-                                               const WebIDBTransaction&);
-  virtual WebIDBObjectStore* objectStore(const WebString& name,
-                                         unsigned short mode);
+                                               const WebIDBTransaction&,
+                                               WebExceptionCode&);
   virtual void removeObjectStore(const WebString& name,
-                                 const WebIDBTransaction&);
-  virtual void setVersion(const WebString& version, WebIDBCallbacks* callbacks);
+                                 const WebIDBTransaction&,
+                                 WebExceptionCode&);
+  virtual void setVersion(const WebString& version,
+                          WebIDBCallbacks* callbacks,
+                          WebExceptionCode&);
   virtual WebIDBTransaction* transaction(const WebDOMStringList& names,
                                          unsigned short mode,
-                                         unsigned long timeout);
+                                         unsigned long timeout,
+                                         WebExceptionCode&);
   virtual void close();
 
  private:

@@ -26,6 +26,7 @@
 #ifndef IDBObjectStoreBackendInterface_h
 #define IDBObjectStoreBackendInterface_h
 
+#include "ExceptionCode.h"
 #include "PlatformString.h"
 #include <wtf/Threading.h>
 
@@ -52,29 +53,36 @@ class IDBObjectStoreBackendInterface
 
   virtual void get(PassRefPtr<IDBKey>,
                    PassRefPtr<IDBCallbacks>,
-                   IDBTransactionBackendInterface*) = 0;
+                   IDBTransactionBackendInterface*,
+                   ExceptionCode&) = 0;
   virtual void put(PassRefPtr<SerializedScriptValue>,
                    PassRefPtr<IDBKey>,
                    bool addOnly,
                    PassRefPtr<IDBCallbacks>,
-                   IDBTransactionBackendInterface*) = 0;
+                   IDBTransactionBackendInterface*,
+                   ExceptionCode&) = 0;
   virtual void remove(PassRefPtr<IDBKey>,
                       PassRefPtr<IDBCallbacks>,
-                      IDBTransactionBackendInterface*) = 0;
+                      IDBTransactionBackendInterface*,
+                      ExceptionCode&) = 0;
 
   virtual PassRefPtr<IDBIndexBackendInterface> createIndex(
       const String& name,
       const String& keyPath,
       bool unique,
-      IDBTransactionBackendInterface*) = 0;
-  virtual PassRefPtr<IDBIndexBackendInterface> index(const String& name) = 0;
+      IDBTransactionBackendInterface*,
+      ExceptionCode&) = 0;
+  virtual PassRefPtr<IDBIndexBackendInterface> index(const String& name,
+                                                     ExceptionCode&) = 0;
   virtual void removeIndex(const String& name,
-                           IDBTransactionBackendInterface*) = 0;
+                           IDBTransactionBackendInterface*,
+                           ExceptionCode&) = 0;
 
   virtual void openCursor(PassRefPtr<IDBKeyRange>,
                           unsigned short direction,
                           PassRefPtr<IDBCallbacks>,
-                          IDBTransactionBackendInterface*) = 0;
+                          IDBTransactionBackendInterface*,
+                          ExceptionCode&) = 0;
 };
 
 }  // namespace WebCore

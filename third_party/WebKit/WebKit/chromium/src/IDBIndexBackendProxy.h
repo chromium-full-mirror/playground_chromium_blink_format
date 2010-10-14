@@ -52,17 +52,21 @@ class IDBIndexBackendProxy : public IDBIndexBackendInterface {
   virtual void openCursor(PassRefPtr<IDBKeyRange>,
                           unsigned short direction,
                           PassRefPtr<IDBCallbacks>,
-                          IDBTransactionBackendInterface*);
+                          IDBTransactionBackendInterface*,
+                          ExceptionCode&);
   virtual void openKeyCursor(PassRefPtr<IDBKeyRange>,
                              unsigned short direction,
                              PassRefPtr<IDBCallbacks>,
-                             IDBTransactionBackendInterface*);
+                             IDBTransactionBackendInterface*,
+                             ExceptionCode&);
   virtual void get(PassRefPtr<IDBKey>,
                    PassRefPtr<IDBCallbacks>,
-                   IDBTransactionBackendInterface*);
+                   IDBTransactionBackendInterface*,
+                   ExceptionCode&);
   virtual void getKey(PassRefPtr<IDBKey>,
                       PassRefPtr<IDBCallbacks>,
-                      IDBTransactionBackendInterface*);
+                      IDBTransactionBackendInterface*,
+                      ExceptionCode&);
 
  private:
   IDBIndexBackendProxy(PassOwnPtr<WebKit::WebIDBIndex>);

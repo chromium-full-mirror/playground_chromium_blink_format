@@ -92,15 +92,15 @@ PassRefPtr<IDBAny> IDBCursorBackendImpl::value() const {
 }
 
 void IDBCursorBackendImpl::update(PassRefPtr<SerializedScriptValue> prpValue,
-                                  PassRefPtr<IDBCallbacks> prpCallbacks) {
+                                  PassRefPtr<IDBCallbacks> prpCallbacks,
+                                  ExceptionCode& ec) {
   RefPtr<IDBCursorBackendImpl> cursor = this;
   RefPtr<SerializedScriptValue> value = prpValue;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
+  // FIXME: Throw DATA_ERR and SERIAL_ERR when appropriate.
   if (!m_transaction->scheduleTask(createCallbackTask(
           &IDBCursorBackendImpl::updateInternal, cursor, value, callbacks)))
-    callbacks->onError(IDBDatabaseError::create(
-        IDBDatabaseException::NOT_ALLOWED_ERR,
-        "update must be called in the context of a transaction."));
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
 }
 
 void IDBCursorBackendImpl::updateInternal(
@@ -140,16 +140,15 @@ void IDBCursorBackendImpl::updateInternal(
 
 void IDBCursorBackendImpl::continueFunction(
     PassRefPtr<IDBKey> prpKey,
-    PassRefPtr<IDBCallbacks> prpCallbacks) {
+    PassRefPtr<IDBCallbacks> prpCallbacks,
+    ExceptionCode& ec) {
   RefPtr<IDBCursorBackendImpl> cursor = this;
   RefPtr<IDBKey> key = prpKey;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
   if (!m_transaction->scheduleTask(
           createCallbackTask(&IDBCursorBackendImpl::continueFunctionInternal,
                              cursor, key, callbacks)))
-    callbacks->onError(IDBDatabaseError::create(
-        IDBDatabaseException::NOT_ALLOWED_ERR,
-        "continue must be called in the context of a transaction."));
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
 }
 
 void IDBCursorBackendImpl::continueFunctionInternal(
@@ -189,14 +188,13 @@ void IDBCursorBackendImpl::continueFunctionInternal(
   callbacks->onSuccess(cursor.get());
 }
 
-void IDBCursorBackendImpl::remove(PassRefPtr<IDBCallbacks> prpCallbacks) {
+void IDBCursorBackendImpl::remove(PassRefPtr<IDBCallbacks> prpCallbacks,
+                                  ExceptionCode& ec) {
   RefPtr<IDBCursorBackendImpl> cursor = this;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
   if (!m_transaction->scheduleTask(createCallbackTask(
           &IDBCursorBackendImpl::removeInternal, cursor, callbacks)))
-    callbacks->onError(IDBDatabaseError::create(
-        IDBDatabaseException::NOT_ALLOWED_ERR,
-        "remove must be called in the context of a transaction."));
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
 }
 
 void IDBCursorBackendImpl::removeInternal(

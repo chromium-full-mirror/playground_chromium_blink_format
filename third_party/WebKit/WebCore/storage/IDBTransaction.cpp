@@ -34,6 +34,7 @@
 #include "IDBCompleteEvent.h"
 #include "IDBDatabase.h"
 #include "IDBDatabaseException.h"
+#include "IDBIndex.h"
 #include "IDBObjectStore.h"
 #include "IDBObjectStoreBackendInterface.h"
 #include "IDBPendingTransactionMonitor.h"
@@ -67,15 +68,15 @@ IDBDatabase* IDBTransaction::db() {
 }
 
 PassRefPtr<IDBObjectStore> IDBTransaction::objectStore(const String& name,
-                                                       const ExceptionCode&) {
+                                                       ExceptionCode& ec) {
   if (!m_backend) {
-    // FIXME: throw IDBDatabaseException::NOT_ALLOWED_ERR.
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
     return 0;
   }
   RefPtr<IDBObjectStoreBackendInterface> objectStoreBackend =
       m_backend->objectStore(name);
   if (!objectStoreBackend) {
-    // FIXME: throw IDBDatabaseException::NOT_ALLOWED_ERR.
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
     return 0;
   }
   RefPtr<IDBObjectStore> objectStore =

@@ -66,44 +66,39 @@ WebIDBObjectStore* WebIDBDatabaseImpl::createObjectStore(
     const WebString& name,
     const WebString& keyPath,
     bool autoIncrement,
-    const WebIDBTransaction& transaction) {
+    const WebIDBTransaction& transaction,
+    WebExceptionCode& ec) {
   RefPtr<IDBObjectStoreBackendInterface> objectStore =
       m_databaseBackend->createObjectStore(
           name, keyPath, autoIncrement,
-          transaction.getIDBTransactionBackendInterface());
+          transaction.getIDBTransactionBackendInterface(), ec);
   if (!objectStore)
     return 0;
   return new WebIDBObjectStoreImpl(objectStore);
 }
 
-WebIDBObjectStore* WebIDBDatabaseImpl::objectStore(const WebString& name,
-                                                   unsigned short mode) {
-  RefPtr<IDBObjectStoreBackendInterface> objectStore =
-      m_databaseBackend->objectStore(name, mode);
-  if (!objectStore)
-    return 0;
-  return new WebIDBObjectStoreImpl(objectStore);
-}
-
-void WebIDBDatabaseImpl::removeObjectStore(
-    const WebString& name,
-    const WebIDBTransaction& transaction) {
+void WebIDBDatabaseImpl::removeObjectStore(const WebString& name,
+                                           const WebIDBTransaction& transaction,
+                                           WebExceptionCode& ec) {
   m_databaseBackend->removeObjectStore(
-      name, transaction.getIDBTransactionBackendInterface());
+      name, transaction.getIDBTransactionBackendInterface(), ec);
 }
 
 void WebIDBDatabaseImpl::setVersion(const WebString& version,
-                                    WebIDBCallbacks* callbacks) {
-  m_databaseBackend->setVersion(version, IDBCallbacksProxy::create(callbacks));
+                                    WebIDBCallbacks* callbacks,
+                                    WebExceptionCode& ec) {
+  m_databaseBackend->setVersion(version, IDBCallbacksProxy::create(callbacks),
+                                ec);
 }
 
 WebIDBTransaction* WebIDBDatabaseImpl::transaction(
     const WebDOMStringList& names,
     unsigned short mode,
-    unsigned long timeout) {
+    unsigned long timeout,
+    WebExceptionCode& ec) {
   RefPtr<DOMStringList> nameList = PassRefPtr<DOMStringList>(names);
   RefPtr<IDBTransactionBackendInterface> transaction =
-      m_databaseBackend->transaction(nameList.get(), mode, timeout);
+      m_databaseBackend->transaction(nameList.get(), mode, timeout, ec);
   if (!transaction)
     return 0;
   return new WebIDBTransactionImpl(transaction);

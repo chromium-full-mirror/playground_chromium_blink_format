@@ -64,8 +64,7 @@ class IDBTransaction : public IDBTransactionCallbacks,
 
   unsigned short mode() const;
   IDBDatabase* db();
-  PassRefPtr<IDBObjectStore> objectStore(const String& name,
-                                         const ExceptionCode&);
+  PassRefPtr<IDBObjectStore> objectStore(const String& name, ExceptionCode&);
   void abort();
 
   DEFINE_ATTRIBUTE_EVENT_LISTENER(abort);

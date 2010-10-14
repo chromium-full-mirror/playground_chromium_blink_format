@@ -92,19 +92,17 @@ static void bindWhereClause(SQLiteStatement& query, int64_t id, IDBKey* key) {
   key->bind(query, 2);
 }
 
-void IDBObjectStoreBackendImpl::get(
-    PassRefPtr<IDBKey> prpKey,
-    PassRefPtr<IDBCallbacks> prpCallbacks,
-    IDBTransactionBackendInterface* transaction) {
+void IDBObjectStoreBackendImpl::get(PassRefPtr<IDBKey> prpKey,
+                                    PassRefPtr<IDBCallbacks> prpCallbacks,
+                                    IDBTransactionBackendInterface* transaction,
+                                    ExceptionCode& ec) {
   RefPtr<IDBObjectStoreBackendImpl> objectStore = this;
   RefPtr<IDBKey> key = prpKey;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
   if (!transaction->scheduleTask(
           createCallbackTask(&IDBObjectStoreBackendImpl::getInternal,
                              objectStore, key, callbacks)))
-    callbacks->onError(IDBDatabaseError::create(
-        IDBDatabaseException::NOT_ALLOWED_ERR,
-        "get must be called in the context of a transaction."));
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
 }
 
 void IDBObjectStoreBackendImpl::getInternal(
@@ -208,18 +206,20 @@ void IDBObjectStoreBackendImpl::put(
     PassRefPtr<IDBKey> prpKey,
     bool addOnly,
     PassRefPtr<IDBCallbacks> prpCallbacks,
-    IDBTransactionBackendInterface* transactionPtr) {
+    IDBTransactionBackendInterface* transactionPtr,
+    ExceptionCode& ec) {
   RefPtr<IDBObjectStoreBackendImpl> objectStore = this;
   RefPtr<SerializedScriptValue> value = prpValue;
   RefPtr<IDBKey> key = prpKey;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
   RefPtr<IDBTransactionBackendInterface> transaction = transactionPtr;
+  // FIXME: This should throw a SERIAL_ERR on structured clone problems.
+  // FIXME: This should throw a DATA_ERR when the wrong key/keyPath data is
+  // supplied.
   if (!transaction->scheduleTask(createCallbackTask(
           &IDBObjectStoreBackendImpl::putInternal, objectStore, value, key,
           addOnly, callbacks, transaction)))
-    callbacks->onError(IDBDatabaseError::create(
-        IDBDatabaseException::NOT_ALLOWED_ERR,
-        "put must be called in the context of a transaction."));
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
 }
 
 void IDBObjectStoreBackendImpl::putInternal(
@@ -325,16 +325,15 @@ void IDBObjectStoreBackendImpl::putInternal(
 void IDBObjectStoreBackendImpl::remove(
     PassRefPtr<IDBKey> prpKey,
     PassRefPtr<IDBCallbacks> prpCallbacks,
-    IDBTransactionBackendInterface* transaction) {
+    IDBTransactionBackendInterface* transaction,
+    ExceptionCode& ec) {
   RefPtr<IDBObjectStoreBackendImpl> objectStore = this;
   RefPtr<IDBKey> key = prpKey;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
   if (!transaction->scheduleTask(
           createCallbackTask(&IDBObjectStoreBackendImpl::removeInternal,
                              objectStore, key, callbacks)))
-    callbacks->onError(IDBDatabaseError::create(
-        IDBDatabaseException::NOT_ALLOWED_ERR,
-        "remove must be called in the context of a transaction."));
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
 }
 
 void IDBObjectStoreBackendImpl::removeInternal(
@@ -363,9 +362,14 @@ PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreBackendImpl::createIndex(
     const String& name,
     const String& keyPath,
     bool unique,
-    IDBTransactionBackendInterface* transaction) {
+    IDBTransactionBackendInterface* transaction,
+    ExceptionCode& ec) {
   if (m_indexes.contains(name)) {
-    // FIXME: Raise CONSTRAINT_ERR.
+    ec = IDBDatabaseException::CONSTRAINT_ERR;
+    return 0;
+  }
+  if (transaction->mode() != IDBTransaction::VERSION_CHANGE) {
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
     return 0;
   }
 
@@ -380,6 +384,7 @@ PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreBackendImpl::createIndex(
                              objectStore, index, transaction),
           createCallbackTask(&IDBObjectStoreBackendImpl::removeIndexFromMap,
                              objectStore, index))) {
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
     return 0;
   }
 
@@ -413,8 +418,14 @@ void IDBObjectStoreBackendImpl::createIndexInternal(
 }
 
 PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreBackendImpl::index(
-    const String& name) {
-  return m_indexes.get(name);
+    const String& name,
+    ExceptionCode& ec) {
+  RefPtr<IDBIndexBackendInterface> index = m_indexes.get(name);
+  if (!index) {
+    ec = IDBDatabaseException::NOT_FOUND_ERR;
+    return 0;
+  }
+  return index.release();
 }
 
 static void doDelete(SQLiteDatabase& db, const char* sql, int64_t id) {
@@ -428,10 +439,11 @@ static void doDelete(SQLiteDatabase& db, const char* sql, int64_t id) {
 
 void IDBObjectStoreBackendImpl::removeIndex(
     const String& name,
-    IDBTransactionBackendInterface* transaction) {
+    IDBTransactionBackendInterface* transaction,
+    ExceptionCode& ec) {
   RefPtr<IDBIndexBackendImpl> index = m_indexes.get(name);
   if (!index) {
-    // FIXME: Raise NOT_FOUND_ERR.
+    ec = IDBDatabaseException::NOT_FOUND_ERR;
     return;
   }
 
@@ -442,7 +454,7 @@ void IDBObjectStoreBackendImpl::removeIndex(
                              objectStore, index, transactionPtr),
           createCallbackTask(&IDBObjectStoreBackendImpl::addIndexToMap,
                              objectStore, index))) {
-    // FIXME: Raise NOT_ALLOWED_ERR if the above statement fails.
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
     return;
   }
   m_indexes.remove(name);
@@ -465,7 +477,8 @@ void IDBObjectStoreBackendImpl::openCursor(
     PassRefPtr<IDBKeyRange> prpRange,
     unsigned short direction,
     PassRefPtr<IDBCallbacks> prpCallbacks,
-    IDBTransactionBackendInterface* transactionPtr) {
+    IDBTransactionBackendInterface* transactionPtr,
+    ExceptionCode& ec) {
   RefPtr<IDBObjectStoreBackendImpl> objectStore = this;
   RefPtr<IDBKeyRange> range = prpRange;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
@@ -473,9 +486,7 @@ void IDBObjectStoreBackendImpl::openCursor(
   if (!transaction->scheduleTask(createCallbackTask(
           &IDBObjectStoreBackendImpl::openCursorInternal, objectStore, range,
           direction, callbacks, transaction)))
-    callbacks->onError(IDBDatabaseError::create(
-        IDBDatabaseException::NOT_ALLOWED_ERR,
-        "openCursor must be called in the context of a transaction."));
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
 }
 
 void IDBObjectStoreBackendImpl::openCursorInternal(

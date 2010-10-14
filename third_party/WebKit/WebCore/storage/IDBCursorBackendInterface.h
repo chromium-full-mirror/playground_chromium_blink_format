@@ -28,6 +28,7 @@
 
 #if ENABLE(INDEXED_DATABASE)
 
+#include "ExceptionCode.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/Threading.h>
@@ -50,10 +51,12 @@ class IDBCursorBackendInterface
   virtual PassRefPtr<IDBAny> value() const = 0;
 
   virtual void update(PassRefPtr<SerializedScriptValue>,
-                      PassRefPtr<IDBCallbacks>) = 0;
+                      PassRefPtr<IDBCallbacks>,
+                      ExceptionCode&) = 0;
   virtual void continueFunction(PassRefPtr<IDBKey> key,
-                                PassRefPtr<IDBCallbacks>) = 0;
-  virtual void remove(PassRefPtr<IDBCallbacks>) = 0;
+                                PassRefPtr<IDBCallbacks>,
+                                ExceptionCode&) = 0;
+  virtual void remove(PassRefPtr<IDBCallbacks>, ExceptionCode&) = 0;
 };
 
 }  // namespace WebCore

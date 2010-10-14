@@ -30,6 +30,7 @@
 #include "IDBDatabaseError.h"
 #include "IDBDatabaseException.h"
 #include "IDBFactoryBackendInterface.h"
+#include "IDBIndex.h"
 #include "IDBObjectStore.h"
 #include "IDBRequest.h"
 #include "IDBTransaction.h"
@@ -41,7 +42,7 @@ namespace WebCore {
 
 IDBDatabase::IDBDatabase(PassRefPtr<IDBDatabaseBackendInterface> backend)
     : m_backend(backend) {
-  // We pass a reference to this object before it can be adopted.
+  // We pass a reference of this object before it can be adopted.
   relaxAdoptionRequirement();
 }
 
@@ -54,33 +55,37 @@ void IDBDatabase::setSetVersionTransaction(
 
 PassRefPtr<IDBObjectStore> IDBDatabase::createObjectStore(const String& name,
                                                           const String& keyPath,
-                                                          bool autoIncrement) {
+                                                          bool autoIncrement,
+                                                          ExceptionCode& ec) {
   if (!m_setVersionTransaction) {
-    // FIXME: Raise a NOT_ALLOWED_ERR if m_setVersionTransaction is 0.
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
     return 0;
   }
 
   RefPtr<IDBObjectStoreBackendInterface> objectStore =
       m_backend->createObjectStore(name, keyPath, autoIncrement,
-                                   m_setVersionTransaction.get());
+                                   m_setVersionTransaction.get(), ec);
   if (!objectStore)
     return 0;
   return IDBObjectStore::create(objectStore.release(),
                                 m_setVersionTransaction.get());
 }
 
-void IDBDatabase::removeObjectStore(const String& name) {
-  // FIXME: Raise a NOT_ALLOWED_ERR if m_setVersionTransaction is 0.
-  if (!m_setVersionTransaction)
+void IDBDatabase::removeObjectStore(const String& name, ExceptionCode& ec) {
+  if (!m_setVersionTransaction) {
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
     return;
-  m_backend->removeObjectStore(name, m_setVersionTransaction.get());
+  }
+
+  m_backend->removeObjectStore(name, m_setVersionTransaction.get(), ec);
 }
 
 PassRefPtr<IDBRequest> IDBDatabase::setVersion(ScriptExecutionContext* context,
-                                               const String& version) {
+                                               const String& version,
+                                               ExceptionCode& ec) {
   RefPtr<IDBRequest> request =
       IDBRequest::create(context, IDBAny::create(this), 0);
-  m_backend->setVersion(version, request);
+  m_backend->setVersion(version, request, ec);
   return request;
 }
 
@@ -88,7 +93,8 @@ PassRefPtr<IDBTransaction> IDBDatabase::transaction(
     ScriptExecutionContext* context,
     DOMStringList* storeNames,
     unsigned short mode,
-    unsigned long timeout) {
+    unsigned long timeout,
+    ExceptionCode& ec) {
   // We need to create a new transaction synchronously. Locks are acquired
   // asynchronously. Operations
   // can be queued against the transaction at any point. They will start
@@ -97,7 +103,7 @@ PassRefPtr<IDBTransaction> IDBDatabase::transaction(
   // Also note that each backend object corresponds to exactly one
   // IDBTransaction object.
   RefPtr<IDBTransactionBackendInterface> transactionBackend =
-      m_backend->transaction(storeNames, mode, timeout);
+      m_backend->transaction(storeNames, mode, timeout, ec);
   RefPtr<IDBTransaction> transaction =
       IDBTransaction::create(context, transactionBackend, this);
   transactionBackend->setCallbacks(transaction.get());

@@ -28,6 +28,7 @@
 
 #if ENABLE(INDEXED_DATABASE)
 
+#include "ExceptionCode.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
@@ -59,14 +60,18 @@ class IDBCursor : public RefCounted<IDBCursor> {
   }
   ~IDBCursor();
 
+  // FIXME: Try to modify the code generator so this is unneeded.
+  void continueFunction(ExceptionCode& ec) { continueFunction(0, ec); }
+
   // Implement the IDL
   unsigned short direction() const;
   PassRefPtr<IDBKey> key() const;
   PassRefPtr<IDBAny> value() const;
   PassRefPtr<IDBRequest> update(ScriptExecutionContext*,
-                                PassRefPtr<SerializedScriptValue>);
-  void continueFunction(PassRefPtr<IDBKey> = 0);
-  PassRefPtr<IDBRequest> remove(ScriptExecutionContext*);
+                                PassRefPtr<SerializedScriptValue>,
+                                ExceptionCode&);
+  void continueFunction(PassRefPtr<IDBKey>, ExceptionCode&);
+  PassRefPtr<IDBRequest> remove(ScriptExecutionContext*, ExceptionCode&);
 
  private:
   explicit IDBCursor(PassRefPtr<IDBCursorBackendInterface>,

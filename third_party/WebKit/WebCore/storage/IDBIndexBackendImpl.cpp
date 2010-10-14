@@ -138,7 +138,8 @@ void IDBIndexBackendImpl::openCursor(
     PassRefPtr<IDBKeyRange> prpKeyRange,
     unsigned short direction,
     PassRefPtr<IDBCallbacks> prpCallbacks,
-    IDBTransactionBackendInterface* transactionPtr) {
+    IDBTransactionBackendInterface* transactionPtr,
+    ExceptionCode& ec) {
   RefPtr<IDBIndexBackendImpl> index = this;
   RefPtr<IDBKeyRange> keyRange = prpKeyRange;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
@@ -146,16 +147,15 @@ void IDBIndexBackendImpl::openCursor(
   if (!transaction->scheduleTask(createCallbackTask(&openCursorInternal, index,
                                                     keyRange, direction, true,
                                                     callbacks, transaction)))
-    callbacks->onError(IDBDatabaseError::create(
-        IDBDatabaseException::NOT_ALLOWED_ERR,
-        "Get must be called in the context of a transaction."));
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
 }
 
 void IDBIndexBackendImpl::openKeyCursor(
     PassRefPtr<IDBKeyRange> prpKeyRange,
     unsigned short direction,
     PassRefPtr<IDBCallbacks> prpCallbacks,
-    IDBTransactionBackendInterface* transactionPtr) {
+    IDBTransactionBackendInterface* transactionPtr,
+    ExceptionCode& ec) {
   RefPtr<IDBIndexBackendImpl> index = this;
   RefPtr<IDBKeyRange> keyRange = prpKeyRange;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
@@ -163,9 +163,7 @@ void IDBIndexBackendImpl::openKeyCursor(
   if (!transaction->scheduleTask(createCallbackTask(&openCursorInternal, index,
                                                     keyRange, direction, false,
                                                     callbacks, transaction)))
-    callbacks->onError(IDBDatabaseError::create(
-        IDBDatabaseException::NOT_ALLOWED_ERR,
-        "Get must be called in the context of a transaction."));
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
 }
 
 void IDBIndexBackendImpl::getInternal(ScriptExecutionContext*,
@@ -206,28 +204,26 @@ void IDBIndexBackendImpl::getInternal(ScriptExecutionContext*,
 
 void IDBIndexBackendImpl::get(PassRefPtr<IDBKey> prpKey,
                               PassRefPtr<IDBCallbacks> prpCallbacks,
-                              IDBTransactionBackendInterface* transaction) {
+                              IDBTransactionBackendInterface* transaction,
+                              ExceptionCode& ec) {
   RefPtr<IDBIndexBackendImpl> index = this;
   RefPtr<IDBKey> key = prpKey;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
   if (!transaction->scheduleTask(
           createCallbackTask(&getInternal, index, key, true, callbacks)))
-    callbacks->onError(IDBDatabaseError::create(
-        IDBDatabaseException::NOT_ALLOWED_ERR,
-        "Get must be called in the context of a transaction."));
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
 }
 
 void IDBIndexBackendImpl::getKey(PassRefPtr<IDBKey> prpKey,
                                  PassRefPtr<IDBCallbacks> prpCallbacks,
-                                 IDBTransactionBackendInterface* transaction) {
+                                 IDBTransactionBackendInterface* transaction,
+                                 ExceptionCode& ec) {
   RefPtr<IDBIndexBackendImpl> index = this;
   RefPtr<IDBKey> key = prpKey;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
   if (!transaction->scheduleTask(
           createCallbackTask(&getInternal, index, key, false, callbacks)))
-    callbacks->onError(IDBDatabaseError::create(
-        IDBDatabaseException::NOT_ALLOWED_ERR,
-        "Get must be called in the context of a transaction."));
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
 }
 
 static String whereClause(IDBKey* key) {

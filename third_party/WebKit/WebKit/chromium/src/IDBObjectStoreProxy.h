@@ -51,28 +51,36 @@ class IDBObjectStoreProxy : public IDBObjectStoreBackendInterface {
 
   virtual void get(PassRefPtr<IDBKey>,
                    PassRefPtr<IDBCallbacks>,
-                   IDBTransactionBackendInterface*);
+                   IDBTransactionBackendInterface*,
+                   ExceptionCode&);
   virtual void put(PassRefPtr<SerializedScriptValue>,
                    PassRefPtr<IDBKey>,
                    bool addOnly,
                    PassRefPtr<IDBCallbacks>,
-                   IDBTransactionBackendInterface*);
+                   IDBTransactionBackendInterface*,
+                   ExceptionCode&);
   virtual void remove(PassRefPtr<IDBKey>,
                       PassRefPtr<IDBCallbacks>,
-                      IDBTransactionBackendInterface*);
+                      IDBTransactionBackendInterface*,
+                      ExceptionCode&);
 
   PassRefPtr<IDBIndexBackendInterface> createIndex(
       const String& name,
       const String& keyPath,
       bool unique,
-      IDBTransactionBackendInterface*);
-  PassRefPtr<IDBIndexBackendInterface> index(const String& name);
-  void removeIndex(const String& name, IDBTransactionBackendInterface*);
+      IDBTransactionBackendInterface*,
+      ExceptionCode&);
+  PassRefPtr<IDBIndexBackendInterface> index(const String& name,
+                                             ExceptionCode&);
+  void removeIndex(const String& name,
+                   IDBTransactionBackendInterface*,
+                   ExceptionCode&);
 
   virtual void openCursor(PassRefPtr<IDBKeyRange>,
                           unsigned short direction,
                           PassRefPtr<IDBCallbacks>,
-                          IDBTransactionBackendInterface*);
+                          IDBTransactionBackendInterface*,
+                          ExceptionCode&);
 
  private:
   IDBObjectStoreProxy(PassOwnPtr<WebKit::WebIDBObjectStore>);
