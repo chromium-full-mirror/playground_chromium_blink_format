@@ -514,7 +514,7 @@ static void sendRequestCallback(GObject* source,
     }
 
     if (d->m_soupMessage &&
-        soupMessage->status_code == SOUP_STATUS_UNAUTHORIZED) {
+        d->m_soupMessage->status_code == SOUP_STATUS_UNAUTHORIZED) {
       fillResponseFromMessage(soupMsg, &d->m_response);
       client->didReceiveResponse(handle.get(), d->m_response);
 
