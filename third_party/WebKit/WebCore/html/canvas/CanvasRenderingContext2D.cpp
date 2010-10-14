@@ -1508,10 +1508,10 @@ PassRefPtr<CanvasGradient> CanvasRenderingContext2D::createLinearGradient(
     return 0;
   }
 
-  PassRefPtr<CanvasGradient> gradient =
+  RefPtr<CanvasGradient> gradient =
       CanvasGradient::create(FloatPoint(x0, y0), FloatPoint(x1, y1));
   prepareGradientForDashboard(gradient.get());
-  return gradient;
+  return gradient.release();
 }
 
 PassRefPtr<CanvasGradient> CanvasRenderingContext2D::createRadialGradient(
@@ -1527,10 +1527,16 @@ PassRefPtr<CanvasGradient> CanvasRenderingContext2D::createRadialGradient(
     ec = NOT_SUPPORTED_ERR;
     return 0;
   }
-  PassRefPtr<CanvasGradient> gradient =
+
+  if (r0 < 0 || r1 < 0) {
+    ec = INDEX_SIZE_ERR;
+    return 0;
+  }
+
+  RefPtr<CanvasGradient> gradient =
       CanvasGradient::create(FloatPoint(x0, y0), r0, FloatPoint(x1, y1), r1);
   prepareGradientForDashboard(gradient.get());
-  return gradient;
+  return gradient.release();
 }
 
 PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
@@ -1636,7 +1642,7 @@ GraphicsContext* CanvasRenderingContext2D::drawingContext() const {
 static PassRefPtr<ImageData> createEmptyImageData(const IntSize& size) {
   RefPtr<ImageData> data = ImageData::create(size.width(), size.height());
   memset(data->data()->data()->data(), 0, data->data()->data()->length());
-  return data.get();
+  return data.release();
 }
 
 PassRefPtr<ImageData> CanvasRenderingContext2D::createImageData(
@@ -1874,7 +1880,7 @@ PassRefPtr<TextMetrics> CanvasRenderingContext2D::measureText(
   Font::setCodePath(oldCodePath);
 #endif
 
-  return metrics;
+  return metrics.release();
 }
 
 void CanvasRenderingContext2D::drawTextInternal(const String& text,
