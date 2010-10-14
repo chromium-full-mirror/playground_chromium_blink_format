@@ -102,9 +102,11 @@ void WebFontImpl::drawText(WebCanvas* canvas,
   notImplemented();
 #endif
 
+  gc.save();
   gc.setFillColor(color, DeviceColorSpace);
   gc.clip(WebCore::FloatRect(clip));
   m_font.drawText(&gc, run, leftBaseline, from, to);
+  gc.restore();
 }
 
 int WebFontImpl::calculateWidth(const WebTextRun& run) const {
