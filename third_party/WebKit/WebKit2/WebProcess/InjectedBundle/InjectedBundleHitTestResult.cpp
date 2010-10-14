@@ -75,7 +75,7 @@ WebFrame* InjectedBundleHitTestResult::targetFrame() const {
       ->webFrame();
 }
 
-const String& InjectedBundleHitTestResult::absoluteLinkURL() const {
+String InjectedBundleHitTestResult::absoluteLinkURL() const {
   return m_hitTestResult.absoluteLinkURL().string();
 }
 
