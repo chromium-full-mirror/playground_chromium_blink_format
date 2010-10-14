@@ -38,7 +38,7 @@ PassRefPtr<WebGLProgram> WebGLProgram::create(WebGLRenderingContext* ctx) {
 }
 
 WebGLProgram::WebGLProgram(WebGLRenderingContext* ctx)
-    : WebGLObject(ctx), m_linkFailure(false) {
+    : WebGLObject(ctx), m_linkStatus(false) {
   setObject(context()->graphicsContext3D()->createProgram());
 }
 
