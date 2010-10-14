@@ -53,6 +53,10 @@ Vector<String> PluginInfoStore::pluginPathsInDirectory(
   return result;
 }
 
+Vector<String> PluginInfoStore::individualPluginPaths() {
+  return Vector<String>();
+}
+
 bool PluginInfoStore::getPluginInfo(const String& pluginPath, Plugin& plugin) {
   // We are loading the plugin here since it does not seem to be a standardized
   // way to
