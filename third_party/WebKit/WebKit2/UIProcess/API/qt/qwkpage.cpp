@@ -95,6 +95,8 @@ FloatRect QWKPagePrivate::convertToUserSpace(const FloatRect& rect) {
   return rect;
 }
 
+void QWKPagePrivate::didNotHandleKeyEvent(const NativeWebKeyboardEvent&) {}
+
 void QWKPagePrivate::paint(QPainter* painter, QRect area) {
   painter->save();
 

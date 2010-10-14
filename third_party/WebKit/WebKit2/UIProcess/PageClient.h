@@ -36,6 +36,7 @@ struct ViewportArguments;
 
 namespace WebKit {
 
+class NativeWebKeyboardEvent;
 class WebEditCommandProxy;
 
 class PageClient {
@@ -61,6 +62,8 @@ class PageClient {
   virtual WebCore::FloatRect convertToDeviceSpace(
       const WebCore::FloatRect&) = 0;
   virtual WebCore::FloatRect convertToUserSpace(const WebCore::FloatRect&) = 0;
+
+  virtual void didNotHandleKeyEvent(const NativeWebKeyboardEvent&) = 0;
 
 #if USE(ACCELERATED_COMPOSITING)
   virtual void pageDidEnterAcceleratedCompositing() = 0;

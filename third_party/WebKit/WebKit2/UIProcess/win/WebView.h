@@ -125,6 +125,7 @@ class WebView : public APIObject,
   virtual void setEditCommandState(const WTF::String&, bool, int);
   virtual WebCore::FloatRect convertToDeviceSpace(const WebCore::FloatRect&);
   virtual WebCore::FloatRect convertToUserSpace(const WebCore::FloatRect&);
+  virtual void didNotHandleKeyEvent(const NativeWebKeyboardEvent&);
 
 #if USE(ACCELERATED_COMPOSITING)
   virtual void pageDidEnterAcceleratedCompositing();
