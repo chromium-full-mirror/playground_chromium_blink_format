@@ -198,6 +198,16 @@ CString prettyNameForNPPVariable(NPPVariable variable, void* value) {
   }
 }
 
+CString prettyNameForNPNURLVariable(NPNURLVariable variable) {
+  switch (variable) {
+    case NPNURLVCookie:
+      return "NPNURLVCookie";
+    case NPNURLVProxy:
+      return "NPNURLVProxy";
+    default:
+      return "Unknown variable";
+  }
+}
 }  // namespace WebCore
 
 #endif  // !LOG_DISABLED
