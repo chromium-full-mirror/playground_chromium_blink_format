@@ -303,7 +303,7 @@ void QGraphicsWebView::paint(QPainter* painter,
     return;
   }
 #endif
-#if USE(ACCELERATED_COMPOSITING)
+#if USE(ACCELERATED_COMPOSITING) && !USE(TEXTURE_MAPPER)
   page()->mainFrame()->render(
       painter, d->overlay() ? QWebFrame::ContentsLayer : QWebFrame::AllLayers,
       option->exposedRect.toAlignedRect());
