@@ -115,6 +115,7 @@ struct _Ewk_View_Private_Data {
     Eina_Bool enable_scripts : 1;
     Eina_Bool enable_plugins : 1;
     Eina_Bool enable_frame_flattening : 1;
+    Eina_Bool encoding_detector : 1;
     Eina_Bool scripts_window_open : 1;
     Eina_Bool resizable_textareas : 1;
     Eina_Bool private_browsing : 1;
@@ -602,6 +603,7 @@ static Ewk_View_Private_Data* _ewk_view_priv_new(Ewk_View_Smart_Data* sd) {
   priv->page_settings->setLocalStorageEnabled(true);
   priv->page_settings->setOfflineWebApplicationCacheEnabled(true);
   priv->page_settings->setUsesPageCache(true);
+  priv->page_settings->setUsesEncodingDetector(true);
 
   url = priv->page_settings->userStyleSheetLocation();
   priv->settings.user_stylesheet =
@@ -659,6 +661,8 @@ static Ewk_View_Private_Data* _ewk_view_priv_new(Ewk_View_Smart_Data* sd) {
   priv->settings.offline_app_cache =
       true;  // XXX no function to read setting; this keeps the original setting
   priv->settings.page_cache = priv->page_settings->usesPageCache();
+  priv->settings.encoding_detector =
+      priv->page_settings->usesEncodingDetector();
 
   // Since there's no scale separated from zooming in webkit-efl, this
   // functionality of
@@ -2561,6 +2565,37 @@ Eina_Bool ewk_view_setting_encoding_default_set(Evas_Object* o,
   return EINA_TRUE;
 }
 
+/**
+ * Sets the encoding detector.
+ *
+ * @param o view object to set if encoding detector is enabled.
+ * @return @c EINA_TRUE on success and @c EINA_FALSE on failure
+ */
+Eina_Bool ewk_view_setting_encoding_detector_set(Evas_Object* o,
+                                                 Eina_Bool enable) {
+  EWK_VIEW_SD_GET_OR_RETURN(o, sd, EINA_FALSE);
+  EWK_VIEW_PRIV_GET_OR_RETURN(sd, priv, EINA_FALSE);
+  enable = !!enable;
+  if (priv->settings.encoding_detector != enable) {
+    priv->page_settings->setUsesEncodingDetector(enable);
+    priv->settings.encoding_detector = enable;
+  }
+  return EINA_TRUE;
+}
+
+/**
+ * Gets if the encoding detector is enabled.
+ *
+ * @param o view object to get if encoding detector is enabled.
+ * @return @c EINA_TRUE if encoding detector is enabled, @c EINA_FALSE if not or
+ * on errors.
+ */
+Eina_Bool ewk_view_setting_encoding_detector_get(Evas_Object* o) {
+  EWK_VIEW_SD_GET_OR_RETURN(o, sd, EINA_FALSE);
+  EWK_VIEW_PRIV_GET_OR_RETURN(sd, priv, EINA_FALSE);
+  return priv->settings.encoding_detector;
+}
+
 const char* ewk_view_setting_cache_directory_get(const Evas_Object* o) {
   EWK_VIEW_SD_GET_OR_RETURN(o, sd, 0);
   EWK_VIEW_PRIV_GET_OR_RETURN(sd, priv, 0);
@@ -2763,8 +2798,9 @@ Eina_Bool ewk_view_setting_spatial_navigation_set(Evas_Object* o,
 /**
  * Gets if the local storage is enabled.
  *
- * @param o view object to set if local storage is enabled.
- * @return @c EINA_TRUE if local storage is enabled, @c EINA_FALSE if not.
+ * @param o view object to get if local storage is enabled.
+ * @return @c EINA_TRUE if local storage is enabled, @c EINA_FALSE if not or on
+ * errors.
  */
 Eina_Bool ewk_view_setting_local_storage_get(Evas_Object* o) {
   EWK_VIEW_SD_GET_OR_RETURN(o, sd, EINA_FALSE);
