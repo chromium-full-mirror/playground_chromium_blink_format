@@ -127,6 +127,7 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
   IntSize rootLayerTextureSize() const {
     return IntSize(m_rootLayerTextureWidth, m_rootLayerTextureHeight);
   }
+  IntRect rootLayerContentRect() const { return m_rootContentRect; }
   void getFramebufferPixels(void* pixels, const IntRect& rect);
 
  private:
@@ -185,6 +186,7 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
   IntSize m_rootLayerCanvasSize;
 
   IntRect m_rootVisibleRect;
+  IntRect m_rootContentRect;
 
   int m_maxTextureSize;
 
