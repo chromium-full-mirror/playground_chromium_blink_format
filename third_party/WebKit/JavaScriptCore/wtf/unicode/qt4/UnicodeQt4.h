@@ -31,6 +31,9 @@
 #include <config.h>
 
 #include <stdint.h>
+#if USE(QT_ICU_TEXT_BREAKING)
+#include <unicode/ubrk.h>
+#endif
 
 QT_BEGIN_NAMESPACE
 namespace QUnicodeTables {
@@ -63,7 +66,10 @@ typedef wchar_t UChar;
 #else
 typedef uint16_t UChar;
 #endif
+
+#if !USE(QT_ICU_TEXT_BREAKING)
 typedef uint32_t UChar32;
+#endif
 
 namespace WTF {
 namespace Unicode {
@@ -148,7 +154,7 @@ enum CharCategory {
 // FIXME: handle surrogates correctly in all methods
 
 inline UChar32 toLower(UChar32 ch) {
-  return QChar::toLower(ch);
+  return QChar::toLower(uint32_t(ch));
 }
 
 inline int toLower(UChar* result,
@@ -207,8 +213,8 @@ inline int toLower(UChar* result,
   return rindex + needed;
 }
 
-inline UChar32 toUpper(UChar32 ch) {
-  return QChar::toUpper(ch);
+inline UChar32 toUpper(UChar32 c) {
+  return QChar::toUpper(uint32_t(c));
 }
 
 inline int toUpper(UChar* result,
@@ -268,11 +274,11 @@ inline int toUpper(UChar* result,
 }
 
 inline int toTitleCase(UChar32 c) {
-  return QChar::toTitleCase(c);
+  return QChar::toTitleCase(uint32_t(c));
 }
 
 inline UChar32 foldCase(UChar32 c) {
-  return QChar::toCaseFolded(c);
+  return QChar::toCaseFolded(uint32_t(c));
 }
 
 inline int foldCase(UChar* result,
@@ -298,11 +304,11 @@ inline bool isArabicChar(UChar32 c) {
 inline bool isPrintableChar(UChar32 c) {
   const uint test =
       U_MASK(QChar::Other_Control) | U_MASK(QChar::Other_NotAssigned);
-  return !(U_MASK(QChar::category(c)) & test);
+  return !(U_MASK(QChar::category(uint32_t(c))) & test);
 }
 
 inline bool isSeparatorSpace(UChar32 c) {
-  return QChar::category(c) == QChar::Separator_Space;
+  return QChar::category(uint32_t(c)) == QChar::Separator_Space;
 }
 
 inline bool isPunct(UChar32 c) {
@@ -311,11 +317,11 @@ inline bool isPunct(UChar32 c) {
       U_MASK(QChar::Punctuation_Open) | U_MASK(QChar::Punctuation_Close) |
       U_MASK(QChar::Punctuation_InitialQuote) |
       U_MASK(QChar::Punctuation_FinalQuote) | U_MASK(QChar::Punctuation_Other);
-  return U_MASK(QChar::category(c)) & test;
+  return U_MASK(QChar::category(uint32_t(c))) & test;
 }
 
 inline bool isLower(UChar32 c) {
-  return QChar::category(c) == QChar::Letter_Lowercase;
+  return QChar::category(uint32_t(c)) == QChar::Letter_Lowercase;
 }
 
 inline bool hasLineBreakingPropertyComplexContext(UChar32) {
@@ -325,11 +331,11 @@ inline bool hasLineBreakingPropertyComplexContext(UChar32) {
 }
 
 inline UChar32 mirroredChar(UChar32 c) {
-  return QChar::mirroredChar(c);
+  return QChar::mirroredChar(uint32_t(c));
 }
 
 inline uint8_t combiningClass(UChar32 c) {
-  return QChar::combiningClass(c);
+  return QChar::combiningClass(uint32_t(c));
 }
 
 inline DecompositionType decompositionType(UChar32 c) {
@@ -348,11 +354,11 @@ inline int umemcasecmp(const UChar* a, const UChar* b, int len) {
 }
 
 inline Direction direction(UChar32 c) {
-  return (Direction)QChar::direction(c);
+  return (Direction)QChar::direction(uint32_t(c));
 }
 
 inline CharCategory category(UChar32 c) {
-  return (CharCategory)U_MASK(QChar::category(c));
+  return (CharCategory)U_MASK(QChar::category(uint32_t(c)));
 }
 }
 }
