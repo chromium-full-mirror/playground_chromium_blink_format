@@ -162,6 +162,8 @@ InspectorController::InspectorController(Page* page, InspectorClient* client)
       m_client(client),
       m_openingFrontend(false),
       m_cssStore(new InspectorCSSStore(this)),
+      m_loadEventTime(-1.0),
+      m_domContentEventTime(-1.0),
       m_expiredConsoleMessageCount(0),
       m_showAfterVisible(lastActivePanel),
       m_sessionSettings(InspectorObject::create()),
@@ -672,6 +674,10 @@ void InspectorController::populateScriptObjects() {
   for (ResourcesMap::iterator it = m_resources.begin(); it != resourcesEnd;
        ++it)
     it->second->updateScriptObject(m_frontend.get());
+  if (m_domContentEventTime != -1.0)
+    m_frontend->domContentEventFired(m_domContentEventTime);
+  if (m_loadEventTime != -1.0)
+    m_frontend->loadEventFired(m_loadEventTime);
 
   m_domAgent->setDocument(m_inspectedPage->mainFrame()->document());
 
@@ -996,13 +1002,11 @@ void InspectorController::mainResourceFiredDOMContentEvent(
   if (!enabled() || !isMainResourceLoader(loader, url))
     return;
 
-  if (m_mainResource) {
-    m_mainResource->markDOMContentEventTime();
-    if (m_timelineAgent)
-      m_timelineAgent->didMarkDOMContentEvent();
-    if (m_frontend)
-      m_mainResource->updateScriptObject(m_frontend.get());
-  }
+  m_domContentEventTime = currentTime();
+  if (m_timelineAgent)
+    m_timelineAgent->didMarkDOMContentEvent();
+  if (m_frontend)
+    m_frontend->domContentEventFired(m_domContentEventTime);
 }
 
 void InspectorController::mainResourceFiredLoadEvent(DocumentLoader* loader,
@@ -1010,13 +1014,11 @@ void InspectorController::mainResourceFiredLoadEvent(DocumentLoader* loader,
   if (!enabled() || !isMainResourceLoader(loader, url))
     return;
 
-  if (m_mainResource) {
-    m_mainResource->markLoadEventTime();
-    if (m_timelineAgent)
-      m_timelineAgent->didMarkLoadEvent();
-    if (m_frontend)
-      m_mainResource->updateScriptObject(m_frontend.get());
-  }
+  m_loadEventTime = currentTime();
+  if (m_timelineAgent)
+    m_timelineAgent->didMarkLoadEvent();
+  if (m_frontend)
+    m_frontend->loadEventFired(m_loadEventTime);
 }
 
 bool InspectorController::isMainResourceLoader(DocumentLoader* loader,
