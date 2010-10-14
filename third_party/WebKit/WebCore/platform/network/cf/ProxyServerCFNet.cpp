@@ -93,7 +93,7 @@ Vector<ProxyServer> proxyServersForURL(const KURL& url,
   return proxyServers;
 }
 #else
-Vector<ProxyServer> proxyServersForURL(const KURL&) {
+Vector<ProxyServer> proxyServersForURL(const KURL&, const NetworkingContext*) {
   // FIXME: Implement.
   return Vector<ProxyServer>();
 }
