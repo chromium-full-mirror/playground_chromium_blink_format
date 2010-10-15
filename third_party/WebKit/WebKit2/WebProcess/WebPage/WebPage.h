@@ -173,6 +173,8 @@ class WebPage : public APIObject {
 
   static const WebEvent* currentEvent();
 
+  FindController& findController() { return m_findController; }
+
  private:
   WebPage(uint64_t pageID, const WebPageCreationParameters&);
 
