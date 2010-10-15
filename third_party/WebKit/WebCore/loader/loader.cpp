@@ -32,6 +32,7 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "HTMLDocument.h"
+#include "Logging.h"
 #include "Request.h"
 #include "ResourceHandle.h"
 #include "ResourceRequest.h"
@@ -43,7 +44,6 @@
 #include <wtf/Vector.h>
 
 #define REQUEST_MANAGEMENT_ENABLED 1
-#define REQUEST_DEBUG 0
 
 namespace WebCore {
 
@@ -125,6 +125,9 @@ void Loader::load(CachedResourceLoader* cachedResourceLoader,
                   bool incremental,
                   SecurityCheckPolicy securityCheck,
                   bool sendResourceLoadCallbacks) {
+  LOG(ResourceLoading, "Loader::load resource %p '%s'", resource,
+      resource->url().latin1().data());
+
   ASSERT(cachedResourceLoader);
   Request* request = new Request(cachedResourceLoader, resource, incremental,
                                  securityCheck, sendResourceLoadCallbacks);
@@ -161,15 +164,22 @@ void Loader::load(CachedResourceLoader* cachedResourceLoader,
 }
 
 void Loader::scheduleServePendingRequests() {
+  LOG(ResourceLoading,
+      "Loader::scheduleServePendingRequests, m_requestTimer.isActive()=%u",
+      m_requestTimer.isActive());
   if (!m_requestTimer.isActive())
     m_requestTimer.startOneShot(0);
 }
 
 void Loader::requestTimerFired(Timer<Loader>*) {
+  LOG(ResourceLoading, "Loader::requestTimerFired\n");
   servePendingRequests();
 }
 
 void Loader::servePendingRequests(Priority minimumPriority) {
+  LOG(ResourceLoading,
+      "Loader::servePendingRequests. m_isSuspendingPendingRequests=%d",
+      m_isSuspendingPendingRequests);
   if (m_isSuspendingPendingRequests)
     return;
 
@@ -299,8 +309,12 @@ bool Loader::Host::hasRequests() const {
 }
 
 void Loader::Host::servePendingRequests(Loader::Priority minimumPriority) {
-  if (cache()->loader()->isSuspendingPendingRequests())
+  LOG(ResourceLoading, "Host::servePendingRequests '%s'",
+      m_name.string().latin1().data());
+  if (cache()->loader()->isSuspendingPendingRequests()) {
+    LOG(ResourceLoading, "...isSuspendingPendingRequests");
     return;
+  }
 
   bool serveMore = true;
   for (int priority = High; priority >= minimumPriority && serveMore;
@@ -374,16 +388,20 @@ void Loader::Host::servePendingRequests(RequestQueue& requestsPending,
     if (loader) {
       m_requestsLoading.add(loader.release(), request);
       request->cachedResource()->setRequestedFromNetworkingLayer();
-#if REQUEST_DEBUG
-      printf("HOST %s COUNT %d LOADING %s\n",
-             resourceRequest.url().host().latin1().data(),
-             m_requestsLoading.size(),
-             request->cachedResource()->url().latin1().data());
-#endif
+      LOG(ResourceLoading, "Host '%s' loading '%s'. Current count %d",
+          m_name.string().latin1().data(),
+          request->cachedResource()->url().latin1().data(),
+          m_requestsLoading.size());
     } else {
-      cachedResourceLoader->decrementRequestCount(request->cachedResource());
+      // FIXME: What if resources in other frames were waiting for this
+      // revalidation?
+      LOG(ResourceLoading, "Host '%s' cannot start loading '%s'",
+          m_name.string().latin1().data(),
+          request->cachedResource()->url().latin1().data());
+      CachedResource* resource = request->cachedResource();
+      cachedResourceLoader->decrementRequestCount(resource);
       cachedResourceLoader->setLoadInProgress(true);
-      request->cachedResource()->error();
+      resource->error();
       cachedResourceLoader->setLoadInProgress(false);
       delete request;
     }
@@ -424,11 +442,10 @@ void Loader::Host::didFinishLoading(SubresourceLoader* loader) {
 
   cachedResourceLoader->checkForPendingPreloads();
 
-#if REQUEST_DEBUG
-  KURL u(ParsedURLString, resource->url());
-  printf("HOST %s COUNT %d RECEIVED %s\n", u.host().latin1().data(),
-         m_requestsLoading.size(), resource->url().latin1().data());
-#endif
+  LOG(ResourceLoading, "Host '%s' received %s. Current count %d\n",
+      m_name.string().latin1().data(), resource->url().latin1().data(),
+      m_requestsLoading.size());
+
   servePendingRequests();
 }
 
@@ -472,6 +489,11 @@ void Loader::Host::didFail(SubresourceLoader* loader, bool cancelled) {
   delete request;
 
   cachedResourceLoader->checkForPendingPreloads();
+
+  LOG(ResourceLoading,
+      "Host '%s' failed to load %s (cancelled=%d). Current count %d\n",
+      m_name.string().latin1().data(), resource->url().latin1().data(),
+      cancelled, m_requestsLoading.size());
 
   servePendingRequests();
 }
