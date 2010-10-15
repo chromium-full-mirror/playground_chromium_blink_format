@@ -936,7 +936,8 @@ void CompositeEditCommand::moveParagraphWithClones(
 
   if (beforeParagraph.isNotNull() &&
       !isTableElement(beforeParagraph.deepEquivalent().node()) &&
-      (!isEndOfParagraph(beforeParagraph) ||
+      ((!isEndOfParagraph(beforeParagraph) &&
+        !isStartOfParagraph(beforeParagraph)) ||
        beforeParagraph == afterParagraph)) {
     // FIXME: Trim text between beforeParagraph and afterParagraph if they
     // aren't equal.
