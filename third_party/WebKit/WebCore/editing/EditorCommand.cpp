@@ -555,12 +555,10 @@ static bool executeFormatBlock(Frame* frame,
     return false;
   QualifiedName qualifiedTagName(prefix, localName, xhtmlNamespaceURI);
 
-  if (!FormatBlockCommand::isElementToApplyInFormatBlockCommand(
-          qualifiedTagName))
-    return false;
-
-  applyCommand(FormatBlockCommand::create(frame->document(), qualifiedTagName));
-  return true;
+  RefPtr<FormatBlockCommand> command =
+      FormatBlockCommand::create(frame->document(), qualifiedTagName);
+  applyCommand(command);
+  return command->didApply();
 }
 
 static bool executeForwardDelete(Frame* frame,
@@ -1806,7 +1804,12 @@ static String valueForeColor(Frame* frame, Event*) {
 }
 
 static String valueFormatBlock(Frame* frame, Event*) {
-  Element* formatBlockElement = frame->editor()->elementForFormatBlockCommand();
+  const VisibleSelection& selection = frame->selection()->selection();
+  if (!selection.isNonOrphanedCaretOrRange() || !selection.isContentEditable())
+    return "";
+  Element* formatBlockElement =
+      FormatBlockCommand::elementForFormatBlockCommand(
+          selection.firstRange().get());
   if (!formatBlockElement)
     return "";
   return formatBlockElement->localName();
