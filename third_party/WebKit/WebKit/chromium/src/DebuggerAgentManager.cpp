@@ -41,6 +41,7 @@
 #include "WebViewImpl.h"
 #include <wtf/HashSet.h>
 #include <wtf/Noncopyable.h>
+#include <wtf/text/StringConcatenate.h>
 
 namespace WebKit {
 
@@ -155,10 +156,10 @@ void DebuggerAgentManager::debugDetach(DebuggerAgentImpl* debuggerAgent) {
     }
   } else {
     // Remove all breakpoints set by the agent.
-    WTF::String clearBreakpointGroupCmd = WTF::String::format(
+    String clearBreakpointGroupCmd = makeString(
         "{\"seq\":1,\"type\":\"request\",\"command\":\"clearbreakpointgroup\","
-        "\"arguments\":{\"groupId\":%d}}",
-        hostId);
+        "\"arguments\":{\"groupId\":",
+        String::number(hostId), "}}");
     sendCommandToV8(clearBreakpointGroupCmd, new CallerIdWrapper());
 
     if (isOnBreakpoint) {

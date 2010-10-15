@@ -46,6 +46,18 @@ class StringTypeAdapter<char> {
 };
 
 template <>
+class StringTypeAdapter<UChar> {
+ public:
+  StringTypeAdapter<UChar>(UChar buffer) : m_buffer(buffer) {}
+
+  unsigned length() { return 1; }
+  void writeTo(UChar* destination) { *destination = m_buffer; }
+
+ private:
+  UChar m_buffer;
+};
+
+template <>
 class StringTypeAdapter<char*> {
  public:
   StringTypeAdapter<char*>(char* buffer)
