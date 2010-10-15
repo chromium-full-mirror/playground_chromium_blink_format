@@ -34,6 +34,8 @@
 
 namespace WebKit {
 
+class FindIndicatorWindow;
+
 // NOTE: This does not use String::operator NSString*() since that function
 // expects to be called on the thread running WebCore.
 NSString* nsStringFromWebCoreString(const String&);
@@ -75,6 +77,7 @@ class PageClientImpl : public PageClient {
 
   WKView* m_wkView;
   RetainPtr<WebEditorUndoTargetObjC> m_undoTarget;
+  OwnPtr<FindIndicatorWindow> m_findIndicatorWindow;
 };
 
 }  // namespace WebKit
