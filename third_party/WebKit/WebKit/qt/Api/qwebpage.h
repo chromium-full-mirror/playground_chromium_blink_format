@@ -313,6 +313,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
                          PermissionDomain domain,
                          PermissionPolicy policy);
 
+  QStringList supportedContentTypes() const;
+  bool supportsContentType(const QString& mimeType) const;
+
   enum Extension { ChooseMultipleFilesExtension, ErrorPageExtension };
   class ExtensionOption {};
   class ExtensionReturn {};
