@@ -1035,7 +1035,11 @@ void FrameLoaderClientImpl::committedLoad(DocumentLoader* loader,
       m_pluginWidget->didReceiveResponse(
           m_webFrame->frame()->loader()->activeDocumentLoader()->response());
     }
-    m_pluginWidget->didReceiveData(data, length);
+
+    // It's possible that the above call removed the pointer to the plugin, so
+    // check before calling it.
+    if (m_pluginWidget.get())
+      m_pluginWidget->didReceiveData(data, length);
   }
 }
 
