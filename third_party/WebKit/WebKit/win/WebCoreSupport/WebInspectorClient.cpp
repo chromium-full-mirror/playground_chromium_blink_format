@@ -281,8 +281,9 @@ void WebInspectorFrontendClient::attachWindow() {
   if (m_attached)
     return;
 
-  m_inspectedWebView->page()->inspectorController()->setSetting(
-      InspectorController::inspectorStartsAttachedSettingName(), "true");
+  // FIXME: This flag can be saved to the flags storage directly.
+  m_inspectedWebView->page()->inspectorController()->setInspectorStartsAttached(
+      true);
 
   closeWindowWithoutNotifications();
   showWindowWithoutNotifications();
@@ -292,8 +293,9 @@ void WebInspectorFrontendClient::detachWindow() {
   if (!m_attached)
     return;
 
-  m_inspectedWebView->page()->inspectorController()->setSetting(
-      InspectorController::inspectorStartsAttachedSettingName(), "false");
+  // FIXME: This flag can be saved to the flags storage directly.
+  m_inspectedWebView->page()->inspectorController()->setInspectorStartsAttached(
+      false);
 
   closeWindowWithoutNotifications();
   showWindowWithoutNotifications();
@@ -376,10 +378,10 @@ void WebInspectorFrontendClient::showWindowWithoutNotifications() {
   else {
     // If no preference is set - default to an attached window. This is
     // important for inspector LayoutTests.
-    String shouldAttachPref =
-        m_inspectedWebView->page()->inspectorController()->setting(
-            InspectorController::inspectorStartsAttachedSettingName());
-    shouldAttach = shouldAttachPref != "false";
+    // FIXME: This flag can be fetched directly from the flags storage.
+    shouldAttach = m_inspectedWebView->page()
+                       ->inspectorController()
+                       ->inspectorStartsAttached();
 
     if (shouldAttach && !canAttachWindow())
       shouldAttach = false;

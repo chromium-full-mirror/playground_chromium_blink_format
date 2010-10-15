@@ -47,8 +47,6 @@
 
 namespace WebCore {
 
-static const char* const inspectorAttachedHeightName =
-    "inspectorAttachedHeight";
 static const unsigned defaultAttachedHeight = 300;
 static const float minimumAttachedHeight = 250.0f;
 static const float maximumAttachedHeightRatio = 0.75f;
@@ -113,8 +111,7 @@ void InspectorFrontendClientLocal::changeAttachedWindowHeight(unsigned height) {
                              ->visibleHeight();
   unsigned attachedHeight =
       constrainedAttachedWindowHeight(height, totalHeight);
-  m_inspectorController->setSetting(inspectorAttachedHeightName,
-                                    String::number(attachedHeight));
+  m_inspectorController->setInspectorAttachedHeight(attachedHeight);
   setAttachedWindowHeight(attachedHeight);
 }
 
@@ -141,12 +138,10 @@ void InspectorFrontendClientLocal::restoreAttachedWindowHeight() {
                                      ->mainFrame()
                                      ->view()
                                      ->visibleHeight();
-  String attachedHeight =
-      m_inspectorController->setting(inspectorAttachedHeightName);
+  int attachedHeight = m_inspectorController->inspectorAttachedHeight();
   bool success = true;
-  int height = attachedHeight.toInt(&success);
   unsigned preferredHeight =
-      success ? static_cast<unsigned>(height) : defaultAttachedHeight;
+      success ? static_cast<unsigned>(attachedHeight) : defaultAttachedHeight;
 
   // This call might not go through (if the window starts out detached), but if
   // the window is initially created attached,
