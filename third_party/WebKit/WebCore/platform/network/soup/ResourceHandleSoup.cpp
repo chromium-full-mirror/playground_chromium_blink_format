@@ -354,6 +354,7 @@ static gboolean parseDataUrl(gpointer callbackData) {
       session, &error.outPtr()));
   if (error) {
     d->m_soupRequest = 0;
+    client->didFinishLoading(handle, 0);
     return false;
   }
 
@@ -361,6 +362,7 @@ static gboolean parseDataUrl(gpointer callbackData) {
       webkit_soup_request_send(d->m_soupRequest.get(), 0, &error.outPtr()));
   if (error) {
     d->m_inputStream = 0;
+    client->didFinishLoading(handle, 0);
     return false;
   }
 
