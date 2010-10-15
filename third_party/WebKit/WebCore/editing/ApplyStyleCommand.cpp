@@ -700,6 +700,11 @@ void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclaration* style) {
 
   VisiblePosition visibleStart(start);
   VisiblePosition visibleEnd(end);
+
+  if (visibleStart.isNull() || visibleStart.isOrphan() || visibleEnd.isNull() ||
+      visibleEnd.isOrphan())
+    return;
+
   // Save and restore the selection endpoints using their indices in the
   // document, since
   // addBlockStyleIfNeeded may moveParagraphs, which can remove these endpoints.
