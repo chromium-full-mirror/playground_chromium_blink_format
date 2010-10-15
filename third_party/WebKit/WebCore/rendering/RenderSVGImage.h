@@ -42,6 +42,7 @@ class RenderSVGImage : public RenderSVGModelObject {
   virtual ~RenderSVGImage();
 
   virtual void setNeedsTransformUpdate() { m_needsTransformUpdate = true; }
+  virtual void updateFromElement();
 
   RenderImageResource* imageResource() { return m_imageResource.get(); }
   const RenderImageResource* imageResource() const {
@@ -56,9 +57,11 @@ class RenderSVGImage : public RenderSVGModelObject {
     return m_localTransform;
   }
 
-  virtual FloatRect objectBoundingBox() const { return m_localBounds; }
-  virtual FloatRect strokeBoundingBox() const { return m_localBounds; }
-  virtual FloatRect repaintRectInLocalCoordinates() const;
+  virtual FloatRect objectBoundingBox() const { return m_objectBoundingBox; }
+  virtual FloatRect strokeBoundingBox() const { return m_objectBoundingBox; }
+  virtual FloatRect repaintRectInLocalCoordinates() const {
+    return m_repaintBoundingBox;
+  }
 
   virtual void addFocusRingRects(Vector<IntRect>&, int tx, int ty);
 
@@ -76,10 +79,11 @@ class RenderSVGImage : public RenderSVGModelObject {
 
   virtual AffineTransform localTransform() const { return m_localTransform; }
 
+  bool m_updateCachedRepaintRect : 1;
   bool m_needsTransformUpdate : 1;
   AffineTransform m_localTransform;
-  FloatRect m_localBounds;
-  mutable FloatRect m_cachedLocalRepaintRect;
+  FloatRect m_objectBoundingBox;
+  FloatRect m_repaintBoundingBox;
   OwnPtr<RenderImageResource> m_imageResource;
 };
 
