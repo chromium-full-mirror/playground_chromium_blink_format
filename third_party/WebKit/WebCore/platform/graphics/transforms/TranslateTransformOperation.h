@@ -54,6 +54,10 @@ class TranslateTransformOperation : public TransformOperation {
   }
   double z(const IntSize&) const { return m_z.calcFloatValue(1); }
 
+  Length x() const { return m_x; }
+  Length y() const { return m_y; }
+  Length z() const { return m_z; }
+
  private:
   virtual bool isIdentity() const {
     return m_x.calcFloatValue(1) == 0 && m_y.calcFloatValue(1) == 0 &&

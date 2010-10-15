@@ -36,6 +36,8 @@ class PerspectiveTransformOperation : public TransformOperation {
     return adoptRef(new PerspectiveTransformOperation(p));
   }
 
+  double perspective() const { return m_p; }
+
  private:
   virtual bool isIdentity() const { return m_p == 0; }
   virtual OperationType getOperationType() const { return PERSPECTIVE; }

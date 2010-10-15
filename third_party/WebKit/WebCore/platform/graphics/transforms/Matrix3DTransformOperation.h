@@ -37,6 +37,8 @@ class Matrix3DTransformOperation : public TransformOperation {
     return adoptRef(new Matrix3DTransformOperation(matrix));
   }
 
+  TransformationMatrix matrix() const { return m_matrix; }
+
  private:
   virtual bool isIdentity() const { return m_matrix.isIdentity(); }
 
