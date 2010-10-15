@@ -25,6 +25,10 @@
 
 #import "WKView.h"
 
+namespace WebKit {
+class FindIndicator;
+}
+
 @interface WKView (Internal)
 - (void)_processDidExit;
 - (void)_processDidRevive;
@@ -37,6 +41,9 @@
 
 - (NSRect)_convertToDeviceSpace:(NSRect)rect;
 - (NSRect)_convertToUserSpace:(NSRect)rect;
+
+- (void)_setFindIndicator:(PassRefPtr<WebKit::FindIndicator>)findIndicator
+                  fadeOut:(BOOL)fadeOut;
 
 #if USE(ACCELERATED_COMPOSITING)
 - (void)_startAcceleratedCompositing:(CALayer*)rootLayer;
