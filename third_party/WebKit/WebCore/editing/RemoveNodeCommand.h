@@ -43,7 +43,7 @@ class RemoveNodeCommand : public SimpleEditCommand {
   virtual void doUnapply();
 
   RefPtr<Node> m_node;
-  RefPtr<Node> m_parent;
+  RefPtr<ContainerNode> m_parent;
   RefPtr<Node> m_refChild;
 };
 

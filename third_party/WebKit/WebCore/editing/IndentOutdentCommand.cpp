@@ -172,7 +172,7 @@ void IndentOutdentCommand::outdentParagraph() {
     // just removed one, then this assumption isn't true. By splitting the next
     // containing blockquote after this node, we keep this assumption true
     if (splitPoint) {
-      if (Node* splitPointParent = splitPoint->parentNode()) {
+      if (ContainerNode* splitPointParent = splitPoint->parentNode()) {
         if (splitPointParent->hasTagName(blockquoteTag) &&
             !splitPoint->hasTagName(blockquoteTag) &&
             splitPointParent->parentNode()->isContentEditable())  // We can't

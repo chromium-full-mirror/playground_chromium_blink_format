@@ -581,7 +581,7 @@ XMLDocumentParser::XMLDocumentParser(
   while (parentElement) {
     elemStack.append(parentElement);
 
-    Node* n = parentElement->parentNode();
+    ContainerNode* n = parentElement->parentNode();
     if (!n || !n->isElementNode())
       break;
     parentElement = static_cast<Element*>(n);

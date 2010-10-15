@@ -921,11 +921,11 @@ static Node* serializeNodes(StyledMarkupAccumulator& accumulator,
 
       // Surround the currently accumulated markup with markup for ancestors we
       // never opened as we leave the subtree(s) rooted at those ancestors.
-      Node* nextParent = next ? next->parentNode() : 0;
+      ContainerNode* nextParent = next ? next->parentNode() : 0;
       if (next != pastEnd && n != nextParent) {
         Node* lastAncestorClosedOrSelf =
             n->isDescendantOf(lastClosed) ? lastClosed : n;
-        for (Node* parent = lastAncestorClosedOrSelf->parent();
+        for (ContainerNode* parent = lastAncestorClosedOrSelf->parent();
              parent && parent != nextParent; parent = parent->parentNode()) {
           // All ancestors that aren't in the ancestorsToClose list should
           // either be a) unrendered:
@@ -952,7 +952,7 @@ static Node* ancestorToRetainStructureAndAppearance(Node* commonAncestor) {
 
   if (commonAncestorBlock->hasTagName(tbodyTag) ||
       commonAncestorBlock->hasTagName(trTag)) {
-    Node* table = commonAncestorBlock->parentNode();
+    ContainerNode* table = commonAncestorBlock->parentNode();
     while (table && !table->hasTagName(tableTag))
       table = table->parentNode();
 
@@ -1207,7 +1207,7 @@ String createMarkup(const Range* range,
   if (specialCommonAncestor && lastClosed) {
     // Also include all of the ancestors of lastClosed up to this special
     // ancestor.
-    for (Node* ancestor = lastClosed->parentNode(); ancestor;
+    for (ContainerNode* ancestor = lastClosed->parentNode(); ancestor;
          ancestor = ancestor->parentNode()) {
       if (ancestor == fullySelectedRoot && !convertBlocksToInlines) {
         RefPtr<CSSMutableStyleDeclaration> fullySelectedRootStyle =
@@ -1265,7 +1265,7 @@ String createMarkup(const Range* range,
 
   // Add a wrapper span with the styles that all of the nodes in the markup
   // inherit.
-  Node* parentOfLastClosed = lastClosed ? lastClosed->parentNode() : 0;
+  ContainerNode* parentOfLastClosed = lastClosed ? lastClosed->parentNode() : 0;
   if (parentOfLastClosed && parentOfLastClosed->renderer()) {
     RefPtr<CSSMutableStyleDeclaration> style =
         ApplyStyleCommand::editingStyleAtPosition(

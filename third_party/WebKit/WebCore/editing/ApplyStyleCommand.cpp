@@ -1341,7 +1341,7 @@ bool ApplyStyleCommand::removeStyleFromRunBeforeApplyingStyle(
 
     Node* previousSibling = node->previousSibling();
     Node* nextSibling = node->nextSibling();
-    Node* parent = node->parentNode();
+    ContainerNode* parent = node->parentNode();
     removeInlineStyleFromElement(style, static_cast<HTMLElement*>(node),
                                  RemoveAlways);
     if (!node->inDocument()) {
@@ -1548,7 +1548,7 @@ void ApplyStyleCommand::replaceWithSpanOrRemoveIfWithoutAttributes(
     removeNodePreservingChildren(elem);
   else {
     HTMLElement* newSpanElement =
-        replaceNodeWithSpanPreservingChildrenAndAttributes(elem);
+        replaceElementWithSpanPreservingChildrenAndAttributes(elem);
     ASSERT(newSpanElement && newSpanElement->inDocument());
     elem = newSpanElement;
   }

@@ -45,7 +45,7 @@ WMLNoopElement::~WMLNoopElement() {}
 void WMLNoopElement::insertedIntoDocument() {
   WMLElement::insertedIntoDocument();
 
-  Node* parent = parentNode();
+  ContainerNode* parent = parentNode();
   if (!parent || !parent->isWMLElement())
     return;
 

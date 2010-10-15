@@ -192,7 +192,7 @@ RenderObject* HTMLFrameSetElement::createRenderer(RenderArena* arena,
 void HTMLFrameSetElement::attach() {
   // Inherit default settings from parent frameset
   // FIXME: This is not dynamic.
-  for (Node* node = parentNode(); node; node = node->parentNode()) {
+  for (ContainerNode* node = parentNode(); node; node = node->parentNode()) {
     if (node->hasTagName(framesetTag)) {
       HTMLFrameSetElement* frameset = static_cast<HTMLFrameSetElement*>(node);
       if (!frameBorderSet)

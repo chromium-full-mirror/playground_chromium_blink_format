@@ -57,7 +57,7 @@ void WMLSetvarElement::parseMappedAttribute(Attribute* attr) {
 void WMLSetvarElement::insertedIntoDocument() {
   WMLElement::insertedIntoDocument();
 
-  Node* parent = parentNode();
+  ContainerNode* parent = parentNode();
   if (!parent || !parent->isWMLElement())
     return;
 
@@ -66,7 +66,7 @@ void WMLSetvarElement::insertedIntoDocument() {
 }
 
 void WMLSetvarElement::removedFromDocument() {
-  Node* parent = parentNode();
+  ContainerNode* parent = parentNode();
   if (parent && parent->isWMLElement()) {
     if (static_cast<WMLElement*>(parent)->isWMLTaskElement())
       static_cast<WMLTaskElement*>(parent)->deregisterVariableSetter(this);

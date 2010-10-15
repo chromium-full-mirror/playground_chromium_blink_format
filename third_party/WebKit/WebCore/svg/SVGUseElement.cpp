@@ -314,7 +314,7 @@ void SVGUseElement::updateContainerOffsets() {
   SVGElement* shadowRoot = m_targetElementInstance->shadowTreeElement();
   ASSERT(shadowRoot);
 
-  Node* parentNode = shadowRoot->parentNode();
+  ContainerNode* parentNode = shadowRoot->parentNode();
   ASSERT(parentNode);
   ASSERT(parentNode->isSVGElement());
   ASSERT(parentNode->hasTagName(SVGNames::gTag));
@@ -515,7 +515,7 @@ void SVGUseElement::buildShadowAndInstanceTree(
   // Do not build the shadow/instance tree for <use> elements living in a shadow
   // tree.
   // The will be expanded soon anyway - see expandUseElementsInShadowTree().
-  Node* parent = parentNode();
+  ContainerNode* parent = parentNode();
   while (parent) {
     if (parent->isShadowNode())
       return;

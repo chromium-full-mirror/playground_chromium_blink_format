@@ -54,7 +54,7 @@ void SVGFEMergeNodeElement::svgAttributeChanged(const QualifiedName& attrName) {
   if (attrName != SVGNames::inAttr)
     return;
 
-  Node* parentNode = parent();
+  ContainerNode* parentNode = parent();
   if (!parentNode)
     return;
 

@@ -153,8 +153,8 @@ PassRefPtr<Text> Text::replaceWholeText(const String& newText, ExceptionCode&) {
 
   RefPtr<Text> protectedThis(
       this);  // Mutation event handlers could cause our last ref to go away
-  Node* parent = parentNode();  // Protect against mutation handlers moving this
-                                // node during traversal
+  ContainerNode* parent = parentNode();  // Protect against mutation handlers
+                                         // moving this node during traversal
   ExceptionCode ignored = 0;
   for (RefPtr<Node> n = startText;
        n && n != this && n->isTextNode() && n->parentNode() == parent;) {

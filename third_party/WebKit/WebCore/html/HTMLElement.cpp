@@ -501,7 +501,7 @@ void HTMLElement::setOuterText(const String& text, ExceptionCode& ec) {
     return;
   }
 
-  Node* parent = parentNode();
+  ContainerNode* parent = parentNode();
   if (!parent) {
     ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
@@ -556,9 +556,8 @@ Node* HTMLElement::insertAdjacent(const String& where,
   // Opera also appears to disallow such usage.
 
   if (equalIgnoringCase(where, "beforeBegin")) {
-    if (Node* p = parent())
-      return p->insertBefore(newChild, this, ec) ? newChild : 0;
-    return 0;
+    ContainerNode* parent = this->parent();
+    return (parent && parent->insertBefore(newChild, this, ec)) ? newChild : 0;
   }
 
   if (equalIgnoringCase(where, "afterBegin"))
@@ -568,9 +567,10 @@ Node* HTMLElement::insertAdjacent(const String& where,
     return appendChild(newChild, ec) ? newChild : 0;
 
   if (equalIgnoringCase(where, "afterEnd")) {
-    if (Node* p = parent())
-      return p->insertBefore(newChild, nextSibling(), ec) ? newChild : 0;
-    return 0;
+    ContainerNode* parent = this->parent();
+    return (parent && parent->insertBefore(newChild, nextSibling(), ec))
+               ? newChild
+               : 0;
   }
 
   // IE throws COM Exception E_INVALIDARG; this is the best DOM exception
@@ -601,7 +601,7 @@ static Element* contextElementForInsertion(const String& where,
                                            ExceptionCode& ec) {
   if (equalIgnoringCase(where, "beforeBegin") ||
       equalIgnoringCase(where, "afterEnd")) {
-    Node* parent = element->parentNode();
+    ContainerNode* parent = element->parentNode();
     if (parent && parent->isDocumentNode()) {
       ec = NO_MODIFICATION_ALLOWED_ERR;
       return 0;
@@ -838,10 +838,11 @@ RenderObject* HTMLElement::createRenderer(RenderArena* arena,
 }
 
 HTMLFormElement* HTMLElement::findFormAncestor() const {
-  for (Node* ancestor = parentNode(); ancestor;
-       ancestor = ancestor->parentNode())
+  for (ContainerNode* ancestor = parentNode(); ancestor;
+       ancestor = ancestor->parentNode()) {
     if (ancestor->hasTagName(formTag))
       return static_cast<HTMLFormElement*>(ancestor);
+  }
   return 0;
 }
 

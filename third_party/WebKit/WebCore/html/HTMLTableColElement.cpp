@@ -81,7 +81,7 @@ void HTMLTableColElement::additionalAttributeStyleDecls(
     Vector<CSSMutableStyleDeclaration*>& results) {
   if (!hasLocalName(colgroupTag))
     return;
-  Node* p = parentNode();
+  ContainerNode* p = parentNode();
   while (p && !p->hasTagName(tableTag))
     p = p->parentNode();
   if (!p)

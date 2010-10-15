@@ -72,7 +72,7 @@ void SVGFELightElement::svgAttributeChanged(const QualifiedName& attrName) {
       attrName == SVGNames::pointsAtZAttr ||
       attrName == SVGNames::specularExponentAttr ||
       attrName == SVGNames::limitingConeAngleAttr) {
-    if (Node* parentNode = parent()) {
+    if (ContainerNode* parentNode = parent()) {
       RenderObject* renderer = parentNode->renderer();
       if (renderer && renderer->isSVGResourceFilterPrimitive())
         RenderSVGResource::markForLayoutAndParentResourceInvalidation(renderer);
@@ -127,7 +127,7 @@ void SVGFELightElement::childrenChanged(bool changedByParser,
                               childCountDelta);
 
   if (!changedByParser) {
-    if (Node* parentNode = parent()) {
+    if (ContainerNode* parentNode = parent()) {
       RenderObject* renderer = parentNode->renderer();
       if (renderer && renderer->isSVGResourceFilterPrimitive())
         RenderSVGResource::markForLayoutAndParentResourceInvalidation(renderer);

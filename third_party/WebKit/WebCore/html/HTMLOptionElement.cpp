@@ -189,7 +189,7 @@ void HTMLOptionElement::childrenChanged(bool changedByParser,
 }
 
 HTMLSelectElement* HTMLOptionElement::ownerSelectElement() const {
-  Node* select = parentNode();
+  ContainerNode* select = parentNode();
   while (select &&
          !(select->hasTagName(selectTag) || select->hasTagName(keygenTag)))
     select = select->parentNode();

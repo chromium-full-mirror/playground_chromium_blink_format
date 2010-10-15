@@ -42,8 +42,7 @@ static bool isViewportElement(Node* node) {
 
 SVGElement* SVGLocatable::nearestViewportElement(const SVGElement* element) {
   ASSERT(element);
-  for (Node* n = element->parentNode(); n && !n->isDocumentNode();
-       n = n->parentNode()) {
+  for (ContainerNode* n = element->parentNode(); n; n = n->parentNode()) {
     if (isViewportElement(n))
       return static_cast<SVGElement*>(n);
   }
@@ -54,8 +53,7 @@ SVGElement* SVGLocatable::nearestViewportElement(const SVGElement* element) {
 SVGElement* SVGLocatable::farthestViewportElement(const SVGElement* element) {
   ASSERT(element);
   SVGElement* farthest = 0;
-  for (Node* n = element->parentNode(); n && !n->isDocumentNode();
-       n = n->parentNode()) {
+  for (ContainerNode* n = element->parentNode(); n; n = n->parentNode()) {
     if (isViewportElement(n))
       farthest = static_cast<SVGElement*>(n);
   }

@@ -138,7 +138,7 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
 
     // If child is already present in the tree, first remove it from the old
     // location.
-    if (Node* oldParent = child->parentNode())
+    if (ContainerNode* oldParent = child->parentNode())
       oldParent->removeChild(child, ec);
     if (ec)
       return false;
@@ -292,7 +292,7 @@ bool ContainerNode::replaceChild(PassRefPtr<Node> newChild,
     RefPtr<Node> nextChild = isFragment ? child->nextSibling() : 0;
 
     // Remove child from its old position.
-    if (Node* oldParent = child->parentNode())
+    if (ContainerNode* oldParent = child->parentNode())
       oldParent->removeChild(child.get(), ec);
     if (ec)
       return false;
@@ -584,7 +584,7 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
        ++it) {
     Node* child = it->get();
     // If child is already present in the tree, first remove it
-    if (Node* oldParent = child->parentNode()) {
+    if (ContainerNode* oldParent = child->parentNode()) {
       oldParent->removeChild(child, ec);
       if (ec)
         return false;

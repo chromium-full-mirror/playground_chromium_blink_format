@@ -82,7 +82,7 @@ void HTMLOptGroupElement::parseMappedAttribute(Attribute* attr) {
 }
 
 void HTMLOptGroupElement::recalcSelectOptions() {
-  Node* select = parentNode();
+  ContainerNode* select = parentNode();
   while (select && !select->hasTagName(selectTag))
     select = select->parentNode();
   if (select)
@@ -122,7 +122,7 @@ String HTMLOptGroupElement::groupLabelText() const {
 }
 
 HTMLSelectElement* HTMLOptGroupElement::ownerSelectElement() const {
-  Node* select = parentNode();
+  ContainerNode* select = parentNode();
   while (select && !select->hasTagName(selectTag))
     select = select->parentNode();
 

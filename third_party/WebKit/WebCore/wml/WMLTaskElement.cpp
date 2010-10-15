@@ -43,7 +43,7 @@ WMLTaskElement::~WMLTaskElement() {}
 void WMLTaskElement::insertedIntoDocument() {
   WMLElement::insertedIntoDocument();
 
-  Node* parent = parentNode();
+  ContainerNode* parent = parentNode();
   if (!parent || !parent->isWMLElement())
     return;
 
@@ -56,7 +56,7 @@ void WMLTaskElement::insertedIntoDocument() {
 }
 
 void WMLTaskElement::removedFromDocument() {
-  Node* parent = parentNode();
+  ContainerNode* parent = parentNode();
   if (parent && parent->isWMLElement()) {
     if (parent->hasTagName(anchorTag))
       static_cast<WMLAnchorElement*>(parent)->deregisterTask(this);
