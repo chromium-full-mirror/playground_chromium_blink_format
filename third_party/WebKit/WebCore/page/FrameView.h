@@ -294,6 +294,8 @@ class FrameView : public ScrollView {
   void applyOverflowToViewport(RenderObject*,
                                ScrollbarMode& hMode,
                                ScrollbarMode& vMode);
+  void calculateScrollbarModesForLayout(ScrollbarMode& hMode,
+                                        ScrollbarMode& vMode);
 
   void updateOverflowStatus(bool horizontalOverflow, bool verticalOverflow);
 
