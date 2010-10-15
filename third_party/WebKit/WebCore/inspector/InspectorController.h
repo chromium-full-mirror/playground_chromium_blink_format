@@ -144,14 +144,11 @@ class InspectorController : public Noncopyable {
   void showPanel(const String&);
   void close();
 
-  // We are in transition from JS transport via webInspector to native
-  // transport via InspectorClient. After migration, webInspector parameter
-  // should
-  // be removed.
   void connectFrontend();
   void reuseFrontend();
   void disconnectFrontend();
 
+  void setConsoleMessagesEnabled(bool enabled, bool* newState);
   void addMessageToConsole(MessageSource,
                            MessageType,
                            MessageLevel,
@@ -339,6 +336,7 @@ class InspectorController : public Noncopyable {
 
  private:
   void getInspectorState(RefPtr<InspectorObject>* state);
+  void setConsoleMessagesEnabled(bool enabled);
 
   friend class InspectorBackend;
   friend class InspectorBackendDispatcher;

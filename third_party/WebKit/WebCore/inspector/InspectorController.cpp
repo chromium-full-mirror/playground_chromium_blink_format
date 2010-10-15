@@ -304,6 +304,25 @@ void InspectorController::hideHighlight() {
   m_client->hideHighlight();
 }
 
+void InspectorController::setConsoleMessagesEnabled(bool enabled,
+                                                    bool* newState) {
+  *newState = enabled;
+  setConsoleMessagesEnabled(enabled);
+}
+
+void InspectorController::setConsoleMessagesEnabled(bool enabled) {
+  m_state->setBoolean(InspectorState::consoleMessagesEnabled, enabled);
+  if (!enabled)
+    return;
+
+  if (m_expiredConsoleMessageCount)
+    m_frontend->updateConsoleMessageExpiredCount(m_expiredConsoleMessageCount);
+  unsigned messageCount = m_consoleMessages.size();
+  for (unsigned i = 0; i < messageCount; ++i)
+    m_consoleMessages[i]->addToFrontend(m_frontend.get(),
+                                        m_injectedScriptHost.get());
+}
+
 void InspectorController::addMessageToConsole(MessageSource source,
                                               MessageType type,
                                               MessageLevel level,
@@ -339,12 +358,14 @@ void InspectorController::addConsoleMessage(
 
   if (m_previousMessage && m_previousMessage->isEqual(consoleMessage.get())) {
     m_previousMessage->incrementCount();
-    if (m_frontend)
+    if (m_state->getBoolean(InspectorState::consoleMessagesEnabled) &&
+        m_frontend)
       m_previousMessage->updateRepeatCountInConsole(m_frontend.get());
   } else {
     m_previousMessage = consoleMessage.get();
     m_consoleMessages.append(consoleMessage);
-    if (m_frontend)
+    if (m_state->getBoolean(InspectorState::consoleMessagesEnabled) &&
+        m_frontend)
       m_previousMessage->addToFrontend(m_frontend.get(),
                                        m_injectedScriptHost.get());
   }
@@ -549,6 +570,9 @@ void InspectorController::close() {
 void InspectorController::disconnectFrontend() {
   if (!m_frontend)
     return;
+
+  setConsoleMessagesEnabled(false);
+
   m_frontend.clear();
 
   InspectorInstrumentation::frontendDeleted();
@@ -626,13 +650,6 @@ void InspectorController::populateScriptObjects() {
 
   if (m_nodeToFocus)
     focusNode();
-
-  if (m_expiredConsoleMessageCount)
-    m_frontend->updateConsoleMessageExpiredCount(m_expiredConsoleMessageCount);
-  unsigned messageCount = m_consoleMessages.size();
-  for (unsigned i = 0; i < messageCount; ++i)
-    m_consoleMessages[i]->addToFrontend(m_frontend.get(),
-                                        m_injectedScriptHost.get());
 
 #if ENABLE(DATABASE)
   DatabaseResourcesMap::iterator databasesEnd = m_databaseResources.end();

@@ -60,6 +60,8 @@ InspectorState::InspectorState(InspectorClient* client) : m_client(client) {
                "inspectorAttachedHeight");
   registerLong(pauseOnExceptionsState, 0, "pauseOnExceptionsState",
                (const char*)0);
+  registerBoolean(consoleMessagesEnabled, false, "consoleMessagesEnabled",
+                  (const char*)0);
 }
 
 void InspectorState::restoreFromInspectorCookie(const String& json) {
