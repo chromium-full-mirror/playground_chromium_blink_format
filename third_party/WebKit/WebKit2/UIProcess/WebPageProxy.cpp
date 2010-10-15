@@ -26,6 +26,7 @@
 #include "WebPageProxy.h"
 
 #include "DrawingAreaProxy.h"
+#include "FindIndicator.h"
 #include "MessageID.h"
 #include "NativeWebKeyboardEvent.h"
 #include "PageClient.h"
@@ -1013,8 +1014,11 @@ void WebPageProxy::didCountStringMatches(const String& string,
 void WebPageProxy::setFindIndicator(
     const FloatRect& selectionRect,
     const Vector<FloatRect>& textRects,
-    const SharedMemory::Handle& contentImageHandle) {
-  // FIXME: Implement.
+    const SharedMemory::Handle& contentImageHandle,
+    bool fadeOut) {
+  RefPtr<FindIndicator> findIndicator =
+      FindIndicator::create(selectionRect, textRects, contentImageHandle);
+  m_pageClient->setFindIndicator(findIndicator.release(), fadeOut);
 }
 
 void WebPageProxy::registerEditCommand(

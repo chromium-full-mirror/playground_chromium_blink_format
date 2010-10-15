@@ -97,6 +97,9 @@ FloatRect QWKPagePrivate::convertToUserSpace(const FloatRect& rect) {
 
 void QWKPagePrivate::didNotHandleKeyEvent(const NativeWebKeyboardEvent&) {}
 
+void QWKPagePrivate::setFindIndicator(PassRefPtr<FindIndicator>, bool fadeOut) {
+}
+
 void QWKPagePrivate::paint(QPainter* painter, QRect area) {
   painter->save();
 

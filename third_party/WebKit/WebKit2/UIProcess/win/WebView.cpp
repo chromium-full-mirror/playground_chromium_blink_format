@@ -642,6 +642,10 @@ void WebView::didNotHandleKeyEvent(const NativeWebKeyboardEvent& event) {
                    event.nativeEvent()->wParam, event.nativeEvent()->lParam);
 }
 
+void WebView::setFindIndicator(PassRefPtr<FindIndicator>, bool fadeOut) {
+  // FIXME: Implement.
+}
+
 #if USE(ACCELERATED_COMPOSITING)
 void WebView::pageDidEnterAcceleratedCompositing() {}
 

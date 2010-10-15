@@ -36,6 +36,7 @@ struct ViewportArguments;
 
 namespace WebKit {
 
+class FindIndicator;
 class NativeWebKeyboardEvent;
 class WebEditCommandProxy;
 
@@ -64,6 +65,8 @@ class PageClient {
   virtual WebCore::FloatRect convertToUserSpace(const WebCore::FloatRect&) = 0;
 
   virtual void didNotHandleKeyEvent(const NativeWebKeyboardEvent&) = 0;
+
+  virtual void setFindIndicator(PassRefPtr<FindIndicator>, bool fadeOut) = 0;
 
 #if USE(ACCELERATED_COMPOSITING)
   virtual void pageDidEnterAcceleratedCompositing() = 0;

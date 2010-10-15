@@ -66,6 +66,8 @@ class PageClientImpl : public PageClient {
 
   virtual void didNotHandleKeyEvent(const NativeWebKeyboardEvent&);
 
+  void setFindIndicator(PassRefPtr<FindIndicator>, bool fadeOut);
+
 #if USE(ACCELERATED_COMPOSITING)
   void pageDidEnterAcceleratedCompositing();
   void pageDidLeaveAcceleratedCompositing();

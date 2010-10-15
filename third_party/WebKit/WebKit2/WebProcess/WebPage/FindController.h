@@ -54,7 +54,8 @@ class FindController {
   void findPageOverlayDestroyed();
 
  private:
-  bool updateFindIndicator(WebCore::Frame* selectedFrame);
+  bool updateFindIndicator(WebCore::Frame* selectedFrame,
+                           bool isShowingOverlay);
   void resetFindIndicator();
 
   WebPage* m_webPage;
