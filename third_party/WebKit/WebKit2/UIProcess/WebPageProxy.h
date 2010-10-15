@@ -219,6 +219,8 @@ class WebPageProxy : public APIObject {
   void didLeaveAcceleratedCompositing();
 #endif
 
+  void didDraw();
+
   enum UndoOrRedo { Undo, Redo };
   void addEditCommand(WebEditCommandProxy*);
   void removeEditCommand(WebEditCommandProxy*);

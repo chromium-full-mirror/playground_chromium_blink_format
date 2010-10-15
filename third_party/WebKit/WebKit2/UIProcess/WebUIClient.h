@@ -74,6 +74,8 @@ class WebUIClient {
                                    const String&,
                                    WebFrameProxy*);
 
+  void didDraw(WebPageProxy*);
+
  private:
   WKPageUIClient m_pageUIClient;
 };
