@@ -55,6 +55,7 @@ int equivalentYearForDST(int year);
 
 // Not really math related, but this is currently the only shared place to put
 // these.
+double parseES5DateFromNullTerminatedCharacters(const char* dateString);
 double parseDateFromNullTerminatedCharacters(const char* dateString);
 double timeClip(double);
 
