@@ -51,7 +51,7 @@ class RenderTextControl : public RenderBlock {
   void setSelectionEnd(int);
   void select();
   void setSelectionRange(int start, int end);
-  VisibleSelection selection(int start, int end) const;
+  PassRefPtr<Range> selection(int start, int end) const;
 
   virtual void subtreeHasChanged();
   String text();
