@@ -1780,7 +1780,7 @@ class ByteCompiler {
                 term.frameLocation +
                 RegexStackSpaceForBackTrackInfoParentheticalAssertion;
 
-            ASSERT(currentCountAlreadyChecked >= term.inputPosition);
+            ASSERT(currentCountAlreadyChecked >= (unsigned)term.inputPosition);
             int positiveInputOffset =
                 currentCountAlreadyChecked - term.inputPosition;
 
