@@ -1016,11 +1016,6 @@ start:
       shiftLineTerminator();
       m_atLineStart = true;
       m_terminator = true;
-      if (lastTokenWasRestrKeyword()) {
-        token = SEMICOLON;
-        m_delimited = true;
-        goto returnToken;
-      }
       goto start;
     case CharacterInvalid:
       goto returnError;
