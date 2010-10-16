@@ -118,8 +118,11 @@ void RenderFileUploadControl::chooseIconForFiles(
 }
 
 void RenderFileUploadControl::click() {
+  // Requires a user gesture to open the file dialog.
+  if (!frame() || !frame()->loader()->isProcessingUserGesture())
+    return;
   if (Chrome* chromePointer = chrome())
-    chromePointer->runOpenPanel(node()->document()->frame(), m_fileChooser);
+    chromePointer->runOpenPanel(frame(), m_fileChooser);
 }
 
 Chrome* RenderFileUploadControl::chrome() const {
