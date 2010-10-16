@@ -126,6 +126,7 @@ class WebView : public APIObject,
   virtual WebCore::FloatRect convertToDeviceSpace(const WebCore::FloatRect&);
   virtual WebCore::FloatRect convertToUserSpace(const WebCore::FloatRect&);
   virtual void didNotHandleKeyEvent(const NativeWebKeyboardEvent&);
+  virtual PassRefPtr<WebPopupMenuProxy> createPopupMenuProxy();
   virtual void setFindIndicator(PassRefPtr<FindIndicator>, bool fadeOut);
 
 #if USE(ACCELERATED_COMPOSITING)

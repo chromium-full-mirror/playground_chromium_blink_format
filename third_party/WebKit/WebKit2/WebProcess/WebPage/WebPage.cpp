@@ -48,9 +48,10 @@
 #include "WebInspectorClient.h"
 #include "WebPageCreationParameters.h"
 #include "WebPageProxyMessages.h"
-#include "WebProcessProxyMessageKinds.h"
+#include "WebPopupMenu.h"
 #include "WebPreferencesStore.h"
 #include "WebProcess.h"
+#include "WebProcessProxyMessageKinds.h"
 #include <WebCore/EventHandler.h>
 #include <WebCore/FocusController.h>
 #include <WebCore/Frame.h>
@@ -268,8 +269,12 @@ void WebPage::close() {
   if (WebProcess::shared().injectedBundle())
     WebProcess::shared().injectedBundle()->willDestroyPage(this);
 
-  m_mainFrame->coreFrame()->loader()->detachFromParent();
+  if (m_activePopupMenu) {
+    m_activePopupMenu->disconnectFromPage();
+    m_activePopupMenu = 0;
+  }
 
+  m_mainFrame->coreFrame()->loader()->detachFromParent();
   m_page.clear();
 
   WebProcess::shared().removeWebPage(m_pageID);
@@ -788,6 +793,10 @@ void WebPage::didRemoveEditCommand(uint64_t commandID) {
   removeWebEditCommand(commandID);
 }
 
+void WebPage::setActivePopupMenu(WebPopupMenu* menu) {
+  m_activePopupMenu = menu;
+}
+
 void WebPage::findString(const String& string,
                          uint32_t findDirection,
                          uint32_t findOptions,
@@ -812,6 +821,14 @@ void WebPage::countStringMatches(const String& string,
   WebProcess::shared().connection()->send(
       Messages::WebPageProxy::DidCountStringMatches(string, numMatches),
       m_pageID);
+}
+
+void WebPage::didChangeSelectedIndexForActivePopupMenu(int32_t newIndex) {
+  if (!m_activePopupMenu)
+    return;
+
+  m_activePopupMenu->didChangeSelectedIndex(newIndex);
+  m_activePopupMenu = 0;
 }
 
 #if PLATFORM(MAC)

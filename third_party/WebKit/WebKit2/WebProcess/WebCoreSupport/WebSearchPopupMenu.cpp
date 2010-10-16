@@ -21,17 +21,20 @@
 
 #include "WebSearchPopupMenu.h"
 
+using namespace WebCore;
+
 namespace WebKit {
 
 PassRefPtr<WebSearchPopupMenu> WebSearchPopupMenu::create(
-    WebCore::PopupMenuClient* client) {
-  return adoptRef(new WebSearchPopupMenu(client));
+    WebPage* page,
+    PopupMenuClient* client) {
+  return adoptRef(new WebSearchPopupMenu(page, client));
 }
 
-WebSearchPopupMenu::WebSearchPopupMenu(WebCore::PopupMenuClient* client)
-    : m_popup(WebPopupMenu::create(client)) {}
+WebSearchPopupMenu::WebSearchPopupMenu(WebPage* page, PopupMenuClient* client)
+    : m_popup(WebPopupMenu::create(page, client)) {}
 
-WebCore::PopupMenu* WebSearchPopupMenu::popupMenu() {
+PopupMenu* WebSearchPopupMenu::popupMenu() {
   return m_popup.get();
 }
 

@@ -33,6 +33,7 @@
 #include "WebEventFactory.h"
 #include "WebPageNamespace.h"
 #include "WebPageProxy.h"
+#include "WebPopupMenuProxyWin.h"
 #include <Commctrl.h>
 #include <WebCore/FloatRect.h>
 #include <WebCore/IntRect.h>
@@ -641,6 +642,10 @@ void WebView::didNotHandleKeyEvent(const NativeWebKeyboardEvent& event) {
   // event, e.g. See <http://webkit.org/b/47671>.
   ::DefWindowProcW(event.nativeEvent()->hwnd, event.nativeEvent()->message,
                    event.nativeEvent()->wParam, event.nativeEvent()->lParam);
+}
+
+PassRefPtr<WebPopupMenuProxy> WebView::createPopupMenuProxy() {
+  return WebPopupMenuProxyWin::create();
 }
 
 void WebView::setFindIndicator(PassRefPtr<FindIndicator>, bool fadeOut) {

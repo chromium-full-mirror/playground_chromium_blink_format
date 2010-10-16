@@ -61,6 +61,7 @@ class QWKPagePrivate : WebKit::PageClient {
   virtual WebCore::FloatRect convertToDeviceSpace(const WebCore::FloatRect&);
   virtual WebCore::FloatRect convertToUserSpace(const WebCore::FloatRect&);
   virtual void didNotHandleKeyEvent(const WebKit::NativeWebKeyboardEvent&);
+  virtual PassRefPtr<WebKit::WebPopupMenuProxy> createPopupMenuProxy();
 
   virtual void setFindIndicator(PassRefPtr<WebKit::FindIndicator>,
                                 bool fadeOut);
