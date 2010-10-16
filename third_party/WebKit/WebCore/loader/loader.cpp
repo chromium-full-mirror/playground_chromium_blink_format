@@ -430,6 +430,10 @@ void Loader::Host::didFinishLoading(SubresourceLoader* loader) {
   CachedResource* resource = request->cachedResource();
   ASSERT(!resource->resourceToRevalidate());
 
+  LOG(ResourceLoading, "Host '%s' received %s. Current count %d\n",
+      m_name.string().latin1().data(), resource->url().latin1().data(),
+      m_requestsLoading.size());
+
   // If we got a 4xx response, we're pretending to have received a network
   // error, so we can't send the successful data() and finish() callbacks.
   if (!resource->errorOccurred()) {
@@ -443,10 +447,6 @@ void Loader::Host::didFinishLoading(SubresourceLoader* loader) {
   cachedResourceLoader->setLoadInProgress(false);
 
   cachedResourceLoader->checkForPendingPreloads();
-
-  LOG(ResourceLoading, "Host '%s' received %s. Current count %d\n",
-      m_name.string().latin1().data(), resource->url().latin1().data(),
-      m_requestsLoading.size());
 
   servePendingRequests();
 }
@@ -476,6 +476,11 @@ void Loader::Host::didFail(SubresourceLoader* loader, bool cancelled) {
 
   CachedResource* resource = request->cachedResource();
 
+  LOG(ResourceLoading,
+      "Host '%s' failed to load %s (cancelled=%d). Current count %d\n",
+      m_name.string().latin1().data(), resource->url().latin1().data(),
+      cancelled, m_requestsLoading.size());
+
   if (resource->resourceToRevalidate())
     cache()->revalidationFailed(resource);
 
@@ -491,11 +496,6 @@ void Loader::Host::didFail(SubresourceLoader* loader, bool cancelled) {
   delete request;
 
   cachedResourceLoader->checkForPendingPreloads();
-
-  LOG(ResourceLoading,
-      "Host '%s' failed to load %s (cancelled=%d). Current count %d\n",
-      m_name.string().latin1().data(), resource->url().latin1().data(),
-      cancelled, m_requestsLoading.size());
 
   servePendingRequests();
 }
