@@ -54,7 +54,10 @@ class DirectoryReaderBase : public RefCounted<DirectoryReaderBase> {
         m_hasMoreEntries(true) {}
 
   DOMFileSystemBase* m_fileSystem;
+
+  // This is a virtual path.
   String m_fullPath;
+
   bool m_hasMoreEntries;
 };
 

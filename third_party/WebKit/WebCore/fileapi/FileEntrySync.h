@@ -40,6 +40,8 @@
 
 namespace WebCore {
 
+class File;
+
 class FileEntrySync : public EntrySync {
  public:
   static PassRefPtr<FileEntrySync> create(DOMFileSystemBase* fileSystem,
@@ -48,6 +50,8 @@ class FileEntrySync : public EntrySync {
   }
 
   virtual bool isFile() const { return true; }
+
+  PassRefPtr<File> file(ExceptionCode&);
 
  private:
   friend class EntrySync;

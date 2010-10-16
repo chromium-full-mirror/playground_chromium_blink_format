@@ -65,7 +65,10 @@ class EntryBase : public RefCounted<EntryBase> {
   friend class EntrySync;
 
   DOMFileSystemBase* m_fileSystem;
+
+  // This is a virtual path.
   String m_fullPath;
+
   String m_name;
 };
 }

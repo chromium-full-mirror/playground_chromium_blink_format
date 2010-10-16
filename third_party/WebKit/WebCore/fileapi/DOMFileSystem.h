@@ -40,6 +40,8 @@
 namespace WebCore {
 
 class DirectoryEntry;
+class File;
+class FileCallback;
 class FileEntry;
 class FileWriterCallback;
 
@@ -59,9 +61,12 @@ class DOMFileSystem : public DOMFileSystemBase, public ActiveDOMObject {
   virtual bool hasPendingActivity() const;
   virtual void contextDestroyed();
 
-  void createWriter(const FileEntry* file,
+  void createWriter(const FileEntry*,
                     PassRefPtr<FileWriterCallback>,
                     PassRefPtr<ErrorCallback>);
+  void createFile(const FileEntry*,
+                  PassRefPtr<FileCallback>,
+                  PassRefPtr<ErrorCallback>);
 
   // Schedule a callback. This should not cross threads (should be called on the
   // same context thread).

@@ -38,6 +38,8 @@
 namespace WebCore {
 
 class DirectoryEntrySync;
+class File;
+class FileEntrySync;
 
 typedef int ExceptionCode;
 
@@ -54,6 +56,8 @@ class DOMFileSystemSync : public DOMFileSystemBase {
   virtual ~DOMFileSystemSync();
 
   PassRefPtr<DirectoryEntrySync> root();
+
+  PassRefPtr<File> createFile(const FileEntrySync*, ExceptionCode&);
 
  private:
   DOMFileSystemSync(const String& name, PassOwnPtr<AsyncFileSystem>);
