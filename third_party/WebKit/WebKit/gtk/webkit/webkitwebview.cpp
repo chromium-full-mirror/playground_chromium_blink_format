@@ -2840,11 +2840,11 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       enablePlugins, enableDeveloperExtras, resizableTextAreas,
       enablePrivateBrowsing, enableCaretBrowsing, enableHTML5Database,
       enableHTML5LocalStorage, enableXSSAuditor, enableSpatialNavigation,
-      javascriptCanOpenWindows, javaScriptCanAccessClipboard,
-      enableOfflineWebAppCache, enableUniversalAccessFromFileURI,
-      enableFileAccessFromFileURI, enableDOMPaste, tabKeyCyclesThroughElements,
-      enableSiteSpecificQuirks, usePageCache, enableJavaApplet,
-      enableHyperlinkAuditing;
+      enableFrameFlattening, javascriptCanOpenWindows,
+      javaScriptCanAccessClipboard, enableOfflineWebAppCache,
+      enableUniversalAccessFromFileURI, enableFileAccessFromFileURI,
+      enableDOMPaste, tabKeyCyclesThroughElements, enableSiteSpecificQuirks,
+      usePageCache, enableJavaApplet, enableHyperlinkAuditing;
 
   WebKitEditingBehavior editingBehavior;
 
@@ -2864,6 +2864,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       &enableHTML5Database, "enable-html5-local-storage",
       &enableHTML5LocalStorage, "enable-xss-auditor", &enableXSSAuditor,
       "enable-spatial-navigation", &enableSpatialNavigation,
+      "enable-frame-flattening", &enableFrameFlattening,
       "javascript-can-open-windows-automatically", &javascriptCanOpenWindows,
       "javascript-can-access-clipboard", &javaScriptCanAccessClipboard,
       "enable-offline-web-application-cache", &enableOfflineWebAppCache,
@@ -2900,6 +2901,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   settings->setLocalStorageEnabled(enableHTML5LocalStorage);
   settings->setXSSAuditorEnabled(enableXSSAuditor);
   settings->setSpatialNavigationEnabled(enableSpatialNavigation);
+  settings->setFrameFlatteningEnabled(enableFrameFlattening);
   settings->setJavaScriptCanOpenWindowsAutomatically(javascriptCanOpenWindows);
   settings->setJavaScriptCanAccessClipboard(javaScriptCanAccessClipboard);
   settings->setOfflineWebApplicationCacheEnabled(enableOfflineWebAppCache);
@@ -3004,6 +3006,8 @@ static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
     settings->setXSSAuditorEnabled(g_value_get_boolean(&value));
   else if (name == g_intern_string("enable-spatial-navigation"))
     settings->setSpatialNavigationEnabled(g_value_get_boolean(&value));
+  else if (name == g_intern_string("enable-frame-flattening"))
+    settings->setFrameFlatteningEnabled(g_value_get_boolean(&value));
   else if (name == g_intern_string("javascript-can-open-windows-automatically"))
     settings->setJavaScriptCanOpenWindowsAutomatically(
         g_value_get_boolean(&value));
