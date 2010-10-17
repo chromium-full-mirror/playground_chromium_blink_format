@@ -168,7 +168,6 @@ void RenderMathMLOperator::updateFromElement() {
   // We only stretch character if the stretch height is larger than a minimum
   // size (e.g. 24px).
   bool shouldStretch = isStretchy && m_stretchHeight > gMinimumStretchHeight;
-  m_isCentered = true;
 
   // Either stretch is disabled or we don't have a stretchable character over
   // the minimum height
@@ -179,6 +178,7 @@ void RenderMathMLOperator::updateFromElement() {
     RefPtr<RenderStyle> newStyle = RenderStyle::create();
     newStyle->inheritFrom(style());
     newStyle->setDisplay(INLINE_BLOCK);
+    newStyle->setVerticalAlign(BASELINE);
 
     // Check for a stretchable character that is under the minimum height and
     // use the
@@ -193,19 +193,6 @@ void RenderMathMLOperator::updateFromElement() {
       desc.setComputedSize(m_stretchHeight);
       newStyle->setFontDescription(desc);
       newStyle->font().update(newStyle->font().fontSelector());
-      newStyle->setVerticalAlign(BASELINE);
-      m_isCentered = false;
-    } else {
-      int topPad = (m_stretchHeight - currentFontSize) / 2;
-
-      if (topPad / static_cast<float>(m_stretchHeight) >
-          gMinimumRatioForStretch) {
-        newStyle->setVerticalAlign(TOP);
-        newStyle->setPaddingTop(Length(topPad, Fixed));
-      } else {
-        m_isCentered = false;
-        newStyle->setVerticalAlign(BASELINE);
-      }
     }
 
     container->setStyle(newStyle.release());
@@ -368,8 +355,7 @@ int RenderMathMLOperator::baselinePosition(bool firstLine,
            (m_stretchHeight -
             static_cast<int>(m_stretchHeight / gOperatorExpansion)) /
                2;
-  if (m_isCentered && firstChild())
-    return firstChild()->baselinePosition(firstLine, isRootLineBox);
+
   return RenderBlock::baselinePosition(firstLine, isRootLineBox);
 }
 }
