@@ -111,9 +111,12 @@ class ScheduledURLNavigation : public ScheduledNavigation {
         m_haveToldClient(false) {}
 
   virtual void fire(Frame* frame) {
+    UserGestureIndicator gestureIndicator(
+        wasUserGesture() ? DefinitelyProcessingUserGesture
+                         : DefinitelyNotProcessingUserGesture);
     frame->loader()->changeLocation(KURL(ParsedURLString, m_url), m_referrer,
                                     lockHistory(), lockBackForwardList(),
-                                    wasUserGesture(), false);
+                                    false);
   }
 
   virtual void didStartTimer(Frame* frame, Timer<NavigationScheduler>* timer) {
@@ -194,9 +197,11 @@ class ScheduledRefresh : public ScheduledURLNavigation {
                                true) {}
 
   virtual void fire(Frame* frame) {
+    UserGestureIndicator gestureIndicator(
+        wasUserGesture() ? DefinitelyProcessingUserGesture
+                         : DefinitelyNotProcessingUserGesture);
     frame->loader()->changeLocation(KURL(ParsedURLString, url()), referrer(),
-                                    lockHistory(), lockBackForwardList(),
-                                    wasUserGesture(), true);
+                                    lockHistory(), lockBackForwardList(), true);
   }
 };
 
@@ -217,8 +222,7 @@ class ScheduledHistoryNavigation : public ScheduledNavigation {
       // To follow Firefox and IE's behavior, history reload can only navigate
       // the self frame.
       loader->urlSelected(loader->url(), "_self", 0, lockHistory(),
-                          lockBackForwardList(), wasUserGesture(),
-                          SendReferrer);
+                          lockBackForwardList(), SendReferrer);
       return;
     }
     // go(i!=0) from a frame navigates into the history of the frame only,
@@ -369,7 +373,7 @@ void NavigationScheduler::scheduleLocationChange(const String& url,
   if (parsedURL.hasFragmentIdentifier() &&
       equalIgnoringFragmentIdentifier(loader->url(), parsedURL)) {
     loader->changeLocation(loader->completeURL(url), referrer, lockHistory,
-                           lockBackForwardList, wasUserGesture);
+                           lockBackForwardList);
     return;
   }
 

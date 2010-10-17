@@ -76,7 +76,6 @@ ScriptValue ScriptController::executeScript(const ScriptSourceCode& sourceCode,
 
 bool ScriptController::executeIfJavaScriptURL(
     const KURL& url,
-    bool userGesture,
     ShouldReplaceDocumentIfJavaScriptURL shouldReplaceDocumentIfJavaScriptURL) {
   if (!protocolIsJavaScript(url))
     return false;
@@ -100,7 +99,7 @@ bool ScriptController::executeIfJavaScriptURL(
   ScriptValue result;
   if (xssAuditor()->canEvaluateJavaScriptURL(decodedURL))
     result = executeScript(decodedURL.substring(javascriptSchemeLength),
-                           userGesture, AllowXSS);
+                           processingUserGesture(), AllowXSS);
 
   // If executing script caused this frame to be removed from the page, we
   // don't want to try to replace its document!

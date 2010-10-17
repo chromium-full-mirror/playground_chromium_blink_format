@@ -124,14 +124,11 @@ Frame* BindingDOMWindow<Binding>::createWindow(
       BindingSecurity<Binding>::canAccessFrame(state, newFrame, true)) {
     KURL completedUrl =
         url.isEmpty() ? KURL(ParsedURLString, "") : completeURL(state, url);
-    bool userGesture = state->processingUserGesture();
-
     if (created)
-      newFrame->loader()->changeLocation(completedUrl, referrer, false, false,
-                                         userGesture);
+      newFrame->loader()->changeLocation(completedUrl, referrer, false, false);
     else if (!url.isEmpty())
       newFrame->navigationScheduler()->scheduleLocationChange(
-          completedUrl.string(), referrer, false, false, userGesture);
+          completedUrl.string(), referrer, false, false);
   }
 
   return newFrame;
@@ -194,14 +191,12 @@ WebCore::DOMWindow* BindingDOMWindow<Binding>::open(
     if (!completedUrl.isEmpty() &&
         (!protocolIsJavaScript(completedUrl) ||
          BindingSecurity<Binding>::canAccessFrame(state, frame, true))) {
-      bool userGesture = state->processingUserGesture();
-
       // For whatever reason, Firefox uses the first frame to determine
       // the outgoingReferrer.  We replicate that behavior here.
       String referrer = firstFrame->loader()->outgoingReferrer();
 
       frame->navigationScheduler()->scheduleLocationChange(
-          completedUrl, referrer, false, false, userGesture);
+          completedUrl, referrer, false, false);
     }
     return frame->domWindow();
   }

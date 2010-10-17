@@ -775,16 +775,12 @@ static Frame* createWindow(ExecState* exec,
   if (!protocolIsJavaScript(url) || newWindow->allowsAccessFrom(exec)) {
     KURL completedURL =
         url.isEmpty() ? KURL(ParsedURLString, "") : completeURL(exec, url);
-    bool userGesture = processingUserGesture();
-
     if (created)
-      newFrame->loader()->changeLocation(completedURL, referrer, false, false,
-                                         userGesture);
+      newFrame->loader()->changeLocation(completedURL, referrer, false, false);
     else if (!url.isEmpty())
       newFrame->navigationScheduler()->scheduleLocationChange(
           completedURL.string(), referrer,
-          !lexicalFrame->script()->anyPageIsProcessingUserGesture(), false,
-          userGesture);
+          !lexicalFrame->script()->anyPageIsProcessingUserGesture(), false);
   }
 
   return newFrame;
@@ -851,8 +847,6 @@ JSValue JSDOMWindow::open(ExecState* exec) {
     if (!completedURL.isEmpty() &&
         (!protocolIsJavaScript(completedURL) ||
          (targetedWindow && targetedWindow->allowsAccessFrom(exec)))) {
-      bool userGesture = processingUserGesture();
-
       // For whatever reason, Firefox uses the dynamicGlobalObject to
       // determine the outgoingReferrer.  We replicate that behavior
       // here.
@@ -860,8 +854,7 @@ JSValue JSDOMWindow::open(ExecState* exec) {
 
       frame->navigationScheduler()->scheduleLocationChange(
           completedURL, referrer,
-          !lexicalFrame->script()->anyPageIsProcessingUserGesture(), false,
-          userGesture);
+          !lexicalFrame->script()->anyPageIsProcessingUserGesture(), false);
     }
     return toJS(exec, frame->domWindow());
   }

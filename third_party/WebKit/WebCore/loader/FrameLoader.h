@@ -242,14 +242,12 @@ class FrameLoader : public Noncopyable {
                       const String& referrer,
                       bool lockHistory = true,
                       bool lockBackForwardList = true,
-                      bool userGesture = false,
                       bool refresh = false);
   void urlSelected(const KURL&,
                    const String& target,
                    PassRefPtr<Event>,
                    bool lockHistory,
                    bool lockBackForwardList,
-                   bool userGesture,
                    ReferrerPolicy);
 
   void submitForm(PassRefPtr<FormSubmission>);
@@ -468,7 +466,6 @@ class FrameLoader : public Noncopyable {
                    PassRefPtr<Event>,
                    bool lockHistory,
                    bool lockBackForwardList,
-                   bool userGesture,
                    ReferrerPolicy,
                    ShouldReplaceDocumentIfJavaScriptURL);
 

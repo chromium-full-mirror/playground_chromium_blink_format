@@ -280,7 +280,6 @@ void FrameLoader::changeLocation(const KURL& url,
                                  const String& referrer,
                                  bool lockHistory,
                                  bool lockBackForwardList,
-                                 bool userGesture,
                                  bool refresh) {
   RefPtr<Frame> protect(m_frame);
 
@@ -288,7 +287,7 @@ void FrameLoader::changeLocation(const KURL& url,
                                                  : UseProtocolCachePolicy);
 
   urlSelected(request, "_self", 0, lockHistory, lockBackForwardList,
-              userGesture, SendReferrer, ReplaceDocumentIfJavaScriptURL);
+              SendReferrer, ReplaceDocumentIfJavaScriptURL);
 }
 
 void FrameLoader::urlSelected(const KURL& url,
@@ -296,10 +295,9 @@ void FrameLoader::urlSelected(const KURL& url,
                               PassRefPtr<Event> triggeringEvent,
                               bool lockHistory,
                               bool lockBackForwardList,
-                              bool userGesture,
                               ReferrerPolicy referrerPolicy) {
   urlSelected(ResourceRequest(url), passedTarget, triggeringEvent, lockHistory,
-              lockBackForwardList, userGesture, referrerPolicy,
+              lockBackForwardList, referrerPolicy,
               DoNotReplaceDocumentIfJavaScriptURL);
 }
 
@@ -313,13 +311,12 @@ void FrameLoader::urlSelected(
     PassRefPtr<Event> triggeringEvent,
     bool lockHistory,
     bool lockBackForwardList,
-    bool userGesture,
     ReferrerPolicy referrerPolicy,
     ShouldReplaceDocumentIfJavaScriptURL shouldReplaceDocumentIfJavaScriptURL) {
   ASSERT(!m_suppressOpenerInNewFrame);
 
   if (m_frame->script()->executeIfJavaScriptURL(
-          request.url(), userGesture, shouldReplaceDocumentIfJavaScriptURL))
+          request.url(), shouldReplaceDocumentIfJavaScriptURL))
     return;
 
   String target = passedTarget;
@@ -361,7 +358,7 @@ void FrameLoader::submitForm(PassRefPtr<FormSubmission> submission) {
   if (protocolIsJavaScript(submission->action())) {
     m_isExecutingJavaScriptFormAction = true;
     m_frame->script()->executeIfJavaScriptURL(
-        submission->action(), false, DoNotReplaceDocumentIfJavaScriptURL);
+        submission->action(), DoNotReplaceDocumentIfJavaScriptURL);
     m_isExecutingJavaScriptFormAction = false;
     return;
   }

@@ -80,7 +80,6 @@ class ScriptController {
 
   // Returns true if argument is a JavaScript URL.
   bool executeIfJavaScriptURL(const KURL&,
-                              bool userGesture = false,
                               ShouldReplaceDocumentIfJavaScriptURL
                                   shouldReplaceDocumentIfJavaScriptURL =
                                       ReplaceDocumentIfJavaScriptURL);
