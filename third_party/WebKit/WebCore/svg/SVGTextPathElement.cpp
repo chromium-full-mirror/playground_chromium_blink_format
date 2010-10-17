@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 Nikolas Zimmermann <zimmermann@kde.org>
+ * Copyright (C) 2010 Rob Buis <rwlbuis@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -117,6 +118,7 @@ bool SVGTextPathElement::childShouldCreateRenderer(Node* child) const {
 #endif
       || child->hasTagName(SVGNames::trefTag) ||
       child->hasTagName(SVGNames::tspanTag) ||
+      child->hasTagName(SVGNames::aTag) ||
       child->hasTagName(SVGNames::textPathTag))
     return true;
 
