@@ -117,6 +117,7 @@ class MarkupAccumulator {
   void appendCDATASection(Vector<UChar>& out, const String& section);
   void appendStartMarkup(Vector<UChar>& result, const Node*, Namespaces*);
   bool shouldSelfClose(const Node*);
+  bool elementCannotHaveEndTag(const Node* node);
   void appendEndMarkup(Vector<UChar>& result, const Node*);
 
   bool shouldResolveURLs() { return m_shouldResolveURLs == AbsoluteURLs; }
