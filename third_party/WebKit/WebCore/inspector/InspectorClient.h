@@ -58,6 +58,9 @@ class InspectorClient {
   // or recording timeline). Following callbacks allow embedders to track these
   // states.
   virtual void updateInspectorStateCookie(const String&){};
+
+  bool doDispatchMessageOnFrontendPage(Page* frontendPage,
+                                       const String& message);
 };
 
 }  // namespace WebCore
