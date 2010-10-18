@@ -105,10 +105,6 @@ void PageClientQGraphicsWidget::scroll(int dx,
                                        int dy,
                                        const QRect& rectToScroll) {
   view->scroll(qreal(dx), qreal(dy), rectToScroll);
-
-#if USE(ACCELERATED_COMPOSITING)
-  updateCompositingScrollPosition();
-#endif
 }
 
 void PageClientQGraphicsWidget::update(const QRect& dirtyRect) {
@@ -119,9 +115,6 @@ void PageClientQGraphicsWidget::update(const QRect& dirtyRect) {
     overlay->update(QRectF(dirtyRect));
 #if USE(ACCELERATED_COMPOSITING)
   syncLayers();
-  // This might be a slow-scroll. We ensure that the compositing layers are in
-  // the right position.
-  updateCompositingScrollPosition();
 #endif
 }
 
@@ -174,7 +167,6 @@ void PageClientQGraphicsWidget::setRootGraphicsLayer(QGraphicsItem* layer) {
     layer->setFlag(QGraphicsItem::ItemClipsChildrenToShape, true);
     layer->setParentItem(view);
     layer->setZValue(RootGraphicsLayerZValue);
-    updateCompositingScrollPosition();
   }
   createOrDeleteOverlay();
 }
@@ -185,12 +177,6 @@ void PageClientQGraphicsWidget::markForSync(bool scheduleSync) {
     syncMetaMethod.invoke(view, Qt::QueuedConnection);
 }
 
-void PageClientQGraphicsWidget::updateCompositingScrollPosition() {
-  if (rootGraphicsLayer && page && page->mainFrame()) {
-    const QPoint scrollPosition = page->mainFrame()->scrollPosition();
-    rootGraphicsLayer.data()->setPos(-scrollPosition);
-  }
-}
 #endif
 
 #if ENABLE(TILED_BACKING_STORE)
