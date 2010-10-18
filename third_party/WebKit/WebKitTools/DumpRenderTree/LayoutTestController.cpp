@@ -2557,6 +2557,24 @@ static JSValueRef abortModalCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef hasSpellingMarkerCallback(JSContextRef context,
+                                            JSObjectRef function,
+                                            JSObjectRef thisObject,
+                                            size_t argumentCount,
+                                            const JSValueRef arguments[],
+                                            JSValueRef* exception) {
+  if (argumentCount != 2)
+    return JSValueMakeUndefined(context);
+
+  int from = JSValueToNumber(context, arguments[0], 0);
+  int length = JSValueToNumber(context, arguments[1], 0);
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  bool ok = controller->hasSpellingMarker(from, length);
+
+  return JSValueMakeBoolean(context, ok);
+}
+
 static JSValueRef markerTextForListItemCallback(JSContextRef context,
                                                 JSObjectRef,
                                                 JSObjectRef thisObject,
@@ -2825,6 +2843,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"grantDesktopNotificationPermission",
        grantDesktopNotificationPermissionCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"hasSpellingMarker", hasSpellingMarkerCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"isCommandEnabled", isCommandEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

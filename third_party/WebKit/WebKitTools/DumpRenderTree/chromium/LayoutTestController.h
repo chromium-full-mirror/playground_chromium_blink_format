@@ -332,6 +332,7 @@ class LayoutTestController : public CppBoundClass {
   void layerTreeAsText(const CppArgumentList& args, CppVariant* result);
 
   void markerTextForListItem(const CppArgumentList&, CppVariant*);
+  void hasSpellingMarker(const CppArgumentList&, CppVariant*);
 
  public:
   // The following methods are not exposed to JavaScript.

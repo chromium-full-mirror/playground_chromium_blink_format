@@ -833,3 +833,8 @@ void LayoutTestController::setEditingBehavior(const char* editingBehavior) {
 }
 
 void LayoutTestController::abortModal() {}
+
+bool LayoutTestController::hasSpellingMarker(int, int) {
+  // FIXME: Implement this.
+  return false;
+}

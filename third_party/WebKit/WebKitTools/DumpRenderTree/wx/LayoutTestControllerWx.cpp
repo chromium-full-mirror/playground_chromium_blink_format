@@ -450,6 +450,11 @@ void LayoutTestController::setEditingBehavior(const char* editingBehavior) {
 
 void LayoutTestController::abortModal() {}
 
+bool LayoutTestController::hasSpellingMarker(int, int) {
+  // FIXME: Implement
+  return false;
+}
+
 JSRetainPtr<JSStringRef> LayoutTestController::pageProperty(
     const char* propertyName,
     int pageNumber) const {

@@ -122,6 +122,7 @@ LayoutTestController::LayoutTestController(TestShell* shell)
   bindMethod("layerTreeAsText", &LayoutTestController::layerTreeAsText);
   bindMethod("markerTextForListItem",
              &LayoutTestController::markerTextForListItem);
+  bindMethod("hasSpellingMarker", &LayoutTestController::hasSpellingMarker);
   bindMethod("notifyDone", &LayoutTestController::notifyDone);
   bindMethod("numberOfActiveAnimations",
              &LayoutTestController::numberOfActiveAnimations);
@@ -1710,4 +1711,14 @@ WebDeviceOrientationClient* LayoutTestController::deviceOrientationClient() {
   if (!m_deviceOrientationClientMock.get())
     m_deviceOrientationClientMock.set(WebDeviceOrientationClientMock::create());
   return m_deviceOrientationClientMock.get();
+}
+
+void LayoutTestController::hasSpellingMarker(const CppArgumentList& arguments,
+                                             CppVariant* result) {
+  if (arguments.size() < 2 || !arguments[0].isNumber() ||
+      !arguments[1].isNumber())
+    return;
+  result->set(
+      m_shell->webView()->mainFrame()->selectionStartHasSpellingMarkerFor(
+          arguments[0].toInt32(), arguments[1].toInt32()));
 }

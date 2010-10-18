@@ -800,5 +800,10 @@ void LayoutTestController::removeAllVisitedLinks() {
   DumpRenderTreeSupportQt::dumpVisitedLinksCallbacks(true);
 }
 
+bool LayoutTestController::hasSpellingMarker(int, int) {
+  // FIXME: Implement.
+  return false;
+}
+
 const unsigned LayoutTestController::maxViewWidth = 800;
 const unsigned LayoutTestController::maxViewHeight = 600;
