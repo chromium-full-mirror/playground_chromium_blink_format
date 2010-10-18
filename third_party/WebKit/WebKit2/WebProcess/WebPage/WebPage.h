@@ -264,6 +264,7 @@ class WebPage : public APIObject {
   RefPtr<DrawingArea> m_drawingArea;
 
   bool m_isInRedo;
+  bool m_isClosed;
 
 #if PLATFORM(MAC)
   // Whether the containing window is visible or not.
