@@ -177,10 +177,10 @@ void WKPageFindString(WKPageRef pageRef,
                       WKStringRef string,
                       WKFindDirection findDirection,
                       WKFindOptions findOptions,
-                      unsigned maxNumMatches) {
+                      unsigned maxMatchCount) {
   toImpl(pageRef)->findString(toImpl(string)->string(),
                               toFindDirection(findDirection),
-                              toFindOptions(findOptions), maxNumMatches);
+                              toFindOptions(findOptions), maxMatchCount);
 }
 
 void WKPageHideFindUI(WKPageRef pageRef) {
@@ -190,9 +190,9 @@ void WKPageHideFindUI(WKPageRef pageRef) {
 void WKPageCountStringMatches(WKPageRef pageRef,
                               WKStringRef string,
                               bool caseInsensitive,
-                              unsigned maxNumMatches) {
+                              unsigned maxMatchCount) {
   toImpl(pageRef)->countStringMatches(toImpl(string)->string(), caseInsensitive,
-                                      maxNumMatches);
+                                      maxMatchCount);
 }
 
 void WKPageSetPageLoaderClient(WKPageRef pageRef,

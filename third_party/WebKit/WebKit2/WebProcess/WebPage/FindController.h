@@ -48,8 +48,11 @@ class FindController {
   void findString(const String&,
                   FindDirection,
                   FindOptions,
-                  unsigned maxNumMatches);
+                  unsigned maxMatchCount);
   void hideFindUI();
+  void countStringMatches(const String&,
+                          bool caseInsensitive,
+                          unsigned maxMatchCount);
 
   void findPageOverlayDestroyed();
 

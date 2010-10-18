@@ -492,9 +492,9 @@ void WebPageProxy::setPageAndTextZoomFactors(double pageZoomFactor,
 void WebPageProxy::findString(const String& string,
                               FindDirection findDirection,
                               FindOptions findOptions,
-                              unsigned maxNumMatches) {
+                              unsigned maxMatchCount) {
   process()->send(Messages::WebPage::FindString(string, findDirection,
-                                                findOptions, maxNumMatches),
+                                                findOptions, maxMatchCount),
                   m_pageID);
 }
 
@@ -504,9 +504,9 @@ void WebPageProxy::hideFindUI() {
 
 void WebPageProxy::countStringMatches(const String& string,
                                       bool caseInsensitive,
-                                      unsigned maxNumMatches) {
+                                      unsigned maxMatchCount) {
   process()->send(Messages::WebPage::CountStringMatches(string, caseInsensitive,
-                                                        maxNumMatches),
+                                                        maxMatchCount),
                   m_pageID);
 }
 
@@ -1015,8 +1015,8 @@ void WebPageProxy::clearAllEditCommands() {
 }
 
 void WebPageProxy::didCountStringMatches(const String& string,
-                                         uint32_t numMatches) {
-  m_findClient.didCountStringMatches(this, string, numMatches);
+                                         uint32_t matchCount) {
+  m_findClient.didCountStringMatches(this, string, matchCount);
 }
 
 void WebPageProxy::setFindIndicator(
@@ -1027,6 +1027,11 @@ void WebPageProxy::setFindIndicator(
   RefPtr<FindIndicator> findIndicator =
       FindIndicator::create(selectionRect, textRects, contentImageHandle);
   m_pageClient->setFindIndicator(findIndicator.release(), fadeOut);
+}
+
+void WebPageProxy::matchCountDidChange(const String& string,
+                                       uint32_t matchCount) {
+  m_findClient.matchCountDidChange(this, string, matchCount);
 }
 
 void WebPageProxy::showPopupMenu(const IntRect& rect,

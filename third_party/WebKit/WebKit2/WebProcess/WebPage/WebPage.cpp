@@ -800,10 +800,10 @@ void WebPage::setActivePopupMenu(WebPopupMenu* menu) {
 void WebPage::findString(const String& string,
                          uint32_t findDirection,
                          uint32_t findOptions,
-                         uint32_t maxNumMatches) {
+                         uint32_t maxMatchCount) {
   m_findController.findString(string, static_cast<FindDirection>(findDirection),
                               static_cast<FindOptions>(findOptions),
-                              maxNumMatches);
+                              maxMatchCount);
 }
 
 void WebPage::hideFindUI() {
@@ -812,15 +812,8 @@ void WebPage::hideFindUI() {
 
 void WebPage::countStringMatches(const String& string,
                                  bool caseInsensitive,
-                                 uint32_t maxNumMatches) {
-  unsigned numMatches = m_page->markAllMatchesForText(
-      string, caseInsensitive ? TextCaseInsensitive : TextCaseSensitive, false,
-      maxNumMatches);
-  m_page->unmarkAllTextMatches();
-
-  WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidCountStringMatches(string, numMatches),
-      m_pageID);
+                                 uint32_t maxMatchCount) {
+  m_findController.countStringMatches(string, caseInsensitive, maxMatchCount);
 }
 
 void WebPage::didChangeSelectedIndexForActivePopupMenu(int32_t newIndex) {

@@ -277,14 +277,19 @@ struct WKPageUIClient {
 typedef struct WKPageUIClient WKPageUIClient;
 
 // Find client.
+typedef void (*WKPageMatchCountDidChangeCallback)(WKPageRef page,
+                                                  WKStringRef string,
+                                                  unsigned matchCount,
+                                                  const void* clientInfo);
 typedef void (*WKPageDidCountStringMatchesCallback)(WKPageRef page,
                                                     WKStringRef string,
-                                                    unsigned numMatches,
+                                                    unsigned matchCount,
                                                     const void* clientInfo);
 
 struct WKPageFindClient {
   int version;
   const void* clientInfo;
+  WKPageMatchCountDidChangeCallback matchCountDidChange;
   WKPageDidCountStringMatchesCallback didCountStringMatches;
 };
 typedef struct WKPageFindClient WKPageFindClient;
@@ -363,12 +368,12 @@ WK_EXPORT void WKPageFindString(WKPageRef page,
                                 WKStringRef string,
                                 WKFindDirection findDirection,
                                 WKFindOptions findOptions,
-                                unsigned maxNumMatches);
+                                unsigned maxMatchCount);
 WK_EXPORT void WKPageHideFindUI(WKPageRef page);
 WK_EXPORT void WKPageCountStringMatches(WKPageRef page,
                                         WKStringRef string,
                                         bool caseInsensitive,
-                                        unsigned maxNumMatches);
+                                        unsigned maxMatchCount);
 
 WK_EXPORT void WKPageSetPageLoaderClient(WKPageRef page,
                                          const WKPageLoaderClient* client);

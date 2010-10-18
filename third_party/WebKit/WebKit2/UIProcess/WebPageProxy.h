@@ -187,11 +187,11 @@ class WebPageProxy : public APIObject {
   void findString(const String&,
                   FindDirection,
                   FindOptions,
-                  unsigned maxNumMatches);
+                  unsigned maxMatchCount);
   void hideFindUI();
   void countStringMatches(const String&,
                           bool caseInsensitive,
-                          unsigned maxNumMatches);
+                          unsigned maxMatchCount);
 
   void runJavaScriptInMainFrame(const String&,
                                 PassRefPtr<ScriptReturnValueCallback>);
@@ -345,11 +345,12 @@ class WebPageProxy : public APIObject {
   void clearAllEditCommands();
 
   // Find.
-  void didCountStringMatches(const String&, uint32_t numMatches);
+  void didCountStringMatches(const String&, uint32_t matchCount);
   void setFindIndicator(const WebCore::FloatRect& selectionRect,
                         const Vector<WebCore::FloatRect>& textRects,
                         const SharedMemory::Handle& contentImageHandle,
                         bool fadeOut);
+  void matchCountDidChange(const String&, uint32_t matchCount);
 
   // Popup Menu.
   void showPopupMenu(const WebCore::IntRect& rect,

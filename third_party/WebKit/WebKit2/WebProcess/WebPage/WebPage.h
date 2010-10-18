@@ -247,11 +247,11 @@ class WebPage : public APIObject {
   void findString(const String&,
                   uint32_t findDirection,
                   uint32_t findOptions,
-                  uint32_t maxNumMatches);
+                  uint32_t maxMatchCount);
   void hideFindUI();
   void countStringMatches(const String&,
                           bool caseInsensitive,
-                          uint32_t maxNumMatches);
+                          uint32_t maxMatchCount);
 
   void didChangeSelectedIndexForActivePopupMenu(int32_t newIndex);
 
