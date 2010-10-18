@@ -142,4 +142,14 @@ void FindPageOverlay::drawRect(GraphicsContext& graphicsContext,
   graphicsContext.endTransparencyLayer();
 }
 
+bool FindPageOverlay::mouseEvent(const WebMouseEvent& event) {
+  if (event.type() == WebEvent::MouseDown) {
+    // Dismiss the overlay.
+    m_findController->hideFindUI();
+    return false;
+  }
+
+  return false;
+}
+
 }  // namespace WebKit

@@ -35,6 +35,7 @@ class IntRect;
 
 namespace WebKit {
 
+class WebMouseEvent;
 class WebPage;
 
 class PageOverlay {
@@ -44,6 +45,7 @@ class PageOverlay {
   virtual ~PageOverlay();
   virtual void drawRect(WebCore::GraphicsContext&,
                         const WebCore::IntRect& dirtyRect) = 0;
+  virtual bool mouseEvent(const WebMouseEvent&) = 0;
 
   void setPage(WebPage*);
   void setNeedsDisplay();
