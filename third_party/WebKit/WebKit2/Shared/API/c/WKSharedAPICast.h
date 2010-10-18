@@ -48,6 +48,7 @@ class WebError;
 class WebSerializedScriptValue;
 class WebURLRequest;
 class WebURLResponse;
+class WebUserContentURLPattern;
 
 template <typename APIType>
 struct APITypeInfo {};
@@ -80,6 +81,7 @@ WK_ADD_API_MAPPING(WKUInt64Ref, WebUInt64)
 WK_ADD_API_MAPPING(WKURLRef, WebURL)
 WK_ADD_API_MAPPING(WKURLRequestRef, WebURLRequest)
 WK_ADD_API_MAPPING(WKURLResponseRef, WebURLResponse)
+WK_ADD_API_MAPPING(WKUserContentURLPatternRef, WebUserContentURLPattern)
 
 template <typename ImplType,
           typename APIType = typename ImplTypeInfo<ImplType*>::APIType>

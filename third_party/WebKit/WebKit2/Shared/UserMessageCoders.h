@@ -32,6 +32,7 @@
 #include "WebSerializedScriptValue.h"
 #include "WebString.h"
 #include "WebURL.h"
+#include "WebUserContentURLPattern.h"
 
 namespace WebKit {
 
@@ -40,6 +41,7 @@ namespace WebKit {
 //   - Dictionary -> Dictionary
 //   - String -> String
 //   - SerializedScriptValue -> SerializedScriptValue
+//   - UserContentURLPattern -> UserContentURLPattern
 //   - WebDouble -> WebDouble
 //   - WebUInt64 -> WebUInt64
 //   - WebURL -> WebURL
@@ -111,6 +113,12 @@ class UserMessageEncoder {
         encoder->encode(urlObject->string());
         return true;
       }
+      case APIObject::TypeUserContentURLPattern: {
+        WebUserContentURLPattern* urlPattern =
+            static_cast<WebUserContentURLPattern*>(m_root);
+        encoder->encode(urlPattern->patternString());
+        return true;
+      }
       default:
         break;
     }
@@ -130,6 +138,7 @@ class UserMessageEncoder {
 //   - Dictionary -> Dictionary
 //   - String -> String
 //   - SerializedScriptValue -> SerializedScriptValue
+//   - UserContentURLPattern -> UserContentURLPattern
 //   - WebDouble -> WebDouble
 //   - WebUInt64 -> WebUInt64
 //   - WebURL -> WebURL
@@ -229,6 +238,13 @@ class UserMessageDecoder {
         if (!decoder->decode(string))
           return false;
         coder.m_root = WebURL::create(string);
+        break;
+      }
+      case APIObject::TypeUserContentURLPattern: {
+        String string;
+        if (!decoder->decode(string))
+          return false;
+        coder.m_root = WebUserContentURLPattern::create(string);
         break;
       }
       default:

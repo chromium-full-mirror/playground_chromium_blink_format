@@ -45,6 +45,7 @@ class APIObject : public RefCounted<APIObject> {
     TypeURL,
     TypeURLRequest,
     TypeURLResponse,
+    TypeUserContentURLPattern,
 
     // Base numeric types
     TypeBoolean,
