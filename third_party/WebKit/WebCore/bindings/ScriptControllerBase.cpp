@@ -52,7 +52,7 @@ ScriptValue ScriptController::executeScript(const String& script,
                                             ShouldAllowXSS shouldAllowXSS) {
   return executeScript(
       ScriptSourceCode(script,
-                       forceUserGesture ? KURL() : m_frame->loader()->url()),
+                       forceUserGesture ? KURL() : m_frame->document()->url()),
       shouldAllowXSS);
 }
 

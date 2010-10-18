@@ -504,7 +504,7 @@ ScriptValue ScriptController::executeScriptInWorld(
     bool forceUserGesture,
     ShouldAllowXSS shouldAllowXSS) {
   ScriptSourceCode sourceCode(
-      script, forceUserGesture ? KURL() : m_frame->loader()->url());
+      script, forceUserGesture ? KURL() : m_frame->document()->url());
 
   if (!canExecuteScripts(AboutToExecuteScript) || isPaused())
     return ScriptValue();
