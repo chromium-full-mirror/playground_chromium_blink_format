@@ -96,6 +96,8 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
   unsigned createLayerTexture();
   void deleteLayerTexture(unsigned);
 
+  IntRect currentScissorRect() const { return m_currentScissorRect; }
+
   static void debugGLCall(GraphicsContext3D*,
                           const char* command,
                           const char* file,
@@ -138,7 +140,7 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
                              const TransformationMatrix& parentMatrix,
                              float opacity);
 
-  void drawLayersRecursive(LayerChromium*, const FloatRect& scissorRect);
+  void drawLayersRecursive(LayerChromium*);
 
   void drawLayer(LayerChromium*);
 
@@ -148,7 +150,7 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
 
   void drawLayerIntoStencilBuffer(LayerChromium*, bool decrement);
 
-  void scissorToRect(const FloatRect&);
+  void scissorToRect(const IntRect&);
 
   bool makeContextCurrent();
 
@@ -187,6 +189,7 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
 
   IntRect m_rootVisibleRect;
   IntRect m_rootContentRect;
+  IntRect m_currentScissorRect;
 
   int m_maxTextureSize;
 
