@@ -2051,12 +2051,17 @@ TreeExpression JSParser::parseUnaryExpression(TreeBuilder& context) {
   int subExprStart = tokenStart();
   TreeExpression expr = parseMemberExpression(context);
   failIfFalse(expr);
-  bool isEval = false;
+  bool isEvalOrArguments = false;
   if (strictMode() && !m_syntaxAlreadyValidated) {
-    if (context.isResolve(expr))
-      isEval = m_globalData->propertyNames->eval == *m_lastIdentifier;
+    if (context.isResolve(expr)) {
+      isEvalOrArguments =
+          m_globalData->propertyNames->eval == *m_lastIdentifier;
+      if (!isEvalOrArguments && currentScope()->isFunction())
+        isEvalOrArguments =
+            m_globalData->propertyNames->arguments == *m_lastIdentifier;
+    }
   }
-  failIfTrueIfStrict(isEval && modifiesExpr);
+  failIfTrueIfStrict(isEvalOrArguments && modifiesExpr);
   switch (m_token.m_type) {
     case PLUSPLUS:
       m_nonTrivialExpressionCount++;
@@ -2064,7 +2069,7 @@ TreeExpression JSParser::parseUnaryExpression(TreeBuilder& context) {
       expr = context.makePostfixNode(expr, OpPlusPlus, subExprStart,
                                      lastTokenEnd(), tokenEnd());
       m_assignmentCount++;
-      failIfTrueIfStrict(isEval);
+      failIfTrueIfStrict(isEvalOrArguments);
       failIfTrueIfStrict(requiresLExpr);
       next();
       break;
@@ -2074,7 +2079,7 @@ TreeExpression JSParser::parseUnaryExpression(TreeBuilder& context) {
       expr = context.makePostfixNode(expr, OpMinusMinus, subExprStart,
                                      lastTokenEnd(), tokenEnd());
       m_assignmentCount++;
-      failIfTrueIfStrict(isEval);
+      failIfTrueIfStrict(isEvalOrArguments);
       failIfTrueIfStrict(requiresLExpr);
       next();
       break;
