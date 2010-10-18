@@ -60,10 +60,9 @@ class NavigationScheduler : public Noncopyable {
   void scheduleLocationChange(const String& url,
                               const String& referrer,
                               bool lockHistory = true,
-                              bool lockBackForwardList = true,
-                              bool userGesture = false);
+                              bool lockBackForwardList = true);
   void scheduleFormSubmission(PassRefPtr<FormSubmission>);
-  void scheduleRefresh(bool userGesture = false);
+  void scheduleRefresh();
   void scheduleHistoryNavigation(int steps);
 
   void startTimer();
@@ -75,8 +74,7 @@ class NavigationScheduler : public Noncopyable {
   void timerFired(Timer<NavigationScheduler>*);
   void schedule(PassOwnPtr<ScheduledNavigation>);
 
-  static bool mustLockBackForwardList(Frame* targetFrame,
-                                      bool mustLockIfDuringLoad);
+  static bool mustLockBackForwardList(Frame* targetFrame);
 
   Frame* m_frame;
   Timer<NavigationScheduler> m_timer;

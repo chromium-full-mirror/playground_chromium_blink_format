@@ -267,7 +267,7 @@ Frame* SubframeLoader::loadOrRedirectSubframe(
   if (frame)
     frame->navigationScheduler()->scheduleLocationChange(
         url.string(), m_frame->loader()->outgoingReferrer(), lockHistory,
-        lockBackForwardList, m_frame->loader()->isProcessingUserGesture());
+        lockBackForwardList);
   else
     frame = loadSubframe(ownerElement, url, frameName,
                          m_frame->loader()->outgoingReferrer());

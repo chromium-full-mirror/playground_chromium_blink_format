@@ -58,7 +58,7 @@ void BindingFrame<Binding>::navigateIfAllowed(State<Binding>* state,
   if (!protocolIsJavaScript(url) || state->allowsAccessFromFrame(frame))
     frame->navigationScheduler()->scheduleLocationChange(
         url.string(), activeFrame->loader()->outgoingReferrer(), lockHistory,
-        lockBackForwardList, state->processingUserGesture());
+        lockBackForwardList);
 }
 
 }  // namespace WebCore
