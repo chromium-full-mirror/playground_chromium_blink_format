@@ -306,6 +306,12 @@ class Element : public ContainerNode {
   DOMStringMap* dataset();
   DOMStringMap* optionalDataset() const;
 
+#if ENABLE(MATHML)
+  virtual bool isMathMLElement() const { return false; }
+#else
+  static bool isMathMLElement() { return false; }
+#endif
+
   virtual bool isFormControlElement() const { return false; }
   virtual bool isEnabledFormControl() const { return true; }
   virtual bool isReadOnlyFormControl() const { return false; }
@@ -335,7 +341,7 @@ class Element : public ContainerNode {
 #endif
 
 #if ENABLE(FULLSCREEN_API)
-  enum { ALLOW_KEYBOARD_INPUT = 1 };
+  enum {ALLOW_KEYBOARD_INPUT = 1};
 
   void webkitRequestFullScreen(unsigned short flags);
 #endif

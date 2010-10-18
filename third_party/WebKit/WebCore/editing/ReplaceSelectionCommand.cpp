@@ -899,6 +899,21 @@ void ReplaceSelectionCommand::mergeEndIfNeeded() {
   }
 }
 
+static Node* enclosingInline(Node* node) {
+  while (ContainerNode* parent = node->parentNode()) {
+    if (parent->isBlockFlow() || parent->hasTagName(bodyTag))
+      return node;
+    // Stop if any previous sibling is a block.
+    for (Node* sibling = node->previousSibling(); sibling;
+         sibling = sibling->previousSibling()) {
+      if (sibling->isBlockFlow())
+        return node;
+    }
+    node = parent;
+  }
+  return node;
+}
+
 void ReplaceSelectionCommand::doApply() {
   VisibleSelection selection = endingSelection();
   ASSERT(selection.isCaretOrRange());
@@ -1171,8 +1186,8 @@ void ReplaceSelectionCommand::doApply() {
     // merged into the inline.
     Node* destinationNode = destination.deepEquivalent().node();
     if (m_shouldMergeEnd &&
-        destinationNode != destinationNode->enclosingInlineElement() &&
-        destinationNode->enclosingInlineElement()->nextSibling())
+        destinationNode != enclosingInline(destinationNode) &&
+        enclosingInline(destinationNode)->nextSibling())
       insertNodeBefore(createBreakElement(document()), refNode.get());
 
     // Merging the the first paragraph of inserted content with the content that
