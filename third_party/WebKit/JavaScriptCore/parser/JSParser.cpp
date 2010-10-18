@@ -999,6 +999,7 @@ TreeStatement JSParser::parseThrowStatement(TreeBuilder& context) {
   failIfFalse(expr);
   int eEnd = lastTokenEnd();
   int endLine = tokenLine();
+  failIfFalse(autoSemiColon());
 
   return context.createThrowStatement(expr, eStart, eEnd, startLine, endLine);
 }
