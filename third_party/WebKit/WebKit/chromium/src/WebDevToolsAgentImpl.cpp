@@ -319,7 +319,7 @@ void WebDevToolsAgentImpl::didReceiveData(unsigned long resourceId,
 void WebDevToolsAgentImpl::didReceiveResponse(unsigned long resourceId,
                                               const WebURLResponse& response) {
   if (InspectorController* ic = inspectorController())
-    ic->didReceiveResponse(resourceId, response.toResourceResponse());
+    ic->didReceiveResponse(resourceId, 0, response.toResourceResponse());
 }
 
 void WebDevToolsAgentImpl::didFinishLoading(unsigned long resourceId) {

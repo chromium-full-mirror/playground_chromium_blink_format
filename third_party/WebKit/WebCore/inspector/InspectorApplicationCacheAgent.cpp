@@ -51,7 +51,7 @@ InspectorApplicationCacheAgent::InspectorApplicationCacheAgent(
 void InspectorApplicationCacheAgent::didReceiveManifestResponse(
     unsigned long identifier,
     const ResourceResponse& response) {
-  m_inspectorController->didReceiveResponse(identifier, response);
+  m_inspectorController->didReceiveResponse(identifier, 0, response);
 }
 
 void InspectorApplicationCacheAgent::updateApplicationCacheStatus(

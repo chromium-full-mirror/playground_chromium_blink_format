@@ -582,7 +582,8 @@ void ApplicationCacheGroup::didReceiveResponse(
             m_currentResourceIdentifier, response);
     } else
       page->inspectorController()->didReceiveResponse(
-          m_currentResourceIdentifier, response);
+          m_currentResourceIdentifier, m_frame->loader()->documentLoader(),
+          response);
   }
 #endif
 

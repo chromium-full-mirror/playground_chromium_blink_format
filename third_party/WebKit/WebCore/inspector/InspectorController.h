@@ -68,6 +68,7 @@ class InspectorFrontendClient;
 class InspectorObject;
 class InspectorProfilerAgent;
 class InspectorResource;
+class InspectorResourceAgent;
 class InspectorState;
 class InspectorStorageAgent;
 class InspectorTimelineAgent;
@@ -185,7 +186,9 @@ class InspectorController : public Noncopyable {
                        ResourceRequest&,
                        const ResourceResponse& redirectResponse);
   void markResourceAsCached(unsigned long identifier);
-  void didReceiveResponse(unsigned long identifier, const ResourceResponse&);
+  void didReceiveResponse(unsigned long identifier,
+                          DocumentLoader*,
+                          const ResourceResponse&);
   void didReceiveContentLength(unsigned long identifier, int lengthReceived);
   void didFinishLoading(unsigned long identifier, double finishTime);
   void didFailLoading(unsigned long identifier, const ResourceError&);
@@ -406,6 +409,7 @@ class InspectorController : public Noncopyable {
   bool m_openingFrontend;
   OwnPtr<InspectorFrontend> m_frontend;
   RefPtr<InspectorDOMAgent> m_domAgent;
+  RefPtr<InspectorResourceAgent> m_resourceAgent;
   RefPtr<InspectorStorageAgent> m_storageAgent;
   OwnPtr<InspectorCSSStore> m_cssStore;
   OwnPtr<InspectorTimelineAgent> m_timelineAgent;
