@@ -289,7 +289,7 @@ class CodeBlock : public FastAllocBase {
   bool isStrictMode() const { return m_isStrictMode; }
 
   inline bool isKnownNotImmediate(int index) {
-    if (index == m_thisRegister)
+    if (index == m_thisRegister && !m_isStrictMode)
       return true;
 
     if (isConstantRegisterIndex(index))
