@@ -31,7 +31,7 @@ namespace WebKit {
 template <typename T>
 class APIClient {
  public:
-  APIClient() {}
+  APIClient() { initialize(0); }
 
   void initialize(const T* client) {
     if (client && !client->version)
