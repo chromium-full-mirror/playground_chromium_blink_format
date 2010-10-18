@@ -151,8 +151,8 @@ bool FormDataIODevice::isSequential() const {
   return true;
 }
 
-static QString httpMethodString(QNetworkAccessManager::Operation method) {
-  switch (method) {
+String QNetworkReplyHandler::httpMethod() const {
+  switch (m_method) {
     case QNetworkAccessManager::GetOperation:
       return "GET";
     case QNetworkAccessManager::HeadOperation:
@@ -161,15 +161,14 @@ static QString httpMethodString(QNetworkAccessManager::Operation method) {
       return "POST";
     case QNetworkAccessManager::PutOperation:
       return "PUT";
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
     case QNetworkAccessManager::DeleteOperation:
       return "DELETE";
-#endif
 #if QT_VERSION >= QT_VERSION_CHECK(4, 7, 0)
     case QNetworkAccessManager::CustomOperation:
-      return "OPTIONS";
+      return m_resourceHandle->firstRequest().httpMethod();
 #endif
     default:
+      ASSERT_NOT_REACHED();
       return "GET";
   }
 }
@@ -201,11 +200,12 @@ QNetworkReplyHandler::QNetworkReplyHandler(ResourceHandle* handle,
   else if (r.httpMethod() == "DELETE")
     m_method = QNetworkAccessManager::DeleteOperation;
 #if QT_VERSION >= QT_VERSION_CHECK(4, 7, 0)
-  else if (r.httpMethod() == "OPTIONS")
+  else
     m_method = QNetworkAccessManager::CustomOperation;
-#endif
+#else
   else
     m_method = QNetworkAccessManager::UnknownOperation;
+#endif
 
   QObject* originatingObject = 0;
   if (m_resourceHandle->getInternal()->m_context)
@@ -423,7 +423,7 @@ void QNetworkReplyHandler::sendResponseIfNeeded() {
       m_method = QNetworkAccessManager::GetOperation;
 
     ResourceRequest newRequest = m_resourceHandle->firstRequest();
-    newRequest.setHTTPMethod(httpMethodString(m_method));
+    newRequest.setHTTPMethod(httpMethod());
     newRequest.setURL(newUrl);
 
     // Should not set Referer after a redirect from a secure resource to
