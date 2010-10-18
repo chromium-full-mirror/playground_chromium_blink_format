@@ -467,7 +467,8 @@ inline size_t normalizePrototypeChain(CallFrame* callFrame, JSCell* base) {
 
 ALWAYS_INLINE JSValue resolveBase(CallFrame* callFrame,
                                   Identifier& property,
-                                  ScopeChainNode* scopeChain) {
+                                  ScopeChainNode* scopeChain,
+                                  bool isStrictPut) {
   ScopeChainIterator iter = scopeChain->begin();
   ScopeChainIterator next = iter;
   ++next;
@@ -478,7 +479,9 @@ ALWAYS_INLINE JSValue resolveBase(CallFrame* callFrame,
   JSObject* base;
   while (true) {
     base = *iter;
-    if (next == end || base->getPropertySlot(callFrame, property, slot))
+    if (next == end)
+      return isStrictPut ? JSValue() : base;
+    if (base->getPropertySlot(callFrame, property, slot))
       return base;
 
     iter = next;

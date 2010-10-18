@@ -1499,7 +1499,7 @@ RegisterID* AssignResolveNode::emitBytecode(BytecodeGenerator& generator,
   }
 
   RefPtr<RegisterID> base =
-      generator.emitResolveBase(generator.newTemporary(), m_ident);
+      generator.emitResolveBaseForPut(generator.newTemporary(), m_ident);
   if (dst == generator.ignoredResult())
     dst = 0;
   RegisterID* value = generator.emitNode(dst, m_right);
@@ -1914,7 +1914,7 @@ RegisterID* ForInNode::emitBytecode(BytecodeGenerator& generator,
       propertyName = generator.newTemporary();
       RefPtr<RegisterID> protect = propertyName;
       RegisterID* base =
-          generator.emitResolveBase(generator.newTemporary(), ident);
+          generator.emitResolveBaseForPut(generator.newTemporary(), ident);
 
       generator.emitExpressionInfo(divot(), startOffset(), endOffset());
       generator.emitPutById(base, ident, propertyName);

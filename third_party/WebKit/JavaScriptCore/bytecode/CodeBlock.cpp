@@ -888,7 +888,16 @@ void CodeBlock::dump(ExecState* exec,
     case op_resolve_base: {
       int r0 = (++it)->u.operand;
       int id0 = (++it)->u.operand;
-      printf("[%4d] resolve_base\t %s, %s\n", location,
+      int isStrict = (++it)->u.operand;
+      printf("[%4d] resolve_base%s\t %s, %s\n", location,
+             isStrict ? "_strict" : "", registerName(exec, r0).data(),
+             idName(id0, m_identifiers[id0]).data());
+      break;
+    }
+    case op_ensure_property_exists: {
+      int r0 = (++it)->u.operand;
+      int id0 = (++it)->u.operand;
+      printf("[%4d] ensure_property_exists\t %s, %s\n", location,
              registerName(exec, r0).data(),
              idName(id0, m_identifiers[id0]).data());
       break;

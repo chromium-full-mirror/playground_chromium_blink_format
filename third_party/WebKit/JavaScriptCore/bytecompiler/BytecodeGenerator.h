@@ -389,6 +389,8 @@ class BytecodeGenerator : public FastAllocBase {
                                JSValue globalObject);
 
   RegisterID* emitResolveBase(RegisterID* dst, const Identifier& property);
+  RegisterID* emitResolveBaseForPut(RegisterID* dst,
+                                    const Identifier& property);
   RegisterID* emitResolveWithBase(RegisterID* baseDst,
                                   RegisterID* propDst,
                                   const Identifier& property);

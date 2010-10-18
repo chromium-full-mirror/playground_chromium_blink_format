@@ -1344,11 +1344,40 @@ RegisterID* BytecodeGenerator::emitResolveBase(RegisterID* dst,
     emitOpcode(op_resolve_base);
     instructions().append(dst->index());
     instructions().append(addConstant(property));
+    instructions().append(false);
     return dst;
   }
 
   // Global object is the base
   return emitLoad(dst, JSValue(globalObject));
+}
+
+RegisterID* BytecodeGenerator::emitResolveBaseForPut(
+    RegisterID* dst,
+    const Identifier& property) {
+  if (!m_codeBlock->isStrictMode())
+    return emitResolveBase(dst, property);
+  size_t depth = 0;
+  int index = 0;
+  JSObject* globalObject = 0;
+  bool requiresDynamicChecks = false;
+  findScopedProperty(property, index, depth, false, requiresDynamicChecks,
+                     globalObject);
+  if (!globalObject || requiresDynamicChecks) {
+    // We can't optimise at all :-(
+    emitOpcode(op_resolve_base);
+    instructions().append(dst->index());
+    instructions().append(addConstant(property));
+    instructions().append(true);
+    return dst;
+  }
+
+  // Global object is the base
+  RefPtr<RegisterID> result = emitLoad(dst, JSValue(globalObject));
+  emitOpcode(op_ensure_property_exists);
+  instructions().append(dst->index());
+  instructions().append(addConstant(property));
+  return result.get();
 }
 
 RegisterID* BytecodeGenerator::emitResolveWithBase(RegisterID* baseDst,
