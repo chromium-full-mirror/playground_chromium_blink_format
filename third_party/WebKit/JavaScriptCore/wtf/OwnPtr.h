@@ -23,6 +23,7 @@
 
 #include "Assertions.h"
 #include "Noncopyable.h"
+#include "NullPtr.h"
 #include "OwnPtrCommon.h"
 #include "TypeTraits.h"
 #include <algorithm>
@@ -85,6 +86,10 @@ class OwnPtr : public Noncopyable {
   operator UnspecifiedBoolType() const { return m_ptr ? &OwnPtr::m_ptr : 0; }
 
   OwnPtr& operator=(const PassOwnPtr<T>&);
+  OwnPtr& operator=(std::nullptr_t) {
+    clear();
+    return *this;
+  }
   template <typename U>
   OwnPtr& operator=(const PassOwnPtr<U>&);
 

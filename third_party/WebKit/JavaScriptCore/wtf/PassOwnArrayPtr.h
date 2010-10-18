@@ -27,6 +27,7 @@
 #define WTF_PassOwnArrayPtr_h
 
 #include "Assertions.h"
+#include "NullPtr.h"
 #include "OwnArrayPtrCommon.h"
 #include "TypeTraits.h"
 
@@ -89,6 +90,10 @@ class PassOwnArrayPtr {
 #endif
 
   PassOwnArrayPtr& operator=(const PassOwnArrayPtr<T>&);
+  PassOwnArrayPtr& operator=(std::nullptr_t) {
+    clear();
+    return *this;
+  }
   template <typename U>
   PassOwnArrayPtr& operator=(const PassOwnArrayPtr<U>&);
 

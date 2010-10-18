@@ -22,6 +22,7 @@
 #define RetainPtr_h
 
 #include "HashTraits.h"
+#include "NullPtr.h"
 #include "TypeTraits.h"
 #include <algorithm>
 #include <CoreFoundation/CoreFoundation.h>
@@ -103,6 +104,10 @@ class RetainPtr {
   RetainPtr& operator=(PtrType);
   template <typename U>
   RetainPtr& operator=(U*);
+  RetainPtr& operator=(std::nullptr_t) {
+    clear();
+    return *this;
+  }
 
   void adoptCF(PtrType);
   void adoptNS(PtrType);

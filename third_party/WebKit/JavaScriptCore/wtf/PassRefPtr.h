@@ -23,6 +23,7 @@
 #define WTF_PassRefPtr_h
 
 #include "AlwaysInline.h"
+#include "NullPtr.h"
 
 namespace WTF {
 
@@ -102,6 +103,10 @@ class PassRefPtr {
 
   PassRefPtr& operator=(T*);
   PassRefPtr& operator=(const PassRefPtr&);
+  PassRefPtr& operator=(std::nullptr_t) {
+    clear();
+    return *this;
+  }
   template <typename U>
   PassRefPtr& operator=(const PassRefPtr<U>&);
   template <typename U>

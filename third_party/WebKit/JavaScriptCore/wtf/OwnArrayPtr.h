@@ -23,6 +23,7 @@
 
 #include "Assertions.h"
 #include "Noncopyable.h"
+#include "NullPtr.h"
 #include "OwnArrayPtrCommon.h"
 #include <algorithm>
 
@@ -91,6 +92,10 @@ class OwnArrayPtr : public Noncopyable {
 #endif
 
   OwnArrayPtr& operator=(const PassOwnArrayPtr<T>&);
+  OwnArrayPtr& operator=(std::nullptr_t) {
+    clear();
+    return *this;
+  }
   template <typename U>
   OwnArrayPtr& operator=(const PassOwnArrayPtr<U>&);
 

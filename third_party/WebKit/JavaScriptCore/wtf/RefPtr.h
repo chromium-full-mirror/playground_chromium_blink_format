@@ -25,7 +25,6 @@
 #define WTF_RefPtr_h
 
 #include <algorithm>
-#include "AlwaysInline.h"
 #include "FastAllocBase.h"
 #include "PassRefPtr.h"
 
@@ -95,6 +94,10 @@ class RefPtr : public FastAllocBase {
   RefPtr& operator=(T*);
   RefPtr& operator=(const PassRefPtr<T>&);
   RefPtr& operator=(const NonNullPassRefPtr<T>&);
+  RefPtr& operator=(std::nullptr_t) {
+    clear();
+    return *this;
+  }
   template <typename U>
   RefPtr& operator=(const RefPtr<U>&);
   template <typename U>
