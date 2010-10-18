@@ -37,6 +37,7 @@
 #include "Frame.h"
 #include "GroupSettings.h"
 #include "IDBDatabase.h"
+#include "IDBDatabaseException.h"
 #include "IDBFactoryBackendInterface.h"
 #include "IDBKeyRange.h"
 #include "IDBRequest.h"
@@ -67,6 +68,11 @@ PassRefPtr<IDBRequest> IDBFactory::open(ScriptExecutionContext* context,
     return 0;
 
   // FIXME: Raise a NON_TRANSIENT_ERR if the name is invalid.
+
+  if (description.isNull()) {
+    ec = IDBDatabaseException::NON_TRANSIENT_ERR;
+    return 0;
+  }
 
   RefPtr<IDBRequest> request =
       IDBRequest::create(document, IDBAny::create(this), 0);

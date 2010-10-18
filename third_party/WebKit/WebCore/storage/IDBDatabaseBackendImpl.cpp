@@ -42,10 +42,9 @@ namespace WebCore {
 
 static bool extractMetaData(SQLiteDatabase* sqliteDatabase,
                             const String& expectedName,
-                            String& foundDescription,
                             String& foundVersion) {
-  SQLiteStatement metaDataQuery(
-      *sqliteDatabase, "SELECT name, description, version FROM MetaData");
+  SQLiteStatement metaDataQuery(*sqliteDatabase,
+                                "SELECT name, version FROM MetaData");
   if (metaDataQuery.prepare() != SQLResultOk ||
       metaDataQuery.step() != SQLResultRow)
     return false;
@@ -56,8 +55,7 @@ static bool extractMetaData(SQLiteDatabase* sqliteDatabase,
               expectedName.utf8().data());
     ASSERT_NOT_REACHED();
   }
-  foundDescription = metaDataQuery.getColumnText(1);
-  foundVersion = metaDataQuery.getColumnText(2);
+  foundVersion = metaDataQuery.getColumnText(1);
 
   if (metaDataQuery.step() == SQLResultRow) {
     LOG_ERROR("More than one row found in MetaData table");
@@ -92,8 +90,6 @@ static bool setMetaData(SQLiteDatabase* sqliteDatabase,
     return false;
   }
 
-  // FIXME: Should we assert there's only one row?
-
   return true;
 }
 
@@ -104,19 +100,14 @@ IDBDatabaseBackendImpl::IDBDatabaseBackendImpl(
     IDBTransactionCoordinator* coordinator)
     : m_sqliteDatabase(sqliteDatabase),
       m_name(name),
+      m_description(description),
       m_version(""),
       m_transactionCoordinator(coordinator) {
   ASSERT(!m_name.isNull());
+  ASSERT(!m_description.isNull());
 
-  // FIXME: The spec is in flux about how to handle description. Sync it up once
-  // a final decision is made.
-  String foundDescription = "";
-  bool result = extractMetaData(m_sqliteDatabase.get(), m_name,
-                                foundDescription, m_version);
-  m_description = description.isNull() ? foundDescription : description;
-
-  if (!result || m_description != foundDescription)
-    setMetaData(m_sqliteDatabase.get(), m_name, m_description, m_version);
+  extractMetaData(m_sqliteDatabase.get(), m_name, m_version);
+  setMetaData(m_sqliteDatabase.get(), m_name, m_description, m_version);
 
   loadObjectStores();
 }
