@@ -485,7 +485,7 @@ static int16_t handleEventCarbon(NPP instance,
       pluginLog(instance, "kHighLevelEvent");
       break;
     // NPAPI events
-    case NPEventType_LoseFocusEvent:
+    case NPEventType_GetFocusEvent:
       pluginLog(instance, "getFocusEvent");
       break;
     case NPEventType_LoseFocusEvent:
