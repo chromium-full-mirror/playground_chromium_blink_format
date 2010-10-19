@@ -143,6 +143,10 @@ class PluginProxy : public Plugin {
   RefPtr<BackingStore> m_pluginBackingStore;
 
   bool m_isStarted;
+
+  // Whether we're called invalidate in response to an update call, and are now
+  // waiting for a paint call.
+  bool m_waitingForPaintInResponseToUpdate;
 };
 
 }  // namespace WebKit

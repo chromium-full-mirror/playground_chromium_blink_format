@@ -56,9 +56,8 @@ PluginProxy::PluginProxy(PassRefPtr<PluginProcessConnection> connection)
     : m_connection(connection),
       m_pluginInstanceID(generatePluginInstanceID()),
       m_pluginController(0),
-      m_isStarted(false)
-
-{}
+      m_isStarted(false),
+      m_waitingForPaintInResponseToUpdate(false) {}
 
 PluginProxy::~PluginProxy() {}
 
@@ -120,6 +119,13 @@ void PluginProxy::paint(GraphicsContext* graphicsContext,
   m_backingStore->paint(graphicsContext, dirtyRectInPluginCoordinates);
 
   graphicsContext->restore();
+
+  if (m_waitingForPaintInResponseToUpdate) {
+    m_waitingForPaintInResponseToUpdate = false;
+    m_connection->connection()->send(
+        Messages::PluginControllerProxy::DidUpdate(), m_pluginInstanceID);
+    return;
+  }
 }
 
 #if PLATFORM(MAC)
@@ -379,6 +385,7 @@ void PluginProxy::update(const IntRect& paintedRect) {
   }
 
   // Ask the controller to invalidate the rect for us.
+  m_waitingForPaintInResponseToUpdate = true;
   m_pluginController->invalidate(paintedRectPluginCoordinates);
 }
 

@@ -59,7 +59,8 @@ PluginControllerProxy::PluginControllerProxy(WebProcessConnection* connection,
       m_pluginInstanceID(pluginInstanceID),
       m_userAgent(userAgent),
       m_isPrivateBrowsingEnabled(isPrivateBrowsingEnabled),
-      m_paintTimer(RunLoop::main(), this, &PluginControllerProxy::paint) {}
+      m_paintTimer(RunLoop::main(), this, &PluginControllerProxy::paint),
+      m_waitingForDidUpdate(false) {}
 
 PluginControllerProxy::~PluginControllerProxy() {
   ASSERT(!m_plugin);
@@ -106,16 +107,7 @@ void PluginControllerProxy::paint() {
                                    m_pluginInstanceID);
 }
 
-void PluginControllerProxy::invalidate(const IntRect& rect) {
-  // Convert the dirty rect to window coordinates.
-  IntRect dirtyRect = rect;
-  dirtyRect.move(m_frameRect.x(), m_frameRect.y());
-
-  // Make sure that the dirty rect is not greater than the plug-in itself.
-  dirtyRect.intersect(m_frameRect);
-
-  m_dirtyRect.unite(dirtyRect);
-
+void PluginControllerProxy::startPaintTimer() {
   // Check if we should start the timer.
 
   if (m_dirtyRect.isEmpty())
@@ -126,8 +118,26 @@ void PluginControllerProxy::invalidate(const IntRect& rect) {
   if (m_paintTimer.isActive())
     return;
 
+  if (m_waitingForDidUpdate)
+    return;
+
   // Start the timer.
   m_paintTimer.startOneShot(0);
+
+  m_waitingForDidUpdate = true;
+}
+
+void PluginControllerProxy::invalidate(const IntRect& rect) {
+  // Convert the dirty rect to window coordinates.
+  IntRect dirtyRect = rect;
+  dirtyRect.move(m_frameRect.x(), m_frameRect.y());
+
+  // Make sure that the dirty rect is not greater than the plug-in itself.
+  dirtyRect.intersect(m_frameRect);
+
+  m_dirtyRect.unite(dirtyRect);
+
+  startPaintTimer();
 }
 
 String PluginControllerProxy::userAgent() {
@@ -303,6 +313,11 @@ void PluginControllerProxy::handleKeyboardEvent(
 
 void PluginControllerProxy::setFocus(bool hasFocus) {
   m_plugin->setFocus(hasFocus);
+}
+
+void PluginControllerProxy::didUpdate() {
+  m_waitingForDidUpdate = false;
+  startPaintTimer();
 }
 
 #if PLATFORM(MAC)

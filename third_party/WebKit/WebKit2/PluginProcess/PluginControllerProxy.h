@@ -75,6 +75,7 @@ class PluginControllerProxy : PluginController {
                         const String& userAgent,
                         bool isPrivateBrowsingEnabled);
 
+  void startPaintTimer();
   void paint();
 
   // PluginController
@@ -127,6 +128,7 @@ class PluginControllerProxy : PluginController {
   void handleMouseLeaveEvent(const WebMouseEvent&, bool& handled);
   void handleKeyboardEvent(const WebKeyboardEvent&, bool& handled);
   void setFocus(bool);
+  void didUpdate();
 #if PLATFORM(MAC)
   void windowFocusChanged(bool);
   void windowFrameChanged(const WebCore::IntRect&);
@@ -151,6 +153,11 @@ class PluginControllerProxy : PluginController {
 
   // The paint timer, used for coalescing painting.
   RunLoop::Timer<PluginControllerProxy> m_paintTimer;
+
+  // Whether we're waiting for the plug-in proxy in the web process to draw the
+  // contents of its
+  // backing store into the web process backing store.
+  bool m_waitingForDidUpdate;
 
   // The backing store that this plug-in draws into.
   RefPtr<BackingStore> m_backingStore;
