@@ -64,7 +64,6 @@ class ContentLayerChromium : public LayerChromium {
     int shaderMatrixLocation() const { return m_shaderMatrixLocation; }
     int shaderAlphaLocation() const { return m_shaderAlphaLocation; }
     int initialized() const { return m_initialized; }
-    bool npotSupported() const { return m_npotSupported; }
 
    private:
     GraphicsContext3D* m_context;
@@ -73,20 +72,16 @@ class ContentLayerChromium : public LayerChromium {
     int m_shaderMatrixLocation;
     int m_shaderAlphaLocation;
     int m_initialized;
-    bool m_npotSupported;
   };
 
  protected:
   ContentLayerChromium(GraphicsLayerChromium* owner);
 
-  enum MipmapUse { noMipmap, useMipmap };
-
   void updateTextureRect(void* pixels,
                          const IntSize& bitmapSize,
                          const IntSize& requiredTextureSize,
                          const IntRect& updateRect,
-                         unsigned textureId,
-                         MipmapUse generateMipmap = noMipmap);
+                         unsigned textureId);
 
   virtual void cleanupResources();
   bool requiresClippedUpdateRect() const;

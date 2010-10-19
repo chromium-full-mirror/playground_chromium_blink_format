@@ -152,7 +152,7 @@ void ImageLayerChromium::updateContents() {
 
   if (pixels)
     updateTextureRect(pixels, bitmapSize, requiredTextureSize, dirtyRect,
-                      textureId, useMipmap);
+                      textureId);
 }
 }
 #endif  // USE(ACCELERATED_COMPOSITING)
