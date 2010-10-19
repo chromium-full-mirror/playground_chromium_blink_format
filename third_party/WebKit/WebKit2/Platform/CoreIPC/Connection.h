@@ -245,7 +245,8 @@ class Connection : public ThreadSafeShared<Connection> {
 
   BinarySemaphore m_waitForSyncReplySemaphore;
 
-  Mutex m_pendingSyncRepliesMutex;
+  Mutex m_syncReplyStateMutex;
+  bool m_shouldWaitForSyncReplies;
   Vector<PendingSyncReply> m_pendingSyncReplies;
 
 #if PLATFORM(MAC)

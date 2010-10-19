@@ -57,7 +57,8 @@ Connection::Connection(Identifier identifier,
       m_syncRequestID(0),
       m_isConnected(false),
       m_connectionQueue("com.apple.CoreIPC.ReceiveQueue"),
-      m_clientRunLoop(clientRunLoop) {
+      m_clientRunLoop(clientRunLoop),
+      m_shouldWaitForSyncReplies(true) {
   ASSERT(m_client);
 
   platformInitialize(identifier);
@@ -179,7 +180,10 @@ PassOwnPtr<ArgumentDecoder> Connection::sendSyncMessage(
 
   // Push the pending sync reply information on our stack.
   {
-    MutexLocker locker(m_pendingSyncRepliesMutex);
+    MutexLocker locker(m_syncReplyStateMutex);
+    if (!m_shouldWaitForSyncReplies)
+      return 0;
+
     m_pendingSyncReplies.append(PendingSyncReply(syncRequestID));
   }
 
@@ -191,7 +195,7 @@ PassOwnPtr<ArgumentDecoder> Connection::sendSyncMessage(
 
   // Finally, pop the pending sync reply information.
   {
-    MutexLocker locker(m_pendingSyncRepliesMutex);
+    MutexLocker locker(m_syncReplyStateMutex);
     ASSERT(m_pendingSyncReplies.last().syncRequestID == syncRequestID);
     m_pendingSyncReplies.removeLast();
   }
@@ -206,7 +210,7 @@ PassOwnPtr<ArgumentDecoder> Connection::waitForSyncReply(uint64_t syncRequestID,
   bool timedOut = false;
   while (!timedOut) {
     {
-      MutexLocker locker(m_pendingSyncRepliesMutex);
+      MutexLocker locker(m_syncReplyStateMutex);
 
       // First, check if there is a sync reply at the top of the stack.
       ASSERT(!m_pendingSyncReplies.isEmpty());
@@ -214,8 +218,8 @@ PassOwnPtr<ArgumentDecoder> Connection::waitForSyncReply(uint64_t syncRequestID,
       PendingSyncReply& pendingSyncReply = m_pendingSyncReplies.last();
       ASSERT(pendingSyncReply.syncRequestID == syncRequestID);
 
-      // We found the sync reply, return it.
-      if (pendingSyncReply.didReceiveReply)
+      // We found the sync reply, or the connection was closed.
+      if (pendingSyncReply.didReceiveReply || !m_shouldWaitForSyncReplies)
         return pendingSyncReply.releaseReplyDecoder();
     }
 
@@ -231,7 +235,7 @@ void Connection::processIncomingMessage(MessageID messageID,
                                         PassOwnPtr<ArgumentDecoder> arguments) {
   // Check if this is a sync reply.
   if (messageID == MessageID(CoreIPCMessage::SyncMessageReply)) {
-    MutexLocker locker(m_pendingSyncRepliesMutex);
+    MutexLocker locker(m_syncReplyStateMutex);
     ASSERT(!m_pendingSyncReplies.isEmpty());
 
     PendingSyncReply& pendingSyncReply = m_pendingSyncReplies.last();
@@ -269,6 +273,16 @@ void Connection::processIncomingMessage(MessageID messageID,
 void Connection::connectionDidClose() {
   // The connection is now invalid.
   platformInvalidate();
+
+  {
+    MutexLocker locker(m_syncReplyStateMutex);
+
+    ASSERT(m_shouldWaitForSyncReplies);
+    m_shouldWaitForSyncReplies = false;
+
+    if (!m_pendingSyncReplies.isEmpty())
+      m_waitForSyncReplySemaphore.signal();
+  }
 
   m_clientRunLoop->scheduleWork(
       WorkItem::create(this, &Connection::dispatchConnectionDidClose));
