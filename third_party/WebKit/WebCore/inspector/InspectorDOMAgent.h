@@ -143,8 +143,7 @@ class InspectorDOMAgent : public EventListener {
                       const String& styleText,
                       const String& propertyName,
                       bool* success,
-                      RefPtr<InspectorValue>* styleObject,
-                      RefPtr<InspectorArray>* changedProperties);
+                      RefPtr<InspectorValue>* styleObject);
   void setStyleText(long styleId, const String& cssText, bool* success);
   void setStyleProperty(long styleId,
                         const String& name,

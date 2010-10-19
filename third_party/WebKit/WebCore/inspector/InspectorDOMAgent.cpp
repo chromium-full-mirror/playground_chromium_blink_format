@@ -1440,13 +1440,11 @@ PassRefPtr<InspectorArray> InspectorDOMAgent::buildArrayForPseudoElements(
   return result.release();
 }
 
-void InspectorDOMAgent::applyStyleText(
-    long styleId,
-    const String& styleText,
-    const String& propertyName,
-    bool* success,
-    RefPtr<InspectorValue>* styleObject,
-    RefPtr<InspectorArray>* changedPropertiesArray) {
+void InspectorDOMAgent::applyStyleText(long styleId,
+                                       const String& styleText,
+                                       const String& propertyName,
+                                       bool* success,
+                                       RefPtr<InspectorValue>* styleObject) {
   CSSStyleDeclaration* style = cssStore()->styleForId(styleId);
   if (!style)
     return;
@@ -1486,7 +1484,6 @@ void InspectorDOMAgent::applyStyleText(
 
   // Notify caller that the property was successfully deleted.
   if (!styleTextLength) {
-    (*changedPropertiesArray)->pushString(propertyName);
     *success = true;
     return;
   }
@@ -1497,7 +1494,6 @@ void InspectorDOMAgent::applyStyleText(
   // Iterate of the properties on the test element's style declaration and
   // add them to the real style declaration. We take care to move shorthands.
   HashSet<String> foundShorthands;
-  Vector<String> changedProperties;
 
   for (unsigned i = 0; i < tempStyle->length(); ++i) {
     String name = tempStyle->item(i);
@@ -1524,11 +1520,9 @@ void InspectorDOMAgent::applyStyleText(
     // Remove disabled property entry for property with this name.
     if (disabledStyle)
       disabledStyle->remove(name);
-    changedProperties.append(name);
   }
   *success = true;
   *styleObject = buildObjectForStyle(style, true);
-  *changedPropertiesArray = toArray(changedProperties);
 }
 
 void InspectorDOMAgent::setStyleText(long styleId,
