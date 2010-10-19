@@ -159,6 +159,7 @@ PassRefPtr<InspectorResource> InspectorResource::createWebSocket(
       adoptRef(new InspectorResource(identifier, 0, requestURL));
   resource->markWebSocket();
   resource->m_documentURL = documentURL;
+  resource->m_changes.setAll();
   return resource.release();
 }
 #endif
