@@ -59,4 +59,6 @@ PlatformVideoWindow::~PlatformVideoWindow() {
 
   m_videoWindowId = 0;
 }
+
+void PlatformVideoWindow::prepareForOverlay(GstMessage*) {}
 #endif  // USE(GSTREAMER)
