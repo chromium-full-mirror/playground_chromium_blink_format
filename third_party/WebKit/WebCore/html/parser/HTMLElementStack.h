@@ -119,6 +119,8 @@ class HTMLElementStack : public Noncopyable {
   bool inTableScope(const QualifiedName&) const;
   bool inButtonScope(const AtomicString& tagName) const;
   bool inButtonScope(const QualifiedName&) const;
+  bool inSelectScope(const AtomicString& tagName) const;
+  bool inSelectScope(const QualifiedName&) const;
 
   bool hasOnlyHTMLElementsInScope() const;
   bool hasNumberedHeaderElementInScope() const;
