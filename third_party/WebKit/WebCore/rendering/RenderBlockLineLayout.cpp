@@ -1076,7 +1076,11 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
                    scrollbarLogicalHeight());
 
   if (!firstLineBox() && hasLineIfEmpty())
-    setLogicalHeight(logicalHeight() + lineHeight(true, true));
+    setLogicalHeight(logicalHeight() +
+                     lineHeight(true, style()->isHorizontalWritingMode()
+                                          ? HorizontalLine
+                                          : VerticalLine,
+                                PositionOfInteriorLineBoxes));
 
   // See if we have any lines that spill out of our block.  If we do, then we
   // will possibly need to

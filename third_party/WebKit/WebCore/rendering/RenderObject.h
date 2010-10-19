@@ -580,12 +580,6 @@ class RenderObject : public CachedResourceClient {
   void updateFillImages(const FillLayer*, const FillLayer*);
   void updateImage(StyleImage*, StyleImage*);
 
-  // for discussion of lineHeight see CSS2 spec
-  virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
-  // for the vertical-align property of inline elements
-  // the offset of baseline from the top of the object.
-  virtual int baselinePosition(bool firstLine,
-                               bool isRootLineBox = false) const;
   virtual void paint(PaintInfo&, int tx, int ty);
 
   // Recursive function that computes the size and position of this object and

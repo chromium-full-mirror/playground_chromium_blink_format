@@ -21,6 +21,7 @@
 #ifndef InlineBox_h
 #define InlineBox_h
 
+#include "RenderBR.h"
 #include "RenderBoxModelObject.h"
 #include "TextDirection.h"
 
@@ -261,11 +262,15 @@ class InlineBox {
   // for horizontal text and width for vertical text.
   int logicalHeight() const;
 
-  inline int baselinePosition(bool isRootLineBox) const {
-    return renderer()->baselinePosition(m_firstLine, isRootLineBox);
+  virtual int baselinePosition() const {
+    return boxModelObject()->baselinePosition(
+        m_firstLine, m_isVertical ? VerticalLine : HorizontalLine,
+        PositionOnContainingLine);
   }
-  inline int lineHeight(bool isRootLineBox) const {
-    return renderer()->lineHeight(m_firstLine, isRootLineBox);
+  virtual int lineHeight() const {
+    return boxModelObject()->lineHeight(
+        m_firstLine, m_isVertical ? VerticalLine : HorizontalLine,
+        PositionOnContainingLine);
   }
 
   virtual int caretMinOffset() const;

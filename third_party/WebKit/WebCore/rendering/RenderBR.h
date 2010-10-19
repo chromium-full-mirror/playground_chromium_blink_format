@@ -58,9 +58,7 @@ class RenderBR : public RenderText {
     return 0;
   }
 
-  virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
-  virtual int baselinePosition(bool firstLine,
-                               bool isRootLineBox = false) const;
+  int lineHeight(bool firstLine) const;
 
   // overrides
   virtual bool isBR() const { return true; }
@@ -77,6 +75,19 @@ class RenderBR : public RenderText {
  private:
   mutable int m_lineHeight;
 };
+
+inline RenderBR* toRenderBR(RenderObject* object) {
+  ASSERT(!object || object->isBR());
+  return static_cast<RenderBR*>(object);
+}
+
+inline const RenderBR* toRenderBR(const RenderObject* object) {
+  ASSERT(!object || object->isBR());
+  return static_cast<const RenderBR*>(object);
+}
+
+// This will catch anyone doing an unnecessary cast.
+void toRenderBR(const RenderBR*);
 
 }  // namespace WebCore
 

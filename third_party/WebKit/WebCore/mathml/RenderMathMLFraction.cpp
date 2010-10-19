@@ -173,8 +173,10 @@ void RenderMathMLFraction::paint(PaintInfo& info, int tx, int ty) {
   info.context->restore();
 }
 
-int RenderMathMLFraction::baselinePosition(bool firstLine,
-                                           bool isRootLineBox) const {
+int RenderMathMLFraction::baselinePosition(
+    bool firstLine,
+    LineDirectionMode lineDirection,
+    LinePositionMode linePositionMode) const {
   if (firstChild() && firstChild()->isRenderMathMLBlock()) {
     RenderMathMLBlock* numerator = toRenderMathMLBlock(firstChild());
     // FIXME: the baseline should adjust so the fraction line aligns
@@ -183,7 +185,8 @@ int RenderMathMLFraction::baselinePosition(bool firstLine,
     // a good guess.
     return numerator->offsetHeight() + style()->fontSize() / 3;
   }
-  return RenderBlock::baselinePosition(firstLine, isRootLineBox);
+  return RenderBlock::baselinePosition(firstLine, lineDirection,
+                                       linePositionMode);
 }
 }
 

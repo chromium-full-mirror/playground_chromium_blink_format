@@ -234,7 +234,8 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
     int textY = buttonRenderer->absoluteBoundingBoxRect().y() +
                 buttonRenderer->marginTop() + buttonRenderer->borderTop() +
                 buttonRenderer->paddingTop() +
-                buttonRenderer->baselinePosition(true, false);
+                buttonRenderer->baselinePosition(true, HorizontalLine,
+                                                 PositionOnContainingLine);
 
     paintInfo.context->setFillColor(
         style()->visitedDependentColor(CSSPropertyColor),

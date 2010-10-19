@@ -523,6 +523,14 @@ class RenderBox : public RenderBoxModelObject {
            parent()->style()->writingMode() != style()->writingMode();
   }
 
+  virtual int lineHeight(bool firstLine,
+                         LineDirectionMode,
+                         LinePositionMode = PositionOnContainingLine) const;
+  virtual int baselinePosition(
+      bool firstLine,
+      LineDirectionMode,
+      LinePositionMode = PositionOnContainingLine) const;
+
  protected:
   virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);

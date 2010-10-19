@@ -93,8 +93,6 @@ class RenderText : public RenderObject {
                          HashSet<const SimpleFontData*>* fallbackFonts = 0,
                          GlyphOverflow* = 0) const;
 
-  virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
-
   virtual int minPreferredLogicalWidth() const;
   virtual int maxPreferredLogicalWidth() const;
 

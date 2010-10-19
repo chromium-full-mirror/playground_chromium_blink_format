@@ -40,7 +40,10 @@ class RenderMathMLSubSup : public RenderMathMLBlock {
   virtual bool hasBase() const { return true; }
   virtual int nonOperatorHeight() const;
   virtual void stretchToHeight(int pixelHeight);
-  virtual int baselinePosition(bool, bool) const;
+  virtual int baselinePosition(
+      bool firstLine,
+      LineDirectionMode,
+      LinePositionMode = PositionOnContainingLine) const;
 
  protected:
   virtual void layout();

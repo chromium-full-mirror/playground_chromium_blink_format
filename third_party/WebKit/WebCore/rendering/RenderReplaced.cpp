@@ -287,14 +287,6 @@ void RenderReplaced::computePreferredLogicalWidths() {
   setPreferredLogicalWidthsDirty(false);
 }
 
-int RenderReplaced::lineHeight(bool, bool) const {
-  return height() + marginTop() + marginBottom();
-}
-
-int RenderReplaced::baselinePosition(bool, bool) const {
-  return height() + marginTop() + marginBottom();
-}
-
 unsigned RenderReplaced::caretMaxRenderedOffset() const {
   return 1;
 }

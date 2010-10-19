@@ -960,7 +960,9 @@ InlineFlowBox* RenderInline::createAndAppendInlineFlowBox() {
   return flowBox;
 }
 
-int RenderInline::lineHeight(bool firstLine, bool /*isRootLineBox*/) const {
+int RenderInline::lineHeight(bool firstLine,
+                             LineDirectionMode /*direction*/,
+                             LinePositionMode /*linePositionMode*/) const {
   if (firstLine && document()->usesFirstLineRules()) {
     RenderStyle* s = style(firstLine);
     if (s != style())
@@ -971,6 +973,14 @@ int RenderInline::lineHeight(bool firstLine, bool /*isRootLineBox*/) const {
     m_lineHeight = style()->computedLineHeight();
 
   return m_lineHeight;
+}
+
+int RenderInline::baselinePosition(bool firstLine,
+                                   LineDirectionMode direction,
+                                   LinePositionMode linePositionMode) const {
+  const Font& f = style(firstLine)->font();
+  return f.ascent() +
+         (lineHeight(firstLine, direction, linePositionMode) - f.height()) / 2;
 }
 
 int RenderInline::verticalPositionFromCache(bool firstLine) const {

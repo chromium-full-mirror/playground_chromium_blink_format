@@ -74,6 +74,9 @@ class InlineTextBox : public InlineBox {
     return first->start() < second->start();
   }
 
+  virtual int baselinePosition() const;
+  virtual int lineHeight() const;
+
  private:
   virtual int selectionTop();
   virtual int selectionHeight();

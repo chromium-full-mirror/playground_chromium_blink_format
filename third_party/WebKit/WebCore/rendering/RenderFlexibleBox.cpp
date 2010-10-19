@@ -412,7 +412,10 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
     }
 
     if (!iterator.first() && hasLineIfEmpty())
-      setHeight(height() + lineHeight(true, true));
+      setHeight(height() + lineHeight(true, style()->isHorizontalWritingMode()
+                                                ? HorizontalLine
+                                                : VerticalLine,
+                                      PositionOfInteriorLineBoxes));
 
     setHeight(height() + toAdd);
 
@@ -788,7 +791,10 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
     yPos = height();
 
     if (!iterator.first() && hasLineIfEmpty())
-      setHeight(height() + lineHeight(true, true));
+      setHeight(height() + lineHeight(true, style()->isHorizontalWritingMode()
+                                                ? HorizontalLine
+                                                : VerticalLine,
+                                      PositionOfInteriorLineBoxes));
 
     setHeight(height() + toAdd);
 

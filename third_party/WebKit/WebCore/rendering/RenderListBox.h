@@ -79,7 +79,10 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
                       Node** stopNode = 0);
 
   virtual void computePreferredLogicalWidths();
-  virtual int baselinePosition(bool firstLine, bool isRootLineBox) const;
+  virtual int baselinePosition(
+      bool firstLine,
+      LineDirectionMode,
+      LinePositionMode = PositionOnContainingLine) const;
   virtual void computeLogicalHeight();
 
   virtual void layout();

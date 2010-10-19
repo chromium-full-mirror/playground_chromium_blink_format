@@ -60,10 +60,6 @@ class RenderReplaced : public RenderBox {
 
   virtual bool canHaveChildren() const { return false; }
 
-  virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
-  virtual int baselinePosition(bool firstLine,
-                               bool isRootLineBox = false) const;
-
   virtual void computePreferredLogicalWidths();
 
   int calcAspectRatioLogicalWidth() const;

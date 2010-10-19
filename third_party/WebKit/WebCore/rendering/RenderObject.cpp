@@ -2518,15 +2518,6 @@ bool RenderObject::nodeAtPoint(const HitTestRequest&,
   return false;
 }
 
-int RenderObject::lineHeight(bool firstLine, bool /*isRootLineBox*/) const {
-  return style(firstLine)->computedLineHeight();
-}
-
-int RenderObject::baselinePosition(bool firstLine, bool isRootLineBox) const {
-  const Font& f = style(firstLine)->font();
-  return f.ascent() + (lineHeight(firstLine, isRootLineBox) - f.height()) / 2;
-}
-
 void RenderObject::scheduleRelayout() {
   if (isRenderView()) {
     FrameView* view = toRenderView(this)->frameView();

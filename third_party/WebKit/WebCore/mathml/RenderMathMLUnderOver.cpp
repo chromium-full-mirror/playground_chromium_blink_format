@@ -158,10 +158,14 @@ void RenderMathMLUnderOver::layout() {
         // base)
         // FIXME: bases that ascend higher than the line box intrude into the
         // over
+        if (!over->firstChild()->isBoxModelObject())
+          break;
+
         int overSpacing =
             static_cast<int>(gOverSpacingAdjustment *
                              (getOffsetHeight(over) -
-                              over->firstChild()->baselinePosition(true)));
+                              toRenderBoxModelObject(over->firstChild())
+                                  ->baselinePosition(true, HorizontalLine)));
 
         // base row wrapper
         base = over->nextSibling();
@@ -187,10 +191,15 @@ void RenderMathMLUnderOver::layout() {
         int baseHeight = getOffsetHeight(base);
         // actual base
         base = base->firstChild();
+        if (!base->isBoxModelObject())
+          break;
+
         // FIXME: We need to look at the space between a single maximum height
         // of
         //        the line boxes and the baseline and squeeze them together
-        int underSpacing = baseHeight - base->baselinePosition(true);
+        int underSpacing = baseHeight -
+                           toRenderBoxModelObject(base)->baselinePosition(
+                               true, HorizontalLine);
 
         // adjust the base's intrusion into the under
         RenderObject* under = lastChild();
@@ -214,10 +223,13 @@ void RenderMathMLUnderOver::layout() {
         // base)
         // FIXME: bases that ascend higher than the line box intrude into the
         // over
+        if (!over->firstChild()->isBoxModelObject())
+          break;
         int overSpacing =
             static_cast<int>(gOverSpacingAdjustment *
                              (getOffsetHeight(over) -
-                              over->firstChild()->baselinePosition(true)));
+                              toRenderBoxModelObject(over->firstChild())
+                                  ->baselinePosition(true, HorizontalLine)));
 
         // base row wrapper
         base = over->nextSibling();
@@ -233,10 +245,15 @@ void RenderMathMLUnderOver::layout() {
           int baseHeight = getOffsetHeight(base);
           // actual base
           base = base->firstChild();
+          if (!base->isBoxModelObject())
+            break;
+
           // FIXME: We need to look at the space between a single maximum height
           // of
           //        the line boxes and the baseline and squeeze them together
-          int underSpacing = baseHeight - base->baselinePosition(true);
+          int underSpacing = baseHeight -
+                             toRenderBoxModelObject(base)->baselinePosition(
+                                 true, HorizontalLine);
 
           RenderObject* under = lastChild();
           if (under && under->firstChild()->isRenderInline() &&
@@ -250,11 +267,14 @@ void RenderMathMLUnderOver::layout() {
   RenderBlock::layout();
 }
 
-int RenderMathMLUnderOver::baselinePosition(bool firstLine,
-                                            bool isRootLineBox) const {
+int RenderMathMLUnderOver::baselinePosition(
+    bool firstLine,
+    LineDirectionMode direction,
+    LinePositionMode linePositionMode) const {
   RenderObject* current = firstChild();
   if (!current)
-    return RenderBlock::baselinePosition(firstLine, isRootLineBox);
+    return RenderBlock::baselinePosition(firstLine, direction,
+                                         linePositionMode);
 
   int baseline = 0;
   switch (m_kind) {
@@ -265,17 +285,19 @@ int RenderMathMLUnderOver::baselinePosition(bool firstLine,
       if (current) {
         // actual base
         RenderObject* base = current->firstChild();
-        if (!base)
+        if (!base || !base->isBoxModelObject())
           break;
-        baseline += base->baselinePosition(firstLine, isRootLineBox);
+        baseline += toRenderBoxModelObject(base)->baselinePosition(
+            firstLine, HorizontalLine, linePositionMode);
         // added the negative top margin
         baseline += current->style()->marginTop().value();
       }
       break;
     case Under:
       RenderObject* base = current->firstChild();
-      if (base)
-        baseline += base->baselinePosition(true);
+      if (base && base->isBoxModelObject())
+        baseline += toRenderBoxModelObject(base)->baselinePosition(
+            true, HorizontalLine);
   }
 
   // FIXME: Where is the extra 2-3px adjusted for zoom coming from?

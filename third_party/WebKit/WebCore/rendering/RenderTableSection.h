@@ -160,8 +160,6 @@ class RenderTableSection : public RenderBox {
                            int ty,
                            HitTestAction);
 
-  virtual int lineHeight(bool, bool) const { return 0; }
-
   bool ensureRows(int);
   void clearGrid();
 
