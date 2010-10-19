@@ -26,7 +26,7 @@
 #include "config.h"
 
 #if ENABLE(JIT)
-#if !USE(JSVALUE32_64)
+#if USE(JSVALUE64)
 #include "JIT.h"
 
 #include "CodeBlock.h"
@@ -92,7 +92,7 @@ void JIT::emit_op_get_by_val(Instruction* currentInstruction) {
 
   emitGetVirtualRegisters(base, regT0, property, regT1);
   emitJumpSlowCaseIfNotImmediateInteger(regT1);
-#if USE(JSVALUE64)
+
   // This is technically incorrect - we're zero-extending an int32.  On the hot
   // path this doesn't matter.
   // We check the value as if it was a uint32 against the m_vectorLength - which
@@ -105,9 +105,7 @@ void JIT::emit_op_get_by_val(Instruction* currentInstruction) {
   // zero extend rather than sign
   // extending since it makes it easier to re-tag the value in the slow case.
   zeroExtend32ToPtr(regT1, regT1);
-#else
-  emitFastArithImmToInt(regT1);
-#endif
+
   emitJumpSlowCaseIfNotJSCell(regT0, base);
   addSlowCase(
       branchPtr(NotEqual, Address(regT0), ImmPtr(m_globalData->jsArrayVPtr)));
@@ -228,12 +226,8 @@ void JIT::emit_op_put_by_val(Instruction* currentInstruction) {
 
   emitGetVirtualRegisters(base, regT0, property, regT1);
   emitJumpSlowCaseIfNotImmediateInteger(regT1);
-#if USE(JSVALUE64)
   // See comment in op_get_by_val.
   zeroExtend32ToPtr(regT1, regT1);
-#else
-  emitFastArithImmToInt(regT1);
-#endif
   emitJumpSlowCaseIfNotJSCell(regT0, base);
   addSlowCase(
       branchPtr(NotEqual, Address(regT0), ImmPtr(m_globalData->jsArrayVPtr)));
@@ -1389,5 +1383,5 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
 
 }  // namespace JSC
 
-#endif  // !USE(JSVALUE32_64)
+#endif  // USE(JSVALUE64)
 #endif  // ENABLE(JIT)

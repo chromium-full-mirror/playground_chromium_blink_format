@@ -140,12 +140,7 @@ JSGlobalData::JSGlobalData(GlobalDataType globalDataType,
           JSPropertyNameIterator::createStructure(jsNull())),
       getterSetterStructure(GetterSetter::createStructure(jsNull())),
       apiWrapperStructure(JSAPIValueWrapper::createStructure(jsNull())),
-      dummyMarkableCellStructure(JSCell::createDummyStructure())
-#if USE(JSVALUE32)
-      ,
-      numberStructure(JSNumberCell::createStructure(jsNull()))
-#endif
-      ,
+      dummyMarkableCellStructure(JSCell::createDummyStructure()),
       identifierTable(globalDataType == Default
                           ? wtfThreadData().currentIdentifierTable()
                           : createIdentifierTable()),

@@ -159,7 +159,7 @@ struct JITStackFrame {
 struct JITStackFrame {
   JITStubArg reserved;  // Unused
   JITStubArg args[6];
-#if !USE(JSVALUE32_64)
+#if USE(JSVALUE64)
   void* padding;  // Maintain 16-byte stack alignment.
 #endif
 

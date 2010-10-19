@@ -75,10 +75,7 @@ class JSCell {
                              AnonymousSlotCount);
   }
 
-// Querying the type.
-#if USE(JSVALUE32)
-  bool isNumber() const;
-#endif
+  // Querying the type.
   bool isString() const;
   bool isObject() const;
   virtual bool isGetterSetter() const;
@@ -165,12 +162,6 @@ inline JSCell::JSCell(Structure* structure) : m_structure(structure) {}
 
 inline JSCell::~JSCell() {}
 
-#if USE(JSVALUE32)
-inline bool JSCell::isNumber() const {
-  return m_structure->typeInfo().type() == NumberType;
-}
-#endif
-
 inline bool JSCell::isObject() const {
   return m_structure->typeInfo().type() == ObjectType;
 }
@@ -249,12 +240,12 @@ ALWAYS_INLINE bool JSValue::getUInt32(uint32_t& v) const {
   return false;
 }
 
-#if !USE(JSVALUE32_64)
+#if USE(JSVALUE64)
 ALWAYS_INLINE JSCell* JSValue::asCell() const {
   ASSERT(isCell());
   return m_ptr;
 }
-#endif  // !USE(JSVALUE32_64)
+#endif  // USE(JSVALUE64)
 
 inline JSValue JSValue::toPrimitive(
     ExecState* exec,

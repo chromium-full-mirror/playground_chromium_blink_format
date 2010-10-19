@@ -67,7 +67,7 @@ ALWAYS_INLINE void JIT::emitGetFromCallFrameHeaderPtr(
     RegisterID to,
     RegisterID from) {
   loadPtr(Address(from, entry * sizeof(Register)), to);
-#if !USE(JSVALUE32_64)
+#if USE(JSVALUE64)
   killLastResultRegister();
 #endif
 }
@@ -95,7 +95,7 @@ ALWAYS_INLINE void JIT::emitGetFromCallFrameHeader32(
     RegisterID to,
     RegisterID from) {
   load32(Address(from, entry * sizeof(Register)), to);
-#if !USE(JSVALUE32_64)
+#if USE(JSVALUE64)
   killLastResultRegister();
 #endif
 }
@@ -782,7 +782,7 @@ ALWAYS_INLINE void JIT::emitJumpSlowCaseIfNotImmediateNumber(RegisterID reg) {
   addSlowCase(emitJumpIfNotImmediateNumber(reg));
 }
 
-#if !USE(JSVALUE64)
+#if USE(JSVALUE32_64)
 ALWAYS_INLINE void JIT::emitFastArithDeTagImmediate(RegisterID reg) {
   subPtr(Imm32(JSImmediate::TagTypeNumber), reg);
 }

@@ -649,17 +649,6 @@ inline bool isPointerAligned(void* p) {
 COMPILE_ASSERT(sizeof(CollectorCell) % 2 == 0,
                Collector_cell_size_is_power_of_two);
 
-#if USE(JSVALUE32)
-static bool isHalfCellAligned(void* p) {
-  return (((intptr_t)(p) & (CELL_MASK >> 1)) == 0);
-}
-
-static inline bool isPossibleCell(void* p) {
-  return isHalfCellAligned(p) && p;
-}
-
-#else
-
 static inline bool isCellAligned(void* p) {
   return (((intptr_t)(p)&CELL_MASK) == 0);
 }
@@ -667,7 +656,6 @@ static inline bool isCellAligned(void* p) {
 static inline bool isPossibleCell(void* p) {
   return isCellAligned(p) && p;
 }
-#endif  // USE(JSVALUE32)
 
 void Heap::markConservatively(MarkStack& markStack, void* start, void* end) {
   if (start > end) {
@@ -1142,10 +1130,6 @@ size_t Heap::protectedObjectCount() {
 static const char* typeName(JSCell* cell) {
   if (cell->isString())
     return "string";
-#if USE(JSVALUE32)
-  if (cell->isNumber())
-    return "number";
-#endif
   if (cell->isGetterSetter())
     return "Getter-Setter";
   if (cell->isAPIValueWrapper())

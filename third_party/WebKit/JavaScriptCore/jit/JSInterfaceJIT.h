@@ -168,7 +168,7 @@ class JSInterfaceJIT : public MacroAssembler {
   inline Address tagFor(unsigned index, RegisterID base = callFrameRegister);
 #endif
 
-#if USE(JSVALUE32) || USE(JSVALUE64)
+#if USE(JSVALUE64)
   Jump emitJumpIfImmediateNumber(RegisterID reg);
   Jump emitJumpIfNotImmediateNumber(RegisterID reg);
   void emitFastArithImmToInt(RegisterID reg);
@@ -293,37 +293,7 @@ ALWAYS_INLINE void JSInterfaceJIT::emitFastArithImmToInt(RegisterID) {}
 
 #endif
 
-#if USE(JSVALUE32)
-inline JSInterfaceJIT::Jump JSInterfaceJIT::emitLoadJSCell(
-    unsigned virtualRegisterIndex,
-    RegisterID dst) {
-  loadPtr(addressFor(virtualRegisterIndex), dst);
-  return branchTest32(NonZero, dst, Imm32(JSImmediate::TagMask));
-}
-
-inline JSInterfaceJIT::Jump JSInterfaceJIT::emitLoadInt32(
-    unsigned virtualRegisterIndex,
-    RegisterID dst) {
-  loadPtr(addressFor(virtualRegisterIndex), dst);
-  Jump result = branchTest32(Zero, dst, Imm32(JSImmediate::TagTypeNumber));
-  rshift32(Imm32(JSImmediate::IntegerPayloadShift), dst);
-  return result;
-}
-
-inline JSInterfaceJIT::Jump JSInterfaceJIT::emitLoadDouble(unsigned,
-                                                           FPRegisterID,
-                                                           RegisterID) {
-  ASSERT_NOT_REACHED();
-  return jump();
-}
-
-ALWAYS_INLINE void JSInterfaceJIT::emitFastArithImmToInt(RegisterID reg) {
-  rshift32(Imm32(JSImmediate::IntegerPayloadShift), reg);
-}
-
-#endif
-
-#if !USE(JSVALUE32_64)
+#if USE(JSVALUE64)
 inline JSInterfaceJIT::Address JSInterfaceJIT::payloadFor(
     unsigned virtualRegisterIndex,
     RegisterID base) {

@@ -38,12 +38,7 @@ class NumberObject : public JSWrapperObject {
   }
 
  protected:
-#if USE(JSVALUE32)
-  static const unsigned StructureFlags =
-      OverridesMarkChildren | JSWrapperObject::StructureFlags;
-#else
   static const unsigned StructureFlags = JSWrapperObject::StructureFlags;
-#endif
 
  private:
   virtual const ClassInfo* classInfo() const { return &info; }
