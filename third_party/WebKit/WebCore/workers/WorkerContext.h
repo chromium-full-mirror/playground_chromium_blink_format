@@ -143,8 +143,8 @@ class WorkerContext : public RefCounted<WorkerContext>,
   virtual bool isJSExecutionTerminated() const;
 
 #if ENABLE(BLOB)
-  String createBlobURL(Blob*);
-  void revokeBlobURL(const String&);
+  String createObjectURL(Blob*);
+  void revokeObjectURL(const String&);
 #endif
 
 #if ENABLE(FILE_SYSTEM)

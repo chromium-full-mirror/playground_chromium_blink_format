@@ -1572,11 +1572,11 @@ EventTargetData* DOMWindow::ensureEventTargetData() {
 }
 
 #if ENABLE(BLOB)
-String DOMWindow::createBlobURL(Blob* blob) {
+String DOMWindow::createObjectURL(Blob* blob) {
   return scriptExecutionContext()->createPublicBlobURL(blob).string();
 }
 
-void DOMWindow::revokeBlobURL(const String& blobURLString) {
+void DOMWindow::revokeObjectURL(const String& blobURLString) {
   scriptExecutionContext()->revokePublicBlobURL(KURL(KURL(), blobURLString));
 }
 #endif

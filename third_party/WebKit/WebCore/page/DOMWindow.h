@@ -444,8 +444,8 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   }
 #endif
 #if ENABLE(BLOB)
-  String createBlobURL(Blob*);
-  void revokeBlobURL(const String&);
+  String createObjectURL(Blob*);
+  void revokeObjectURL(const String&);
 #endif
 
   using RefCounted<DOMWindow>::ref;
