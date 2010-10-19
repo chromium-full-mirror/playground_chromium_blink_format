@@ -256,6 +256,21 @@ void WebPageProxy::loadHTMLString(const String& htmlString,
                   m_pageID);
 }
 
+void WebPageProxy::loadAlternateHTMLString(const String& htmlString,
+                                           const String& baseURL,
+                                           const String& unreachableURL) {
+  if (!isValid())
+    return;
+
+  if (!m_mainFrame)
+    return;
+
+  m_mainFrame->setUnreachableURL(unreachableURL);
+  process()->send(Messages::WebPage::LoadAlternateHTMLString(
+                      htmlString, baseURL, unreachableURL),
+                  m_pageID);
+}
+
 void WebPageProxy::loadPlainTextString(const String& string) {
   if (!isValid())
     return;
@@ -617,6 +632,7 @@ void WebPageProxy::didFinishProgress() {
 void WebPageProxy::didStartProvisionalLoadForFrame(
     uint64_t frameID,
     const String& url,
+    bool loadingSubstituteDataForUnreachableURL,
     CoreIPC::ArgumentDecoder* arguments) {
   RefPtr<APIObject> userData;
   WebContextUserMessageDecoder messageDecoder(userData,
@@ -625,6 +641,9 @@ void WebPageProxy::didStartProvisionalLoadForFrame(
     return;
 
   WebFrameProxy* frame = process()->webFrame(frameID);
+
+  if (!loadingSubstituteDataForUnreachableURL)
+    frame->setUnreachableURL(String());
 
   frame->didStartProvisionalLoad(url);
   m_loaderClient.didStartProvisionalLoadForFrame(this, frame, userData.get());

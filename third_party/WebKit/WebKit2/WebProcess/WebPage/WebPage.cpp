@@ -313,10 +313,10 @@ void WebPage::loadData(PassRefPtr<SharedBuffer> sharedBuffer,
                        const String& MIMEType,
                        const String& encodingName,
                        const KURL& baseURL,
-                       const KURL& failingURL) {
+                       const KURL& unreachableURL) {
   ResourceRequest request(baseURL);
   SubstituteData substituteData(sharedBuffer, MIMEType, encodingName,
-                                failingURL);
+                                unreachableURL);
   m_mainFrame->coreFrame()->loader()->load(request, substituteData, false);
 }
 
@@ -328,6 +328,20 @@ void WebPage::loadHTMLString(const String& htmlString,
   KURL baseURL =
       baseURLString.isEmpty() ? blankURL() : KURL(KURL(), baseURLString);
   loadData(sharedBuffer, "text/html", "utf-16", baseURL, KURL());
+}
+
+void WebPage::loadAlternateHTMLString(const String& htmlString,
+                                      const String& baseURLString,
+                                      const String& unreachableURLString) {
+  RefPtr<SharedBuffer> sharedBuffer = SharedBuffer::create(
+      reinterpret_cast<const char*>(htmlString.characters()),
+      htmlString.length() * sizeof(UChar));
+  KURL baseURL =
+      baseURLString.isEmpty() ? blankURL() : KURL(KURL(), baseURLString);
+  KURL unreachableURL = unreachableURLString.isEmpty()
+                            ? KURL()
+                            : KURL(KURL(), unreachableURLString);
+  loadData(sharedBuffer, "text/html", "utf-16", baseURL, unreachableURL);
 }
 
 void WebPage::loadPlainTextString(const String& string) {

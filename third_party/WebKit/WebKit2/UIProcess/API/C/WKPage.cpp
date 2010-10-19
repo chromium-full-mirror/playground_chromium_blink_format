@@ -60,6 +60,15 @@ void WKPageLoadHTMLString(WKPageRef pageRef,
                                   toWTFString(baseURLRef));
 }
 
+void WKPageLoadAlternateHTMLString(WKPageRef pageRef,
+                                   WKStringRef htmlStringRef,
+                                   WKURLRef baseURLRef,
+                                   WKURLRef unreachableURLRef) {
+  toImpl(pageRef)->loadAlternateHTMLString(toWTFString(htmlStringRef),
+                                           toWTFString(baseURLRef),
+                                           toWTFString(unreachableURLRef));
+}
+
 void WKPageLoadPlainTextString(WKPageRef pageRef,
                                WKStringRef plainTextStringRef) {
   toImpl(pageRef)->loadPlainTextString(toWTFString(plainTextStringRef));

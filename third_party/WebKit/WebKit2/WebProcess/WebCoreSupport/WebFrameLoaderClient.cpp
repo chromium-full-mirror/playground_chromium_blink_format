@@ -313,10 +313,13 @@ void WebFrameLoaderClient::dispatchDidStartProvisionalLoad() {
   webPage->injectedBundleLoaderClient().didStartProvisionalLoadForFrame(
       webPage, m_frame, userData);
 
+  bool loadingSubstituteDataForUnreachableURL =
+      !provisionalLoader->unreachableURL().isNull();
+
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       Messages::WebPageProxy::DidStartProvisionalLoadForFrame(
-          m_frame->frameID(), url,
+          m_frame->frameID(), url, loadingSubstituteDataForUnreachableURL,
           InjectedBundleUserMessageEncoder(userData.get())),
       webPage->pageID());
 }
