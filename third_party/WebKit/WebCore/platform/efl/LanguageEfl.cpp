@@ -34,7 +34,7 @@
 
 namespace WebCore {
 
-String defaultLanguage() {
+String platformDefaultLanguage() {
   notImplemented();
   return String();
 }

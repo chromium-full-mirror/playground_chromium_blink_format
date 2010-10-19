@@ -32,7 +32,7 @@
 
 namespace WebCore {
 
-String defaultLanguage() {
+String platformDefaultLanguage() {
   QLocale locale;
   return locale.name().replace("_", "-");
 }
