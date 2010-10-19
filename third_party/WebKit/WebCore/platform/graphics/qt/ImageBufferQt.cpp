@@ -223,8 +223,8 @@ PassRefPtr<ImageData> getImageData(const IntRect& rect,
   const uchar* bits = image.bits();
 #endif
 
-  quint32* destRows =
-      reinterpret_cast_ptr<quint32*>(&data[desty * rect.width() + destx]);
+  quint32* destRows = reinterpret_cast_ptr<quint32*>(
+      &data[desty * rect.width() * 4 + destx * 4]);
 
   if (multiplied == Unmultiplied) {
     for (int y = 0; y < numRows; ++y) {
