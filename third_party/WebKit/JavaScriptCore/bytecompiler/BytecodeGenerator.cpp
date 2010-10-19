@@ -347,7 +347,12 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
       m_firstLazyFunction(0),
       m_lastLazyFunction(0),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
-      m_lastOpcodeID(op_end),
+      m_lastOpcodeID(op_end)
+#ifndef NDEBUG
+      ,
+      m_lastOpcodePosition(0)
+#endif
+      ,
       m_emitNodeDepth(0),
       m_usesExceptions(false),
       m_regeneratingForExceptionInfo(false),
@@ -527,7 +532,12 @@ BytecodeGenerator::BytecodeGenerator(EvalNode* evalNode,
       m_firstLazyFunction(0),
       m_lastLazyFunction(0),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
-      m_lastOpcodeID(op_end),
+      m_lastOpcodeID(op_end)
+#ifndef NDEBUG
+      ,
+      m_lastOpcodePosition(0)
+#endif
+      ,
       m_emitNodeDepth(0),
       m_usesExceptions(false),
       m_regeneratingForExceptionInfo(false),
