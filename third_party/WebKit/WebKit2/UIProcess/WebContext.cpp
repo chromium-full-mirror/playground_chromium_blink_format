@@ -60,6 +60,7 @@ static WTF::RefCountedLeakCounter webContextCounter("WebContext");
 #endif
 
 WebContext* WebContext::sharedProcessContext() {
+  WTF::initializeMainThread();
   RunLoop::initializeMainRunLoop();
   static WebContext* context =
       adoptRef(new WebContext(ProcessModelSharedSecondaryProcess, String()))
@@ -76,6 +77,7 @@ WebContext* WebContext::sharedThreadContext() {
 }
 
 PassRefPtr<WebContext> WebContext::create(const String& injectedBundlePath) {
+  WTF::initializeMainThread();
   RunLoop::initializeMainRunLoop();
   return adoptRef(
       new WebContext(ProcessModelSecondaryProcess, injectedBundlePath));
@@ -92,7 +94,7 @@ WebContext::WebContext(ProcessModel processModel,
       m_shouldPaintNativeControls(true)
 #endif
 {
-  RunLoop::initializeMainRunLoop();
+  addLanguageChangeObserver(this, languageChanged);
 
   m_preferences = WebPreferences::shared();
   m_preferences->addContext(this);
@@ -128,10 +130,15 @@ void WebContext::initializeHistoryClient(const WKContextHistoryClient* client) {
                   0);
 }
 
-static void languageChanged(void* context) {
-  WebProcessProxy* process = static_cast<WebContext*>(context)->process();
-  if (process)
-    process->send(Messages::WebProcess::LanguageChanged(defaultLanguage()), 0);
+void WebContext::languageChanged(void* context) {
+  static_cast<WebContext*>(context)->languageChanged();
+}
+
+void WebContext::languageChanged() {
+  if (!hasValidProcess())
+    return;
+
+  m_process->send(Messages::WebProcess::LanguageChanged(defaultLanguage()), 0);
 }
 
 void WebContext::ensureWebProcess() {
@@ -163,10 +170,7 @@ void WebContext::ensureWebProcess() {
   parameters.shouldTrackVisitedLinks =
       m_historyClient.shouldTrackVisitedLinks();
   parameters.cacheModel = m_cacheModel;
-
   parameters.languageCode = defaultLanguage();
-  addLanguageChangeObserver(this, languageChanged);
-
   parameters.applicationCacheDirectory = applicationCacheDirectory();
 
   copyToVector(m_schemesToRegisterAsEmptyDocument,
