@@ -31,7 +31,6 @@
 #define TO_MASK(x) (1 << (x))
 
 namespace WTF {
-
 namespace Unicode {
 
 enum Direction {
@@ -74,7 +73,7 @@ enum DecompositionType {
   DecompositionSub = UnicodeCE::U_DT_SUB,
   DecompositionSuper = UnicodeCE::U_DT_SUPER,
   DecompositionVertical = UnicodeCE::U_DT_VERTICAL,
-  DecompositionWide = UnicodeCE::U_DT_WIDE,
+  DecompositionWide = UnicodeCE::U_DT_WIDE
 };
 
 enum CharCategory {
@@ -187,7 +186,6 @@ inline UChar32 surrogateToUcs4(wchar_t high, wchar_t low) {
 }
 
 }  // namespace Unicode
-
 }  // namespace WTF
 
 #endif  // WTF_UnicodeWinCE_h
