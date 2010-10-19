@@ -47,6 +47,14 @@ class UrlLoader : public QObject {
  public slots:
   void loadNext();
 
+ private slots:
+  void checkIfFinished();
+  void frameLoadStarted();
+  void frameLoadFinished();
+
+ signals:
+  void pageLoadFinished();
+
  private:
   void loadUrlList(const QString& inputFileName);
   bool getUrl(QString& qstr);
@@ -59,6 +67,8 @@ class UrlLoader : public QObject {
   int m_loaded;
   QTimer m_timeoutTimer;
   QTimer m_extraTimeTimer;
+  QTimer m_checkIfFinishedTimer;
+  int m_numFramesLoading;
 };
 
 #endif
