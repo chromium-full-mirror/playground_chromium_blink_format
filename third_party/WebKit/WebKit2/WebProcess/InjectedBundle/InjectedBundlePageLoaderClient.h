@@ -32,6 +32,7 @@
 
 namespace WebCore {
 class DOMWrapperWorld;
+class ResourceError;
 }
 
 namespace WebKit {
@@ -54,6 +55,7 @@ class InjectedBundlePageLoaderClient {
       RefPtr<APIObject>& userData);
   void didFailProvisionalLoadWithErrorForFrame(WebPage*,
                                                WebFrame*,
+                                               const WebCore::ResourceError&,
                                                RefPtr<APIObject>& userData);
   void didCommitLoadForFrame(WebPage*, WebFrame*, RefPtr<APIObject>& userData);
   void didFinishDocumentLoadForFrame(WebPage*,
@@ -62,6 +64,7 @@ class InjectedBundlePageLoaderClient {
   void didFinishLoadForFrame(WebPage*, WebFrame*, RefPtr<APIObject>& userData);
   void didFailLoadWithErrorForFrame(WebPage*,
                                     WebFrame*,
+                                    const WebCore::ResourceError&,
                                     RefPtr<APIObject>& userData);
   void didReceiveTitleForFrame(WebPage*,
                                const String&,

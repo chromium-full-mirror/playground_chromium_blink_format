@@ -649,6 +649,7 @@ void WebPageProxy::didReceiveServerRedirectForProvisionalLoadForFrame(
 
 void WebPageProxy::didFailProvisionalLoadForFrame(
     uint64_t frameID,
+    const ResourceError& error,
     CoreIPC::ArgumentDecoder* arguments) {
   RefPtr<APIObject> userData;
   WebContextUserMessageDecoder messageDecoder(userData,
@@ -659,7 +660,7 @@ void WebPageProxy::didFailProvisionalLoadForFrame(
   WebFrameProxy* frame = process()->webFrame(frameID);
 
   frame->didFailProvisionalLoad();
-  m_loaderClient.didFailProvisionalLoadWithErrorForFrame(this, frame,
+  m_loaderClient.didFailProvisionalLoadWithErrorForFrame(this, frame, error,
                                                          userData.get());
 }
 
@@ -711,6 +712,7 @@ void WebPageProxy::didFinishLoadForFrame(uint64_t frameID,
 }
 
 void WebPageProxy::didFailLoadForFrame(uint64_t frameID,
+                                       const ResourceError& error,
                                        CoreIPC::ArgumentDecoder* arguments) {
   RefPtr<APIObject> userData;
   WebContextUserMessageDecoder messageDecoder(userData,
@@ -721,7 +723,8 @@ void WebPageProxy::didFailLoadForFrame(uint64_t frameID,
   WebFrameProxy* frame = process()->webFrame(frameID);
   frame->didFailLoad();
 
-  m_loaderClient.didFailLoadWithErrorForFrame(this, frame, userData.get());
+  m_loaderClient.didFailLoadWithErrorForFrame(this, frame, error,
+                                              userData.get());
 }
 
 void WebPageProxy::didReceiveTitleForFrame(

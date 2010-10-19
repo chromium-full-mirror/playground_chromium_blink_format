@@ -58,6 +58,7 @@ class InjectedBundlePage {
       const void*);
   static void didFailProvisionalLoadWithErrorForFrame(WKBundlePageRef,
                                                       WKBundleFrameRef,
+                                                      WKErrorRef,
                                                       WKTypeRef*,
                                                       const void*);
   static void didCommitLoadForFrame(WKBundlePageRef,
@@ -74,6 +75,7 @@ class InjectedBundlePage {
                                             const void*);
   static void didFailLoadWithErrorForFrame(WKBundlePageRef,
                                            WKBundleFrameRef,
+                                           WKErrorRef,
                                            WKTypeRef*,
                                            const void*);
   static void didReceiveTitleForFrame(WKBundlePageRef,
@@ -108,10 +110,10 @@ class InjectedBundlePage {
                                             const void*);
   void didStartProvisionalLoadForFrame(WKBundleFrameRef);
   void didReceiveServerRedirectForProvisionalLoadForFrame(WKBundleFrameRef);
-  void didFailProvisionalLoadWithErrorForFrame(WKBundleFrameRef);
+  void didFailProvisionalLoadWithErrorForFrame(WKBundleFrameRef, WKErrorRef);
   void didCommitLoadForFrame(WKBundleFrameRef);
   void didFinishLoadForFrame(WKBundleFrameRef);
-  void didFailLoadWithErrorForFrame(WKBundleFrameRef);
+  void didFailLoadWithErrorForFrame(WKBundleFrameRef, WKErrorRef);
   void didReceiveTitleForFrame(WKStringRef title, WKBundleFrameRef);
   void didClearWindowForFrame(WKBundleFrameRef, WKBundleScriptWorldRef);
   void didCancelClientRedirectForFrame(WKBundleFrameRef);

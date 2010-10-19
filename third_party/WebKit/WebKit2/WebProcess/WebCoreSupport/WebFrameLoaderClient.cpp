@@ -376,12 +376,13 @@ void WebFrameLoaderClient::dispatchDidFailProvisionalLoad(
 
   // Notify the bundle client.
   webPage->injectedBundleLoaderClient().didFailProvisionalLoadWithErrorForFrame(
-      webPage, m_frame, userData);
+      webPage, m_frame, error, userData);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       Messages::WebPageProxy::DidFailProvisionalLoadForFrame(
-          m_frame->frameID(), InjectedBundleUserMessageEncoder(userData.get())),
+          m_frame->frameID(), error,
+          InjectedBundleUserMessageEncoder(userData.get())),
       webPage->pageID());
 
   // If we have a load listener, notify it.
@@ -398,12 +399,13 @@ void WebFrameLoaderClient::dispatchDidFailLoad(const ResourceError& error) {
 
   // Notify the bundle client.
   webPage->injectedBundleLoaderClient().didFailLoadWithErrorForFrame(
-      webPage, m_frame, userData);
+      webPage, m_frame, error, userData);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
       Messages::WebPageProxy::DidFailLoadForFrame(
-          m_frame->frameID(), InjectedBundleUserMessageEncoder(userData.get())),
+          m_frame->frameID(), error,
+          InjectedBundleUserMessageEncoder(userData.get())),
       webPage->pageID());
 
   // If we have a load listener, notify it.

@@ -39,6 +39,7 @@ static bool testDone;
 
 static void didFailProvisionalLoadWithErrorForFrame(WKPageRef page,
                                                     WKFrameRef frame,
+                                                    WKErrorRef error,
                                                     WKTypeRef userData,
                                                     const void* clientInfo) {
   TEST_ASSERT(WKFrameGetFrameLoadState(frame) == kWKFrameLoadStateFinished);

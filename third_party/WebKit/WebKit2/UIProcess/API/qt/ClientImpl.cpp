@@ -53,6 +53,7 @@ void qt_wk_didReceiveServerRedirectForProvisionalLoadForFrame(
 
 void qt_wk_didFailProvisionalLoadWithErrorForFrame(WKPageRef page,
                                                    WKFrameRef frame,
+                                                   WKErrorRef error,
                                                    WKTypeRef userData,
                                                    const void* clientInfo) {}
 
@@ -88,6 +89,7 @@ void qt_wk_didFinishLoadForFrame(WKPageRef page,
 
 void qt_wk_didFailLoadWithErrorForFrame(WKPageRef page,
                                         WKFrameRef frame,
+                                        WKErrorRef error,
                                         WKTypeRef userData,
                                         const void* clientInfo) {
   if (!WKFrameIsMainFrame(frame))

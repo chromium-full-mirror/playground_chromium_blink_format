@@ -266,6 +266,7 @@ class WebPageProxy : public APIObject {
       const String&,
       CoreIPC::ArgumentDecoder*);
   void didFailProvisionalLoadForFrame(uint64_t frameID,
+                                      const WebCore::ResourceError&,
                                       CoreIPC::ArgumentDecoder*);
   void didCommitLoadForFrame(uint64_t frameID,
                              const String& mimeType,
@@ -274,7 +275,9 @@ class WebPageProxy : public APIObject {
   void didFinishDocumentLoadForFrame(uint64_t frameID,
                                      CoreIPC::ArgumentDecoder*);
   void didFinishLoadForFrame(uint64_t frameID, CoreIPC::ArgumentDecoder*);
-  void didFailLoadForFrame(uint64_t frameID, CoreIPC::ArgumentDecoder*);
+  void didFailLoadForFrame(uint64_t frameID,
+                           const WebCore::ResourceError&,
+                           CoreIPC::ArgumentDecoder*);
   void didReceiveTitleForFrame(uint64_t frameID,
                                const String&,
                                CoreIPC::ArgumentDecoder*);

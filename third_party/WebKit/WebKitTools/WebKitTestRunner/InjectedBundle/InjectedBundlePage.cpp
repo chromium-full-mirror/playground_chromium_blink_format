@@ -259,10 +259,11 @@ void InjectedBundlePage::didReceiveServerRedirectForProvisionalLoadForFrame(
 void InjectedBundlePage::didFailProvisionalLoadWithErrorForFrame(
     WKBundlePageRef page,
     WKBundleFrameRef frame,
+    WKErrorRef error,
     WKTypeRef*,
     const void* clientInfo) {
   static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
-      ->didFailProvisionalLoadWithErrorForFrame(frame);
+      ->didFailProvisionalLoadWithErrorForFrame(frame, error);
 }
 
 void InjectedBundlePage::didCommitLoadForFrame(WKBundlePageRef page,
@@ -291,10 +292,11 @@ void InjectedBundlePage::didFinishDocumentLoadForFrame(WKBundlePageRef page,
 
 void InjectedBundlePage::didFailLoadWithErrorForFrame(WKBundlePageRef page,
                                                       WKBundleFrameRef frame,
+                                                      WKErrorRef error,
                                                       WKTypeRef*,
                                                       const void* clientInfo) {
   static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
-      ->didFailLoadWithErrorForFrame(frame);
+      ->didFailLoadWithErrorForFrame(frame, error);
 }
 
 void InjectedBundlePage::didReceiveTitleForFrame(WKBundlePageRef page,
@@ -376,7 +378,8 @@ void InjectedBundlePage::didReceiveServerRedirectForProvisionalLoadForFrame(
     WKBundleFrameRef frame) {}
 
 void InjectedBundlePage::didFailProvisionalLoadWithErrorForFrame(
-    WKBundleFrameRef frame) {}
+    WKBundleFrameRef frame,
+    WKErrorRef error) {}
 
 void InjectedBundlePage::didCommitLoadForFrame(WKBundleFrameRef frame) {}
 
@@ -493,7 +496,8 @@ void InjectedBundlePage::didFinishLoadForFrame(WKBundleFrameRef frame) {
   dump();
 }
 
-void InjectedBundlePage::didFailLoadWithErrorForFrame(WKBundleFrameRef frame) {
+void InjectedBundlePage::didFailLoadWithErrorForFrame(WKBundleFrameRef frame,
+                                                      WKErrorRef) {
   if (!InjectedBundle::shared().isTestRunning())
     return;
 

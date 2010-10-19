@@ -38,6 +38,7 @@ void qt_wk_didReceiveServerRedirectForProvisionalLoadForFrame(
     const void* clientInfo);
 void qt_wk_didFailProvisionalLoadWithErrorForFrame(WKPageRef,
                                                    WKFrameRef,
+                                                   WKErrorRef,
                                                    WKTypeRef,
                                                    const void* clientInfo);
 void qt_wk_didCommitLoadForFrame(WKPageRef,
@@ -54,6 +55,7 @@ void qt_wk_didFinishLoadForFrame(WKPageRef,
                                  const void* clientInfo);
 void qt_wk_didFailLoadWithErrorForFrame(WKPageRef,
                                         WKFrameRef,
+                                        WKErrorRef,
                                         WKTypeRef,
                                         const void* clientInfo);
 void qt_wk_didReceiveTitleForFrame(WKPageRef,

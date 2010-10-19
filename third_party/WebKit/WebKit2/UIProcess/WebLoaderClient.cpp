@@ -28,6 +28,8 @@
 #include "WKAPICast.h"
 #include <string.h>
 
+using namespace WebCore;
+
 namespace WebKit {
 
 WebLoaderClient::WebLoaderClient() {
@@ -67,12 +69,13 @@ void WebLoaderClient::didReceiveServerRedirectForProvisionalLoadForFrame(
 void WebLoaderClient::didFailProvisionalLoadWithErrorForFrame(
     WebPageProxy* page,
     WebFrameProxy* frame,
+    const ResourceError& error,
     APIObject* userData) {
   if (!m_pageLoaderClient.didFailProvisionalLoadWithErrorForFrame)
     return;
 
   m_pageLoaderClient.didFailProvisionalLoadWithErrorForFrame(
-      toAPI(page), toAPI(frame), toAPI(userData),
+      toAPI(page), toAPI(frame), toAPI(error), toAPI(userData),
       m_pageLoaderClient.clientInfo);
 }
 
@@ -111,12 +114,13 @@ void WebLoaderClient::didFinishLoadForFrame(WebPageProxy* page,
 
 void WebLoaderClient::didFailLoadWithErrorForFrame(WebPageProxy* page,
                                                    WebFrameProxy* frame,
+                                                   const ResourceError& error,
                                                    APIObject* userData) {
   if (!m_pageLoaderClient.didFailLoadWithErrorForFrame)
     return;
 
   m_pageLoaderClient.didFailLoadWithErrorForFrame(
-      toAPI(page), toAPI(frame), toAPI(userData),
+      toAPI(page), toAPI(frame), toAPI(error), toAPI(userData),
       m_pageLoaderClient.clientInfo);
 }
 
