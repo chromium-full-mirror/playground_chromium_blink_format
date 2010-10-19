@@ -1082,6 +1082,20 @@ static gint webkit_accessible_text_get_caret_offset(AtkText* text) {
   return offset;
 }
 
+static int baselinePositionForAccessibilityRenderObject(
+    RenderObject* renderObject) {
+  // FIXME: This implementation of baselinePosition originates from
+  // RenderObject.cpp and was
+  // removed in r70072. The implementation looks incorrect though, because this
+  // is not the
+  // baseline of the underlying RenderObject, but of the
+  // AccessibilityRenderObject.
+  const Font& f = renderObject->firstLineStyle()->font();
+  return f.ascent() +
+         (renderObject->firstLineStyle()->computedLineHeight() - f.height()) /
+             2;
+}
+
 static AtkAttributeSet* getAttributeSetForAccessibilityObject(
     const AccessibilityObject* object) {
   if (!object->isAccessibilityRenderObject())
@@ -1118,10 +1132,11 @@ static AtkAttributeSet* getAttributeSetForAccessibilityObject(
   bool includeRise = true;
   switch (style->verticalAlign()) {
     case SUB:
-      baselinePosition = -1 * renderer->baselinePosition(true);
+      baselinePosition =
+          -1 * baselinePositionForAccessibilityRenderObject(renderer);
       break;
     case SUPER:
-      baselinePosition = renderer->baselinePosition(true);
+      baselinePosition = baselinePositionForAccessibilityRenderObject(renderer);
       break;
     case BASELINE:
       baselinePosition = 0;
