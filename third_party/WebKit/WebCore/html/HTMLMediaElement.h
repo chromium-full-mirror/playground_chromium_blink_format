@@ -191,6 +191,9 @@ class HTMLMediaElement : public HTMLElement,
 
   bool processingUserGesture() const;
 
+  void sourceWillBeRemoved(HTMLSourceElement*);
+  void sourceWasAdded(HTMLSourceElement*);
+
  protected:
   HTMLMediaElement(const QualifiedName&, Document*);
   virtual ~HTMLMediaElement();
@@ -365,6 +368,8 @@ class HTMLMediaElement : public HTMLElement,
   };
   LoadState m_loadState;
   HTMLSourceElement* m_currentSourceNode;
+  Node* m_nextChildNodeToConsider;
+  Node* sourceChildEndOfListValue() { return static_cast<Node*>(this); }
 
   OwnPtr<MediaPlayer> m_player;
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)

@@ -50,6 +50,7 @@ class HTMLSourceElement : public HTMLElement {
   HTMLSourceElement(const QualifiedName&, Document*);
 
   virtual void insertedIntoTree(bool);
+  virtual void willRemove();
   virtual bool isURLAttribute(Attribute*) const;
 
   void errorEventTimerFired(Timer<HTMLSourceElement>*);
