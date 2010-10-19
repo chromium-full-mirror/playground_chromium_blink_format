@@ -44,6 +44,8 @@ class WebError : public APIObject {
     return adoptRef(new WebError(error));
   }
 
+  static const String& webKitErrorDomain();
+
   const String& domain() const { return m_platformError.domain(); }
   int errorCode() const {
     return m_platformError.errorCode();
