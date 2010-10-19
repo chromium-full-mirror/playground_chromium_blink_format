@@ -757,6 +757,21 @@ class CloneDeserializer : CloneBase {
     JSValue m_jsString;
   };
 
+  struct CachedStringRef {
+    CachedStringRef() : m_base(0), m_index(0) {}
+    CachedStringRef(Vector<CachedString>* base, size_t index)
+        : m_base(base), m_index(index) {}
+
+    CachedString* operator->() {
+      ASSERT(m_base);
+      return &m_base->at(m_index);
+    }
+
+   private:
+    Vector<CachedString>* m_base;
+    size_t m_index;
+  };
+
   CloneDeserializer(ExecState* exec,
                     JSGlobalObject* globalObject,
                     const Vector<uint8_t>& buffer)
@@ -901,12 +916,12 @@ class CloneDeserializer : CloneBase {
     return true;
   }
 
-  bool readStringData(CachedString*& cachedString) {
+  bool readStringData(CachedStringRef& cachedString) {
     bool scratch;
     return readStringData(cachedString, scratch);
   }
 
-  bool readStringData(CachedString*& cachedString, bool& wasTerminator) {
+  bool readStringData(CachedStringRef& cachedString, bool& wasTerminator) {
     if (m_failed)
       return false;
     uint32_t length = 0;
@@ -926,7 +941,7 @@ class CloneDeserializer : CloneBase {
         fail();
         return false;
       }
-      cachedString = &m_constantPool[index];
+      cachedString = CachedStringRef(&m_constantPool, index);
       return true;
     }
     UString str;
@@ -935,7 +950,7 @@ class CloneDeserializer : CloneBase {
       return false;
     }
     m_constantPool.append(str);
-    cachedString = &m_constantPool.last();
+    cachedString = CachedStringRef(&m_constantPool, m_constantPool.size() - 1);
     return true;
   }
 
@@ -959,13 +974,13 @@ class CloneDeserializer : CloneBase {
   }
 
   bool readFile(RefPtr<File>& file) {
-    CachedString* path = 0;
+    CachedStringRef path;
     if (!readStringData(path))
       return 0;
-    CachedString* url = 0;
+    CachedStringRef url;
     if (!readStringData(url))
       return 0;
-    CachedString* type = 0;
+    CachedStringRef type;
     if (!readStringData(type))
       return 0;
     if (m_isDOMGlobalObject)
@@ -1060,10 +1075,10 @@ class CloneDeserializer : CloneBase {
                     result.get());
       }
       case BlobTag: {
-        CachedString* url = 0;
+        CachedStringRef url;
         if (!readStringData(url))
           return JSValue();
-        CachedString* type = 0;
+        CachedStringRef type;
         if (!readStringData(type))
           return JSValue();
         unsigned long long size = 0;
@@ -1076,7 +1091,7 @@ class CloneDeserializer : CloneBase {
                                  String(type->ustring().impl()), size));
       }
       case StringTag: {
-        CachedString* cachedString = 0;
+        CachedStringRef cachedString;
         if (!readStringData(cachedString))
           return JSValue();
         return cachedString->jsString(m_exec);
@@ -1084,10 +1099,10 @@ class CloneDeserializer : CloneBase {
       case EmptyStringTag:
         return jsEmptyString(&m_exec->globalData());
       case RegExpTag: {
-        CachedString* pattern = 0;
+        CachedStringRef pattern;
         if (!readStringData(pattern))
           return JSValue();
-        CachedString* flags = 0;
+        CachedStringRef flags;
         if (!readStringData(flags))
           return JSValue();
         RefPtr<RegExp> regExp = RegExp::create(
@@ -1196,7 +1211,7 @@ JSValue CloneDeserializer::deserialize() {
           tickCount = ticksUntilNextCheck();
         }
 
-        CachedString* cachedString = 0;
+        CachedStringRef cachedString;
         bool wasTerminator = false;
         if (!readStringData(cachedString, wasTerminator)) {
           if (!wasTerminator)
