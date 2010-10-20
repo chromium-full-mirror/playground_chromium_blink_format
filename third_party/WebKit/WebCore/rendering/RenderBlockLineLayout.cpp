@@ -552,8 +552,8 @@ void RenderBlock::computeBlockDirectionPositionsForLine(
     BidiRun* firstRun,
     GlyphOverflowAndFallbackFontsMap& textBoxDataMap) {
   setLogicalHeight(
-      lineBox->alignBoxesInBlockDirection(height(), textBoxDataMap));
-  lineBox->setBlockLogicalHeight(height());
+      lineBox->alignBoxesInBlockDirection(logicalHeight(), textBoxDataMap));
+  lineBox->setBlockLogicalHeight(logicalHeight());
 
   // Now make sure we place replaced render objects correctly.
   for (BidiRun* r = firstRun; r; r = r->next()) {
@@ -564,7 +564,7 @@ void RenderBlock::computeBlockDirectionPositionsForLine(
     // Align positioned boxes with the top of the line box.  This is
     // a reasonable approximation of an appropriate y position.
     if (r->m_object->isPositioned())
-      r->m_box->setY(height());
+      r->m_box->setLogicalTop(logicalHeight());
 
     // Position is used to properly position both replaced elements and
     // to update the static normal flow x/y of positioned elements.
