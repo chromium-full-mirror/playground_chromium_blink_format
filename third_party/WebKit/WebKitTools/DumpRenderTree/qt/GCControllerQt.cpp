@@ -44,6 +44,6 @@ void GCController::collectOnAlternateThread(bool waitUntilDone) const {
       waitUntilDone);
 }
 
-size_t GCController::getJSObjectCount() const {
+unsigned int GCController::getJSObjectCount() const {
   return DumpRenderTreeSupportQt::javaScriptObjectsCount();
 }
