@@ -40,7 +40,7 @@ class SVGURIReference {
 
  protected:
   virtual void setHrefBaseValue(
-      SVGAnimatedPropertyTraits<String>::PassType) = 0;
+      DeprecatedSVGAnimatedPropertyTraits<String>::PassType) = 0;
 };
 
 }  // namespace WebCore

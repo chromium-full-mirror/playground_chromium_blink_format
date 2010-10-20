@@ -47,7 +47,7 @@ class SVGExternalResourcesRequired {
 
  protected:
   virtual void setExternalResourcesRequiredBaseValue(
-      SVGAnimatedPropertyTraits<bool>::PassType) = 0;
+      DeprecatedSVGAnimatedPropertyTraits<bool>::PassType) = 0;
 };
 
 }  // namespace WebCore

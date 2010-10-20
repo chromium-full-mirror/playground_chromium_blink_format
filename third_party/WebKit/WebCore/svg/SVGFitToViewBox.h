@@ -47,9 +47,10 @@ class SVGFitToViewBox {
   bool isKnownAttribute(const QualifiedName&);
 
   virtual void setViewBoxBaseValue(
-      SVGAnimatedPropertyTraits<FloatRect>::PassType) = 0;
+      DeprecatedSVGAnimatedPropertyTraits<FloatRect>::PassType) = 0;
   virtual void setPreserveAspectRatioBaseValue(
-      SVGAnimatedPropertyTraits<SVGPreserveAspectRatio>::PassType) = 0;
+      DeprecatedSVGAnimatedPropertyTraits<
+          SVGPreserveAspectRatio>::PassType) = 0;
 
  private:
   bool parseViewBox(Document*, const String&, FloatRect&);

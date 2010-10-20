@@ -19,11 +19,11 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef SVGAnimatedTemplate_h
-#define SVGAnimatedTemplate_h
+#ifndef DeprecatedSVGAnimatedTemplate_h
+#define DeprecatedSVGAnimatedTemplate_h
 
 #if ENABLE(SVG)
-#include "SVGAnimatedPropertyTraits.h"
+#include "DeprecatedSVGAnimatedPropertyTraits.h"
 #include <wtf/Forward.h>
 #include <wtf/HashMap.h>
 
@@ -37,26 +37,26 @@ class SVGPreserveAspectRatio;
 class SVGTransformList;
 class QualifiedName;
 
-struct SVGAnimatedTypeWrapperKey {
+struct DeprecatedSVGAnimatedTypeWrapperKey {
   // Empty value
-  SVGAnimatedTypeWrapperKey() : element(0), attributeName(0) {}
+  DeprecatedSVGAnimatedTypeWrapperKey() : element(0), attributeName(0) {}
 
   // Deleted value
-  SVGAnimatedTypeWrapperKey(WTF::HashTableDeletedValueType)
+  DeprecatedSVGAnimatedTypeWrapperKey(WTF::HashTableDeletedValueType)
       : element(reinterpret_cast<SVGElement*>(-1)) {}
 
   bool isHashTableDeletedValue() const {
     return element == reinterpret_cast<SVGElement*>(-1);
   }
 
-  SVGAnimatedTypeWrapperKey(const SVGElement* _element,
-                            const AtomicString& _attributeName)
+  DeprecatedSVGAnimatedTypeWrapperKey(const SVGElement* _element,
+                                      const AtomicString& _attributeName)
       : element(_element), attributeName(_attributeName.impl()) {
     ASSERT(element);
     ASSERT(attributeName);
   }
 
-  bool operator==(const SVGAnimatedTypeWrapperKey& other) const {
+  bool operator==(const DeprecatedSVGAnimatedTypeWrapperKey& other) const {
     return element == other.element && attributeName == other.attributeName;
   }
 
@@ -64,43 +64,44 @@ struct SVGAnimatedTypeWrapperKey {
   AtomicStringImpl* attributeName;
 };
 
-struct SVGAnimatedTypeWrapperKeyHash {
-  static unsigned hash(const SVGAnimatedTypeWrapperKey& key) {
+struct DeprecatedSVGAnimatedTypeWrapperKeyHash {
+  static unsigned hash(const DeprecatedSVGAnimatedTypeWrapperKey& key) {
     return StringImpl::computeHash(
         reinterpret_cast<const UChar*>(&key),
-        sizeof(SVGAnimatedTypeWrapperKey) / sizeof(UChar));
+        sizeof(DeprecatedSVGAnimatedTypeWrapperKey) / sizeof(UChar));
   }
 
-  static bool equal(const SVGAnimatedTypeWrapperKey& a,
-                    const SVGAnimatedTypeWrapperKey& b) {
+  static bool equal(const DeprecatedSVGAnimatedTypeWrapperKey& a,
+                    const DeprecatedSVGAnimatedTypeWrapperKey& b) {
     return a == b;
   }
 
   static const bool safeToCompareToEmptyOrDeleted = true;
 };
 
-struct SVGAnimatedTypeWrapperKeyHashTraits
-    : WTF::GenericHashTraits<SVGAnimatedTypeWrapperKey> {
+struct DeprecatedSVGAnimatedTypeWrapperKeyHashTraits
+    : WTF::GenericHashTraits<DeprecatedSVGAnimatedTypeWrapperKey> {
   static const bool emptyValueIsZero = true;
 
-  static void constructDeletedValue(SVGAnimatedTypeWrapperKey& slot) {
-    new (&slot) SVGAnimatedTypeWrapperKey(WTF::HashTableDeletedValue);
+  static void constructDeletedValue(DeprecatedSVGAnimatedTypeWrapperKey& slot) {
+    new (&slot) DeprecatedSVGAnimatedTypeWrapperKey(WTF::HashTableDeletedValue);
   }
 
-  static bool isDeletedValue(const SVGAnimatedTypeWrapperKey& value) {
+  static bool isDeletedValue(const DeprecatedSVGAnimatedTypeWrapperKey& value) {
     return value.isHashTableDeletedValue();
   }
 };
 
 template <typename AnimatedType>
-class SVGAnimatedTemplate
-    : public RefCounted<SVGAnimatedTemplate<AnimatedType>> {
+class DeprecatedSVGAnimatedTemplate
+    : public RefCounted<DeprecatedSVGAnimatedTemplate<AnimatedType>> {
  public:
-  typedef typename SVGAnimatedPropertyTraits<AnimatedType>::PassType PassType;
-  typedef
-      typename SVGAnimatedPropertyTraits<AnimatedType>::ReturnType ReturnType;
+  typedef typename DeprecatedSVGAnimatedPropertyTraits<AnimatedType>::PassType
+      PassType;
+  typedef typename DeprecatedSVGAnimatedPropertyTraits<AnimatedType>::ReturnType
+      ReturnType;
 
-  virtual ~SVGAnimatedTemplate() { forgetWrapper(this); }
+  virtual ~DeprecatedSVGAnimatedTemplate() { forgetWrapper(this); }
 
   virtual ReturnType baseVal() const = 0;
   virtual void setBaseVal(PassType) = 0;
@@ -110,10 +111,10 @@ class SVGAnimatedTemplate
 
   virtual const QualifiedName& associatedAttributeName() const = 0;
 
-  typedef HashMap<SVGAnimatedTypeWrapperKey,
-                  SVGAnimatedTemplate<AnimatedType>*,
-                  SVGAnimatedTypeWrapperKeyHash,
-                  SVGAnimatedTypeWrapperKeyHashTraits>
+  typedef HashMap<DeprecatedSVGAnimatedTypeWrapperKey,
+                  DeprecatedSVGAnimatedTemplate<AnimatedType>*,
+                  DeprecatedSVGAnimatedTypeWrapperKeyHash,
+                  DeprecatedSVGAnimatedTypeWrapperKeyHashTraits>
       ElementToWrapperMap;
   typedef
       typename ElementToWrapperMap::const_iterator ElementToWrapperMapIterator;
@@ -123,7 +124,8 @@ class SVGAnimatedTemplate
     return s_wrapperCache;
   }
 
-  static void forgetWrapper(SVGAnimatedTemplate<AnimatedType>* wrapper) {
+  static void forgetWrapper(
+      DeprecatedSVGAnimatedTemplate<AnimatedType>* wrapper) {
     ElementToWrapperMap* cache = wrapperCache();
     ElementToWrapperMapIterator itr = cache->begin();
     ElementToWrapperMapIterator end = cache->end();
@@ -137,14 +139,14 @@ class SVGAnimatedTemplate
 };
 
 template <typename AnimatedType>
-class SVGAnimatedProperty;
+class DeprecatedSVGAnimatedProperty;
 
 template <typename AnimatedType, typename AnimatedTearOff>
 PassRefPtr<AnimatedTearOff> lookupOrCreateWrapper(
     SVGElement* element,
-    SVGAnimatedProperty<AnimatedType>& creator,
+    DeprecatedSVGAnimatedProperty<AnimatedType>& creator,
     const QualifiedName& attrName) {
-  SVGAnimatedTypeWrapperKey key(element, attrName.localName());
+  DeprecatedSVGAnimatedTypeWrapperKey key(element, attrName.localName());
   RefPtr<AnimatedTearOff> wrapper =
       static_cast<AnimatedTearOff*>(AnimatedTearOff::wrapperCache()->get(key));
 
@@ -157,19 +159,20 @@ PassRefPtr<AnimatedTearOff> lookupOrCreateWrapper(
 }
 
 // Common type definitions, to ease IDL generation.
-typedef SVGAnimatedTemplate<SVGAngle> SVGAnimatedAngle;
-typedef SVGAnimatedTemplate<bool> SVGAnimatedBoolean;
-typedef SVGAnimatedTemplate<int> SVGAnimatedEnumeration;
-typedef SVGAnimatedTemplate<long> SVGAnimatedInteger;
-typedef SVGAnimatedTemplate<SVGLength> SVGAnimatedLength;
-typedef SVGAnimatedTemplate<SVGLengthList*> SVGAnimatedLengthList;
-typedef SVGAnimatedTemplate<float> SVGAnimatedNumber;
-typedef SVGAnimatedTemplate<SVGNumberList*> SVGAnimatedNumberList;
-typedef SVGAnimatedTemplate<SVGPreserveAspectRatio>
+typedef DeprecatedSVGAnimatedTemplate<SVGAngle> SVGAnimatedAngle;
+typedef DeprecatedSVGAnimatedTemplate<bool> SVGAnimatedBoolean;
+typedef DeprecatedSVGAnimatedTemplate<int> SVGAnimatedEnumeration;
+typedef DeprecatedSVGAnimatedTemplate<long> SVGAnimatedInteger;
+typedef DeprecatedSVGAnimatedTemplate<SVGLength> SVGAnimatedLength;
+typedef DeprecatedSVGAnimatedTemplate<SVGLengthList*> SVGAnimatedLengthList;
+typedef DeprecatedSVGAnimatedTemplate<float> SVGAnimatedNumber;
+typedef DeprecatedSVGAnimatedTemplate<SVGNumberList*> SVGAnimatedNumberList;
+typedef DeprecatedSVGAnimatedTemplate<SVGPreserveAspectRatio>
     SVGAnimatedPreserveAspectRatio;
-typedef SVGAnimatedTemplate<FloatRect> SVGAnimatedRect;
-typedef SVGAnimatedTemplate<String> SVGAnimatedString;
-typedef SVGAnimatedTemplate<SVGTransformList*> SVGAnimatedTransformList;
+typedef DeprecatedSVGAnimatedTemplate<FloatRect> SVGAnimatedRect;
+typedef DeprecatedSVGAnimatedTemplate<String> SVGAnimatedString;
+typedef DeprecatedSVGAnimatedTemplate<SVGTransformList*>
+    SVGAnimatedTransformList;
 }
 
 #endif
