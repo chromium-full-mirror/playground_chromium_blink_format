@@ -108,6 +108,9 @@ class RenderBox : public RenderBoxModelObject {
   IntRect frameRect() const { return m_frameRect; }
   void setFrameRect(const IntRect& rect) { m_frameRect = rect; }
 
+  IntRect transformedFrameRect() const;
+  IntRect applyLayerTransformToRect(const IntRect&) const;
+
   IntRect borderBoxRect() const { return IntRect(0, 0, width(), height()); }
   virtual IntRect borderBoundingBox() const { return borderBoxRect(); }
 
@@ -359,14 +362,19 @@ class RenderBox : public RenderBoxModelObject {
   }
   void deleteLineBoxWrapper();
 
+  enum ApplyTransform { IncludeTransform, ExcludeTransform };
   virtual int topmostPosition(bool includeOverflowInterior = true,
-                              bool includeSelf = true) const;
+                              bool includeSelf = true,
+                              ApplyTransform = IncludeTransform) const;
   virtual int lowestPosition(bool includeOverflowInterior = true,
-                             bool includeSelf = true) const;
+                             bool includeSelf = true,
+                             ApplyTransform = IncludeTransform) const;
   virtual int rightmostPosition(bool includeOverflowInterior = true,
-                                bool includeSelf = true) const;
+                                bool includeSelf = true,
+                                ApplyTransform = IncludeTransform) const;
   virtual int leftmostPosition(bool includeOverflowInterior = true,
-                               bool includeSelf = true) const;
+                               bool includeSelf = true,
+                               ApplyTransform = IncludeTransform) const;
 
   virtual IntRect clippedOverflowRectForRepaint(
       RenderBoxModelObject* repaintContainer);

@@ -3887,14 +3887,19 @@ int RenderBlock::lowestFloatLogicalBottom(
 }
 
 int RenderBlock::topmostPosition(bool includeOverflowInterior,
-                                 bool includeSelf) const {
-  int top = includeSelf && width() > 0 ? 0 : height();
+                                 bool includeSelf,
+                                 ApplyTransform applyTransform) const {
+  IntRect transformedRect = transformedFrameRect();
+  int transformedTop =
+      includeSelf && transformedRect.width() > 0 ? 0 : transformedRect.height();
 
   if (!includeOverflowInterior && (hasOverflowClip() || hasControlClip()))
-    return top;
+    return transformedTop;
 
-  if (!firstChild() && (!width() || !height()))
-    return top;
+  if (!firstChild() && (!transformedRect.width() || !transformedRect.height()))
+    return transformedTop;
+
+  int top = includeSelf && width() > 0 ? 0 : height();
 
   if (!hasColumns()) {
     // FIXME: Come up with a way to use the layer tree to avoid visiting all the
@@ -3907,7 +3912,8 @@ int RenderBlock::topmostPosition(bool includeOverflowInterior,
     for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
       if (!c->isFloatingOrPositioned() && c->isBox()) {
         RenderBox* childBox = toRenderBox(c);
-        top = min(top, childBox->y() + childBox->topmostPosition(false));
+        top = min(top, childBox->transformedFrameRect().y() +
+                           childBox->topmostPosition(false));
       }
     }
   }
@@ -3937,9 +3943,10 @@ int RenderBlock::topmostPosition(bool includeOverflowInterior,
         // will be unreachable via scrolling.
         // Therefore we should not allow it to contribute to the topmost
         // position.
-        if (!isRenderView() || r->x() + r->width() > 0 ||
-            r->x() + r->rightmostPosition(false) > 0) {
-          int tp = r->y() + r->topmostPosition(false);
+        IntRect transformedR = r->transformedFrameRect();
+        if (!isRenderView() || transformedR.x() + transformedR.width() > 0 ||
+            transformedR.x() + r->rightmostPosition(false) > 0) {
+          int tp = transformedR.y() + r->topmostPosition(false);
           top = min(top, tp + relativeOffset);
         }
       }
@@ -3968,18 +3975,36 @@ int RenderBlock::topmostPosition(bool includeOverflowInterior,
   if (!includeSelf && firstRootBox())
     top = min(top, firstRootBox()->selectionTop() + relativeOffset);
 
+  if (applyTransform == IncludeTransform && includeSelf && layer() &&
+      layer()->hasTransform()) {
+    int bottom =
+        lowestPosition(includeOverflowInterior, includeSelf, ExcludeTransform);
+    int right = rightmostPosition(includeOverflowInterior, includeSelf,
+                                  ExcludeTransform);
+    int left = leftmostPosition(includeOverflowInterior, includeSelf,
+                                ExcludeTransform);
+    IntRect transformRect = applyLayerTransformToRect(
+        IntRect(left, top, right - left, bottom - top));
+    return transformRect.y();
+  }
+
   return top;
 }
 
 int RenderBlock::lowestPosition(bool includeOverflowInterior,
-                                bool includeSelf) const {
-  int bottom = includeSelf && width() > 0 ? height() : 0;
+                                bool includeSelf,
+                                ApplyTransform applyTransform) const {
+  IntRect transformedRect = transformedFrameRect();
+  int transformedBottom =
+      includeSelf && transformedRect.width() > 0 ? transformedRect.height() : 0;
 
   if (!includeOverflowInterior && (hasOverflowClip() || hasControlClip()))
-    return bottom;
+    return transformedBottom;
 
-  if (!firstChild() && (!width() || !height()))
-    return bottom;
+  if (!firstChild() && (!transformedRect.width() || !transformedRect.height()))
+    return transformedBottom;
+
+  int bottom = includeSelf && width() > 0 ? height() : 0;
 
   if (!hasColumns()) {
     // FIXME: Come up with a way to use the layer tree to avoid visiting all the
@@ -3996,7 +4021,8 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior,
     for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
       if (!c->isFloatingOrPositioned() && c->isBox()) {
         RenderBox* childBox = toRenderBox(c);
-        bottom = max(bottom, childBox->y() + childBox->lowestPosition(false));
+        bottom = max(bottom, childBox->transformedFrameRect().y() +
+                                 childBox->lowestPosition(false));
       }
     }
   }
@@ -4025,9 +4051,10 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior,
         // will be unreachable via scrolling.
         // Therefore we should not allow it to contribute to the lowest
         // position.
-        if (!isRenderView() || r->x() + r->width() > 0 ||
-            r->x() + r->rightmostPosition(false) > 0) {
-          int lp = r->y() + r->lowestPosition(false);
+        IntRect transformedR = r->transformedFrameRect();
+        if (!isRenderView() || transformedR.x() + transformedR.width() > 0 ||
+            transformedR.x() + r->rightmostPosition(false) > 0) {
+          int lp = transformedR.y() + r->lowestPosition(false);
           bottom = max(bottom, lp + relativeOffset);
         }
       }
@@ -4068,8 +4095,9 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior,
       while (currBox && currBox->isFloatingOrPositioned())
         currBox = currBox->previousSiblingBox();
       if (currBox) {
+        IntRect transformedCurrBox = currBox->transformedFrameRect();
         int childBottomEdge =
-            currBox->y() + currBox->height() +
+            transformedCurrBox.y() + transformedCurrBox.height() +
             currBox->collapsedMarginAfter();  // FIXME: "after" is wrong here
                                               // for lowestPosition.
         bottom =
@@ -4078,18 +4106,36 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior,
     }
   }
 
+  if (applyTransform == IncludeTransform && includeSelf && layer() &&
+      layer()->hasTransform()) {
+    int top =
+        topmostPosition(includeOverflowInterior, includeSelf, ExcludeTransform);
+    int right = rightmostPosition(includeOverflowInterior, includeSelf,
+                                  ExcludeTransform);
+    int left = leftmostPosition(includeOverflowInterior, includeSelf,
+                                ExcludeTransform);
+    IntRect transformRect = applyLayerTransformToRect(
+        IntRect(left, top, right - left, bottom - top));
+    return transformRect.height();
+  }
+
   return bottom;
 }
 
 int RenderBlock::rightmostPosition(bool includeOverflowInterior,
-                                   bool includeSelf) const {
-  int right = includeSelf && height() > 0 ? width() : 0;
+                                   bool includeSelf,
+                                   ApplyTransform applyTransform) const {
+  IntRect transformedRect = transformedFrameRect();
+  int transformedRight =
+      includeSelf && transformedRect.height() > 0 ? transformedRect.width() : 0;
 
   if (!includeOverflowInterior && (hasOverflowClip() || hasControlClip()))
-    return right;
+    return transformedRight;
 
-  if (!firstChild() && (!width() || !height()))
-    return right;
+  if (!firstChild() && (!transformedRect.width() || !transformedRect.height()))
+    return transformedRight;
+
+  int right = includeSelf && height() > 0 ? width() : 0;
 
   if (!hasColumns()) {
     // FIXME: Come up with a way to use the layer tree to avoid visiting all the
@@ -4102,7 +4148,8 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
     for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
       if (!c->isFloatingOrPositioned() && c->isBox()) {
         RenderBox* childBox = toRenderBox(c);
-        right = max(right, childBox->x() + childBox->rightmostPosition(false));
+        right = max(right, childBox->transformedFrameRect().x() +
+                               childBox->rightmostPosition(false));
       }
     }
   }
@@ -4132,9 +4179,10 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
         // unreachable via scrolling.
         // Therefore we should not allow it to contribute to the rightmost
         // position.
-        if (!isRenderView() || r->y() + r->height() > 0 ||
-            r->y() + r->lowestPosition(false) > 0) {
-          int rp = r->x() + r->rightmostPosition(false);
+        IntRect transformedR = r->transformedFrameRect();
+        if (!isRenderView() || transformedR.y() + transformedR.height() > 0 ||
+            transformedR.y() + r->lowestPosition(false) > 0) {
+          int rp = transformedR.x() + r->rightmostPosition(false);
           right = max(right, rp + relativeOffset);
         }
       }
@@ -4149,6 +4197,18 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
       if (count)
         right = max(columnRectAt(colInfo, count - 1).right() + relativeOffset,
                     right);
+    }
+    if (applyTransform == IncludeTransform && includeSelf && layer() &&
+        layer()->hasTransform()) {
+      int top = topmostPosition(includeOverflowInterior, includeSelf,
+                                ExcludeTransform);
+      int bottom = lowestPosition(includeOverflowInterior, includeSelf,
+                                  ExcludeTransform);
+      int left = leftmostPosition(includeOverflowInterior, includeSelf,
+                                  ExcludeTransform);
+      IntRect transformRect = applyLayerTransformToRect(
+          IntRect(left, top, right - left, bottom - top));
+      return transformRect.width();
     }
     return right;
   }
@@ -4189,25 +4249,44 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
            currBox = currBox->nextSiblingBox()) {
         if (currBox->isFloatingOrPositioned())
           continue;
-        int childRightEdge =
-            currBox->x() + currBox->width() + currBox->marginRight();
+        IntRect transformedChild = currBox->transformedFrameRect();
+        int childRightEdge = transformedChild.x() + transformedChild.width() +
+                             currBox->marginRight();
         right = max(right, childRightEdge + paddingRight() + relativeOffset);
       }
     }
+  }
+
+  if (applyTransform == IncludeTransform && includeSelf && layer() &&
+      layer()->hasTransform()) {
+    int top =
+        topmostPosition(includeOverflowInterior, includeSelf, ExcludeTransform);
+    int bottom =
+        lowestPosition(includeOverflowInterior, includeSelf, ExcludeTransform);
+    int left = leftmostPosition(includeOverflowInterior, includeSelf,
+                                ExcludeTransform);
+    IntRect transformRect = applyLayerTransformToRect(
+        IntRect(left, top, right - left, bottom - top));
+    return transformRect.width();
   }
 
   return right;
 }
 
 int RenderBlock::leftmostPosition(bool includeOverflowInterior,
-                                  bool includeSelf) const {
-  int left = includeSelf && height() > 0 ? 0 : width();
+                                  bool includeSelf,
+                                  ApplyTransform applyTransform) const {
+  IntRect transformedRect = transformedFrameRect();
+  int transformedLeft =
+      includeSelf && transformedRect.height() > 0 ? 0 : transformedRect.width();
 
   if (!includeOverflowInterior && (hasOverflowClip() || hasControlClip()))
-    return left;
+    return transformedLeft;
 
-  if (!firstChild() && (!width() || !height()))
-    return left;
+  if (!firstChild() && (!transformedRect.width() || !transformedRect.height()))
+    return transformedLeft;
+
+  int left = includeSelf && height() > 0 ? 0 : width();
 
   if (!hasColumns()) {
     // FIXME: Come up with a way to use the layer tree to avoid visiting all the
@@ -4220,7 +4299,8 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
     for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
       if (!c->isFloatingOrPositioned() && c->isBox()) {
         RenderBox* childBox = toRenderBox(c);
-        left = min(left, childBox->x() + childBox->leftmostPosition(false));
+        left = min(left, childBox->transformedFrameRect().x() +
+                             childBox->leftmostPosition(false));
       }
     }
   }
@@ -4250,9 +4330,10 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
         // unreachable via scrolling.
         // Therefore we should not allow it to contribute to the leftmost
         // position.
-        if (!isRenderView() || r->y() + r->height() > 0 ||
-            r->y() + r->lowestPosition(false) > 0) {
-          int lp = r->x() + r->leftmostPosition(false);
+        IntRect transformedR = r->transformedFrameRect();
+        if (!isRenderView() || transformedR.y() + transformedR.height() > 0 ||
+            transformedR.y() + r->lowestPosition(false) > 0) {
+          int lp = transformedR.x() + r->leftmostPosition(false);
           left = min(left, lp + relativeOffset);
         }
       }
@@ -4286,6 +4367,19 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
     for (InlineFlowBox* currBox = firstLineBox(); currBox;
          currBox = currBox->nextLineBox())
       left = min(left, (int)currBox->x() + relativeOffset);
+  }
+
+  if (applyTransform == IncludeTransform && includeSelf && layer() &&
+      layer()->hasTransform()) {
+    int top =
+        topmostPosition(includeOverflowInterior, includeSelf, ExcludeTransform);
+    int bottom =
+        lowestPosition(includeOverflowInterior, includeSelf, ExcludeTransform);
+    int right = rightmostPosition(includeOverflowInterior, includeSelf,
+                                  ExcludeTransform);
+    IntRect transformRect = applyLayerTransformToRect(
+        IntRect(left, top, right - left, bottom - top));
+    return transformRect.x();
   }
 
   return left;
