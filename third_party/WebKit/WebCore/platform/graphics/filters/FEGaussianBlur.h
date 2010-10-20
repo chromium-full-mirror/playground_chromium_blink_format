@@ -49,10 +49,6 @@ class FEGaussianBlur : public FilterEffect {
 
  private:
   FEGaussianBlur(float, float);
-  static void kernelPosition(int boxBlur,
-                             unsigned& std,
-                             int& dLeft,
-                             int& dRight);
 
   float m_stdX;
   float m_stdY;
