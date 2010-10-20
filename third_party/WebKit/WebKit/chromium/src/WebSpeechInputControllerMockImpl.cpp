@@ -55,7 +55,13 @@ WebSpeechInputControllerMockImpl::~WebSpeechInputControllerMockImpl() {
 
 void WebSpeechInputControllerMockImpl::setMockRecognitionResult(
     const WebString& result) {
-  m_webcoreMock->setRecognitionResult(result);
+  m_webcoreMock->setRecognitionResult(result, WebString::fromUTF8(""));
+}
+
+void WebSpeechInputControllerMockImpl::setMockRecognitionResult(
+    const WebString& result,
+    const WebString& language) {
+  m_webcoreMock->setRecognitionResult(result, language);
 }
 
 void WebSpeechInputControllerMockImpl::didCompleteRecording(int requestId) {
@@ -74,8 +80,9 @@ void WebSpeechInputControllerMockImpl::setRecognitionResult(
 
 bool WebSpeechInputControllerMockImpl::startRecognition(
     int requestId,
+    const WebString& language,
     const WebRect& elementRect) {
-  return m_webcoreMock->startRecognition(requestId, elementRect);
+  return m_webcoreMock->startRecognition(requestId, language, elementRect);
 }
 
 void WebSpeechInputControllerMockImpl::cancelRecognition(int requestId) {
