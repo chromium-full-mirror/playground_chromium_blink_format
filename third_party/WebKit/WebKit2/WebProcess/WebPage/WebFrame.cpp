@@ -91,6 +91,8 @@ PassRefPtr<WebFrame> WebFrame::create(WebPage* page,
   // WebFrameLoaderClient::frameLoaderDestroyed().
   frame->ref();
 
+  frame->coreFrame()->init();
+
   return frame.release();
 }
 
@@ -115,8 +117,6 @@ WebFrame::WebFrame(WebPage* page,
     ASSERT(ownerElement->document()->frame());
     ownerElement->document()->frame()->tree()->appendChild(frame);
   }
-
-  frame->init();
 
 #ifndef NDEBUG
   webFrameCounter.increment();
