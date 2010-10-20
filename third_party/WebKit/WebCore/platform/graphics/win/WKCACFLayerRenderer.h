@@ -41,9 +41,7 @@
 #include <CoreGraphics/CGGeometry.h>
 
 interface IDirect3DDevice9;
-typedef struct _CACFContext* CACFContextRef;
-typedef struct _CARenderContext CARenderContext;
-typedef struct _CARenderOGLContext CARenderOGLContext;
+struct WKCACFContext;
 
 namespace WebCore {
 
@@ -64,7 +62,7 @@ class WKCACFLayerRenderer : public Noncopyable {
   ~WKCACFLayerRenderer();
 
   static bool acceleratedCompositingAvailable();
-  static void didFlushContext(CACFContextRef);
+  static void didFlushContext(WKCACFContext*);
 
   void setRootContents(CGImageRef);
   void setRootContentsAndDisplay(CGImageRef);
@@ -106,9 +104,7 @@ class WKCACFLayerRenderer : public Noncopyable {
   COMPtr<IDirect3DDevice9> m_d3dDevice;
   RefPtr<WKCACFRootLayer> m_rootLayer;
   RefPtr<WKCACFLayer> m_rootChildLayer;
-  RetainPtr<CACFContextRef> m_context;
-  CARenderContext* m_renderContext;
-  CARenderOGLContext* m_renderer;
+  WKCACFContext* m_context;
   HWND m_hostWindow;
   Timer<WKCACFLayerRenderer> m_renderTimer;
   bool m_backingStoreDirty;

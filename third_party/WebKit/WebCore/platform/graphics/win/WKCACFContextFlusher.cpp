@@ -29,8 +29,8 @@
 
 #include "WKCACFContextFlusher.h"
 
+#include <WebKitSystemInterface/WebKitSystemInterface.h>
 #include <wtf/StdLibExtras.h>
-#include <QuartzCore/CACFContext.h>
 
 namespace WebCore {
 
@@ -43,22 +43,16 @@ WKCACFContextFlusher::WKCACFContextFlusher() {}
 
 WKCACFContextFlusher::~WKCACFContextFlusher() {}
 
-void WKCACFContextFlusher::addContext(CACFContextRef context) {
+void WKCACFContextFlusher::addContext(WKCACFContext* context) {
   ASSERT(context);
 
-  if (m_contexts.add(context).second)
-    CFRetain(context);
+  m_contexts.add(context);
 }
 
-void WKCACFContextFlusher::removeContext(CACFContextRef context) {
+void WKCACFContextFlusher::removeContext(WKCACFContext* context) {
   ASSERT(context);
 
-  ContextSet::iterator found = m_contexts.find(context);
-  if (found == m_contexts.end())
-    return;
-
-  CFRelease(*found);
-  m_contexts.remove(found);
+  m_contexts.remove(context);
 }
 
 void WKCACFContextFlusher::flushAllContexts() {
@@ -70,12 +64,8 @@ void WKCACFContextFlusher::flushAllContexts() {
   contextsToFlush.swap(m_contexts);
 
   ContextSet::const_iterator end = contextsToFlush.end();
-  for (ContextSet::const_iterator it = contextsToFlush.begin(); it != end;
-       ++it) {
-    CACFContextRef context = *it;
-    CACFContextFlush(context);
-    CFRelease(context);
-  }
+  for (ContextSet::const_iterator it = contextsToFlush.begin(); it != end; ++it)
+    wkCACFContextFlush(*it);
 }
 }
 
