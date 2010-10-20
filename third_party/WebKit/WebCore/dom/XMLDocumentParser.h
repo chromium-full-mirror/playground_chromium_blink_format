@@ -113,7 +113,7 @@ class XMLDocumentParser : public ScriptableDocumentParser,
   // WMLErrorHandling uses these functions.
   virtual bool wellFormed() const { return !m_sawError; }
   virtual int lineNumber() const;
-  virtual int columnNumber() const;
+  TextPosition0 textPosition() const;
 
   static bool supportsXMLVersion(const String&);
 
@@ -139,6 +139,11 @@ class XMLDocumentParser : public ScriptableDocumentParser,
   void resumeParsing();
 
   bool appendFragmentSource(const String&);
+
+  int columnNumber() const;
+  // The method is used in XMLDocumentParserLibxml2.cpp only,
+  // It is neither used nor implemented in XMLDocumentParserQt.cpp.
+  TextPosition1 textPositionOneBased() const;
 
 #if USE(QXMLSTREAM)
  private:
@@ -232,7 +237,7 @@ class XMLDocumentParser : public ScriptableDocumentParser,
 
   CachedResourceHandle<CachedScript> m_pendingScript;
   RefPtr<Element> m_scriptElement;
-  int m_scriptStartLine;
+  TextPosition1 m_scriptStartPosition;
 
   bool m_parsingFragment;
   AtomicString m_defaultNamespaceURI;

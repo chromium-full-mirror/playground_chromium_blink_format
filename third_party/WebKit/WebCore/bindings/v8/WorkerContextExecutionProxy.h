@@ -35,6 +35,7 @@
 
 #include "ScriptValue.h"
 #include <v8.h>
+#include <wtf/text/TextPosition.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/Vector.h>
 
@@ -67,7 +68,7 @@ class WorkerContextExecutionProxy {
   // Evaluate a script file in the current execution environment.
   ScriptValue evaluate(const String& script,
                        const String& fileName,
-                       int baseLine,
+                       const TextPosition0& scriptStartPosition,
                        WorkerContextExecutionState*);
 
   // Returns a local handle of the context.
