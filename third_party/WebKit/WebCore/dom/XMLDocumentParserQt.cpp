@@ -106,7 +106,7 @@ XMLDocumentParser::XMLDocumentParser(Document* document, FrameView* frameView)
       m_lastErrorLine(0),
       m_lastErrorColumn(0),
       m_pendingScript(0),
-      m_scriptStartPosition(TextPosition1::belowRangePosition()),
+      m_scriptStartLine(0),
       m_parsingFragment(false),
       m_scriptingPermission(FragmentScriptingAllowed) {
   m_stream.setEntityResolver(new EntityResolver);
@@ -136,7 +136,7 @@ XMLDocumentParser::XMLDocumentParser(DocumentFragment* fragment,
       m_lastErrorLine(0),
       m_lastErrorColumn(0),
       m_pendingScript(0),
-      m_scriptStartPosition(TextPosition1::belowRangePosition()),
+      m_scriptStartLine(0),
       m_parsingFragment(true),
       m_scriptingPermission(permission) {
   fragment->ref();
@@ -235,11 +235,6 @@ int XMLDocumentParser::lineNumber() const {
 
 int XMLDocumentParser::columnNumber() const {
   return m_stream.columnNumber();
-}
-
-TextPosition0 XMLDocumentParser::textPosition() const {
-  return TextPosition0(WTF::ZeroBasedNumber::fromZeroBasedInt(lineNumber()),
-                       WTF::ZeroBasedNumber::fromZeroBasedInt(columnNumber()));
 }
 
 void XMLDocumentParser::stopParsing() {
@@ -524,7 +519,7 @@ void XMLDocumentParser::parseStartElement() {
 
   ScriptElement* scriptElement = toScriptElement(newElement.get());
   if (scriptElement)
-    m_scriptStartPosition = WTF::toOneBasedTextPosition(textPosition());
+    m_scriptStartLine = lineNumber();
 
   m_currentNode->deprecatedParserAddChild(newElement.get());
 
@@ -605,7 +600,7 @@ void XMLDocumentParser::parseEndElement() {
     } else
       m_view->frame()->script()->executeScript(
           ScriptSourceCode(scriptElement->scriptContent(), document()->url(),
-                           m_scriptStartPosition));
+                           m_scriptStartLine));
   }
   m_requestingScript = false;
   popCurrentNode();

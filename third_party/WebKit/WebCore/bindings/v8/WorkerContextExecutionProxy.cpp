@@ -187,7 +187,7 @@ bool WorkerContextExecutionProxy::forgetV8EventObject(Event* event) {
 ScriptValue WorkerContextExecutionProxy::evaluate(
     const String& script,
     const String& fileName,
-    const TextPosition0& scriptStartPosition,
+    int baseLine,
     WorkerContextExecutionState* state) {
   v8::HandleScope hs;
 
@@ -200,7 +200,7 @@ ScriptValue WorkerContextExecutionProxy::evaluate(
 
   v8::Local<v8::String> scriptString = v8ExternalString(script);
   v8::Handle<v8::Script> compiledScript =
-      V8Proxy::compileScript(scriptString, fileName, scriptStartPosition);
+      V8Proxy::compileScript(scriptString, fileName, baseLine);
   v8::Local<v8::Value> result = runScript(compiledScript);
 
   if (!exceptionCatcher.CanContinue())
@@ -232,7 +232,7 @@ v8::Local<v8::Value> WorkerContextExecutionProxy::runScript(
   if (m_recursion >= kMaxRecursionDepth) {
     v8::Local<v8::String> code =
         v8ExternalString("throw RangeError('Recursion too deep')");
-    script = V8Proxy::compileScript(code, "", TextPosition0::minimumPosition());
+    script = V8Proxy::compileScript(code, "", 0);
   }
 
   if (V8Proxy::handleOutOfMemory())

@@ -168,7 +168,8 @@ class ScriptController {
 
   void finishedWithEvent(Event*);
 
-  TextPosition0 eventHandlerPosition() const;
+  int eventHandlerLineNumber() const;
+  int eventHandlerColumnNumber() const;
 
   void setProcessingTimerCallback(bool processingTimerCallback) {
     m_processingTimerCallback = processingTimerCallback;
