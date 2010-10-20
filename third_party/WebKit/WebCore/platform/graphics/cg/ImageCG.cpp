@@ -199,7 +199,8 @@ void BitmapImage::draw(GraphicsContext* ctxt,
     // into the destination rect. See <rdar://problem/6112909>.
     shouldUseSubimage = (interpolationQuality == kCGInterpolationHigh ||
                          interpolationQuality == kCGInterpolationDefault) &&
-                        srcRect.size() != destRect.size();
+                        (srcRect.size() != destRect.size() ||
+                         !ctxt->getCTM().isIdentityOrTranslationOrFlipped());
     float xScale = srcRect.width() / destRect.width();
     float yScale = srcRect.height() / destRect.height();
     if (shouldUseSubimage) {
