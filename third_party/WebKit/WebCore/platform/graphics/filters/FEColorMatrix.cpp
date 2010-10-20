@@ -168,7 +168,7 @@ void FEColorMatrix::apply(Filter* filter) {
     return;
 
   filterContext->drawImageBuffer(
-      in->resultImage(), DeviceColorSpace,
+      in->resultImage(), ColorSpaceDeviceRGB,
       drawingRegionOfInputImage(in->absolutePaintRect()));
 
   IntRect imageRect(IntPoint(), resultImage()->size());

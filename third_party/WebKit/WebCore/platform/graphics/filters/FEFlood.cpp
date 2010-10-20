@@ -61,7 +61,7 @@ void FEFlood::apply(Filter* filter) {
 
   Color color = colorWithOverrideAlpha(floodColor().rgb(), floodOpacity());
   filterContext->fillRect(FloatRect(FloatPoint(), absolutePaintRect().size()),
-                          color, DeviceColorSpace);
+                          color, ColorSpaceDeviceRGB);
 }
 
 void FEFlood::dump() {}

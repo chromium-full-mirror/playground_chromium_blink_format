@@ -84,11 +84,11 @@ bool BitmapImage::getHBITMAPOfSize(HBITMAP bmp, LPSIZE size) {
   if (size)
     drawFrameMatchingSourceSize(
         &gc, FloatRect(0.0f, 0.0f, bmpInfo.bmWidth, bmpInfo.bmHeight),
-        IntSize(*size), DeviceColorSpace, CompositeCopy);
+        IntSize(*size), ColorSpaceDeviceRGB, CompositeCopy);
   else
     draw(&gc, FloatRect(0.0f, 0.0f, bmpInfo.bmWidth, bmpInfo.bmHeight),
          FloatRect(0.0f, 0.0f, imageSize.width(), imageSize.height()),
-         DeviceColorSpace, CompositeCopy);
+         ColorSpaceDeviceRGB, CompositeCopy);
 
   // Do cleanup
   CGContextRelease(cgContext);

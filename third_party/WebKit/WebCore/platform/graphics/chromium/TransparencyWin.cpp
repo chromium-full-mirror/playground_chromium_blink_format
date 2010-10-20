@@ -260,7 +260,7 @@ void TransparencyWin::setupLayerForWhiteLayer() {
     return;
 
   m_drawContext->fillRect(IntRect(IntPoint(0, 0), m_layerSize), Color::white,
-                          DeviceColorSpace);
+                          ColorSpaceDeviceRGB);
   // Layer rect represents the part of the original layer.
 }
 

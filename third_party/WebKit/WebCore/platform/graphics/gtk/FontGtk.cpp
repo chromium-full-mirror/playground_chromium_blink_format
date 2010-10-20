@@ -285,7 +285,8 @@ void Font::drawComplexText(GraphicsContext* context,
 
   // Re-enable the platform shadow we disabled earlier
   if (hasShadow)
-    context->setShadow(shadowOffset, shadowBlur, shadowColor, DeviceColorSpace);
+    context->setShadow(shadowOffset, shadowBlur, shadowColor,
+                       ColorSpaceDeviceRGB);
 
   // Pango sometimes leaves behind paths we don't want
   cairo_new_path(cr);

@@ -29,6 +29,7 @@
 #define ImageBuffer_h
 
 #include "AffineTransform.h"
+#include "ColorSpace.h"
 #include "FloatRect.h"
 #include "Image.h"
 #include "IntSize.h"
@@ -45,13 +46,6 @@ class ImageData;
 class IntPoint;
 class IntRect;
 
-enum ImageColorSpace {
-  Unknown,
-  DeviceRGB,  // like sRGB
-  GrayScale,
-  LinearRGB
-};
-
 enum Multiply { Premultiplied, Unmultiplied };
 
 class ImageBuffer : public Noncopyable {
@@ -59,7 +53,7 @@ class ImageBuffer : public Noncopyable {
   // Will return a null pointer on allocation failure.
   static PassOwnPtr<ImageBuffer> create(
       const IntSize& size,
-      ImageColorSpace colorSpace = DeviceRGB) {
+      ColorSpace colorSpace = ColorSpaceDeviceRGB) {
     bool success = false;
     OwnPtr<ImageBuffer> buf(new ImageBuffer(size, colorSpace, success));
     if (success)
@@ -93,8 +87,7 @@ class ImageBuffer : public Noncopyable {
   String toDataURL(const String& mimeType, const double* quality = 0) const;
 #if !PLATFORM(CG)
   AffineTransform baseTransform() const { return AffineTransform(); }
-  void transformColorSpace(ImageColorSpace srcColorSpace,
-                           ImageColorSpace dstColorSpace);
+  void transformColorSpace(ColorSpace srcColorSpace, ColorSpace dstColorSpace);
   void platformTransformColorSpace(const Vector<int>&);
 #else
   AffineTransform baseTransform() const {
@@ -135,7 +128,7 @@ class ImageBuffer : public Noncopyable {
 
   // This constructor will place its success into the given out-variable
   // so that create() knows when it should return failure.
-  ImageBuffer(const IntSize&, ImageColorSpace colorSpace, bool& success);
+  ImageBuffer(const IntSize&, ColorSpace colorSpace, bool& success);
 };
 
 }  // namespace WebCore

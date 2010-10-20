@@ -156,7 +156,7 @@ void RenderMathMLRoot::paint(PaintInfo& info, int tx, int ty) {
   info.context->setStrokeThickness(gRadicalLineThickness * style()->fontSize());
   info.context->setStrokeStyle(SolidStroke);
   info.context->setStrokeColor(style()->visitedDependentColor(CSSPropertyColor),
-                               DeviceColorSpace);
+                               ColorSpaceDeviceRGB);
   info.context->setLineJoin(MiterJoin);
   info.context->setMiterLimit(style()->fontSize());
 

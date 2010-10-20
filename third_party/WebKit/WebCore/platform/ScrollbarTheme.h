@@ -85,7 +85,7 @@ class ScrollbarTheme : public Noncopyable {
   virtual void paintScrollCorner(ScrollView*,
                                  GraphicsContext* context,
                                  const IntRect& cornerRect) {
-    context->fillRect(cornerRect, Color::white, DeviceColorSpace);
+    context->fillRect(cornerRect, Color::white, ColorSpaceDeviceRGB);
   }
 
   virtual bool shouldCenterOnThumb(Scrollbar*, const PlatformMouseEvent&) {

@@ -227,7 +227,7 @@ void CanvasRenderingContext2D::setAllAttributesToDefault() {
   if (!context)
     return;
 
-  context->setShadow(FloatSize(), 0, Color::transparent, DeviceColorSpace);
+  context->setShadow(FloatSize(), 0, Color::transparent, ColorSpaceDeviceRGB);
   context->setAlpha(1);
   context->setCompositeOperation(CompositeSourceOver);
 }
@@ -1040,7 +1040,7 @@ void CanvasRenderingContext2D::setShadow(float width,
     return;
 
   c->setShadow(IntSize(width, -height), state().m_shadowBlur,
-               state().m_shadowColor, DeviceColorSpace);
+               state().m_shadowColor, ColorSpaceDeviceRGB);
 }
 
 void CanvasRenderingContext2D::setShadow(float width,
@@ -1062,7 +1062,7 @@ void CanvasRenderingContext2D::setShadow(float width,
     return;
 
   c->setShadow(IntSize(width, -height), state().m_shadowBlur,
-               state().m_shadowColor, DeviceColorSpace);
+               state().m_shadowColor, ColorSpaceDeviceRGB);
 }
 
 void CanvasRenderingContext2D::setShadow(float width,
@@ -1080,7 +1080,7 @@ void CanvasRenderingContext2D::setShadow(float width,
     return;
 
   c->setShadow(IntSize(width, -height), state().m_shadowBlur,
-               state().m_shadowColor, DeviceColorSpace);
+               state().m_shadowColor, ColorSpaceDeviceRGB);
 }
 
 void CanvasRenderingContext2D::setShadow(float width,
@@ -1099,7 +1099,7 @@ void CanvasRenderingContext2D::setShadow(float width,
     return;
 
   c->setShadow(IntSize(width, -height), state().m_shadowBlur,
-               state().m_shadowColor, DeviceColorSpace);
+               state().m_shadowColor, ColorSpaceDeviceRGB);
 }
 
 void CanvasRenderingContext2D::setShadow(float width,
@@ -1128,7 +1128,7 @@ void CanvasRenderingContext2D::setShadow(float width,
   CGColorRelease(shadowColor);
 #else
   dc->setShadow(IntSize(width, -height), blur, state().m_shadowColor,
-                DeviceColorSpace);
+                ColorSpaceDeviceRGB);
 #endif
 }
 
@@ -1147,7 +1147,7 @@ void CanvasRenderingContext2D::applyShadow() {
   float width = state().m_shadowOffset.width();
   float height = state().m_shadowOffset.height();
   c->setShadow(FloatSize(width, -height), state().m_shadowBlur,
-               state().m_shadowColor, DeviceColorSpace);
+               state().m_shadowColor, ColorSpaceDeviceRGB);
 }
 
 static IntSize size(HTMLImageElement* image) {
@@ -1261,7 +1261,7 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
 
   FloatRect sourceRect = c->roundToDevicePixels(normalizedSrcRect);
   FloatRect destRect = c->roundToDevicePixels(normalizedDstRect);
-  c->drawImage(cachedImage->image(), DeviceColorSpace, destRect, sourceRect,
+  c->drawImage(cachedImage->image(), ColorSpaceDeviceRGB, destRect, sourceRect,
                state().m_globalComposite);
   didDraw(destRect);
 }
@@ -1361,7 +1361,7 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* sourceCanvas,
   sourceCanvas->makeRenderingResultsAvailable();
 #endif
 
-  c->drawImageBuffer(buffer, DeviceColorSpace, destRect, sourceRect,
+  c->drawImageBuffer(buffer, ColorSpaceDeviceRGB, destRect, sourceRect,
                      state().m_globalComposite);
   didDraw(destRect);
 }
@@ -1488,7 +1488,7 @@ void CanvasRenderingContext2D::drawImageFromRect(
     op = CompositeSourceOver;
 
   FloatRect destRect = FloatRect(dx, dy, dw, dh);
-  c->drawImage(cachedImage->image(), DeviceColorSpace, destRect,
+  c->drawImage(cachedImage->image(), ColorSpaceDeviceRGB, destRect,
                FloatRect(sx, sy, sw, sh), op);
   didDraw(destRect);
 }
@@ -1982,9 +1982,9 @@ void CanvasRenderingContext2D::drawTextInternal(const String& text,
     GraphicsContext* maskImageContext = maskImage->context();
 
     if (fill)
-      maskImageContext->setFillColor(Color::black, DeviceColorSpace);
+      maskImageContext->setFillColor(Color::black, ColorSpaceDeviceRGB);
     else {
-      maskImageContext->setStrokeColor(Color::black, DeviceColorSpace);
+      maskImageContext->setStrokeColor(Color::black, ColorSpaceDeviceRGB);
       maskImageContext->setStrokeThickness(c->strokeThickness());
     }
 

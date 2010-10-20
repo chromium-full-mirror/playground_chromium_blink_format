@@ -979,7 +979,7 @@ void WebViewImpl::doPixelReadbackToCanvas(WebCanvas* canvas,
     gc.scale(FloatSize(1.0f, -1.0f));
     // Use invertRect in next line, so that transform above inverts it back to
     // desired destination rect.
-    gc.drawImageBuffer(imageBuffer.get(), DeviceColorSpace,
+    gc.drawImageBuffer(imageBuffer.get(), ColorSpaceDeviceRGB,
                        invertRect.location());
     gc.restore();
   }

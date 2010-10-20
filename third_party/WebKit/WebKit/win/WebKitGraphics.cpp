@@ -118,7 +118,8 @@ void WebDrawText(WebTextRenderInfo* info) {
         (info->shadowOffset.cx || info->shadowOffset.cy || info->shadowBlur ||
          info->shadowColor))
       context.setShadow(FloatSize(info->shadowOffset.cx, info->shadowOffset.cy),
-                        info->shadowBlur, info->shadowColor, DeviceColorSpace);
+                        info->shadowBlur, info->shadowColor,
+                        ColorSpaceDeviceRGB);
 
     WebCoreDrawTextAtPoint(context, drawString, info->pt,
                            makeFont(*(info->description)), info->color,

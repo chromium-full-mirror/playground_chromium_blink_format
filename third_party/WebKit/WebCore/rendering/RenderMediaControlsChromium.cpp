@@ -62,7 +62,7 @@ static bool paintMediaButton(GraphicsContext* context,
                              const IntRect& rect,
                              Image* image) {
   IntRect imageRect = image->rect();
-  context->drawImage(image, DeviceColorSpace, rect);
+  context->drawImage(image, ColorSpaceDeviceRGB, rect);
   return true;
 }
 
@@ -126,11 +126,11 @@ static bool paintMediaSlider(RenderObject* object,
   context->setStrokeStyle(SolidStroke);
   context->setStrokeColor(
       style->visitedDependentColor(CSSPropertyBorderLeftColor),
-      DeviceColorSpace);
+      ColorSpaceDeviceRGB);
   context->setStrokeThickness(style->borderLeftWidth());
   context->setFillColor(
       style->visitedDependentColor(CSSPropertyBackgroundColor),
-      DeviceColorSpace);
+      ColorSpaceDeviceRGB);
   context->drawRect(rect);
   context->restore();
 
@@ -201,14 +201,14 @@ static bool paintMediaVolumeSlider(RenderObject* object,
   GraphicsContext* context = paintInfo.context;
   Color originalColor = context->strokeColor();
   if (originalColor != Color::white)
-    context->setStrokeColor(Color::white, DeviceColorSpace);
+    context->setStrokeColor(Color::white, ColorSpaceDeviceRGB);
 
   int x = rect.x() + rect.width() / 2;
   context->drawLine(IntPoint(x, rect.y()),
                     IntPoint(x, rect.y() + rect.height()));
 
   if (originalColor != Color::white)
-    context->setStrokeColor(originalColor, DeviceColorSpace);
+    context->setStrokeColor(originalColor, ColorSpaceDeviceRGB);
   return true;
 }
 
@@ -244,7 +244,7 @@ static bool paintMediaTimelineContainer(RenderObject* object,
         object->style()
             ->visitedDependentColor(CSSPropertyBorderLeftColor)
             .rgb(),
-        DeviceColorSpace);
+        ColorSpaceDeviceRGB);
     context->drawLine(IntPoint(rect.x() + 1, rect.y()),
                       IntPoint(rect.x() + 1, rect.y() + rect.height()));
 
@@ -254,12 +254,12 @@ static bool paintMediaTimelineContainer(RenderObject* object,
         object->style()
             ->visitedDependentColor(CSSPropertyBorderRightColor)
             .rgb(),
-        DeviceColorSpace);
+        ColorSpaceDeviceRGB);
     context->drawLine(
         IntPoint(rect.x() + rect.width() - 1, rect.y()),
         IntPoint(rect.x() + rect.width() - 1, rect.y() + rect.height()));
 
-    context->setStrokeColor(originalColor, DeviceColorSpace);
+    context->setStrokeColor(originalColor, ColorSpaceDeviceRGB);
     context->setStrokeThickness(originalThickness);
     context->setStrokeStyle(originalStyle);
   }

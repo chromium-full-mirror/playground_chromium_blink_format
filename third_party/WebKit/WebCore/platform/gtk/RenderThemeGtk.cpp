@@ -585,7 +585,7 @@ bool RenderThemeGtk::paintSearchFieldResultsDecoration(RenderObject* object,
   static Image* searchImage =
       Image::loadPlatformThemeIcon(GTK_STOCK_FIND, rect.width()).releaseRef();
   IntRect centeredRect(centerRectVerticallyInParentInputElement(object, rect));
-  i.context->drawImage(searchImage, DeviceColorSpace, centeredRect);
+  i.context->drawImage(searchImage, ColorSpaceDeviceRGB, centeredRect);
   return false;
 }
 
@@ -609,7 +609,7 @@ bool RenderThemeGtk::paintSearchFieldCancelButton(RenderObject* object,
   static Image* cancelImage =
       Image::loadPlatformThemeIcon(GTK_STOCK_CLEAR, rect.width()).releaseRef();
   IntRect centeredRect(centerRectVerticallyInParentInputElement(object, rect));
-  i.context->drawImage(cancelImage, DeviceColorSpace, centeredRect);
+  i.context->drawImage(cancelImage, ColorSpaceDeviceRGB, centeredRect);
   return false;
 }
 
@@ -876,8 +876,8 @@ static inline bool paintMediaButton(GraphicsContext* context,
                                     Image* image,
                                     Color panelColor,
                                     int mediaIconSize) {
-  context->fillRect(FloatRect(r), panelColor, DeviceColorSpace);
-  context->drawImage(image, DeviceColorSpace,
+  context->fillRect(FloatRect(r), panelColor, ColorSpaceDeviceRGB);
+  context->drawImage(image, ColorSpaceDeviceRGB,
                      IntRect(r.x() + (r.width() - mediaIconSize) / 2,
                              r.y() + (r.height() - mediaIconSize) / 2,
                              mediaIconSize, mediaIconSize));
@@ -940,11 +940,11 @@ bool RenderThemeGtk::paintMediaSliderTrack(RenderObject* o,
                                            const IntRect& r) {
   GraphicsContext* context = paintInfo.context;
 
-  context->fillRect(FloatRect(r), m_panelColor, DeviceColorSpace);
+  context->fillRect(FloatRect(r), m_panelColor, ColorSpaceDeviceRGB);
   context->fillRect(
       FloatRect(IntRect(r.x(), r.y() + (r.height() - m_mediaSliderHeight) / 2,
                         r.width(), m_mediaSliderHeight)),
-      m_sliderColor, DeviceColorSpace);
+      m_sliderColor, ColorSpaceDeviceRGB);
 
   RenderStyle* style = o->style();
   HTMLMediaElement* mediaElement = toParentMediaElement(o);
@@ -1007,7 +1007,7 @@ bool RenderThemeGtk::paintMediaSliderThumb(RenderObject* o,
   // Make the thumb nicer with rounded corners.
   paintInfo.context->fillRoundedRect(r, IntSize(3, 3), IntSize(3, 3),
                                      IntSize(3, 3), IntSize(3, 3),
-                                     m_sliderThumbColor, DeviceColorSpace);
+                                     m_sliderThumbColor, ColorSpaceDeviceRGB);
   return false;
 }
 #endif

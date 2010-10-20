@@ -1187,7 +1187,7 @@ void MediaPlayerPrivateGStreamer::paint(GraphicsContext* context,
     return;
 
   context->drawImage(reinterpret_cast<Image*>(gstImage->image().get()),
-                     sRGBColorSpace, rect, CompositeCopy, false);
+                     ColorSpaceSRGB, rect, CompositeCopy, false);
 }
 
 static HashSet<String> mimeTypeCache() {

@@ -59,9 +59,7 @@ ImageBufferData::ImageBufferData(const IntSize& size)
     : m_platformContext(0)  // Canvas is set in ImageBuffer constructor.
 {}
 
-ImageBuffer::ImageBuffer(const IntSize& size,
-                         ImageColorSpace imageColorSpace,
-                         bool& success)
+ImageBuffer::ImageBuffer(const IntSize& size, ColorSpace, bool& success)
     : m_data(size), m_size(size) {
   if (!m_data.m_canvas.initialize(size.width(), size.height(), false)) {
     success = false;

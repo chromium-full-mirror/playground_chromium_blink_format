@@ -197,7 +197,7 @@ bool GraphicsContext::shouldAntialias() const {
 void GraphicsContext::setStrokePattern(PassRefPtr<Pattern> pattern) {
   ASSERT(pattern);
   if (!pattern) {
-    setStrokeColor(Color::black, DeviceColorSpace);
+    setStrokeColor(Color::black, ColorSpaceDeviceRGB);
     return;
   }
   m_common->state.strokeGradient.clear();
@@ -208,7 +208,7 @@ void GraphicsContext::setStrokePattern(PassRefPtr<Pattern> pattern) {
 void GraphicsContext::setFillPattern(PassRefPtr<Pattern> pattern) {
   ASSERT(pattern);
   if (!pattern) {
-    setFillColor(Color::black, DeviceColorSpace);
+    setFillColor(Color::black, ColorSpaceDeviceRGB);
     return;
   }
   m_common->state.fillGradient.clear();
@@ -219,7 +219,7 @@ void GraphicsContext::setFillPattern(PassRefPtr<Pattern> pattern) {
 void GraphicsContext::setStrokeGradient(PassRefPtr<Gradient> gradient) {
   ASSERT(gradient);
   if (!gradient) {
-    setStrokeColor(Color::black, DeviceColorSpace);
+    setStrokeColor(Color::black, ColorSpaceDeviceRGB);
     return;
   }
   m_common->state.strokeGradient = gradient;
@@ -230,7 +230,7 @@ void GraphicsContext::setStrokeGradient(PassRefPtr<Gradient> gradient) {
 void GraphicsContext::setFillGradient(PassRefPtr<Gradient> gradient) {
   ASSERT(gradient);
   if (!gradient) {
-    setFillColor(Color::black, DeviceColorSpace);
+    setFillColor(Color::black, ColorSpaceDeviceRGB);
     return;
   }
   m_common->state.fillGradient = gradient;

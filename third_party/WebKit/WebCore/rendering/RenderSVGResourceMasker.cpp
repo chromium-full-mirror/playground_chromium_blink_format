@@ -117,7 +117,7 @@ bool RenderSVGResourceMasker::applyResource(RenderObject* object,
 
     if (!SVGImageBufferTools::createImageBuffer(
             absoluteTargetRect, clampedAbsoluteTargetRect,
-            maskerData->maskImage, LinearRGB))
+            maskerData->maskImage, ColorSpaceLinearRGB))
       return false;
 
     GraphicsContext* maskImageContext = maskerData->maskImage->context();
@@ -179,7 +179,8 @@ void RenderSVGResourceMasker::drawContentIntoMaskImage(
   maskImageContext->restore();
 
 #if !PLATFORM(CG)
-  maskerData->maskImage->transformColorSpace(DeviceRGB, LinearRGB);
+  maskerData->maskImage->transformColorSpace(ColorSpaceDeviceRGB,
+                                             ColorSpaceLinearRGB);
 #endif
 
   // Create the luminance mask.

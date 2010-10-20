@@ -134,7 +134,7 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int, int) {
             SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_NONE)
           imageElement->preserveAspectRatio().transformRect(destRect, srcRect);
 
-        childPaintInfo.context->drawImage(image, DeviceColorSpace, destRect,
+        childPaintInfo.context->drawImage(image, ColorSpaceDeviceRGB, destRect,
                                           srcRect);
       }
 

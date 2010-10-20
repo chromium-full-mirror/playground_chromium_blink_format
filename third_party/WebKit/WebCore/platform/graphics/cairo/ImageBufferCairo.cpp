@@ -66,9 +66,7 @@ namespace WebCore {
 
 ImageBufferData::ImageBufferData(const IntSize& size) : m_surface(0) {}
 
-ImageBuffer::ImageBuffer(const IntSize& size,
-                         ImageColorSpace imageColorSpace,
-                         bool& success)
+ImageBuffer::ImageBuffer(const IntSize& size, ColorSpace, bool& success)
     : m_data(size), m_size(size) {
   success = false;  // Make early return mean error.
   m_data.m_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,

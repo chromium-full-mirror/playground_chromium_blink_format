@@ -103,7 +103,7 @@ void WebFontImpl::drawText(WebCanvas* canvas,
 #endif
 
   gc.save();
-  gc.setFillColor(color, DeviceColorSpace);
+  gc.setFillColor(color, ColorSpaceDeviceRGB);
   gc.clip(WebCore::FloatRect(clip));
   m_font.drawText(&gc, run, leftBaseline, from, to);
   gc.restore();

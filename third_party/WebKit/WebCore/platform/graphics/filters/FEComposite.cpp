@@ -146,10 +146,10 @@ void FEComposite::apply(Filter* filter) {
   switch (m_type) {
     case FECOMPOSITE_OPERATOR_OVER:
       filterContext->drawImageBuffer(
-          in2->resultImage(), DeviceColorSpace,
+          in2->resultImage(), ColorSpaceDeviceRGB,
           drawingRegionOfInputImage(in2->absolutePaintRect()));
       filterContext->drawImageBuffer(
-          in->resultImage(), DeviceColorSpace,
+          in->resultImage(), ColorSpaceDeviceRGB,
           drawingRegionOfInputImage(in->absolutePaintRect()));
       break;
     case FECOMPOSITE_OPERATOR_IN:
@@ -158,34 +158,34 @@ void FEComposite::apply(Filter* filter) {
           in2->resultImage(),
           drawingRegionOfInputImage(in2->absolutePaintRect()));
       filterContext->drawImageBuffer(
-          in->resultImage(), DeviceColorSpace,
+          in->resultImage(), ColorSpaceDeviceRGB,
           drawingRegionOfInputImage(in->absolutePaintRect()));
       filterContext->restore();
       break;
     case FECOMPOSITE_OPERATOR_OUT:
       filterContext->drawImageBuffer(
-          in->resultImage(), DeviceColorSpace,
+          in->resultImage(), ColorSpaceDeviceRGB,
           drawingRegionOfInputImage(in->absolutePaintRect()));
       filterContext->drawImageBuffer(
-          in2->resultImage(), DeviceColorSpace,
+          in2->resultImage(), ColorSpaceDeviceRGB,
           drawingRegionOfInputImage(in2->absolutePaintRect()), srcRect,
           CompositeDestinationOut);
       break;
     case FECOMPOSITE_OPERATOR_ATOP:
       filterContext->drawImageBuffer(
-          in2->resultImage(), DeviceColorSpace,
+          in2->resultImage(), ColorSpaceDeviceRGB,
           drawingRegionOfInputImage(in2->absolutePaintRect()));
       filterContext->drawImageBuffer(
-          in->resultImage(), DeviceColorSpace,
+          in->resultImage(), ColorSpaceDeviceRGB,
           drawingRegionOfInputImage(in->absolutePaintRect()), srcRect,
           CompositeSourceAtop);
       break;
     case FECOMPOSITE_OPERATOR_XOR:
       filterContext->drawImageBuffer(
-          in2->resultImage(), DeviceColorSpace,
+          in2->resultImage(), ColorSpaceDeviceRGB,
           drawingRegionOfInputImage(in2->absolutePaintRect()));
       filterContext->drawImageBuffer(
-          in->resultImage(), DeviceColorSpace,
+          in->resultImage(), ColorSpaceDeviceRGB,
           drawingRegionOfInputImage(in->absolutePaintRect()), srcRect,
           CompositeXOR);
       break;

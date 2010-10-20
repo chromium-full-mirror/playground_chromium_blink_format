@@ -140,12 +140,16 @@ static RetainPtr<CGImageRef> imageWithColorSpace(CGImageRef originalImage,
     return originalImage;
 
   switch (colorSpace) {
-    case DeviceColorSpace:
+    case ColorSpaceDeviceRGB:
       return originalImage;
-    case sRGBColorSpace:
+    case ColorSpaceSRGB:
       return RetainPtr<CGImageRef>(
           AdoptCF,
           CGImageCreateCopyWithColorSpace(originalImage, sRGBColorSpaceRef()));
+    case ColorSpaceLinearRGB:
+      return RetainPtr<CGImageRef>(
+          AdoptCF, CGImageCreateCopyWithColorSpace(originalImage,
+                                                   linearRGBColorSpaceRef()));
   }
 
   ASSERT_NOT_REACHED();

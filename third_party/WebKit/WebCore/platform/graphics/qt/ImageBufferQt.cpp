@@ -78,7 +78,7 @@ ImageBufferData::ImageBufferData(const IntSize& size)
   m_image = StillImage::createForRendering(&m_pixmap);
 }
 
-ImageBuffer::ImageBuffer(const IntSize& size, ImageColorSpace, bool& success)
+ImageBuffer::ImageBuffer(const IntSize& size, ColorSpace, bool& success)
     : m_data(size), m_size(size) {
   success = m_data.m_painter && m_data.m_painter->isActive();
   if (!success)
@@ -113,8 +113,8 @@ void ImageBuffer::draw(GraphicsContext* destContext,
     // We're drawing into our own buffer.  In order for this to work, we need to
     // copy the source buffer first.
     RefPtr<Image> copy = copyImage();
-    destContext->drawImage(copy.get(), DeviceColorSpace, destRect, srcRect, op,
-                           useLowQualityScale);
+    destContext->drawImage(copy.get(), ColorSpaceDeviceRGB, destRect, srcRect,
+                           op, useLowQualityScale);
   } else
     destContext->drawImage(m_data.m_image.get(), styleColorSpace, destRect,
                            srcRect, op, useLowQualityScale);

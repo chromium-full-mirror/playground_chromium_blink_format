@@ -408,7 +408,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
     Color shadowFillColor(shadowColor.red(), shadowColor.green(),
                           shadowColor.blue(),
                           shadowColor.alpha() * fillColor.alpha() / 255);
-    graphicsContext->setFillColor(shadowFillColor, DeviceColorSpace);
+    graphicsContext->setFillColor(shadowFillColor, ColorSpaceDeviceRGB);
     CGContextSetTextPosition(
         cgContext, point.x() + translation.width() + shadowOffset.width(),
         point.y() + translation.height() + shadowOffset.height());
@@ -422,7 +422,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
       CGContextShowGlyphsWithAdvances(cgContext, glyphBuffer.glyphs(from),
                                       glyphBuffer.advances(from), numGlyphs);
     }
-    graphicsContext->setFillColor(fillColor, DeviceColorSpace);
+    graphicsContext->setFillColor(fillColor, ColorSpaceDeviceRGB);
   }
 
   CGContextSetTextPosition(cgContext, point.x() + translation.width(),
@@ -439,7 +439,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
 
   if (hasSimpleShadow)
     graphicsContext->setShadow(shadowOffset, shadowBlur, shadowColor,
-                               DeviceColorSpace);
+                               ColorSpaceDeviceRGB);
 
   wkRestoreFontSmoothingStyle(cgContext, oldFontSmoothingStyle);
 }

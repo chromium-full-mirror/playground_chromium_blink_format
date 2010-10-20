@@ -72,10 +72,12 @@ Color::Color(CGColorRef color) {
 
 static inline CGColorSpaceRef cachedCGColorSpace(ColorSpace colorSpace) {
   switch (colorSpace) {
-    case DeviceColorSpace:
+    case ColorSpaceDeviceRGB:
       return deviceRGBColorSpaceRef();
-    case sRGBColorSpace:
+    case ColorSpaceSRGB:
       return sRGBColorSpaceRef();
+    case ColorSpaceLinearRGB:
+      return linearRGBColorSpaceRef();
   }
   ASSERT_NOT_REACHED();
   return deviceRGBColorSpaceRef();
@@ -129,13 +131,15 @@ static CGColorRef cachedCGColor(const Color& color) {
 
 CGColorRef cachedCGColor(const Color& color, ColorSpace colorSpace) {
   switch (colorSpace) {
-    case DeviceColorSpace:
-      return cachedCGColor<DeviceColorSpace>(color);
-    case sRGBColorSpace:
-      return cachedCGColor<sRGBColorSpace>(color);
+    case ColorSpaceDeviceRGB:
+      return cachedCGColor<ColorSpaceDeviceRGB>(color);
+    case ColorSpaceSRGB:
+      return cachedCGColor<ColorSpaceSRGB>(color);
+    case ColorSpaceLinearRGB:
+      return cachedCGColor<ColorSpaceLinearRGB>(color);
   }
   ASSERT_NOT_REACHED();
-  return cachedCGColor(color, DeviceColorSpace);
+  return cachedCGColor(color, ColorSpaceDeviceRGB);
 }
 }
 

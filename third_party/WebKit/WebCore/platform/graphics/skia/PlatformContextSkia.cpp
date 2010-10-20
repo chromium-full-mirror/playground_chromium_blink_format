@@ -798,7 +798,7 @@ void PlatformContextSkia::uploadSoftwareToHardware(CompositeOperator op) const {
   AffineTransform identity;
   gpuCanvas()->drawTexturedRect(m_uploadTexture.get(), m_softwareDirtyRect,
                                 m_softwareDirtyRect, identity, 1.0,
-                                DeviceColorSpace, op);
+                                ColorSpaceDeviceRGB, op);
   // Clear out the region of the software canvas we just uploaded.
   m_canvas->save();
   m_canvas->resetMatrix();

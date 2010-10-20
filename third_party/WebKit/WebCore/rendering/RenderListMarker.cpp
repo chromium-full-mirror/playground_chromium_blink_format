@@ -1148,7 +1148,7 @@ void RenderListMarker::paint(PaintInfo& paintInfo, int tx, int ty) {
       context->drawEllipse(marker);
       return;
     case Circle:
-      context->setFillColor(Color::transparent, DeviceColorSpace);
+      context->setFillColor(Color::transparent, ColorSpaceDeviceRGB);
       context->drawEllipse(marker);
       return;
     case Square:

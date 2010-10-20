@@ -2149,11 +2149,16 @@ template <>
 inline CSSPrimitiveValue::CSSPrimitiveValue(ColorSpace space)
     : m_type(CSS_IDENT), m_hasCachedCSSText(false) {
   switch (space) {
-    case DeviceColorSpace:
+    case ColorSpaceDeviceRGB:
       m_value.ident = CSSValueDefault;
       break;
-    case sRGBColorSpace:
+    case ColorSpaceSRGB:
       m_value.ident = CSSValueSrgb;
+      break;
+    case ColorSpaceLinearRGB:
+      // CSS color correction does not support linearRGB yet.
+      ASSERT_NOT_REACHED();
+      m_value.ident = CSSValueDefault;
       break;
   }
 }
@@ -2162,12 +2167,12 @@ template <>
 inline CSSPrimitiveValue::operator ColorSpace() const {
   switch (m_value.ident) {
     case CSSValueDefault:
-      return DeviceColorSpace;
+      return ColorSpaceDeviceRGB;
     case CSSValueSrgb:
-      return sRGBColorSpace;
+      return ColorSpaceSRGB;
     default:
       ASSERT_NOT_REACHED();
-      return DeviceColorSpace;
+      return ColorSpaceDeviceRGB;
   }
 }
 
