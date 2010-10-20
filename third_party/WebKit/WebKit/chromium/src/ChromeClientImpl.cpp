@@ -551,7 +551,7 @@ void ChromeClientImpl::mouseDidMoveOverElement(const HitTestResult& result,
     RenderObject* object = result.innerNonSharedNode()->renderer();
     if (object && object->isWidget()) {
       Widget* widget = toRenderWidget(object)->widget();
-      if (widget) {
+      if (widget && widget->isPluginContainer()) {
         WebPluginContainerImpl* plugin =
             static_cast<WebPluginContainerImpl*>(widget);
         url = plugin->plugin()->linkAtPosition(result.point());

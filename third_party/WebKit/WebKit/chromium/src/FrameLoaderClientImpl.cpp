@@ -1359,7 +1359,8 @@ PassRefPtr<Widget> FrameLoaderClientImpl::createPlugin(
 // This method gets called when a plugin is put in place of html content
 // (e.g., acrobat reader).
 void FrameLoaderClientImpl::redirectDataToPlugin(Widget* pluginWidget) {
-  m_pluginWidget = static_cast<WebPluginContainerImpl*>(pluginWidget);
+  if (pluginWidget->isPluginContainer())
+    m_pluginWidget = static_cast<WebPluginContainerImpl*>(pluginWidget);
   ASSERT(m_pluginWidget.get());
 }
 

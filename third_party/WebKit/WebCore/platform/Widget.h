@@ -246,6 +246,10 @@ class Widget : public RefCounted<Widget> {
   const String edjeThemeRecursive() const;
 #endif
 
+#if PLATFORM(CHROMIUM)
+  virtual bool isPluginContainer() const { return false; }
+#endif
+
   // Virtual methods to convert points to/from the containing ScrollView
   virtual IntRect convertToContainingView(const IntRect&) const;
   virtual IntRect convertFromContainingView(const IntRect&) const;
