@@ -142,6 +142,9 @@ class PluginProxy : public Plugin {
   // store.
   RefPtr<BackingStore> m_pluginBackingStore;
 
+  // Whether all of the plug-in backing store contains valid data.
+  bool m_pluginBackingStoreContainsValidData;
+
   bool m_isStarted;
 
   // Whether we're called invalidate in response to an update call, and are now

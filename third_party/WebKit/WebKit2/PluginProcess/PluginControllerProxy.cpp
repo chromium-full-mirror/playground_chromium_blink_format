@@ -88,6 +88,7 @@ void PluginControllerProxy::destroy() {
 
 void PluginControllerProxy::paint() {
   ASSERT(!m_dirtyRect.isEmpty());
+  m_paintTimer.stop();
 
   if (!m_backingStore)
     return;
@@ -309,6 +310,11 @@ void PluginControllerProxy::handleKeyboardEvent(
     const WebKeyboardEvent& keyboardEvent,
     bool& handled) {
   handled = m_plugin->handleKeyboardEvent(keyboardEvent);
+}
+
+void PluginControllerProxy::paintEntirePlugin() {
+  m_dirtyRect = m_frameRect;
+  paint();
 }
 
 void PluginControllerProxy::setFocus(bool hasFocus) {
