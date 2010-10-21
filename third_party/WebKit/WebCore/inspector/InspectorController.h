@@ -81,7 +81,6 @@ class Page;
 class ResourceRequest;
 class ResourceResponse;
 class ResourceError;
-class ScriptArguments;
 class ScriptCallStack;
 class ScriptProfile;
 class SharedBuffer;
@@ -154,15 +153,14 @@ class InspectorController : public Noncopyable {
   void addMessageToConsole(MessageSource,
                            MessageType,
                            MessageLevel,
-                           const String& message,
-                           PassOwnPtr<ScriptArguments> arguments,
-                           PassOwnPtr<ScriptCallStack>);
+                           ScriptCallStack*,
+                           const String& message);
   void addMessageToConsole(MessageSource,
                            MessageType,
                            MessageLevel,
                            const String& message,
                            unsigned lineNumber,
-                           const String&);
+                           const String& sourceID);
   void clearConsoleMessages();
   const Vector<OwnPtr<ConsoleMessage>>& consoleMessages() const {
     return m_consoleMessages;
@@ -280,8 +278,8 @@ class InspectorController : public Noncopyable {
   void startTiming(const String& title);
   bool stopTiming(const String& title, double& elapsed);
 
-  void startGroup(PassOwnPtr<ScriptArguments>,
-                  PassOwnPtr<ScriptCallStack> callFrame,
+  void startGroup(MessageSource source,
+                  ScriptCallStack* callFrame,
                   bool collapsed = false);
   void endGroup(MessageSource source,
                 unsigned lineNumber,

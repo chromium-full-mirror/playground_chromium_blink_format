@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Google Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,36 +28,42 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ScriptArguments_h
-#define ScriptArguments_h
+#include "config.h"
+#include "ScriptCallFrame.h"
+
+#include <v8.h>
 
 #include "PlatformString.h"
-#include "ScriptState.h"
-#include <wtf/Vector.h>
+#include "V8Binding.h"
+#include "V8Proxy.h"
+#include "ScriptValue.h"
 
 namespace WebCore {
 
-class ScriptValue;
+ScriptCallFrame::ScriptCallFrame(const String& functionName,
+                                 const String& urlString,
+                                 int lineNumber,
+                                 const v8::Arguments& arguments,
+                                 unsigned skipArgumentCount)
+    : m_functionName(functionName),
+      m_sourceURL(urlString),
+      m_lineNumber(lineNumber) {
+  for (int i = skipArgumentCount; i < arguments.Length(); ++i)
+    m_arguments.append(ScriptValue(arguments[i]));
+}
 
-class ScriptArguments {
- public:
-  ScriptArguments(ScriptState*, Vector<ScriptValue>& arguments);
-  ~ScriptArguments();
+ScriptCallFrame::ScriptCallFrame(const String& functionName,
+                                 const String& urlString,
+                                 int lineNumber)
+    : m_functionName(functionName),
+      m_sourceURL(urlString),
+      m_lineNumber(lineNumber) {}
 
-  const ScriptValue& argumentAt(size_t) const;
-  size_t argumentCount() const { return m_arguments.size(); }
+ScriptCallFrame::~ScriptCallFrame() {}
 
-  ScriptState* globalState() const;
-
-  bool getFirstArgumentAsString(WTF::String& result,
-                                bool checkForNullOrUndefined = false);
-  bool isEqual(ScriptArguments*) const;
-
- private:
-  ScriptStateProtectedPtr m_scriptState;
-  Vector<ScriptValue> m_arguments;
-};
+const ScriptValue& ScriptCallFrame::argumentAt(unsigned index) const {
+  ASSERT(m_arguments.size() > index);
+  return m_arguments[index];
+}
 
 }  // namespace WebCore
-
-#endif  // ScriptArguments_h

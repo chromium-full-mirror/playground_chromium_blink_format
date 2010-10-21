@@ -53,7 +53,7 @@ class ScriptStateProtectedPtr : public Noncopyable {
   ScriptStateProtectedPtr() {}
   ScriptStateProtectedPtr(ScriptState* scriptState)
       : m_globalObject(scriptState->lexicalGlobalObject()) {}
-  ScriptState* get() const {
+  ScriptState* get() {
     if (m_globalObject)
       return m_globalObject->globalExec();
     return 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2010 Google Inc. All rights reserved.
+ * Copyright (C) 2008, 2009 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -32,8 +32,14 @@
 #define ScriptCallStack_h
 
 #include "ScriptCallFrame.h"
+#include "ScriptState.h"
+#include "ScriptValue.h"
 #include <wtf/Noncopyable.h>
-#include <wtf/Vector.h>
+#include <wtf/RefPtr.h>
+
+namespace v8 {
+class Arguments;
+}
 
 namespace WebCore {
 
@@ -41,20 +47,45 @@ class InspectorArray;
 
 class ScriptCallStack : public Noncopyable {
  public:
-  static const size_t maxCallStackSizeToCapture = 200;
+  static const int maxCallStackSizeToCapture;
+  static const v8::StackTrace::StackTraceOptions stackTraceOptions;
 
-  ScriptCallStack(Vector<ScriptCallFrame>&);
+  static PassOwnPtr<ScriptCallStack> create(const v8::Arguments&,
+                                            unsigned skipArgumentCount = 0,
+                                            int framCountLimit = 1);
+  static PassOwnPtr<ScriptCallStack> create(ScriptState*,
+                                            v8::Handle<v8::StackTrace>);
   ~ScriptCallStack();
 
-  const ScriptCallFrame& at(size_t);
-  size_t size();
-  static bool stackTrace(int, const RefPtr<InspectorArray>&);
+  // Returns false if there is no running JavaScript or if fetching the stack
+  // failed.
+  // Sets stackTrace to be an array of stack frame objects.
+  // A stack frame object looks like:
+  // {
+  //   scriptName: <file name for the associated script resource>
+  //   functionName: <name of the JavaScript function>
+  //   lineNumber: <1 based line number>
+  //   column: <1 based column offset on the line>
+  // }
+  static bool stackTrace(int frameLimit,
+                         const RefPtr<InspectorArray>& stackTrace);
 
-  bool isEqual(ScriptCallStack*) const;
-  PassRefPtr<InspectorArray> buildInspectorObject() const;
+  const ScriptCallFrame& at(unsigned);
+  unsigned size();
+
+  ScriptState* state() const { return m_scriptState; }
+  ScriptState* globalState() const { return m_scriptState; }
 
  private:
-  Vector<ScriptCallFrame> m_frames;
+  ScriptCallStack(ScriptState* scriptState,
+                  PassOwnPtr<ScriptCallFrame> topFrame,
+                  Vector<OwnPtr<ScriptCallFrame>>& scriptCallFrames);
+  ScriptCallStack(ScriptState* scriptState,
+                  v8::Handle<v8::StackTrace> stackTrace);
+
+  OwnPtr<ScriptCallFrame> m_topFrame;
+  ScriptState* m_scriptState;
+  Vector<OwnPtr<ScriptCallFrame>> m_scriptCallFrames;
 };
 
 }  // namespace WebCore
