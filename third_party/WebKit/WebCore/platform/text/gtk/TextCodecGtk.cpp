@@ -29,6 +29,7 @@
 #include "config.h"
 #include "TextCodecGtk.h"
 
+#include <gio/gio.h>
 #include "GOwnPtr.h"
 #include "Logging.h"
 #include "PlatformString.h"
@@ -426,32 +427,22 @@ void TextCodecGtk::registerExtendedCodecs(TextCodecRegistrar registrar) {
 }
 
 TextCodecGtk::TextCodecGtk(const TextEncoding& encoding)
-    : m_encoding(encoding),
-      m_numBufferedBytes(0),
-      m_iconvDecoder(reinterpret_cast<GIConv>(-1)),
-      m_iconvEncoder(reinterpret_cast<GIConv>(-1)) {}
+    : m_encoding(encoding), m_numBufferedBytes(0) {}
 
-TextCodecGtk::~TextCodecGtk() {
-  if (m_iconvDecoder != reinterpret_cast<GIConv>(-1)) {
-    g_iconv_close(m_iconvDecoder);
-    m_iconvDecoder = reinterpret_cast<GIConv>(-1);
-  }
-  if (m_iconvEncoder != reinterpret_cast<GIConv>(-1)) {
-    g_iconv_close(m_iconvEncoder);
-    m_iconvEncoder = reinterpret_cast<GIConv>(-1);
-  }
-}
+TextCodecGtk::~TextCodecGtk() {}
 
 void TextCodecGtk::createIConvDecoder() const {
-  ASSERT(m_iconvDecoder == reinterpret_cast<GIConv>(-1));
+  ASSERT(!m_iconvDecoder);
 
-  m_iconvDecoder = g_iconv_open(internalEncodingName, m_encoding.name());
+  m_iconvDecoder = adoptPlatformRef(
+      g_charset_converter_new(internalEncodingName, m_encoding.name(), 0));
 }
 
 void TextCodecGtk::createIConvEncoder() const {
-  ASSERT(m_iconvDecoder == reinterpret_cast<GIConv>(-1));
+  ASSERT(!m_iconvEncoder);
 
-  m_iconvEncoder = g_iconv_open(m_encoding.name(), internalEncodingName);
+  m_iconvEncoder = adoptPlatformRef(
+      g_charset_converter_new(m_encoding.name(), internalEncodingName, 0));
 }
 
 String TextCodecGtk::decode(const char* bytes,
@@ -460,77 +451,83 @@ String TextCodecGtk::decode(const char* bytes,
                             bool stopOnError,
                             bool& sawError) {
   // Get a converter for the passed-in encoding.
-  if (m_iconvDecoder == reinterpret_cast<GIConv>(-1)) {
+  if (!m_iconvDecoder)
     createIConvDecoder();
-    ASSERT(m_iconvDecoder != reinterpret_cast<GIConv>(-1));
-    if (m_iconvDecoder == reinterpret_cast<GIConv>(-1)) {
-      LOG_ERROR(
-          "Error creating IConv encoder even though encoding was in table.");
-      return String();
-    }
-  }
-
-  size_t countWritten, countRead, conversionLength;
-  const char* conversionBytes;
-  char* prefixedBytes = 0;
-
-  if (m_numBufferedBytes) {
-    conversionLength = length + m_numBufferedBytes;
-    prefixedBytes = static_cast<char*>(fastMalloc(conversionLength));
-    memcpy(prefixedBytes, m_bufferedBytes, m_numBufferedBytes);
-    memcpy(prefixedBytes + m_numBufferedBytes, bytes, length);
-
-    conversionBytes = prefixedBytes;
-
-    // all buffered bytes are consumed now
-    m_numBufferedBytes = 0;
-  } else {
-    // no previously buffered partial data,
-    // just convert the data that was passed in
-    conversionBytes = bytes;
-    conversionLength = length;
-  }
-
-  GOwnPtr<GError> err;
-  GOwnPtr<UChar> buffer;
-
-  buffer.outPtr() = reinterpret_cast<UChar*>(
-      g_convert_with_iconv(conversionBytes, conversionLength, m_iconvDecoder,
-                           &countRead, &countWritten, &err.outPtr()));
-
-  if (err) {
-    LOG_ERROR("GIConv conversion error, Code %d: \"%s\"", err->code,
-              err->message);
-    m_numBufferedBytes = 0;  // reset state for subsequent calls to decode
-    fastFree(prefixedBytes);
-    sawError = true;
+  if (!m_iconvDecoder) {
+    LOG_ERROR(
+        "Error creating IConv encoder even though encoding was in table.");
     return String();
   }
 
-  // Partial input at the end of the string may not result in an error being
-  // raised.
-  // From the gnome library documentation on g_convert_with_iconv:
-  // "Even if the conversion was successful, this may be less than len if there
-  // were partial characters at the end of the input."
-  // That's why we need to compare conversionLength against countRead
-
-  m_numBufferedBytes = conversionLength - countRead;
-  if (m_numBufferedBytes > 0) {
-    if (flush) {
-      LOG_ERROR("Partial bytes at end of input while flush requested.");
-      m_numBufferedBytes = 0;  // reset state for subsequent calls to decode
-      fastFree(prefixedBytes);
-      sawError = true;
-      return String();
-    }
-    memcpy(m_bufferedBytes, conversionBytes + countRead, m_numBufferedBytes);
-  }
-
-  fastFree(prefixedBytes);
-
   Vector<UChar> result;
 
-  result.append(buffer.get(), countWritten / sizeof(UChar));
+  gsize bytesRead = 0;
+  gsize bytesWritten = 0;
+  const gchar* input = bytes;
+  gsize inputLength = length;
+  gchar buffer[ConversionBufferSize];
+  int flags = !length ? G_CONVERTER_INPUT_AT_END : G_CONVERTER_NO_FLAGS;
+  if (flush)
+    flags |= G_CONVERTER_FLUSH;
+
+  bool bufferWasFull = false;
+  char* prefixedBytes = 0;
+
+  if (m_numBufferedBytes) {
+    inputLength = length + m_numBufferedBytes;
+    prefixedBytes = static_cast<char*>(fastMalloc(inputLength));
+    memcpy(prefixedBytes, m_bufferedBytes, m_numBufferedBytes);
+    memcpy(prefixedBytes + m_numBufferedBytes, bytes, length);
+
+    input = prefixedBytes;
+
+    // all buffered bytes are consumed now
+    m_numBufferedBytes = 0;
+  }
+
+  do {
+    GOwnPtr<GError> error;
+    GConverterResult res = g_converter_convert(
+        G_CONVERTER(m_iconvDecoder.get()), input, inputLength, buffer,
+        sizeof(buffer), static_cast<GConverterFlags>(flags), &bytesRead,
+        &bytesWritten, &error.outPtr());
+    input += bytesRead;
+    inputLength -= bytesRead;
+
+    if (res == G_CONVERTER_ERROR) {
+      if (g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_PARTIAL_INPUT)) {
+        // There is not enough input to fully determine what the conversion
+        // should produce,
+        // save it to a buffer to prepend it to the next input.
+        memcpy(m_bufferedBytes, input, inputLength);
+        m_numBufferedBytes = inputLength;
+        inputLength = 0;
+      } else if (g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_NO_SPACE))
+        bufferWasFull = true;
+      else if (g_error_matches(error.get(), G_IO_ERROR,
+                               G_IO_ERROR_INVALID_DATA)) {
+        if (stopOnError)
+          sawError = true;
+        if (inputLength) {
+          // Ignore invalid character.
+          input += 1;
+          inputLength -= 1;
+        }
+      } else {
+        sawError = true;
+        LOG_ERROR("GIConv conversion error, Code %d: \"%s\"", error->code,
+                  error->message);
+        m_numBufferedBytes = 0;  // Reset state for subsequent calls to decode.
+        fastFree(prefixedBytes);
+        return String();
+      }
+    }
+
+    result.append(reinterpret_cast<UChar*>(buffer),
+                  bytesWritten / sizeof(UChar));
+  } while ((inputLength || bufferWasFull) && !sawError);
+
+  fastFree(prefixedBytes);
 
   return String::adopt(result);
 }
@@ -541,26 +538,41 @@ CString TextCodecGtk::encode(const UChar* characters,
   if (!length)
     return "";
 
-  if (m_iconvEncoder == reinterpret_cast<GIConv>(-1))
+  if (!m_iconvEncoder)
     createIConvEncoder();
-  if (m_iconvEncoder == reinterpret_cast<GIConv>(-1))
-    return CString();
-
-  size_t count;
-
-  GOwnPtr<GError> err;
-  GOwnPtr<char> buffer;
-
-  buffer.outPtr() = g_convert_with_iconv(
-      reinterpret_cast<const char*>(characters), length * sizeof(UChar),
-      m_iconvEncoder, 0, &count, &err.outPtr());
-  if (err) {
-    LOG_ERROR("GIConv conversion error, Code %d: \"%s\"", err->code,
-              err->message);
+  if (!m_iconvEncoder) {
+    LOG_ERROR(
+        "Error creating IConv encoder even though encoding was in table.");
     return CString();
   }
 
-  return CString(buffer.get(), count);
+  gsize bytesRead = 0;
+  gsize bytesWritten = 0;
+  const gchar* input = reinterpret_cast<const char*>(characters);
+  gsize inputLength = length * sizeof(UChar);
+  gchar buffer[ConversionBufferSize];
+  Vector<char> result;
+  GOwnPtr<GError> error;
+
+  size_t size = 0;
+  do {
+    g_converter_convert(G_CONVERTER(m_iconvEncoder.get()), input, inputLength,
+                        buffer, sizeof(buffer), G_CONVERTER_INPUT_AT_END,
+                        &bytesRead, &bytesWritten, &error.outPtr());
+    input += bytesRead;
+    inputLength -= bytesRead;
+    result.grow(size + bytesWritten);
+    memcpy(result.data() + size, buffer, bytesWritten);
+    size += bytesWritten;
+  } while (inputLength && !error.get());
+
+  if (error) {
+    LOG_ERROR("GIConv conversion error, Code %d: \"%s\"", error->code,
+              error->message);
+    return CString();
+  }
+
+  return CString(result.data(), size);
 }
 
 }  // namespace WebCore
