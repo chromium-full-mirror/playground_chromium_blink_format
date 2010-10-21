@@ -45,22 +45,21 @@ class WebView : public APIObject,
  public:
   static PassRefPtr<WebView> create(RECT rect,
                                     WebPageNamespace* pageNamespace,
-                                    HWND hostWindow) {
-    return adoptRef(new WebView(rect, pageNamespace, hostWindow));
+                                    HWND parentWindow) {
+    return adoptRef(new WebView(rect, pageNamespace, parentWindow));
   }
   ~WebView();
 
   RECT rect() const { return m_rect; }
 
   HWND window() const { return m_window; }
-  HWND hostWindow() const { return m_hostWindow; }
-  void setHostWindow(HWND);
+  void setParentWindow(HWND);
   void windowAncestryDidChange();
 
   WebPageProxy* page() const { return m_page.get(); }
 
  private:
-  WebView(RECT, WebPageNamespace*, HWND hostWindow);
+  WebView(RECT, WebPageNamespace*, HWND parentWindow);
 
   virtual Type type() const { return TypeView; }
 
@@ -141,7 +140,6 @@ class WebView : public APIObject,
 
   RECT m_rect;
   HWND m_window;
-  HWND m_hostWindow;
   HWND m_topLevelParentWindow;
   HWND m_toolTipWindow;
 
