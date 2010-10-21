@@ -152,10 +152,13 @@ EncodedJSValue JSC_HOST_CALL numberProtoFuncToExponential(ExecState* exec) {
 
   // Round if the argument is not undefined, always format as exponential.
   NumberToStringBuffer buffer;
-  unsigned length = isUndefined ? DecimalNumber(x).toStringExponential(buffer)
-                                : DecimalNumber(x, RoundingSignificantFigures,
-                                                decimalPlacesInExponent + 1)
-                                      .toStringExponential(buffer);
+  unsigned length =
+      isUndefined
+          ? DecimalNumber(x).toStringExponential(
+                buffer, WTF::NumberToStringBufferLength)
+          : DecimalNumber(x, RoundingSignificantFigures,
+                          decimalPlacesInExponent + 1)
+                .toStringExponential(buffer, WTF::NumberToStringBufferLength);
 
   return JSValue::encode(jsString(exec, UString(buffer, length)));
 }
@@ -194,8 +197,9 @@ EncodedJSValue JSC_HOST_CALL numberProtoFuncToFixed(ExecState* exec) {
 
   // Convert to decimal with rounding, and format as decimal.
   NumberToStringBuffer buffer;
-  unsigned length = DecimalNumber(x, RoundingDecimalPlaces, decimalPlaces)
-                        .toStringDecimal(buffer);
+  unsigned length =
+      DecimalNumber(x, RoundingDecimalPlaces, decimalPlaces)
+          .toStringDecimal(buffer, WTF::NumberToStringBufferLength);
   return JSValue::encode(jsString(exec, UString(buffer, length)));
 }
 
@@ -241,8 +245,8 @@ EncodedJSValue JSC_HOST_CALL numberProtoFuncToPrecision(ExecState* exec) {
   NumberToStringBuffer buffer;
   unsigned length =
       number.exponent() >= -6 && number.exponent() < significantFigures
-          ? number.toStringDecimal(buffer)
-          : number.toStringExponential(buffer);
+          ? number.toStringDecimal(buffer, WTF::NumberToStringBufferLength)
+          : number.toStringExponential(buffer, WTF::NumberToStringBufferLength);
   return JSValue::encode(jsString(exec, UString(buffer, length)));
 }
 

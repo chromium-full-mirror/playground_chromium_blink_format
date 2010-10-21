@@ -54,7 +54,8 @@ void dtoaRoundDP(DtoaBuffer result,
 
 // Size = 80 for sizeof(DtoaBuffer) + some sign bits, decimal point, 'e',
 // exponent digits.
-typedef UChar NumberToStringBuffer[96];
+const unsigned NumberToStringBufferLength = 96;
+typedef UChar NumberToStringBuffer[NumberToStringBufferLength];
 unsigned numberToString(double, NumberToStringBuffer);
 
 }  // namespace WTF
