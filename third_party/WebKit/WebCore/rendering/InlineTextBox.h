@@ -152,7 +152,8 @@ class InlineTextBox : public InlineBox {
                                                 const ShadowData*,
                                                 const FloatRect& textRect,
                                                 bool stroked,
-                                                bool opaque);
+                                                bool opaque,
+                                                bool vertical);
 
  private:
   InlineTextBox*

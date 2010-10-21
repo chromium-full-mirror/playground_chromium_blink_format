@@ -128,10 +128,6 @@ class InlineFlowBox : public InlineBox {
                       int ty,
                       int w,
                       int h);
-  virtual void paintTextDecorations(PaintInfo&,
-                                    int tx,
-                                    int ty,
-                                    bool paintedChildren = false);
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
