@@ -27,6 +27,7 @@
 #define FontDescription_h
 
 #include "FontFamily.h"
+#include "FontOrientation.h"
 #include "FontRenderingMode.h"
 #include "FontSmoothingMode.h"
 #include "FontTraitsMask.h"
@@ -63,6 +64,7 @@ class FontDescription {
   FontDescription()
       : m_specifiedSize(0),
         m_computedSize(0),
+        m_orientation(Horizontal),
         m_italic(false),
         m_smallCaps(false),
         m_isAbsoluteSize(false),
@@ -114,6 +116,7 @@ class FontDescription {
 
   FontTraitsMask traitsMask() const;
   bool isSpecifiedFont() const { return m_isSpecifiedFont; }
+  FontOrientation orientation() const { return m_orientation; }
 
   void setFamily(const FontFamily& family) { m_familyList = family; }
   void setComputedSize(float s) { m_computedSize = s; }
@@ -141,6 +144,9 @@ class FontDescription {
   void setIsSpecifiedFont(bool isSpecifiedFont) {
     m_isSpecifiedFont = isSpecifiedFont;
   }
+  void setOrientation(FontOrientation orientation) {
+    m_orientation = orientation;
+  }
 
  private:
   FontFamily m_familyList;  // The list of font families to be used.
@@ -150,6 +156,8 @@ class FontDescription {
                           // rounding, minimum font sizes, and zooming.
   float m_computedSize;  // Computed size adjusted for the minimum font size and
                          // the zoom factor.
+
+  FontOrientation m_orientation;
 
   bool m_italic : 1;
   bool m_smallCaps : 1;
@@ -189,7 +197,8 @@ inline bool FontDescription::operator==(const FontDescription& other) const {
          m_keywordSize == other.m_keywordSize &&
          m_fontSmoothing == other.m_fontSmoothing &&
          m_textRendering == other.m_textRendering &&
-         m_isSpecifiedFont == other.m_isSpecifiedFont;
+         m_isSpecifiedFont == other.m_isSpecifiedFont &&
+         m_orientation == other.m_orientation;
 }
 }
 

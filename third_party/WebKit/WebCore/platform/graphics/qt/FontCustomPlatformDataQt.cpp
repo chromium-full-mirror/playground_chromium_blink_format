@@ -37,6 +37,7 @@ FontCustomPlatformData::~FontCustomPlatformData() {
 FontPlatformData FontCustomPlatformData::fontPlatformData(int size,
                                                           bool bold,
                                                           bool italic,
+                                                          FontOrientation,
                                                           FontRenderingMode) {
   QFont font;
   font.setFamily(QFontDatabase::applicationFontFamilies(m_handle)[0]);
