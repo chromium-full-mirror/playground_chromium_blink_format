@@ -231,7 +231,16 @@ static void initializeFonts(const char* testURL = 0) {
           "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif.ttf",
           "/usr/share/fonts/dejavu/DejaVuSerif.ttf",
       },
-  };
+
+      // MathML tests require the STIX fonts.
+      {"/usr/share/fonts/opentype/stix/STIXGeneral.otf",
+       "/usr/share/fonts/stix/STIXGeneral.otf"},
+      {"/usr/share/fonts/opentype/stix/STIXGeneralBolIta.otf",
+       "/usr/share/fonts/stix/STIXGeneralBolIta.otf"},
+      {"/usr/share/fonts/opentype/stix/STIXGeneralBol.otf",
+       "/usr/share/fonts/stix/STIXGeneralBol.otf"},
+      {"/usr/share/fonts/opentype/stix/STIXGeneralItalic.otf",
+       "/usr/share/fonts/stix/STIXGeneralItalic.otf"}};
 
   // TODO: Some tests use Lucida. We should load these as well, once it becomes
   // clear how to install these fonts easily on Fedora.
