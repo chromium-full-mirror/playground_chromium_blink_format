@@ -117,6 +117,13 @@ WK_EXPORT void WKPreferencesSetFantasyFontFamily(
 WK_EXPORT WKStringRef
 WKPreferencesCopyFantasyFontFamily(WKPreferencesRef preferencesRef);
 
+// Defaults to false.
+WK_EXPORT void WKPreferencesSetPrivateBrowsingEnabled(
+    WKPreferencesRef preferencesRef,
+    bool enabled);
+WK_EXPORT bool WKPreferencesGetPrivateBrowsingEnabled(
+    WKPreferencesRef preferencesRef);
+
 #ifdef __cplusplus
 }
 #endif

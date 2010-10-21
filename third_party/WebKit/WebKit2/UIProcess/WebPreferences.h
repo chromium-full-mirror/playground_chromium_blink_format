@@ -107,6 +107,9 @@ class WebPreferences : public APIObject {
   void setCompositingRepaintCountersVisible(bool);
   bool compositingRepaintCountersVisible() const;
 
+  void setPrivateBrowsingEnabled(bool);
+  bool privateBrowsingEnabled() const;
+
  private:
   WebPreferences();
   WebPreferences(WebPreferences*);
