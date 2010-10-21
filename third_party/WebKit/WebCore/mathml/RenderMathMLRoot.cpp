@@ -262,8 +262,8 @@ void RenderMathMLRoot::layout() {
         rootMarginTop + static_cast<int>(gRootPadding * style()->fontSize()),
         Fixed));
 
-  setNeedsLayoutAndPrefWidthsRecalc();
-  markContainingBlocksForLayout();
+  setNeedsLayout(true);
+  setPreferredLogicalWidthsDirty(true, false);
   RenderBlock::layout();
 
   indexBox->style()->setBottom(
@@ -271,7 +271,7 @@ void RenderMathMLRoot::layout() {
 
   // Now that we've potentially changed its position, we need layout the index
   // again.
-  indexBox->setNeedsLayoutAndPrefWidthsRecalc();
+  indexBox->setNeedsLayout(true);
   indexBox->layout();
 }
 }

@@ -127,14 +127,6 @@ void RenderMathMLFraction::layout() {
         m_lineThickness * ceil(gFractionBarWidth * style()->fontSize()));
 
   RenderBlock::layout();
-
-  // The row layout can affect the numerator/denominator width.
-  // FIXME: This is probably only needed if one of the children
-  // contains an mrow.
-  setNeedsLayoutAndPrefWidthsRecalc();
-  markContainingBlocksForLayout();
-
-  RenderBlock::layout();
 }
 
 void RenderMathMLFraction::paint(PaintInfo& info, int tx, int ty) {

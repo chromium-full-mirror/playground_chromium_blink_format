@@ -41,6 +41,7 @@ class RenderMathMLRow : public RenderMathMLBlock {
       bool firstLine,
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;
+  virtual void stretchToHeight(int) {}
 
  protected:
   virtual void layout();

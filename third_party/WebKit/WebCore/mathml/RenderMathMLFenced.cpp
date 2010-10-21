@@ -144,27 +144,6 @@ void RenderMathMLFenced::addChild(RenderObject* child, RenderObject*) {
   } else
     RenderBlock::addChild(child, lastChild());
 }
-
-void RenderMathMLFenced::layout() {
-  RenderMathMLRow::layout();
-
-  int width = 0;
-  for (RenderObject* current = firstChild(); current;
-       current = current->nextSibling()) {
-    if (current->isBoxModelObject()) {
-      RenderBoxModelObject* box = toRenderBoxModelObject(current);
-      width += box->offsetWidth();
-    }
-  }
-  width++;
-  style()->setWidth(Length(width, Fixed));
-
-  setNeedsLayoutAndPrefWidthsRecalc();
-  markContainingBlocksForLayout();
-  RenderBlock::layout();
-
-  setNeedsLayout(false);
-}
 }
 
 #endif
