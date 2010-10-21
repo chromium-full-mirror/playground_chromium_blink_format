@@ -222,6 +222,12 @@ class CSSStyleSelector : public Noncopyable {
                                         TransformOperations& outOperations);
 
  private:
+  enum SelectorMatch {
+    SelectorMatches,
+    SelectorFailsLocally,
+    SelectorFailsCompletely
+  };
+
   // This function fixes up the default font size if it detects that the current
   // generic font family has changed. -dwh
   void checkForGenericFamilyChange(RenderStyle*, RenderStyle* parentStyle);
@@ -281,14 +287,14 @@ class CSSStyleSelector : public Noncopyable {
     SelectorChecker(Document*, bool strictParsing);
 
     bool checkSelector(CSSSelector*, Element*) const;
-    bool checkSelector(CSSSelector*,
-                       Element*,
-                       HashSet<AtomicStringImpl*>* selectorAttrs,
-                       PseudoId& dynamicPseudo,
-                       bool isSubSelector,
-                       bool encounteredLink,
-                       RenderStyle* = 0,
-                       RenderStyle* elementParentStyle = 0) const;
+    SelectorMatch checkSelector(CSSSelector*,
+                                Element*,
+                                HashSet<AtomicStringImpl*>* selectorAttrs,
+                                PseudoId& dynamicPseudo,
+                                bool isSubSelector,
+                                bool encounteredLink,
+                                RenderStyle* = 0,
+                                RenderStyle* elementParentStyle = 0) const;
     bool checkOneSelector(CSSSelector*,
                           Element*,
                           HashSet<AtomicStringImpl*>* selectorAttrs,
