@@ -103,6 +103,7 @@ FontPlatformData FontCustomPlatformData::fontPlatformData(
     int size,
     bool bold,
     bool italic,
+    FontOrientation,
     FontRenderingMode renderingMode) {
   ASSERT(m_fontReference);
   ASSERT(T2embedLibrary());

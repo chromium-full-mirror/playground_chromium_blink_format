@@ -37,7 +37,7 @@
 typedef struct OpaqueATSUStyle* ATSUStyle;
 #endif
 
-#if USE(CORE_TEXT)
+#if PLATFORM(MAC)
 #include <wtf/RetainPtr.h>
 #endif
 
@@ -137,7 +137,7 @@ class SimpleFontData : public FontData {
   NSFont* getNSFont() const { return m_platformData.nsFont(); }
 #endif
 
-#if USE(CORE_TEXT)
+#if PLATFORM(MAC)
   CFDictionaryRef getCFStringAttributes(TypesettingFeatures) const;
 #endif
 
@@ -241,7 +241,7 @@ class SimpleFontData : public FontData {
  private:
 #endif
 
-#if USE(CORE_TEXT)
+#if PLATFORM(MAC)
   mutable HashMap<unsigned, RetainPtr<CFDictionaryRef>> m_CFStringAttributes;
 #endif
 

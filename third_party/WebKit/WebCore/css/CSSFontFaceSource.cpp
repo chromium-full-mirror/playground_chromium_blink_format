@@ -177,7 +177,8 @@ SimpleFontData* CSSFontFaceSource::getFontData(
         fontData.set(new SimpleFontData(
             m_font->platformDataFromCustomData(
                 fontDescription.computedPixelSize(), syntheticBold,
-                syntheticItalic, fontDescription.renderingMode()),
+                syntheticItalic, fontDescription.orientation(),
+                fontDescription.renderingMode()),
             true, false));
       }
     } else {

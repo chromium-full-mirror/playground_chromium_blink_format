@@ -21,6 +21,7 @@
 #ifndef FontCustomPlatformData_h
 #define FontCustomPlatformData_h
 
+#include "FontOrientation.h"
 #include "FontRenderingMode.h"
 #include <CoreFoundation/CFBase.h>
 #include <wtf/Forward.h>
@@ -45,6 +46,7 @@ struct FontCustomPlatformData : Noncopyable {
   FontPlatformData fontPlatformData(int size,
                                     bool bold,
                                     bool italic,
+                                    FontOrientation = Horizontal,
                                     FontRenderingMode = NormalRenderingMode);
 
   static bool supportsFormat(const String&);

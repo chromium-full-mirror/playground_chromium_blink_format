@@ -57,13 +57,15 @@ struct FontPlatformDataCacheKey : FastAllocBase {
       unsigned weight = 0,
       bool italic = false,
       bool isPrinterFont = false,
-      FontRenderingMode renderingMode = NormalRenderingMode)
+      FontRenderingMode renderingMode = NormalRenderingMode,
+      FontOrientation orientation = Horizontal)
       : m_size(size),
         m_weight(weight),
         m_family(family),
         m_italic(italic),
         m_printerFont(isPrinterFont),
-        m_renderingMode(renderingMode) {}
+        m_renderingMode(renderingMode),
+        m_orientation(orientation) {}
 
   FontPlatformDataCacheKey(HashTableDeletedValueType)
       : m_size(hashTableDeletedSize()) {}
@@ -75,7 +77,8 @@ struct FontPlatformDataCacheKey : FastAllocBase {
     return equalIgnoringCase(m_family, other.m_family) &&
            m_size == other.m_size && m_weight == other.m_weight &&
            m_italic == other.m_italic && m_printerFont == other.m_printerFont &&
-           m_renderingMode == other.m_renderingMode;
+           m_renderingMode == other.m_renderingMode &&
+           m_orientation == other.m_orientation;
   }
 
   unsigned m_size;
@@ -84,6 +87,7 @@ struct FontPlatformDataCacheKey : FastAllocBase {
   bool m_italic;
   bool m_printerFont;
   FontRenderingMode m_renderingMode;
+  FontOrientation m_orientation;
 
  private:
   static unsigned hashTableDeletedSize() { return 0xFFFFFFFFU; }
@@ -92,7 +96,8 @@ struct FontPlatformDataCacheKey : FastAllocBase {
 inline unsigned computeHash(const FontPlatformDataCacheKey& fontKey) {
   unsigned hashCodes[4] = {
       CaseFoldingHash::hash(fontKey.m_family), fontKey.m_size, fontKey.m_weight,
-      static_cast<unsigned>(fontKey.m_italic) << 2 |
+      static_cast<unsigned>(fontKey.m_orientation) << 3 |
+          static_cast<unsigned>(fontKey.m_italic) << 2 |
           static_cast<unsigned>(fontKey.m_printerFont) << 1 |
           static_cast<unsigned>(fontKey.m_renderingMode)};
   return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
@@ -195,7 +200,7 @@ FontPlatformData* FontCache::getCachedFontPlatformData(
   FontPlatformDataCacheKey key(
       familyName, fontDescription.computedPixelSize(), fontDescription.weight(),
       fontDescription.italic(), fontDescription.usePrinterFont(),
-      fontDescription.renderingMode());
+      fontDescription.renderingMode(), fontDescription.orientation());
   FontPlatformData* result = 0;
   bool foundResult;
   FontPlatformDataCache::iterator it = gFontPlatformDataCache->find(key);

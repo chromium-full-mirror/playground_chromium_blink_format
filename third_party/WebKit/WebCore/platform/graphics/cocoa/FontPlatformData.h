@@ -24,6 +24,7 @@
 #ifndef FontPlatformData_h
 #define FontPlatformData_h
 
+#include "FontOrientation.h"
 #include <wtf/text/StringImpl.h>
 
 #ifdef __OBJC__
@@ -59,9 +60,13 @@ inline CTFontRef toCTFontRef(NSFont* nsFont) {
 
 class FontPlatformData {
  public:
-  FontPlatformData(float size, bool syntheticBold, bool syntheticOblique)
+  FontPlatformData(float size,
+                   bool syntheticBold,
+                   bool syntheticOblique,
+                   FontOrientation orientation = Horizontal)
       : m_syntheticBold(syntheticBold),
         m_syntheticOblique(syntheticOblique),
+        m_orientation(orientation),
         m_atsuFontID(0),
         m_size(size),
         m_font(0)
@@ -75,15 +80,18 @@ class FontPlatformData {
 
   FontPlatformData(NSFont* nsFont,
                    bool syntheticBold = false,
-                   bool syntheticOblique = false);
+                   bool syntheticOblique = false,
+                   FontOrientation = Horizontal);
 
   FontPlatformData(CGFontRef cgFont,
                    ATSUFontID fontID,
                    float size,
                    bool syntheticBold,
-                   bool syntheticOblique)
+                   bool syntheticOblique,
+                   FontOrientation orientation)
       : m_syntheticBold(syntheticBold),
         m_syntheticOblique(syntheticOblique),
+        m_orientation(orientation),
         m_atsuFontID(fontID),
         m_size(size),
         m_font(0),
@@ -103,17 +111,20 @@ class FontPlatformData {
   float size() const { return m_size; }
   bool syntheticBold() const { return m_syntheticBold; }
   bool syntheticOblique() const { return m_syntheticOblique; }
+  FontOrientation orientation() const { return m_orientation; }
 
   bool m_syntheticBold;
   bool m_syntheticOblique;
+  FontOrientation m_orientation;
 
   ATSUFontID m_atsuFontID;
   float m_size;
 
   unsigned hash() const {
     ASSERT(m_font != 0 || m_cgFont == 0);
-    uintptr_t hashCodes[2] = {(uintptr_t)m_font,
-                              m_syntheticBold << 1 | m_syntheticOblique};
+    uintptr_t hashCodes[2] = {(uintptr_t)m_font, m_orientation << 2 |
+                                                     m_syntheticBold << 1 |
+                                                     m_syntheticOblique};
     return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
                                    sizeof(hashCodes) / sizeof(UChar));
   }
@@ -124,7 +135,8 @@ class FontPlatformData {
     return m_font == other.m_font && m_syntheticBold == other.m_syntheticBold &&
            m_syntheticOblique == other.m_syntheticOblique &&
            m_cgFont == other.m_cgFont && m_size == other.m_size &&
-           m_atsuFontID == other.m_atsuFontID;
+           m_atsuFontID == other.m_atsuFontID &&
+           m_orientation == other.m_orientation;
   }
 
   NSFont* font() const { return m_font; }
