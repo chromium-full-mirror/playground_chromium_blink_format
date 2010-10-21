@@ -691,11 +691,13 @@ void WebPage::runJavaScriptInMainFrame(const String& script,
   JSLock lock(SilenceAssertionsOnly);
   JSValue resultValue =
       m_mainFrame->coreFrame()->script()->executeScript(script, true).jsValue();
-  String resultString = ustringToString(
-      resultValue.toString(m_mainFrame->coreFrame()
-                               ->script()
-                               ->globalObject(mainThreadNormalWorld())
-                               ->globalExec()));
+  String resultString;
+  if (resultValue)
+    resultString = ustringToString(
+        resultValue.toString(m_mainFrame->coreFrame()
+                                 ->script()
+                                 ->globalObject(mainThreadNormalWorld())
+                                 ->globalExec()));
 
   WebProcess::shared().connection()->send(
       Messages::WebPageProxy::DidRunJavaScriptInMainFrame(resultString,
