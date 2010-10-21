@@ -39,6 +39,8 @@
 
 namespace WebCore {
 
+class ScriptArguments;
+
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 typedef Vector<RefPtr<ScriptProfile>> ProfilesArray;
 #endif
@@ -90,32 +92,48 @@ class Console : public RefCounted<Console> {
                   MessageLevel,
                   const String& message,
                   unsigned lineNumber,
+                  const String& sourceURL);
+  void addMessage(MessageSource,
+                  MessageType,
+                  MessageLevel,
+                  const String& message,
+                  unsigned lineNumber,
                   const String& sourceURL,
-                  ScriptCallStack* callStack = 0);
+                  PassOwnPtr<ScriptCallStack> callStack);
 
-  void debug(ScriptCallStack*);
-  void error(ScriptCallStack*);
-  void info(ScriptCallStack*);
-  void log(ScriptCallStack*);
-  void warn(ScriptCallStack*);
-  void dir(ScriptCallStack*);
-  void dirxml(ScriptCallStack*);
-  void trace(ScriptCallStack*);
-  void assertCondition(bool condition, ScriptCallStack*);
-  void count(ScriptCallStack*);
-  void markTimeline(ScriptCallStack*);
+  void debug(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+  void error(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+  void info(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+  void log(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+  void warn(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+  void dir(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+  void dirxml(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+  void trace(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+  void assertCondition(bool condition,
+                       PassOwnPtr<ScriptArguments>,
+                       PassOwnPtr<ScriptCallStack>);
+  void count(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+  void markTimeline(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
 #if ENABLE(WML)
   String lastWMLErrorMessage() const;
 #endif
 #if ENABLE(JAVASCRIPT_DEBUGGER)
-  void profile(const String&, ScriptCallStack*);
-  void profileEnd(const String&, ScriptCallStack*);
+  void profile(const String&,
+               PassOwnPtr<ScriptArguments>,
+               PassOwnPtr<ScriptCallStack>);
+  void profileEnd(const String&,
+                  PassOwnPtr<ScriptArguments>,
+                  PassOwnPtr<ScriptCallStack>);
 #endif
   void time(const String&);
-  void timeEnd(const String&, ScriptCallStack*);
-  void group(ScriptCallStack*);
-  void groupCollapsed(ScriptCallStack*);
+  void timeEnd(const String&,
+               PassOwnPtr<ScriptArguments>,
+               PassOwnPtr<ScriptCallStack>);
+  void group(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+  void groupCollapsed(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
   void groupEnd();
+
+  bool shouldCaptureFullStackTrace() const;
 
   static bool shouldPrintExceptions();
   static void setShouldPrintExceptions(bool);
@@ -130,7 +148,8 @@ class Console : public RefCounted<Console> {
   inline Page* page() const;
   void addMessage(MessageType,
                   MessageLevel,
-                  ScriptCallStack*,
+                  PassOwnPtr<ScriptArguments>,
+                  PassOwnPtr<ScriptCallStack>,
                   bool acceptNoArguments = false);
 
   Console(Frame*);
