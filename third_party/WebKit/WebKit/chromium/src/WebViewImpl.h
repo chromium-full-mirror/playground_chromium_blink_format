@@ -261,6 +261,10 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   // load.
   void didCommitLoad(bool* isNewNavigation);
 
+  // Returns true if popup menus should be rendered by the browser, false if
+  // they should be rendered by WebKit (which is the default).
+  static bool useExternalPopupMenus();
+
   bool contextMenuAllowed() const { return m_contextMenuAllowed; }
 
   // Set the disposition for how this webview is to be initially shown.
