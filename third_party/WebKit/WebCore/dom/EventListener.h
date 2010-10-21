@@ -43,7 +43,8 @@ class EventListener : public RefCounted<EventListener> {
     ObjCEventListenerType,
     CPPEventListenerType,
     ConditionEventListenerType,
-    GObjectEventListenerType
+    GObjectEventListenerType,
+    NativeEventListenerType
   };
 
   virtual ~EventListener() {}

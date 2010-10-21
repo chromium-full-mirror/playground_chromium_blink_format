@@ -41,7 +41,7 @@ namespace WebKit {
 
 EventListenerWrapper::EventListenerWrapper(
     WebDOMEventListener* webDOMEventListener)
-    : EventListener(EventListener::JSEventListenerType),
+    : EventListener(EventListener::NativeEventListenerType),
       m_webDOMEventListener(webDOMEventListener) {}
 
 EventListenerWrapper::~EventListenerWrapper() {
