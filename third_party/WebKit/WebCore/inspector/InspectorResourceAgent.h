@@ -111,7 +111,7 @@ class InspectorResourceAgent : public RefCounted<InspectorResourceAgent> {
 #endif
 
   // Called from frontend
-  void cachedResources(RefPtr<InspectorArray>*);
+  void cachedResources(RefPtr<InspectorObject>*);
   void resourceContent(unsigned long frameID,
                        const String& url,
                        String* content);

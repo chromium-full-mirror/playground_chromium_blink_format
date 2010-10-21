@@ -216,17 +216,23 @@ static PassRefPtr<InspectorObject> buildObjectForResourceResponse(
   return responseObject;
 }
 
-static PassRefPtr<InspectorObject> buildObjectForMainResource(Frame* frame) {
+static PassRefPtr<InspectorObject> buildObjectForDocumentLoader(
+    DocumentLoader* loader) {
+  RefPtr<InspectorObject> documentLoaderObject = InspectorObject::create();
+  documentLoaderObject->setNumber("frameId",
+                                  reinterpret_cast<uintptr_t>(loader->frame()));
+  documentLoaderObject->setNumber("loaderId",
+                                  reinterpret_cast<uintptr_t>(loader));
+  return documentLoaderObject;
+}
+
+static PassRefPtr<InspectorObject> buildObjectForFrameResource(Frame* frame) {
   FrameLoader* frameLoader = frame->loader();
   DocumentLoader* loader = frameLoader->documentLoader();
 
   RefPtr<InspectorObject> resourceObject = InspectorObject::create();
   resourceObject->setString("url", loader->url().string());
-  resourceObject->setString("host", loader->url().host());
-  resourceObject->setString("path", loader->url().path());
-  resourceObject->setString("lastPathComponent",
-                            loader->url().lastPathComponent());
-  resourceObject->setString("type", "Document");
+  resourceObject->setObject("loader", buildObjectForDocumentLoader(loader));
   resourceObject->setObject("request",
                             buildObjectForResourceRequest(loader->request()));
   resourceObject->setObject("response",
@@ -255,6 +261,7 @@ static String cachedResourceTypeString(const CachedResource& cachedResource) {
 }
 
 static PassRefPtr<InspectorObject> buildObjectForCachedResource(
+    DocumentLoader* loader,
     const CachedResource& cachedResource) {
   RefPtr<InspectorObject> resourceObject = InspectorObject::create();
   resourceObject->setString("url", cachedResource.url());
@@ -262,13 +269,14 @@ static PassRefPtr<InspectorObject> buildObjectForCachedResource(
   resourceObject->setNumber("encodedSize", cachedResource.encodedSize());
   resourceObject->setObject(
       "response", buildObjectForResourceResponse(cachedResource.response()));
+  resourceObject->setObject("loader", buildObjectForDocumentLoader(loader));
   return resourceObject;
 }
 
-static PassRefPtr<InspectorObject> buildObjectForFrameResources(Frame* frame) {
-  RefPtr<InspectorObject> frameResources = InspectorObject::create();
-  frameResources->setNumber("frameID", reinterpret_cast<uintptr_t>(frame));
-  frameResources->setObject("mainResource", buildObjectForMainResource(frame));
+static void populateObjectWithFrameResources(
+    Frame* frame,
+    PassRefPtr<InspectorObject> frameResources) {
+  frameResources->setObject("resource", buildObjectForFrameResource(frame));
   RefPtr<InspectorArray> subresources = InspectorArray::create();
   frameResources->setArray("subresources", subresources);
 
@@ -280,10 +288,13 @@ static PassRefPtr<InspectorObject> buildObjectForFrameResources(Frame* frame) {
            allResources.begin();
        it != end; ++it) {
     CachedResource* cachedResource = it->second.get();
-    if (cachedResource)
-      subresources->pushValue(buildObjectForCachedResource(*cachedResource));
+    if (cachedResource) {
+      RefPtr<InspectorObject> cachedResourceObject =
+          buildObjectForCachedResource(frame->loader()->documentLoader(),
+                                       *cachedResource);
+      subresources->pushValue(cachedResourceObject);
+    }
   }
-  return frameResources;
 }
 
 InspectorResourceAgent::~InspectorResourceAgent() {}
@@ -293,9 +304,9 @@ void InspectorResourceAgent::identifierForInitialRequest(
     const KURL& url,
     DocumentLoader* loader,
     bool isMainResource) {
-  m_frontend->identifierForInitialRequest(
-      identifier, url.string(), reinterpret_cast<uintptr_t>(loader->frame()),
-      isMainResource);
+  RefPtr<InspectorObject> loaderObject = buildObjectForDocumentLoader(loader);
+  m_frontend->identifierForInitialRequest(identifier, url.string(),
+                                          loaderObject, isMainResource);
 }
 
 void InspectorResourceAgent::willSendRequest(
@@ -358,10 +369,8 @@ void InspectorResourceAgent::didFailLoading(unsigned long identifier,
 void InspectorResourceAgent::didLoadResourceFromMemoryCache(
     DocumentLoader* loader,
     const CachedResource* resource) {
-  Frame* frame = loader->frame();
   m_frontend->didLoadResourceFromMemoryCache(
-      currentTime(), reinterpret_cast<uintptr_t>(frame),
-      buildObjectForCachedResource(*resource));
+      currentTime(), buildObjectForCachedResource(loader, *resource));
 }
 
 void InspectorResourceAgent::setOverrideContent(unsigned long identifier,
@@ -382,13 +391,34 @@ void InspectorResourceAgent::setOverrideContent(unsigned long identifier,
   m_frontend->setOverrideContent(identifier, sourceString, typeString);
 }
 
+static PassRefPtr<InspectorObject> buildObjectForFrameTree(Frame* frame,
+                                                           bool dumpResources) {
+  RefPtr<InspectorObject> frameObject = InspectorObject::create();
+  frameObject->setNumber("id", reinterpret_cast<uintptr_t>(frame));
+  if (dumpResources)
+    populateObjectWithFrameResources(frame, frameObject);
+  RefPtr<InspectorArray> childrenArray;
+  for (Frame* child = frame->tree()->firstChild(); child;
+       child = child->tree()->nextSibling()) {
+    if (!childrenArray) {
+      childrenArray = InspectorArray::create();
+      frameObject->setArray("children", childrenArray);
+    }
+    childrenArray->pushObject(buildObjectForFrameTree(child, dumpResources));
+  }
+  return frameObject;
+}
+
 void InspectorResourceAgent::didCommitLoad(DocumentLoader* loader) {
-  Frame* frame = loader->frame();
-  m_frontend->didCommitLoad(reinterpret_cast<uintptr_t>(frame));
+  RefPtr<InspectorObject> frameObject =
+      buildObjectForFrameTree(loader->frame(), false);
+  m_frontend->didCommitLoadForFrame(frameObject,
+                                    reinterpret_cast<uintptr_t>(loader));
 }
 
 void InspectorResourceAgent::frameDetachedFromParent(Frame* frame) {
-  m_frontend->frameDetachedFromParent(reinterpret_cast<uintptr_t>(frame));
+  RefPtr<InspectorObject> frameObject = buildObjectForFrameTree(frame, false);
+  m_frontend->frameDetachedFromParent(frameObject);
 }
 
 #if ENABLE(WEB_SOCKETS)
@@ -452,20 +482,17 @@ void InspectorResourceAgent::didCloseWebSocket(unsigned long identifier) {
 }
 #endif  // ENABLE(WEB_SOCKETS)
 
-void InspectorResourceAgent::cachedResources(
-    RefPtr<InspectorArray>* resources) {
-  for (Frame* frame = m_page->mainFrame(); frame;
-       frame = frame->tree()->traverseNext(m_page->mainFrame()))
-    (*resources)->pushObject(buildObjectForFrameResources(frame));
+void InspectorResourceAgent::cachedResources(RefPtr<InspectorObject>* object) {
+  *object = buildObjectForFrameTree(m_page->mainFrame(), true);
 }
 
-void InspectorResourceAgent::resourceContent(unsigned long frameID,
+void InspectorResourceAgent::resourceContent(unsigned long frameId,
                                              const String& url,
                                              String* content) {
   RefPtr<InspectorArray> frameResources = InspectorArray::create();
   for (Frame* frame = m_page->mainFrame(); frame;
        frame = frame->tree()->traverseNext(m_page->mainFrame())) {
-    if (reinterpret_cast<uintptr_t>(frame) != frameID)
+    if (reinterpret_cast<uintptr_t>(frame) != frameId)
       continue;
     InspectorResourceAgent::resourceContent(frame, KURL(ParsedURLString, url),
                                             content);
