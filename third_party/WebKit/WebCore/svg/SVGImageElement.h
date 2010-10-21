@@ -22,6 +22,8 @@
 #define SVGImageElement_h
 
 #if ENABLE(SVG)
+#include "SVGAnimatedLength.h"
+#include "SVGAnimatedPropertyMacros.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGImageLoader.h"
@@ -64,18 +66,26 @@ class SVGImageElement : public SVGStyledTransformableElement,
   virtual bool selfHasRelativeLengths() const;
   virtual void willMoveToNewOwnerDocument();
 
-  DECLARE_ANIMATED_PROPERTY(SVGImageElement, SVGNames::xAttr, SVGLength, X, x)
-  DECLARE_ANIMATED_PROPERTY(SVGImageElement, SVGNames::yAttr, SVGLength, Y, y)
-  DECLARE_ANIMATED_PROPERTY(SVGImageElement,
-                            SVGNames::widthAttr,
-                            SVGLength,
-                            Width,
-                            width)
-  DECLARE_ANIMATED_PROPERTY(SVGImageElement,
-                            SVGNames::heightAttr,
-                            SVGLength,
-                            Height,
-                            height)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGImageElement,
+                                SVGNames::xAttr,
+                                SVGLength,
+                                X,
+                                x)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGImageElement,
+                                SVGNames::yAttr,
+                                SVGLength,
+                                Y,
+                                y)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGImageElement,
+                                SVGNames::widthAttr,
+                                SVGLength,
+                                Width,
+                                width)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGImageElement,
+                                SVGNames::heightAttr,
+                                SVGLength,
+                                Height,
+                                height)
   DECLARE_ANIMATED_PROPERTY(SVGImageElement,
                             SVGNames::preserveAspectRatioAttr,
                             SVGPreserveAspectRatio,

@@ -23,22 +23,16 @@
 
 #if ENABLE(SVG)
 #include "SVGLength.h"
-#include "SVGList.h"
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
-class SVGLengthList : public SVGPODList<SVGLength> {
+class SVGLengthList : public Vector<SVGLength> {
  public:
-  static PassRefPtr<SVGLengthList> create(const QualifiedName& attributeName) {
-    return adoptRef(new SVGLengthList(attributeName));
-  }
+  SVGLengthList() {}
 
   void parse(const String& value, SVGLengthMode);
-
   String valueAsString() const;
-
- private:
-  SVGLengthList(const QualifiedName&);
 };
 
 }  // namespace WebCore

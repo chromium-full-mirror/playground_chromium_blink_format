@@ -23,6 +23,8 @@
 #define SVGUseElement_h
 
 #if ENABLE(SVG)
+#include "SVGAnimatedLength.h"
+#include "SVGAnimatedPropertyMacros.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledTransformableElement.h"
@@ -80,18 +82,18 @@ class SVGUseElement : public SVGStyledTransformableElement,
 
   virtual bool selfHasRelativeLengths() const;
 
-  DECLARE_ANIMATED_PROPERTY(SVGUseElement, SVGNames::xAttr, SVGLength, X, x)
-  DECLARE_ANIMATED_PROPERTY(SVGUseElement, SVGNames::yAttr, SVGLength, Y, y)
-  DECLARE_ANIMATED_PROPERTY(SVGUseElement,
-                            SVGNames::widthAttr,
-                            SVGLength,
-                            Width,
-                            width)
-  DECLARE_ANIMATED_PROPERTY(SVGUseElement,
-                            SVGNames::heightAttr,
-                            SVGLength,
-                            Height,
-                            height)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGUseElement, SVGNames::xAttr, SVGLength, X, x)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGUseElement, SVGNames::yAttr, SVGLength, Y, y)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGUseElement,
+                                SVGNames::widthAttr,
+                                SVGLength,
+                                Width,
+                                width)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGUseElement,
+                                SVGNames::heightAttr,
+                                SVGLength,
+                                Height,
+                                height)
 
   // SVGURIReference
   DECLARE_ANIMATED_PROPERTY(SVGUseElement,

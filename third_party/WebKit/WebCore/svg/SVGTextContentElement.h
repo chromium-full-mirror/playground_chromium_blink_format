@@ -22,6 +22,8 @@
 #define SVGTextContentElement_h
 
 #if ENABLE(SVG)
+#include "SVGAnimatedLength.h"
+#include "SVGAnimatedPropertyMacros.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledElement.h"
@@ -71,11 +73,11 @@ class SVGTextContentElement : public SVGStyledElement,
  private:
   virtual bool isTextContent() const { return true; }
 
-  DECLARE_ANIMATED_PROPERTY(SVGTextContentElement,
-                            SVGNames::textLengthAttr,
-                            SVGLength,
-                            TextLength,
-                            textLength)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGTextContentElement,
+                                SVGNames::textLengthAttr,
+                                SVGLength,
+                                TextLength,
+                                textLength)
   DECLARE_ANIMATED_PROPERTY(SVGTextContentElement,
                             SVGNames::lengthAdjustAttr,
                             int,

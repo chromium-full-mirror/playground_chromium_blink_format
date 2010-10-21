@@ -24,15 +24,12 @@
 #include "SVGLengthList.h"
 
 #include "SVGParserUtilities.h"
+#include <wtf/text/StringBuilder.h>
 
 namespace WebCore {
 
-SVGLengthList::SVGLengthList(const QualifiedName& attributeName)
-    : SVGPODList<SVGLength>(attributeName) {}
-
 void SVGLengthList::parse(const String& value, SVGLengthMode mode) {
-  ExceptionCode ec = 0;
-  clear(ec);
+  clear();
 
   const UChar* ptr = value.characters();
   const UChar* end = ptr + value.length();
@@ -45,24 +42,23 @@ void SVGLengthList::parse(const String& value, SVGLengthMode mode) {
     SVGLength length(mode);
     if (!length.setValueAsString(String(start, ptr - start)))
       return;
-    appendItem(length, ec);
+    append(length);
     skipOptionalSpacesOrDelimiter(ptr, end);
   }
 }
 
 String SVGLengthList::valueAsString() const {
-  String result;
+  StringBuilder builder;
 
-  ExceptionCode ec = 0;
-  for (unsigned int i = 0; i < numberOfItems(); ++i) {
+  unsigned size = this->size();
+  for (unsigned i = 0; i < size; ++i) {
     if (i > 0)
-      result += ", ";
+      builder.append(", ");
 
-    result += getItem(i, ec).valueAsString();
-    ASSERT(ec == 0);
+    builder.append(at(i).valueAsString());
   }
 
-  return result;
+  return builder.toString();
 }
 }
 

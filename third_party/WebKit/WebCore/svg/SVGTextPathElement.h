@@ -67,11 +67,11 @@ class SVGTextPathElement : public SVGTextContentElement,
 
   virtual bool selfHasRelativeLengths() const;
 
-  DECLARE_ANIMATED_PROPERTY(SVGTextPathElement,
-                            SVGNames::startOffsetAttr,
-                            SVGLength,
-                            StartOffset,
-                            startOffset)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGTextPathElement,
+                                SVGNames::startOffsetAttr,
+                                SVGLength,
+                                StartOffset,
+                                startOffset)
   DECLARE_ANIMATED_PROPERTY(SVGTextPathElement,
                             SVGNames::methodAttr,
                             int,

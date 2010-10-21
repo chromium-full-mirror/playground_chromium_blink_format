@@ -22,8 +22,9 @@
 #define SVGSVGElement_h
 
 #if ENABLE(SVG)
-
 #include "IntSize.h"
+#include "SVGAnimatedLength.h"
+#include "SVGAnimatedPropertyMacros.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGFitToViewBox.h"
 #include "SVGLangSpace.h"
@@ -142,18 +143,18 @@ class SVGSVGElement : public SVGStyledLocatableElement,
 
   virtual bool selfHasRelativeLengths() const;
 
-  DECLARE_ANIMATED_PROPERTY(SVGSVGElement, SVGNames::xAttr, SVGLength, X, x)
-  DECLARE_ANIMATED_PROPERTY(SVGSVGElement, SVGNames::yAttr, SVGLength, Y, y)
-  DECLARE_ANIMATED_PROPERTY(SVGSVGElement,
-                            SVGNames::widthAttr,
-                            SVGLength,
-                            Width,
-                            width)
-  DECLARE_ANIMATED_PROPERTY(SVGSVGElement,
-                            SVGNames::heightAttr,
-                            SVGLength,
-                            Height,
-                            height)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGSVGElement, SVGNames::xAttr, SVGLength, X, x)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGSVGElement, SVGNames::yAttr, SVGLength, Y, y)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGSVGElement,
+                                SVGNames::widthAttr,
+                                SVGLength,
+                                Width,
+                                width)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGSVGElement,
+                                SVGNames::heightAttr,
+                                SVGLength,
+                                Height,
+                                height)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_PROPERTY(SVGSVGElement,
