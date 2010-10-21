@@ -42,10 +42,16 @@ class CharacterData;
 class Element;
 class InspectorController;
 class InspectorTimelineAgent;
+class KURL;
 class Node;
 class ResourceRequest;
 class ResourceResponse;
 class XMLHttpRequest;
+
+#if ENABLE(WEB_SOCKETS)
+class WebSocketHandshakeRequest;
+class WebSocketHandshakeResponse;
+#endif
 
 typedef pair<InspectorController*, int> InspectorInstrumentationCookie;
 
@@ -114,6 +120,23 @@ class InspectorInstrumentation {
                                                       unsigned int startLine);
   static void didWriteHTML(const InspectorInstrumentationCookie&,
                            unsigned int endLine);
+
+#if ENABLE(WEB_SOCKETS)
+  static void didCreateWebSocket(ScriptExecutionContext*,
+                                 unsigned long identifier,
+                                 const KURL& requestURL,
+                                 const KURL& documentURL);
+  static void willSendWebSocketHandshakeRequest(
+      ScriptExecutionContext*,
+      unsigned long identifier,
+      const WebSocketHandshakeRequest&);
+  static void didReceiveWebSocketHandshakeResponse(
+      ScriptExecutionContext*,
+      unsigned long identifier,
+      const WebSocketHandshakeResponse&);
+  static void didCloseWebSocket(ScriptExecutionContext*,
+                                unsigned long identifier);
+#endif
 
 #if ENABLE(INSPECTOR)
   static void frontendCreated() { s_frontendCounter += 1; }
@@ -203,6 +226,23 @@ class InspectorInstrumentation {
       unsigned int startLine);
   static void didWriteHTMLImpl(const InspectorInstrumentationCookie&,
                                unsigned int endLine);
+
+#if ENABLE(WEB_SOCKETS)
+  static void didCreateWebSocketImpl(InspectorController*,
+                                     unsigned long identifier,
+                                     const KURL& requestURL,
+                                     const KURL& documentURL);
+  static void willSendWebSocketHandshakeRequestImpl(
+      InspectorController*,
+      unsigned long identifier,
+      const WebSocketHandshakeRequest&);
+  static void didReceiveWebSocketHandshakeResponseImpl(
+      InspectorController*,
+      unsigned long identifier,
+      const WebSocketHandshakeResponse&);
+  static void didCloseWebSocketImpl(InspectorController*,
+                                    unsigned long identifier);
+#endif
 
   static InspectorController* inspectorControllerForContext(
       ScriptExecutionContext*);
@@ -582,6 +622,55 @@ inline void InspectorInstrumentation::didWriteHTML(
     didWriteHTMLImpl(cookie, endLine);
 #endif
 }
+
+#if ENABLE(WEB_SOCKETS)
+inline void InspectorInstrumentation::didCreateWebSocket(
+    ScriptExecutionContext* context,
+    unsigned long identifier,
+    const KURL& requestURL,
+    const KURL& documentURL) {
+#if ENABLE(INSPECTOR)
+  if (InspectorController* inspectorController =
+          inspectorControllerForContext(context))
+    didCreateWebSocketImpl(inspectorController, identifier, requestURL,
+                           documentURL);
+#endif
+}
+
+inline void InspectorInstrumentation::willSendWebSocketHandshakeRequest(
+    ScriptExecutionContext* context,
+    unsigned long identifier,
+    const WebSocketHandshakeRequest& request) {
+#if ENABLE(INSPECTOR)
+  if (InspectorController* inspectorController =
+          inspectorControllerForContext(context))
+    willSendWebSocketHandshakeRequestImpl(inspectorController, identifier,
+                                          request);
+#endif
+}
+
+inline void InspectorInstrumentation::didReceiveWebSocketHandshakeResponse(
+    ScriptExecutionContext* context,
+    unsigned long identifier,
+    const WebSocketHandshakeResponse& response) {
+#if ENABLE(INSPECTOR)
+  if (InspectorController* inspectorController =
+          inspectorControllerForContext(context))
+    didReceiveWebSocketHandshakeResponseImpl(inspectorController, identifier,
+                                             response);
+#endif
+}
+
+inline void InspectorInstrumentation::didCloseWebSocket(
+    ScriptExecutionContext* context,
+    unsigned long identifier) {
+#if ENABLE(INSPECTOR)
+  if (InspectorController* inspectorController =
+          inspectorControllerForContext(context))
+    didCloseWebSocketImpl(inspectorController, identifier);
+#endif
+}
+#endif
 
 #if ENABLE(INSPECTOR)
 inline InspectorController*
