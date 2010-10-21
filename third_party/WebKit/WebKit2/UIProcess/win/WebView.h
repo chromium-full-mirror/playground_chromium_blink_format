@@ -55,6 +55,7 @@ class WebView : public APIObject,
   HWND window() const { return m_window; }
   void setParentWindow(HWND);
   void windowAncestryDidChange();
+  void setOverrideCursor(HCURSOR overrideCursor);
 
   WebPageProxy* page() const { return m_page.get(); }
 
@@ -111,6 +112,8 @@ class WebView : public APIObject,
 
   void close();
 
+  void updateNativeCursor();
+
   // PageClient
   virtual void processDidExit();
   virtual void processDidRevive();
@@ -144,6 +147,8 @@ class WebView : public APIObject,
   HWND m_toolTipWindow;
 
   HCURSOR m_lastCursorSet;
+  HCURSOR m_webCoreCursor;
+  HCURSOR m_overrideCursor;
 
   bool m_trackingMouseLeave;
   bool m_isBeingDestroyed;
