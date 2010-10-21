@@ -268,6 +268,7 @@ class Frame : public RefCounted<Frame>, public TiledBackingStoreClient {
   virtual void tiledBackingStorePaintEnd(const Vector<IntRect>& paintedArea);
   virtual IntRect tiledBackingStoreContentsRect();
   virtual IntRect tiledBackingStoreVisibleRect();
+  virtual Color tiledBackingStoreBackgroundColor() const;
 
   OwnPtr<TiledBackingStore> m_tiledBackingStore;
 #endif
