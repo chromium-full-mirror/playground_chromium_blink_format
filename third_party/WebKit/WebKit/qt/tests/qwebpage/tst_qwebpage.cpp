@@ -71,7 +71,6 @@ class tst_QWebPage : public QObject {
   void cleanupTestCase();
 
   void acceptNavigationRequest();
-  void infiniteLoopJS();
   void geolocationRequestJS();
   void loadFinished();
   void acceptNavigationRequestWithNewWindow();
@@ -122,6 +121,7 @@ class tst_QWebPage : public QObject {
   void testStopScheduledPageRefresh();
   void findText();
   void supportedContentType();
+  void infiniteLoopJS();
 
  private:
   QWebView* m_view;
@@ -1599,12 +1599,6 @@ void tst_QWebPage::inputMethods() {
   variant = page->inputMethodQuery(Qt::ImCurrentSelection);
   QString selectionValue = variant.value<QString>();
   QCOMPARE(selectionValue, QString("eb"));
-
-  // Cancel current composition first
-  inputAttributes << QInputMethodEvent::Attribute(QInputMethodEvent::Selection,
-                                                  0, 0, QVariant());
-  QInputMethodEvent eventSelection2("", inputAttributes);
-  page->event(&eventSelection2);
 
   // Set selection with negative length
   inputAttributes << QInputMethodEvent::Attribute(QInputMethodEvent::Selection,
