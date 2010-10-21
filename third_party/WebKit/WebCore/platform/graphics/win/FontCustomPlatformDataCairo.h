@@ -22,7 +22,6 @@
 #ifndef FontCustomPlatformDataCairo_h
 #define FontCustomPlatformDataCairo_h
 
-#include "FontDescription.h"
 #include <wtf/Forward.h>
 #include <wtf/Noncopyable.h>
 
@@ -37,10 +36,7 @@ struct FontCustomPlatformData : Noncopyable {
   FontCustomPlatformData(cairo_font_face_t* fontFace) : m_fontFace(fontFace) {}
   ~FontCustomPlatformData();
 
-  FontPlatformData fontPlatformData(int size,
-                                    bool bold,
-                                    bool italic,
-                                    FontOrientation = Horizontal);
+  FontPlatformData fontPlatformData(int size, bool bold, bool italic);
 
   static bool supportsFormat(const String&);
 

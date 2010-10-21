@@ -33,8 +33,7 @@ FontCustomPlatformData::~FontCustomPlatformData() {
 
 FontPlatformData FontCustomPlatformData::fontPlatformData(int size,
                                                           bool bold,
-                                                          bool italic,
-                                                          FontOrientation) {
+                                                          bool italic) {
   return FontPlatformData(m_fontFace, size, bold, italic);
 }
 

@@ -37,14 +37,11 @@ FontCustomPlatformData::~FontCustomPlatformData() {
   CGFontRelease(m_cgFont);
 }
 
-FontPlatformData FontCustomPlatformData::fontPlatformData(
-    int size,
-    bool bold,
-    bool italic,
-    FontOrientation orientation,
-    FontRenderingMode) {
-  return FontPlatformData(m_cgFont, (ATSUFontID)m_atsFont, size, bold, italic,
-                          orientation);
+FontPlatformData FontCustomPlatformData::fontPlatformData(int size,
+                                                          bool bold,
+                                                          bool italic,
+                                                          FontRenderingMode) {
+  return FontPlatformData(m_cgFont, (ATSUFontID)m_atsFont, size, bold, italic);
 }
 
 FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {

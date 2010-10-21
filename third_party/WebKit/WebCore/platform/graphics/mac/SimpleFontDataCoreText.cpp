@@ -30,6 +30,8 @@
 #import "config.h"
 #import "SimpleFontData.h"
 
+#if USE(CORE_TEXT)
+
 #import "Font.h"
 #import "FontCache.h"
 #import "FontDescription.h"
@@ -64,13 +66,10 @@ CFDictionaryRef SimpleFontData::getCFStringAttributes(
     static CFNumberRef kerningAdjustment = CFNumberCreate(
         kCFAllocatorDefault, kCFNumberFloatType, &kerningAdjustmentValue);
     static const void* keysWithKerningDisabled[] = {
-        kCTFontAttributeName, kCTKernAttributeName, kCTLigatureAttributeName,
-        kCTVerticalFormsAttributeName};
+        kCTFontAttributeName, kCTKernAttributeName, kCTLigatureAttributeName};
     const void* valuesWithKerningDisabled[] = {
         platformData().ctFont(), kerningAdjustment,
-        allowLigatures ? ligaturesAllowed : ligaturesNotAllowed,
-        platformData().orientation() == Vertical ? kCFBooleanTrue
-                                                 : kCFBooleanFalse};
+        allowLigatures ? ligaturesAllowed : ligaturesNotAllowed};
     attributesDictionary.adoptCF(CFDictionaryCreate(
         0, keysWithKerningDisabled, valuesWithKerningDisabled,
         sizeof(keysWithKerningDisabled) / sizeof(*keysWithKerningDisabled),
@@ -79,14 +78,11 @@ CFDictionaryRef SimpleFontData::getCFStringAttributes(
   } else {
     // By omitting the kCTKernAttributeName attribute, we get Core Text's
     // standard kerning.
-    static const void* keysWithKerningEnabled[] = {
-        kCTFontAttributeName, kCTLigatureAttributeName,
-        kCTVerticalFormsAttributeName};
+    static const void* keysWithKerningEnabled[] = {kCTFontAttributeName,
+                                                   kCTLigatureAttributeName};
     const void* valuesWithKerningEnabled[] = {
         platformData().ctFont(),
-        allowLigatures ? ligaturesAllowed : ligaturesNotAllowed,
-        platformData().orientation() == Vertical ? kCFBooleanTrue
-                                                 : kCFBooleanFalse};
+        allowLigatures ? ligaturesAllowed : ligaturesNotAllowed};
     attributesDictionary.adoptCF(CFDictionaryCreate(
         0, keysWithKerningEnabled, valuesWithKerningEnabled,
         sizeof(keysWithKerningEnabled) / sizeof(*keysWithKerningEnabled),
@@ -98,3 +94,5 @@ CFDictionaryRef SimpleFontData::getCFStringAttributes(
 }
 
 }  // namespace WebCore
+
+#endif

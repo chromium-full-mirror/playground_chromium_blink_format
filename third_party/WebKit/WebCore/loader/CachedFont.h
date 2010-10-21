@@ -27,7 +27,6 @@
 #define CachedFont_h
 
 #include "CachedResource.h"
-#include "FontOrientation.h"
 #include "FontRenderingMode.h"
 #include <wtf/Vector.h>
 
@@ -67,7 +66,6 @@ class CachedFont : public CachedResource {
       float size,
       bool bold,
       bool italic,
-      FontOrientation = Horizontal,
       FontRenderingMode = NormalRenderingMode);
 
 #if ENABLE(SVG_FONTS)

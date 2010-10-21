@@ -47,7 +47,6 @@ FontPlatformData FontCustomPlatformData::fontPlatformData(
     int size,
     bool bold,
     bool italic,
-    FontOrientation,
     FontRenderingMode renderingMode) {
   FontDescription fontDesc;
   fontDesc.setComputedSize(size);
