@@ -43,6 +43,11 @@ void NetscapePlugin::platformDestroy() {
   notImplemented();
 }
 
+bool NetscapePlugin::platformInvalidate(const IntRect&) {
+  notImplemented();
+  return false;
+}
+
 void NetscapePlugin::platformGeometryDidChange() {
   notImplemented();
 }

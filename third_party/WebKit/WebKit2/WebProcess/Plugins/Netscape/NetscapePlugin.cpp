@@ -100,6 +100,9 @@ void NetscapePlugin::invalidate(const NPRect* invalidRect) {
                    invalidRect->right - invalidRect->left,
                    invalidRect->bottom - invalidRect->top);
 
+  if (platformInvalidate(rect))
+    return;
+
   m_pluginController->invalidate(rect);
 }
 

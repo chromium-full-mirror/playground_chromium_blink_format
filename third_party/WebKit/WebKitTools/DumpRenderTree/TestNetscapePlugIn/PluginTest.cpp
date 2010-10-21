@@ -26,6 +26,7 @@
 #include "PluginTest.h"
 
 #include <assert.h>
+#include <string.h>
 
 using namespace std;
 extern NPNetscapeFuncs* browser;
@@ -57,6 +58,10 @@ NPError PluginTest::NPP_SetWindow(NPP, NPWindow*) {
   return NPERR_NO_ERROR;
 }
 
+void PluginTest::NPN_InvalidateRect(NPRect* invalidRect) {
+  browser->invalidaterect(m_npp, invalidRect);
+}
+
 NPIdentifier PluginTest::NPN_GetStringIdentifier(const NPUTF8* name) {
   return browser->getstringidentifier(name);
 }
@@ -76,6 +81,27 @@ NPObject* PluginTest::NPN_CreateObject(NPClass* npClass) {
 bool PluginTest::NPN_RemoveProperty(NPObject* npObject,
                                     NPIdentifier propertyName) {
   return browser->removeproperty(m_npp, npObject, propertyName);
+}
+
+static void executeScript(NPP npp, const char* script) {
+  NPObject* windowScriptObject;
+  browser->getvalue(npp, NPNVWindowNPObject, &windowScriptObject);
+
+  NPString npScript;
+  npScript.UTF8Characters = script;
+  npScript.UTF8Length = strlen(script);
+
+  NPVariant browserResult;
+  browser->evaluate(npp, windowScriptObject, &npScript, &browserResult);
+  browser->releasevariantvalue(&browserResult);
+}
+
+void PluginTest::waitUntilDone() {
+  executeScript(m_npp, "layoutTestController.waitUntilDone()");
+}
+
+void PluginTest::notifyDone() {
+  executeScript(m_npp, "layoutTestController.notifyDone()");
 }
 
 void PluginTest::registerCreateTestFunction(

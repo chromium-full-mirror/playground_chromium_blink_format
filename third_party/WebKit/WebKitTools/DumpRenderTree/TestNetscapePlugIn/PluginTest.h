@@ -72,6 +72,7 @@ class PluginTest {
   virtual NPError NPP_SetWindow(NPP, NPWindow*);
 
   // NPN functions.
+  void NPN_InvalidateRect(NPRect* invalidRect);
   NPIdentifier NPN_GetStringIdentifier(const NPUTF8* name);
   NPIdentifier NPN_GetIntIdentifier(int32_t intid);
   NPError NPN_GetValue(NPNVariable, void* value);
@@ -99,6 +100,9 @@ class PluginTest {
   NPP m_npp;
 
   const std::string& identifier() const { return m_identifier; }
+
+  void waitUntilDone();
+  void notifyDone();
 
   // NPObject helper template.
   template <typename T>
