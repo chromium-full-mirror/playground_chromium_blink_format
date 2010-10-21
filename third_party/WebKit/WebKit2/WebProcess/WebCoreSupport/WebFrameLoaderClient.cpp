@@ -1019,11 +1019,6 @@ PassRefPtr<Frame> WebFrameLoaderClient::createFrame(
   RefPtr<WebFrame> subframe =
       WebFrame::createSubframe(webPage, name, ownerElement);
 
-  // Notify the UI process that subframe has been added.
-  WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidCreateSubFrame(subframe->frameID()),
-      webPage->pageID());
-
   Frame* coreSubframe = subframe->coreFrame();
 
   // The creation of the frame may have run arbitrary JavaScript that removed it

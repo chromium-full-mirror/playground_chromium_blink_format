@@ -30,6 +30,7 @@
 #include "InjectedBundleScriptWorld.h"
 #include "WebChromeClient.h"
 #include "WebPage.h"
+#include "WebPageProxyMessages.h"
 #include "WebProcess.h"
 #include <JavaScriptCore/APICast.h>
 #include <JavaScriptCore/JSLock.h>
@@ -71,34 +72,43 @@ static uint64_t generateListenerID() {
 }
 
 PassRefPtr<WebFrame> WebFrame::createMainFrame(WebPage* page) {
-  return create(page, String(), 0);
+  RefPtr<WebFrame> frame = create();
+
+  WebProcess::shared().connection()->send(
+      Messages::WebPageProxy::DidCreateMainFrame(frame->frameID()),
+      page->pageID());
+
+  frame->init(page, String(), 0);
+
+  return frame.release();
 }
 
 PassRefPtr<WebFrame> WebFrame::createSubframe(
     WebPage* page,
     const String& frameName,
     HTMLFrameOwnerElement* ownerElement) {
-  return create(page, frameName, ownerElement);
+  RefPtr<WebFrame> frame = create();
+
+  WebProcess::shared().connection()->send(
+      Messages::WebPageProxy::DidCreateSubFrame(frame->frameID()),
+      page->pageID());
+
+  frame->init(page, frameName, ownerElement);
+
+  return frame.release();
 }
 
-PassRefPtr<WebFrame> WebFrame::create(WebPage* page,
-                                      const String& frameName,
-                                      HTMLFrameOwnerElement* ownerElement) {
-  RefPtr<WebFrame> frame =
-      adoptRef(new WebFrame(page, frameName, ownerElement));
+PassRefPtr<WebFrame> WebFrame::create() {
+  RefPtr<WebFrame> frame = adoptRef(new WebFrame);
 
   // Add explict ref() that will be balanced in
   // WebFrameLoaderClient::frameLoaderDestroyed().
   frame->ref();
 
-  frame->coreFrame()->init();
-
   return frame.release();
 }
 
-WebFrame::WebFrame(WebPage* page,
-                   const String& frameName,
-                   HTMLFrameOwnerElement* ownerElement)
+WebFrame::WebFrame()
     : m_coreFrame(0),
       m_policyListenerID(0),
       m_policyFunction(0),
@@ -106,17 +116,6 @@ WebFrame::WebFrame(WebPage* page,
       m_loadListener(0),
       m_frameID(generateFrameID()) {
   WebProcess::shared().addWebFrame(m_frameID, this);
-
-  RefPtr<Frame> frame =
-      Frame::create(page->corePage(), ownerElement, &m_frameLoaderClient);
-  m_coreFrame = frame.get();
-
-  frame->tree()->setName(frameName);
-
-  if (ownerElement) {
-    ASSERT(ownerElement->document()->frame());
-    ownerElement->document()->frame()->tree()->appendChild(frame);
-  }
 
 #ifndef NDEBUG
   webFrameCounter.increment();
@@ -129,6 +128,23 @@ WebFrame::~WebFrame() {
 #ifndef NDEBUG
   webFrameCounter.decrement();
 #endif
+}
+
+void WebFrame::init(WebPage* page,
+                    const String& frameName,
+                    HTMLFrameOwnerElement* ownerElement) {
+  RefPtr<Frame> frame =
+      Frame::create(page->corePage(), ownerElement, &m_frameLoaderClient);
+  m_coreFrame = frame.get();
+
+  frame->tree()->setName(frameName);
+
+  if (ownerElement) {
+    ASSERT(ownerElement->document()->frame());
+    ownerElement->document()->frame()->tree()->appendChild(frame);
+  }
+
+  frame->init();
 }
 
 WebPage* WebFrame::page() const {

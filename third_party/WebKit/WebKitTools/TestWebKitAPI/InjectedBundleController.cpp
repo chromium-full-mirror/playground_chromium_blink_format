@@ -78,7 +78,7 @@ void InjectedBundleController::didReceiveMessage(WKBundleRef bundle,
     assert(WKGetTypeID(messageBody) == WKStringGetTypeID());
     WKStringRef messageBodyString = static_cast<WKStringRef>(messageBody);
 
-    self->initializeTestNamed(Util::toSTD(messageBodyString));
+    self->initializeTestNamed(bundle, Util::toSTD(messageBodyString));
 
     return;
   }
@@ -97,6 +97,7 @@ void InjectedBundleController::dumpTestNames() {
 }
 
 void InjectedBundleController::initializeTestNamed(
+    WKBundleRef bundle,
     const std::string& identifier) {
   CreateInjectedBundleTestFunction createTestFunction =
       m_createInjectedBundleTestFunctions[identifier];
@@ -106,7 +107,7 @@ void InjectedBundleController::initializeTestNamed(
   }
 
   m_currentTest = createTestFunction(identifier);
-  m_currentTest->initialize();
+  m_currentTest->initialize(bundle);
 }
 
 void InjectedBundleController::registerCreateInjectedBundleTestFunction(

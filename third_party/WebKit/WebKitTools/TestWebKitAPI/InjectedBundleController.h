@@ -41,7 +41,7 @@ class InjectedBundleController {
   void initialize(WKBundleRef);
 
   void dumpTestNames();
-  void initializeTestNamed(const std::string&);
+  void initializeTestNamed(WKBundleRef bundle, const std::string&);
 
   typedef InjectedBundleTest* (*CreateInjectedBundleTestFunction)(
       const std::string&);
