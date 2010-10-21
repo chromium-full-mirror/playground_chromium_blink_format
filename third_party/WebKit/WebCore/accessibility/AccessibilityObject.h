@@ -388,7 +388,6 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual String ariaLabeledByAttribute() const { return String(); }
   virtual String ariaDescribedByAttribute() const { return String(); }
   virtual String accessibilityDescription() const { return String(); }
-  virtual PassRefPtr<Range> ariaSelectedTextDOMRange() const { return 0; }
 
   virtual AXObjectCache* axObjectCache() const { return 0; }
   AXID axObjectID() const { return m_id; }
