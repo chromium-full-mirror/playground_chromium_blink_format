@@ -90,6 +90,19 @@ bool SVGStyledTransformableElement::isKnownAttribute(
          SVGStyledLocatableElement::isKnownAttribute(attrName);
 }
 
+SVGElement* SVGStyledTransformableElement::nearestViewportElement() const {
+  return SVGTransformable::nearestViewportElement(this);
+}
+
+SVGElement* SVGStyledTransformableElement::farthestViewportElement() const {
+  return SVGTransformable::farthestViewportElement(this);
+}
+
+FloatRect SVGStyledTransformableElement::getBBox(
+    StyleUpdateStrategy styleUpdateStrategy) const {
+  return SVGTransformable::getBBox(this, styleUpdateStrategy);
+}
+
 RenderObject* SVGStyledTransformableElement::createRenderer(RenderArena* arena,
                                                             RenderStyle*) {
   // By default, any subclass is expected to do path-based drawing
