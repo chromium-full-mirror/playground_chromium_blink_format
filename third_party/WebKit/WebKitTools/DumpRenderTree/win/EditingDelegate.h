@@ -135,9 +135,7 @@ class __declspec(uuid("265DCD4B-79C3-44a2-84BC-511C3EDABD6F")) EditingDelegate
       /* [in] */ LPCTSTR text,
       /* [in] */ int length,
       /* [out] */ int* misspellingLocation,
-      /* [out] */ int* misspellingLength) {
-    return E_NOTIMPL;
-  }
+      /* [out] */ int* misspellingLength);
 
   virtual HRESULT STDMETHODCALLTYPE checkGrammarOfString(
       /* [in] */ IWebView* view,
