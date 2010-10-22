@@ -104,7 +104,6 @@ PassRefPtr<Document> XSLTProcessor::createDocumentFromSource(
   result->setDecoder(decoder.release());
 
   result->write(documentSource);
-  result->finishParsing();
   result->close();
 
   return result.release();
