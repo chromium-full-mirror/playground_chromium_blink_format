@@ -91,7 +91,7 @@ ImageBufferData::ImageBufferData(const IntSize& size)
 }
 
 ImageBuffer::ImageBuffer(const IntSize& size,
-                         ImageColorSpace colorSpace,
+                         ColorSpace colorSpace,
                          bool& success)
     : m_data(size), m_size(size) {
   // FIXME: colorSpace is not used
