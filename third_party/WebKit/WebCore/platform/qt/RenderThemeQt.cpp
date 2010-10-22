@@ -79,6 +79,19 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
+inline static void initStyleOption(QWidget* widget, QStyleOption& option) {
+  if (widget)
+    option.initFrom(widget);
+  else {
+    /*
+      If a widget is not directly available for rendering, we fallback to
+      default
+      value for an active widget.
+     */
+    option.state = QStyle::State_Active | QStyle::State_Enabled;
+  }
+}
+
 StylePainter::StylePainter(RenderThemeQt* theme, const PaintInfo& paintInfo) {
   init(paintInfo.context ? paintInfo.context : 0, theme->qStyle());
 }
@@ -527,9 +540,7 @@ bool RenderThemeQt::paintButton(RenderObject* o,
     return true;
 
   QStyleOptionButton option;
-  if (p.widget)
-    option.initFrom(p.widget);
-
+  initStyleOption(p.widget, option);
   option.rect = r;
   option.state |= QStyle::State_Small;
 
@@ -562,9 +573,7 @@ bool RenderThemeQt::paintTextField(RenderObject* o,
     return true;
 
   QStyleOptionFrameV2 panel;
-  if (p.widget)
-    panel.initFrom(p.widget);
-
+  initStyleOption(p.widget, panel);
   panel.rect = r;
   panel.lineWidth = findFrameLineWidth(qStyle());
   panel.state |= QStyle::State_Sunken;
@@ -631,8 +640,7 @@ bool RenderThemeQt::paintMenuList(RenderObject* o,
     return true;
 
   QtStyleOptionWebComboBox opt(o);
-  if (p.widget)
-    opt.initFrom(p.widget);
+  initStyleOption(p.widget, opt);
   initializeCommonQStyleOptions(opt, o);
 
   const QPoint topLeft = r.topLeft();
@@ -677,8 +685,7 @@ bool RenderThemeQt::paintMenuListButton(RenderObject* o,
     return true;
 
   QtStyleOptionWebComboBox option(o);
-  if (p.widget)
-    option.initFrom(p.widget);
+  initStyleOption(p.widget, option);
   initializeCommonQStyleOptions(option, o);
   option.rect = r;
 
@@ -733,8 +740,7 @@ bool RenderThemeQt::paintProgressBar(RenderObject* o,
     return true;
 
   QStyleOptionProgressBarV2 option;
-  if (p.widget)
-    option.initFrom(p.widget);
+  initStyleOption(p.widget, option);
   initializeCommonQStyleOptions(option, o);
 
   RenderProgress* renderProgress = toRenderProgress(o);
@@ -785,8 +791,7 @@ bool RenderThemeQt::paintSliderTrack(RenderObject* o,
     return true;
 
   QStyleOptionSlider option;
-  if (p.widget)
-    option.initFrom(p.widget);
+  initStyleOption(p.widget, option);
   option.subControls = QStyle::SC_SliderGroove | QStyle::SC_SliderHandle;
   ControlPart appearance = initializeCommonQStyleOptions(option, o);
 
