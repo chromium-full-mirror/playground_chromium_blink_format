@@ -39,9 +39,11 @@ class FETile : public FilterEffect {
     setAbsolutePaintRect(maxEffectRect());
   }
 
-  virtual TextStream& externalRepresentation(TextStream&, int indention) const;
+  virtual FilterEffectType filterEffectType() const {
+    return FilterEffectTypeTile;
+  }
 
-  virtual FloatRect determineFilterPrimitiveSubregion(Filter*);
+  virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
   FETile();

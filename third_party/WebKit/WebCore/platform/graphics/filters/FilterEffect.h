@@ -111,9 +111,6 @@ class FilterEffect : public RefCounted<FilterEffect> {
   bool hasHeight() const { return m_hasHeight; }
   void setHasHeight(bool value) { m_hasHeight = value; }
 
-  // FIXME: FETile still needs special handling.
-  virtual FloatRect determineFilterPrimitiveSubregion(Filter*);
-
   FloatRect filterPrimitiveSubregion() const {
     return m_filterPrimitiveSubregion;
   }

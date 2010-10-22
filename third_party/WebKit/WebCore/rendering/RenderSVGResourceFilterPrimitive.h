@@ -31,13 +31,20 @@
 
 #include "RenderSVGHiddenContainer.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
+#include "SVGFilter.h"
 
 namespace WebCore {
 
 class RenderSVGResourceFilterPrimitive : public RenderSVGHiddenContainer {
  public:
   explicit RenderSVGResourceFilterPrimitive(
-      SVGFilterPrimitiveStandardAttributes* filterPrimitiveElement);
+      SVGFilterPrimitiveStandardAttributes* filterPrimitiveElement)
+      : RenderSVGHiddenContainer(filterPrimitiveElement) {}
+
+  // They depend on the RenderObject argument of
+  // RenderSVGResourceFilter::applyResource.
+  static FloatRect determineFilterPrimitiveSubregion(FilterEffect* effect,
+                                                     SVGFilter* filter);
 
  private:
   virtual const char* renderName() const {
