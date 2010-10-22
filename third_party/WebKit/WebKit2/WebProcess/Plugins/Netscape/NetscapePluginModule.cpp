@@ -49,6 +49,11 @@ NetscapePluginModule::~NetscapePluginModule() {
 }
 
 void NetscapePluginModule::pluginCreated() {
+  if (!m_pluginCount) {
+    // Load the plug-in module if necessary.
+    load();
+  }
+
   m_pluginCount++;
 }
 
@@ -56,14 +61,18 @@ void NetscapePluginModule::pluginDestroyed() {
   ASSERT(m_pluginCount > 0);
   m_pluginCount--;
 
-  if (!m_pluginCount)
+  if (!m_pluginCount) {
     shutdown();
+    unload();
+  }
 }
 
 void NetscapePluginModule::shutdown() {
   ASSERT(m_isInitialized);
 
   m_shutdownProcPtr();
+
+  m_isInitialized = false;
 
   size_t pluginModuleIndex = initializedNetscapePluginModules().find(this);
   ASSERT(pluginModuleIndex != notFound);
@@ -92,6 +101,11 @@ PassRefPtr<NetscapePluginModule> NetscapePluginModule::getOrCreate(
 }
 
 bool NetscapePluginModule::load() {
+  if (m_isInitialized) {
+    ASSERT(initializedNetscapePluginModules().find(this) != notFound);
+    return true;
+  }
+
   if (!tryLoad()) {
     unload();
     return false;
@@ -147,6 +161,8 @@ bool NetscapePluginModule::tryLoad() {
 }
 
 void NetscapePluginModule::unload() {
+  ASSERT(!m_isInitialized);
+
   m_module = 0;
 }
 
