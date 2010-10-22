@@ -83,6 +83,8 @@ class EditorClientWinCE : public WebCore::EditorClient {
   virtual void undo();
   virtual void redo();
 
+  virtual const char* interpretKeyEvent(const WebCore::KeyboardEvent*);
+  virtual bool handleEditingKeyboardEvent(WebCore::KeyboardEvent*);
   virtual void handleKeyboardEvent(WebCore::KeyboardEvent*);
   virtual void handleInputMethodKeydown(WebCore::KeyboardEvent*);
 
