@@ -105,7 +105,10 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void setApplicationCacheOriginQuota(unsigned long long quota);
   void setAuthorAndUserStylesEnabled(bool);
   void setCacheModel(int);
-  void setCustomPolicyDelegate(bool setDelegate, bool permissive);
+  void setCustomPolicyDelegate(
+      bool setDelegate,
+      bool permissive,
+      bool callIgnoreInDecidePolicyForMIMETypeAfterOneSecond);
   void setDatabaseQuota(unsigned long long quota);
   void setDomainRelaxationForbiddenForURLScheme(bool forbidden,
                                                 JSStringRef scheme);

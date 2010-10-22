@@ -91,7 +91,7 @@ void LayoutTestController::setAlwaysAcceptCookies(bool alwaysAcceptCookies) {
   // test in DumpRenderTree.cpp).
 }
 
-void LayoutTestController::setCustomPolicyDelegate(bool, bool) {
+void LayoutTestController::setCustomPolicyDelegate(bool, bool, bool) {
   // FIXME: implement
 }
 
