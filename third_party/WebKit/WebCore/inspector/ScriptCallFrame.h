@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, Google Inc. All rights reserved.
+ * Copyright (c) 2010 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,46 +28,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ScriptCallStack_h
-#define ScriptCallStack_h
+#ifndef ScriptCallFrame_h
+#define ScriptCallFrame_h
 
-#include "ScriptCallFrame.h"
-#include "ScriptState.h"
-#include <wtf/Noncopyable.h>
-#include <wtf/RefPtr.h>
-
-namespace JSC {
-class ExecState;
-class JSValue;
-}
+#include "PlatformString.h"
+#include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
-class InspectorArray;
+class InspectorObject;
 
-class ScriptCallStack : public Noncopyable {
+class ScriptCallFrame {
  public:
-  ScriptCallStack(JSC::ExecState*, unsigned skipArgumentCount = 0);
-  ~ScriptCallStack();
+  ScriptCallFrame(const String& functionName,
+                  const String& urlString,
+                  unsigned lineNumber);
+  ~ScriptCallFrame();
 
-  ScriptState* state() const { return m_exec; }
-  ScriptState* globalState() const {
-    return m_exec->lexicalGlobalObject()->globalExec();
-  }
-  // frame retrieval methods
-  const ScriptCallFrame& at(unsigned);
-  unsigned size();
-  static bool stackTrace(int, const RefPtr<InspectorArray>&);
+  const String& functionName() const { return m_functionName; }
+  const String& sourceURL() const { return m_sourceURL; }
+  unsigned lineNumber() const { return m_lineNumber; }
+
+  bool isEqual(const ScriptCallFrame&) const;
+  PassRefPtr<InspectorObject> buildInspectorObject() const;
 
  private:
-  void initialize();
-  bool m_initialized;
-
-  JSC::ExecState* m_exec;
-  Vector<ScriptCallFrame> m_frames;
-  JSC::JSFunction* m_caller;
+  String m_functionName;
+  String m_sourceURL;
+  unsigned m_lineNumber;
 };
 
 }  // namespace WebCore
 
-#endif  // ScriptCallStack_h
+#endif  // ScriptCallFrame_h

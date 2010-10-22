@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 Google Inc. All rights reserved.
+ * Copyright (c) 2010 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,52 +28,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ScriptCallFrame_h
-#define ScriptCallFrame_h
+#ifndef ScriptCallStackFactory_h
+#define ScriptCallStackFactory_h
 
-#include "KURL.h"
+#include <wtf/PassOwnPtr.h>
 
-#include <wtf/Vector.h>
-
-namespace v8 {
-class Arguments;
+namespace JSC {
+class ExecState;
 }
 
 namespace WebCore {
-class ScriptValue;
 
-// FIXME: Implement retrieving line number and source URL and storing here
-// for all call frames, not just the first one.
-// See <https://bugs.webkit.org/show_bug.cgi?id=22556> and
-// <https://bugs.webkit.org/show_bug.cgi?id=21180>
-class ScriptCallFrame {
- public:
-  ScriptCallFrame(const String& functionName,
-                  const String& urlString,
-                  int lineNumber,
-                  const v8::Arguments&,
-                  unsigned skipArgumentCount);
-  ScriptCallFrame(const String& functionName,
-                  const String& urlString,
-                  int lineNumber);
-  ~ScriptCallFrame();
+class ScriptArguments;
+class ScriptCallStack;
 
-  const String& functionName() const { return m_functionName; }
-  const String& sourceURL() const { return m_sourceURL; }
-  unsigned lineNumber() const { return m_lineNumber; }
-
-  // argument retrieval methods
-  const ScriptValue& argumentAt(unsigned) const;
-  unsigned argumentCount() const { return m_arguments.size(); }
-
- private:
-  String m_functionName;
-  String m_sourceURL;
-  unsigned m_lineNumber;
-
-  Vector<ScriptValue> m_arguments;
-};
+PassOwnPtr<ScriptCallStack> createScriptCallStack(JSC::ExecState*,
+                                                  size_t maxStackSize);
+PassOwnPtr<ScriptArguments> createScriptArguments(JSC::ExecState*,
+                                                  unsigned skipArgumentCount);
 
 }  // namespace WebCore
 
-#endif  // ScriptCallFrame_h
+#endif  // ScriptCallStackFactory_h
