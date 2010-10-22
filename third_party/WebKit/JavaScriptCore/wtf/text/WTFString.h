@@ -51,6 +51,15 @@ class wxString;
 class BString;
 #endif
 
+#if PLATFORM(BREWMP)
+// AECHAR is defined in AEEStdDef.h, but don't include it here to avoid
+// conflicts.
+#ifndef _AECHAR_DEFINED
+typedef uint16 AECHAR;
+#define _AECHAR_DEFINED
+#endif
+#endif
+
 namespace WTF {
 
 class CString;
@@ -382,6 +391,10 @@ class String {
 #if PLATFORM(HAIKU)
   String(const BString&);
   operator BString() const;
+#endif
+
+#if PLATFORM(BREWMP)
+  String(const AECHAR*);
 #endif
 
   static String fromUTF8(const char*, size_t);
