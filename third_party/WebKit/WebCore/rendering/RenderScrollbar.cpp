@@ -57,13 +57,19 @@ RenderScrollbar::RenderScrollbar(ScrollbarClient* client,
   // as soon as the scrollbar is created.
 
   // Update the scrollbar size.
+  int width = 0;
+  int height = 0;
   updateScrollbarPart(ScrollbarBGPart);
-  RenderScrollbarPart* part = m_parts.get(ScrollbarBGPart);
-  if (!part)
-    return;
+  if (RenderScrollbarPart* part = m_parts.get(ScrollbarBGPart)) {
+    part->layout();
+    width = part->width();
+    height = part->height();
+  } else if (this->orientation() == HorizontalScrollbar)
+    width = this->width();
+  else
+    height = this->height();
 
-  part->layout();
-  setFrameRect(IntRect(0, 0, part->width(), part->height()));
+  setFrameRect(IntRect(0, 0, width, height));
 }
 
 RenderScrollbar::~RenderScrollbar() {
