@@ -660,13 +660,16 @@ void InlineFlowBox::computeBlockDirectionOverflow(
     int lineBottom,
     bool strictMode,
     GlyphOverflowAndFallbackFontsMap& textBoxDataMap) {
+  bool isFlippedLine =
+      renderer()->style(m_firstLine)->isFlippedLinesWritingMode();
+
   int boxHeight = logicalHeight();
 
   // Any spillage outside of the line top and bottom is not considered overflow.
   // We just ignore this, since it only happens
   // from the "your ascent/descent don't affect the line" quirk.
-  int topOverflow = max(y(), lineTop);
-  int bottomOverflow = min(y() + boxHeight, lineBottom);
+  int topOverflow = max(logicalTop(), lineTop);
+  int bottomOverflow = min(logicalTop() + boxHeight, lineBottom);
 
   int topLayoutOverflow = topOverflow;
   int bottomLayoutOverflow = bottomOverflow;
@@ -681,11 +684,11 @@ void InlineFlowBox::computeBlockDirectionOverflow(
     int boxShadowBottom;
     renderer()
         ->style(m_firstLine)
-        ->getBoxShadowVerticalExtent(boxShadowTop, boxShadowBottom);
+        ->getBoxShadowBlockDirectionExtent(boxShadowTop, boxShadowBottom);
 
-    topVisualOverflow = min(y() + boxShadowTop, topVisualOverflow);
+    topVisualOverflow = min(logicalTop() + boxShadowTop, topVisualOverflow);
     bottomVisualOverflow =
-        max(y() + boxHeight + boxShadowBottom, bottomVisualOverflow);
+        max(logicalTop() + boxHeight + boxShadowBottom, bottomVisualOverflow);
   }
 
   for (InlineBox* curr = firstChild(); curr; curr = curr->nextOnLine()) {
@@ -706,25 +709,30 @@ void InlineFlowBox::computeBlockDirectionOverflow(
       GlyphOverflow* glyphOverflow =
           it == textBoxDataMap.end() ? 0 : &it->second.second;
 
-      int topGlyphOverflow =
-          -strokeOverflow - (glyphOverflow ? glyphOverflow->top : 0);
-      int bottomGlyphOverflow =
-          strokeOverflow + (glyphOverflow ? glyphOverflow->bottom : 0);
+      int topGlyphEdge = glyphOverflow ? (isFlippedLine ? glyphOverflow->bottom
+                                                        : glyphOverflow->top)
+                                       : 0;
+      int bottomGlyphEdge =
+          glyphOverflow
+              ? (isFlippedLine ? glyphOverflow->top : glyphOverflow->bottom)
+              : 0;
 
-      int childOverflowTop = topGlyphOverflow;
-      int childOverflowBottom = bottomGlyphOverflow;
-      for (const ShadowData* shadow = rt->style()->textShadow(); shadow;
-           shadow = shadow->next()) {
-        childOverflowTop = min(childOverflowTop,
-                               shadow->y() - shadow->blur() + topGlyphOverflow);
-        childOverflowBottom =
-            max(childOverflowBottom,
-                shadow->y() + shadow->blur() + bottomGlyphOverflow);
-      }
+      int topGlyphOverflow = -strokeOverflow - topGlyphEdge;
+      int bottomGlyphOverflow = strokeOverflow + bottomGlyphEdge;
 
-      topVisualOverflow = min(curr->y() + childOverflowTop, topVisualOverflow);
+      int textShadowTop;
+      int textShadowBottom;
+      curr->renderer()
+          ->style(m_firstLine)
+          ->getTextShadowBlockDirectionExtent(textShadowTop, textShadowBottom);
+
+      int childOverflowTop = min(textShadowTop, topGlyphOverflow);
+      int childOverflowBottom = max(textShadowBottom, bottomGlyphOverflow);
+
+      topVisualOverflow =
+          min(curr->logicalTop() + childOverflowTop, topVisualOverflow);
       bottomVisualOverflow =
-          max(curr->y() + text->logicalHeight() + childOverflowBottom,
+          max(curr->logicalTop() + text->logicalHeight() + childOverflowBottom,
               bottomVisualOverflow);
     } else if (curr->renderer()->isRenderInline()) {
       InlineFlowBox* flow = static_cast<InlineFlowBox*>(curr);
@@ -739,26 +747,31 @@ void InlineFlowBox::computeBlockDirectionOverflow(
     } else if (!curr->boxModelObject()->hasSelfPaintingLayer()) {
       // Only include overflow from replaced inlines if they do not paint
       // themselves.
+      int boxLogicalTop = curr->logicalTop();
+      int childTopLayoutOverflow;
+      int childBottomLayoutOverflow;
+      int childTopVisualOverflow;
+      int childBottomVisualOverflow;
+
       RenderBox* box = toRenderBox(curr->renderer());
-      int boxY = curr->y();
-      int childTopOverflow =
-          box->hasOverflowClip() ? 0 : box->topLayoutOverflow();
-      int childBottomOverflow = box->hasOverflowClip()
-                                    ? curr->logicalHeight()
-                                    : box->bottomLayoutOverflow();
-      topLayoutOverflow = min(boxY + childTopOverflow, topLayoutOverflow);
+      box->blockDirectionOverflow(
+          isVertical(), isFlippedLine, childTopLayoutOverflow,
+          childBottomLayoutOverflow, childTopVisualOverflow,
+          childBottomVisualOverflow);
+
+      topLayoutOverflow =
+          min(boxLogicalTop + childTopLayoutOverflow, topLayoutOverflow);
       bottomLayoutOverflow =
-          max(boxY + childBottomOverflow, bottomLayoutOverflow);
+          max(boxLogicalTop + childBottomLayoutOverflow, bottomLayoutOverflow);
       topVisualOverflow =
-          min(boxY + box->topVisualOverflow(), topVisualOverflow);
+          min(boxLogicalTop + childTopVisualOverflow, topVisualOverflow);
       bottomVisualOverflow =
-          max(boxY + box->bottomVisualOverflow(), bottomVisualOverflow);
+          max(boxLogicalTop + childBottomVisualOverflow, bottomVisualOverflow);
     }
   }
 
   setBlockDirectionOverflowPositions(topLayoutOverflow, bottomLayoutOverflow,
-                                     topVisualOverflow, bottomVisualOverflow,
-                                     boxHeight);
+                                     topVisualOverflow, bottomVisualOverflow);
 }
 
 bool InlineFlowBox::nodeAtPoint(const HitTestRequest& request,

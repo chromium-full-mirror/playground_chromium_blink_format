@@ -167,7 +167,7 @@ void RootInlineBox::addHighlightOverflow() {
   setBlockDirectionOverflowPositions(
       topLayoutOverflow(), bottomLayoutOverflow(),
       min(topVisualOverflow(), inflatedRect.y()),
-      max(bottomVisualOverflow(), inflatedRect.bottom()), logicalHeight());
+      max(bottomVisualOverflow(), inflatedRect.bottom()));
 }
 
 void RootInlineBox::paintCustomHighlight(PaintInfo& paintInfo,

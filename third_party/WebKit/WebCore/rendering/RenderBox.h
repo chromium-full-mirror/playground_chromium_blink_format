@@ -220,6 +220,13 @@ class RenderBox : public RenderBoxModelObject {
   void addOverflowFromChild(RenderBox* child, const IntSize& delta);
   void clearLayoutOverflow();
 
+  void blockDirectionOverflow(bool isLineVertical,
+                              bool isFlippedLine,
+                              int& logicalTopLayoutOverflow,
+                              int& logicalBottomLayoutOverflow,
+                              int& logicalTopVisualOverflow,
+                              int& logicalBottomVisualOverflow);
+
   int contentWidth() const {
     return clientWidth() - paddingLeft() - paddingRight();
   }

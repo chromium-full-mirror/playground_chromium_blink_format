@@ -1041,7 +1041,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
                                                           textBoxDataMap);
         trailingFloatsLineBox->setBlockDirectionOverflowPositions(
             logicalHeight(), bottomLayoutOverflow, logicalHeight(),
-            bottomVisualOverflow, 0);
+            bottomVisualOverflow);
         trailingFloatsLineBox->setBlockLogicalHeight(logicalHeight());
       }
       if (lastFloat) {

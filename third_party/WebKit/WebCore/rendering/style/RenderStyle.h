@@ -825,6 +825,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void getTextShadowInlineDirectionExtent(int& logicalLeft, int& logicalRight) {
     getShadowInlineDirectionExtent(textShadow(), logicalLeft, logicalRight);
   }
+  void getTextShadowBlockDirectionExtent(int& logicalTop, int& logicalBottom) {
+    getShadowBlockDirectionExtent(textShadow(), logicalTop, logicalBottom);
+  }
 
   float textStrokeWidth() const { return rareInheritedData->textStrokeWidth; }
   ColorSpace colorSpace() const {
@@ -871,6 +874,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
   void getBoxShadowInlineDirectionExtent(int& logicalLeft, int& logicalRight) {
     getShadowInlineDirectionExtent(boxShadow(), logicalLeft, logicalRight);
+  }
+  void getBoxShadowBlockDirectionExtent(int& logicalTop, int& logicalBottom) {
+    getShadowBlockDirectionExtent(boxShadow(), logicalTop, logicalBottom);
   }
 
   StyleReflection* boxReflect() const {
@@ -1964,6 +1970,13 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return isHorizontalWritingMode()
                ? getShadowHorizontalExtent(shadow, logicalLeft, logicalRight)
                : getShadowVerticalExtent(shadow, logicalLeft, logicalRight);
+  }
+  void getShadowBlockDirectionExtent(const ShadowData* shadow,
+                                     int& logicalTop,
+                                     int& logicalBottom) const {
+    return isHorizontalWritingMode()
+               ? getShadowVerticalExtent(shadow, logicalTop, logicalBottom)
+               : getShadowHorizontalExtent(shadow, logicalTop, logicalBottom);
   }
 
   // Color accessors are all private to make sure callers use
