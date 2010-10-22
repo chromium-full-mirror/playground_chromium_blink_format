@@ -63,8 +63,9 @@ class SVGAnimatedProperty : public RefCounted<SVGAnimatedProperty> {
   static PassRefPtr<TearOffType> lookupOrCreateWrapper(
       SVGElement* element,
       const QualifiedName& attributeName,
+      const AtomicString& attributeIdentifier,
       PropertyType& property) {
-    SVGAnimatedPropertyDescription key(element, attributeName.localName());
+    SVGAnimatedPropertyDescription key(element, attributeIdentifier);
     RefPtr<SVGAnimatedProperty> wrapper = animatedPropertyCache()->get(key);
     if (!wrapper) {
       wrapper = TearOffType::create(element, attributeName, property);
@@ -76,8 +77,8 @@ class SVGAnimatedProperty : public RefCounted<SVGAnimatedProperty> {
 
   template <typename TearOffType>
   static TearOffType* lookupWrapper(SVGElement* element,
-                                    const QualifiedName& attributeName) {
-    SVGAnimatedPropertyDescription key(element, attributeName.localName());
+                                    const AtomicString& attributeIdentifier) {
+    SVGAnimatedPropertyDescription key(element, attributeIdentifier);
     return static_pointer_cast<TearOffType>(animatedPropertyCache()->get(key))
         .get();
   }

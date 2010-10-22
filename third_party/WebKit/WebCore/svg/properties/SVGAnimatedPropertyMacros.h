@@ -27,6 +27,7 @@
 #include "SVGAnimatedListPropertyTearOff.h"
 #include "SVGAnimatedPropertySynchronizer.h"
 #include "SVGAnimatedPropertyTearOff.h"
+#include "SVGNames.h"  // FIXME: Temporary hack, until we expand the macros in all files, so we don't need a global SVGNames.h include
 #include "SVGPropertyTraits.h"
 
 namespace WebCore {
@@ -53,6 +54,7 @@ struct SVGSynchronizableAnimatedProperty {
 // FIXME: These macros should be removed, after the transition to the new
 // SVGAnimatedProperty concept is finished.
 #define DECLARE_ANIMATED_PROPERTY_NEW_SHARED(OwnerType, DOMAttribute,         \
+                                             SVGDOMAttributeIdentifier,       \
                                              TearOffType, PropertyType,       \
                                              UpperProperty, LowerProperty)    \
  public:                                                                      \
@@ -82,7 +84,8 @@ struct SVGSynchronizableAnimatedProperty {
     m_##LowerProperty.shouldSynchronize = true;                               \
     return SVGAnimatedProperty::lookupOrCreateWrapper<TearOffType,            \
                                                       PropertyType>(          \
-        this, DOMAttribute, m_##LowerProperty.value);                         \
+        this, DOMAttribute, SVGDOMAttributeIdentifier,                        \
+        m_##LowerProperty.value);                                             \
   }                                                                           \
                                                                               \
  private:                                                                     \
@@ -91,22 +94,33 @@ struct SVGSynchronizableAnimatedProperty {
 #define DECLARE_ANIMATED_PROPERTY_NEW(OwnerType, DOMAttribute, PropertyType, \
                                       UpperProperty, LowerProperty)          \
   DECLARE_ANIMATED_PROPERTY_NEW_SHARED(                                      \
-      OwnerType, DOMAttribute, SVGAnimatedPropertyTearOff<PropertyType>,     \
-      PropertyType, UpperProperty, LowerProperty)
+      OwnerType, DOMAttribute, DOMAttribute.localName(),                     \
+      SVGAnimatedPropertyTearOff<PropertyType>, PropertyType, UpperProperty, \
+      LowerProperty)
 
-#define DECLARE_ANIMATED_LIST_PROPERTY_NEW(                                  \
-    OwnerType, DOMAttribute, PropertyType, UpperProperty, LowerProperty)     \
+#define DECLARE_ANIMATED_PROPERTY_NEW_MULTIPLE_WRAPPERS(                     \
+    OwnerType, DOMAttribute, SVGDOMAttributeIdentifier, PropertyType,        \
+    UpperProperty, LowerProperty)                                            \
   DECLARE_ANIMATED_PROPERTY_NEW_SHARED(                                      \
-      OwnerType, DOMAttribute, SVGAnimatedListPropertyTearOff<PropertyType>, \
-      PropertyType, UpperProperty, LowerProperty)                            \
-                                                                             \
-  void detachAnimated##UpperProperty##ListWrappers(unsigned newListSize) {   \
-    SVGAnimatedProperty* wrapper = SVGAnimatedProperty::lookupWrapper<       \
-        SVGAnimatedListPropertyTearOff<PropertyType>>(this, DOMAttribute);   \
-    if (!wrapper)                                                            \
-      return;                                                                \
-    static_cast<SVGAnimatedListPropertyTearOff<PropertyType>*>(wrapper)      \
-        ->detachListWrappers(newListSize);                                   \
+      OwnerType, DOMAttribute, SVGDOMAttributeIdentifier,                    \
+      SVGAnimatedPropertyTearOff<PropertyType>, PropertyType, UpperProperty, \
+      LowerProperty)
+
+#define DECLARE_ANIMATED_LIST_PROPERTY_NEW(                                \
+    OwnerType, DOMAttribute, PropertyType, UpperProperty, LowerProperty)   \
+  DECLARE_ANIMATED_PROPERTY_NEW_SHARED(                                    \
+      OwnerType, DOMAttribute, DOMAttribute.localName(),                   \
+      SVGAnimatedListPropertyTearOff<PropertyType>, PropertyType,          \
+      UpperProperty, LowerProperty)                                        \
+                                                                           \
+  void detachAnimated##UpperProperty##ListWrappers(unsigned newListSize) { \
+    SVGAnimatedProperty* wrapper = SVGAnimatedProperty::lookupWrapper<     \
+        SVGAnimatedListPropertyTearOff<PropertyType>>(                     \
+        this, DOMAttribute.localName());                                   \
+    if (!wrapper)                                                          \
+      return;                                                              \
+    static_cast<SVGAnimatedListPropertyTearOff<PropertyType>*>(wrapper)    \
+        ->detachListWrappers(newListSize);                                 \
   }
 }
 
