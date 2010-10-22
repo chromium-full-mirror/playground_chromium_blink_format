@@ -59,7 +59,8 @@ class ChromeClientWx : public ChromeClient {
 
   virtual Page* createWindow(Frame*,
                              const FrameLoadRequest&,
-                             const WindowFeatures&);
+                             const WindowFeatures&,
+                             const NavigationAction&);
   virtual Page* createModalDialog(Frame*, const FrameLoadRequest&);
   virtual void show();
 

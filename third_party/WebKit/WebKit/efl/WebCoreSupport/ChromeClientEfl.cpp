@@ -46,6 +46,7 @@
 #include "HitTestResult.h"
 #include "IntRect.h"
 #include "KURL.h"
+#include "NavigationAction.h"
 #include "NotImplemented.h"
 #include "PlatformString.h"
 #include "SecurityOrigin.h"
@@ -132,7 +133,8 @@ void ChromeClientEfl::unfocus() {
 
 Page* ChromeClientEfl::createWindow(Frame*,
                                     const FrameLoadRequest& frameLoadRequest,
-                                    const WindowFeatures& features) {
+                                    const WindowFeatures& features,
+                                    const NavigationAction&) {
   Evas_Object* newView = ewk_view_window_create(m_view, EINA_TRUE, &features);
   if (!newView)
     return 0;

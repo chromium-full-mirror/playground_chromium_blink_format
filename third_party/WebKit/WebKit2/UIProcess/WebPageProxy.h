@@ -61,6 +61,7 @@ class Cursor;
 class FloatRect;
 class IntSize;
 struct ViewportArguments;
+struct WindowFeatures;
 }
 
 struct WKContextStatistics;
@@ -318,7 +319,11 @@ class WebPageProxy : public APIObject {
                       CoreIPC::ArgumentDecoder*);
 
   // UI client
-  void createNewPage(uint64_t& newPageID, WebPageCreationParameters&);
+  void createNewPage(const WebCore::WindowFeatures&,
+                     uint32_t modifiers,
+                     int32_t mouseButton,
+                     uint64_t& newPageID,
+                     WebPageCreationParameters&);
   void showPage();
   void closePage();
   void runJavaScriptAlert(uint64_t frameID, const String&);

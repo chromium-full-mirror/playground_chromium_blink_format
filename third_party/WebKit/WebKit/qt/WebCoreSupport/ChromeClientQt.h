@@ -74,7 +74,8 @@ class ChromeClientQt : public ChromeClient {
 
   virtual Page* createWindow(Frame*,
                              const FrameLoadRequest&,
-                             const WindowFeatures&);
+                             const WindowFeatures&,
+                             const NavigationAction&);
   virtual void show();
 
   virtual bool canRunModal();

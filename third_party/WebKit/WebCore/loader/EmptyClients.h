@@ -108,7 +108,8 @@ class EmptyChromeClient : public ChromeClient {
 
   virtual Page* createWindow(Frame*,
                              const FrameLoadRequest&,
-                             const WindowFeatures&) {
+                             const WindowFeatures&,
+                             const NavigationAction&) {
     return 0;
   }
   virtual void show() {}
@@ -315,7 +316,7 @@ class EmptyFrameLoaderClient : public FrameLoaderClient, public Noncopyable {
   virtual void dispatchDidFirstLayout() {}
   virtual void dispatchDidFirstVisuallyNonEmptyLayout() {}
 
-  virtual Frame* dispatchCreatePage() { return 0; }
+  virtual Frame* dispatchCreatePage(const NavigationAction&) { return 0; }
   virtual void dispatchShow() {}
 
   virtual void dispatchDecidePolicyForMIMEType(FramePolicyFunction,

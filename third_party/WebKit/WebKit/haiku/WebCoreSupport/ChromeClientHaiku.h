@@ -63,7 +63,8 @@ class ChromeClientHaiku : public ChromeClient {
 
   Page* createWindow(Frame*,
                      const FrameLoadRequest&,
-                     const WebCore::WindowFeatures&);
+                     const WebCore::WindowFeatures&,
+                     const WebCore::NavigationAction&);
   Page* createModalDialog(Frame*, const FrameLoadRequest&);
   void show();
 

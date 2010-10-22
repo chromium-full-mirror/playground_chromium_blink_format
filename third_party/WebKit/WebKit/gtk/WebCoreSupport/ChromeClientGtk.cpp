@@ -36,6 +36,7 @@
 #include "HitTestResult.h"
 #include "Icon.h"
 #include "KURL.h"
+#include "NavigationAction.h"
 #include "PlatformString.h"
 #include "PopupMenuClient.h"
 #include "PopupMenuGtk.h"
@@ -129,7 +130,8 @@ void ChromeClient::unfocus() {
 
 Page* ChromeClient::createWindow(Frame* frame,
                                  const FrameLoadRequest& frameLoadRequest,
-                                 const WindowFeatures& coreFeatures) {
+                                 const WindowFeatures& coreFeatures,
+                                 const NavigationAction&) {
   WebKitWebView* webView = 0;
 
   g_signal_emit_by_name(m_webView, "create-web-view", kit(frame), &webView);

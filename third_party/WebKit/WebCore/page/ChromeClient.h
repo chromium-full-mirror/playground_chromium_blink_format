@@ -56,11 +56,12 @@ class Geolocation;
 class HTMLParserQuirks;
 class HitTestResult;
 class IntRect;
+class NavigationAction;
 class Node;
 class Page;
+class PopupMenuClient;
 class SecurityOrigin;
 class SharedGraphicsContext3D;
-class PopupMenuClient;
 class Widget;
 
 struct FrameLoadRequest;
@@ -100,7 +101,8 @@ class ChromeClient {
   // created Page has its show method called.
   virtual Page* createWindow(Frame*,
                              const FrameLoadRequest&,
-                             const WindowFeatures&) = 0;
+                             const WindowFeatures&,
+                             const NavigationAction&) = 0;
   virtual void show() = 0;
 
   virtual bool canRunModal() = 0;

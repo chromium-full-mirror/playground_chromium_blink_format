@@ -467,7 +467,7 @@ void WebFrameLoaderClient::dispatchDidFirstVisuallyNonEmptyLayout() {
                                                                     m_webFrame);
 }
 
-Frame* WebFrameLoaderClient::dispatchCreatePage() {
+Frame* WebFrameLoaderClient::dispatchCreatePage(const NavigationAction&) {
   WebView* webView = m_webFrame->webView();
 
   COMPtr<IWebUIDelegate> ui;

@@ -52,6 +52,7 @@
 #include "HTMLNames.h"
 #include "HitTestResult.h"
 #include "IntRect.h"
+#include "NavigationAction.h"
 #include "Node.h"
 #include "NotificationPresenterImpl.h"
 #include "Page.h"
@@ -239,7 +240,8 @@ void ChromeClientImpl::focusedNodeChanged(Node* node) {
 
 Page* ChromeClientImpl::createWindow(Frame* frame,
                                      const FrameLoadRequest& r,
-                                     const WindowFeatures& features) {
+                                     const WindowFeatures& features,
+                                     const NavigationAction&) {
   if (!m_webView->client())
     return 0;
 

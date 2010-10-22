@@ -3270,22 +3270,24 @@ void FrameLoader::callContinueLoadAfterNewWindowPolicy(
     const ResourceRequest& request,
     PassRefPtr<FormState> formState,
     const String& frameName,
+    const NavigationAction& action,
     bool shouldContinue) {
   FrameLoader* loader = static_cast<FrameLoader*>(argument);
   loader->continueLoadAfterNewWindowPolicy(request, formState, frameName,
-                                           shouldContinue);
+                                           action, shouldContinue);
 }
 
 void FrameLoader::continueLoadAfterNewWindowPolicy(
     const ResourceRequest& request,
     PassRefPtr<FormState> formState,
     const String& frameName,
+    const NavigationAction& action,
     bool shouldContinue) {
   if (!shouldContinue)
     return;
 
   RefPtr<Frame> frame = m_frame;
-  RefPtr<Frame> mainFrame = m_client->dispatchCreatePage();
+  RefPtr<Frame> mainFrame = m_client->dispatchCreatePage(action);
   if (!mainFrame)
     return;
 
@@ -3817,8 +3819,9 @@ Frame* createWindow(Frame* openerFrame,
   if (!oldPage)
     return 0;
 
+  NavigationAction action;
   Page* page = oldPage->chrome()->createWindow(openerFrame, requestWithReferrer,
-                                               features);
+                                               features, action);
   if (!page)
     return 0;
 

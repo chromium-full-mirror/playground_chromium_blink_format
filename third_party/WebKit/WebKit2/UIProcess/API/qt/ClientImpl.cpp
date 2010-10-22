@@ -151,7 +151,11 @@ void qt_wk_didBecomeUnresponsive(WKPageRef page, const void* clientInfo) {}
 
 void qt_wk_didBecomeResponsive(WKPageRef page, const void* clientInfo) {}
 
-WKPageRef qt_wk_createNewPage(WKPageRef page, const void* clientInfo) {
+WKPageRef qt_wk_createNewPage(WKPageRef page,
+                              WKDictionaryRef features,
+                              WKEventModifiers modifiers,
+                              WKEventMouseButton mouseButton,
+                              const void* clientInfo) {
   QWKPage* wkPage = toQWKPage(clientInfo);
   QWKPagePrivate* d = QWKPagePrivate::get(wkPage);
   QWKPage::CreateNewPageFn createNewPageFn = d->createNewPageFn;

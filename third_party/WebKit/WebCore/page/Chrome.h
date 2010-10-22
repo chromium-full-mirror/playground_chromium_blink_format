@@ -45,6 +45,7 @@ class Frame;
 class Geolocation;
 class HitTestResult;
 class IntRect;
+class NavigationAction;
 class Node;
 class Page;
 class PopupMenuClient;
@@ -96,7 +97,8 @@ class Chrome : public HostWindow {
 
   Page* createWindow(Frame*,
                      const FrameLoadRequest&,
-                     const WindowFeatures&) const;
+                     const WindowFeatures&,
+                     const NavigationAction&) const;
   void show() const;
 
   bool canRunModal() const;

@@ -32,9 +32,10 @@
 #define PolicyCallback_h
 
 #include "FrameLoaderTypes.h"
-#include "PlatformString.h"
+#include "NavigationAction.h"
 #include "ResourceRequest.h"
 #include <wtf/RefPtr.h>
+#include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
@@ -48,6 +49,7 @@ typedef void (*NewWindowPolicyDecisionFunction)(void* argument,
                                                 const ResourceRequest&,
                                                 PassRefPtr<FormState>,
                                                 const String& frameName,
+                                                const NavigationAction&,
                                                 bool shouldContinue);
 typedef void (*ContentPolicyDecisionFunction)(void* argument, PolicyAction);
 
@@ -64,6 +66,7 @@ class PolicyCallback {
   void set(const ResourceRequest&,
            PassRefPtr<FormState>,
            const String& frameName,
+           const NavigationAction&,
            NewWindowPolicyDecisionFunction,
            void* argument);
   void set(ContentPolicyDecisionFunction, void* argument);
@@ -79,6 +82,7 @@ class PolicyCallback {
   ResourceRequest m_request;
   RefPtr<FormState> m_formState;
   String m_frameName;
+  NavigationAction m_navigationAction;
 
   NavigationPolicyDecisionFunction m_navigationFunction;
   NewWindowPolicyDecisionFunction m_newWindowFunction;

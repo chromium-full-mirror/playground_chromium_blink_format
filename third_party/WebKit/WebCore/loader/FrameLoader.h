@@ -425,6 +425,7 @@ class FrameLoader : public Noncopyable {
                                                    const ResourceRequest&,
                                                    PassRefPtr<FormState>,
                                                    const String& frameName,
+                                                   const NavigationAction&,
                                                    bool shouldContinue);
   static void callContinueFragmentScrollAfterNavigationPolicy(
       void*,
@@ -438,6 +439,7 @@ class FrameLoader : public Noncopyable {
   void continueLoadAfterNewWindowPolicy(const ResourceRequest&,
                                         PassRefPtr<FormState>,
                                         const String& frameName,
+                                        const NavigationAction&,
                                         bool shouldContinue);
   void continueFragmentScrollAfterNavigationPolicy(const ResourceRequest&,
                                                    bool shouldContinue);

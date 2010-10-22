@@ -170,7 +170,7 @@ class FrameLoaderClient {
   virtual void dispatchDidFirstLayout() = 0;
   virtual void dispatchDidFirstVisuallyNonEmptyLayout() = 0;
 
-  virtual Frame* dispatchCreatePage() = 0;
+  virtual Frame* dispatchCreatePage(const NavigationAction&) = 0;
   virtual void dispatchShow() = 0;
 
   virtual void dispatchDecidePolicyForMIMEType(FramePolicyFunction,

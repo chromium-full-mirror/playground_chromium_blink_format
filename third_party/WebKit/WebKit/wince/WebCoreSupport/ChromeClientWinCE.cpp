@@ -28,6 +28,7 @@
 #include "FileChooser.h"
 #include "Icon.h"
 #include "NotImplemented.h"
+#include "NavigationAction.h"
 #include "PopupMenuWin.h"
 #include "SearchPopupMenuWin.h"
 #include "WebView.h"
@@ -76,7 +77,8 @@ void ChromeClientWinCE::unfocus() {
 
 Page* ChromeClientWinCE::createWindow(Frame*,
                                       const FrameLoadRequest&,
-                                      const WindowFeatures&) {
+                                      const WindowFeatures&,
+                                      const NavigationAction&) {
   notImplemented();
   return 0;
 }

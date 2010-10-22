@@ -67,6 +67,7 @@
 #include "FocusController.h"
 #include "Editor.h"
 #include "Scrollbar.h"
+#include "NavigationAction.h"
 #include "NetworkingContext.h"
 #include "PlatformKeyboardEvent.h"
 #include "PlatformWheelEvent.h"
@@ -2223,8 +2224,9 @@ static WebCore::FrameLoadRequest frameLoadRequest(const QUrl& url,
 static void openNewWindow(const QUrl& url, WebCore::Frame* frame) {
   if (Page* oldPage = frame->page()) {
     WindowFeatures features;
+    NavigationAction action;
     if (Page* newPage = oldPage->chrome()->createWindow(
-            frame, frameLoadRequest(url, frame), features))
+            frame, frameLoadRequest(url, frame), features, action))
       newPage->chrome()->show();
   }
 }

@@ -58,7 +58,8 @@ class ChromeClient : public WebCore::ChromeClient {
 
   virtual WebCore::Page* createWindow(WebCore::Frame*,
                                       const WebCore::FrameLoadRequest&,
-                                      const WebCore::WindowFeatures&);
+                                      const WebCore::WindowFeatures&,
+                                      const WebCore::NavigationAction&);
   virtual void show();
 
   virtual bool canRunModal();

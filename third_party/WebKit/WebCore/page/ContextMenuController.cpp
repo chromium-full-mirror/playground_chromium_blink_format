@@ -50,6 +50,7 @@
 #include "HitTestResult.h"
 #include "InspectorController.h"
 #include "MouseEvent.h"
+#include "NavigationAction.h"
 #include "Node.h"
 #include "Page.h"
 #include "RenderLayer.h"
@@ -137,7 +138,7 @@ static void openNewWindow(const KURL& urlToLoad, Frame* frame) {
     if (Page* newPage = oldPage->chrome()->createWindow(
             frame, FrameLoadRequest(ResourceRequest(
                        urlToLoad, frame->loader()->outgoingReferrer())),
-            features))
+            features, NavigationAction()))
       newPage->chrome()->show();
   }
 }

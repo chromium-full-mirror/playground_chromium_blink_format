@@ -105,7 +105,7 @@ void PolicyChecker::checkNewWindowPolicy(
     PassRefPtr<FormState> formState,
     const String& frameName,
     void* argument) {
-  m_callback.set(request, formState, frameName, function, argument);
+  m_callback.set(request, formState, frameName, action, function, argument);
   m_frame->loader()->client()->dispatchDecidePolicyForNewWindowAction(
       &PolicyChecker::continueAfterNewWindowPolicy, action, request, formState,
       frameName);

@@ -492,14 +492,16 @@ void WebFrameLoaderClient::dispatchDidFirstVisuallyNonEmptyLayout() {
       webPage->pageID());
 }
 
-Frame* WebFrameLoaderClient::dispatchCreatePage() {
+Frame* WebFrameLoaderClient::dispatchCreatePage(
+    const NavigationAction& navigationAction) {
   WebPage* webPage = m_frame->page();
   if (!webPage)
     return 0;
 
   // Just call through to the chrome client.
   Page* newPage = webPage->corePage()->chrome()->createWindow(
-      m_frame->coreFrame(), FrameLoadRequest(), WindowFeatures());
+      m_frame->coreFrame(), FrameLoadRequest(), WindowFeatures(),
+      navigationAction);
   if (!newPage)
     return 0;
 
@@ -514,7 +516,7 @@ void WebFrameLoaderClient::dispatchShow() {
   webPage->show();
 }
 
-static uint32_t modifiersForNavigationAction(
+uint32_t modifiersForNavigationAction(
     const NavigationAction& navigationAction) {
   uint32_t modifiers = 0;
   if (const UIEventWithKeyState* keyStateEvent =
@@ -540,7 +542,7 @@ static const MouseEvent* findMouseEvent(const Event* event) {
   return 0;
 }
 
-static int32_t mouseButtonForNavigationAction(
+int32_t mouseButtonForNavigationAction(
     const NavigationAction& navigationAction) {
   const MouseEvent* mouseEvent = findMouseEvent(navigationAction.event());
   if (!mouseEvent)

@@ -219,7 +219,7 @@ class FrameLoaderClientWx : public FrameLoaderClient {
 
   virtual void dispatchDidFailProvisionalLoad(const ResourceError&);
   virtual void dispatchDidFailLoad(const ResourceError&);
-  virtual Frame* dispatchCreatePage();
+  virtual Frame* dispatchCreatePage(const WebCore::NavigationAction&);
   virtual void dispatchDecidePolicyForMIMEType(FramePolicyFunction function,
                                                const String&,
                                                const ResourceRequest&);
