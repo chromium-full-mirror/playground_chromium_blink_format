@@ -41,6 +41,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
   enum EPropertyLevel { PropertyDefault, ForceBlockProperties };
   enum InlineStyleRemovalMode { RemoveIfNeeded, RemoveAlways, RemoveNone };
   enum EAddStyledElement { AddStyledElement, DoNotAddStyledElement };
+  typedef bool (*IsInlineElementToRemoveFunction)(const Element*);
 
   static PassRefPtr<ApplyStyleCommand> create(
       Document* document,
@@ -65,6 +66,14 @@ class ApplyStyleCommand : public CompositeEditCommand {
       EditAction action = EditActionChangeAttributes) {
     return adoptRef(new ApplyStyleCommand(element, removeOnly, action));
   }
+  static PassRefPtr<ApplyStyleCommand> create(
+      Document* document,
+      CSSStyleDeclaration* style,
+      IsInlineElementToRemoveFunction isInlineElementToRemoveFunction,
+      EditAction action = EditActionChangeAttributes) {
+    return adoptRef(new ApplyStyleCommand(
+        document, style, isInlineElementToRemoveFunction, action));
+  }
 
   static RefPtr<CSSMutableStyleDeclaration> removeNonEditingProperties(
       CSSStyleDeclaration* style);
@@ -84,6 +93,10 @@ class ApplyStyleCommand : public CompositeEditCommand {
                     EditAction,
                     EPropertyLevel);
   ApplyStyleCommand(PassRefPtr<Element>, bool removeOnly, EditAction);
+  ApplyStyleCommand(Document*,
+                    CSSStyleDeclaration*,
+                    bool (*isInlineElementToRemove)(const Element*),
+                    EditAction);
 
   virtual void doApply();
   virtual EditAction editingAction() const;
@@ -91,6 +104,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
   CSSMutableStyleDeclaration* style() const { return m_style.get(); }
 
   // style-removal helpers
+  bool isStyledInlineElementToRemove(Element*) const;
   bool removeStyleFromRunBeforeApplyingStyle(CSSMutableStyleDeclaration* style,
                                              Node*& runStart,
                                              Node*& runEnd);
@@ -179,6 +193,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
   bool m_useEndingSelection;
   RefPtr<Element> m_styledInlineElement;
   bool m_removeOnly;
+  IsInlineElementToRemoveFunction m_isInlineElementToRemoveFunction;
 };
 
 bool isStyleSpan(const Node*);

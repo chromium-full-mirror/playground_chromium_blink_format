@@ -596,7 +596,8 @@ ApplyStyleCommand::ApplyStyleCommand(Document* document,
       m_end(endingSelection().end().upstream()),
       m_useEndingSelection(true),
       m_styledInlineElement(0),
-      m_removeOnly(false) {}
+      m_removeOnly(false),
+      m_isInlineElementToRemoveFunction(0) {}
 
 ApplyStyleCommand::ApplyStyleCommand(Document* document,
                                      CSSStyleDeclaration* style,
@@ -612,7 +613,8 @@ ApplyStyleCommand::ApplyStyleCommand(Document* document,
       m_end(end),
       m_useEndingSelection(false),
       m_styledInlineElement(0),
-      m_removeOnly(false) {}
+      m_removeOnly(false),
+      m_isInlineElementToRemoveFunction(0) {}
 
 ApplyStyleCommand::ApplyStyleCommand(PassRefPtr<Element> element,
                                      bool removeOnly,
@@ -625,7 +627,24 @@ ApplyStyleCommand::ApplyStyleCommand(PassRefPtr<Element> element,
       m_end(endingSelection().end().upstream()),
       m_useEndingSelection(true),
       m_styledInlineElement(element),
-      m_removeOnly(removeOnly) {}
+      m_removeOnly(removeOnly),
+      m_isInlineElementToRemoveFunction(0) {}
+
+ApplyStyleCommand::ApplyStyleCommand(
+    Document* document,
+    CSSStyleDeclaration* style,
+    IsInlineElementToRemoveFunction isInlineElementToRemoveFunction,
+    EditAction editingAction)
+    : CompositeEditCommand(document),
+      m_style(style->makeMutable()),
+      m_editingAction(editingAction),
+      m_propertyLevel(PropertyDefault),
+      m_start(endingSelection().start().downstream()),
+      m_end(endingSelection().end().upstream()),
+      m_useEndingSelection(true),
+      m_styledInlineElement(0),
+      m_removeOnly(true),
+      m_isInlineElementToRemoveFunction(isInlineElementToRemoveFunction) {}
 
 void ApplyStyleCommand::updateStartEnd(const Position& newStart,
                                        const Position& newEnd) {
@@ -664,7 +683,8 @@ void ApplyStyleCommand::doApply() {
       // apply any remaining styles to the inline elements
       // NOTE: hopefully, this string comparison is the same as checking for a
       // non-null diff
-      if (blockStyle->length() < m_style->length() || m_styledInlineElement) {
+      if (blockStyle->length() < m_style->length() || m_styledInlineElement ||
+          m_isInlineElementToRemoveFunction) {
         RefPtr<CSSMutableStyleDeclaration> inlineStyle = m_style->copy();
         applyRelativeFontStyleChange(inlineStyle.get());
         blockStyle->diff(inlineStyle.get());
@@ -728,10 +748,12 @@ void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclaration* style) {
     if (styleChange.cssStyle().length() || m_removeOnly) {
       RefPtr<Node> block =
           enclosingBlock(paragraphStart.deepEquivalent().node());
-      RefPtr<Node> newBlock = moveParagraphContentsToNewBlockIfNecessary(
-          paragraphStart.deepEquivalent());
-      if (newBlock)
-        block = newBlock;
+      if (!m_removeOnly) {
+        RefPtr<Node> newBlock = moveParagraphContentsToNewBlockIfNecessary(
+            paragraphStart.deepEquivalent());
+        if (newBlock)
+          block = newBlock;
+      }
       ASSERT(block->isHTMLElement());
       if (block->isHTMLElement()) {
         removeCSSStyle(style, static_cast<HTMLElement*>(block.get()));
@@ -1256,6 +1278,9 @@ void ApplyStyleCommand::applyInlineStyleToNodeRange(
     CSSMutableStyleDeclaration* style,
     Node* node,
     Node* pastEndNode) {
+  if (m_removeOnly)
+    return;
+
   for (Node* next; node && node != pastEndNode; node = next) {
     next = node->traverseNextNode();
 
@@ -1305,10 +1330,15 @@ void ApplyStyleCommand::applyInlineStyleToNodeRange(
 
     if (!removeStyleFromRunBeforeApplyingStyle(style, node, runEnd))
       continue;
-    addInlineStyleIfNeeded(style, node, runEnd, m_removeOnly
-                                                    ? DoNotAddStyledElement
-                                                    : AddStyledElement);
+    addInlineStyleIfNeeded(style, node, runEnd, AddStyledElement);
   }
+}
+
+bool ApplyStyleCommand::isStyledInlineElementToRemove(Element* element) const {
+  return (m_styledInlineElement &&
+          element->hasTagName(m_styledInlineElement->tagQName())) ||
+         (m_isInlineElementToRemoveFunction &&
+          m_isInlineElementToRemoveFunction(element));
 }
 
 bool ApplyStyleCommand::removeStyleFromRunBeforeApplyingStyle(
@@ -1322,6 +1352,8 @@ bool ApplyStyleCommand::removeStyleFromRunBeforeApplyingStyle(
        node = node->traverseNextNode()) {
     if (node->childNodeCount())
       continue;
+    // We don't consider m_isInlineElementToRemoveFunction here because we never
+    // apply style when m_isInlineElementToRemoveFunction is specified
     if (getPropertiesNotIn(style, computedStyle(node).get())->length() ||
         (m_styledInlineElement &&
          !enclosingNodeWithTag(positionBeforeNode(node),
@@ -1370,8 +1402,7 @@ bool ApplyStyleCommand::removeInlineStyleFromElement(
   if (!element->parentNode() || !element->parentNode()->isContentEditable())
     return false;
 
-  if (m_styledInlineElement &&
-      element->hasTagName(m_styledInlineElement->tagQName())) {
+  if (isStyledInlineElementToRemove(element)) {
     if (mode == RemoveNone)
       return true;
     ASSERT(extractedStyle);
@@ -1724,6 +1755,11 @@ void ApplyStyleCommand::pushDownInlineStyleAroundNode(
   // The outer loop is traversing the tree vertically from highestAncestor to
   // targetNode
   Node* current = highestAncestor;
+  // Along the way, styled elements that contain targetNode are removed and
+  // accumulated into elementsToPushDown.
+  // Each child of the removed element, exclusing ancestors of targetNode, is
+  // then wrapped by clones of elements in elementsToPushDown.
+  Vector<RefPtr<Element>> elementsToPushDown;
   while (current != targetNode) {
     ASSERT(current);
     ASSERT(current->isHTMLElement());
@@ -1731,9 +1767,11 @@ void ApplyStyleCommand::pushDownInlineStyleAroundNode(
     Node* child = current->firstChild();
     Node* lastChild = current->lastChild();
     RefPtr<StyledElement> styledElement;
-    if (current->isStyledElement() && m_styledInlineElement &&
-        current->hasTagName(m_styledInlineElement->tagQName()))
+    if (current->isStyledElement() &&
+        isStyledInlineElementToRemove(static_cast<Element*>(current))) {
       styledElement = static_cast<StyledElement*>(current);
+      elementsToPushDown.append(styledElement);
+    }
     RefPtr<CSSMutableStyleDeclaration> styleToPushDown =
         CSSMutableStyleDeclaration::create();
     removeInlineStyleFromElement(style, static_cast<HTMLElement*>(current),
@@ -1745,20 +1783,15 @@ void ApplyStyleCommand::pushDownInlineStyleAroundNode(
     while (child) {
       Node* nextChild = child->nextSibling();
 
-      if (child != targetNode && styledElement) {
-        // If child has children, wrap children of child by a clone of the
-        // styled element to avoid infinite loop.
-        // Otherwise, wrap the child by the styled element, and we won't fall
-        // into an infinite loop.
-        RefPtr<Element> wrapper = styledElement->cloneElementWithoutChildren();
-        ExceptionCode ec = 0;
-        wrapper->removeAttribute(styleAttr, ec);
-        ASSERT(!ec);
-        if (child->firstChild())
-          surroundNodeRangeWithElement(child->firstChild(), child->lastChild(),
-                                       wrapper);
-        else
+      if (!child->contains(targetNode) && elementsToPushDown.size()) {
+        for (size_t i = 0; i < elementsToPushDown.size(); i++) {
+          RefPtr<Element> wrapper =
+              elementsToPushDown[i]->cloneElementWithoutChildren();
+          ExceptionCode ec = 0;
+          wrapper->removeAttribute(styleAttr, ec);
+          ASSERT(!ec);
           surroundNodeRangeWithElement(child, child, wrapper);
+        }
       }
 
       // Apply text decoration to all nodes containing targetNode and their
@@ -1836,8 +1869,7 @@ void ApplyStyleCommand::removeInlineStyle(
       RefPtr<Node> next = elem->traverseNextNode();
       RefPtr<CSSMutableStyleDeclaration> styleToPushDown;
       PassRefPtr<Node> childNode = 0;
-      if (m_styledInlineElement &&
-          elem->hasTagName(m_styledInlineElement->tagQName())) {
+      if (isStyledInlineElementToRemove(elem.get())) {
         styleToPushDown = CSSMutableStyleDeclaration::create();
         childNode = elem->firstChild();
       }
