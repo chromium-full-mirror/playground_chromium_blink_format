@@ -3267,6 +3267,7 @@ void Editor::handleRejectedCorrection() {
   replacedRange->startContainer()->document()->markers()->addMarker(
       replacedRange, DocumentMarker::RejectedCorrection,
       m_stringToBeReplacedByCorrection);
+  m_rangeToBeReplacedByCorrection.clear();
 }
 
 void Editor::startCorrectionPanelTimer() {
