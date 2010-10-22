@@ -44,6 +44,8 @@ class VisitedLinkProvider : Noncopyable {
   void populateVisitedLinksIfNeeded();
   void addVisitedLink(WebCore::LinkHash);
 
+  void stopVisitedLinksTimer();
+
  private:
   void pendingVisitedLinksTimerFired();
 

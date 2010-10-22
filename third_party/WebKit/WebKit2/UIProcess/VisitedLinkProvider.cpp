@@ -62,6 +62,10 @@ void VisitedLinkProvider::addVisitedLink(LinkHash linkHash) {
     m_pendingVisitedLinksTimer.startOneShot(0);
 }
 
+void VisitedLinkProvider::stopVisitedLinksTimer() {
+  m_pendingVisitedLinksTimer.stop();
+}
+
 static unsigned nextPowerOf2(unsigned v) {
   // Taken from http://www.cs.utk.edu/~vose/c-stuff/bithacks.html
   // Devised by Sean Anderson, Sepember 14, 2001

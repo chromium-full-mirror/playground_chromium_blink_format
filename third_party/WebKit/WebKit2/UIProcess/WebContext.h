@@ -68,6 +68,7 @@ class WebContext : public APIObject {
   WebProcessProxy* process() const { return m_process.get(); }
 
   void processDidFinishLaunching(WebProcessProxy*);
+  void processDidClose(WebProcessProxy*);
 
   WebPageProxy* createWebPage(WebPageNamespace*);
 

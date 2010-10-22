@@ -203,6 +203,16 @@ void WebContext::processDidFinishLaunching(WebProcessProxy* process) {
   m_visitedLinkProvider.populateVisitedLinksIfNeeded();
 }
 
+void WebContext::processDidClose(WebProcessProxy* process) {
+  // FIXME: Once we support multiple processes per context, this assertion won't
+  // hold.
+  ASSERT(process == m_process);
+
+  m_visitedLinkProvider.stopVisitedLinksTimer();
+
+  m_process = 0;
+}
+
 WebPageProxy* WebContext::createWebPage(WebPageNamespace* pageNamespace) {
   ensureWebProcess();
   return m_process->createWebPage(pageNamespace);
