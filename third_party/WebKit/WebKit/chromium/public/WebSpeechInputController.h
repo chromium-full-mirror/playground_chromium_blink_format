@@ -35,7 +35,6 @@
 
 namespace WebKit {
 
-class WebString;
 struct WebRect;
 
 // Provides an embedder API called by WebKit.
@@ -46,9 +45,7 @@ class WebSpeechInputController {
   // runs to the limit or stopRecording is called. Progress indications and the
   // recognized
   // text are returned via the listener interface.
-  virtual bool startRecognition(int requestId,
-                                const WebString& language,
-                                const WebRect& elementRect) {
+  virtual bool startRecognition(int requestId, const WebRect&) {
     WEBKIT_ASSERT_NOT_REACHED();
     return false;
   }
