@@ -36,7 +36,11 @@ BrowserView::BrowserView() : m_webView(0) {}
 
 // UI Client Callbacks
 
-static WKPageRef createNewPage(WKPageRef page, const void* clientInfo) {
+static WKPageRef createNewPage(WKPageRef page,
+                               WKDictionaryRef features,
+                               WKEventModifiers modifiers,
+                               WKEventMouseButton mouseButton,
+                               const void* clientInfo) {
   BrowserWindow* browserWindow = BrowserWindow::create();
   browserWindow->createWindow(0, 0, 800, 600);
 
