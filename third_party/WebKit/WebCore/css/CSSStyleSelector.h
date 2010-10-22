@@ -24,6 +24,7 @@
 #define CSSStyleSelector_h
 
 #include "CSSFontSelector.h"
+#include "CSSRule.h"
 #include "LinkHash.h"
 #include "MediaQueryExp.h"
 #include "RenderStyle.h"
@@ -141,14 +142,17 @@ class CSSStyleSelector : public Noncopyable {
  public:
   // These methods will give back the set of rules that matched for a given
   // element (or a pseudo-element).
-  PassRefPtr<CSSRuleList> styleRulesForElement(Element*,
-                                               bool authorOnly,
-                                               bool includeEmptyRules = false);
+  PassRefPtr<CSSRuleList> styleRulesForElement(
+      Element*,
+      bool authorOnly,
+      bool includeEmptyRules = false,
+      CSSRuleFilter filter = AllCSSRules);
   PassRefPtr<CSSRuleList> pseudoStyleRulesForElement(
       Element*,
       PseudoId,
       bool authorOnly,
-      bool includeEmptyRules = false);
+      bool includeEmptyRules = false,
+      CSSRuleFilter filter = AllCSSRules);
 
   // Given a CSS keyword in the range (xx-small to -webkit-xxx-large), this
   // function will return
@@ -312,6 +316,7 @@ class CSSStyleSelector : public Noncopyable {
     Document* m_document;
     bool m_strictParsing;
     bool m_collectRulesOnly;
+    bool m_sameOriginOnly;
     PseudoId m_pseudoStyle;
     bool m_documentIsHTML;
     mutable bool m_matchVisitedPseudoClass;

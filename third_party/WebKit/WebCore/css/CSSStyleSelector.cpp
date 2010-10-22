@@ -776,6 +776,9 @@ void CSSStyleSelector::matchRulesForList(CSSRuleDataList* rules,
 
   for (CSSRuleData* d = rules->first(); d; d = d->next()) {
     CSSStyleRule* rule = d->rule();
+    if (m_checker.m_sameOriginOnly &&
+        !m_checker.m_document->securityOrigin()->canRequest(rule->baseURL()))
+      continue;
     if (checkSelector(d->selector())) {
       // If the rule has no properties to apply, then ignore it in the non-debug
       // mode.
@@ -959,6 +962,7 @@ CSSStyleSelector::SelectorChecker::SelectorChecker(Document* document,
     : m_document(document),
       m_strictParsing(strictParsing),
       m_collectRulesOnly(false),
+      m_sameOriginOnly(false),
       m_pseudoStyle(NOPSEUDO),
       m_documentIsHTML(document->isHTMLDocument()),
       m_matchVisitedPseudoClass(false) {}
@@ -2072,15 +2076,18 @@ void CSSStyleSelector::cacheBorderAndBackground() {
 PassRefPtr<CSSRuleList> CSSStyleSelector::styleRulesForElement(
     Element* e,
     bool authorOnly,
-    bool includeEmptyRules) {
-  return pseudoStyleRulesForElement(e, NOPSEUDO, authorOnly, includeEmptyRules);
+    bool includeEmptyRules,
+    CSSRuleFilter filter) {
+  return pseudoStyleRulesForElement(e, NOPSEUDO, authorOnly, includeEmptyRules,
+                                    filter);
 }
 
 PassRefPtr<CSSRuleList> CSSStyleSelector::pseudoStyleRulesForElement(
     Element* e,
     PseudoId pseudoId,
     bool authorOnly,
-    bool includeEmptyRules) {
+    bool includeEmptyRules,
+    CSSRuleFilter filter) {
   if (!e || !e->document()->haveStylesheetsLoaded())
     return 0;
 
@@ -2103,10 +2110,14 @@ PassRefPtr<CSSRuleList> CSSStyleSelector::pseudoStyleRulesForElement(
   }
 
   if (m_matchAuthorAndUserStyles) {
+    m_checker.m_sameOriginOnly = (filter == SameOriginCSSRulesOnly);
+
     // Check the rules in author sheets.
     int firstAuthorRule = -1, lastAuthorRule = -1;
     matchRules(m_authorStyle.get(), firstAuthorRule, lastAuthorRule,
                includeEmptyRules);
+
+    m_checker.m_sameOriginOnly = false;
   }
 
   m_checker.m_collectRulesOnly = false;
