@@ -232,6 +232,9 @@ class InlineBox {
   void setY(int y) { m_y = y; }
   int y() const { return m_y; }
 
+  int width() const { return m_isVertical ? logicalHeight() : logicalWidth(); }
+  int height() const { return m_isVertical ? logicalWidth() : logicalHeight(); }
+
   // The logicalLeft position is the left edge of the line box in a horizontal
   // line and the top edge in a vertical line.
   int logicalLeft() const { return !m_isVertical ? m_x : m_y; }

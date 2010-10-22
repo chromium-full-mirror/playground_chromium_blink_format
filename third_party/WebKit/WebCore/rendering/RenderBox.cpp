@@ -3564,35 +3564,20 @@ int RenderBox::baselinePosition(bool /*firstLine*/,
 }
 
 void RenderBox::blockDirectionOverflow(bool isLineVertical,
-                                       bool isFlippedLine,
                                        int& logicalTopLayoutOverflow,
                                        int& logicalBottomLayoutOverflow,
                                        int& logicalTopVisualOverflow,
                                        int& logicalBottomVisualOverflow) {
   if (isLineVertical) {
-    if (isFlippedLine) {
-      logicalTopLayoutOverflow = leftLayoutOverflow();
-      logicalBottomLayoutOverflow = rightLayoutOverflow();
-      logicalTopVisualOverflow = leftVisualOverflow();
-      logicalBottomVisualOverflow = rightVisualOverflow();
-    } else {
-      logicalTopLayoutOverflow = rightLayoutOverflow();
-      logicalBottomLayoutOverflow = leftLayoutOverflow();
-      logicalTopVisualOverflow = rightVisualOverflow();
-      logicalBottomVisualOverflow = leftVisualOverflow();
-    }
+    logicalTopLayoutOverflow = leftLayoutOverflow();
+    logicalBottomLayoutOverflow = rightLayoutOverflow();
+    logicalTopVisualOverflow = leftVisualOverflow();
+    logicalBottomVisualOverflow = rightVisualOverflow();
   } else {
-    if (isFlippedLine) {
-      logicalTopLayoutOverflow = bottomLayoutOverflow();
-      logicalBottomLayoutOverflow = topLayoutOverflow();
-      logicalTopVisualOverflow = bottomVisualOverflow();
-      logicalBottomVisualOverflow = topVisualOverflow();
-    } else {
-      logicalTopLayoutOverflow = topLayoutOverflow();
-      logicalBottomLayoutOverflow = bottomLayoutOverflow();
-      logicalTopVisualOverflow = topVisualOverflow();
-      logicalBottomVisualOverflow = bottomVisualOverflow();
-    }
+    logicalTopLayoutOverflow = topLayoutOverflow();
+    logicalBottomLayoutOverflow = bottomLayoutOverflow();
+    logicalTopVisualOverflow = topVisualOverflow();
+    logicalBottomVisualOverflow = bottomVisualOverflow();
   }
 }
 

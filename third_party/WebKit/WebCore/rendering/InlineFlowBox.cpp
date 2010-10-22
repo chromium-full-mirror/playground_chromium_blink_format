@@ -317,9 +317,11 @@ int InlineFlowBox::placeBoxesInInlineDirection(
           ->getTextShadowInlineDirectionExtent(textShadowLogicalLeft,
                                                textShadowLogicalRight);
       childOverflowLogicalLeft =
-          min(childOverflowLogicalLeft, textShadowLogicalLeft);
+          min(childOverflowLogicalLeft,
+              textShadowLogicalLeft + logicalLeftGlyphOverflow);
       childOverflowLogicalRight =
-          max(childOverflowLogicalRight, textShadowLogicalRight);
+          max(childOverflowLogicalRight,
+              textShadowLogicalRight + logicalRightGlyphOverflow);
       logicalLeftVisualOverflow = min(logicalLeft + childOverflowLogicalLeft,
                                       logicalLeftVisualOverflow);
       logicalRightVisualOverflow =
@@ -726,8 +728,10 @@ void InlineFlowBox::computeBlockDirectionOverflow(
           ->style(m_firstLine)
           ->getTextShadowBlockDirectionExtent(textShadowTop, textShadowBottom);
 
-      int childOverflowTop = min(textShadowTop, topGlyphOverflow);
-      int childOverflowBottom = max(textShadowBottom, bottomGlyphOverflow);
+      int childOverflowTop =
+          min(textShadowTop + topGlyphOverflow, topGlyphOverflow);
+      int childOverflowBottom =
+          max(textShadowBottom + bottomGlyphOverflow, bottomGlyphOverflow);
 
       topVisualOverflow =
           min(curr->logicalTop() + childOverflowTop, topVisualOverflow);
@@ -738,12 +742,14 @@ void InlineFlowBox::computeBlockDirectionOverflow(
       InlineFlowBox* flow = static_cast<InlineFlowBox*>(curr);
       flow->computeBlockDirectionOverflow(lineTop, lineBottom, strictMode,
                                           textBoxDataMap);
-      topLayoutOverflow = min(topLayoutOverflow, flow->topLayoutOverflow());
+      topLayoutOverflow =
+          min(topLayoutOverflow, flow->logicalTopLayoutOverflow());
       bottomLayoutOverflow =
-          max(bottomLayoutOverflow, flow->bottomLayoutOverflow());
-      topVisualOverflow = min(topVisualOverflow, flow->topVisualOverflow());
+          max(bottomLayoutOverflow, flow->logicalBottomLayoutOverflow());
+      topVisualOverflow =
+          min(topVisualOverflow, flow->logicalTopVisualOverflow());
       bottomVisualOverflow =
-          max(bottomVisualOverflow, flow->bottomVisualOverflow());
+          max(bottomVisualOverflow, flow->logicalBottomVisualOverflow());
     } else if (!curr->boxModelObject()->hasSelfPaintingLayer()) {
       // Only include overflow from replaced inlines if they do not paint
       // themselves.
@@ -755,9 +761,13 @@ void InlineFlowBox::computeBlockDirectionOverflow(
 
       RenderBox* box = toRenderBox(curr->renderer());
       box->blockDirectionOverflow(
-          isVertical(), isFlippedLine, childTopLayoutOverflow,
-          childBottomLayoutOverflow, childTopVisualOverflow,
-          childBottomVisualOverflow);
+          isVertical(), childTopLayoutOverflow, childBottomLayoutOverflow,
+          childTopVisualOverflow, childBottomVisualOverflow);
+
+      if (box->hasOverflowClip()) {
+        childTopLayoutOverflow = 0;
+        childBottomLayoutOverflow = curr->logicalHeight();
+      }
 
       topLayoutOverflow =
           min(boxLogicalTop + childTopLayoutOverflow, topLayoutOverflow);
@@ -796,7 +806,7 @@ bool InlineFlowBox::nodeAtPoint(const HitTestRequest& request,
   }
 
   // Now check ourselves.
-  IntRect rect(tx + m_x, ty + m_y, m_logicalWidth, logicalHeight());
+  IntRect rect(tx + m_x, ty + m_y, width(), height());
   if (visibleToHitTesting() && rect.intersects(result.rectForPoint(x, y))) {
     renderer()->updateHitTestResult(
         result, IntPoint(x - tx, y - ty));  // Don't add in m_x or m_y here, we

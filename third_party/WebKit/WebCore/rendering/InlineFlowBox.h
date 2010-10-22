@@ -236,6 +236,13 @@ class InlineFlowBox : public InlineBox {
   void checkConsistency() const;
   void setHasBadChildList();
 
+  // Line visual and layout overflow are in the coordinate space of the block.
+  // This means that - unlike other unprefixed uses of the words
+  // top/right/bottom/left in the code - these aren't purely physical
+  // directions.  For horizontal-tb and vertical-lr they will match physical
+  // directions, but for horizontal-bt and vertical-rl, the top/bottom and
+  // left/right respectively are inverted when compared to
+  // their physical counterparts.
   int topVisibleOverflow() const {
     return std::min(topLayoutOverflow(), topVisualOverflow());
   }
@@ -248,9 +255,17 @@ class InlineFlowBox : public InlineBox {
   int rightVisibleOverflow() const {
     return std::max(rightLayoutOverflow(), rightVisualOverflow());
   }
+  int logicalTopVisibleOverflow() const {
+    return std::min(logicalTopLayoutOverflow(), logicalTopVisualOverflow());
+  }
+  int logicalBottomVisibleOverflow() const {
+    return std::max(logicalBottomLayoutOverflow(),
+                    logicalBottomVisualOverflow());
+  }
+
   IntRect visibleOverflowRect() const {
     return m_overflow ? m_overflow->visibleOverflowRect()
-                      : IntRect(m_x, m_y, m_logicalWidth, logicalHeight());
+                      : IntRect(m_x, m_y, width(), height());
   }
 
   int topLayoutOverflow() const {
@@ -269,7 +284,7 @@ class InlineFlowBox : public InlineBox {
   }
   IntRect layoutOverflowRect() const {
     return m_overflow ? m_overflow->layoutOverflowRect()
-                      : IntRect(m_x, m_y, m_logicalWidth, logicalHeight());
+                      : IntRect(m_x, m_y, width(), height());
   }
   int logicalLeftLayoutOverflow() const {
     return renderer()->style()->isHorizontalWritingMode() ? leftLayoutOverflow()
@@ -279,6 +294,16 @@ class InlineFlowBox : public InlineBox {
     return renderer()->style()->isHorizontalWritingMode()
                ? rightLayoutOverflow()
                : bottomLayoutOverflow();
+  }
+  int logicalTopLayoutOverflow() const {
+    return renderer()->style()->isHorizontalWritingMode()
+               ? topVisualOverflow()
+               : leftVisualOverflow();
+  }
+  int logicalBottomLayoutOverflow() const {
+    return renderer()->style()->isHorizontalWritingMode()
+               ? bottomLayoutOverflow()
+               : rightLayoutOverflow();
   }
 
   int topVisualOverflow() const {
@@ -297,7 +322,7 @@ class InlineFlowBox : public InlineBox {
   }
   IntRect visualOverflowRect() const {
     return m_overflow ? m_overflow->visualOverflowRect()
-                      : IntRect(m_x, m_y, m_logicalWidth, logicalHeight());
+                      : IntRect(m_x, m_y, width(), height());
   }
   int logicalLeftVisualOverflow() const {
     return renderer()->style()->isHorizontalWritingMode() ? leftVisualOverflow()
@@ -307,6 +332,16 @@ class InlineFlowBox : public InlineBox {
     return renderer()->style()->isHorizontalWritingMode()
                ? rightVisualOverflow()
                : bottomVisualOverflow();
+  }
+  int logicalTopVisualOverflow() const {
+    return renderer()->style()->isHorizontalWritingMode()
+               ? topVisualOverflow()
+               : leftVisualOverflow();
+  }
+  int logicalBottomVisualOverflow() const {
+    return renderer()->style()->isHorizontalWritingMode()
+               ? bottomVisualOverflow()
+               : rightVisualOverflow();
   }
 
   void setInlineDirectionOverflowPositions(int logicalLeftLayoutOverflow,

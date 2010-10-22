@@ -221,7 +221,6 @@ class RenderBox : public RenderBoxModelObject {
   void clearLayoutOverflow();
 
   void blockDirectionOverflow(bool isLineVertical,
-                              bool isFlippedLine,
                               int& logicalTopLayoutOverflow,
                               int& logicalBottomLayoutOverflow,
                               int& logicalTopVisualOverflow,

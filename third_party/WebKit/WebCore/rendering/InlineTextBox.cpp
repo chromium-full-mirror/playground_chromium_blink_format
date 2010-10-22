@@ -327,7 +327,7 @@ bool InlineTextBox::nodeAtPoint(const HitTestRequest&,
   if (isLineBreak())
     return false;
 
-  IntRect rect(tx + m_x, ty + m_y, m_logicalWidth, logicalHeight());
+  IntRect rect(tx + m_x, ty + m_y, width(), height());
   if (m_truncation != cFullTruncation && visibleToHitTesting() &&
       rect.intersects(result.rectForPoint(x, y))) {
     renderer()->updateHitTestResult(result, IntPoint(x - tx, y - ty));
