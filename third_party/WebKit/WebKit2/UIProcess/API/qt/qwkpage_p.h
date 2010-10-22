@@ -49,7 +49,7 @@ class QWKPagePrivate : WebKit::PageClient {
   void pageDidEnterAcceleratedCompositing() {}
   void pageDidLeaveAcceleratedCompositing() {}
 #endif  // USE(ACCELERATED_COMPOSITING)
-  virtual void processDidExit() {}
+  virtual void processDidCrash() {}
   virtual void processDidRevive() {}
   virtual void setCursor(const WebCore::Cursor&);
   virtual void setViewportArguments(const WebCore::ViewportArguments&);

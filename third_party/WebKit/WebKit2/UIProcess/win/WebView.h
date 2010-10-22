@@ -115,7 +115,7 @@ class WebView : public APIObject,
   void updateNativeCursor();
 
   // PageClient
-  virtual void processDidExit();
+  virtual void processDidCrash();
   virtual void processDidRevive();
   virtual void takeFocus(bool direction);
   virtual void toolTipChanged(const WTF::String&, const WTF::String&);

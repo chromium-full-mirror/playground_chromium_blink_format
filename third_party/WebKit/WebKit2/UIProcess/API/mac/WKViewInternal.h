@@ -30,7 +30,7 @@ class FindIndicator;
 }
 
 @interface WKView (Internal)
-- (void)_processDidExit;
+- (void)_processDidCrash;
 - (void)_processDidRevive;
 - (void)_takeFocus:(BOOL)direction;
 - (void)_toolTipChangedFrom:(NSString*)oldToolTip to:(NSString*)newToolTip;

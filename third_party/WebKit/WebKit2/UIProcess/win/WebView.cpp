@@ -585,7 +585,7 @@ void WebView::close() {
 
 // PageClient
 
-void WebView::processDidExit() {}
+void WebView::processDidCrash() {}
 
 void WebView::processDidRevive() {}
 
