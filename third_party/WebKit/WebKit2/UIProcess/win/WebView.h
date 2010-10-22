@@ -116,7 +116,7 @@ class WebView : public APIObject,
 
   // PageClient
   virtual void processDidCrash();
-  virtual void processDidRevive();
+  virtual void didRelaunchProcess();
   virtual void takeFocus(bool direction);
   virtual void toolTipChanged(const WTF::String&, const WTF::String&);
   virtual void setCursor(const WebCore::Cursor&);

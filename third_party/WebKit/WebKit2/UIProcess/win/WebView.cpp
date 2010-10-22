@@ -587,7 +587,7 @@ void WebView::close() {
 
 void WebView::processDidCrash() {}
 
-void WebView::processDidRevive() {}
+void WebView::didRelaunchProcess() {}
 
 void WebView::takeFocus(bool) {}
 
