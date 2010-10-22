@@ -32,10 +32,6 @@
 #include "SVGNames.h"
 #include <wtf/PassOwnPtr.h>
 
-#if ENABLE(SVG)
-#include "SVGNames.h"
-#endif
-
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -49,13 +45,19 @@ inline bool isNumberedHeaderElement(Element* element) {
 }
 
 inline bool isScopeMarker(Element* element) {
-  return element->hasTagName(appletTag) || element->hasTagName(captionTag)
-#if ENABLE(SVG_FOREIGN_OBJECT)
-         || element->hasTagName(SVGNames::foreignObjectTag)
-#endif
-         || element->hasTagName(htmlTag) || element->hasTagName(marqueeTag) ||
+  return element->hasTagName(appletTag) || element->hasTagName(captionTag) ||
+         element->hasTagName(htmlTag) || element->hasTagName(marqueeTag) ||
          element->hasTagName(objectTag) || element->hasTagName(tableTag) ||
-         element->hasTagName(tdTag) || element->hasTagName(thTag);
+         element->hasTagName(tdTag) || element->hasTagName(thTag) ||
+         element->hasTagName(MathMLNames::miTag) ||
+         element->hasTagName(MathMLNames::moTag) ||
+         element->hasTagName(MathMLNames::mnTag) ||
+         element->hasTagName(MathMLNames::msTag) ||
+         element->hasTagName(MathMLNames::mtextTag) ||
+         element->hasTagName(MathMLNames::annotation_xmlTag) ||
+         element->hasTagName(SVGNames::foreignObjectTag) ||
+         element->hasTagName(SVGNames::descTag) ||
+         element->hasTagName(SVGNames::titleTag);
 }
 
 inline bool isListItemScopeMarker(Element* element) {

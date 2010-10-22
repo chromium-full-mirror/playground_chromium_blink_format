@@ -180,8 +180,10 @@ class HTMLTreeBuilder : public Noncopyable {
   void defaultForAfterHead();
   void defaultForInTableText();
 
-  void processUsingSecondaryInsertionModeAndAdjustInsertionMode(
-      AtomicHTMLToken&);
+  void prepareToReprocessToken();
+
+  void reprocessStartTag(AtomicHTMLToken&);
+  void reprocessEndTag(AtomicHTMLToken&);
 
   PassRefPtr<NamedNodeMap> attributesForIsindexInput(AtomicHTMLToken&);
 
@@ -210,12 +212,10 @@ class HTMLTreeBuilder : public Noncopyable {
     m_isFakeInsertionMode = true;
   }
 
-  void setSecondaryInsertionMode(InsertionMode);
-
-  void setInsertionModeAndEnd(
-      InsertionMode,
-      bool foreign);  // Helper for resetInsertionModeAppropriately
   void resetInsertionModeAppropriately();
+
+  void processForeignContentUsingInBodyModeAndResetMode(AtomicHTMLToken& token);
+  void resetForeignInsertionMode();
 
   class FragmentParsingContext : public Noncopyable {
    public:
@@ -262,7 +262,6 @@ class HTMLTreeBuilder : public Noncopyable {
   // setInsertionMode and never set m_insertionMode directly.
   InsertionMode m_insertionMode;
   InsertionMode m_originalInsertionMode;
-  InsertionMode m_secondaryInsertionMode;
 
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#pending-table-character-tokens
   Vector<UChar> m_pendingTableCharacters;
@@ -282,6 +281,8 @@ class HTMLTreeBuilder : public Noncopyable {
   int m_lastScriptElementStartLine;
 
   bool m_usePreHTML5ParserQuirks;
+
+  bool m_hasPendingForeignInsertionModeSteps;
 };
 }
 
