@@ -29,48 +29,35 @@
  */
 
 #include "config.h"
-#include "ScriptCallStack.h"
+#include "ScriptCallFrame.h"
 
-#include "InspectorValues.h"
+#include <runtime/ArgList.h>
+#include <runtime/UString.h>
+
+using namespace JSC;
 
 namespace WebCore {
 
-ScriptCallStack::ScriptCallStack(Vector<ScriptCallFrame>& frames) {
-  m_frames.swap(frames);
+ScriptCallFrame::ScriptCallFrame(const UString& functionName,
+                                 const UString& urlString,
+                                 int lineNumber,
+                                 ExecState* exec,
+                                 unsigned skipArgumentCount)
+    : m_functionName(ustringToString(functionName)),
+      m_sourceURL(ustringToString(urlString)),
+      m_lineNumber(lineNumber) {
+  if (!exec)
+    return;
+  size_t argumentCount = exec->argumentCount();
+  for (size_t i = skipArgumentCount; i < argumentCount; ++i)
+    m_arguments.append(ScriptValue(exec->argument(i)));
 }
 
-ScriptCallStack::~ScriptCallStack() {}
+ScriptCallFrame::~ScriptCallFrame() {}
 
-const ScriptCallFrame& ScriptCallStack::at(size_t index) {
-  ASSERT(m_frames.size() > index);
-  return m_frames[index];
-}
-
-size_t ScriptCallStack::size() {
-  return m_frames.size();
-}
-
-bool ScriptCallStack::isEqual(ScriptCallStack* o) const {
-  if (!o)
-    return false;
-
-  size_t frameCount = o->m_frames.size();
-  if (frameCount != m_frames.size())
-    return false;
-
-  for (size_t i = 0; i < frameCount; ++i) {
-    if (!m_frames[i].isEqual(o->m_frames[i]))
-      return false;
-  }
-
-  return true;
-}
-
-PassRefPtr<InspectorArray> ScriptCallStack::buildInspectorObject() const {
-  RefPtr<InspectorArray> frames = InspectorArray::create();
-  for (size_t i = 0; i < m_frames.size(); i++)
-    frames->pushObject(m_frames.at(i).buildInspectorObject());
-  return frames;
+const ScriptValue& ScriptCallFrame::argumentAt(unsigned index) const {
+  ASSERT(m_arguments.size() > index);
+  return m_arguments[index];
 }
 
 }  // namespace WebCore

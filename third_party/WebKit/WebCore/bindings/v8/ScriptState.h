@@ -92,7 +92,7 @@ class ScriptStateProtectedPtr : public Noncopyable {
       m_context.Clear();
     }
   }
-  ScriptState* get() const { return m_scriptState; }
+  ScriptState* get() { return m_scriptState; }
 
  private:
   ScriptState* m_scriptState;

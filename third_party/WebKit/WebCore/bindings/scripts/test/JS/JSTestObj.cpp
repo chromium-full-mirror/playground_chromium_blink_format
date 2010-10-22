@@ -31,9 +31,7 @@
 #include "JSTestObj.h"
 #include "JSlog.h"
 #include "KURL.h"
-#include "ScriptArguments.h"
 #include "ScriptCallStack.h"
-#include "ScriptCallStackFactory.h"
 #include "SerializedScriptValue.h"
 #include "TestObj.h"
 #include <runtime/Error.h>
@@ -1359,17 +1357,12 @@ jsTestObjPrototypeFunctionCustomArgsAndException(ExecState* exec) {
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   ExceptionCode ec = 0;
-  OwnPtr<ScriptArguments> scriptArguments(createScriptArguments(exec, 1));
-  size_t maxStackSize = imp->shouldCaptureFullStackTrace()
-                            ? ScriptCallStack::maxCallStackSizeToCapture
-                            : 1;
-  OwnPtr<ScriptCallStack> callStack(createScriptCallStack(exec, maxStackSize));
+  ScriptCallStack callStack(exec, 1);
   log* intArg = tolog(exec->argument(0));
   if (exec->hadException())
     return JSValue::encode(jsUndefined());
 
-  imp->customArgsAndException(intArg, scriptArguments.release(),
-                              callStack.release(), ec);
+  imp->customArgsAndException(intArg, &callStack, ec);
   setDOMException(exec, ec);
   return JSValue::encode(jsUndefined());
 }

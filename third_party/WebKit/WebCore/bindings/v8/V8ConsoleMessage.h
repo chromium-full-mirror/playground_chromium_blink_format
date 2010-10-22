@@ -33,7 +33,6 @@
 
 #include "PlatformString.h"
 #include <v8.h>
-#include <wtf/PassOwnPtr.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -84,7 +83,7 @@ class V8ConsoleMessage {
   const String m_sourceID;
   const unsigned m_lineNumber;
 
-  void dispatchNow(Page*, PassOwnPtr<ScriptCallStack>);
+  void dispatchNow(Page*, ScriptCallStack*);
 
   // All delayed messages are stored in this vector. If the vector
   // is 0, there are no delayed messages.

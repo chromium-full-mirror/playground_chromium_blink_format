@@ -37,7 +37,6 @@
 #include "OwnPtr.h"
 #include "Page.h"
 #include "ScriptCallStack.h"
-#include "ScriptCallStackFactory.h"
 #include "V8Binding.h"
 #include "V8Proxy.h"
 
@@ -113,8 +112,8 @@ void V8ConsoleMessage::handler(v8::Handle<v8::Message> message,
   // Currently stack trace is only collected when inspector is open.
   if (!stackTrace.IsEmpty() && stackTrace->GetFrameCount() > 0) {
     v8::Local<v8::Context> context = v8::Context::GetEntered();
-    callStack = createScriptCallStack(
-        context, stackTrace, ScriptCallStack::maxCallStackSizeToCapture);
+    ScriptState* scriptState = ScriptState::forContext(context);
+    callStack = ScriptCallStack::create(scriptState, stackTrace);
   }
 
   v8::Handle<v8::Value> resourceName = message->GetScriptResourceName();
@@ -123,11 +122,10 @@ void V8ConsoleMessage::handler(v8::Handle<v8::Message> message,
       useURL ? frame->document()->url() : toWebCoreString(resourceName);
   V8ConsoleMessage consoleMessage(errorMessage, resourceNameString,
                                   message->GetLineNumber());
-  consoleMessage.dispatchNow(page, callStack.release());
+  consoleMessage.dispatchNow(page, callStack.get());
 }
 
-void V8ConsoleMessage::dispatchNow(Page* page,
-                                   PassOwnPtr<ScriptCallStack> callStack) {
+void V8ConsoleMessage::dispatchNow(Page* page, ScriptCallStack* callStack) {
   ASSERT(page);
 
   // Process any delayed messages to make sure that messages
