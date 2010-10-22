@@ -300,7 +300,7 @@ NEVER_INLINE void Interpreter::resolveBase(CallFrame* callFrame,
   Identifier ident = callFrame->codeBlock()->identifier(property);
   JSValue result =
       JSC::resolveBase(callFrame, ident, callFrame->scopeChain(), isStrictPut);
-  if (!result) {
+  if (result) {
     callFrame->r(dst) = result;
     ASSERT(callFrame->r(dst).jsValue());
   } else
