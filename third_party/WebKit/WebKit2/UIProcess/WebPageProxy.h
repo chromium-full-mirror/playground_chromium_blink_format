@@ -115,7 +115,7 @@ class WebPageProxy : public APIObject {
   void initializeFormClient(const WKPageFormClient*);
   void initializeUIClient(const WKPageUIClient*);
   void initializeFindClient(const WKPageFindClient*);
-  void revive();
+  void relaunch();
 
   void initializeWebPage(const WebCore::IntSize&);
   void reinitializeWebPage(const WebCore::IntSize&);
@@ -218,7 +218,6 @@ class WebPageProxy : public APIObject {
   void processDidBecomeUnresponsive();
   void processDidBecomeResponsive();
   void processDidCrash();
-  void processDidRevive();
 
 #if USE(ACCELERATED_COMPOSITING)
   void didEnterAcceleratedCompositing();

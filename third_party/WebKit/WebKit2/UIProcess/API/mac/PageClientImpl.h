@@ -49,7 +49,7 @@ class PageClientImpl : public PageClient {
   PageClientImpl(WKView*);
 
   virtual void processDidCrash();
-  virtual void processDidRevive();
+  virtual void didRelaunchProcess();
   virtual void takeFocus(bool direction);
   virtual void toolTipChanged(const String& oldToolTip,
                               const String& newToolTip);

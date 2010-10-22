@@ -72,7 +72,7 @@ class WebContext : public APIObject {
 
   WebPageProxy* createWebPage(WebPageNamespace*);
 
-  void reviveIfNecessary();
+  void relaunchProcessIfNecessary();
 
   WebPageNamespace* createPageNamespace();
   void pageNamespaceWasDestroyed(WebPageNamespace*);

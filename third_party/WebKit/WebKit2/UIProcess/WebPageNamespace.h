@@ -51,7 +51,6 @@ class WebPageNamespace : public APIObject {
 
   WebContext* context() const { return m_context.get(); }
   WebProcessProxy* process() const { return m_context->process(); }
-  void reviveIfNecessary() { m_context->reviveIfNecessary(); }
 
   void preferencesDidChange();
 
