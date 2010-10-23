@@ -29,13 +29,23 @@
 #include "config.h"
 #include "Language.h"
 
-#include "NotImplemented.h"
 #include "PlatformString.h"
+
+#include <locale.h>
 
 namespace WebCore {
 
 String platformDefaultLanguage() {
-  notImplemented();
-  return String();
+  char* localeDefault = setlocale(LC_CTYPE, 0);
+
+  if (!localeDefault)
+    return String("c");
+
+  char* ptr = strchr(localeDefault, '_');
+
+  if (ptr)
+    *ptr = '-';
+
+  return String(localeDefault);
 }
 }
