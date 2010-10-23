@@ -443,6 +443,7 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   WebCore::KURL url() const;
 
   WebView* webView() const;
+  void setWebView(WebView*);
 
   COMPtr<IAccessible> accessible() const;
 

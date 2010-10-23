@@ -2651,6 +2651,10 @@ WebView* WebFrame::webView() const {
   return d->webView;
 }
 
+void WebFrame::setWebView(WebView* webView) {
+  d->webView = webView;
+}
+
 COMPtr<IAccessible> WebFrame::accessible() const {
   Frame* coreFrame = core(this);
   ASSERT(coreFrame);

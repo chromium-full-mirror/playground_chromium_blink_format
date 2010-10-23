@@ -796,7 +796,13 @@ PassRefPtr<Frame> WebFrameLoaderClient::createFrame(
   return result.release();
 }
 
-void WebFrameLoaderClient::didTransferChildFrameToNewDocument(Page*) {}
+void WebFrameLoaderClient::didTransferChildFrameToNewDocument(Page*) {
+  Frame* coreFrame = core(m_webFrame);
+  ASSERT(coreFrame);
+  WebView* webView = kit(coreFrame->page());
+  if (m_webFrame->webView() != webView)
+    m_webFrame->setWebView(webView);
+}
 
 PassRefPtr<Frame> WebFrameLoaderClient::createFrame(
     const KURL& URL,
