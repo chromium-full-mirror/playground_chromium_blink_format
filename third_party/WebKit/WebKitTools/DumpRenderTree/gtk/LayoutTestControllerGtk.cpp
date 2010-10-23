@@ -301,10 +301,8 @@ void LayoutTestController::setAlwaysAcceptCookies(bool alwaysAcceptCookies) {
 #endif
 }
 
-void LayoutTestController::setCustomPolicyDelegate(
-    bool setDelegate,
-    bool permissive,
-    bool callIgnoreInDecidePolicyForMIMETypeAfterOneSecond) {
+void LayoutTestController::setCustomPolicyDelegate(bool setDelegate,
+                                                   bool permissive) {
   // FIXME: implement
 }
 
