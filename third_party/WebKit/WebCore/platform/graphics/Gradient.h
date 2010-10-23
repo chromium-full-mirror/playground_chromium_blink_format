@@ -90,6 +90,7 @@ class Gradient : public Generator {
   void addColorStop(float, const Color&);
 
   void getColor(float value, float* r, float* g, float* b, float* a) const;
+  bool hasAlpha() const;
 
   bool isRadial() const { return m_radial; }
   bool isZeroSize() const {
