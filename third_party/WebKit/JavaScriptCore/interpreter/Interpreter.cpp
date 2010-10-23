@@ -503,7 +503,7 @@ void Interpreter::dumpRegisters(CallFrame* callFrame) {
   CodeBlock* codeBlock = callFrame->codeBlock();
   RegisterFile* registerFile = &callFrame->scopeChain()
                                     ->globalObject->globalData()
-                                    ->interpreter->registerFile();
+                                    .interpreter->registerFile();
   const Register* it;
   const Register* end;
   JSValue v;

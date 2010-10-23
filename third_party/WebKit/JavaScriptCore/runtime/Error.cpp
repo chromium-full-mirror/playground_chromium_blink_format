@@ -44,7 +44,7 @@ static const char* expressionEndOffsetPropertyName = "expressionEndOffset";
 
 JSObject* createError(JSGlobalObject* globalObject, const UString& message) {
   ASSERT(!message.isEmpty());
-  return ErrorInstance::create(globalObject->globalData(),
+  return ErrorInstance::create(&globalObject->globalData(),
                                globalObject->errorStructure(), message);
 }
 
@@ -52,7 +52,7 @@ JSObject* createEvalError(JSGlobalObject* globalObject,
                           const UString& message) {
   ASSERT(!message.isEmpty());
   return ErrorInstance::create(
-      globalObject->globalData(),
+      &globalObject->globalData(),
       globalObject->evalErrorConstructor()->errorStructure(), message);
 }
 
@@ -60,7 +60,7 @@ JSObject* createRangeError(JSGlobalObject* globalObject,
                            const UString& message) {
   ASSERT(!message.isEmpty());
   return ErrorInstance::create(
-      globalObject->globalData(),
+      &globalObject->globalData(),
       globalObject->rangeErrorConstructor()->errorStructure(), message);
 }
 
@@ -68,7 +68,7 @@ JSObject* createReferenceError(JSGlobalObject* globalObject,
                                const UString& message) {
   ASSERT(!message.isEmpty());
   return ErrorInstance::create(
-      globalObject->globalData(),
+      &globalObject->globalData(),
       globalObject->referenceErrorConstructor()->errorStructure(), message);
 }
 
@@ -76,7 +76,7 @@ JSObject* createSyntaxError(JSGlobalObject* globalObject,
                             const UString& message) {
   ASSERT(!message.isEmpty());
   return ErrorInstance::create(
-      globalObject->globalData(),
+      &globalObject->globalData(),
       globalObject->syntaxErrorConstructor()->errorStructure(), message);
 }
 
@@ -84,14 +84,14 @@ JSObject* createTypeError(JSGlobalObject* globalObject,
                           const UString& message) {
   ASSERT(!message.isEmpty());
   return ErrorInstance::create(
-      globalObject->globalData(),
+      &globalObject->globalData(),
       globalObject->typeErrorConstructor()->errorStructure(), message);
 }
 
 JSObject* createURIError(JSGlobalObject* globalObject, const UString& message) {
   ASSERT(!message.isEmpty());
   return ErrorInstance::create(
-      globalObject->globalData(),
+      &globalObject->globalData(),
       globalObject->URIErrorConstructor()->errorStructure(), message);
 }
 

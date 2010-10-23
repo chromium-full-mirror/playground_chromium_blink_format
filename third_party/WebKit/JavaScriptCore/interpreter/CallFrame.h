@@ -62,9 +62,6 @@ class ExecState : private Register {
   // the actual DOM window, which can't be "this" for security reasons.
   JSObject* globalThisValue() const { return scopeChain()->globalThis; }
 
-  // FIXME: Elsewhere, we use JSGlobalData* rather than JSGlobalData&.
-  // We should make this more uniform and either use a reference everywhere
-  // or a pointer everywhere.
   JSGlobalData& globalData() const {
     ASSERT(scopeChain()->globalData);
     return *scopeChain()->globalData;

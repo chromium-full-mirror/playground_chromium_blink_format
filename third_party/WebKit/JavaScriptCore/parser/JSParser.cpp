@@ -550,8 +550,8 @@ int jsParse(JSGlobalObject* lexicalGlobalObject,
             JSParserStrictness strictness,
             JSParserMode parserMode,
             const SourceCode* source) {
-  JSParser parser(lexicalGlobalObject->globalData()->lexer,
-                  lexicalGlobalObject->globalData(), parameters,
+  JSParser parser(lexicalGlobalObject->globalData().lexer,
+                  &lexicalGlobalObject->globalData(), parameters,
                   strictness == JSParseStrict,
                   parserMode == JSParseFunctionCode, source->provider());
   return parser.parseProgram(lexicalGlobalObject);

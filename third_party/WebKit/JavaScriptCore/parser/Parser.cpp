@@ -49,7 +49,7 @@ void Parser::parse(JSGlobalObject* lexicalGlobalObject,
   *errLine = -1;
   *errMsg = UString();
 
-  Lexer& lexer = *lexicalGlobalObject->globalData()->lexer;
+  Lexer& lexer = *lexicalGlobalObject->globalData().lexer;
   lexer.setCode(*m_source, m_arena);
 
   int parseError =

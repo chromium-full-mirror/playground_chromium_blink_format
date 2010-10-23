@@ -109,7 +109,7 @@ JSValue evaluateInGlobalCallFrame(const UString& script,
   if (error)
     return error;
 
-  return globalObject->globalData()->interpreter->execute(
+  return globalObject->globalData().interpreter->execute(
       eval.get(), globalCallFrame, globalObject, globalCallFrame->scopeChain(),
       &exception);
 }

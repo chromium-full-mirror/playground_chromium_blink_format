@@ -110,7 +110,7 @@ JSObject* constructFunction(ExecState* exec,
   }
 
   JSGlobalObject* globalObject = exec->lexicalGlobalObject();
-  JSGlobalData* globalData = globalObject->globalData();
+  JSGlobalData& globalData = globalObject->globalData();
   SourceCode source = makeSource(program, sourceURL, lineNumber);
   JSObject* exception = 0;
   RefPtr<FunctionExecutable> function = FunctionExecutable::fromGlobalCode(
@@ -121,7 +121,7 @@ JSObject* constructFunction(ExecState* exec,
     return throwError(exec, exception);
   }
 
-  ScopeChain scopeChain(globalObject, globalData, globalObject,
+  ScopeChain scopeChain(globalObject, &globalData, globalObject,
                         exec->globalThisValue());
   return new (exec) JSFunction(exec, function, scopeChain.node());
 }

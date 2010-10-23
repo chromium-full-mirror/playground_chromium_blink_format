@@ -328,7 +328,7 @@ class JSGlobalObject : public JSVariableObject {
 
   void resetPrototype(JSValue prototype);
 
-  JSGlobalData* globalData() { return d()->globalData.get(); }
+  JSGlobalData& globalData() { return *d()->globalData.get(); }
   JSGlobalObjectData* d() const {
     return static_cast<JSGlobalObjectData*>(JSVariableObject::d);
   }
