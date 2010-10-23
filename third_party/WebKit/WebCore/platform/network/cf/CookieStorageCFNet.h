@@ -32,6 +32,7 @@ namespace WebCore {
 
 CFHTTPCookieStorageRef currentCookieStorage();
 
+// Needed for WebKit1 API only.
 void setCurrentCookieStorage(CFHTTPCookieStorageRef cookieStorage);
 }
 

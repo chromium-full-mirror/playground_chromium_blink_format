@@ -33,6 +33,7 @@
 
 #include "config.h"
 
+#include "CookieStorage.h"
 #include "KURL.h"
 #include "NotImplemented.h"
 #include "PlatformString.h"
@@ -70,6 +71,10 @@ void callOnMainThread(void (*)()) {
 String KURL::fileSystemPath() const {
   notImplemented();
   return String();
+}
+
+void setCookieStoragePrivateBrowsingEnabled(bool) {
+  notImplemented();
 }
 
 }  // namespace WebCore

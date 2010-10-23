@@ -30,6 +30,7 @@
 
 #include "config.h"
 
+#include "CookieStorage.h"
 #include "KURL.h"
 #include "NotImplemented.h"
 #include "SharedBuffer.h"
@@ -44,6 +45,10 @@ String KURL::fileSystemPath() const {
 PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(const String&) {
   notImplemented();
   return 0;
+}
+
+void setCookieStoragePrivateBrowsingEnabled(bool) {
+  notImplemented();
 }
 
 }  // namespace WebCore

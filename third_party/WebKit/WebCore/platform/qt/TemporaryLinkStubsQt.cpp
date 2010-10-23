@@ -35,6 +35,7 @@
 #include "AXObjectCache.h"
 #include "CachedResource.h"
 #include "CookieJar.h"
+#include "CookieStorage.h"
 #include "Cursor.h"
 #include "DNS.h"
 #include "FTPDirectoryDocument.h"
@@ -112,6 +113,10 @@ float userIdleTime() {
                    // pages from the page cache isn't postponed
 }
 #endif
+
+void setCookieStoragePrivateBrowsingEnabled(bool) {
+  notImplemented();
+}
 }
 
 // vim: ts=4 sw=4 et

@@ -66,6 +66,8 @@ Class WKNSURLProtocolClassForRequest(NSURLRequest* request);
 void WKSetNSURLRequestShouldContentSniff(NSMutableURLRequest* request,
                                          BOOL shouldContentSniff);
 
+void WKSetCookieStoragePrivateBrowsingEnabled(BOOL enabled);
+
 unsigned WKGetNSAutoreleasePoolCount(void);
 
 void WKAdvanceDefaultButtonPulseAnimation(NSButtonCell* button);

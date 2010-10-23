@@ -28,6 +28,7 @@
 #include "config.h"
 
 #include "AXObjectCache.h"
+#include "CookieStorage.h"
 #include "DNS.h"
 #include "Editor.h"
 #include "FrameView.h"
@@ -56,4 +57,7 @@ float userIdleTime() {
   return FLT_MAX;
 }  // return an arbitrarily high userIdleTime so that releasing pages from the
    // page cache isn't postponed
+void setCookieStoragePrivateBrowsingEnabled(bool) {
+  notImplemented();
+}
 }

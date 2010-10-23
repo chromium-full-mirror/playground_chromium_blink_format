@@ -163,6 +163,8 @@ class Settings : public Noncopyable {
   //  - Application Cache
   //  - Back/Forward Page History
   //  - Page Search Results
+  //  - HTTP Cookies
+  //  - Plug-ins (that support NPNVprivateModeBool)
   void setPrivateBrowsingEnabled(bool);
   bool privateBrowsingEnabled() const { return m_privateBrowsingEnabled; }
 
