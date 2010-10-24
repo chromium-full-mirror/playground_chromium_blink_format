@@ -112,12 +112,12 @@ class SVGMarkerElement : public SVGStyledElement,
                                               int,
                                               OrientType,
                                               orientType)
-  DECLARE_ANIMATED_PROPERTY_MULTIPLE_WRAPPERS(SVGMarkerElement,
-                                              SVGNames::orientAttr,
-                                              SVGOrientAngleAttrIdentifier,
-                                              SVGAngle,
-                                              OrientAngle,
-                                              orientAngle)
+  DECLARE_ANIMATED_PROPERTY_NEW_MULTIPLE_WRAPPERS(SVGMarkerElement,
+                                                  SVGNames::orientAttr,
+                                                  SVGOrientAngleAttrIdentifier,
+                                                  SVGAngle,
+                                                  OrientAngle,
+                                                  orientAngle)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_PROPERTY(SVGMarkerElement,
