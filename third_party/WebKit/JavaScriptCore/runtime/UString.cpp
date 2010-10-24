@@ -83,7 +83,7 @@ UString::UString(const char* characters)
 
 UString UString::number(int i) {
   UChar buf[1 + sizeof(i) * 3];
-  UChar* end = buf + sizeof(buf) / sizeof(UChar);
+  UChar* end = buf + WTF_ARRAY_LENGTH(buf);
   UChar* p = end;
 
   if (i == 0)
@@ -111,7 +111,7 @@ UString UString::number(int i) {
 
 UString UString::number(long long i) {
   UChar buf[1 + sizeof(i) * 3];
-  UChar* end = buf + sizeof(buf) / sizeof(UChar);
+  UChar* end = buf + WTF_ARRAY_LENGTH(buf);
   UChar* p = end;
 
   if (i == 0)
@@ -145,7 +145,7 @@ UString UString::number(long long i) {
 
 UString UString::number(unsigned u) {
   UChar buf[sizeof(u) * 3];
-  UChar* end = buf + sizeof(buf) / sizeof(UChar);
+  UChar* end = buf + WTF_ARRAY_LENGTH(buf);
   UChar* p = end;
 
   if (u == 0)
@@ -162,7 +162,7 @@ UString UString::number(unsigned u) {
 
 UString UString::number(long l) {
   UChar buf[1 + sizeof(l) * 3];
-  UChar* end = buf + sizeof(buf) / sizeof(UChar);
+  UChar* end = buf + WTF_ARRAY_LENGTH(buf);
   UChar* p = end;
 
   if (l == 0)
