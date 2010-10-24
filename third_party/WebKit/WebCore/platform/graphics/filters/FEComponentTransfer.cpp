@@ -26,11 +26,11 @@
 #if ENABLE(FILTERS)
 #include "FEComponentTransfer.h"
 
-#include "CanvasPixelArray.h"
 #include "Filter.h"
 #include "GraphicsContext.h"
 #include "ImageData.h"
-#include <math.h>
+
+#include <wtf/MathExtras.h>
 
 namespace WebCore {
 
@@ -173,15 +173,16 @@ void FEComponentTransfer::apply(Filter* filter) {
 
   IntRect drawingRect =
       requestedRegionOfInputImageData(in->absolutePaintRect());
-  RefPtr<ImageData> imageData(
-      in->resultImage()->getUnmultipliedImageData(drawingRect));
-  CanvasPixelArray* srcPixelArray(imageData->data());
+  RefPtr<ImageData> imageData =
+      in->resultImage()->getUnmultipliedImageData(drawingRect);
+  ByteArray* pixelArray = imageData->data()->data();
 
-  for (unsigned pixelOffset = 0; pixelOffset < srcPixelArray->length();
+  unsigned pixelArrayLength = pixelArray->length();
+  for (unsigned pixelOffset = 0; pixelOffset < pixelArrayLength;
        pixelOffset += 4) {
     for (unsigned channel = 0; channel < 4; ++channel) {
-      unsigned char c = srcPixelArray->get(pixelOffset + channel);
-      imageData->data()->set(pixelOffset + channel, tables[channel][c]);
+      unsigned char c = pixelArray->get(pixelOffset + channel);
+      pixelArray->set(pixelOffset + channel, tables[channel][c]);
     }
   }
 

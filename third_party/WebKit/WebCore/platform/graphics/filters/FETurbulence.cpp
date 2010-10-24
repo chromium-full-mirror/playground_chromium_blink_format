@@ -26,7 +26,6 @@
 #if ENABLE(FILTERS)
 #include "FETurbulence.h"
 
-#include "CanvasPixelArray.h"
 #include "Filter.h"
 #include "ImageData.h"
 
@@ -352,6 +351,7 @@ void FETurbulence::apply(Filter* filter) {
 
   RefPtr<ImageData> imageData =
       ImageData::create(imageRect.width(), imageRect.height());
+  ByteArray* pixelArray = imageData->data()->data();
   PaintingData paintingData(m_seed,
                             roundedIntSize(filterPrimitiveSubregion().size()));
   initPaint(paintingData);
@@ -367,7 +367,7 @@ void FETurbulence::apply(Filter* filter) {
       point.setX(point.x() + 1);
       for (paintingData.channel = 0; paintingData.channel < 4;
            ++paintingData.channel, ++indexOfPixelChannel)
-        imageData->data()->set(
+        pixelArray->set(
             indexOfPixelChannel,
             calculateTurbulenceValueForPoint(
                 paintingData, filter->mapAbsolutePointToLocalPoint(point)));

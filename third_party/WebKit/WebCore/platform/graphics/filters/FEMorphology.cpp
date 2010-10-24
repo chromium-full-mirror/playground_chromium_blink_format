@@ -26,7 +26,6 @@
 #if ENABLE(FILTERS)
 #include "FEMorphology.h"
 
-#include "CanvasPixelArray.h"
 #include "Filter.h"
 #include "ImageData.h"
 
@@ -100,10 +99,12 @@ void FEMorphology::apply(Filter* filter) {
   IntRect imageRect(IntPoint(), resultImage()->size());
   IntRect effectDrawingRect =
       requestedRegionOfInputImageData(in->absolutePaintRect());
-  RefPtr<CanvasPixelArray> srcPixelArray(
-      in->resultImage()->getPremultipliedImageData(effectDrawingRect)->data());
+  RefPtr<ImageData> srcImageData =
+      in->resultImage()->getPremultipliedImageData(effectDrawingRect);
+  ByteArray* srcPixelArray = srcImageData->data()->data();
   RefPtr<ImageData> imageData =
       ImageData::create(imageRect.width(), imageRect.height());
+  ByteArray* dstPixelArray = imageData->data()->data();
 
   int effectWidth = effectDrawingRect.width() * 4;
 
@@ -160,8 +161,7 @@ void FEMorphology::apply(Filter* filter) {
                extrema[kernelIndex] >= entireExtrema))
             entireExtrema = extrema[kernelIndex];
         }
-        imageData->data()->set(y * effectWidth + 4 * x + channel,
-                               entireExtrema);
+        dstPixelArray->set(y * effectWidth + 4 * x + channel, entireExtrema);
       }
     }
   }
