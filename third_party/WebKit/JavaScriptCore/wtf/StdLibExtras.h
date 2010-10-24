@@ -95,7 +95,7 @@ namespace WTF {
  * C++'s idea of a reinterpret_cast lacks sufficient cojones.
  */
 template <typename TO, typename FROM>
-TO bitwise_cast(FROM from) {
+inline TO bitwise_cast(FROM from) {
   COMPILE_ASSERT(sizeof(TO) == sizeof(FROM),
                  WTF_bitwise_cast_sizeof_casted_types_is_equal);
   union {
@@ -115,4 +115,4 @@ inline size_t bitCount(unsigned bits) {
 
 }  // namespace WTF
 
-#endif
+#endif  // WTF_StdLibExtras_h
