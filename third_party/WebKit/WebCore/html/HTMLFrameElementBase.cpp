@@ -173,10 +173,6 @@ void HTMLFrameElementBase::setNameAndOpenURL() {
   openURL();
 }
 
-void HTMLFrameElementBase::setNameAndOpenURLCallback(Node* n) {
-  static_cast<HTMLFrameElementBase*>(n)->setNameAndOpenURL();
-}
-
 void HTMLFrameElementBase::updateOnReparenting() {
   ASSERT(m_remainsAliveOnRemovalFromTree);
 
