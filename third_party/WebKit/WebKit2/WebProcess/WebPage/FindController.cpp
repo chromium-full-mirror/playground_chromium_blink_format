@@ -94,7 +94,7 @@ void FindController::findString(const String& string,
     hideFindIndicator();
 
     WebProcess::shared().connection()->send(
-        Messages::WebPageProxy::MatchCountDidChange(string, 0),
+        Messages::WebPageProxy::DidFailToFindString(string),
         m_webPage->pageID());
   } else {
     shouldShowOverlay = findOptions & FindOptionsShowOverlay;
@@ -108,7 +108,7 @@ void FindController::findString(const String& string,
         shouldShowOverlay = false;
 
       WebProcess::shared().connection()->send(
-          Messages::WebPageProxy::MatchCountDidChange(string, matchCount),
+          Messages::WebPageProxy::DidFindString(string, matchCount),
           m_webPage->pageID());
     }
 

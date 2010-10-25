@@ -284,9 +284,12 @@ struct WKPageUIClient {
 typedef struct WKPageUIClient WKPageUIClient;
 
 // Find client.
-typedef void (*WKPageMatchCountDidChangeCallback)(WKPageRef page,
+typedef void (*WKPageDidFindStringCallback)(WKPageRef page,
+                                            WKStringRef string,
+                                            unsigned matchCount,
+                                            const void* clientInfo);
+typedef void (*WKPageDidFailToFindStringCallback)(WKPageRef page,
                                                   WKStringRef string,
-                                                  unsigned matchCount,
                                                   const void* clientInfo);
 typedef void (*WKPageDidCountStringMatchesCallback)(WKPageRef page,
                                                     WKStringRef string,
@@ -296,7 +299,8 @@ typedef void (*WKPageDidCountStringMatchesCallback)(WKPageRef page,
 struct WKPageFindClient {
   int version;
   const void* clientInfo;
-  WKPageMatchCountDidChangeCallback matchCountDidChange;
+  WKPageDidFindStringCallback didFindString;
+  WKPageDidFailToFindStringCallback didFailToFindString;
   WKPageDidCountStringMatchesCallback didCountStringMatches;
 };
 typedef struct WKPageFindClient WKPageFindClient;
