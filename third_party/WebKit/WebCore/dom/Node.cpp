@@ -2973,7 +2973,8 @@ void Node::defaultEventHandler(Event* event) {
         frame->eventHandler()->defaultTextInputEventHandler(
             static_cast<TextEvent*>(event));
 #if ENABLE(PAN_SCROLLING)
-  } else if (eventType == eventNames().mousedownEvent) {
+  } else if (eventType == eventNames().mousedownEvent &&
+             event->isMouseEvent()) {
     MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);
     if (mouseEvent->button() == MiddleButton) {
       if (enclosingLinkEventParentOrSelf())
