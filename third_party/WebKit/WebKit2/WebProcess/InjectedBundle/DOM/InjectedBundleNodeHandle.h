@@ -30,6 +30,7 @@
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
+class IntRect;
 class Node;
 }
 
@@ -51,6 +52,7 @@ class InjectedBundleNodeHandle : public APIObject {
 
   // Additional DOM Operations
   // Note: These should only be operations that are not exposed to JavaScript.
+  WebCore::IntRect elementBounds() const;
   void setHTMLInputElementValueForUser(const String&);
   void setHTMLInputElementAutofilled(bool);
   PassRefPtr<InjectedBundleNodeHandle> copyHTMLTableCellElementCellAbove();
