@@ -27,6 +27,7 @@
 
 #include "WKError.h"
 #include "WebError.h"
+#include <CFNetwork/CFNetworkErrors.h>
 #include <WebCore/ResourceRequest.h>
 #include <WebCore/ResourceResponse.h>
 
@@ -34,12 +35,8 @@ using namespace WebCore;
 
 namespace WebKit {
 
-enum {
-  WebURLErrorCancelled = -999,
-};
-
 ResourceError cancelledError(const ResourceRequest& request) {
-  return ResourceError(WebError::webKitErrorDomain(), WebURLErrorCancelled,
+  return ResourceError(kCFErrorDomainCFNetwork, kCFURLErrorCancelled,
                        request.url().string(), String());
 }
 
