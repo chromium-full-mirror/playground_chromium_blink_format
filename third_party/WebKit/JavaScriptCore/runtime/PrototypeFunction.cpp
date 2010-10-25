@@ -45,7 +45,7 @@ PrototypeFunction::PrototypeFunction(ExecState* exec,
           name),
       m_function(function) {
   ASSERT_ARG(function, function);
-  putDirect(exec->propertyNames().length, jsNumber(exec, length),
+  putDirect(exec->propertyNames().length, jsNumber(length),
             DontDelete | ReadOnly | DontEnum);
 }
 
@@ -62,7 +62,7 @@ PrototypeFunction::PrototypeFunction(
                        name),
       m_function(function) {
   ASSERT_ARG(function, function);
-  putDirect(exec->propertyNames().length, jsNumber(exec, length),
+  putDirect(exec->propertyNames().length, jsNumber(length),
             DontDelete | ReadOnly | DontEnum);
 }
 

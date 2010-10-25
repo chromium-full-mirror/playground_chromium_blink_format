@@ -78,7 +78,7 @@ JSFunction::JSFunction(ExecState* exec,
   putDirect(exec->globalData().propertyNames->name,
             jsString(exec, name.isNull() ? "" : name.ustring()),
             DontDelete | ReadOnly | DontEnum);
-  putDirect(exec->propertyNames().length, jsNumber(exec, length),
+  putDirect(exec->propertyNames().length, jsNumber(length),
             DontDelete | ReadOnly | DontEnum);
 }
 #endif
@@ -100,7 +100,7 @@ JSFunction::JSFunction(ExecState* exec,
             jsString(exec, name.isNull() ? "" : name.ustring()),
             DontDelete | ReadOnly | DontEnum);
 #if ENABLE(JIT)
-  putDirect(exec->propertyNames().length, jsNumber(exec, length),
+  putDirect(exec->propertyNames().length, jsNumber(length),
             DontDelete | ReadOnly | DontEnum);
 #else
   UNUSED_PARAM(length);
@@ -216,12 +216,12 @@ JSValue JSFunction::callerGetter(ExecState* exec,
   return exec->interpreter()->retrieveCaller(exec, thisObj);
 }
 
-JSValue JSFunction::lengthGetter(ExecState* exec,
+JSValue JSFunction::lengthGetter(ExecState*,
                                  JSValue slotBase,
                                  const Identifier&) {
   JSFunction* thisObj = asFunction(slotBase);
   ASSERT(!thisObj->isHostFunction());
-  return jsNumber(exec, thisObj->jsExecutable()->parameterCount());
+  return jsNumber(thisObj->jsExecutable()->parameterCount());
 }
 
 bool JSFunction::getOwnPropertySlot(ExecState* exec,
@@ -298,7 +298,7 @@ bool JSFunction::getOwnPropertyDescriptor(ExecState* exec,
   }
 
   if (propertyName == exec->propertyNames().length) {
-    descriptor.setDescriptor(jsNumber(exec, jsExecutable()->parameterCount()),
+    descriptor.setDescriptor(jsNumber(jsExecutable()->parameterCount()),
                              ReadOnly | DontEnum | DontDelete);
     return true;
   }

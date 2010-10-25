@@ -49,11 +49,11 @@ RuntimeArray::~RuntimeArray() {
   delete getConcreteArray();
 }
 
-JSValue RuntimeArray::lengthGetter(ExecState* exec,
+JSValue RuntimeArray::lengthGetter(ExecState*,
                                    JSValue slotBase,
                                    const Identifier&) {
   RuntimeArray* thisObj = static_cast<RuntimeArray*>(asObject(slotBase));
-  return jsNumber(exec, thisObj->getLength());
+  return jsNumber(thisObj->getLength());
 }
 
 JSValue RuntimeArray::indexGetter(ExecState* exec,

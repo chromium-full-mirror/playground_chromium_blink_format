@@ -41,7 +41,7 @@ JSByteArray::JSByteArray(ExecState* exec,
                          const JSC::ClassInfo* classInfo)
     : JSObject(structure), m_storage(storage), m_classInfo(classInfo) {
   putDirect(exec->globalData().propertyNames->length,
-            jsNumber(exec, m_storage->length()), ReadOnly | DontDelete);
+            jsNumber(m_storage->length()), ReadOnly | DontDelete);
 }
 
 #if !ASSERT_DISABLED

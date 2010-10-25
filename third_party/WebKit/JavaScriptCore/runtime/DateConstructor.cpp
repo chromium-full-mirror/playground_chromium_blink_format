@@ -87,7 +87,7 @@ DateConstructor::DateConstructor(ExecState* exec,
                 exec->propertyNames().now, dateNow),
       DontEnum);
 
-  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 7),
+  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(7),
                              ReadOnly | DontEnum | DontDelete);
 }
 
@@ -171,11 +171,11 @@ CallType DateConstructor::getCallData(CallData& callData) {
 
 static EncodedJSValue JSC_HOST_CALL dateParse(ExecState* exec) {
   return JSValue::encode(
-      jsNumber(exec, parseDate(exec, exec->argument(0).toString(exec))));
+      jsNumber(parseDate(exec, exec->argument(0).toString(exec))));
 }
 
-static EncodedJSValue JSC_HOST_CALL dateNow(ExecState* exec) {
-  return JSValue::encode(jsNumber(exec, jsCurrentTime()));
+static EncodedJSValue JSC_HOST_CALL dateNow(ExecState*) {
+  return JSValue::encode(jsNumber(jsCurrentTime()));
 }
 
 static EncodedJSValue JSC_HOST_CALL dateUTC(ExecState* exec) {
@@ -191,7 +191,7 @@ static EncodedJSValue JSC_HOST_CALL dateUTC(ExecState* exec) {
       (n >= 5 && isnan(doubleArguments[4])) ||
       (n >= 6 && isnan(doubleArguments[5])) ||
       (n >= 7 && isnan(doubleArguments[6])))
-    return JSValue::encode(jsNaN(exec));
+    return JSValue::encode(jsNaN());
 
   GregorianDateTime t;
   int year = JSC::toInt32(doubleArguments[0]);
@@ -203,7 +203,7 @@ static EncodedJSValue JSC_HOST_CALL dateUTC(ExecState* exec) {
   t.second = JSC::toInt32(doubleArguments[5]);
   double ms = (n >= 7) ? doubleArguments[6] : 0;
   return JSValue::encode(
-      jsNumber(exec, timeClip(gregorianDateTimeToMS(exec, t, ms, true))));
+      jsNumber(timeClip(gregorianDateTimeToMS(exec, t, ms, true))));
 }
 
 }  // namespace JSC

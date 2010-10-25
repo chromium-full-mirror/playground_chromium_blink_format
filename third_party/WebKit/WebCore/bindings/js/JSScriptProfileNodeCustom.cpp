@@ -40,8 +40,8 @@ namespace WebCore {
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 
-JSValue JSScriptProfileNode::callUID(ExecState* exec) const {
-  JSValue result = jsNumber(exec, impl()->callIdentifier().hash());
+JSValue JSScriptProfileNode::callUID(ExecState*) const {
+  JSValue result = jsNumber(impl()->callIdentifier().hash());
   return result;
 }
 

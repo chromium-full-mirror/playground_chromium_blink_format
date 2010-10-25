@@ -51,7 +51,7 @@ NumberPrototype::NumberPrototype(ExecState* exec,
                                  NonNullPassRefPtr<Structure> structure,
                                  Structure* prototypeFunctionStructure)
     : NumberObject(structure) {
-  setInternalValue(jsNumber(exec, 0));
+  setInternalValue(jsNumber(0));
 
   // The constructor will be added later, after NumberConstructor has been
   // constructed

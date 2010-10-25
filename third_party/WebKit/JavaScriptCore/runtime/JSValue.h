@@ -102,21 +102,18 @@ class JSValue {
   JSValue(const JSCell* ptr);
 
   // Numbers
-  JSValue(EncodeAsDoubleTag, ExecState*, double);
-  JSValue(ExecState*, double);
-  JSValue(ExecState*, char);
-  JSValue(ExecState*, unsigned char);
-  JSValue(ExecState*, short);
-  JSValue(ExecState*, unsigned short);
-  JSValue(ExecState*, int);
-  JSValue(ExecState*, unsigned);
-  JSValue(ExecState*, long);
-  JSValue(ExecState*, unsigned long);
-  JSValue(ExecState*, long long);
-  JSValue(ExecState*, unsigned long long);
-  JSValue(JSGlobalData*, double);
-  JSValue(JSGlobalData*, int);
-  JSValue(JSGlobalData*, unsigned);
+  JSValue(EncodeAsDoubleTag, double);
+  explicit JSValue(double);
+  explicit JSValue(char);
+  explicit JSValue(unsigned char);
+  explicit JSValue(short);
+  explicit JSValue(unsigned short);
+  explicit JSValue(int);
+  explicit JSValue(unsigned);
+  explicit JSValue(long);
+  explicit JSValue(unsigned long);
+  explicit JSValue(long long);
+  explicit JSValue(unsigned long long);
 
   operator bool() const;
   bool operator==(const JSValue& other) const;
@@ -312,64 +309,52 @@ inline JSValue jsBoolean(bool b) {
   return b ? JSValue(JSValue::JSTrue) : JSValue(JSValue::JSFalse);
 }
 
-ALWAYS_INLINE JSValue jsDoubleNumber(ExecState* exec, double d) {
-  return JSValue(JSValue::EncodeAsDouble, exec, d);
+ALWAYS_INLINE JSValue jsDoubleNumber(double d) {
+  return JSValue(JSValue::EncodeAsDouble, d);
 }
 
-ALWAYS_INLINE JSValue jsNumber(ExecState* exec, double d) {
-  return JSValue(exec, d);
+ALWAYS_INLINE JSValue jsNumber(double d) {
+  return JSValue(d);
 }
 
-ALWAYS_INLINE JSValue jsNumber(ExecState* exec, char i) {
-  return JSValue(exec, i);
+ALWAYS_INLINE JSValue jsNumber(char i) {
+  return JSValue(i);
 }
 
-ALWAYS_INLINE JSValue jsNumber(ExecState* exec, unsigned char i) {
-  return JSValue(exec, i);
+ALWAYS_INLINE JSValue jsNumber(unsigned char i) {
+  return JSValue(i);
 }
 
-ALWAYS_INLINE JSValue jsNumber(ExecState* exec, short i) {
-  return JSValue(exec, i);
+ALWAYS_INLINE JSValue jsNumber(short i) {
+  return JSValue(i);
 }
 
-ALWAYS_INLINE JSValue jsNumber(ExecState* exec, unsigned short i) {
-  return JSValue(exec, i);
+ALWAYS_INLINE JSValue jsNumber(unsigned short i) {
+  return JSValue(i);
 }
 
-ALWAYS_INLINE JSValue jsNumber(ExecState* exec, int i) {
-  return JSValue(exec, i);
+ALWAYS_INLINE JSValue jsNumber(int i) {
+  return JSValue(i);
 }
 
-ALWAYS_INLINE JSValue jsNumber(ExecState* exec, unsigned i) {
-  return JSValue(exec, i);
+ALWAYS_INLINE JSValue jsNumber(unsigned i) {
+  return JSValue(i);
 }
 
-ALWAYS_INLINE JSValue jsNumber(ExecState* exec, long i) {
-  return JSValue(exec, i);
+ALWAYS_INLINE JSValue jsNumber(long i) {
+  return JSValue(i);
 }
 
-ALWAYS_INLINE JSValue jsNumber(ExecState* exec, unsigned long i) {
-  return JSValue(exec, i);
+ALWAYS_INLINE JSValue jsNumber(unsigned long i) {
+  return JSValue(i);
 }
 
-ALWAYS_INLINE JSValue jsNumber(ExecState* exec, long long i) {
-  return JSValue(exec, i);
+ALWAYS_INLINE JSValue jsNumber(long long i) {
+  return JSValue(i);
 }
 
-ALWAYS_INLINE JSValue jsNumber(ExecState* exec, unsigned long long i) {
-  return JSValue(exec, i);
-}
-
-ALWAYS_INLINE JSValue jsNumber(JSGlobalData* globalData, double d) {
-  return JSValue(globalData, d);
-}
-
-ALWAYS_INLINE JSValue jsNumber(JSGlobalData* globalData, int i) {
-  return JSValue(globalData, i);
-}
-
-ALWAYS_INLINE JSValue jsNumber(JSGlobalData* globalData, unsigned i) {
-  return JSValue(globalData, i);
+ALWAYS_INLINE JSValue jsNumber(unsigned long long i) {
+  return JSValue(i);
 }
 
 inline bool operator==(const JSValue a, const JSCell* b) {
@@ -405,8 +390,8 @@ inline uint32_t JSValue::toUInt32(ExecState* exec) const {
 }
 
 #if USE(JSVALUE32_64)
-inline JSValue jsNaN(ExecState* exec) {
-  return JSValue(exec, nonInlineNaN());
+inline JSValue jsNaN() {
+  return JSValue(nonInlineNaN());
 }
 
 // JSValue member functions.
@@ -552,100 +537,78 @@ ALWAYS_INLINE JSCell* JSValue::asCell() const {
   return reinterpret_cast<JSCell*>(u.asBits.payload);
 }
 
-ALWAYS_INLINE JSValue::JSValue(EncodeAsDoubleTag, ExecState*, double d) {
+ALWAYS_INLINE JSValue::JSValue(EncodeAsDoubleTag, double d) {
   u.asDouble = d;
 }
 
-inline JSValue::JSValue(ExecState* exec, double d) {
+inline JSValue::JSValue(double d) {
   const int32_t asInt32 = static_cast<int32_t>(d);
   if (asInt32 != d || (!asInt32 && signbit(d))) {  // true for -0.0
     u.asDouble = d;
     return;
   }
-  *this = JSValue(exec, static_cast<int32_t>(d));
+  *this = JSValue(static_cast<int32_t>(d));
 }
 
-inline JSValue::JSValue(ExecState* exec, char i) {
-  *this = JSValue(exec, static_cast<int32_t>(i));
+inline JSValue::JSValue(char i) {
+  *this = JSValue(static_cast<int32_t>(i));
 }
 
-inline JSValue::JSValue(ExecState* exec, unsigned char i) {
-  *this = JSValue(exec, static_cast<int32_t>(i));
+inline JSValue::JSValue(unsigned char i) {
+  *this = JSValue(static_cast<int32_t>(i));
 }
 
-inline JSValue::JSValue(ExecState* exec, short i) {
-  *this = JSValue(exec, static_cast<int32_t>(i));
+inline JSValue::JSValue(short i) {
+  *this = JSValue(static_cast<int32_t>(i));
 }
 
-inline JSValue::JSValue(ExecState* exec, unsigned short i) {
-  *this = JSValue(exec, static_cast<int32_t>(i));
+inline JSValue::JSValue(unsigned short i) {
+  *this = JSValue(static_cast<int32_t>(i));
 }
 
-inline JSValue::JSValue(ExecState*, int i) {
+inline JSValue::JSValue(int i) {
   u.asBits.tag = Int32Tag;
   u.asBits.payload = i;
 }
 
-inline JSValue::JSValue(ExecState* exec, unsigned i) {
+inline JSValue::JSValue(unsigned i) {
   if (static_cast<int32_t>(i) < 0) {
-    *this = JSValue(exec, static_cast<double>(i));
+    *this = JSValue(static_cast<double>(i));
     return;
   }
-  *this = JSValue(exec, static_cast<int32_t>(i));
+  *this = JSValue(static_cast<int32_t>(i));
 }
 
-inline JSValue::JSValue(ExecState* exec, long i) {
+inline JSValue::JSValue(long i) {
   if (static_cast<int32_t>(i) != i) {
-    *this = JSValue(exec, static_cast<double>(i));
+    *this = JSValue(static_cast<double>(i));
     return;
   }
-  *this = JSValue(exec, static_cast<int32_t>(i));
+  *this = JSValue(static_cast<int32_t>(i));
 }
 
-inline JSValue::JSValue(ExecState* exec, unsigned long i) {
+inline JSValue::JSValue(unsigned long i) {
   if (static_cast<uint32_t>(i) != i) {
-    *this = JSValue(exec, static_cast<double>(i));
+    *this = JSValue(static_cast<double>(i));
     return;
   }
-  *this = JSValue(exec, static_cast<uint32_t>(i));
+  *this = JSValue(static_cast<uint32_t>(i));
 }
 
-inline JSValue::JSValue(ExecState* exec, long long i) {
+inline JSValue::JSValue(long long i) {
   if (static_cast<int32_t>(i) != i) {
-    *this = JSValue(exec, static_cast<double>(i));
+    *this = JSValue(static_cast<double>(i));
     return;
   }
-  *this = JSValue(exec, static_cast<int32_t>(i));
+  *this = JSValue(static_cast<int32_t>(i));
 }
 
-inline JSValue::JSValue(ExecState* exec, unsigned long long i) {
+inline JSValue::JSValue(unsigned long long i) {
   if (static_cast<uint32_t>(i) != i) {
-    *this = JSValue(exec, static_cast<double>(i));
+    *this = JSValue(static_cast<double>(i));
     return;
   }
-  *this = JSValue(exec, static_cast<uint32_t>(i));
-}
-
-inline JSValue::JSValue(JSGlobalData* globalData, double d) {
-  const int32_t asInt32 = static_cast<int32_t>(d);
-  if (asInt32 != d || (!asInt32 && signbit(d))) {  // true for -0.0
-    u.asDouble = d;
-    return;
-  }
-  *this = JSValue(globalData, static_cast<int32_t>(d));
-}
-
-inline JSValue::JSValue(JSGlobalData*, int i) {
-  u.asBits.tag = Int32Tag;
-  u.asBits.payload = i;
-}
-
-inline JSValue::JSValue(JSGlobalData* globalData, unsigned i) {
-  if (static_cast<int32_t>(i) < 0) {
-    *this = JSValue(globalData, static_cast<double>(i));
-    return;
-  }
-  *this = JSValue(globalData, static_cast<int32_t>(i));
+  *this = JSValue(static_cast<uint32_t>(i));
 }
 
 inline bool JSValue::isNumber() const {
@@ -680,7 +643,7 @@ inline double JSValue::uncheckedGetNumber() const {
 }
 
 ALWAYS_INLINE JSValue JSValue::toJSNumber(ExecState* exec) const {
-  return isNumber() ? asValue() : jsNumber(exec, this->toNumber(exec));
+  return isNumber() ? asValue() : jsNumber(this->toNumber(exec));
 }
 
 inline bool JSValue::getNumber(double& result) const {

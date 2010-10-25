@@ -246,8 +246,7 @@ EncodedJSValue JSC_HOST_CALL functionRun(ExecState* exec) {
            makeSource(script.data(), fileName));
   stopWatch.stop();
 
-  return JSValue::encode(
-      jsNumber(globalObject->globalExec(), stopWatch.getElapsedMS()));
+  return JSValue::encode(jsNumber(stopWatch.getElapsedMS()));
 }
 
 EncodedJSValue JSC_HOST_CALL functionLoad(ExecState* exec) {

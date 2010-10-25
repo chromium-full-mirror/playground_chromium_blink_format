@@ -305,7 +305,7 @@ bool JSArray::getOwnPropertySlot(ExecState* exec,
                                  const Identifier& propertyName,
                                  PropertySlot& slot) {
   if (propertyName == exec->propertyNames().length) {
-    slot.setValue(jsNumber(exec, length()));
+    slot.setValue(jsNumber(length()));
     return true;
   }
 
@@ -321,7 +321,7 @@ bool JSArray::getOwnPropertyDescriptor(ExecState* exec,
                                        const Identifier& propertyName,
                                        PropertyDescriptor& descriptor) {
   if (propertyName == exec->propertyNames().length) {
-    descriptor.setDescriptor(jsNumber(exec, length()), DontDelete | DontEnum);
+    descriptor.setDescriptor(jsNumber(length()), DontDelete | DontEnum);
     return true;
   }
 

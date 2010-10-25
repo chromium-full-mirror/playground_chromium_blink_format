@@ -80,7 +80,7 @@ NumberConstructor::NumberConstructor(ExecState* exec,
                              DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 1),
+  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(1),
                              ReadOnly | DontEnum | DontDelete);
 }
 
@@ -99,34 +99,34 @@ bool NumberConstructor::getOwnPropertyDescriptor(
       exec, ExecState::numberTable(exec), this, propertyName, descriptor);
 }
 
-static JSValue numberConstructorNaNValue(ExecState* exec,
+static JSValue numberConstructorNaNValue(ExecState*,
                                          JSValue,
                                          const Identifier&) {
-  return jsNaN(exec);
+  return jsNaN();
 }
 
-static JSValue numberConstructorNegInfinity(ExecState* exec,
+static JSValue numberConstructorNegInfinity(ExecState*,
                                             JSValue,
                                             const Identifier&) {
-  return jsNumber(exec, -Inf);
+  return jsNumber(-Inf);
 }
 
-static JSValue numberConstructorPosInfinity(ExecState* exec,
+static JSValue numberConstructorPosInfinity(ExecState*,
                                             JSValue,
                                             const Identifier&) {
-  return jsNumber(exec, Inf);
+  return jsNumber(Inf);
 }
 
-static JSValue numberConstructorMaxValue(ExecState* exec,
+static JSValue numberConstructorMaxValue(ExecState*,
                                          JSValue,
                                          const Identifier&) {
-  return jsNumber(exec, 1.7976931348623157E+308);
+  return jsNumber(1.7976931348623157E+308);
 }
 
-static JSValue numberConstructorMinValue(ExecState* exec,
+static JSValue numberConstructorMinValue(ExecState*,
                                          JSValue,
                                          const Identifier&) {
-  return jsNumber(exec, 5E-324);
+  return jsNumber(5E-324);
 }
 
 // ECMA 15.7.1
@@ -135,7 +135,7 @@ constructWithNumberConstructor(ExecState* exec) {
   NumberObject* object = new (exec)
       NumberObject(exec->lexicalGlobalObject()->numberObjectStructure());
   double n = exec->argumentCount() ? exec->argument(0).toNumber(exec) : 0;
-  object->setInternalValue(jsNumber(exec, n));
+  object->setInternalValue(jsNumber(n));
   return JSValue::encode(object);
 }
 
@@ -147,8 +147,8 @@ ConstructType NumberConstructor::getConstructData(
 
 // ECMA 15.7.2
 static EncodedJSValue JSC_HOST_CALL callNumberConstructor(ExecState* exec) {
-  return JSValue::encode(jsNumber(
-      exec, !exec->argumentCount() ? 0 : exec->argument(0).toNumber(exec)));
+  return JSValue::encode(
+      jsNumber(!exec->argumentCount() ? 0 : exec->argument(0).toNumber(exec)));
 }
 
 CallType NumberConstructor::getCallData(CallData& callData) {

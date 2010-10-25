@@ -121,7 +121,7 @@ RegExpConstructor::RegExpConstructor(ExecState* exec,
                              DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 2),
+  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(2),
                              ReadOnly | DontDelete | DontEnum);
 }
 
@@ -165,8 +165,8 @@ void RegExpMatchesArray::fillArrayInstance(ExecState* exec) {
   }
 
   PutPropertySlot slot;
-  JSArray::put(exec, exec->propertyNames().index,
-               jsNumber(exec, d->lastOvector()[0]), slot);
+  JSArray::put(exec, exec->propertyNames().index, jsNumber(d->lastOvector()[0]),
+               slot);
   JSArray::put(exec, exec->propertyNames().input, jsString(exec, d->input),
                slot);
 

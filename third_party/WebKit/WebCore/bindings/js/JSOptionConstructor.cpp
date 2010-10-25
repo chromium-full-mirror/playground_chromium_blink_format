@@ -42,7 +42,7 @@ JSOptionConstructor::JSOptionConstructor(ExecState* exec,
           globalObject) {
   putDirect(exec->propertyNames().prototype,
             JSHTMLOptionElementPrototype::self(exec, globalObject), None);
-  putDirect(exec->propertyNames().length, jsNumber(exec, 4),
+  putDirect(exec->propertyNames().length, jsNumber(4),
             ReadOnly | DontDelete | DontEnum);
 }
 

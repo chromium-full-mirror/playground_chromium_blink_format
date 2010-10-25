@@ -125,9 +125,9 @@ JSValue convertNPVariantToValue(ExecState* exec,
   if (type == NPVariantType_Void)
     return jsUndefined();
   if (type == NPVariantType_Int32)
-    return jsNumber(exec, NPVARIANT_TO_INT32(*variant));
+    return jsNumber(NPVARIANT_TO_INT32(*variant));
   if (type == NPVariantType_Double)
-    return jsNumber(exec, NPVARIANT_TO_DOUBLE(*variant));
+    return jsNumber(NPVARIANT_TO_DOUBLE(*variant));
   if (type == NPVariantType_String)
     return WebCore::jsString(
         exec, convertNPStringToUTF16(&variant->value.stringValue));

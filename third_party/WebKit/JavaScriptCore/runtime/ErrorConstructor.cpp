@@ -42,7 +42,7 @@ ErrorConstructor::ErrorConstructor(ExecState* exec,
   // ECMA 15.11.3.1 Error.prototype
   putDirectWithoutTransition(exec->propertyNames().prototype, errorPrototype,
                              DontEnum | DontDelete | ReadOnly);
-  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 1),
+  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(1),
                              DontDelete | ReadOnly | DontEnum);
 }
 

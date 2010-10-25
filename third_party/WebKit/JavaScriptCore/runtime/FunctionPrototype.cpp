@@ -47,7 +47,7 @@ FunctionPrototype::FunctionPrototype(ExecState* exec,
                        globalObject,
                        structure,
                        exec->propertyNames().nullIdentifier) {
-  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 0),
+  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(0),
                              DontDelete | ReadOnly | DontEnum);
 }
 

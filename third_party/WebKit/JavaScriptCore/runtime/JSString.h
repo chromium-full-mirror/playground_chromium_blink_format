@@ -614,7 +614,7 @@ ALWAYS_INLINE bool JSString::getStringPropertySlot(
     const Identifier& propertyName,
     PropertySlot& slot) {
   if (propertyName == exec->propertyNames().length) {
-    slot.setValue(jsNumber(exec, m_length));
+    slot.setValue(jsNumber(m_length));
     return true;
   }
 

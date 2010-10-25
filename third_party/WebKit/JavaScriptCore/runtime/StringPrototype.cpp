@@ -139,7 +139,7 @@ StringPrototype::StringPrototype(ExecState* exec,
     : StringObject(exec, structure) {
   putAnonymousValue(0, globalObject);
   // The constructor will be added later, after StringConstructor has been built
-  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 0),
+  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(0),
                              DontDelete | ReadOnly | DontEnum);
 }
 
@@ -379,7 +379,7 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncReplace(ExecState* exec) {
                 i, jsSubstring(exec, source, matchStart, matchLen));
         }
 
-        cachedCall.setArgument(i++, jsNumber(exec, completeMatchStart));
+        cachedCall.setArgument(i++, jsNumber(completeMatchStart));
         cachedCall.setArgument(i++, sourceVal);
 
         cachedCall.setThis(exec->globalThisValue());
@@ -427,7 +427,7 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncReplace(ExecState* exec) {
               args.append(jsSubstring(exec, source, matchStart, matchLen));
           }
 
-          args.append(jsNumber(exec, completeMatchStart));
+          args.append(jsNumber(completeMatchStart));
           args.append(sourceVal);
 
           replacements.append(call(exec, replacement, callType, callData,
@@ -491,7 +491,7 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncReplace(ExecState* exec) {
   if (callType != CallTypeNone) {
     MarkedArgumentBuffer args;
     args.append(jsSubstring(exec, source, matchPos, matchLen));
-    args.append(jsNumber(exec, matchPos));
+    args.append(jsNumber(matchPos));
     args.append(sourceVal);
 
     replacementString = call(exec, replacement, callType, callData,
@@ -550,13 +550,13 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncCharCodeAt(ExecState* exec) {
   if (a0.isUInt32()) {
     uint32_t i = a0.asUInt32();
     if (i < len)
-      return JSValue::encode(jsNumber(exec, s.characters()[i]));
-    return JSValue::encode(jsNaN(exec));
+      return JSValue::encode(jsNumber(s.characters()[i]));
+    return JSValue::encode(jsNaN());
   }
   double dpos = a0.toInteger(exec);
   if (dpos >= 0 && dpos < len)
-    return JSValue::encode(jsNumber(exec, s[static_cast<int>(dpos)]));
-  return JSValue::encode(jsNaN(exec));
+    return JSValue::encode(jsNumber(s[static_cast<int>(dpos)]));
+  return JSValue::encode(jsNaN());
 }
 
 EncodedJSValue JSC_HOST_CALL stringProtoFuncConcat(ExecState* exec) {
@@ -598,8 +598,8 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncIndexOf(ExecState* exec) {
 
   size_t result = s.find(u2, pos);
   if (result == notFound)
-    return JSValue::encode(jsNumber(exec, -1));
-  return JSValue::encode(jsNumber(exec, result));
+    return JSValue::encode(jsNumber(-1));
+  return JSValue::encode(jsNumber(result));
 }
 
 EncodedJSValue JSC_HOST_CALL stringProtoFuncLastIndexOf(ExecState* exec) {
@@ -626,8 +626,8 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncLastIndexOf(ExecState* exec) {
 
   size_t result = s.reverseFind(u2, static_cast<unsigned>(dpos));
   if (result == notFound)
-    return JSValue::encode(jsNumber(exec, -1));
-  return JSValue::encode(jsNumber(exec, result));
+    return JSValue::encode(jsNumber(-1));
+  return JSValue::encode(jsNumber(result));
 }
 
 EncodedJSValue JSC_HOST_CALL stringProtoFuncMatch(ExecState* exec) {
@@ -711,7 +711,7 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncSearch(ExecState* exec) {
   int pos;
   int matchLength = 0;
   regExpConstructor->performMatch(reg.get(), u, 0, pos, matchLength);
-  return JSValue::encode(jsNumber(exec, pos));
+  return JSValue::encode(jsNumber(pos));
 }
 
 EncodedJSValue JSC_HOST_CALL stringProtoFuncSlice(ExecState* exec) {
@@ -947,7 +947,7 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncToUpperCase(ExecState* exec) {
 
 EncodedJSValue JSC_HOST_CALL stringProtoFuncLocaleCompare(ExecState* exec) {
   if (exec->argumentCount() < 1)
-    return JSValue::encode(jsNumber(exec, 0));
+    return JSValue::encode(jsNumber(0));
 
   JSValue thisValue = exec->hostThisValue();
   if (thisValue.isUndefinedOrNull())  // CheckObjectCoercible
@@ -955,7 +955,7 @@ EncodedJSValue JSC_HOST_CALL stringProtoFuncLocaleCompare(ExecState* exec) {
 
   UString s = thisValue.toThisString(exec);
   JSValue a0 = exec->argument(0);
-  return JSValue::encode(jsNumber(exec, localeCompare(s, a0.toString(exec))));
+  return JSValue::encode(jsNumber(localeCompare(s, a0.toString(exec))));
 }
 
 EncodedJSValue JSC_HOST_CALL stringProtoFuncBig(ExecState* exec) {

@@ -80,7 +80,7 @@ StringConstructor::StringConstructor(ExecState* exec,
       DontEnum);
 #endif
   // no. of arguments for constructor
-  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 1),
+  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(1),
                              ReadOnly | DontEnum | DontDelete);
 }
 

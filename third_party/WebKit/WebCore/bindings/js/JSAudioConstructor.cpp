@@ -46,7 +46,7 @@ JSAudioConstructor::JSAudioConstructor(ExecState* exec,
           globalObject) {
   putDirect(exec->propertyNames().prototype,
             JSHTMLAudioElementPrototype::self(exec, globalObject), None);
-  putDirect(exec->propertyNames().length, jsNumber(exec, 1),
+  putDirect(exec->propertyNames().length, jsNumber(1),
             ReadOnly | DontDelete | DontEnum);
 }
 

@@ -42,7 +42,7 @@ BooleanConstructor::BooleanConstructor(ExecState* exec,
                              DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 1),
+  putDirectWithoutTransition(exec->propertyNames().length, jsNumber(1),
                              ReadOnly | DontDelete | DontEnum);
 }
 
