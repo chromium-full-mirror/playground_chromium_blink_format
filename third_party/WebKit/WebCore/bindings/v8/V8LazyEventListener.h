@@ -34,6 +34,7 @@
 #include "PlatformString.h"
 #include "V8AbstractEventListener.h"
 #include <v8.h>
+#include <wtf/text/TextPosition.h>
 #include <wtf/PassRefPtr.h>
 
 namespace WebCore {
@@ -51,12 +52,10 @@ class V8LazyEventListener : public V8AbstractEventListener {
       bool isSVGEvent,
       const String& code,
       const String& sourceURL,
-      int lineNumber,
-      int columnNumber,
+      const TextPosition0& position,
       const WorldContextHandle& worldContext) {
     return adoptRef(new V8LazyEventListener(functionName, isSVGEvent, code,
-                                            sourceURL, lineNumber, columnNumber,
-                                            worldContext));
+                                            sourceURL, position, worldContext));
   }
 
   virtual bool isLazy() const { return true; }
@@ -69,8 +68,7 @@ class V8LazyEventListener : public V8AbstractEventListener {
                       bool isSVGEvent,
                       const String& code,
                       const String sourceURL,
-                      int lineNumber,
-                      int columnNumber,
+                      const TextPosition0& position,
                       const WorldContextHandle& worldContext);
 
   virtual v8::Local<v8::Value> callListenerFunction(
@@ -89,8 +87,7 @@ class V8LazyEventListener : public V8AbstractEventListener {
   bool m_isSVGEvent;
   String m_code;
   String m_sourceURL;
-  int m_lineNumber;
-  int m_columnNumber;
+  TextPosition0 m_position;
 };
 
 }  // namespace WebCore

@@ -99,7 +99,7 @@ ScriptSourceCode HTMLScriptRunner::sourceFromPendingScript(
   errorOccurred = false;
   return ScriptSourceCode(script.element()->textContent(),
                           documentURLForScriptExecution(m_document),
-                          script.startingLineNumber());
+                          script.startingPosition());
 }
 
 bool HTMLScriptRunner::isPendingScriptReady(const PendingScript& script) {
@@ -171,12 +171,12 @@ void HTMLScriptRunner::stopWatchingForLoad(PendingScript& pendingScript) {
 // This function should match 10.2.5.11 "An end tag whose tag name is 'script'"
 // Script handling lives outside the tree builder to keep the each class simple.
 bool HTMLScriptRunner::execute(PassRefPtr<Element> scriptElement,
-                               int startLine) {
+                               const TextPosition1& scriptStartPosition) {
   ASSERT(scriptElement);
   // FIXME: If scripting is disabled, always just return true;
 
   // Try to execute the script given to us.
-  runScript(scriptElement.get(), startLine);
+  runScript(scriptElement.get(), scriptStartPosition);
 
   if (haveParsingBlockingScript()) {
     if (m_scriptNestingLevel)
@@ -287,7 +287,8 @@ bool HTMLScriptRunner::requestPendingScript(PendingScript& pendingScript,
 
 // This method is meant to match the HTML5 definition of "running a script"
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1.html#running-a-script
-void HTMLScriptRunner::runScript(Element* script, int startingLineNumber) {
+void HTMLScriptRunner::runScript(Element* script,
+                                 const TextPosition1& scriptStartPosition) {
   ASSERT(m_document);
   ASSERT(!haveParsingBlockingScript());
   {
@@ -316,7 +317,7 @@ void HTMLScriptRunner::runScript(Element* script, int startingLineNumber) {
       ASSERT(isExecutingScript());
       ScriptSourceCode sourceCode(script->textContent(),
                                   documentURLForScriptExecution(m_document),
-                                  startingLineNumber);
+                                  scriptStartPosition);
       executeScript(sourceCode);
     }
   }
