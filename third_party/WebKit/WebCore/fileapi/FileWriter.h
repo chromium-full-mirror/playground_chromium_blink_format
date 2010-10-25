@@ -75,7 +75,7 @@ class FileWriter : public RefCounted<FileWriter>,
   // AsyncFileWriterClient
   void didWrite(long long bytes, bool complete);
   void didTruncate();
-  void didFail(ExceptionCode ec);
+  void didFail(FileError::ErrorCode);
 
   // ActiveDOMObject
   virtual bool canSuspend() const;
@@ -114,6 +114,8 @@ class FileWriter : public RefCounted<FileWriter>,
   }
 
   void fireEvent(const AtomicString& type);
+
+  void setError(FileError::ErrorCode, ExceptionCode&);
 
   RefPtr<FileError> m_error;
   EventTargetData m_eventTargetData;

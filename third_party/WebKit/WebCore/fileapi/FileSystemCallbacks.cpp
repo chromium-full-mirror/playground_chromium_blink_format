@@ -43,7 +43,6 @@
 #include "EntryArray.h"
 #include "EntryCallback.h"
 #include "ErrorCallback.h"
-#include "ExceptionCode.h"
 #include "FileEntry.h"
 #include "FileError.h"
 #include "FileSystemCallback.h"
@@ -96,7 +95,8 @@ void FileSystemCallbacksBase::didCreateFileWriter(PassOwnPtr<AsyncFileWriter>,
 
 void FileSystemCallbacksBase::didFail(int code) {
   if (m_errorCallback) {
-    m_errorCallback->handleEvent(FileError::create(code).get());
+    m_errorCallback->handleEvent(
+        FileError::create(static_cast<FileError::ErrorCode>(code)).get());
     m_errorCallback.clear();
   }
 }

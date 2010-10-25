@@ -707,7 +707,7 @@ void DOMWindow::requestFileSystem(
   if (!AsyncFileSystem::isAvailable() ||
       !document->securityOrigin()->canAccessFileSystem()) {
     DOMFileSystem::scheduleCallback(document, errorCallback,
-                                    FileError::create(SECURITY_ERR));
+                                    FileError::create(FileError::SECURITY_ERR));
     return;
   }
 
@@ -716,7 +716,8 @@ void DOMWindow::requestFileSystem(
   if (fileSystemType != AsyncFileSystem::Temporary &&
       fileSystemType != AsyncFileSystem::Persistent) {
     DOMFileSystem::scheduleCallback(
-        document, errorCallback, FileError::create(INVALID_MODIFICATION_ERR));
+        document, errorCallback,
+        FileError::create(FileError::INVALID_MODIFICATION_ERR));
     return;
   }
 

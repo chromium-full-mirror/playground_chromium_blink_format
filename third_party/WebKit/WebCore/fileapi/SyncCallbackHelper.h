@@ -41,6 +41,7 @@
 #include "ExceptionCode.h"
 #include "FileEntry.h"
 #include "FileError.h"
+#include "FileException.h"
 #include "FileSystemCallback.h"
 #include "MetadataCallback.h"
 #include "VoidCallback.h"
@@ -71,19 +72,19 @@ class SyncCallbackHelper : public Noncopyable {
       : m_observer(observer),
         m_successCallback(SuccessCallbackImpl::create(this)),
         m_errorCallback(ErrorCallbackImpl::create(this)),
-        m_error(0),
+        m_exceptionCode(0),
         m_completed(false) {}
 
   PassRefPtr<ResultType> getResult(ExceptionCode& ec) {
     if (m_observer) {
       while (!m_completed) {
         if (!m_observer->waitForOperationToComplete()) {
-          m_error = ABORT_ERR;
+          m_exceptionCode = FileException::ABORT_ERR;
           break;
         }
       }
     }
-    ec = m_error;
+    ec = m_exceptionCode;
     return m_result.release();
   }
 
@@ -129,8 +130,8 @@ class SyncCallbackHelper : public Noncopyable {
   friend class SuccessCallbackImpl;
   friend class ErrorCallbackImpl;
 
-  void setError(ExceptionCode ec) {
-    m_error = ec;
+  void setError(int code) {
+    m_exceptionCode = FileException::ErrorCodeToExceptionCode(code);
     m_completed = true;
   }
 
@@ -143,7 +144,7 @@ class SyncCallbackHelper : public Noncopyable {
   RefPtr<SuccessCallbackImpl> m_successCallback;
   RefPtr<ErrorCallbackImpl> m_errorCallback;
   RefPtr<ResultType> m_result;
-  ExceptionCode m_error;
+  ExceptionCode m_exceptionCode;
   bool m_completed;
 };
 

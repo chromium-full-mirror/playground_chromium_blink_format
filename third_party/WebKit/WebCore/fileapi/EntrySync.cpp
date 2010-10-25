@@ -38,6 +38,7 @@
 #include "DirectoryEntry.h"
 #include "DirectoryEntrySync.h"
 #include "FileEntrySync.h"
+#include "FileException.h"
 #include "Metadata.h"
 #include "SyncCallbackHelper.h"
 
@@ -55,7 +56,7 @@ PassRefPtr<Metadata> EntrySync::getMetadata(ExceptionCode& ec) {
   MetadataSyncCallbackHelper helper(m_fileSystem->asyncFileSystem());
   if (!m_fileSystem->getMetadata(this, helper.successCallback(),
                                  helper.errorCallback())) {
-    ec = INVALID_MODIFICATION_ERR;
+    ec = FileException::INVALID_MODIFICATION_ERR;
     return 0;
   }
   return helper.getResult(ec);
@@ -68,7 +69,7 @@ PassRefPtr<EntrySync> EntrySync::moveTo(PassRefPtr<DirectoryEntrySync> parent,
   EntrySyncCallbackHelper helper(m_fileSystem->asyncFileSystem());
   if (!m_fileSystem->move(this, parent.get(), name, helper.successCallback(),
                           helper.errorCallback())) {
-    ec = INVALID_MODIFICATION_ERR;
+    ec = FileException::INVALID_MODIFICATION_ERR;
     return 0;
   }
   return helper.getResult(ec);
@@ -81,7 +82,7 @@ PassRefPtr<EntrySync> EntrySync::copyTo(PassRefPtr<DirectoryEntrySync> parent,
   EntrySyncCallbackHelper helper(m_fileSystem->asyncFileSystem());
   if (!m_fileSystem->copy(this, parent.get(), name, helper.successCallback(),
                           helper.errorCallback())) {
-    ec = INVALID_MODIFICATION_ERR;
+    ec = FileException::INVALID_MODIFICATION_ERR;
     return 0;
   }
   return helper.getResult(ec);
@@ -92,7 +93,7 @@ void EntrySync::remove(ExceptionCode& ec) const {
   VoidSyncCallbackHelper helper(m_fileSystem->asyncFileSystem());
   if (!m_fileSystem->remove(this, helper.successCallback(),
                             helper.errorCallback())) {
-    ec = INVALID_MODIFICATION_ERR;
+    ec = FileException::INVALID_MODIFICATION_ERR;
     return;
   }
   helper.getResult(ec);

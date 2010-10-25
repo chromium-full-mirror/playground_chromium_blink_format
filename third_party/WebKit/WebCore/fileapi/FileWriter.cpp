@@ -38,6 +38,7 @@
 #include "Blob.h"
 #include "ExceptionCode.h"
 #include "FileError.h"
+#include "FileException.h"
 #include "ProgressEvent.h"
 
 namespace WebCore {
@@ -84,13 +85,11 @@ void FileWriter::stop() {
 void FileWriter::write(Blob* data, ExceptionCode& ec) {
   ASSERT(m_writer);
   if (m_readyState == WRITING) {
-    ec = INVALID_STATE_ERR;
-    m_error = FileError::create(ec);
+    setError(FileError::INVALID_STATE_ERR, ec);
     return;
   }
   if (!data) {
-    ec = TYPE_MISMATCH_ERR;
-    m_error = FileError::create(ec);
+    setError(FileError::TYPE_MISMATCH_ERR, ec);
     return;
   }
 
@@ -105,8 +104,7 @@ void FileWriter::write(Blob* data, ExceptionCode& ec) {
 void FileWriter::seek(long long position, ExceptionCode& ec) {
   ASSERT(m_writer);
   if (m_readyState == WRITING) {
-    ec = INVALID_STATE_ERR;
-    m_error = FileError::create(ec);
+    setError(FileError::INVALID_STATE_ERR, ec);
     return;
   }
 
@@ -124,8 +122,7 @@ void FileWriter::seek(long long position, ExceptionCode& ec) {
 void FileWriter::truncate(long long position, ExceptionCode& ec) {
   ASSERT(m_writer);
   if (m_readyState == WRITING || position < 0) {
-    ec = INVALID_STATE_ERR;
-    m_error = FileError::create(ec);
+    setError(FileError::INVALID_STATE_ERR, ec);
     return;
   }
   m_readyState = WRITING;
@@ -138,12 +135,11 @@ void FileWriter::truncate(long long position, ExceptionCode& ec) {
 void FileWriter::abort(ExceptionCode& ec) {
   ASSERT(m_writer);
   if (m_readyState != WRITING) {
-    ec = INVALID_STATE_ERR;
-    m_error = FileError::create(ec);
+    setError(FileError::INVALID_STATE_ERR, ec);
     return;
   }
 
-  m_error = FileError::create(ABORT_ERR);
+  m_error = FileError::create(FileError::ABORT_ERR);
   m_writer->abort();
 }
 
@@ -180,10 +176,10 @@ void FileWriter::didTruncate() {
   fireEvent(eventNames().writeendEvent);
 }
 
-void FileWriter::didFail(ExceptionCode ec) {
-  m_error = FileError::create(ec);
+void FileWriter::didFail(FileError::ErrorCode code) {
+  m_error = FileError::create(code);
   fireEvent(eventNames().errorEvent);
-  if (ABORT_ERR == ec)
+  if (FileError::ABORT_ERR == code)
     fireEvent(eventNames().abortEvent);
   fireEvent(eventNames().errorEvent);
   m_blobBeingWritten.clear();
@@ -197,6 +193,11 @@ void FileWriter::fireEvent(const AtomicString& type) {
   dispatchEvent(ProgressEvent::create(type, true,
                                       static_cast<unsigned>(m_bytesWritten),
                                       static_cast<unsigned>(m_bytesToWrite)));
+}
+
+void FileWriter::setError(FileError::ErrorCode errorCode, ExceptionCode& ec) {
+  ec = FileException::ErrorCodeToExceptionCode(errorCode);
+  m_error = FileError::create(errorCode);
 }
 
 }  // namespace WebCore

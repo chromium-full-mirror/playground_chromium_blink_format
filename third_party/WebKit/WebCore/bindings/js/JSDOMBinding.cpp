@@ -80,6 +80,11 @@
 #include "SQLException.h"
 #endif
 
+#if ENABLE(BLOB) || ENABLE(FILE_SYSTEM)
+#include "FileException.h"
+#include "JSFileException.h"
+#endif
+
 using namespace JSC;
 
 namespace WebCore {
@@ -657,6 +662,12 @@ void setDOMException(ExecState* exec, ExceptionCode ec) {
 #if ENABLE(DATABASE)
     case SQLExceptionType:
       errorObject = toJS(exec, globalObject, SQLException::create(description));
+      break;
+#endif
+#if ENABLE(BLOB) || ENABLE(FILE_SYSTEM)
+    case FileExceptionType:
+      errorObject =
+          toJS(exec, globalObject, FileException::create(description));
       break;
 #endif
   }

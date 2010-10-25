@@ -69,6 +69,7 @@
 #include "DOMFileSystemSync.h"
 #include "ErrorCallback.h"
 #include "FileError.h"
+#include "FileException.h"
 #include "FileSystemCallback.h"
 #include "FileSystemCallbacks.h"
 #include "LocalFileSystem.h"
@@ -374,7 +375,7 @@ void WorkerContext::requestFileSystem(
   if (!AsyncFileSystem::isAvailable() ||
       !securityOrigin()->canAccessFileSystem()) {
     DOMFileSystem::scheduleCallback(this, errorCallback,
-                                    FileError::create(SECURITY_ERR));
+                                    FileError::create(FileError::SECURITY_ERR));
     return;
   }
 
@@ -383,7 +384,8 @@ void WorkerContext::requestFileSystem(
   if (fileSystemType != AsyncFileSystem::Temporary &&
       fileSystemType != AsyncFileSystem::Persistent) {
     DOMFileSystem::scheduleCallback(
-        this, errorCallback, FileError::create(INVALID_MODIFICATION_ERR));
+        this, errorCallback,
+        FileError::create(FileError::INVALID_MODIFICATION_ERR));
     return;
   }
 
@@ -399,7 +401,7 @@ PassRefPtr<DOMFileSystemSync> WorkerContext::requestFileSystemSync(
   ec = 0;
   if (!AsyncFileSystem::isAvailable() ||
       !securityOrigin()->canAccessFileSystem()) {
-    ec = SECURITY_ERR;
+    ec = FileException::SECURITY_ERR;
     return 0;
   }
 
@@ -407,7 +409,7 @@ PassRefPtr<DOMFileSystemSync> WorkerContext::requestFileSystemSync(
       static_cast<AsyncFileSystem::Type>(type);
   if (fileSystemType != AsyncFileSystem::Temporary &&
       fileSystemType != AsyncFileSystem::Persistent) {
-    ec = INVALID_MODIFICATION_ERR;
+    ec = FileException::INVALID_MODIFICATION_ERR;
     return 0;
   }
 

@@ -85,6 +85,10 @@ enum ExceptionType {
   ,
   SQLExceptionType
 #endif
+#if ENABLE(BLOB) || ENABLE(FILE_SYSTEM)
+  ,
+  FileExceptionType
+#endif
 };
 
 struct ExceptionCodeDescription {

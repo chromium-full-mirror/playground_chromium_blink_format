@@ -49,8 +49,9 @@ void Entry::getMetadata(PassRefPtr<MetadataCallback> successCallback,
                         PassRefPtr<ErrorCallback> errorCallbackRef) {
   RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
   if (!m_fileSystem->getMetadata(this, successCallback, errorCallback))
-    filesystem()->scheduleCallback(errorCallback.release(),
-                                   FileError::create(INVALID_MODIFICATION_ERR));
+    filesystem()->scheduleCallback(
+        errorCallback.release(),
+        FileError::create(FileError::INVALID_MODIFICATION_ERR));
 }
 
 void Entry::moveTo(PassRefPtr<DirectoryEntry> parent,
@@ -60,8 +61,9 @@ void Entry::moveTo(PassRefPtr<DirectoryEntry> parent,
   RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
   if (!m_fileSystem->move(this, parent.get(), name, successCallback,
                           errorCallback))
-    filesystem()->scheduleCallback(errorCallback.release(),
-                                   FileError::create(INVALID_MODIFICATION_ERR));
+    filesystem()->scheduleCallback(
+        errorCallback.release(),
+        FileError::create(FileError::INVALID_MODIFICATION_ERR));
 }
 
 void Entry::copyTo(PassRefPtr<DirectoryEntry> parent,
@@ -71,24 +73,27 @@ void Entry::copyTo(PassRefPtr<DirectoryEntry> parent,
   RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
   if (!m_fileSystem->copy(this, parent.get(), name, successCallback,
                           errorCallback))
-    filesystem()->scheduleCallback(errorCallback.release(),
-                                   FileError::create(INVALID_MODIFICATION_ERR));
+    filesystem()->scheduleCallback(
+        errorCallback.release(),
+        FileError::create(FileError::INVALID_MODIFICATION_ERR));
 }
 
 void Entry::remove(PassRefPtr<VoidCallback> successCallback,
                    PassRefPtr<ErrorCallback> errorCallbackRef) const {
   RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
   if (!m_fileSystem->remove(this, successCallback, errorCallback))
-    filesystem()->scheduleCallback(errorCallback.release(),
-                                   FileError::create(INVALID_MODIFICATION_ERR));
+    filesystem()->scheduleCallback(
+        errorCallback.release(),
+        FileError::create(FileError::INVALID_MODIFICATION_ERR));
 }
 
 void Entry::getParent(PassRefPtr<EntryCallback> successCallback,
                       PassRefPtr<ErrorCallback> errorCallbackRef) const {
   RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
   if (!m_fileSystem->getParent(this, successCallback, errorCallback))
-    filesystem()->scheduleCallback(errorCallback.release(),
-                                   FileError::create(INVALID_MODIFICATION_ERR));
+    filesystem()->scheduleCallback(
+        errorCallback.release(),
+        FileError::create(FileError::INVALID_MODIFICATION_ERR));
 }
 
 String Entry::toURI(const String&) {

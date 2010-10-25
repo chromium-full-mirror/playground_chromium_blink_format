@@ -55,8 +55,9 @@ void DirectoryEntry::getFile(const String& path,
                              PassRefPtr<ErrorCallback> errorCallbackRef) {
   RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
   if (!m_fileSystem->getFile(this, path, flags, successCallback, errorCallback))
-    filesystem()->scheduleCallback(errorCallback.release(),
-                                   FileError::create(INVALID_MODIFICATION_ERR));
+    filesystem()->scheduleCallback(
+        errorCallback.release(),
+        FileError::create(FileError::INVALID_MODIFICATION_ERR));
 }
 
 void DirectoryEntry::getDirectory(const String& path,
@@ -66,8 +67,9 @@ void DirectoryEntry::getDirectory(const String& path,
   RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
   if (!m_fileSystem->getDirectory(this, path, flags, successCallback,
                                   errorCallback))
-    filesystem()->scheduleCallback(errorCallback.release(),
-                                   FileError::create(INVALID_MODIFICATION_ERR));
+    filesystem()->scheduleCallback(
+        errorCallback.release(),
+        FileError::create(FileError::INVALID_MODIFICATION_ERR));
 }
 
 void DirectoryEntry::removeRecursively(
@@ -75,8 +77,9 @@ void DirectoryEntry::removeRecursively(
     PassRefPtr<ErrorCallback> errorCallbackRef) const {
   RefPtr<ErrorCallback> errorCallback(errorCallbackRef);
   if (!m_fileSystem->removeRecursively(this, successCallback, errorCallback))
-    filesystem()->scheduleCallback(errorCallback.release(),
-                                   FileError::create(INVALID_MODIFICATION_ERR));
+    filesystem()->scheduleCallback(
+        errorCallback.release(),
+        FileError::create(FileError::INVALID_MODIFICATION_ERR));
 }
 }
 
