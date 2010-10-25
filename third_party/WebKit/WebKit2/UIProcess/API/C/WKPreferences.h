@@ -78,10 +78,15 @@ WK_EXPORT void WKPreferencesSetFrameFlatteningEnabled(
 WK_EXPORT bool WKPreferencesGetFrameFlatteningEnabled(
     WKPreferencesRef preferences);
 
-// Default to true.
+// Defaults to true.
 WK_EXPORT void WKPreferencesSetPluginsEnabled(WKPreferencesRef preferences,
                                               bool pluginsEnabled);
 WK_EXPORT bool WKPreferencesGetPluginsEnabled(WKPreferencesRef preferences);
+
+// Defaults to true.
+WK_EXPORT void WKPReferencesSetJavaEnabled(WKPreferencesRef preferences,
+                                           bool javaEnabled);
+WK_EXPORT bool WKPReferencesGetJavaEnabled(WKPreferencesRef preferences);
 
 WK_EXPORT void WKPreferencesSetStandardFontFamily(
     WKPreferencesRef preferencesRef,

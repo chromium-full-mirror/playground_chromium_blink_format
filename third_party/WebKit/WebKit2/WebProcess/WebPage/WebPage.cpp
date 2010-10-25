@@ -734,6 +734,7 @@ void WebPage::updatePreferences(const WebPreferencesStore& store) {
   settings->setJavaScriptEnabled(store.javaScriptEnabled);
   settings->setLoadsImagesAutomatically(store.loadsImagesAutomatically);
   settings->setPluginsEnabled(store.pluginsEnabled);
+  settings->setJavaEnabled(store.javaEnabled);
   settings->setOfflineWebApplicationCacheEnabled(
       store.offlineWebApplicationCacheEnabled);
   settings->setLocalStorageEnabled(store.localStorageEnabled);
