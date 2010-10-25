@@ -38,6 +38,7 @@ class FrameLoaderClientQt;
 class FrameView;
 class HTMLFrameOwnerElement;
 class Scrollbar;
+class TextureMapperContentLayer;
 }
 class QWebPage;
 
@@ -72,8 +73,14 @@ class QWebFramePrivate {
         page(0),
         allowsScrolling(true),
         marginWidth(-1),
-        marginHeight(-1),
-        zoomTextOnly(false) {}
+        marginHeight(-1)
+#if USE(ACCELERATED_COMPOSITING) && USE(TEXTURE_MAPPER)
+        ,
+        rootGraphicsLayer(0)
+#endif
+        ,
+        zoomTextOnly(false) {
+  }
   void init(QWebFrame* qframe, QWebFrameData* frameData);
   void setPage(QWebPage*);
 
@@ -105,6 +112,9 @@ class QWebFramePrivate {
   bool allowsScrolling;
   int marginWidth;
   int marginHeight;
+#if USE(ACCELERATED_COMPOSITING) && USE(TEXTURE_MAPPER)
+  WebCore::TextureMapperContentLayer* rootGraphicsLayer;
+#endif
   bool zoomTextOnly;
 };
 
