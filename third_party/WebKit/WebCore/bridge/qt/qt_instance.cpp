@@ -316,8 +316,8 @@ JSValue QtInstance::stringValue(ExecState* exec) const {
   return jsString(exec, buf.constData());
 }
 
-JSValue QtInstance::numberValue(ExecState* exec) const {
-  return jsNumber(exec, 0);
+JSValue QtInstance::numberValue(ExecState*) const {
+  return jsNumber(0);
 }
 
 JSValue QtInstance::booleanValue() const {
