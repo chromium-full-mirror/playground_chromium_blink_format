@@ -991,6 +991,14 @@ void WebPageProxy::didDraw() {
   m_uiClient.didDraw(this);
 }
 
+// Inspector
+
+WebInspectorProxy* WebPageProxy::inspector() {
+  if (!m_inspector)
+    m_inspector = WebInspectorProxy::create(this);
+  return m_inspector.get();
+}
+
 // BackForwardList
 
 void WebPageProxy::backForwardAddItem(uint64_t itemID) {
@@ -1231,6 +1239,11 @@ void WebPageProxy::processDidCrash() {
     m_urlAtProcessExit = m_mainFrame->url();
 
   m_mainFrame = 0;
+
+  if (m_inspector) {
+    m_inspector->invalidate();
+    m_inspector = 0;
+  }
 
   m_pageTitle = String();
   m_toolTip = String();

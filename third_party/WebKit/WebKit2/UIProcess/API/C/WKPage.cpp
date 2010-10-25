@@ -131,6 +131,10 @@ WKFrameRef WKPageGetMainFrame(WKPageRef pageRef) {
   return toAPI(toImpl(pageRef)->mainFrame());
 }
 
+WKInspectorRef WKPageGetInspector(WKPageRef pageRef) {
+  return toAPI(toImpl(pageRef)->inspector());
+}
+
 double WKPageGetEstimatedProgress(WKPageRef pageRef) {
   return toImpl(pageRef)->estimatedProgress();
 }

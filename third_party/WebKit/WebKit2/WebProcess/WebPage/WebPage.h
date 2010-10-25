@@ -68,6 +68,7 @@ class PageOverlay;
 class PluginView;
 class WebEvent;
 class WebFrame;
+class WebInspector;
 class WebKeyboardEvent;
 class WebMouseEvent;
 class WebPopupMenu;
@@ -95,6 +96,8 @@ class WebPage : public APIObject {
   const WebCore::IntSize& size() const { return m_viewSize; }
 
   DrawingArea* drawingArea() const { return m_drawingArea.get(); }
+
+  WebInspector* inspector();
 
   // -- Called by the DrawingArea.
   // FIXME: We could genericize these into a DrawingArea client interface. Would
@@ -296,6 +299,8 @@ class WebPage : public APIObject {
 
   FindController m_findController;
   OwnPtr<PageOverlay> m_pageOverlay;
+
+  OwnPtr<WebInspector> m_inspector;
 
   RefPtr<WebPopupMenu> m_activePopupMenu;
 

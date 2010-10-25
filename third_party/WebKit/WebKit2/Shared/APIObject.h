@@ -56,6 +56,7 @@ class APIObject : public RefCounted<APIObject> {
     TypeBackForwardList,
     TypeBackForwardListItem,
     TypeContext,
+    TypeInspector,
     TypeFormSubmissionListener,
     TypeFrame,
     TypeFramePolicyListener,
