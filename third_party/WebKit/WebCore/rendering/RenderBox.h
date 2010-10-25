@@ -545,6 +545,8 @@ class RenderBox : public RenderBoxModelObject {
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;
 
+  void adjustForFlippedBlocksWritingMode(RenderBox* child, IntPoint&);
+
  protected:
   virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);

@@ -170,21 +170,18 @@ class InlineTextBox : public InlineBox {
 
  protected:
   void paintCompositionBackground(GraphicsContext*,
-                                  int tx,
-                                  int ty,
+                                  const IntPoint& boxOrigin,
                                   RenderStyle*,
                                   const Font&,
                                   int startPos,
                                   int endPos);
   void paintDocumentMarkers(GraphicsContext*,
-                            int tx,
-                            int ty,
+                            const IntPoint& boxOrigin,
                             RenderStyle*,
                             const Font&,
                             bool background);
   void paintCompositionUnderline(GraphicsContext*,
-                                 int tx,
-                                 int ty,
+                                 const IntPoint& boxOrigin,
                                  const CompositionUnderline&);
 #if PLATFORM(MAC)
   void paintCustomHighlight(int tx, int ty, const AtomicString& type);
@@ -192,31 +189,25 @@ class InlineTextBox : public InlineBox {
 
  private:
   void paintDecoration(GraphicsContext*,
-                       int tx,
-                       int ty,
+                       const IntPoint& boxOrigin,
                        int decoration,
                        const ShadowData*);
   void paintSelection(GraphicsContext*,
-                      int tx,
-                      int ty,
+                      const IntPoint& boxOrigin,
                       RenderStyle*,
                       const Font&);
   void paintSpellingOrGrammarMarker(GraphicsContext*,
-                                    int tx,
-                                    int ty,
+                                    const IntPoint& boxOrigin,
                                     const DocumentMarker&,
                                     RenderStyle*,
                                     const Font&,
                                     bool grammar);
   void paintTextMatchMarker(GraphicsContext*,
-                            int tx,
-                            int ty,
+                            const IntPoint& boxOrigin,
                             const DocumentMarker&,
                             RenderStyle*,
                             const Font&);
-  void computeRectForReplacementMarker(int tx,
-                                       int ty,
-                                       const DocumentMarker&,
+  void computeRectForReplacementMarker(const DocumentMarker&,
                                        RenderStyle*,
                                        const Font&);
 };

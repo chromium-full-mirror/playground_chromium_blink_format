@@ -1103,6 +1103,10 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return writingMode() == LeftToRightWritingMode ||
            writingMode() == BottomToTopWritingMode;
   }
+  bool isFlippedBlocksWritingMode() const {
+    return writingMode() == RightToLeftWritingMode ||
+           writingMode() == BottomToTopWritingMode;
+  }
 
   ESpeak speak() { return static_cast<ESpeak>(rareInheritedData->speak); }
 

@@ -329,6 +329,8 @@ class InlineBox {
     return 0;
   }
 
+  void adjustForFlippedBlocksWritingMode(IntPoint&);
+
  private:
   InlineBox* m_next;  // The next element on the same line as us.
   InlineBox* m_prev;  // The previous element on the same line as us.

@@ -386,10 +386,7 @@ static void paintTextWithShadows(GraphicsContext* context,
                                  int endOffset,
                                  int truncationPoint,
                                  const IntPoint& textOrigin,
-                                 int x,
-                                 int y,
-                                 int w,
-                                 int h,
+                                 const IntRect& boxRect,
                                  const ShadowData* shadow,
                                  bool stroked,
                                  bool vertical) {
@@ -403,7 +400,7 @@ static void paintTextWithShadows(GraphicsContext* context,
     IntSize extraOffset;
     if (shadow)
       extraOffset = roundedIntSize(InlineTextBox::applyShadowToGraphicsContext(
-          context, shadow, FloatRect(x, y, w, h), stroked, opaque, vertical));
+          context, shadow, boxRect, stroked, opaque, vertical));
     else if (!opaque)
       context->setFillColor(fillColor, fillColorSpace);
 
@@ -494,8 +491,14 @@ void InlineTextBox::paint(PaintInfo& paintInfo, int tx, int ty) {
 
   RenderStyle* styleToUse = renderer()->style(m_firstLine);
   int baseline = styleToUse->font().ascent();
-  ty -= styleToUse->isFlippedLinesWritingMode() ? baseline : 0;
-  IntPoint textOrigin(m_x + tx, m_y + ty + baseline);
+  ty -= styleToUse->isHorizontalWritingMode() ? 0 : baseline;
+
+  IntPoint boxOrigin(m_x, m_y);
+  adjustForFlippedBlocksWritingMode(boxOrigin);
+  boxOrigin.move(tx, ty);
+
+  IntPoint textOrigin = IntPoint(boxOrigin.x(), boxOrigin.y() + baseline);
+  IntRect boxRect(boxOrigin, IntSize(logicalWidth(), logicalHeight()));
 
   if (m_isVertical) {
     context->save();
@@ -529,14 +532,14 @@ void InlineTextBox::paint(PaintInfo& paintInfo, int tx, int ty) {
 
     if (containsComposition && !useCustomUnderlines)
       paintCompositionBackground(
-          context, tx, ty, styleToUse, font,
+          context, boxOrigin, styleToUse, font,
           renderer()->frame()->editor()->compositionStart(),
           renderer()->frame()->editor()->compositionEnd());
 
-    paintDocumentMarkers(context, tx, ty, styleToUse, font, true);
+    paintDocumentMarkers(context, boxOrigin, styleToUse, font, true);
 
     if (haveSelection && !useCustomUnderlines)
-      paintSelection(context, tx, ty, styleToUse, font);
+      paintSelection(context, boxOrigin, styleToUse, font);
   }
 
   // 2. Now paint the foreground, including text and decorations like
@@ -647,13 +650,11 @@ void InlineTextBox::paint(PaintInfo& paintInfo, int tx, int ty) {
     if (!paintSelectedTextSeparately || ePos <= sPos) {
       // FIXME: Truncate right-to-left text correctly.
       paintTextWithShadows(context, font, textRun, 0, length, length,
-                           textOrigin, m_x + tx, m_y + ty, logicalWidth(),
-                           logicalHeight(), textShadow, textStrokeWidth > 0,
+                           textOrigin, boxRect, textShadow, textStrokeWidth > 0,
                            m_isVertical);
     } else
       paintTextWithShadows(context, font, textRun, ePos, sPos, length,
-                           textOrigin, m_x + tx, m_y + ty, logicalWidth(),
-                           logicalHeight(), textShadow, textStrokeWidth > 0,
+                           textOrigin, boxRect, textShadow, textStrokeWidth > 0,
                            m_isVertical);
 
     if (textStrokeWidth > 0)
@@ -668,8 +669,7 @@ void InlineTextBox::paint(PaintInfo& paintInfo, int tx, int ty) {
     updateGraphicsContext(context, selectionFillColor, selectionStrokeColor,
                           selectionStrokeWidth, styleToUse->colorSpace());
     paintTextWithShadows(context, font, textRun, sPos, ePos, length, textOrigin,
-                         m_x + tx, m_y + ty, logicalWidth(), logicalHeight(),
-                         selectionShadow, selectionStrokeWidth > 0,
+                         boxRect, selectionShadow, selectionStrokeWidth > 0,
                          m_isVertical);
 
     if (selectionStrokeWidth > 0)
@@ -680,11 +680,11 @@ void InlineTextBox::paint(PaintInfo& paintInfo, int tx, int ty) {
   if (d != TDNONE && paintInfo.phase != PaintPhaseSelection) {
     updateGraphicsContext(context, textFillColor, textStrokeColor,
                           textStrokeWidth, styleToUse->colorSpace());
-    paintDecoration(context, tx, ty, d, textShadow);
+    paintDecoration(context, boxOrigin, d, textShadow);
   }
 
   if (paintInfo.phase == PaintPhaseForeground) {
-    paintDocumentMarkers(context, tx, ty, styleToUse, font, false);
+    paintDocumentMarkers(context, boxOrigin, styleToUse, font, false);
 
     if (useCustomUnderlines) {
       const Vector<CompositionUnderline>& underlines =
@@ -704,7 +704,7 @@ void InlineTextBox::paint(PaintInfo& paintInfo, int tx, int ty) {
 
         if (underline.startOffset <= end()) {
           // underline intersects this run.  Paint it.
-          paintCompositionUnderline(context, tx, ty, underline);
+          paintCompositionUnderline(context, boxOrigin, underline);
           if (underline.endOffset > end() + 1)
             // underline also runs into the next run. Bail now, no more marker
             // advancement.
@@ -739,8 +739,7 @@ void InlineTextBox::selectionStartEnd(int& sPos, int& ePos) {
 }
 
 void InlineTextBox::paintSelection(GraphicsContext* context,
-                                   int tx,
-                                   int ty,
+                                   const IntPoint& boxOrigin,
                                    RenderStyle* style,
                                    const Font& font) {
   // See if we have a selection to paint at all.
@@ -764,8 +763,7 @@ void InlineTextBox::paintSelection(GraphicsContext* context,
   context->save();
   updateGraphicsContext(context, c, c, 0,
                         style->colorSpace());  // Don't draw text at all!
-  int y = selectionTop();
-  int h = selectionHeight();
+
   // If the text is truncated, let the thing being painted in the truncation
   // draw its own highlight.
   int length = m_truncation != cNoTruncation ? m_truncation : m_len;
@@ -778,18 +776,20 @@ void InlineTextBox::paintSelection(GraphicsContext* context,
     ePos = length;
   }
 
-  context->clip(IntRect(m_x + tx, y + ty, m_logicalWidth, h));
+  int deltaY = logicalTop() - selectionTop();
+  int selHeight = selectionHeight();
+  IntPoint localOrigin(boxOrigin.x(), boxOrigin.y() - deltaY);
+  context->clip(IntRect(localOrigin, IntSize(m_logicalWidth, selHeight)));
   context->drawHighlightForText(
       font, TextRun(characters, length, textRenderer()->allowTabs(), textPos(),
                     m_toAdd, !isLeftToRightDirection(),
                     m_dirOverride || style->visuallyOrdered()),
-      IntPoint(m_x + tx, y + ty), h, c, style->colorSpace(), sPos, ePos);
+      localOrigin, selHeight, c, style->colorSpace(), sPos, ePos);
   context->restore();
 }
 
 void InlineTextBox::paintCompositionBackground(GraphicsContext* context,
-                                               int tx,
-                                               int ty,
+                                               const IntPoint& boxOrigin,
                                                RenderStyle* style,
                                                const Font& font,
                                                int startPos,
@@ -808,14 +808,15 @@ void InlineTextBox::paintCompositionBackground(GraphicsContext* context,
   updateGraphicsContext(context, c, c, 0,
                         style->colorSpace());  // Don't draw text at all!
 
-  int y = selectionTop();
-  int h = selectionHeight();
+  int deltaY = logicalTop() - selectionTop();
+  int selHeight = selectionHeight();
+  IntPoint localOrigin(boxOrigin.x(), boxOrigin.y() - deltaY);
   context->drawHighlightForText(
       font, TextRun(textRenderer()->text()->characters() + m_start, m_len,
                     textRenderer()->allowTabs(), textPos(), m_toAdd,
                     !isLeftToRightDirection(),
                     m_dirOverride || style->visuallyOrdered()),
-      IntPoint(m_x + tx, y + ty), h, c, style->colorSpace(), sPos, ePos);
+      localOrigin, selHeight, c, style->colorSpace(), sPos, ePos);
   context->restore();
 }
 
@@ -843,22 +844,20 @@ void InlineTextBox::paintCustomHighlight(int tx,
 #endif
 
 void InlineTextBox::paintDecoration(GraphicsContext* context,
-                                    int tx,
-                                    int ty,
+                                    const IntPoint& boxOrigin,
                                     int deco,
                                     const ShadowData* shadow) {
-  tx += m_x;
-  ty += m_y;
-
   if (m_truncation == cFullTruncation)
     return;
+
+  IntPoint localOrigin = boxOrigin;
 
   int width = m_logicalWidth;
   if (m_truncation != cNoTruncation) {
     width = toRenderText(renderer())
                 ->width(m_start, m_truncation, textPos(), m_firstLine);
     if (!isLeftToRightDirection())
-      tx += (m_logicalWidth - width);
+      localOrigin.move(m_logicalWidth - width, 0);
   }
 
   // Get the text decoration colors.
@@ -883,9 +882,9 @@ void InlineTextBox::paintDecoration(GraphicsContext* context,
   int extraOffset = 0;
   if (!linesAreOpaque && shadow && shadow->next()) {
     context->save();
-    IntRect clipRect(tx, ty, width, baseline + 2);
+    IntRect clipRect(localOrigin, IntSize(width, baseline + 2));
     for (const ShadowData* s = shadow; s; s = s->next()) {
-      IntRect shadowRect(tx, ty, width, baseline + 2);
+      IntRect shadowRect(localOrigin, IntSize(width, baseline + 2));
       shadowRect.inflate(s->blur());
       int shadowX = m_isVertical ? s->y() : s->x();
       int shadowY = m_isVertical ? -s->x() : s->y();
@@ -896,7 +895,7 @@ void InlineTextBox::paintDecoration(GraphicsContext* context,
     context->save();
     context->clip(clipRect);
     extraOffset += baseline + 2;
-    ty += extraOffset;
+    localOrigin.move(0, extraOffset);
     setClip = true;
   }
 
@@ -907,7 +906,7 @@ void InlineTextBox::paintDecoration(GraphicsContext* context,
     if (shadow) {
       if (!shadow->next()) {
         // The last set of lines paints normally inside the clip.
-        ty -= extraOffset;
+        localOrigin.move(0, -extraOffset);
         extraOffset = 0;
       }
       int shadowX = m_isVertical ? shadow->y() : shadow->x();
@@ -922,19 +921,21 @@ void InlineTextBox::paintDecoration(GraphicsContext* context,
       context->setStrokeColor(underline, colorSpace);
       context->setStrokeStyle(SolidStroke);
       // Leave one pixel of white between the baseline and the underline.
-      context->drawLineForText(IntPoint(tx, ty + baseline + 1), width,
-                               isPrinting);
+      context->drawLineForText(
+          IntPoint(localOrigin.x(), localOrigin.y() + baseline + 1), width,
+          isPrinting);
     }
     if (deco & OVERLINE) {
       context->setStrokeColor(overline, colorSpace);
       context->setStrokeStyle(SolidStroke);
-      context->drawLineForText(IntPoint(tx, ty), width, isPrinting);
+      context->drawLineForText(localOrigin, width, isPrinting);
     }
     if (deco & LINE_THROUGH) {
       context->setStrokeColor(linethrough, colorSpace);
       context->setStrokeStyle(SolidStroke);
-      context->drawLineForText(IntPoint(tx, ty + 2 * baseline / 3), width,
-                               isPrinting);
+      context->drawLineForText(
+          IntPoint(localOrigin.x(), localOrigin.y() + 2 * baseline / 3), width,
+          isPrinting);
     }
   } while (shadow);
 
@@ -960,8 +961,7 @@ textCheckingLineStyleForMarkerType(DocumentMarker::MarkerType markerType) {
 }
 
 void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
-                                                 int tx,
-                                                 int ty,
+                                                 const IntPoint& boxOrigin,
                                                  const DocumentMarker& marker,
                                                  RenderStyle* style,
                                                  const Font& font,
@@ -994,15 +994,16 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
       endPosition = min<int>(endPosition, m_truncation);
 
     // Calculate start & width
-    IntPoint startPoint(tx + m_x, ty + selectionTop());
+    int deltaY = logicalTop() - selectionTop();
+    int selHeight = selectionHeight();
+    IntPoint startPoint(boxOrigin.x(), boxOrigin.y() - deltaY);
     TextRun run(textRenderer()->text()->characters() + m_start, m_len,
                 textRenderer()->allowTabs(), textPos(), m_toAdd,
                 !isLeftToRightDirection(),
                 m_dirOverride || style->visuallyOrdered());
-    int h = selectionHeight();
 
     IntRect markerRect = enclosingIntRect(font.selectionRectForText(
-        run, startPoint, h, startPosition, endPosition));
+        run, startPoint, selHeight, startPosition, endPosition));
     start = markerRect.x() - startPoint.x();
     width = markerRect.width();
 
@@ -1010,7 +1011,7 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
     // it elsewhere in order to
     // display a toolTip. We don't do this for misspelling markers.
     if (grammar) {
-      markerRect.move(-tx, -ty);
+      markerRect.move(-boxOrigin.x(), -boxOrigin.y());
       markerRect = renderer()
                        ->localToAbsoluteQuad(FloatRect(markerRect))
                        .enclosingBoundingBox();
@@ -1043,21 +1044,20 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
     underlineOffset = baseline + 2;
   }
   pt->drawLineForTextChecking(
-      IntPoint(tx + m_x + start, ty + m_y + underlineOffset), width,
+      IntPoint(boxOrigin.x() + start, boxOrigin.y() + underlineOffset), width,
       textCheckingLineStyleForMarkerType(marker.type));
 }
 
 void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
-                                         int tx,
-                                         int ty,
+                                         const IntPoint& boxOrigin,
                                          const DocumentMarker& marker,
                                          RenderStyle* style,
                                          const Font& font) {
   // Use same y positioning and height as for selection, so that when the
   // selection and this highlight are on
   // the same word there are no pieces sticking out.
-  int y = selectionTop();
-  int h = selectionHeight();
+  int deltaY = logicalTop() - selectionTop();
+  int selHeight = selectionHeight();
 
   int sPos = max(marker.startOffset - m_start, (unsigned)0);
   int ePos = min(marker.endOffset - m_start, (unsigned)m_len);
@@ -1068,8 +1068,8 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
 
   // Always compute and store the rect associated with this marker. The computed
   // rect is in absolute coordinates.
-  IntRect markerRect = enclosingIntRect(
-      font.selectionRectForText(run, IntPoint(m_x, y), h, sPos, ePos));
+  IntRect markerRect = enclosingIntRect(font.selectionRectForText(
+      run, IntPoint(m_x, selectionTop()), selHeight, sPos, ePos));
   markerRect = renderer()
                    ->localToAbsoluteQuad(FloatRect(markerRect))
                    .enclosingBoundingBox();
@@ -1085,16 +1085,16 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
     pt->save();
     updateGraphicsContext(pt, color, color, 0,
                           style->colorSpace());  // Don't draw text at all!
-    pt->clip(IntRect(tx + m_x, ty + y, m_logicalWidth, h));
-    pt->drawHighlightForText(font, run, IntPoint(m_x + tx, y + ty), h, color,
-                             style->colorSpace(), sPos, ePos);
+    pt->clip(IntRect(boxOrigin.x(), boxOrigin.y() - deltaY, m_logicalWidth,
+                     selHeight));
+    pt->drawHighlightForText(font, run,
+                             IntPoint(boxOrigin.x(), boxOrigin.y() - deltaY),
+                             selHeight, color, style->colorSpace(), sPos, ePos);
     pt->restore();
   }
 }
 
 void InlineTextBox::computeRectForReplacementMarker(
-    int /*tx*/,
-    int /*ty*/,
     const DocumentMarker& marker,
     RenderStyle* style,
     const Font& font) {
@@ -1122,8 +1122,7 @@ void InlineTextBox::computeRectForReplacementMarker(
 }
 
 void InlineTextBox::paintDocumentMarkers(GraphicsContext* pt,
-                                         int tx,
-                                         int ty,
+                                         const IntPoint& boxOrigin,
                                          RenderStyle* style,
                                          const Font& font,
                                          bool background) {
@@ -1175,17 +1174,17 @@ void InlineTextBox::paintDocumentMarkers(GraphicsContext* pt,
     // marker intersects this run.  Paint it.
     switch (marker.type) {
       case DocumentMarker::Spelling:
-        paintSpellingOrGrammarMarker(pt, tx, ty, marker, style, font, false);
+        paintSpellingOrGrammarMarker(pt, boxOrigin, marker, style, font, false);
         break;
       case DocumentMarker::Grammar:
-        paintSpellingOrGrammarMarker(pt, tx, ty, marker, style, font, true);
+        paintSpellingOrGrammarMarker(pt, boxOrigin, marker, style, font, true);
         break;
       case DocumentMarker::TextMatch:
-        paintTextMatchMarker(pt, tx, ty, marker, style, font);
+        paintTextMatchMarker(pt, boxOrigin, marker, style, font);
         break;
       case DocumentMarker::CorrectionIndicator:
-        computeRectForReplacementMarker(tx, ty, marker, style, font);
-        paintSpellingOrGrammarMarker(pt, tx, ty, marker, style, font, false);
+        computeRectForReplacementMarker(marker, style, font);
+        paintSpellingOrGrammarMarker(pt, boxOrigin, marker, style, font, false);
         break;
       case DocumentMarker::Replacement:
       case DocumentMarker::RejectedCorrection:
@@ -1198,12 +1197,8 @@ void InlineTextBox::paintDocumentMarkers(GraphicsContext* pt,
 
 void InlineTextBox::paintCompositionUnderline(
     GraphicsContext* ctx,
-    int tx,
-    int ty,
+    const IntPoint& boxOrigin,
     const CompositionUnderline& underline) {
-  tx += m_x;
-  ty += m_y;
-
   if (m_truncation == cFullTruncation)
     return;
 
@@ -1252,8 +1247,9 @@ void InlineTextBox::paintCompositionUnderline(
   ctx->setStrokeColor(underline.color, renderer()->style()->colorSpace());
   ctx->setStrokeThickness(lineThickness);
   ctx->drawLineForText(
-      IntPoint(tx + start, ty + logicalHeight() - lineThickness), width,
-      textRenderer()->document()->printing());
+      IntPoint(boxOrigin.x() + start,
+               boxOrigin.y() + logicalHeight() - lineThickness),
+      width, textRenderer()->document()->printing());
 }
 
 int InlineTextBox::caretMinOffset() const {
