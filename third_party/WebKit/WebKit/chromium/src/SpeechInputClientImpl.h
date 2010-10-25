@@ -59,7 +59,7 @@ class SpeechInputClientImpl : public WebCore::SpeechInputClient,
 
   // WebSpeechInputListener methods.
   void didCompleteRecording(int);
-  void setRecognitionResult(int, const WebString&);
+  void setRecognitionResult(int, const WebSpeechInputResultArray&);
   void didCompleteRecognition(int);
 
  private:

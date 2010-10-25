@@ -152,7 +152,7 @@ class InputFieldSpeechButtonElement : public TextControlInnerElement,
   // SpeechInputListener methods.
   void didCompleteRecording(int);
   void didCompleteRecognition(int);
-  void setRecognitionResult(int, const String& result);
+  void setRecognitionResult(int, const SpeechInputResultArray&);
 
  private:
   InputFieldSpeechButtonElement(HTMLElement*);
@@ -162,6 +162,7 @@ class InputFieldSpeechButtonElement : public TextControlInnerElement,
   bool m_capturing;
   SpeechInputState m_state;
   int m_listenerId;
+  SpeechInputResultArray m_results;
 };
 
 #endif  // ENABLE(INPUT_SPEECH)

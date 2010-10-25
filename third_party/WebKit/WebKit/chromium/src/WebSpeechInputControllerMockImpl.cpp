@@ -68,7 +68,7 @@ void WebSpeechInputControllerMockImpl::didCompleteRecognition(int requestId) {
 
 void WebSpeechInputControllerMockImpl::setRecognitionResult(
     int requestId,
-    const WTF::String& result) {
+    const WebCore::SpeechInputResultArray& result) {
   m_listener->setRecognitionResult(requestId, result);
 }
 

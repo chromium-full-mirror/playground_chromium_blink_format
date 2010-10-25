@@ -73,7 +73,7 @@ class SpeechInput : public Noncopyable, public SpeechInputListener {
   // SpeechInputListener methods.
   virtual void didCompleteRecording(int);
   virtual void didCompleteRecognition(int);
-  virtual void setRecognitionResult(int, const String&);
+  virtual void setRecognitionResult(int, const SpeechInputResultArray&);
 
  private:
   SpeechInputClient* m_client;

@@ -33,9 +33,12 @@
 
 #if ENABLE(INPUT_SPEECH)
 
+#include "SpeechInputResult.h"
 #include <wtf/Forward.h>
 
 namespace WebCore {
+
+typedef Vector<RefPtr<SpeechInputResult>> SpeechInputResultArray;
 
 // Interface to be implemented by the element which invokes SpeechInput.
 class SpeechInputListener {
@@ -59,7 +62,8 @@ class SpeechInputListener {
   // properly
   // or if there was any other errors in the process, this method may never be
   // called.
-  virtual void setRecognitionResult(int requestId, const String& result) = 0;
+  virtual void setRecognitionResult(int requestId,
+                                    const SpeechInputResultArray&) = 0;
 
  protected:
   virtual ~SpeechInputListener() {}
