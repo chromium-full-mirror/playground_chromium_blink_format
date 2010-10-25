@@ -88,6 +88,11 @@ class LayoutTestController : public CppBoundClass {
   // ignores any that may be present.
   void dumpFrameLoadCallbacks(const CppArgumentList&, CppVariant*);
 
+  // This function sets a flag that tells the test_shell to print a line of
+  // user gesture status text for some frame load callbacks.  It takes no
+  // arguments, and ignores any that may be present.
+  void dumpUserGestureInFrameLoadCallbacks(const CppArgumentList&, CppVariant*);
+
   // This function sets a flag that tells the test_shell to print out a text
   // representation of the back/forward list.  It ignores all arguments.
   void dumpBackForwardList(const CppArgumentList&, CppVariant*);
@@ -347,6 +352,12 @@ class LayoutTestController : public CppBoundClass {
   void setShouldDumpFrameLoadCallbacks(bool value) {
     m_dumpFrameLoadCallbacks = value;
   }
+  bool shouldDumpUserGestureInFrameLoadCallbacks() {
+    return m_dumpUserGestureInFrameLoadCallbacks;
+  }
+  void setShouldDumpUserGestureInFrameLoadCallbacks(bool value) {
+    m_dumpUserGestureInFrameLoadCallbacks = value;
+  }
   bool shouldDumpResourceLoadCallbacks() { return m_dumpResourceLoadCallbacks; }
   void setShouldDumpResourceResponseMIMETypes(bool value) {
     m_dumpResourceResponseMIMETypes = value;
@@ -479,6 +490,10 @@ class LayoutTestController : public CppBoundClass {
   // If true, the test_shell will output a descriptive line for each frame
   // load callback.
   bool m_dumpFrameLoadCallbacks;
+
+  // If true, the test_shell will output a line of the user gesture status
+  // text for some frame load callbacks.
+  bool m_dumpUserGestureInFrameLoadCallbacks;
 
   // If true, the test_shell will output a descriptive line for each resource
   // load callback.

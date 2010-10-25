@@ -52,6 +52,7 @@ LayoutTestController::LayoutTestController(const std::string& testPathOrURL,
       m_dumpDatabaseCallbacks(false),
       m_dumpEditingCallbacks(false),
       m_dumpFrameLoadCallbacks(false),
+      m_dumpUserGestureInFrameLoadCallbacks(false),
       m_dumpHistoryDelegateCallbacks(false),
       m_dumpResourceLoadCallbacks(false),
       m_dumpResourceResponseMIMETypes(false),
@@ -218,6 +219,19 @@ static JSValueRef dumpFrameLoadCallbacksCallback(JSContextRef context,
   LayoutTestController* controller =
       static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setDumpFrameLoadCallbacks(true);
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef dumpUserGestureInFrameLoadCallbacksCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setDumpUserGestureInFrameLoadCallbacks(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -2811,6 +2825,9 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"dumpEditingCallbacks", dumpEditingCallbacksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpFrameLoadCallbacks", dumpFrameLoadCallbacksCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"dumpUserGestureInFrameLoadCallbacks",
+       dumpUserGestureInFrameLoadCallbacksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpResourceLoadCallbacks", dumpResourceLoadCallbacksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

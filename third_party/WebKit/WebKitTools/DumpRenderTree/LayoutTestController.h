@@ -206,6 +206,14 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
     m_dumpFrameLoadCallbacks = dumpFrameLoadCallbacks;
   }
 
+  bool dumpUserGestureInFrameLoadCallbacks() const {
+    return m_dumpUserGestureInFrameLoadCallbacks;
+  }
+  void setDumpUserGestureInFrameLoadCallbacks(
+      bool dumpUserGestureInFrameLoadCallbacks) {
+    m_dumpUserGestureInFrameLoadCallbacks = dumpUserGestureInFrameLoadCallbacks;
+  }
+
   bool dumpHistoryDelegateCallbacks() const {
     return m_dumpHistoryDelegateCallbacks;
   }
@@ -455,6 +463,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool m_dumpDatabaseCallbacks;
   bool m_dumpEditingCallbacks;
   bool m_dumpFrameLoadCallbacks;
+  bool m_dumpUserGestureInFrameLoadCallbacks;
   bool m_dumpHistoryDelegateCallbacks;
   bool m_dumpResourceLoadCallbacks;
   bool m_dumpResourceResponseMIMETypes;

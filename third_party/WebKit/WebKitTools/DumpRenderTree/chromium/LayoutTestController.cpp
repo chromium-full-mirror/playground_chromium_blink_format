@@ -99,6 +99,8 @@ LayoutTestController::LayoutTestController(TestShell* shell)
              &LayoutTestController::dumpEditingCallbacks);
   bindMethod("dumpFrameLoadCallbacks",
              &LayoutTestController::dumpFrameLoadCallbacks);
+  bindMethod("dumpUserGestureInFrameLoadCallbacks",
+             &LayoutTestController::dumpUserGestureInFrameLoadCallbacks);
   bindMethod("dumpResourceLoadCallbacks",
              &LayoutTestController::dumpResourceLoadCallbacks);
   bindMethod("dumpResourceResponseMIMETypes",
@@ -345,6 +347,13 @@ void LayoutTestController::dumpFrameLoadCallbacks(const CppArgumentList&,
   result->setNull();
 }
 
+void LayoutTestController::dumpUserGestureInFrameLoadCallbacks(
+    const CppArgumentList&,
+    CppVariant* result) {
+  m_dumpUserGestureInFrameLoadCallbacks = true;
+  result->setNull();
+}
+
 void LayoutTestController::dumpResourceLoadCallbacks(const CppArgumentList&,
                                                      CppVariant* result) {
   m_dumpResourceLoadCallbacks = true;
@@ -581,6 +590,7 @@ void LayoutTestController::reset() {
   m_dumpAsText = false;
   m_dumpEditingCallbacks = false;
   m_dumpFrameLoadCallbacks = false;
+  m_dumpUserGestureInFrameLoadCallbacks = false;
   m_dumpResourceLoadCallbacks = false;
   m_dumpResourceResponseMIMETypes = false;
   m_dumpBackForwardList = false;

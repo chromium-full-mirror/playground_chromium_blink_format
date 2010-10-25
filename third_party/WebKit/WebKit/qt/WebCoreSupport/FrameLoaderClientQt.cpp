@@ -105,6 +105,14 @@ static QString drtDescriptionSuitableForTestResult(WebCore::Frame* _frame) {
   }
 }
 
+static QString drtPrintFrameUserGestureStatus(WebCore::Frame* frame) {
+  if (frame->loader()->isProcessingUserGesture())
+    return QString::fromLatin1("Frame with user gesture \"%1\"")
+        .arg(QLatin1String("true"));
+  return QString::fromLatin1("Frame with user gesture \"%1\"")
+      .arg(QLatin1String("false"));
+}
+
 static QString drtDescriptionSuitableForTestResult(const WebCore::KURL& _url) {
   if (_url.isEmpty() || !_url.isLocalFile())
     return _url.string();
@@ -169,6 +177,7 @@ static QString drtDescriptionSuitableForTestResult(
 namespace WebCore {
 
 bool FrameLoaderClientQt::dumpFrameLoaderCallbacks = false;
+bool FrameLoaderClientQt::dumpUserGestureInFrameLoaderCallbacks = false;
 bool FrameLoaderClientQt::dumpResourceLoadCallbacks = false;
 bool FrameLoaderClientQt::sendRequestReturnsNullOnRedirect = false;
 bool FrameLoaderClientQt::sendRequestReturnsNull = false;
@@ -375,6 +384,10 @@ void FrameLoaderClientQt::dispatchDidStartProvisionalLoad() {
   if (dumpFrameLoaderCallbacks)
     printf("%s - didStartProvisionalLoadForFrame\n",
            qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
+
+  if (dumpUserGestureInFrameLoaderCallbacks)
+    printf("%s - in didStartProvisionalLoadForFrame\n",
+           qPrintable(drtPrintFrameUserGestureStatus(m_frame)));
 
   if (m_webFrame)
     emit m_webFrame->provisionalLoad();

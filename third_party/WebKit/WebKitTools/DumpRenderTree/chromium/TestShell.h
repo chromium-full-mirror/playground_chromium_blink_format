@@ -115,6 +115,10 @@ class TestShell {
     return (m_testIsPreparing || m_testIsPending) &&
            layoutTestController()->shouldDumpFrameLoadCallbacks();
   }
+  bool shouldDumpUserGestureInFrameLoadCallbacks() const {
+    return (m_testIsPreparing || m_testIsPending) &&
+           layoutTestController()->shouldDumpUserGestureInFrameLoadCallbacks();
+  }
   bool shouldDumpResourceLoadCallbacks() const {
     return (m_testIsPreparing || m_testIsPending) &&
            layoutTestController()->shouldDumpResourceLoadCallbacks();
