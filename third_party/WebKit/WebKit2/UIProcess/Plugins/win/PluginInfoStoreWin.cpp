@@ -82,10 +82,11 @@ static inline String safariPluginsDirectory() {
     cachedPluginDirectory = true;
 
     WCHAR moduleFileNameStr[MAX_PATH];
-    int moduleFileNameLen =
-        ::GetModuleFileNameW(0, moduleFileNameStr, _countof(moduleFileNameStr));
+    int moduleFileNameLen = ::GetModuleFileNameW(
+        0, moduleFileNameStr, WTF_ARRAY_LENGTH(moduleFileNameStr));
 
-    if (!moduleFileNameLen || moduleFileNameLen == _countof(moduleFileNameStr))
+    if (!moduleFileNameLen ||
+        moduleFileNameLen == WTF_ARRAY_LENGTH(moduleFileNameStr))
       return pluginsDirectory;
 
     if (!::PathRemoveFileSpecW(moduleFileNameStr))
@@ -110,7 +111,7 @@ static inline void addMozillaPluginDirectories(Vector<String>& directories) {
 
   // Enumerate subkeys
   for (int i = 0;; i++) {
-    DWORD nameLen = _countof(name);
+    DWORD nameLen = WTF_ARRAY_LENGTH(name);
     result = ::RegEnumKeyExW(key, i, name, &nameLen, 0, 0, 0, &lastModified);
 
     if (result != ERROR_SUCCESS)
@@ -153,10 +154,10 @@ static inline void addWindowsMediaPlayerPluginDirectory(
   WCHAR pluginDirectoryStr[MAX_PATH + 1];
   DWORD pluginDirectorySize = ::ExpandEnvironmentStringsW(
       L"%SYSTEMDRIVE%\\PFiles\\Plugins", pluginDirectoryStr,
-      _countof(pluginDirectoryStr));
+      WTF_ARRAY_LENGTH(pluginDirectoryStr));
 
   if (pluginDirectorySize > 0 &&
-      pluginDirectorySize <= _countof(pluginDirectoryStr))
+      pluginDirectorySize <= WTF_ARRAY_LENGTH(pluginDirectoryStr))
     directories.append(String(pluginDirectoryStr, pluginDirectorySize - 1));
 
   DWORD type;
@@ -208,7 +209,7 @@ static inline void addAdobeAcrobatPluginDirectory(Vector<String>& directories) {
 
   // Enumerate subkeys
   for (int i = 0;; i++) {
-    DWORD nameLen = _countof(name);
+    DWORD nameLen = WTF_ARRAY_LENGTH(name);
     result = ::RegEnumKeyExW(key, i, name, &nameLen, 0, 0, 0, &lastModified);
 
     if (result != ERROR_SUCCESS)
@@ -250,7 +251,8 @@ static inline void addMacromediaPluginDirectories(Vector<String>& directories) {
 #if !OS(WINCE)
   WCHAR systemDirectoryStr[MAX_PATH];
 
-  if (!::GetSystemDirectoryW(systemDirectoryStr, _countof(systemDirectoryStr)))
+  if (!::GetSystemDirectoryW(systemDirectoryStr,
+                             WTF_ARRAY_LENGTH(systemDirectoryStr)))
     return;
 
   WCHAR macromediaDirectoryStr[MAX_PATH];
@@ -343,7 +345,7 @@ static void addPluginPathsFromRegistry(HKEY rootKey, Vector<String>& paths) {
   for (size_t i = 0;; ++i) {
     // MSDN says that key names have a maximum length of 255 characters.
     wchar_t name[256];
-    DWORD nameLen = _countof(name);
+    DWORD nameLen = WTF_ARRAY_LENGTH(name);
     if (::RegEnumKeyExW(key, i, name, &nameLen, 0, 0, 0, 0) != ERROR_SUCCESS)
       break;
 

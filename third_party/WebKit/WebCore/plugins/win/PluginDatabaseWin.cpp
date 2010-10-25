@@ -34,10 +34,6 @@
 #include <windows.h>
 #include <shlwapi.h>
 
-#if COMPILER(MINGW)
-#define _countof(x) (sizeof(x) / sizeof(x[0]))
-#endif
-
 #if OS(WINCE)
 // WINCE doesn't support Registry Key Access Rights. The parameter should always
 // be 0
@@ -102,7 +98,7 @@ static inline void addPluginPathsFromRegistry(HKEY rootKey,
 
   // Enumerate subkeys
   for (int i = 0;; i++) {
-    DWORD nameLen = _countof(name);
+    DWORD nameLen = WTF_ARRAY_LENGTH(name);
     result = RegEnumKeyExW(key, i, name, &nameLen, 0, 0, 0, &lastModified);
 
     if (result != ERROR_SUCCESS)
@@ -276,10 +272,10 @@ static inline void addWindowsMediaPlayerPluginDirectory(
   WCHAR pluginDirectoryStr[_MAX_PATH + 1];
   DWORD pluginDirectorySize = ::ExpandEnvironmentStringsW(
       TEXT("%SYSTEMDRIVE%\\PFiles\\Plugins"), pluginDirectoryStr,
-      _countof(pluginDirectoryStr));
+      WTF_ARRAY_LENGTH(pluginDirectoryStr));
 
   if (pluginDirectorySize > 0 &&
-      pluginDirectorySize <= _countof(pluginDirectoryStr))
+      pluginDirectorySize <= WTF_ARRAY_LENGTH(pluginDirectoryStr))
     directories.append(String(pluginDirectoryStr, pluginDirectorySize - 1));
 #endif
 
@@ -455,7 +451,8 @@ static inline void addMacromediaPluginDirectories(Vector<String>& directories) {
 #if !OS(WINCE)
   WCHAR systemDirectoryStr[MAX_PATH];
 
-  if (GetSystemDirectory(systemDirectoryStr, _countof(systemDirectoryStr)) == 0)
+  if (!GetSystemDirectory(systemDirectoryStr,
+                          WTF_ARRAY_LENGTH(systemDirectoryStr)))
     return;
 
   WCHAR macromediaDirectoryStr[MAX_PATH];
