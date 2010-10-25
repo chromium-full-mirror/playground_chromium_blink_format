@@ -72,6 +72,7 @@ class FileReader : public RefCounted<FileReader>,
   void abort();
 
   void start();
+  void doAbort();
 
   ReadyState readyState() const;
   PassRefPtr<FileError> error() { return m_error; }
@@ -112,7 +113,7 @@ class FileReader : public RefCounted<FileReader>,
 
  private:
   enum ReadType { ReadFileAsBinaryString, ReadFileAsText, ReadFileAsDataURL };
-  enum InternalState { None, Starting, Opening, Reading, Completed };
+  enum InternalState { None, Starting, Opening, Reading, Aborting, Completed };
 
   FileReader(ScriptExecutionContext*);
 
