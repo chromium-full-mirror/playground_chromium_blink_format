@@ -694,10 +694,8 @@ void WebFrameImpl::bindToWindowObject(const WebString& name, NPObject* object) {
 }
 
 void WebFrameImpl::executeScript(const WebScriptSource& source) {
-  TextPosition1 position(WTF::OneBasedNumber::fromOneBasedInt(source.startLine),
-                         WTF::OneBasedNumber::base());
   m_frame->script()->executeScript(
-      ScriptSourceCode(source.code, source.url, position));
+      ScriptSourceCode(source.code, source.url, source.startLine));
 }
 
 void WebFrameImpl::executeScriptInIsolatedWorld(
@@ -708,11 +706,8 @@ void WebFrameImpl::executeScriptInIsolatedWorld(
   Vector<ScriptSourceCode> sources;
 
   for (unsigned i = 0; i < numSources; ++i) {
-    TextPosition1 position(
-        WTF::OneBasedNumber::fromOneBasedInt(sourcesIn[i].startLine),
-        WTF::OneBasedNumber::base());
-    sources.append(
-        ScriptSourceCode(sourcesIn[i].code, sourcesIn[i].url, position));
+    sources.append(ScriptSourceCode(sourcesIn[i].code, sourcesIn[i].url,
+                                    sourcesIn[i].startLine));
   }
 
   m_frame->script()->evaluateInIsolatedWorld(worldId, sources, extensionGroup);
@@ -761,10 +756,9 @@ void WebFrameImpl::collectGarbage() {
 #if USE(V8)
 v8::Handle<v8::Value> WebFrameImpl::executeScriptAndReturnValue(
     const WebScriptSource& source) {
-  TextPosition1 position(WTF::OneBasedNumber::fromOneBasedInt(source.startLine),
-                         WTF::OneBasedNumber::base());
   return m_frame->script()
-      ->executeScript(ScriptSourceCode(source.code, source.url, position))
+      ->executeScript(
+          ScriptSourceCode(source.code, source.url, source.startLine))
       .v8Value();
 }
 

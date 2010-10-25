@@ -28,7 +28,6 @@
 
 #include "PendingScript.h"
 #include <wtf/Deque.h>
-#include <wtf/text/TextPosition.h>
 #include <wtf/Noncopyable.h>
 #include <wtf/PassRefPtr.h>
 
@@ -53,8 +52,7 @@ class HTMLScriptRunner : public Noncopyable {
   void detach();
 
   // Processes the passed in script and any pending scripts if possible.
-  bool execute(PassRefPtr<Element> scriptToProcess,
-               const TextPosition1& scriptStartPosition);
+  bool execute(PassRefPtr<Element> scriptToProcess, int scriptStartLine);
 
   bool executeScriptsWaitingForLoad(CachedResource*);
   bool hasScriptsWaitingForStylesheets() const {
@@ -80,7 +78,7 @@ class HTMLScriptRunner : public Noncopyable {
   void requestDeferredScript(Element*);
   bool requestPendingScript(PendingScript&, Element*) const;
 
-  void runScript(Element*, const TextPosition1& scriptStartPosition);
+  void runScript(Element*, int startingLineNumber);
 
   // Helpers for dealing with HTMLScriptRunnerHost
   void watchForLoad(PendingScript&);
