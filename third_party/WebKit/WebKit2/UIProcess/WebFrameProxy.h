@@ -87,6 +87,8 @@ class WebFrameProxy : public APIObject {
     return m_certificateInfo.get();
   }
 
+  bool canProvideSource() const;
+
   void didStartProvisionalLoad(const String& url);
   void didReceiveServerRedirectForProvisionalLoad(const String& url);
   void didFailProvisionalLoad();
