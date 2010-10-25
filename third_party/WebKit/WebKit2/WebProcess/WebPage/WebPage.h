@@ -178,6 +178,8 @@ class WebPage : public APIObject {
 
   FindController& findController() { return m_findController; }
 
+  void pageDidScroll();
+
  private:
   WebPage(uint64_t pageID, const WebPageCreationParameters&);
 

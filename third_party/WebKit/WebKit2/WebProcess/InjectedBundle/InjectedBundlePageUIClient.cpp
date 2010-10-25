@@ -106,4 +106,9 @@ void InjectedBundlePageUIClient::mouseDidMoveOverElement(
   userData = adoptRef(toImpl(userDataToPass));
 }
 
+void InjectedBundlePageUIClient::pageDidScroll(WebPage* page) {
+  if (m_client.pageDidScroll)
+    m_client.pageDidScroll(toAPI(page), m_client.clientInfo);
+}
+
 }  // namespace WebKit

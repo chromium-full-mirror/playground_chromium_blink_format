@@ -59,6 +59,7 @@ class InjectedBundlePageUIClient {
                                const WebCore::HitTestResult&,
                                WebEvent::Modifiers,
                                RefPtr<APIObject>& userData);
+  void pageDidScroll(WebPage*);
 
  private:
   WKBundlePageUIClient m_client;
