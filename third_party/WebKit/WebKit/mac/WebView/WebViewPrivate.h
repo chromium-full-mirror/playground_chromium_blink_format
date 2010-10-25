@@ -73,6 +73,7 @@ extern NSString* WebElementIsContentEditableKey;  // NSNumber indicating whether
                                                   // the inner non-shared node
                                                   // is content editable (used
                                                   // internally)
+extern NSString* WebElementMediaURLKey;           // NSURL of the media element
 
 // other WebElementDictionary keys
 extern NSString* WebElementLinkIsLiveKey;  // NSNumber of BOOL indictating
