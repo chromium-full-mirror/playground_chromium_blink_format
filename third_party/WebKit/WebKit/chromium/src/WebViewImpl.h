@@ -386,6 +386,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   void updateRootLayerContents(const WebCore::IntRect&);
   void doComposite();
   void doPixelReadbackToCanvas(WebCanvas*, const WebCore::IntRect&);
+  void reallocateRenderer();
 #endif
 
   WebViewClient* m_client;

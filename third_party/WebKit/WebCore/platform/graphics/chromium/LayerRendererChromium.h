@@ -84,6 +84,9 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
 
   void setRootLayer(PassRefPtr<LayerChromium> layer) { m_rootLayer = layer; }
   LayerChromium* rootLayer() { return m_rootLayer.get(); }
+  void transferRootLayer(LayerRendererChromium* other) {
+    other->m_rootLayer = m_rootLayer.release();
+  }
 
   bool hardwareCompositing() const { return m_hardwareCompositing; }
 
