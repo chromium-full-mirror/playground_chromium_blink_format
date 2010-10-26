@@ -249,7 +249,7 @@ PlatformMenuDescription ContextMenuClientImpl::getCustomMenuFromDefaultItems(
       // the node.
       if (m_webView->focusedWebCoreFrame()
               ->editor()
-              ->spellCheckingEnabledInFocusedNode())
+              ->isSpellCheckingEnabledInFocusedNode())
         data.misspelledWord = selectMisspelledWord(defaultMenu, selectedFrame);
     }
   }

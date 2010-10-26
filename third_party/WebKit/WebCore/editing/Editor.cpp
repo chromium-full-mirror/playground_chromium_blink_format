@@ -2836,7 +2836,7 @@ static void markMisspellingsOrBadGrammar(Editor* editor,
   if (!editableNode || !editableNode->isContentEditable())
     return;
 
-  if (!editor->spellCheckingEnabledInFocusedNode())
+  if (!editor->isSpellCheckingEnabledInFocusedNode())
     return;
 
   // Get the spell checker if it is available
@@ -2856,23 +2856,16 @@ static void markMisspellingsOrBadGrammar(Editor* editor,
   }
 }
 
-bool Editor::spellCheckingEnabledInFocusedNode() const {
+bool Editor::isSpellCheckingEnabledInFocusedNode() const {
   // Ascend the DOM tree to find a "spellcheck" attribute.
   // When we find a "spellcheck" attribute, retrieve its value and return false
   // if its value is "false".
   const Node* node = frame()->document()->focusedNode();
-  while (node) {
-    if (node->isElementNode()) {
-      const WTF::AtomicString& value =
-          static_cast<const Element*>(node)->getAttribute(spellcheckAttr);
-      if (equalIgnoringCase(value, "true"))
-        return true;
-      if (equalIgnoringCase(value, "false"))
-        return false;
-    }
-    node = node->parent();
-  }
-  return true;
+  const Element* focusedElement =
+      node->isElementNode() ? toElement(node) : node->parentElement();
+  if (!focusedElement)
+    return false;
+  return focusedElement->isSpellCheckingEnabled();
 }
 
 void Editor::markMisspellings(const VisibleSelection& selection,
@@ -2923,7 +2916,7 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
   if (!editableNode || !editableNode->isContentEditable())
     return;
 
-  if (!spellCheckingEnabledInFocusedNode())
+  if (!isSpellCheckingEnabledInFocusedNode())
     return;
 
   // Expand the range to encompass entire paragraphs, since text checking needs

@@ -230,7 +230,7 @@ class Editor {
   Vector<String> guessesForMisspelledOrUngrammaticalSelection(
       bool& misspelled,
       bool& ungrammatical);
-  bool spellCheckingEnabledInFocusedNode() const;
+  bool isSpellCheckingEnabledInFocusedNode() const;
   void markMisspellingsAfterTypingToPosition(const VisiblePosition&);
   void markMisspellings(const VisibleSelection&,
                         RefPtr<Range>& firstMisspellingRange);

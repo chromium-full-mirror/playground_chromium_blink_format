@@ -41,6 +41,12 @@ class DOMTokenList;
 class ElementRareData;
 class IntSize;
 
+enum SpellcheckAttributeState {
+  SpellcheckAttributeTrue,
+  SpellcheckAttributeFalse,
+  SpellcheckAttributeDefault
+};
+
 class Element : public ContainerNode {
  public:
   static PassRefPtr<Element> create(const QualifiedName&, Document*);
@@ -348,6 +354,8 @@ class Element : public ContainerNode {
   void webkitRequestFullScreen(unsigned short flags);
 #endif
 
+  bool isSpellCheckingEnabled() const;
+
  protected:
   Element(const QualifiedName& tagName,
           Document* document,
@@ -415,6 +423,8 @@ class Element : public ContainerNode {
 
   ElementRareData* rareData() const;
   ElementRareData* ensureRareData();
+
+  SpellcheckAttributeState spellcheckAttributeState() const;
 
  private:
   mutable RefPtr<NamedNodeMap> m_attributeMap;
