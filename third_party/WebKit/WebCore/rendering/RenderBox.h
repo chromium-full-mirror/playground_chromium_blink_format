@@ -398,8 +398,7 @@ class RenderBox : public RenderBoxModelObject {
 
   bool stretchesToViewport() const {
     return document()->inQuirksMode() && style()->logicalHeight().isAuto() &&
-           !isFloatingOrPositioned() && (isRoot() || isBody()) &&
-           !isWritingModeRoot();
+           !isFloatingOrPositioned() && (isRoot() || isBody());
   }
 
   virtual IntSize intrinsicSize() const { return IntSize(); }

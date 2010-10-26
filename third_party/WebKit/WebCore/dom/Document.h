@@ -932,6 +932,19 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   DocumentMarkerController* markers() const { return m_markers.get(); }
 
+  bool directionSetOnDocumentElement() const {
+    return m_directionSetOnDocumentElement;
+  }
+  bool writingModeSetOnDocumentElement() const {
+    return m_writingModeSetOnDocumentElement;
+  }
+  void setDirectionSetOnDocumentElement(bool b) {
+    m_directionSetOnDocumentElement = b;
+  }
+  void setWritingModeSetOnDocumentElement(bool b) {
+    m_writingModeSetOnDocumentElement = b;
+  }
+
   bool execCommand(const String& command,
                    bool userInterface = false,
                    const String& value = String());
@@ -1511,6 +1524,9 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   Timer<Document> m_loadEventDelayTimer;
 
   ViewportArguments m_viewportArguments;
+
+  bool m_directionSetOnDocumentElement;
+  bool m_writingModeSetOnDocumentElement;
 };
 
 inline bool Document::hasElementWithId(AtomicStringImpl* id) const {

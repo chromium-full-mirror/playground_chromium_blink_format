@@ -431,7 +431,9 @@ Document::Document(Frame* frame,
 #endif
       ,
       m_loadEventDelayCount(0),
-      m_loadEventDelayTimer(this, &Document::loadEventDelayTimerFired) {
+      m_loadEventDelayTimer(this, &Document::loadEventDelayTimerFired),
+      m_directionSetOnDocumentElement(false),
+      m_writingModeSetOnDocumentElement(false) {
   m_document = this;
 
   m_pageGroupUserSheetCacheValid = false;
