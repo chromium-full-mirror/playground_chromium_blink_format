@@ -50,7 +50,9 @@ class SpeechInputClientMock : public SpeechInputClient {
 
   // SpeechInputClient methods.
   void setListener(SpeechInputListener*);
-  bool startRecognition(int, const IntRect&);
+  bool startRecognition(int requestId,
+                        const IntRect& elementRect,
+                        const String& grammar);
   void stopRecording(int);
   void cancelRecognition(int);
 

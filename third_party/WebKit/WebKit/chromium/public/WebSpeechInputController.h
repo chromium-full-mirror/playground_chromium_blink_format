@@ -36,6 +36,7 @@
 namespace WebKit {
 
 struct WebRect;
+class WebString;
 
 // Provides an embedder API called by WebKit.
 class WebSpeechInputController {
@@ -45,6 +46,14 @@ class WebSpeechInputController {
   // runs to the limit or stopRecording is called. Progress indications and the
   // recognized
   // text are returned via the listener interface.
+  virtual bool startRecognition(int requestId,
+                                const WebRect& elementRect,
+                                const WebString& grammar) {
+    startRecognition(requestId, elementRect);
+    return false;
+  }
+
+  // FIXME: Remove this method once chromium implements the above method.
   virtual bool startRecognition(int requestId, const WebRect&) {
     WEBKIT_ASSERT_NOT_REACHED();
     return false;

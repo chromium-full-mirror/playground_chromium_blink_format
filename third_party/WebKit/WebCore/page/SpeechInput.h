@@ -66,7 +66,9 @@ class SpeechInput : public Noncopyable, public SpeechInputListener {
   void unregisterListener(int);
 
   // Methods invoked by the input elements.
-  bool startRecognition(int, const IntRect&);
+  bool startRecognition(int listenerId,
+                        const IntRect& elementRect,
+                        const String& grammar);
   void stopRecording(int);
   void cancelRecognition(int);
 

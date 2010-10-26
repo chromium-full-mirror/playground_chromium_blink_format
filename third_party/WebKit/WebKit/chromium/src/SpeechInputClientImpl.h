@@ -53,7 +53,9 @@ class SpeechInputClientImpl : public WebCore::SpeechInputClient,
 
   // SpeechInputClient methods.
   void setListener(WebCore::SpeechInputListener*);
-  bool startRecognition(int, const WebCore::IntRect&);
+  bool startRecognition(int requestId,
+                        const WebCore::IntRect& elementRect,
+                        const WTF::String& grammar);
   void stopRecording(int);
   void cancelRecognition(int);
 
