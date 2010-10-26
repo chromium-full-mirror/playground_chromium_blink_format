@@ -22,7 +22,6 @@
 #define SVGSymbolElement_h
 
 #if ENABLE(SVG)
-#include "SVGAnimatedPropertyMacros.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGFitToViewBox.h"
 #include "SVGLangSpace.h"
@@ -55,11 +54,11 @@ class SVGSymbolElement : public SVGStyledElement,
                             externalResourcesRequired)
 
   // SVGFitToViewBox
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGSymbolElement,
-                                SVGNames::viewBoxAttr,
-                                FloatRect,
-                                ViewBox,
-                                viewBox)
+  DECLARE_ANIMATED_PROPERTY(SVGSymbolElement,
+                            SVGNames::viewBoxAttr,
+                            FloatRect,
+                            ViewBox,
+                            viewBox)
   DECLARE_ANIMATED_PROPERTY(SVGSymbolElement,
                             SVGNames::preserveAspectRatioAttr,
                             SVGPreserveAspectRatio,

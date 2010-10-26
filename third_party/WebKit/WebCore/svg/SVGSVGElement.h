@@ -164,11 +164,11 @@ class SVGSVGElement : public SVGStyledLocatableElement,
                             externalResourcesRequired)
 
   // SVGFitToViewBox
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGSVGElement,
-                                SVGNames::viewBoxAttr,
-                                FloatRect,
-                                ViewBox,
-                                viewBox)
+  DECLARE_ANIMATED_PROPERTY(SVGSVGElement,
+                            SVGNames::viewBoxAttr,
+                            FloatRect,
+                            ViewBox,
+                            viewBox)
   DECLARE_ANIMATED_PROPERTY(SVGSVGElement,
                             SVGNames::preserveAspectRatioAttr,
                             SVGPreserveAspectRatio,
