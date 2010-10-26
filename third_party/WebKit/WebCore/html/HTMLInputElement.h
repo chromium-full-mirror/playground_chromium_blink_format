@@ -222,6 +222,10 @@ class HTMLInputElement : public HTMLTextFormControlElement,
     return document()->checkedRadioButtons();
   }
 
+  // FIXME: We should move m_xPos and m_yPos to ImageInputType class.
+  int xPosition() const { return m_xPos; }
+  int yPosition() const { return m_yPos; }
+
  protected:
   HTMLInputElement(const QualifiedName&, Document*, HTMLFormElement* = 0);
 

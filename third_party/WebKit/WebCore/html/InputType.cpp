@@ -37,6 +37,7 @@
 #include "DateTimeLocalInputType.h"
 #include "EmailInputType.h"
 #include "FileInputType.h"
+#include "FormDataList.h"
 #include "HTMLInputElement.h"
 #include "HiddenInputType.h"
 #include "ImageInputType.h"
@@ -47,6 +48,7 @@
 #include "RadioInputType.h"
 #include "RangeInputType.h"
 #include "RegularExpression.h"
+#include "RenderObject.h"
 #include "ResetInputType.h"
 #include "SearchInputType.h"
 #include "SubmitInputType.h"
@@ -120,6 +122,29 @@ bool InputType::isTextField() const {
 
 bool InputType::isTextType() const {
   return false;
+}
+
+bool InputType::saveFormControlState(String& result) const {
+  String currentValue = element()->value();
+  if (currentValue == element()->defaultValue())
+    return false;
+  result = currentValue;
+  return true;
+}
+
+void InputType::restoreFormControlState(const String& state) const {
+  element()->setValue(state);
+}
+
+bool InputType::isFormDataAppendable() const {
+  // There is no form data unless there's a name for non-image types.
+  return !element()->name().isEmpty();
+}
+
+bool InputType::appendFormData(FormDataList& encoding, bool) const {
+  // Always successful.
+  encoding.appendData(element()->name(), element()->value());
+  return true;
 }
 
 double InputType::valueAsDate() const {
@@ -207,6 +232,11 @@ bool InputType::parsedStepValueShouldBeInteger() const {
 
 bool InputType::scaledStepValeuShouldBeInteger() const {
   return false;
+}
+
+RenderObject* InputType::createRenderer(RenderArena*,
+                                        RenderStyle* style) const {
+  return RenderObject::createObject(element(), style);
 }
 
 double InputType::parseToDouble(const String&, double defaultValue) const {

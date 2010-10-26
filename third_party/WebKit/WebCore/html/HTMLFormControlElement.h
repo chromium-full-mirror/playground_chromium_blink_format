@@ -193,6 +193,7 @@ class HTMLTextFormControlElement : public HTMLFormControlElementWithState {
   // The derived class should return true if placeholder processing is needed.
   virtual bool supportsPlaceholder() const = 0;
   String strippedPlaceholder() const;
+  bool placeholderShouldBeVisible() const;
 
   int selectionStart();
   int selectionEnd();
@@ -205,7 +206,6 @@ class HTMLTextFormControlElement : public HTMLFormControlElementWithState {
  protected:
   HTMLTextFormControlElement(const QualifiedName&, Document*, HTMLFormElement*);
 
-  bool placeholderShouldBeVisible() const;
   void updatePlaceholderVisibility(bool);
 
   virtual void parseMappedAttribute(Attribute*);
