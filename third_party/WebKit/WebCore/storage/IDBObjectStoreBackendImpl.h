@@ -61,6 +61,7 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
   }
   virtual ~IDBObjectStoreBackendImpl();
 
+  static const int64_t InvalidId = 0;
   int64_t id() const {
     ASSERT(m_id != InvalidId);
     return m_id;
@@ -158,8 +159,6 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
   static void addIndexToMap(ScriptExecutionContext*,
                             PassRefPtr<IDBObjectStoreBackendImpl>,
                             PassRefPtr<IDBIndexBackendImpl>);
-
-  static const int64_t InvalidId = 0;
 
   RefPtr<IDBDatabaseBackendImpl> m_database;
 

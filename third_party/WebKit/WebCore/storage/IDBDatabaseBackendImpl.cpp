@@ -32,63 +32,67 @@
 #include "DOMStringList.h"
 #include "IDBDatabaseException.h"
 #include "IDBObjectStoreBackendImpl.h"
+#include "IDBSQLiteDatabase.h"
 #include "IDBTransactionBackendInterface.h"
 #include "IDBTransactionCoordinator.h"
-#include "SQLiteDatabase.h"
 #include "SQLiteStatement.h"
 #include "SQLiteTransaction.h"
 
 namespace WebCore {
 
-static bool extractMetaData(SQLiteDatabase* sqliteDatabase,
-                            const String& expectedName,
-                            String& foundVersion) {
-  SQLiteStatement metaDataQuery(*sqliteDatabase,
-                                "SELECT name, version FROM MetaData");
-  if (metaDataQuery.prepare() != SQLResultOk ||
-      metaDataQuery.step() != SQLResultRow)
+static bool extractMetaData(SQLiteDatabase& sqliteDatabase,
+                            const String& name,
+                            String& foundVersion,
+                            int64& foundId) {
+  SQLiteStatement databaseQuery(
+      sqliteDatabase, "SELECT id, version FROM Databases WHERE name = ?");
+  if (databaseQuery.prepare() != SQLResultOk) {
+    ASSERT_NOT_REACHED();
+    return false;
+  }
+  databaseQuery.bindText(1, name);
+  if (databaseQuery.step() != SQLResultRow)
     return false;
 
-  if (metaDataQuery.getColumnText(0) != expectedName) {
-    LOG_ERROR("Name in MetaData (%s) doesn't match expected (%s) for IndexedDB",
-              metaDataQuery.getColumnText(0).utf8().data(),
-              expectedName.utf8().data());
-    ASSERT_NOT_REACHED();
-  }
-  foundVersion = metaDataQuery.getColumnText(1);
+  foundId = databaseQuery.getColumnInt64(0);
+  foundVersion = databaseQuery.getColumnText(1);
 
-  if (metaDataQuery.step() == SQLResultRow) {
-    LOG_ERROR("More than one row found in MetaData table");
+  if (databaseQuery.step() == SQLResultRow)
     ASSERT_NOT_REACHED();
-  }
-
   return true;
 }
 
-static bool setMetaData(SQLiteDatabase* sqliteDatabase,
+static bool setMetaData(SQLiteDatabase& sqliteDatabase,
                         const String& name,
                         const String& description,
-                        const String& version) {
-  ASSERT(!name.isNull() && !description.isNull() && !version.isNull());
+                        const String& version,
+                        int64_t& rowId) {
+  ASSERT(!name.isNull());
+  ASSERT(!description.isNull());
+  ASSERT(!version.isNull());
 
-  sqliteDatabase->executeCommand("DELETE FROM MetaData");
-
-  SQLiteStatement insert(
-      *sqliteDatabase,
-      "INSERT INTO MetaData (name, description, version) VALUES (?, ?, ?)");
-  if (insert.prepare() != SQLResultOk) {
-    LOG_ERROR("Failed to prepare MetaData insert statement for IndexedDB");
+  String sql = rowId != IDBDatabaseBackendImpl::InvalidId
+                   ? "UPDATE Databases SET name = ?, description = ?, version "
+                     "= ? WHERE id = ?"
+                   : "INSERT INTO Databases (name, description, version) "
+                     "VALUES (?, ?, ?)";
+  SQLiteStatement query(sqliteDatabase, sql);
+  if (query.prepare() != SQLResultOk) {
+    ASSERT_NOT_REACHED();
     return false;
   }
 
-  insert.bindText(1, name);
-  insert.bindText(2, description);
-  insert.bindText(3, version);
+  query.bindText(1, name);
+  query.bindText(2, description);
+  query.bindText(3, version);
+  if (rowId != IDBDatabaseBackendImpl::InvalidId)
+    query.bindInt64(4, rowId);
 
-  if (insert.step() != SQLResultDone) {
-    LOG_ERROR("Failed to insert row into MetaData for IndexedDB");
+  if (query.step() != SQLResultDone)
     return false;
-  }
+
+  if (rowId == IDBDatabaseBackendImpl::InvalidId)
+    rowId = sqliteDatabase.lastInsertRowID();
 
   return true;
 }
@@ -96,9 +100,10 @@ static bool setMetaData(SQLiteDatabase* sqliteDatabase,
 IDBDatabaseBackendImpl::IDBDatabaseBackendImpl(
     const String& name,
     const String& description,
-    PassOwnPtr<SQLiteDatabase> sqliteDatabase,
+    IDBSQLiteDatabase* sqliteDatabase,
     IDBTransactionCoordinator* coordinator)
     : m_sqliteDatabase(sqliteDatabase),
+      m_id(InvalidId),
       m_name(name),
       m_description(description),
       m_version(""),
@@ -106,9 +111,12 @@ IDBDatabaseBackendImpl::IDBDatabaseBackendImpl(
   ASSERT(!m_name.isNull());
   ASSERT(!m_description.isNull());
 
-  extractMetaData(m_sqliteDatabase.get(), m_name, m_version);
-  setMetaData(m_sqliteDatabase.get(), m_name, m_description, m_version);
-
+  bool success =
+      extractMetaData(m_sqliteDatabase->db(), m_name, m_version, m_id);
+  ASSERT_UNUSED(success, success == (m_id != InvalidId));
+  if (!setMetaData(m_sqliteDatabase->db(), m_name, m_description, m_version,
+                   m_id))
+    ASSERT_NOT_REACHED();  // FIXME: Need better error handling.
   loadObjectStores();
 }
 
@@ -119,7 +127,11 @@ void IDBDatabaseBackendImpl::setDescription(const String& description) {
     return;
 
   m_description = description;
-  setMetaData(m_sqliteDatabase.get(), m_name, m_description, m_version);
+  setMetaData(m_sqliteDatabase->db(), m_name, m_description, m_version, m_id);
+}
+
+SQLiteDatabase& IDBDatabaseBackendImpl::sqliteDatabase() const {
+  return m_sqliteDatabase->db();
 }
 
 PassRefPtr<DOMStringList> IDBDatabaseBackendImpl::objectStores() const {
@@ -167,7 +179,7 @@ void IDBDatabaseBackendImpl::createObjectStoreInternal(
     PassRefPtr<IDBTransactionBackendInterface> transaction) {
   SQLiteStatement insert(database->sqliteDatabase(),
                          "INSERT INTO ObjectStores (name, keyPath, "
-                         "doAutoIncrement) VALUES (?, ?, ?)");
+                         "doAutoIncrement, databaseId) VALUES (?, ?, ?, ?)");
   if (insert.prepare() != SQLResultOk) {
     transaction->abort();
     return;
@@ -175,6 +187,7 @@ void IDBDatabaseBackendImpl::createObjectStoreInternal(
   insert.bindText(1, objectStore->name());
   insert.bindText(2, objectStore->keyPath());
   insert.bindInt(3, static_cast<int>(objectStore->autoIncrement()));
+  insert.bindInt64(4, database->id());
   if (insert.step() != SQLResultDone) {
     transaction->abort();
     return;
@@ -264,9 +277,10 @@ void IDBDatabaseBackendImpl::setVersionInternal(
     const String& version,
     PassRefPtr<IDBCallbacks> callbacks,
     PassRefPtr<IDBTransactionBackendInterface> transaction) {
+  int64_t databaseId = database->id();
   database->m_version = version;
-  if (!setMetaData(database->m_sqliteDatabase.get(), database->m_name,
-                   database->m_description, database->m_version)) {
+  if (!setMetaData(database->m_sqliteDatabase->db(), database->m_name,
+                   database->m_description, database->m_version, databaseId)) {
     // FIXME: The Indexed Database specification does not have an error code
     // dedicated to I/O errors.
     callbacks->onError(
@@ -293,11 +307,13 @@ void IDBDatabaseBackendImpl::close() {
 }
 
 void IDBDatabaseBackendImpl::loadObjectStores() {
-  SQLiteStatement objectStoresQuery(
-      sqliteDatabase(),
-      "SELECT id, name, keyPath, doAutoIncrement FROM ObjectStores");
+  SQLiteStatement objectStoresQuery(sqliteDatabase(),
+                                    "SELECT id, name, keyPath, doAutoIncrement "
+                                    "FROM ObjectStores WHERE databaseId = ?");
   bool ok = objectStoresQuery.prepare() == SQLResultOk;
   ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling?
+
+  objectStoresQuery.bindInt64(1, m_id);
 
   while (objectStoresQuery.step() == SQLResultRow) {
     int64_t id = objectStoresQuery.getColumnInt64(0);

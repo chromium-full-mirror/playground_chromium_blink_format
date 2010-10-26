@@ -36,6 +36,7 @@
 namespace WebCore {
 
 class IDBObjectStoreBackendImpl;
+class IDBSQLiteDatabase;
 class IDBTransactionCoordinator;
 class SQLiteDatabase;
 
@@ -44,7 +45,7 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
   static PassRefPtr<IDBDatabaseBackendImpl> create(
       const String& name,
       const String& description,
-      PassOwnPtr<SQLiteDatabase> database,
+      IDBSQLiteDatabase* database,
       IDBTransactionCoordinator* coordinator) {
     return adoptRef(
         new IDBDatabaseBackendImpl(name, description, database, coordinator));
@@ -52,7 +53,10 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
   virtual ~IDBDatabaseBackendImpl();
 
   void setDescription(const String& description);
-  SQLiteDatabase& sqliteDatabase() const { return *m_sqliteDatabase.get(); }
+  SQLiteDatabase& sqliteDatabase() const;
+
+  static const int64_t InvalidId = 0;
+  int64_t id() const { return m_id; }
 
   virtual String name() const { return m_name; }
   virtual String description() const { return m_description; }
@@ -86,7 +90,7 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
  private:
   IDBDatabaseBackendImpl(const String& name,
                          const String& description,
-                         PassOwnPtr<SQLiteDatabase> database,
+                         IDBSQLiteDatabase* database,
                          IDBTransactionCoordinator*);
 
   void loadObjectStores();
@@ -118,7 +122,8 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
                            PassRefPtr<IDBDatabaseBackendImpl>,
                            const String& version);
 
-  OwnPtr<SQLiteDatabase> m_sqliteDatabase;
+  RefPtr<IDBSQLiteDatabase> m_sqliteDatabase;
+  int64 m_id;
   String m_name;
   String m_description;
   String m_version;

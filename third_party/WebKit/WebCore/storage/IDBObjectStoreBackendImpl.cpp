@@ -151,8 +151,8 @@ static bool putObjectStoreData(SQLiteDatabase& db,
                                IDBKey* key,
                                SerializedScriptValue* value,
                                int64_t objectStoreId,
-                               int64_t* dataRowId) {
-  String sql = *dataRowId != -1
+                               int64_t& dataRowId) {
+  String sql = dataRowId != IDBObjectStoreBackendImpl::InvalidId
                    ? "UPDATE ObjectStoreData SET keyString = ?, keyDate = ?, "
                      "keyNumber = ?, value = ? WHERE id = ?"
                    : "INSERT INTO ObjectStoreData (keyString, keyDate, "
@@ -162,16 +162,16 @@ static bool putObjectStoreData(SQLiteDatabase& db,
     return false;
   key->bindWithNulls(query, 1);
   query.bindText(4, value->toWireString());
-  if (*dataRowId != -1)
-    query.bindInt(5, *dataRowId);
+  if (dataRowId != IDBDatabaseBackendImpl::InvalidId)
+    query.bindInt64(5, dataRowId);
   else
     query.bindInt64(5, objectStoreId);
 
   if (query.step() != SQLResultDone)
     return false;
 
-  if (*dataRowId == -1)
-    *dataRowId = db.lastInsertRowID();
+  if (dataRowId == IDBDatabaseBackendImpl::InvalidId)
+    dataRowId = db.lastInsertRowID();
 
   return true;
 }
@@ -296,9 +296,9 @@ void IDBObjectStoreBackendImpl::putInternal(
   // Before this point, don't do any mutation.  After this point, rollback the
   // transaction in case of error.
 
-  int64_t dataRowId = isExistingValue ? getQuery.getColumnInt(0) : -1;
+  int64_t dataRowId = isExistingValue ? getQuery.getColumnInt(0) : InvalidId;
   if (!putObjectStoreData(objectStore->sqliteDatabase(), key.get(), value.get(),
-                          objectStore->id(), &dataRowId)) {
+                          objectStore->id(), dataRowId)) {
     // FIXME: The Indexed Database specification does not have an error code
     // dedicated to I/O errors.
     callbacks->onError(
