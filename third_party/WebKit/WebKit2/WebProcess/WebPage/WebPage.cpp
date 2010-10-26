@@ -456,6 +456,9 @@ void WebPage::pageDidScroll() {
   m_findController.hideFindIndicator();
 
   m_uiClient.pageDidScroll(this);
+
+  WebProcess::shared().connection()->send(
+      Messages::WebPageProxy::PageDidScroll(), m_pageID);
 }
 
 // Events

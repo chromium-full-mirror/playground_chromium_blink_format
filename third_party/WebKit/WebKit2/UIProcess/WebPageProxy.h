@@ -345,6 +345,7 @@ class WebPageProxy : public APIObject {
                                    uint64_t frameID,
                                    bool& shouldClose);
   void didChangeViewportData(const WebCore::ViewportArguments&);
+  void pageDidScroll();
 
   // Back/Forward list management
   void backForwardAddItem(uint64_t itemID);

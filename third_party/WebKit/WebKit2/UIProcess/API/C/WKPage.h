@@ -261,7 +261,8 @@ typedef bool (*WKPageRunBeforeUnloadConfirmPanelCallback)(
     WKStringRef message,
     WKFrameRef frame,
     const void* clientInfo);
-typedef void (*WKPageDidDraw)(WKPageRef page, const void* clientInfo);
+typedef void (*WKPageDidDrawCallback)(WKPageRef page, const void* clientInfo);
+typedef void (*WKPageDidScrollCallback)(WKPageRef page, const void* clientInfo);
 
 struct WKPageUIClient {
   int version;
@@ -279,7 +280,8 @@ struct WKPageUIClient {
   WKPageGetWindowFrameCallback getWindowFrame;
   WKPageSetWindowFrameCallback setWindowFrame;
   WKPageRunBeforeUnloadConfirmPanelCallback runBeforeUnloadConfirmPanel;
-  WKPageDidDraw didDraw;
+  WKPageDidDrawCallback didDraw;
+  WKPageDidScrollCallback pageDidScroll;
 };
 typedef struct WKPageUIClient WKPageUIClient;
 

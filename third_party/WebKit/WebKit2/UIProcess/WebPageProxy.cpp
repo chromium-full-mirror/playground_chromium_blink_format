@@ -993,6 +993,10 @@ void WebPageProxy::didChangeViewportData(const ViewportArguments& args) {
   m_pageClient->setViewportArguments(args);
 }
 
+void WebPageProxy::pageDidScroll() {
+  m_uiClient.pageDidScroll(this);
+}
+
 void WebPageProxy::didDraw() {
   m_uiClient.didDraw(this);
 }

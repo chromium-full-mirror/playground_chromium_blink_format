@@ -79,6 +79,7 @@ class WebUIClient {
                                    WebFrameProxy*);
 
   void didDraw(WebPageProxy*);
+  void pageDidScroll(WebPageProxy*);
 
  private:
   WKPageUIClient m_pageUIClient;
