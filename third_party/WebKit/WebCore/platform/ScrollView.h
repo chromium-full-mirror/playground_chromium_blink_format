@@ -424,6 +424,8 @@ class ScrollView : public Widget, public ScrollbarClient {
   void setGtkAdjustments(GtkAdjustment* hadj,
                          GtkAdjustment* vadj,
                          bool resetValues = true);
+  void setHorizontalAdjustment(GtkAdjustment* hadj, bool resetValues = true);
+  void setVerticalAdjustment(GtkAdjustment* vadj, bool resetValues = true);
   void setScrollOffset(const IntSize& offset) { m_scrollOffset = offset; }
 
  private:
