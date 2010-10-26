@@ -121,8 +121,7 @@ void WebIDBObjectStoreImpl::openCursor(const WebIDBKeyRange& keyRange,
                                        const WebIDBTransaction& transaction,
                                        WebExceptionCode& ec) {
   m_objectStore->openCursor(
-      IDBKeyRange::create(keyRange.left(), keyRange.right(), keyRange.flags()),
-      direction, IDBCallbacksProxy::create(callbacks),
+      keyRange, direction, IDBCallbacksProxy::create(callbacks),
       transaction.getIDBTransactionBackendInterface(), ec);
 }
 
