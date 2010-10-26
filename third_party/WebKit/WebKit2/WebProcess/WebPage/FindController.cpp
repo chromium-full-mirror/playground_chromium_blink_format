@@ -27,6 +27,7 @@
 
 #include "BackingStore.h"
 #include "FindPageOverlay.h"
+#include "WKPage.h"
 #include "WebPage.h"
 #include "WebPageProxyMessages.h"
 #include "WebProcess.h"
@@ -101,11 +102,13 @@ void FindController::findString(const String& string,
 
     if (shouldShowOverlay) {
       unsigned matchCount = m_webPage->corePage()->markAllMatchesForText(
-          string, caseSensitivity, false, maxMatchCount);
+          string, caseSensitivity, false, maxMatchCount + 1);
 
       // Check if we have more matches than allowed.
-      if (matchCount > maxMatchCount)
+      if (matchCount > maxMatchCount) {
         shouldShowOverlay = false;
+        matchCount = static_cast<unsigned>(kWKMoreThanMaximumMatchCount);
+      }
 
       WebProcess::shared().connection()->send(
           Messages::WebPageProxy::DidFindString(string, matchCount),
