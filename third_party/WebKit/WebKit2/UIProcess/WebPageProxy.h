@@ -169,6 +169,7 @@ class WebPageProxy : public APIObject {
 
   const String& pageTitle() const { return m_pageTitle; }
   const String& toolTip() const { return m_toolTip; }
+  const String& customUserAgent() const { return m_customUserAgent; }
 
   double estimatedProgress() const { return m_estimatedProgress; }
 
@@ -405,6 +406,8 @@ class WebPageProxy : public APIObject {
   RefPtr<WebPageNamespace> m_pageNamespace;
   RefPtr<WebFrameProxy> m_mainFrame;
   String m_pageTitle;
+
+  String m_customUserAgent;
 
   RefPtr<WebInspectorProxy> m_inspector;
 
