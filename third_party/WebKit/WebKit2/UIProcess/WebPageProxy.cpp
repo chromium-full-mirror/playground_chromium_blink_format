@@ -816,6 +816,34 @@ void WebPageProxy::didRemoveFrameFromHierarchy(
   m_loaderClient.didRemoveFrameFromHierarchy(this, frame, userData.get());
 }
 
+void WebPageProxy::didDisplayInsecureContentForFrame(
+    uint64_t frameID,
+    CoreIPC::ArgumentDecoder* arguments) {
+  RefPtr<APIObject> userData;
+  WebContextUserMessageDecoder messageDecoder(userData,
+                                              pageNamespace()->context());
+  if (!arguments->decode(messageDecoder))
+    return;
+
+  WebFrameProxy* frame = process()->webFrame(frameID);
+
+  m_loaderClient.didDisplayInsecureContentForFrame(this, frame, userData.get());
+}
+
+void WebPageProxy::didRunInsecureContentForFrame(
+    uint64_t frameID,
+    CoreIPC::ArgumentDecoder* arguments) {
+  RefPtr<APIObject> userData;
+  WebContextUserMessageDecoder messageDecoder(userData,
+                                              pageNamespace()->context());
+  if (!arguments->decode(messageDecoder))
+    return;
+
+  WebFrameProxy* frame = process()->webFrame(frameID);
+
+  m_loaderClient.didRunInsecureContentForFrame(this, frame, userData.get());
+}
+
 // PolicyClient
 
 void WebPageProxy::decidePolicyForNavigationAction(

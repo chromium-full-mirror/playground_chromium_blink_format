@@ -294,6 +294,10 @@ class WebPageProxy : public APIObject {
   void didFirstVisuallyNonEmptyLayoutForFrame(uint64_t frameID,
                                               CoreIPC::ArgumentDecoder*);
   void didRemoveFrameFromHierarchy(uint64_t frameID, CoreIPC::ArgumentDecoder*);
+  void didDisplayInsecureContentForFrame(uint64_t frameID,
+                                         CoreIPC::ArgumentDecoder*);
+  void didRunInsecureContentForFrame(uint64_t frameID,
+                                     CoreIPC::ArgumentDecoder*);
   void didStartProgress();
   void didChangeProgress(double);
   void didFinishProgress();

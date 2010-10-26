@@ -170,6 +170,28 @@ void WebLoaderClient::didRemoveFrameFromHierarchy(WebPageProxy* page,
                                                  m_pageLoaderClient.clientInfo);
 }
 
+void WebLoaderClient::didDisplayInsecureContentForFrame(WebPageProxy* page,
+                                                        WebFrameProxy* frame,
+                                                        APIObject* userData) {
+  if (!m_pageLoaderClient.didDisplayInsecureContentForFrame)
+    return;
+
+  m_pageLoaderClient.didDisplayInsecureContentForFrame(
+      toAPI(page), toAPI(frame), toAPI(userData),
+      m_pageLoaderClient.clientInfo);
+}
+
+void WebLoaderClient::didRunInsecureContentForFrame(WebPageProxy* page,
+                                                    WebFrameProxy* frame,
+                                                    APIObject* userData) {
+  if (!m_pageLoaderClient.didRunInsecureContentForFrame)
+    return;
+
+  m_pageLoaderClient.didRunInsecureContentForFrame(
+      toAPI(page), toAPI(frame), toAPI(userData),
+      m_pageLoaderClient.clientInfo);
+}
+
 void WebLoaderClient::didStartProgress(WebPageProxy* page) {
   if (!m_pageLoaderClient.didStartProgress)
     return;

@@ -70,6 +70,10 @@ class WebLoaderClient {
                                               WebFrameProxy*,
                                               APIObject*);
   void didRemoveFrameFromHierarchy(WebPageProxy*, WebFrameProxy*, APIObject*);
+  void didDisplayInsecureContentForFrame(WebPageProxy*,
+                                         WebFrameProxy*,
+                                         APIObject*);
+  void didRunInsecureContentForFrame(WebPageProxy*, WebFrameProxy*, APIObject*);
 
   void didStartProgress(WebPageProxy*);
   void didChangeProgress(WebPageProxy*);

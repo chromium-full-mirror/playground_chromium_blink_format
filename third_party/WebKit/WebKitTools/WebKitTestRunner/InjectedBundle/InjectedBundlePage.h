@@ -104,9 +104,11 @@ class InjectedBundlePage {
                                             const void*);
   static void didDisplayInsecureContentForFrame(WKBundlePageRef,
                                                 WKBundleFrameRef,
+                                                WKTypeRef*,
                                                 const void*);
   static void didRunInsecureContentForFrame(WKBundlePageRef,
                                             WKBundleFrameRef,
+                                            WKTypeRef*,
                                             const void*);
   void didStartProvisionalLoadForFrame(WKBundleFrameRef);
   void didReceiveServerRedirectForProvisionalLoadForFrame(WKBundleFrameRef);

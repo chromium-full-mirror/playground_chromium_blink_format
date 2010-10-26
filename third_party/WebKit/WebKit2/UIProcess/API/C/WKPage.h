@@ -91,16 +91,26 @@ typedef void (*WKPageDidReceiveTitleForFrameCallback)(WKPageRef page,
                                                       WKFrameRef frame,
                                                       WKTypeRef userData,
                                                       const void* clientInfo);
-typedef void (*WKPageDidFirstLayoutForFrame)(WKPageRef page,
-                                             WKFrameRef frame,
-                                             WKTypeRef userData,
-                                             const void* clientInfo);
-typedef void (*WKPageDidFirstVisuallyNonEmptyLayoutForFrame)(
+typedef void (*WKPageDidFirstLayoutForFrameCallback)(WKPageRef page,
+                                                     WKFrameRef frame,
+                                                     WKTypeRef userData,
+                                                     const void* clientInfo);
+typedef void (*WKPageDidFirstVisuallyNonEmptyLayoutForFrameCallback)(
     WKPageRef page,
     WKFrameRef frame,
     WKTypeRef userData,
     const void* clientInfo);
 typedef void (*WKPageDidRemoveFrameFromHierarchyCallback)(
+    WKPageRef page,
+    WKFrameRef frame,
+    WKTypeRef userData,
+    const void* clientInfo);
+typedef void (*WKPageDidDisplayInsecureContentForFrameCallback)(
+    WKPageRef page,
+    WKFrameRef frame,
+    WKTypeRef userData,
+    const void* clientInfo);
+typedef void (*WKPageDidRunInsecureContentForFrameCallback)(
     WKPageRef page,
     WKFrameRef frame,
     WKTypeRef userData,
@@ -141,10 +151,13 @@ struct WKPageLoaderClient {
   WKPageDidFinishLoadForFrameCallback didFinishLoadForFrame;
   WKPageDidFailLoadWithErrorForFrameCallback didFailLoadWithErrorForFrame;
   WKPageDidReceiveTitleForFrameCallback didReceiveTitleForFrame;
-  WKPageDidFirstLayoutForFrame didFirstLayoutForFrame;
-  WKPageDidFirstVisuallyNonEmptyLayoutForFrame
+  WKPageDidFirstLayoutForFrameCallback didFirstLayoutForFrame;
+  WKPageDidFirstVisuallyNonEmptyLayoutForFrameCallback
       didFirstVisuallyNonEmptyLayoutForFrame;
   WKPageDidRemoveFrameFromHierarchyCallback didRemoveFrameFromHierarchy;
+  WKPageDidDisplayInsecureContentForFrameCallback
+      didDisplayInsecureContentForFrame;
+  WKPageDidRunInsecureContentForFrameCallback didRunInsecureContentForFrame;
 
   // FIXME: Move to progress client.
   WKPageDidStartProgressCallback didStartProgress;

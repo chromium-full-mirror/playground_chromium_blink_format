@@ -89,8 +89,12 @@ class InjectedBundlePageLoaderClient {
                                          double date);
   void didChangeLocationWithinPageForFrame(WebPage*, WebFrame*);
   void didHandleOnloadEventsForFrame(WebPage*, WebFrame*);
-  void didDisplayInsecureContentForFrame(WebPage*, WebFrame*);
-  void didRunInsecureContentForFrame(WebPage*, WebFrame*);
+  void didDisplayInsecureContentForFrame(WebPage*,
+                                         WebFrame*,
+                                         RefPtr<APIObject>& userData);
+  void didRunInsecureContentForFrame(WebPage*,
+                                     WebFrame*,
+                                     RefPtr<APIObject>& userData);
 
  private:
   WKBundlePageLoaderClient m_client;
