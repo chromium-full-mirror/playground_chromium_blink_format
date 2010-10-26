@@ -99,6 +99,9 @@ class LayoutTestController : public JSWrappable {
                                            double time,
                                            JSStringRef elementId);
 
+  // Compositing testing.
+  JSRetainPtr<JSStringRef> layerTreeAsText() const;
+
   // UserContent testing.
   void addUserScript(JSStringRef source, bool runAtStart, bool allFrames);
   void addUserStyleSheet(JSStringRef source, bool allFrames);

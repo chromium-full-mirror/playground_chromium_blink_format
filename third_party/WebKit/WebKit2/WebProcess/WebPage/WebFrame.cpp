@@ -275,7 +275,7 @@ PassRefPtr<ImmutableArray> WebFrame::childFrames() {
   return ImmutableArray::adopt(vector);
 }
 
-unsigned WebFrame::numberOfActiveAnimations() {
+unsigned WebFrame::numberOfActiveAnimations() const {
   if (!m_coreFrame)
     return 0;
 
@@ -307,7 +307,14 @@ bool WebFrame::pauseAnimationOnElementWithId(const String& animationName,
                                           time);
 }
 
-unsigned WebFrame::pendingUnloadCount() {
+String WebFrame::layerTreeAsText() const {
+  if (!m_coreFrame)
+    return "";
+
+  return m_coreFrame->layerTreeAsText();
+}
+
+unsigned WebFrame::pendingUnloadCount() const {
   if (!m_coreFrame)
     return 0;
 
