@@ -51,6 +51,7 @@ KeyframeAnimation::KeyframeAnimation(const Animation* animation,
     : AnimationBase(animation, renderer, compAnim),
       m_keyframes(renderer, animation->name()),
       m_index(index),
+      m_startEventDispatched(false),
       m_unanimatedStyle(unanimatedStyle) {
   // Get the keyframe RenderStyles
   if (m_object && m_object->node() && m_object->node()->isElementNode())
@@ -350,6 +351,9 @@ bool KeyframeAnimation::sendAnimationEvent(const AtomicString& eventType,
     listenerType = Document::ANIMATIONEND_LISTENER;
   else {
     ASSERT(eventType == eventNames().webkitAnimationStartEvent);
+    if (m_startEventDispatched)
+      return false;
+    m_startEventDispatched = true;
     listenerType = Document::ANIMATIONSTART_LISTENER;
   }
 
