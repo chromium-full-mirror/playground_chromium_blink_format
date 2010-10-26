@@ -383,7 +383,7 @@ bool ImageDocument::shouldShrinkToFit() const {
 void ImageEventListener::handleEvent(ScriptExecutionContext*, Event* event) {
   if (event->type() == eventNames().resizeEvent)
     m_doc->windowSizeChanged();
-  else if (event->type() == eventNames().clickEvent) {
+  else if (event->type() == eventNames().clickEvent && event->isMouseEvent()) {
     MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);
     m_doc->imageClicked(mouseEvent->x(), mouseEvent->y());
   }
