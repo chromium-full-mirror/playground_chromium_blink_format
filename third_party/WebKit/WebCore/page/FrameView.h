@@ -276,6 +276,7 @@ class FrameView : public ScrollView {
   virtual bool scrollContentsFastPath(const IntSize& scrollDelta,
                                       const IntRect& rectToScroll,
                                       const IntRect& clipRect);
+  virtual void scrollContentsSlowPath(const IntRect& updateRect);
 
  private:
   FrameView(Frame*);

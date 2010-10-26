@@ -549,6 +549,9 @@ void ScrollView::scrollContents(const IntSize& scrollDelta) {
   hostWindow()->invalidateWindow(updateRect, false /*immediate*/);
 
   if (m_drawPanScrollIcon) {
+    // FIXME: the pan icon is broken when accelerated compositing is on, since
+    // it will draw under the compositing layers.
+    // https://bugs.webkit.org/show_bug.cgi?id=47837
     int panIconDirtySquareSizeLength =
         2 *
         (panIconSizeLength +
@@ -569,12 +572,12 @@ void ScrollView::scrollContents(const IntSize& scrollDelta) {
   if (canBlitOnScroll()) {  // The main frame can just blit the WebView window
     // FIXME: Find a way to scroll subframes with this faster path
     if (!scrollContentsFastPath(-scrollDelta, scrollViewRect, clipRect))
-      hostWindow()->invalidateContentsForSlowScroll(updateRect, false);
+      scrollContentsSlowPath(updateRect);
   } else {
     // We need to go ahead and repaint the entire backing store.  Do it now
     // before moving the
     // windowed plugins.
-    hostWindow()->invalidateContentsForSlowScroll(updateRect, false);
+    scrollContentsSlowPath(updateRect);
   }
 
   // This call will move children with native widgets (plugins) and invalidate
@@ -590,6 +593,10 @@ bool ScrollView::scrollContentsFastPath(const IntSize& scrollDelta,
                                         const IntRect& clipRect) {
   hostWindow()->scroll(scrollDelta, rectToScroll, clipRect);
   return true;
+}
+
+void ScrollView::scrollContentsSlowPath(const IntRect& updateRect) {
+  hostWindow()->invalidateContentsForSlowScroll(updateRect, false);
 }
 
 IntPoint ScrollView::windowToContents(const IntPoint& windowPoint) const {
