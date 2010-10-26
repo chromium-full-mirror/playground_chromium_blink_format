@@ -39,7 +39,7 @@ class IDBDatabaseError;
 
 namespace WebKit {
 
-// See comment in WebIndexedDatabase for a high level overview these classes.
+// See comment in WebIDBFactory for a high level overview these classes.
 class WebIDBDatabaseError {
  public:
   ~WebIDBDatabaseError() { reset(); }
