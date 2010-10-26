@@ -30,6 +30,10 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
+#if PLATFORM(QT)
+#include <wtf/text/WTFString.h>
+#endif
+
 namespace CoreIPC {
 class ArgumentDecoder;
 class ArgumentEncoder;
@@ -57,6 +61,8 @@ class SharedMemory : public RefCounted<SharedMemory> {
     mutable mach_port_t m_port;
 #elif PLATFORM(WIN)
     mutable HANDLE m_handle;
+#elif PLATFORM(QT)
+    mutable String m_fileName;
 #endif
     size_t m_size;
   };
