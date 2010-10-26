@@ -404,6 +404,11 @@ void WebContext::setCacheModel(CacheModel cacheModel) {
       0);
 }
 
+uint64_t WebContext::generateDownloadID() {
+  static uint64_t uniqueDownloadID = 0;
+  return ++uniqueDownloadID;
+}
+
 void WebContext::didReceiveMessage(CoreIPC::Connection*,
                                    CoreIPC::MessageID messageID,
                                    CoreIPC::ArgumentDecoder* arguments) {

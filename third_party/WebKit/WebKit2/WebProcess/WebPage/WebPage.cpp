@@ -652,12 +652,13 @@ void WebPage::setIsInWindow(bool isInWindow) {
 
 void WebPage::didReceivePolicyDecision(uint64_t frameID,
                                        uint64_t listenerID,
-                                       uint32_t policyAction) {
+                                       uint32_t policyAction,
+                                       uint64_t downloadID) {
   WebFrame* frame = WebProcess::shared().webFrame(frameID);
   if (!frame)
     return;
   frame->didReceivePolicyDecision(
-      listenerID, static_cast<WebCore::PolicyAction>(policyAction));
+      listenerID, static_cast<PolicyAction>(policyAction), downloadID);
 }
 
 void WebPage::show() {

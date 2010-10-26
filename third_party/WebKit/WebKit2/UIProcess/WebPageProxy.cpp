@@ -429,14 +429,18 @@ void WebPageProxy::handleTouchEvent(const WebTouchEvent& event) {
 }
 #endif
 
-void WebPageProxy::receivedPolicyDecision(WebCore::PolicyAction action,
+void WebPageProxy::receivedPolicyDecision(PolicyAction action,
                                           WebFrameProxy* frame,
                                           uint64_t listenerID) {
   if (!isValid())
     return;
 
+  uint64_t downloadID = 0;
+  if (action == PolicyDownload)
+    downloadID = pageNamespace()->context()->generateDownloadID();
+
   process()->send(Messages::WebPage::DidReceivePolicyDecision(
-                      frame->frameID(), listenerID, action),
+                      frame->frameID(), listenerID, action, downloadID),
                   m_pageID);
 }
 

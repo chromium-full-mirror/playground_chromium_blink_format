@@ -240,7 +240,8 @@ class WebPage : public APIObject {
 
   void didReceivePolicyDecision(uint64_t frameID,
                                 uint64_t listenerID,
-                                uint32_t policyAction);
+                                uint32_t policyAction,
+                                uint64_t downloadID);
   void setCustomUserAgent(const String&);
 
 #if PLATFORM(MAC)

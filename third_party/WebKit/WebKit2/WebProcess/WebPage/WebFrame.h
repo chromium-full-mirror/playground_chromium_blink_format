@@ -70,7 +70,11 @@ class WebFrame : public APIObject {
 
   uint64_t setUpPolicyListener(WebCore::FramePolicyFunction);
   void invalidatePolicyListener();
-  void didReceivePolicyDecision(uint64_t listenerID, WebCore::PolicyAction);
+  void didReceivePolicyDecision(uint64_t listenerID,
+                                WebCore::PolicyAction,
+                                uint64_t downloadID);
+
+  void startDownload(const WebCore::ResourceRequest&);
 
   String source() const;
 
@@ -126,6 +130,7 @@ class WebFrame : public APIObject {
 
   uint64_t m_policyListenerID;
   WebCore::FramePolicyFunction m_policyFunction;
+  uint64_t m_policyDownloadID;
 
   WebFrameLoaderClient m_frameLoaderClient;
   LoadListener* m_loadListener;

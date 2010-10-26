@@ -134,6 +134,9 @@ class WebContext : public APIObject {
   void setShouldPaintNativeControls(bool);
 #endif
 
+  // Downloads.
+  uint64_t generateDownloadID();
+
  private:
   WebContext(ProcessModel, const String& injectedBundlePath);
 
