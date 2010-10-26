@@ -804,6 +804,12 @@ void WebFrameLoaderClient::didTransferChildFrameToNewDocument(Page*) {
     m_webFrame->setWebView(webView);
 }
 
+void WebFrameLoaderClient::transferLoadingResourceFromPage(
+    unsigned long,
+    DocumentLoader*,
+    const ResourceRequest&,
+    Page*) {}
+
 PassRefPtr<Frame> WebFrameLoaderClient::createFrame(
     const KURL& URL,
     const String& name,

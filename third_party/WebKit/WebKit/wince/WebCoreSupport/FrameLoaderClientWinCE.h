@@ -155,6 +155,10 @@ class FrameLoaderClientWinCE : public WebCore::FrameLoaderClient {
       int marginWidth,
       int marginHeight);
   virtual void didTransferChildFrameToNewDocument(WebCore::Page*);
+  virtual void transferLoadingResourceFromPage(unsigned long,
+                                               WebCore::DocumentLoader*,
+                                               const WebCore::ResourceRequest&,
+                                               WebCore::Page*);
   virtual PassRefPtr<WebCore::Widget> createPlugin(
       const WebCore::IntSize&,
       WebCore::HTMLPlugInElement*,

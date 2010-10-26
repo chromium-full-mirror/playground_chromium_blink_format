@@ -188,6 +188,12 @@ PassRefPtr<Frame> FrameLoaderClientWinCE::createFrame(
 
 void FrameLoaderClientWinCE::didTransferChildFrameToNewDocument(Page*) {}
 
+void FrameLoaderClientWinCE::transferLoadingResourceFromPage(
+    unsigned long,
+    DocumentLoader*,
+    const ResourceRequest&,
+    Page*) {}
+
 void FrameLoaderClientWinCE::redirectDataToPlugin(Widget* pluginWidget) {
   ASSERT(!m_pluginView);
   m_pluginView = static_cast<PluginView*>(pluginWidget);

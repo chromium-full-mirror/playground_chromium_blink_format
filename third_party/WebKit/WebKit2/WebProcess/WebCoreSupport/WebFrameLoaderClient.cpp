@@ -1040,6 +1040,14 @@ void WebFrameLoaderClient::didTransferChildFrameToNewDocument(Page*) {
   notImplemented();
 }
 
+void WebFrameLoaderClient::transferLoadingResourceFromPage(
+    unsigned long,
+    DocumentLoader*,
+    const ResourceRequest&,
+    Page*) {
+  notImplemented();
+}
+
 PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
     const IntSize&,
     HTMLPlugInElement* pluginElement,

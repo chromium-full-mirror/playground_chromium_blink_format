@@ -1922,6 +1922,12 @@ bool FrameLoader::frameHasLoaded() const {
           !m_stateMachine.creatingInitialEmptyDocument());
 }
 
+void FrameLoader::transferLoadingResourcesFromPage(Page* oldPage) {
+  ASSERT(oldPage != m_frame->page());
+  if (isLoading())
+    activeDocumentLoader()->transferLoadingResourcesFromPage(oldPage);
+}
+
 void FrameLoader::setDocumentLoader(DocumentLoader* loader) {
   if (!loader && !m_documentLoader)
     return;

@@ -245,6 +245,10 @@ class FrameLoaderClientHaiku : public FrameLoaderClient {
                                         int marginWidth,
                                         int marginHeight);
   virtual void didTransferChildFrameToNewDocument(WebCore::Page*);
+  virtual void transferLoadingResourceFromPage(unsigned long,
+                                               WebCore::DocumentLoader*,
+                                               const ResourceRequest&,
+                                               WebCore::Page*);
   virtual PassRefPtr<Widget> createPlugin(const IntSize&,
                                           HTMLPlugInElement*,
                                           const KURL&,

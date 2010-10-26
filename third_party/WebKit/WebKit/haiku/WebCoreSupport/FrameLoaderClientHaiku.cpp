@@ -698,6 +698,12 @@ PassRefPtr<Frame> FrameLoaderClientHaiku::createFrame(
 
 void FrameLoaderClientHaiku::didTransferChildFrameToNewDocument(Page*) {}
 
+void FrameLoaderClientHaiku::transferLoadingResourceFromPage(
+    unsigned long,
+    DocumentLoader*,
+    const ResourceRequest&,
+    Page*) {}
+
 ObjectContentType FrameLoaderClientHaiku::objectContentType(
     const KURL& url,
     const String& mimeType) {

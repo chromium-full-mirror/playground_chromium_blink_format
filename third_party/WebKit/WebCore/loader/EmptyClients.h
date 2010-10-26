@@ -438,6 +438,10 @@ class EmptyFrameLoaderClient : public FrameLoaderClient, public Noncopyable {
     return 0;
   }
   virtual void didTransferChildFrameToNewDocument(Page*) {}
+  virtual void transferLoadingResourceFromPage(unsigned long,
+                                               DocumentLoader*,
+                                               const ResourceRequest&,
+                                               Page*) {}
   virtual PassRefPtr<Widget> createPlugin(const IntSize&,
                                           HTMLPlugInElement*,
                                           const KURL&,

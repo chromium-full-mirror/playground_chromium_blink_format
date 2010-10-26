@@ -46,6 +46,7 @@ class ArchiveResourceCollection;
 class Frame;
 class FrameLoader;
 class MainResourceLoader;
+class Page;
 class ResourceLoader;
 class SchedulePair;
 class SharedBuffer;
@@ -221,6 +222,8 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   void removePlugInStreamLoader(ResourceLoader*);
 
   void subresourceLoaderFinishedLoadingOnePart(ResourceLoader*);
+
+  void transferLoadingResourcesFromPage(Page*);
 
   void setDeferMainResourceDataLoad(bool defer) {
     m_deferMainResourceDataLoad = defer;

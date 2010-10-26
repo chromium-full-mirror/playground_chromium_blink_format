@@ -1296,6 +1296,12 @@ void FrameLoaderClientQt::didTransferChildFrameToNewDocument(Page*) {
   }
 }
 
+void FrameLoaderClientQt::transferLoadingResourceFromPage(
+    unsigned long,
+    DocumentLoader*,
+    const ResourceRequest&,
+    Page*) {}
+
 ObjectContentType FrameLoaderClientQt::objectContentType(
     const KURL& url,
     const String& _mimeType) {

@@ -250,6 +250,10 @@ class FrameLoaderClientWx : public FrameLoaderClient {
                                         int marginWidth,
                                         int marginHeight);
   virtual void didTransferChildFrameToNewDocument(Page*);
+  virtual void transferLoadingResourceFromPage(unsigned long,
+                                               DocumentLoader*,
+                                               const ResourceRequest&,
+                                               Page*);
   virtual PassRefPtr<Widget> createPlugin(const IntSize&,
                                           HTMLPlugInElement*,
                                           const KURL&,
