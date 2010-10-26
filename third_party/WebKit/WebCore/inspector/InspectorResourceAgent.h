@@ -114,6 +114,7 @@ class InspectorResourceAgent : public RefCounted<InspectorResourceAgent> {
   void cachedResources(RefPtr<InspectorObject>*);
   void resourceContent(unsigned long frameID,
                        const String& url,
+                       bool base64Encode,
                        String* content);
 
  private:
