@@ -25,7 +25,11 @@
 
 #include "DownloadManager.h"
 
+#include "Download.h"
+#include "NotImplemented.h"
 #include <wtf/StdLibExtras.h>
+
+using namespace WebCore;
 
 namespace WebKit {
 
@@ -35,5 +39,11 @@ DownloadManager& DownloadManager::shared() {
 }
 
 DownloadManager::DownloadManager() {}
+
+void DownloadManager::startDownload(uint64_t downloadID,
+                                    const ResourceRequest& request) {
+  // FIXME: Implement.
+  notImplemented();
+}
 
 }  // namespace WebKit
