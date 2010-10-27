@@ -234,6 +234,8 @@ JIT::Label JIT::privateCompileCTINativeCall(JSGlobalData* globalData,
 
   Label nativeCallThunk = align();
 
+  emitPutImmediateToCallFrameHeader(0, RegisterFile::CodeBlock);
+
 #if CPU(X86)
   // Load caller frame's scope chain into this callframe so that whatever we
   // call can
@@ -363,6 +365,8 @@ JIT::CodePtr JIT::privateCompileCTINativeCall(
     NativeFunction func) {
   Call nativeCall;
   Label nativeCallThunk = align();
+
+  emitPutImmediateToCallFrameHeader(0, RegisterFile::CodeBlock);
 
 #if CPU(X86)
   // Load caller frame's scope chain into this callframe so that whatever we

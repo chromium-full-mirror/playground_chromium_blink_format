@@ -239,6 +239,8 @@ JIT::Label JIT::privateCompileCTINativeCall(JSGlobalData* globalData,
 
   Label nativeCallThunk = align();
 
+  emitPutImmediateToCallFrameHeader(0, RegisterFile::CodeBlock);
+
 #if CPU(X86_64)
   // Load caller frame's scope chain into this callframe so that whatever we
   // call can
