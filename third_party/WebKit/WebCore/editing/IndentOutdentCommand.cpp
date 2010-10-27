@@ -110,6 +110,9 @@ void IndentOutdentCommand::indentIntoBlockquote(
   else
     nodeToSplitTo = editableRootForPosition(start);
 
+  if (!nodeToSplitTo)
+    return;
+
   RefPtr<Node> outerBlock = (start.node() == nodeToSplitTo)
                                 ? start.node()
                                 : splitTreeToNode(start.node(), nodeToSplitTo);
