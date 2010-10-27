@@ -1463,6 +1463,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
   EBorderStyle leftStyle = style->borderLeftStyle();
   EBorderStyle rightStyle = style->borderRightStyle();
 
+  bool horizontal = style->isHorizontalWritingMode();
   bool renderTop = topStyle > BHIDDEN && !topTransparent &&
                    (horizontal || includeLogicalLeftEdge);
   bool renderLeft = leftStyle > BHIDDEN && !leftTransparent &&
