@@ -73,7 +73,7 @@ class NetscapePlugin : public Plugin {
                bool sendNotification,
                void* notificationData);
   NPError destroyStream(NPStream*, NPReason);
-  void setIsWindowed(bool windowed) { m_isWindowed = windowed; }
+  void setIsWindowed(bool);
   void setStatusbarText(const String&);
   static void setException(const String&);
   bool evaluate(NPObject*, const String& scriptString, NPVariant* result);
