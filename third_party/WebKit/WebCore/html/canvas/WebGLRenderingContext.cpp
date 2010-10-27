@@ -1353,6 +1353,8 @@ WebGLGetInfo WebGLRenderingContext::getFramebufferAttachmentParameter(
   m_context->getFramebufferAttachmentParameteriv(
       target, attachment, GraphicsContext3D::FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
       &type);
+  if (!type)
+    return WebGLGetInfo();
   int value = 0;
   m_context->getFramebufferAttachmentParameteriv(
       target, attachment, GraphicsContext3D::FRAMEBUFFER_ATTACHMENT_OBJECT_NAME,
