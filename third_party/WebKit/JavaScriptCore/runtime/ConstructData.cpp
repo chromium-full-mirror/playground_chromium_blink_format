@@ -41,8 +41,7 @@ JSObject* construct(ExecState* exec,
   ASSERT(constructType == ConstructTypeJS ||
          constructType == ConstructTypeHost);
   return exec->interpreter()->executeConstruct(
-      exec, asObject(constructorObject), constructType, constructData, args,
-      exec->exceptionSlot());
+      exec, asObject(constructorObject), constructType, constructData, args);
 }
 
 }  // namespace JSC

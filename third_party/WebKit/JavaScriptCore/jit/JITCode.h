@@ -65,11 +65,11 @@ class JITCode {
   // Execute the code!
   inline JSValue execute(RegisterFile* registerFile,
                          CallFrame* callFrame,
-                         JSGlobalData* globalData,
-                         JSValue* exception) {
-    return JSValue::decode(ctiTrampoline(
-        m_ref.m_code.executableAddress(), registerFile, callFrame, exception,
-        Profiler::enabledProfilerReference(), globalData));
+                         JSGlobalData* globalData) {
+    JSValue result = JSValue::decode(
+        ctiTrampoline(m_ref.m_code.executableAddress(), registerFile, callFrame,
+                      0, Profiler::enabledProfilerReference(), globalData));
+    return globalData->exception ? jsNull() : result;
   }
 
   void* start() { return m_ref.m_code.dataLocation(); }

@@ -69,8 +69,10 @@ JSObject* createNotAnObjectError(ExecState*,
                                  JSNotAnObjectErrorStub*,
                                  unsigned bytecodeOffset,
                                  CodeBlock*);
-JSValue throwOutOfMemoryError(ExecState*);
 JSObject* createErrorForInvalidGlobalAssignment(ExecState*, const UString&);
+
+JSObject* throwOutOfMemoryError(ExecState*);
+JSObject* throwStackOverflowError(ExecState*);
 
 }  // namespace JSC
 

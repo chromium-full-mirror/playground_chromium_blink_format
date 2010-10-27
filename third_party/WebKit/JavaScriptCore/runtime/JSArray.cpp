@@ -1169,8 +1169,8 @@ void JSArray::sort(ExecState* exec,
   tree.abstractor().m_nodes.grow(nodeCount);
 
   if (callType == CallTypeJS)
-    tree.abstractor().m_cachedCall = adoptPtr(new CachedCall(
-        exec, asFunction(compareFunction), 2, exec->exceptionSlot()));
+    tree.abstractor().m_cachedCall =
+        adoptPtr(new CachedCall(exec, asFunction(compareFunction), 2));
 
   if (!tree.abstractor().m_nodes.begin()) {
     throwOutOfMemoryError(exec);

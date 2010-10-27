@@ -103,7 +103,7 @@ struct JITStackFrame {
   void* code;
   RegisterFile* registerFile;
   CallFrame* callFrame;
-  JSValue* exception;
+  void* unused1;
   Profiler** enabledProfilerReference;
   JSGlobalData* globalData;
 
@@ -142,7 +142,7 @@ struct JITStackFrame {
   void* code;
   RegisterFile* registerFile;
   CallFrame* callFrame;
-  JSValue* exception;
+  void* unused1;
   Profiler** enabledProfilerReference;
   JSGlobalData* globalData;
 
@@ -174,7 +174,7 @@ struct JITStackFrame {
   // which is not preserved)
   RegisterFile* registerFile;
   CallFrame* callFrame;
-  JSValue* exception;
+  void* unused1;
 
   // These arguments passed on the stack.
   Profiler** enabledProfilerReference;
@@ -202,7 +202,7 @@ struct JITStackFrame {
 
   RegisterFile* registerFile;
   CallFrame* callFrame;
-  JSValue* exception;
+  void* unused1;
 
   // These arguments passed on the stack.
   Profiler** enabledProfilerReference;
@@ -236,7 +236,7 @@ struct JITStackFrame {
   // which is not preserved)
   RegisterFile* registerFile;
   CallFrame* callFrame;
-  JSValue* exception;
+  void* unused1;
 
   // These arguments passed on the stack.
   Profiler** enabledProfilerReference;
@@ -272,7 +272,7 @@ extern "C" void ctiOpThrowNotCaught();
 extern "C" EncodedJSValue ctiTrampoline(void* code,
                                         RegisterFile*,
                                         CallFrame*,
-                                        JSValue* exception,
+                                        void* /*unused1*/,
                                         Profiler**,
                                         JSGlobalData*);
 
@@ -404,13 +404,11 @@ EncodedJSValue JIT_STUB cti_op_rshift(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_strcat(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_stricteq(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_sub(STUB_ARGS_DECLARATION);
-EncodedJSValue JIT_STUB cti_op_throw(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_to_jsnumber(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_to_primitive(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_typeof(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_urshift(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_to_object(STUB_ARGS_DECLARATION);
-EncodedJSValue JIT_STUB cti_vm_throw(STUB_ARGS_DECLARATION);
 JSObject* JIT_STUB cti_op_new_array(STUB_ARGS_DECLARATION);
 JSObject* JIT_STUB cti_op_new_error(STUB_ARGS_DECLARATION);
 JSObject* JIT_STUB cti_op_new_func(STUB_ARGS_DECLARATION);
@@ -451,7 +449,6 @@ void JIT_STUB cti_op_put_setter(STUB_ARGS_DECLARATION);
 void JIT_STUB cti_op_ret_scopeChain(STUB_ARGS_DECLARATION);
 void JIT_STUB cti_op_tear_off_activation(STUB_ARGS_DECLARATION);
 void JIT_STUB cti_op_tear_off_arguments(STUB_ARGS_DECLARATION);
-void JIT_STUB cti_register_file_check(STUB_ARGS_DECLARATION);
 void* JIT_STUB cti_op_call_arityCheck(STUB_ARGS_DECLARATION);
 void* JIT_STUB cti_op_construct_arityCheck(STUB_ARGS_DECLARATION);
 void* JIT_STUB cti_op_call_jitCompile(STUB_ARGS_DECLARATION);
@@ -459,8 +456,11 @@ void* JIT_STUB cti_op_construct_jitCompile(STUB_ARGS_DECLARATION);
 void* JIT_STUB cti_op_switch_char(STUB_ARGS_DECLARATION);
 void* JIT_STUB cti_op_switch_imm(STUB_ARGS_DECLARATION);
 void* JIT_STUB cti_op_switch_string(STUB_ARGS_DECLARATION);
+void* JIT_STUB cti_op_throw(STUB_ARGS_DECLARATION);
+void* JIT_STUB cti_register_file_check(STUB_ARGS_DECLARATION);
 void* JIT_STUB cti_vm_lazyLinkCall(STUB_ARGS_DECLARATION);
 void* JIT_STUB cti_vm_lazyLinkConstruct(STUB_ARGS_DECLARATION);
+void* JIT_STUB cti_vm_throw(STUB_ARGS_DECLARATION);
 }  // extern "C"
 
 }  // namespace JSC

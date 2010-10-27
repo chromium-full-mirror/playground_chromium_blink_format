@@ -40,8 +40,7 @@ JSValue call(ExecState* exec,
              const ArgList& args) {
   ASSERT(callType == CallTypeJS || callType == CallTypeHost);
   return exec->interpreter()->executeCall(exec, asObject(functionObject),
-                                          callType, callData, thisValue, args,
-                                          exec->exceptionSlot());
+                                          callType, callData, thisValue, args);
 }
 
 }  // namespace JSC

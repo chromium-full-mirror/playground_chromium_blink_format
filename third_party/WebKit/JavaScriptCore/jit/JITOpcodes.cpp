@@ -1146,8 +1146,12 @@ void JIT::emit_op_push_new_scope(Instruction* currentInstruction) {
 void JIT::emit_op_catch(Instruction* currentInstruction) {
   killLastResultRegister();  // FIXME: Implicitly treat op_catch as a labeled
                              // statement, and remove this line of code.
-  peek(callFrameRegister,
-       OBJECT_OFFSETOF(struct JITStackFrame, callFrame) / sizeof(void*));
+  move(regT0, callFrameRegister);
+  peek(regT3,
+       OBJECT_OFFSETOF(struct JITStackFrame, globalData) / sizeof(void*));
+  loadPtr(Address(regT3, OBJECT_OFFSETOF(JSGlobalData, exception)), regT0);
+  storePtr(ImmPtr(JSValue::encode(JSValue())),
+           Address(regT3, OBJECT_OFFSETOF(JSGlobalData, exception)));
   emitPutVirtualRegister(currentInstruction[1].u.operand);
 }
 

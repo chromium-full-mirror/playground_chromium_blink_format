@@ -96,26 +96,22 @@ class Interpreter : public FastAllocBase {
   JSValue execute(ProgramExecutable*,
                   CallFrame*,
                   ScopeChainNode*,
-                  JSObject* thisObj,
-                  JSValue* exception);
+                  JSObject* thisObj);
   JSValue executeCall(CallFrame*,
                       JSObject* function,
                       CallType,
                       const CallData&,
                       JSValue thisValue,
-                      const ArgList&,
-                      JSValue* exception);
+                      const ArgList&);
   JSObject* executeConstruct(CallFrame*,
                              JSObject* function,
                              ConstructType,
                              const ConstructData&,
-                             const ArgList&,
-                             JSValue* exception);
+                             const ArgList&);
   JSValue execute(EvalExecutable* evalNode,
                   CallFrame* exec,
                   JSObject* thisObj,
-                  ScopeChainNode* scopeChain,
-                  JSValue* exception);
+                  ScopeChainNode* scopeChain);
 
   JSValue retrieveArguments(CallFrame*, JSFunction*) const;
   JSValue retrieveCaller(CallFrame*, JSFunction*) const;
@@ -137,8 +133,7 @@ class Interpreter : public FastAllocBase {
                                 RegisterFile*,
                                 Register* argv,
                                 int argc,
-                                int registerOffset,
-                                JSValue& exceptionValue);
+                                int registerOffset);
   NEVER_INLINE HandlerInfo* throwException(CallFrame*&,
                                            JSValue&,
                                            unsigned bytecodeOffset,
@@ -156,17 +151,15 @@ class Interpreter : public FastAllocBase {
                                         CallFrame*,
                                         JSFunction*,
                                         int argCount,
-                                        ScopeChainNode*,
-                                        JSValue* exception);
+                                        ScopeChainNode*);
   void endRepeatCall(CallFrameClosure&);
-  JSValue execute(CallFrameClosure&, JSValue* exception);
+  JSValue execute(CallFrameClosure&);
 
   JSValue execute(EvalExecutable*,
                   CallFrame*,
                   JSObject* thisObject,
                   int globalRegisterOffset,
-                  ScopeChainNode*,
-                  JSValue* exception);
+                  ScopeChainNode*);
 
 #if ENABLE(INTERPRETER)
   NEVER_INLINE bool resolve(CallFrame*, Instruction*, JSValue& exceptionValue);
@@ -215,10 +208,7 @@ class Interpreter : public FastAllocBase {
 
   static CallFrame* findFunctionCallFrame(CallFrame*, JSFunction*);
 
-  JSValue privateExecute(ExecutionFlag,
-                         RegisterFile*,
-                         CallFrame*,
-                         JSValue* exception);
+  JSValue privateExecute(ExecutionFlag, RegisterFile*, CallFrame*);
 
   void dumpCallFrame(CallFrame*);
   void dumpRegisters(CallFrame*);
