@@ -89,6 +89,10 @@ void RenderView::computePreferredLogicalWidths() {
   m_maxPreferredLogicalWidth = m_minPreferredLogicalWidth;
 }
 
+bool RenderView::isChildAllowed(RenderObject* child, RenderStyle*) const {
+  return child->isBox();
+}
+
 void RenderView::layout() {
   if (!document()->paginated())
     setPageHeight(0);
