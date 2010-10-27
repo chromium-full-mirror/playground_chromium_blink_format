@@ -576,6 +576,8 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                                  unsigned long type,
                                  long offset,
                                  long& numElementsRequired);
+  // If numElements <= 0, we only check if each enabled vertex attribute is
+  // bound to a buffer.
   bool validateRenderingState(long numElements);
 
   bool validateWebGLObject(WebGLObject* object);
