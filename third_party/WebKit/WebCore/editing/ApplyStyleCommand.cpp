@@ -1540,7 +1540,7 @@ bool ApplyStyleCommand::removeImplicitlyStyledElement(
         continue;  // If CSS value is primitive, then skip if they are equal.
     }
 
-    if (extractedStyle)
+    if (extractedStyle && mapValue)
       extractedStyle->setProperty(equivalent.propertyID, mapValue->cssText());
 
     if (mode == RemoveNone)
