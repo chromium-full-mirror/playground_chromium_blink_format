@@ -32,6 +32,7 @@
 #include "AudioBus.h"
 #include "AudioDestinationNode.h"
 #include "HRTFDatabaseLoader.h"
+#include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -118,6 +119,9 @@ class AudioContext : public ActiveDOMObject, public RefCounted<AudioContext> {
   // then it tells the context to dereference it.
   void notifyNodeFinishedProcessing(AudioNode*);
 
+  // Called at the start of each render quantum.
+  void handlePreRenderTasks();
+
   // Called at the end of each render quantum.
   void handlePostRenderTasks();
 
@@ -146,7 +150,7 @@ class AudioContext : public ActiveDOMObject, public RefCounted<AudioContext> {
     m_audioThread = thread;
   }  // FIXME: check either not initialized or the same
   ThreadIdentifier audioThread() const { return m_audioThread; }
-  bool isAudioThread();
+  bool isAudioThread() const;
 
   // Returns true only after the audio thread has been started and then
   // shutdown.
@@ -164,7 +168,7 @@ class AudioContext : public ActiveDOMObject, public RefCounted<AudioContext> {
   void unlock();
 
   // Returns true if this thread owns the context's lock.
-  bool isGraphOwner();
+  bool isGraphOwner() const;
 
   class AutoLocker {
    public:
@@ -190,6 +194,10 @@ class AudioContext : public ActiveDOMObject, public RefCounted<AudioContext> {
   // In the audio thread at the start of each render cycle, we'll call
   // handleDeferredFinishDerefs().
   void handleDeferredFinishDerefs();
+
+  // Only accessed when the graph lock is held.
+  void markAudioNodeInputDirty(AudioNodeInput*);
+  void markAudioNodeOutputDirty(AudioNodeOutput*);
 
  private:
   AudioContext(Document*);
@@ -240,6 +248,12 @@ class AudioContext : public ActiveDOMObject, public RefCounted<AudioContext> {
   Vector<AudioNode*> m_nodesToDelete;
 
   Vector<RefPtr<CachedAudio>> m_cachedAudioReferences;
+
+  // Only accessed when the graph lock is held.
+  HashSet<AudioNodeInput*> m_dirtyAudioNodeInputs;
+  HashSet<AudioNodeOutput*> m_dirtyAudioNodeOutputs;
+  void handleDirtyAudioNodeInputs();
+  void handleDirtyAudioNodeOutputs();
 
   OwnPtr<AudioBus> m_temporaryMonoBus;
   OwnPtr<AudioBus> m_temporaryStereoBus;
