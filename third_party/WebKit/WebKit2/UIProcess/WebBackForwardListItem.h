@@ -45,7 +45,8 @@ class WebBackForwardListItem : public APIObject {
     return adoptRef(
         new WebBackForwardListItem(originalURL, url, title, itemID));
   }
-  ~WebBackForwardListItem();
+
+  virtual ~WebBackForwardListItem();
 
   uint64_t itemID() const { return m_itemID; }
 

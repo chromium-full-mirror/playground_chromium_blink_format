@@ -40,7 +40,8 @@ class WebNavigationData : public APIObject {
       const WebNavigationDataStore& store) {
     return adoptRef(new WebNavigationData(store));
   }
-  ~WebNavigationData();
+
+  virtual ~WebNavigationData();
 
   String title() const { return m_store.title; }
   String url() const { return m_store.url; }

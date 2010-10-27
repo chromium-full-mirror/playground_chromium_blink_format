@@ -45,7 +45,7 @@ class WebPageNamespace : public APIObject {
     return adoptRef(new WebPageNamespace(context));
   }
 
-  ~WebPageNamespace();
+  virtual ~WebPageNamespace();
 
   WebPageProxy* createWebPage();
 

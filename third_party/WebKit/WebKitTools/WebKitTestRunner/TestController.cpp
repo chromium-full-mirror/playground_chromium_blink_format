@@ -182,7 +182,8 @@ void TestController::initialize(int argc, const char* argv[]) {
   platformInitializeContext();
 
   WKContextInjectedBundleClient injectedBundleClient = {
-      0, this, didReceiveMessageFromInjectedBundle, 0};
+      0, this, didReceiveMessageFromInjectedBundle,
+      didReceiveSynchronousMessageFromInjectedBundle};
   WKContextSetInjectedBundleClient(m_context.get(), &injectedBundleClient);
 
   _WKContextSetAdditionalPluginsDirectory(m_context.get(),
@@ -320,11 +321,31 @@ void TestController::didReceiveMessageFromInjectedBundle(
       ->didReceiveMessageFromInjectedBundle(messageName, messageBody);
 }
 
+void TestController::didReceiveSynchronousMessageFromInjectedBundle(
+    WKContextRef context,
+    WKStringRef messageName,
+    WKTypeRef messageBody,
+    WKTypeRef* returnData,
+    const void* clientInfo) {
+  *returnData = static_cast<TestController*>(const_cast<void*>(clientInfo))
+                    ->didReceiveSynchronousMessageFromInjectedBundle(
+                        messageName, messageBody)
+                    .leakRef();
+}
+
 void TestController::didReceiveMessageFromInjectedBundle(
     WKStringRef messageName,
     WKTypeRef messageBody) {
   m_currentInvocation->didReceiveMessageFromInjectedBundle(messageName,
                                                            messageBody);
+}
+
+WKRetainPtr<WKTypeRef>
+TestController::didReceiveSynchronousMessageFromInjectedBundle(
+    WKStringRef messageName,
+    WKTypeRef messageBody) {
+  return m_currentInvocation->didReceiveSynchronousMessageFromInjectedBundle(
+      messageName, messageBody);
 }
 
 // WKPageLoaderClient

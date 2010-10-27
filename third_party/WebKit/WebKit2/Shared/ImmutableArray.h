@@ -49,7 +49,7 @@ class ImmutableArray : public APIObject {
     return adoptRef(new ImmutableArray(entries));
   }
 
-  ~ImmutableArray();
+  virtual ~ImmutableArray();
 
   template <typename T>
   T* at(size_t i) {

@@ -182,4 +182,12 @@ void TestInvocation::didReceiveMessageFromInjectedBundle(
   ASSERT_NOT_REACHED();
 }
 
+WKRetainPtr<WKTypeRef>
+    TestInvocation::didReceiveSynchronousMessageFromInjectedBundle(
+        WKStringRef /*messageName*/,
+        WKTypeRef /*messageBody*/) {
+  ASSERT_NOT_REACHED();
+  return 0;
+}
+
 }  // namespace WTR

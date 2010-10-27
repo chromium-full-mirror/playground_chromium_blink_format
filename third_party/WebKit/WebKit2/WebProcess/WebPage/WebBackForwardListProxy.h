@@ -37,49 +37,31 @@ class WebBackForwardListProxy : public WebCore::BackForwardList {
   static PassRefPtr<WebBackForwardListProxy> create(WebPage* page) {
     return adoptRef(new WebBackForwardListProxy(page));
   }
-  ~WebBackForwardListProxy();
 
   static WebCore::HistoryItem* itemForID(uint64_t);
 
-  void addItem(PassRefPtr<WebCore::HistoryItem>);
-  void goBack();
-  void goForward();
-  void goToItem(WebCore::HistoryItem*);
+  void clear();
 
-  WebCore::HistoryItem* backItem();
-  WebCore::HistoryItem* currentItem();
-  WebCore::HistoryItem* forwardItem();
-  WebCore::HistoryItem* itemAtIndex(int);
+ private:
+  WebBackForwardListProxy(WebPage*);
 
-  void backListWithLimit(int, WebCore::HistoryItemVector&);
-  void forwardListWithLimit(int, WebCore::HistoryItemVector&);
+  virtual void addItem(PassRefPtr<WebCore::HistoryItem>);
 
-  int capacity();
-  void setCapacity(int);
-  bool enabled();
-  void setEnabled(bool);
-  int backListCount();
-  int forwardListCount();
-  bool containsItem(WebCore::HistoryItem*);
+  virtual void goToItem(WebCore::HistoryItem*);
 
-  void close();
-  bool closed();
+  virtual WebCore::HistoryItem* itemAtIndex(int);
+  virtual int backListCount();
+  virtual int forwardListCount();
 
-  void removeItem(WebCore::HistoryItem*);
-  WebCore::HistoryItemVector& entries();
+  virtual bool isActive();
+
+  virtual void close();
 
 #if ENABLE(WML)
   void clearWMLPageHistory();
 #endif
 
- private:
-  WebBackForwardListProxy(WebPage*);
-
   WebPage* m_page;
-
-  unsigned m_capacity;
-  bool m_closed;
-  bool m_enabled;
 };
 
 }  // namespace WebKit

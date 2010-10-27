@@ -51,7 +51,8 @@ class ImmutableDictionary : public APIObject {
   static PassRefPtr<ImmutableDictionary> adopt(MapType& map) {
     return adoptRef(new ImmutableDictionary(map));
   }
-  ~ImmutableDictionary();
+
+  virtual ~ImmutableDictionary();
 
   virtual bool isMutable() { return false; }
 

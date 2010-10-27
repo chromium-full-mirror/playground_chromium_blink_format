@@ -71,12 +71,21 @@ class TestController {
   void resetStateToConsistentValues();
 
   // WKContextInjectedBundleClient
-  static void didReceiveMessageFromInjectedBundle(WKContextRef context,
+  static void didReceiveMessageFromInjectedBundle(WKContextRef,
                                                   WKStringRef messageName,
                                                   WKTypeRef messageBody,
                                                   const void*);
+  static void didReceiveSynchronousMessageFromInjectedBundle(
+      WKContextRef,
+      WKStringRef messageName,
+      WKTypeRef messageBody,
+      WKTypeRef* returnData,
+      const void*);
   void didReceiveMessageFromInjectedBundle(WKStringRef messageName,
                                            WKTypeRef messageBody);
+  WKRetainPtr<WKTypeRef> didReceiveSynchronousMessageFromInjectedBundle(
+      WKStringRef messageName,
+      WKTypeRef messageBody);
 
   // WKPageLoaderClient
   static void didFinishLoadForFrame(WKPageRef page,

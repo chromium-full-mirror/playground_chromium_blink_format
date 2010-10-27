@@ -49,7 +49,8 @@ class WebPreferences : public APIObject {
   static PassRefPtr<WebPreferences> copy(WebPreferences* preferences) {
     return adoptRef(new WebPreferences(preferences));
   }
-  ~WebPreferences();
+
+  virtual ~WebPreferences();
 
   void addContext(WebContext*);
   void removeContext(WebContext*);

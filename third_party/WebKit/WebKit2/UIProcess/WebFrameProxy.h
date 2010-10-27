@@ -55,7 +55,7 @@ class WebFrameProxy : public APIObject {
                                           uint64_t frameID) {
     return adoptRef(new WebFrameProxy(page, frameID));
   }
-  ~WebFrameProxy();
+  virtual ~WebFrameProxy();
 
   enum LoadState {
     LoadStateProvisional,

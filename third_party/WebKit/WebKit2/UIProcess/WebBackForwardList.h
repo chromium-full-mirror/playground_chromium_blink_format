@@ -54,10 +54,12 @@ class WebBackForwardList : public APIObject {
   static PassRefPtr<WebBackForwardList> create(WebPageProxy* page) {
     return adoptRef(new WebBackForwardList(page));
   }
-  ~WebBackForwardList();
+
+  virtual ~WebBackForwardList();
 
   void addItem(WebBackForwardListItem*);
   void goToItem(WebBackForwardListItem*);
+  void clear();
 
   WebBackForwardListItem* currentItem();
   WebBackForwardListItem* backItem();
@@ -66,9 +68,6 @@ class WebBackForwardList : public APIObject {
 
   int backListCount();
   int forwardListCount();
-
-  BackForwardListItemVector backListWithLimit(unsigned limit);
-  BackForwardListItemVector forwardListWithLimit(unsigned limit);
 
   PassRefPtr<ImmutableArray> backListAsImmutableArrayWithLimit(unsigned limit);
   PassRefPtr<ImmutableArray> forwardListAsImmutableArrayWithLimit(

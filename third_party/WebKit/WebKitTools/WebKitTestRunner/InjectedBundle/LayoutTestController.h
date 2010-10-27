@@ -62,6 +62,9 @@ class LayoutTestController : public JSWrappable {
   void notifyDone();
 
   // Other dumping.
+  void dumpBackForwardList() {
+    m_shouldDumpBackForwardListsForAllWindows = true;
+  }
   void dumpChildFrameScrollPositions() {
     m_shouldDumpAllFrameScrollPositions = true;
   }
@@ -79,14 +82,15 @@ class LayoutTestController : public JSWrappable {
     m_shouldCloseExtraWindows = value;
   }
   void setXSSAuditorEnabled(bool);
-  unsigned windowCount();
 
   // Special DOM functions.
   JSValueRef computedStyleIncludingVisitedInfo(JSValueRef element);
   JSRetainPtr<JSStringRef> counterValueForElementById(JSStringRef elementId);
-  JSRetainPtr<JSStringRef> markerTextForListItem(JSValueRef element);
+  void clearBackForwardList();
   void execCommand(JSStringRef name, JSStringRef argument);
   bool isCommandEnabled(JSStringRef name);
+  JSRetainPtr<JSStringRef> markerTextForListItem(JSValueRef element);
+  unsigned windowCount();
 
   // Repaint testing.
   void testRepaint() { m_testRepaint = true; }
@@ -112,11 +116,13 @@ class LayoutTestController : public JSWrappable {
   bool shouldDumpAllFrameScrollPositions() const {
     return m_shouldDumpAllFrameScrollPositions;
   }
+  bool shouldDumpBackForwardListsForAllWindows() const {
+    return m_shouldDumpBackForwardListsForAllWindows;
+  }
   bool shouldDumpEditingCallbacks() const { return m_dumpEditingCallbacks; }
   bool shouldDumpMainFrameScrollPosition() const {
     return m_whatToDump == RenderTree;
   }
-
   bool shouldDumpStatusCallbacks() const { return m_dumpStatusCallbacks; }
   bool shouldDumpTitleChanges() const { return m_dumpTitleChanges; }
 
@@ -140,6 +146,7 @@ class LayoutTestController : public JSWrappable {
 
   WhatToDump m_whatToDump;
   bool m_shouldDumpAllFrameScrollPositions;
+  bool m_shouldDumpBackForwardListsForAllWindows;
 
   bool m_shouldAllowEditing;
   bool m_shouldCloseExtraWindows;

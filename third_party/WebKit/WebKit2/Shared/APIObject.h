@@ -67,6 +67,8 @@ class APIObject : public RefCounted<APIObject> {
 
     // Bundle types
     TypeBundle,
+    TypeBundleBackForwardList,
+    TypeBundleBackForwardListItem,
     TypeBundleFrame,
     TypeBundleHitTestResult,
     TypeBundleNodeHandle,

@@ -29,6 +29,7 @@
 #include "InjectedBundlePage.h"
 #include "JSLayoutTestController.h"
 #include "StringFunctions.h"
+#include <WebKit2/WKBundleBackForwardList.h>
 #include <WebKit2/WKBundleFrame.h>
 #include <WebKit2/WKBundleFramePrivate.h>
 #include <WebKit2/WKBundlePagePrivate.h>
@@ -93,6 +94,7 @@ PassRefPtr<LayoutTestController> LayoutTestController::create() {
 LayoutTestController::LayoutTestController()
     : m_whatToDump(RenderTree),
       m_shouldDumpAllFrameScrollPositions(false),
+      m_shouldDumpBackForwardListsForAllWindows(false),
       m_shouldAllowEditing(true),
       m_shouldCloseExtraWindows(false),
       m_dumpEditingCallbacks(false),
@@ -256,6 +258,11 @@ void LayoutTestController::setXSSAuditorEnabled(bool enabled) {
 
 unsigned LayoutTestController::windowCount() {
   return InjectedBundle::shared().pageCount();
+}
+
+void LayoutTestController::clearBackForwardList() {
+  WKBundleBackForwardListClear(
+      WKBundlePageGetBackForwardList(InjectedBundle::shared().page()->page()));
 }
 
 // Object Creation

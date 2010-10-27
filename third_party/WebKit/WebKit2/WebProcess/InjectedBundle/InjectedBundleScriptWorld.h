@@ -45,7 +45,7 @@ class InjectedBundleScriptWorld : public APIObject {
       WebCore::DOMWrapperWorld*);
   static InjectedBundleScriptWorld* normalWorld();
 
-  ~InjectedBundleScriptWorld();
+  virtual ~InjectedBundleScriptWorld();
 
   WebCore::DOMWrapperWorld* coreWorld() const;
 
