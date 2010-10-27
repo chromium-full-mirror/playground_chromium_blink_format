@@ -51,10 +51,6 @@ using namespace WebCore;
 
 QWKPagePrivate::QWKPagePrivate(QWKPage* qq, WKPageNamespaceRef namespaceRef)
     : q(qq), preferences(0), createNewPageFn(0) {
-  // We want to use the LocalizationStrategy at the UI side as well.
-  // FIXME: this should be avoided.
-  WebPlatformStrategies::initialize();
-
   memset(actions, 0, sizeof(actions));
   page = toImpl(namespaceRef)->createWebPage();
   page->setPageClient(this);
