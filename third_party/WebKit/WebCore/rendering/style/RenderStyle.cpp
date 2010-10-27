@@ -28,6 +28,7 @@
 #include "FontSelector.h"
 #include "RenderArena.h"
 #include "RenderObject.h"
+#include "ScaleTransformOperation.h"
 #include "StyleImage.h"
 #include <wtf/StdLibExtras.h>
 #include <algorithm>
@@ -744,6 +745,17 @@ void RenderStyle::applyTransform(TransformationMatrix& transform,
         -transformOriginY().calcFloatValue(borderBoxSize.height()),
         -transformOriginZ());
   }
+}
+
+void RenderStyle::setPageScaleTransform(float scale) {
+  if (scale == 1)
+    return;
+  TransformOperations transform;
+  transform.operations().append(ScaleTransformOperation::create(
+      scale, scale, ScaleTransformOperation::SCALE));
+  setTransform(transform);
+  setTransformOriginX(Length(0, Fixed));
+  setTransformOriginY(Length(0, Fixed));
 }
 
 void RenderStyle::setTextShadow(ShadowData* val, bool add) {

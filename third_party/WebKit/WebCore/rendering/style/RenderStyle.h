@@ -1017,6 +1017,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void applyTransform(TransformationMatrix&,
                       const IntSize& borderBoxSize,
                       ApplyTransformOrigin = IncludeTransformOrigin) const;
+  void setPageScaleTransform(float);
 
   bool hasMask() const {
     return rareNonInheritedData->m_mask.hasImage() ||

@@ -381,6 +381,9 @@ WK_EXPORT void WKPageSetPageAndTextZoomFactors(WKPageRef page,
                                                double pageZoomFactor,
                                                double textZoomFactor);
 
+WK_EXPORT void WKPageScaleWebView(WKPageRef page, double scale);
+WK_EXPORT double WKPageGetViewScaleFactor(WKPageRef page);
+
 // Find.
 enum { kWKFindDirectionForward, kWKFindDirectionBackward };
 typedef uint32_t WKFindDirection;

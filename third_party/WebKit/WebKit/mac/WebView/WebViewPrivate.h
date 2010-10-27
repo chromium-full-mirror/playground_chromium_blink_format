@@ -662,6 +662,9 @@ _removeOriginAccessWhitelistEntryWithSourceOrigin:(NSString*)sourceOrigin
                          forURLScheme:(NSString*)scheme;
 + (void)_registerURLSchemeAsSecure:(NSString*)scheme;
 
+- (void)_scaleWebView:(float)scale;
+- (float)_viewScaleFactor;
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)

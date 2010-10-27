@@ -441,6 +441,20 @@ void WebPage::setPageAndTextZoomFactors(double pageZoomFactor,
                                           static_cast<float>(textZoomFactor));
 }
 
+void WebPage::scaleWebView(double scale) {
+  Frame* frame = m_mainFrame->coreFrame();
+  if (!frame)
+    return;
+  frame->scalePage(scale);
+}
+
+double WebPage::viewScaleFactor() const {
+  Frame* frame = m_mainFrame->coreFrame();
+  if (!frame)
+    return 1;
+  return frame->pageScaleFactor();
+}
+
 void WebPage::installPageOverlay(PassOwnPtr<PageOverlay> pageOverlay) {
   m_pageOverlay = pageOverlay;
   m_pageOverlay->setPage(this);
