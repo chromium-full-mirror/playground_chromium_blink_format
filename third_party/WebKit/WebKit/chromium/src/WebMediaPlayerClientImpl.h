@@ -47,9 +47,14 @@ class WebMediaPlayer;
 
 // This class serves as a bridge between WebCore::MediaPlayer and
 // WebKit::WebMediaPlayer.
-class WebMediaPlayerClientImpl : public WebCore::MediaPlayerPrivateInterface,
-                                 public WebCore::VideoFrameProvider,
+class WebMediaPlayerClientImpl : public WebCore::MediaPlayerPrivateInterface
+#if USE(ACCELERATED_COMPOSITING)
+                                 ,
+                                 public WebCore::VideoFrameProvider
+#endif
+                                 ,
                                  public WebMediaPlayerClient {
+
  public:
   static bool isEnabled();
   static void setIsEnabled(bool);
@@ -110,15 +115,14 @@ class WebMediaPlayerClientImpl : public WebCore::MediaPlayerPrivateInterface,
   virtual void setSize(const WebCore::IntSize&);
   virtual void paint(WebCore::GraphicsContext*, const WebCore::IntRect&);
   virtual bool hasSingleSecurityOrigin() const;
+  virtual WebCore::MediaPlayer::MovieLoadType movieLoadType() const;
 #if USE(ACCELERATED_COMPOSITING)
   virtual bool supportsAcceleratedRendering() const;
-#endif
-
-  virtual WebCore::MediaPlayer::MovieLoadType movieLoadType() const;
 
   // VideoFrameProvider methods:
   virtual WebCore::VideoFrameChromium* getCurrentFrame();
   virtual void putCurrentFrame(WebCore::VideoFrameChromium*);
+#endif
 
  private:
   WebMediaPlayerClientImpl();

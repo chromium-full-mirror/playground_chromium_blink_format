@@ -91,10 +91,12 @@ WebMediaPlayer* WebMediaPlayerClientImpl::mediaPlayer() const {
 // WebMediaPlayerClient --------------------------------------------------------
 
 WebMediaPlayerClientImpl::~WebMediaPlayerClientImpl() {
-  // VideoLayerChromium may outlive this object so make sure all frames are
-  // released.
+// VideoLayerChromium may outlive this object so make sure all frames are
+// released.
+#if USE(ACCELERATED_COMPOSITING)
   if (m_videoLayer.get())
     m_videoLayer->releaseCurrentFrame();
+#endif
 }
 
 void WebMediaPlayerClientImpl::networkStateChanged() {
@@ -105,8 +107,10 @@ void WebMediaPlayerClientImpl::networkStateChanged() {
 void WebMediaPlayerClientImpl::readyStateChanged() {
   ASSERT(m_mediaPlayer);
   m_mediaPlayer->readyStateChanged();
+#if USE(ACCELERATED_COMPOSITING)
   if (hasVideo() && supportsAcceleratedRendering() && !m_videoLayer.get())
     m_videoLayer = VideoLayerChromium::create(0, this);
+#endif
 }
 
 void WebMediaPlayerClientImpl::volumeChanged(float newVolume) {
@@ -169,10 +173,12 @@ void WebMediaPlayerClientImpl::load(const String& url) {
           ->document()
           ->frame();
 
-  // Video frame object is owned by WebMediaPlayer. Before destroying
-  // WebMediaPlayer all frames need to be released.
+// Video frame object is owned by WebMediaPlayer. Before destroying
+// WebMediaPlayer all frames need to be released.
+#if USE(ACCELERATED_COMPOSITING)
   if (m_videoLayer.get())
     m_videoLayer->releaseCurrentFrame();
+#endif
 
   m_webMediaPlayer.set(createWebMediaPlayer(this, frame));
   if (m_webMediaPlayer.get())
@@ -376,17 +382,16 @@ bool WebMediaPlayerClientImpl::hasSingleSecurityOrigin() const {
   return false;
 }
 
-#if USE(ACCELERATED_COMPOSITING)
-bool WebMediaPlayerClientImpl::supportsAcceleratedRendering() const {
-  return m_supportsAcceleratedCompositing;
-}
-#endif
-
 MediaPlayer::MovieLoadType WebMediaPlayerClientImpl::movieLoadType() const {
   if (m_webMediaPlayer.get())
     return static_cast<MediaPlayer::MovieLoadType>(
         m_webMediaPlayer->movieLoadType());
   return MediaPlayer::Unknown;
+}
+
+#if USE(ACCELERATED_COMPOSITING)
+bool WebMediaPlayerClientImpl::supportsAcceleratedRendering() const {
+  return m_supportsAcceleratedCompositing;
 }
 
 VideoFrameChromium* WebMediaPlayerClientImpl::getCurrentFrame() {
@@ -408,6 +413,7 @@ void WebMediaPlayerClientImpl::putCurrentFrame(VideoFrameChromium* videoFrame) {
     delete videoFrame;
   }
 }
+#endif
 
 MediaPlayerPrivateInterface* WebMediaPlayerClientImpl::create(
     MediaPlayer* player) {
