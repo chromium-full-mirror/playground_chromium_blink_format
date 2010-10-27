@@ -98,6 +98,7 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
 
   bool isValid() const { return m_connection; }
   bool isLaunching() const;
+  bool canSendMessage() const { return isValid() || isLaunching(); }
 
   WebFrameProxy* webFrame(uint64_t) const;
   void frameCreated(uint64_t, WebFrameProxy*);

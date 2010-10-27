@@ -184,14 +184,6 @@ void WebContext::ensureWebProcess() {
   platformInitializeWebProcess(parameters);
 
   m_process->send(Messages::WebProcess::InitializeWebProcess(parameters), 0);
-}
-
-void WebContext::processDidFinishLaunching(WebProcessProxy* process) {
-  // FIXME: Once we support multiple processes per context, this assertion won't
-  // hold.
-  ASSERT(process == m_process);
-
-  m_visitedLinkProvider.populateVisitedLinksIfNeeded();
 
   for (size_t i = 0; i != m_pendingMessagesToPostToInjectedBundle.size(); ++i) {
     pair<String, RefPtr<APIObject>>& message =
@@ -201,6 +193,14 @@ void WebContext::processDidFinishLaunching(WebProcessProxy* process) {
                                                    message.second.get())));
   }
   m_pendingMessagesToPostToInjectedBundle.clear();
+}
+
+void WebContext::processDidFinishLaunching(WebProcessProxy* process) {
+  // FIXME: Once we support multiple processes per context, this assertion won't
+  // hold.
+  ASSERT(process == m_process);
+
+  m_visitedLinkProvider.populateVisitedLinksIfNeeded();
 }
 
 void WebContext::processDidClose(WebProcessProxy* process) {
@@ -264,7 +264,7 @@ void WebContext::preferencesDidChange() {
 
 void WebContext::postMessageToInjectedBundle(const String& messageName,
                                              APIObject* messageBody) {
-  if (!hasValidProcess()) {
+  if (!m_process || !m_process->canSendMessage()) {
     m_pendingMessagesToPostToInjectedBundle.append(
         make_pair(messageName, messageBody));
     return;
