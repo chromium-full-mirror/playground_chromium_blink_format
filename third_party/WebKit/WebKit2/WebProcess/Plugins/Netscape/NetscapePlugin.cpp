@@ -292,6 +292,9 @@ void NetscapePlugin::NPP_URLNotify(const char* url,
 }
 
 NPError NetscapePlugin::NPP_GetValue(NPPVariable variable, void* value) {
+  if (!m_pluginModule->pluginFuncs().getvalue)
+    return NPERR_GENERIC_ERROR;
+
   return m_pluginModule->pluginFuncs().getvalue(&m_npp, variable, value);
 }
 
