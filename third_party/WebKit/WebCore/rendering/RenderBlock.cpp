@@ -2623,7 +2623,8 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
     }
 
     IntPoint childPoint(tx, ty);
-    adjustForFlippedBlocksWritingMode(child, childPoint);
+    adjustForFlippedBlocksWritingMode(child, childPoint,
+                                      ParentToChildFlippingAdjustment);
     if (!child->hasSelfPaintingLayer() && !child->isFloating())
       child->paint(info, childPoint.x(), childPoint.y());
 
@@ -2794,7 +2795,8 @@ void RenderBlock::paintFloats(PaintInfo& paintInfo,
       IntPoint childPoint(
           tx + r->left() + r->m_renderer->marginLeft() - r->m_renderer->x(),
           ty + r->top() + r->m_renderer->marginTop() - r->m_renderer->y());
-      adjustForFlippedBlocksWritingMode(r->m_renderer, childPoint);
+      adjustForFlippedBlocksWritingMode(r->m_renderer, childPoint,
+                                        ParentToChildFlippingAdjustment);
       r->m_renderer->paint(currentPaintInfo, childPoint.x(), childPoint.y());
       if (!preservePhase) {
         currentPaintInfo.phase = PaintPhaseChildBlockBackgrounds;

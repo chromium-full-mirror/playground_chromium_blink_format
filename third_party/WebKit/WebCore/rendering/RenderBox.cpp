@@ -3591,8 +3591,10 @@ void RenderBox::blockDirectionOverflow(bool isLineVertical,
   }
 }
 
-void RenderBox::adjustForFlippedBlocksWritingMode(RenderBox* child,
-                                                  IntPoint& point) {
+void RenderBox::adjustForFlippedBlocksWritingMode(
+    RenderBox* child,
+    IntPoint& point,
+    FlippingAdjustment adjustment) {
   if (!style()->isFlippedBlocksWritingMode())
     return;
 
@@ -3600,9 +3602,26 @@ void RenderBox::adjustForFlippedBlocksWritingMode(RenderBox* child,
   // ends up in
   // the right place.
   if (style()->isHorizontalWritingMode())
-    point.move(0, height() - child->height() - child->y() - child->y());
+    point.move(
+        0,
+        height() - child->height() - child->y() -
+            (adjustment == ParentToChildFlippingAdjustment ? child->y() : 0));
   else
-    point.move(width() - child->width() - child->x() - child->x(), 0);
+    point.move(
+        width() - child->width() - child->x() -
+            (adjustment == ParentToChildFlippingAdjustment ? child->x() : 0),
+        0);
+}
+
+IntSize RenderBox::locationOffsetIncludingFlipping() {
+  if (!parent() || !parent()->isBox())
+    return locationOffset();
+
+  RenderBox* parent = parentBox();
+  IntPoint localPoint(x(), y());
+  parent->adjustForFlippedBlocksWritingMode(this, localPoint,
+                                            ChildToParentFlippingAdjustment);
+  return IntSize(localPoint.x(), localPoint.y());
 }
 
 }  // namespace WebCore

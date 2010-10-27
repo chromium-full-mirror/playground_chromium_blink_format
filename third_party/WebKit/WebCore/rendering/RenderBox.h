@@ -544,7 +544,14 @@ class RenderBox : public RenderBoxModelObject {
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;
 
-  void adjustForFlippedBlocksWritingMode(RenderBox* child, IntPoint&);
+  enum FlippingAdjustment {
+    ChildToParentFlippingAdjustment,
+    ParentToChildFlippingAdjustment
+  };
+  void adjustForFlippedBlocksWritingMode(RenderBox* child,
+                                         IntPoint&,
+                                         FlippingAdjustment);
+  IntSize locationOffsetIncludingFlipping();
 
  protected:
   virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
