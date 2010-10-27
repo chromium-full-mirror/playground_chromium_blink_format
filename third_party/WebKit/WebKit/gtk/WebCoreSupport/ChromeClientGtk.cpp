@@ -26,6 +26,7 @@
 #include "ChromeClientGtk.h"
 
 #include "Console.h"
+#include "DumpRenderTreeSupportGtk.h"
 #include "FileSystem.h"
 #include "FileChooser.h"
 #include "FloatRect.h"
@@ -324,6 +325,9 @@ bool ChromeClient::shouldInterruptJavaScript() {
 }
 
 bool ChromeClient::tabsToLinks() const {
+  if (DumpRenderTreeSupportGtk::dumpRenderTreeModeEnabled())
+    return DumpRenderTreeSupportGtk::linksIncludedInFocusChain();
+
   return true;
 }
 
