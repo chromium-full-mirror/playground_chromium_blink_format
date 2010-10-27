@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2007 Apple Computer, Inc.
  * Copyright (c) 2007, 2008, 2009, Google Inc. All rights reserved.
+ * Copyright (C) 2010 Company 100, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -36,7 +37,7 @@
 #include "Base64.h"
 #include "ChromiumBridge.h"
 #include "OpenTypeUtilities.h"
-#elif OS(LINUX) || OS(FREEBSD)
+#elif OS(LINUX) || OS(FREEBSD) || PLATFORM(BREWMP)
 #include "SkStream.h"
 #endif
 
@@ -47,7 +48,7 @@
 
 #if OS(WINDOWS)
 #include <objbase.h>
-#elif OS(LINUX) || OS(FREEBSD)
+#elif OS(LINUX) || OS(FREEBSD) || PLATFORM(BREWMP)
 #include <cstring>
 #endif
 
@@ -57,7 +58,7 @@ FontCustomPlatformData::~FontCustomPlatformData() {
 #if OS(WINDOWS)
   if (m_fontReference)
     RemoveFontMemResourceEx(m_fontReference);
-#elif OS(LINUX) || OS(FREEBSD)
+#elif OS(LINUX) || OS(FREEBSD) || PLATFORM(BREWMP)
   if (m_fontReference)
     m_fontReference->unref();
 #endif
@@ -102,7 +103,7 @@ FontPlatformData FontCustomPlatformData::fontPlatformData(
 
   HFONT hfont = CreateFontIndirect(&logFont);
   return FontPlatformData(hfont, size);
-#elif OS(LINUX) || OS(FREEBSD)
+#elif OS(LINUX) || OS(FREEBSD) || PLATFORM(BREWMP)
   ASSERT(m_fontReference);
   return FontPlatformData(m_fontReference, "", size,
                           bold && !m_fontReference->isBold(),
@@ -128,7 +129,7 @@ static String createUniqueFontName() {
 }
 #endif
 
-#if OS(LINUX) || OS(FREEBSD)
+#if OS(LINUX) || OS(FREEBSD) || PLATFORM(BREWMP)
 class RemoteFontStream : public SkStream {
  public:
   explicit RemoteFontStream(PassRefPtr<SharedBuffer> buffer)
@@ -188,7 +189,7 @@ FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {
   if (!fontReference)
     return 0;
   return new FontCustomPlatformData(fontReference, fontName);
-#elif OS(LINUX) || OS(FREEBSD)
+#elif OS(LINUX) || OS(FREEBSD) || PLATFORM(BREWMP)
   RemoteFontStream* stream = new RemoteFontStream(buffer);
   SkTypeface* typeface = SkTypeface::CreateFromStream(stream);
   if (!typeface)
