@@ -415,6 +415,13 @@ class Settings : public Noncopyable {
   }
   bool hyperlinkAuditingEnabled() const { return m_hyperlinkAuditingEnabled; }
 
+  void setCrossOriginCheckInGetMatchedCSSRulesDisabled(bool flag) {
+    m_crossOriginCheckInGetMatchedCSSRulesDisabled = flag;
+  }
+  bool crossOriginCheckInGetMatchedCSSRulesDisabled() const {
+    return m_crossOriginCheckInGetMatchedCSSRulesDisabled;
+  }
+
  private:
   Page* m_page;
 
@@ -502,6 +509,7 @@ class Settings : public Noncopyable {
   bool m_interactiveFormValidation : 1;
   bool m_usePreHTML5ParserQuirks : 1;
   bool m_hyperlinkAuditingEnabled : 1;
+  bool m_crossOriginCheckInGetMatchedCSSRulesDisabled : 1;
 
 #if USE(SAFARI_THEME)
   static bool gShouldPaintNativeControls;
