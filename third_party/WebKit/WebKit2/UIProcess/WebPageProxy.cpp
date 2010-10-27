@@ -83,8 +83,8 @@ WebPageProxy::WebPageProxy(WebPageNamespace* pageNamespace, uint64_t pageID)
       m_backForwardList(WebBackForwardList::create(this)),
       m_textZoomFactor(1),
       m_pageZoomFactor(1),
-      m_valid(true),
-      m_closed(false),
+      m_isValid(true),
+      m_isClosed(false),
       m_pageID(pageID) {
 #ifndef NDEBUG
   webPageProxyCounter.increment();
@@ -102,7 +102,11 @@ WebProcessProxy* WebPageProxy::process() const {
 }
 
 bool WebPageProxy::isValid() {
-  return m_valid;
+  // A page that has been explicitly closed is never valid.
+  if (m_isClosed)
+    return false;
+
+  return m_isValid;
 }
 
 void WebPageProxy::setPageClient(PageClient* pageClient) {
@@ -139,7 +143,7 @@ void WebPageProxy::initializeFindClient(const WKPageFindClient* client) {
 }
 
 void WebPageProxy::relaunch() {
-  m_valid = true;
+  m_isValid = true;
   m_pageNamespace->context()->relaunchProcessIfNecessary();
   m_pageNamespace->process()->addExistingWebPage(this, m_pageID);
 
@@ -172,7 +176,7 @@ void WebPageProxy::close() {
   if (!isValid())
     return;
 
-  m_closed = true;
+  m_isClosed = true;
 
   process()->disconnectFramesFromPage(this);
   m_mainFrame = 0;
@@ -1276,7 +1280,7 @@ void WebPageProxy::processDidBecomeResponsive() {
 void WebPageProxy::processDidCrash() {
   ASSERT(m_pageClient);
 
-  m_valid = false;
+  m_isValid = false;
 
   if (m_mainFrame)
     m_urlAtProcessExit = m_mainFrame->url();
