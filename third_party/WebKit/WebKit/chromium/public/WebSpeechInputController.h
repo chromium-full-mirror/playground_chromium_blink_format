@@ -35,7 +35,6 @@
 
 namespace WebKit {
 
-class WebString;
 struct WebRect;
 class WebString;
 
@@ -48,17 +47,14 @@ class WebSpeechInputController {
   // recognized
   // text are returned via the listener interface.
   virtual bool startRecognition(int requestId,
-                                const WebString& language,
                                 const WebRect& elementRect,
                                 const WebString& grammar) {
-    startRecognition(requestId, language, elementRect);
+    startRecognition(requestId, elementRect);
     return false;
   }
 
   // FIXME: Remove this method once chromium implements the above method.
-  virtual bool startRecognition(int requestId,
-                                const WebString& language,
-                                const WebRect& elementRect) {
+  virtual bool startRecognition(int requestId, const WebRect&) {
     WEBKIT_ASSERT_NOT_REACHED();
     return false;
   }

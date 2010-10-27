@@ -35,12 +35,6 @@
 
 #include "SpeechInputListener.h"
 
-namespace {
-// HashMap doesn't support empty strings as keys, so this value (an invalid
-// BCP47 tag) is used for those cases.
-const String emptyLanguage = "_";
-}
-
 namespace WebCore {
 
 SpeechInputClientMock::SpeechInputClientMock()
@@ -54,14 +48,12 @@ void SpeechInputClientMock::setListener(SpeechInputListener* listener) {
 }
 
 bool SpeechInputClientMock::startRecognition(int requestId,
-                                             const String& language,
                                              const IntRect& elementRect,
                                              const String& grammar) {
   if (m_timer.isActive())
     return false;
   m_requestId = requestId;
   m_recording = true;
-  m_language = language;
   m_timer.startOneShot(0);
   return true;
 }
@@ -84,12 +76,8 @@ void SpeechInputClientMock::cancelRecognition(int requestId) {
   }
 }
 
-void SpeechInputClientMock::setRecognitionResult(const String& result,
-                                                 const String& language) {
-  if (language.isEmpty())
-    m_recognitionResult.set(emptyLanguage, result);
-  else
-    m_recognitionResult.set(language, result);
+void SpeechInputClientMock::setRecognitionResult(const String& result) {
+  m_recognitionResult = result;
 }
 
 void SpeechInputClientMock::timerFired(WebCore::Timer<SpeechInputClientMock>*) {
@@ -99,22 +87,7 @@ void SpeechInputClientMock::timerFired(WebCore::Timer<SpeechInputClientMock>*) {
     m_timer.startOneShot(0);
   } else {
     SpeechInputResultArray results;
-
-    // Empty language strings crash the HashMap. Using an invalid language value
-    // for that case.
-    String language = m_language.isEmpty() ? String(emptyLanguage) : m_language;
-    if (!m_recognitionResult.contains(language)) {
-      // Can't avoid setting a result on empty or invalid language strings.
-      // This would avoid generating the events used to check the results and
-      // the test would timeout.
-      String error("error: no result found for language '");
-      error.append(m_language);
-      error.append("'");
-      results.append(SpeechInputResult::create(error, 1.0));
-    } else
-      results.append(
-          SpeechInputResult::create(m_recognitionResult.get(language), 1.0));
-
+    results.append(SpeechInputResult::create(m_recognitionResult, 1.0));
     m_listener->setRecognitionResult(m_requestId, results);
     m_listener->didCompleteRecognition(m_requestId);
     m_requestId = 0;
