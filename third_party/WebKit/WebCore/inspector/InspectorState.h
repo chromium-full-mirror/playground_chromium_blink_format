@@ -50,7 +50,6 @@ class InspectorState {
     timelineProfilerEnabled,
     searchingForNode,
     profilerAlwaysEnabled,
-    frontendSettings,
     debuggerAlwaysEnabled,
     lastActivePanel,
     inspectorStartsAttached,

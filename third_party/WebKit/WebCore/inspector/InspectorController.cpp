@@ -144,7 +144,6 @@ InspectorController::InspectorController(Page* page, InspectorClient* client)
       m_domContentEventTime(-1.0),
       m_expiredConsoleMessageCount(0),
       m_showAfterVisible(LastActivePanel),
-      m_sessionSettings(InspectorObject::create()),
       m_groupLevel(0),
       m_previousMessage(0),
       m_settingsLoaded(false),
@@ -223,14 +222,6 @@ bool InspectorController::resourceTrackingEnabled() const {
   return m_state->getBoolean(InspectorState::resourceTrackingEnabled);
 }
 
-void InspectorController::saveApplicationSettings(const String& settings) {
-  m_state->setString(InspectorState::frontendSettings, settings);
-}
-
-void InspectorController::saveSessionSettings(const String& settingsJSON) {
-  m_sessionSettings = InspectorValue::parseJSON(settingsJSON);
-}
-
 void InspectorController::getInspectorState(RefPtr<InspectorObject>* state) {
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   if (m_debuggerAgent)
@@ -245,13 +236,6 @@ void InspectorController::restoreInspectorStateFromCookie(
   m_state->restoreFromInspectorCookie(inspectorStateCookie);
   if (m_state->getBoolean(InspectorState::timelineProfilerEnabled))
     startTimelineProfiler();
-}
-
-void InspectorController::getSettings(RefPtr<InspectorObject>* settings) {
-  *settings = InspectorObject::create();
-  (*settings)->setString("application",
-                         m_state->getString(InspectorState::frontendSettings));
-  (*settings)->setString("session", m_sessionSettings->toJSONString());
 }
 
 void InspectorController::inspect(Node* node) {
@@ -790,7 +774,6 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
     unbindAllResources();
 
     m_cssStore->reset();
-    m_sessionSettings = InspectorObject::create();
     if (m_frontend) {
       m_frontend->reset();
       m_domAgent->reset();

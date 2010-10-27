@@ -48,7 +48,6 @@ InspectorState::InspectorState(InspectorClient* client) : m_client(client) {
                   (const char*)0);
   registerBoolean(profilerAlwaysEnabled, false, (const char*)0,
                   "profilerEnabled");
-  registerString(frontendSettings, "", (const char*)0, "frontendSettings");
   registerBoolean(debuggerAlwaysEnabled, false, (const char*)0,
                   "debuggerEnabled");
   registerString(lastActivePanel, InspectorController::LastActivePanel,
