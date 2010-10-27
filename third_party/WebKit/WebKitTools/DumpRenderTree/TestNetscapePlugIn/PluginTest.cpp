@@ -44,6 +44,10 @@ PluginTest::PluginTest(NPP npp, const string& identifier)
 
 PluginTest::~PluginTest() {}
 
+NPError PluginTest::NPP_Destroy(NPSavedData**) {
+  return NPERR_NO_ERROR;
+}
+
 NPError PluginTest::NPP_DestroyStream(NPStream* stream, NPReason reason) {
   return NPERR_NO_ERROR;
 }

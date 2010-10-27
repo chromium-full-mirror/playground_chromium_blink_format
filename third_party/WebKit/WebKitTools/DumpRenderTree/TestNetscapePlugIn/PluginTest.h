@@ -67,6 +67,7 @@ class PluginTest {
   virtual ~PluginTest();
 
   // NPP functions.
+  virtual NPError NPP_Destroy(NPSavedData**);
   virtual NPError NPP_DestroyStream(NPStream* stream, NPReason reason);
   virtual NPError NPP_GetValue(NPPVariable, void* value);
   virtual NPError NPP_SetWindow(NPP, NPWindow*);

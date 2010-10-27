@@ -110,7 +110,7 @@ static NPError webkit_test_plugin_new_instance(NPMIMEType /*mimetype*/,
 }
 
 static NPError webkit_test_plugin_destroy_instance(NPP instance,
-                                                   NPSavedData** /*save*/) {
+                                                   NPSavedData** save) {
   PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
   if (obj) {
     if (obj->onDestroy) {
@@ -132,6 +132,8 @@ static NPError webkit_test_plugin_destroy_instance(NPP instance,
 
     if (obj->onSetWindow)
       free(obj->onSetWindow);
+
+    obj->pluginTest->NPP_Destroy(save);
 
     browser->releaseobject(&obj->header);
   }
