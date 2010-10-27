@@ -56,4 +56,8 @@ bool getRawCookies(const Document*, const KURL&, Vector<Cookie>& rawCookies) {
 void deleteCookie(const Document*, const KURL&, const String&) {
   // FIXME: Not yet implemented
 }
+
+void setCookieStoragePrivateBrowsingEnabled(bool enabled) {
+  // FIXME: Not yet implemented
+}
 }

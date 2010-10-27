@@ -27,17 +27,24 @@
 
 #include "WKError.h"
 #include "WebError.h"
-#include <CFNetwork/CFNetworkErrors.h>
 #include <WebCore/ResourceRequest.h>
 #include <WebCore/ResourceResponse.h>
+
+#if USE(CFNETWORK)
+#include <CFNetwork/CFNetworkErrors.h>
+#endif
 
 using namespace WebCore;
 
 namespace WebKit {
 
 ResourceError cancelledError(const ResourceRequest& request) {
+#if USE(CFNETWORK)
   return ResourceError(kCFErrorDomainCFNetwork, kCFURLErrorCancelled,
                        request.url().string(), String());
+#else
+  return ResourceError();  // FIXME
+#endif
 }
 
 ResourceError blockedError(const ResourceRequest& request) {
