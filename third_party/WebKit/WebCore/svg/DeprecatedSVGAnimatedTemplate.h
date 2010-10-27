@@ -64,9 +64,8 @@ struct DeprecatedSVGAnimatedTypeWrapperKey {
 
 struct DeprecatedSVGAnimatedTypeWrapperKeyHash {
   static unsigned hash(const DeprecatedSVGAnimatedTypeWrapperKey& key) {
-    return StringImpl::computeHash(
-        reinterpret_cast<const UChar*>(&key),
-        sizeof(DeprecatedSVGAnimatedTypeWrapperKey) / sizeof(UChar));
+    return WTF::StringHasher::createBlobHash<sizeof(
+        DeprecatedSVGAnimatedTypeWrapperKey)>(&key);
   }
 
   static bool equal(const DeprecatedSVGAnimatedTypeWrapperKey& a,

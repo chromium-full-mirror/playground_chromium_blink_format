@@ -141,8 +141,7 @@ struct FixedSizeFontDataKeyHash {
         CaseFoldingHash::hash(font.m_family), font.m_weight,
         // static_cast<unsigned>(font.m_italic);
     };
-    return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
-                                   sizeof(hashCodes) / sizeof(UChar));
+    return WTF::StringHasher::createBlobHash<sizeof(hashCodes)>(hashCodes);
   }
 
   static bool equal(const FixedSizeFontDataKey& a,

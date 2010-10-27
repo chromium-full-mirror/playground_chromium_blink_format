@@ -98,8 +98,7 @@ class FontPlatformData {
 
     HFONT hfont() const { return m_hfont; }
     unsigned hash() const {
-      return StringImpl::computeHash(reinterpret_cast<const UChar*>(&m_hfont),
-                                     sizeof(HFONT) / sizeof(UChar));
+      return WTF::StringHasher::createBlobHash<sizeof(HFONT)>(&m_hfont);
     }
 
     bool operator==(const RefCountedHFONT& other) const {

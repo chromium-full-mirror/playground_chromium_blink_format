@@ -121,8 +121,7 @@ unsigned FontPlatformData::computeHash() const {
       thisFont->GetUnderlined(),
       StringImpl::computeHash(thisFont->GetFaceName().utf8_str())};
 
-  return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
-                                 sizeof(hashCodes) / sizeof(UChar));
+  return WTF::StringHasher::createBlobHash<sizeof(hashCodes)>(hashCodes);
 }
 
 FontPlatformData::~FontPlatformData() {
