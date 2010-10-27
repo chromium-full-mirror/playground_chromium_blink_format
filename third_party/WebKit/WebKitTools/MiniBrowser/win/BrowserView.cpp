@@ -82,12 +82,6 @@ static void mouseDidMoveOverElement(WKPageRef page,
                                     WKTypeRef userData,
                                     const void* clientInfo) {}
 
-static void contentsSizeChanged(WKPageRef page,
-                                int width,
-                                int height,
-                                WKFrameRef frame,
-                                const void* clientInfo) {}
-
 void BrowserView::create(RECT webViewRect, BrowserWindow* parentWindow) {
   assert(!m_webView);
 
@@ -114,7 +108,6 @@ void BrowserView::create(RECT webViewRect, BrowserWindow* parentWindow) {
       runJavaScriptPrompt,
       setStatusText,
       mouseDidMoveOverElement,
-      contentsSizeChanged,
       0 /* didNotHandleKeyEvent */
   };
 

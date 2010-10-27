@@ -90,6 +90,10 @@ void QWKPagePrivate::setViewportArguments(const ViewportArguments& args) {
   emit q->viewportChangeRequested();
 }
 
+void QWKPagePrivate::didChangeContentsSize(const IntSize& newSize) {
+  emit q->contentsSizeChanged(QSize(newSize));
+}
+
 void QWKPagePrivate::toolTipChanged(const String&, const String& newTooltip) {
   emit q->statusBarMessage(QString(newTooltip));
 }
@@ -285,7 +289,6 @@ QWKPage::QWKPage(WKPageNamespaceRef namespaceRef)
       0, /* runJavaScriptPrompt */
       0, /* setStatusText */
       0, /* mouseDidMoveOverElement */
-      0, /* contentsSizeChanged */
       0, /* didNotHandleKeyEvent */
       0, /* getWindowFrame */
       0, /* setWindowFrame */

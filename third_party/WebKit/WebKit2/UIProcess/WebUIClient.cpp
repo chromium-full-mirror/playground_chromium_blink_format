@@ -156,16 +156,6 @@ void WebUIClient::mouseDidMoveOverElement(WebPageProxy* page,
                                          m_pageUIClient.clientInfo);
 }
 
-void WebUIClient::contentsSizeChanged(WebPageProxy* page,
-                                      const IntSize& size,
-                                      WebFrameProxy* frame) {
-  if (!m_pageUIClient.contentsSizeChanged)
-    return;
-
-  m_pageUIClient.contentsSizeChanged(toAPI(page), size.width(), size.height(),
-                                     toAPI(frame), m_pageUIClient.clientInfo);
-}
-
 void WebUIClient::didNotHandleKeyEvent(WebPageProxy* page,
                                        const NativeWebKeyboardEvent& event) {
   if (!m_pageUIClient.didNotHandleKeyEvent)
