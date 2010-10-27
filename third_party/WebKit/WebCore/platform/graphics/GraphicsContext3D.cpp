@@ -1063,6 +1063,8 @@ static void doPacking(const void* sourceData,
           destinationElementsPerPixel);
       break;
     }
+    default:
+      ASSERT(false);
   }
 }
 
