@@ -85,7 +85,7 @@ class FontPlatformData {
 #endif
 
   PlatformRefPtr<FcPattern> m_pattern;
-  FcFontSet* m_fallbacks;
+  mutable FcFontSet* m_fallbacks;  // Initialized lazily.
   float m_size;
   bool m_syntheticBold;
   bool m_syntheticOblique;
