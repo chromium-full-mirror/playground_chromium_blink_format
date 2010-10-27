@@ -59,12 +59,20 @@ class WebSpeechInputControllerMockImpl : public WebCore::SpeechInputListener,
 
   // WebSpeechInputController methods.
   bool startRecognition(int requestId,
+                        const WebString& language,
                         const WebRect& elementRect,
                         const WebString& grammar);
   void cancelRecognition(int requestId);
   void stopRecording(int requestId);
 
   // WebSpeechInputControllerMock methods.
+  void setMockRecognitionResult(const WebString& result,
+                                const WebString& language);
+
+  // FIXME: this is a fix for a two-sided patch. Delete as soon as the chromium
+  // side is patched.
+  // Chromium patch not uploaded yet, but will depend on
+  // http://codereview.chromium.org/3615005/show patch.
   void setMockRecognitionResult(const WebString& result);
 
  private:
