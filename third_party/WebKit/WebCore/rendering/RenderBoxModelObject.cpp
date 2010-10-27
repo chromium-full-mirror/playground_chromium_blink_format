@@ -1138,8 +1138,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
                                        int w,
                                        int h,
                                        const RenderStyle* style,
-                                       bool begin,
-                                       bool end) {
+                                       bool includeLogicalLeftEdge,
+                                       bool includeLogicalRightEdge) {
   if (paintNinePieceImage(graphicsContext, tx, ty, w, h, style,
                           style->borderImage()))
     return;
@@ -1166,10 +1166,16 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
   EBorderStyle leftStyle = style->borderLeftStyle();
   EBorderStyle rightStyle = style->borderRightStyle();
 
-  bool renderTop = topStyle > BHIDDEN && !topTransparent;
-  bool renderLeft = leftStyle > BHIDDEN && begin && !leftTransparent;
-  bool renderRight = rightStyle > BHIDDEN && end && !rightTransparent;
-  bool renderBottom = bottomStyle > BHIDDEN && !bottomTransparent;
+  bool horizontal = style->isHorizontalWritingMode();
+
+  bool renderTop = topStyle > BHIDDEN && !topTransparent &&
+                   (horizontal || includeLogicalLeftEdge);
+  bool renderLeft = leftStyle > BHIDDEN && !leftTransparent &&
+                    (!horizontal || includeLogicalLeftEdge);
+  bool renderRight = rightStyle > BHIDDEN && !rightTransparent &&
+                     (!horizontal || includeLogicalRightEdge);
+  bool renderBottom = bottomStyle > BHIDDEN && !bottomTransparent &&
+                      (horizontal || includeLogicalRightEdge);
 
   bool renderRadii = false;
   Path roundedPath;
@@ -1181,39 +1187,68 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
     style->getBorderRadiiForRect(borderRect, topLeftRadius, topRightRadius,
                                  bottomLeftRadius, bottomRightRadius);
 
-    IntRect innerBorderRect = borderInnerRect(
-        borderRect, style->borderTopWidth(), style->borderBottomWidth(),
-        style->borderLeftWidth(), style->borderRightWidth());
+    int leftWidth =
+        (!horizontal || includeLogicalLeftEdge) ? style->borderLeftWidth() : 0;
+    int rightWidth = (!horizontal || includeLogicalRightEdge)
+                         ? style->borderRightWidth()
+                         : 0;
+    int topWidth =
+        (horizontal || includeLogicalLeftEdge) ? style->borderTopWidth() : 0;
+    int bottomWidth = (horizontal || includeLogicalRightEdge)
+                          ? style->borderBottomWidth()
+                          : 0;
 
+    IntRect innerBorderRect = borderInnerRect(borderRect, topWidth, bottomWidth,
+                                              leftWidth, rightWidth);
     IntSize innerTopLeftRadius, innerTopRightRadius, innerBottomLeftRadius,
         innerBottomRightRadius;
+
     style->getInnerBorderRadiiForRectWithBorderWidths(
-        innerBorderRect, style->borderTopWidth(), style->borderBottomWidth(),
-        style->borderLeftWidth(), style->borderRightWidth(), innerTopLeftRadius,
-        innerTopRightRadius, innerBottomLeftRadius, innerBottomRightRadius);
+        innerBorderRect, topWidth, bottomWidth, leftWidth, rightWidth,
+        innerTopLeftRadius, innerTopRightRadius, innerBottomLeftRadius,
+        innerBottomRightRadius);
 
-    if (begin) {
+    IntSize innerTopLeft, innerTopRight, innerBottomLeft, innerBottomRight;
+
+    if (includeLogicalLeftEdge) {
       topLeft = topLeftRadius;
-      bottomLeft = bottomLeftRadius;
+      innerTopLeft = innerTopLeftRadius;
+      if (horizontal) {
+        bottomLeft = bottomLeftRadius;
+        innerBottomLeft = innerBottomLeftRadius;
+      } else {
+        topRight = topRightRadius;
+        innerTopRight = innerTopRightRadius;
+      }
     }
-    if (end) {
-      topRight = topRightRadius;
+
+    if (includeLogicalRightEdge) {
+      if (horizontal) {
+        topRight = topRightRadius;
+        innerTopRight = innerTopRightRadius;
+      } else {
+        bottomLeft = bottomLeftRadius;
+        innerBottomLeft = innerBottomLeftRadius;
+      }
       bottomRight = bottomRightRadius;
+      innerBottomRight = innerBottomRightRadius;
     }
 
-    renderRadii = true;
+    renderRadii = !topLeft.isZero() || !topRight.isZero() ||
+                  !bottomLeft.isZero() || !bottomRight.isZero();
 
-    // Clip to the inner and outer radii rects.
-    graphicsContext->save();
-    graphicsContext->addRoundedRectClip(borderRect, topLeft, topRight,
-                                        bottomLeft, bottomRight);
-    graphicsContext->clipOutRoundedRect(
-        innerBorderRect, innerTopLeftRadius, innerTopRightRadius,
-        innerBottomLeftRadius, innerBottomRightRadius);
-
-    roundedPath.addRoundedRect(borderRect, topLeft, topRight, bottomLeft,
-                               bottomRight);
-    graphicsContext->addPath(roundedPath);
+    if (renderRadii) {
+      // Clip to the inner and outer radii rects.
+      graphicsContext->save();
+      graphicsContext->addRoundedRectClip(borderRect, topLeft, topRight,
+                                          bottomLeft, bottomRight);
+      graphicsContext->clipOutRoundedRect(innerBorderRect, innerTopLeft,
+                                          innerTopRight, innerBottomLeft,
+                                          innerBottomRight);
+      roundedPath.addRoundedRect(borderRect, topLeft, topRight, bottomLeft,
+                                 bottomRight);
+      graphicsContext->addPath(roundedPath);
+    }
   }
 
   bool upperLeftBorderStylesMatch =
@@ -1241,7 +1276,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
       clipBorderSidePolygon(graphicsContext, borderRect, topLeft, topRight,
                             bottomLeft, bottomRight, BSTop,
                             upperLeftBorderStylesMatch,
-                            upperRightBorderStylesMatch, style);
+                            upperRightBorderStylesMatch, style,
+                            includeLogicalLeftEdge, includeLogicalRightEdge);
       float thickness =
           max(max(style->borderTopWidth(), style->borderLeftWidth()),
               style->borderRightWidth());
@@ -1279,7 +1315,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
       clipBorderSidePolygon(graphicsContext, borderRect, topLeft, topRight,
                             bottomLeft, bottomRight, BSBottom,
                             lowerLeftBorderStylesMatch,
-                            lowerRightBorderStylesMatch, style);
+                            lowerRightBorderStylesMatch, style,
+                            includeLogicalLeftEdge, includeLogicalRightEdge);
       float thickness =
           max(max(style->borderBottomWidth(), style->borderLeftWidth()),
               style->borderRightWidth());
@@ -1319,7 +1356,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
       clipBorderSidePolygon(graphicsContext, borderRect, topLeft, topRight,
                             bottomLeft, bottomRight, BSLeft,
                             upperLeftBorderStylesMatch,
-                            lowerLeftBorderStylesMatch, style);
+                            lowerLeftBorderStylesMatch, style,
+                            includeLogicalLeftEdge, includeLogicalRightEdge);
       float thickness =
           max(max(style->borderLeftWidth(), style->borderTopWidth()),
               style->borderBottomWidth());
@@ -1355,7 +1393,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
       clipBorderSidePolygon(graphicsContext, borderRect, topLeft, topRight,
                             bottomLeft, bottomRight, BSRight,
                             upperRightBorderStylesMatch,
-                            lowerRightBorderStylesMatch, style);
+                            lowerRightBorderStylesMatch, style,
+                            includeLogicalLeftEdge, includeLogicalRightEdge);
       float thickness =
           max(max(style->borderRightWidth(), style->borderTopWidth()),
               style->borderBottomWidth());
@@ -1396,8 +1435,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
                                        int w,
                                        int h,
                                        const RenderStyle* style,
-                                       bool begin,
-                                       bool end) {
+                                       bool includeLogicalLeftEdge,
+                                       bool includeLogicalRightEdge) {
   // FIXME: This old version of paintBorder should be removed when all ports
   // implement
   // GraphicsContext::clipConvexPolygon()!! This should happen soon.
@@ -1424,10 +1463,14 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
   EBorderStyle leftStyle = style->borderLeftStyle();
   EBorderStyle rightStyle = style->borderRightStyle();
 
-  bool renderTop = topStyle > BHIDDEN && !topTransparent;
-  bool renderLeft = leftStyle > BHIDDEN && begin && !leftTransparent;
-  bool renderRight = rightStyle > BHIDDEN && end && !rightTransparent;
-  bool renderBottom = bottomStyle > BHIDDEN && !bottomTransparent;
+  bool renderTop = topStyle > BHIDDEN && !topTransparent &&
+                   (horizontal || includeLogicalLeftEdge);
+  bool renderLeft = leftStyle > BHIDDEN && !leftTransparent &&
+                    (!horizontal || includeLogicalLeftEdge);
+  bool renderRight = rightStyle > BHIDDEN && !rightTransparent &&
+                     (!horizontal || includeLogicalRightEdge);
+  bool renderBottom = bottomStyle > BHIDDEN && !bottomTransparent &&
+                      (horizontal || includeLogicalRightEdge);
 
   bool renderRadii = false;
   IntSize topLeft, topRight, bottomLeft, bottomRight;
@@ -1439,21 +1482,31 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
     style->getBorderRadiiForRect(borderRect, topLeftRadius, topRightRadius,
                                  bottomLeftRadius, bottomRightRadius);
 
-    if (begin) {
+    if (includeLogicalLeftEdge) {
       topLeft = topLeftRadius;
-      bottomLeft = bottomLeftRadius;
+      if (horizontal)
+        bottomLeft = bottomLeftRadius;
+      else
+        topRight = topRightRadius;
     }
-    if (end) {
-      topRight = topRightRadius;
+
+    if (includeLogicalRightEdge) {
+      if (horizontal)
+        topRight = topRightRadius;
+      else
+        bottomLeft = bottomLeftRadius;
       bottomRight = bottomRightRadius;
     }
 
-    renderRadii = true;
+    renderRadii = !topLeft.isZero() || !topRight.isZero() ||
+                  !bottomLeft.isZero() || !bottomRight.isZero();
 
-    // Clip to the rounded rectangle.
-    graphicsContext->save();
-    graphicsContext->addRoundedRectClip(borderRect, topLeft, topRight,
-                                        bottomLeft, bottomRight);
+    if (renderRadii) {
+      // Clip to the rounded rectangle.
+      graphicsContext->save();
+      graphicsContext->addRoundedRectClip(borderRect, topLeft, topRight,
+                                          bottomLeft, bottomRight);
+    }
   }
 
   int firstAngleStart, secondAngleStart, firstAngleSpan, secondAngleSpan;
@@ -1833,12 +1886,24 @@ void RenderBoxModelObject::clipBorderSidePolygon(
     const BoxSide side,
     bool firstEdgeMatches,
     bool secondEdgeMatches,
-    const RenderStyle* style) {
+    const RenderStyle* style,
+    bool includeLogicalLeftEdge,
+    bool includeLogicalRightEdge) {
   FloatPoint quad[4];
   int tx = box.x();
   int ty = box.y();
   int w = box.width();
   int h = box.height();
+
+  bool horizontal = style->isHorizontalWritingMode();
+  int leftWidth =
+      (!horizontal || includeLogicalLeftEdge) ? style->borderLeftWidth() : 0;
+  int rightWidth =
+      (!horizontal || includeLogicalRightEdge) ? style->borderRightWidth() : 0;
+  int topWidth =
+      (horizontal || includeLogicalLeftEdge) ? style->borderTopWidth() : 0;
+  int bottomWidth =
+      (horizontal || includeLogicalRightEdge) ? style->borderBottomWidth() : 0;
 
   // For each side, create an array of FloatPoints where each point is based on
   // whichever value in each corner
@@ -1847,42 +1912,34 @@ void RenderBoxModelObject::clipBorderSidePolygon(
   switch (side) {
     case BSTop:
       quad[0] = FloatPoint(tx, ty);
-      quad[1] =
-          FloatPoint(tx + max(topLeft.width(), (int)style->borderLeftWidth()),
-                     ty + max(topLeft.height(), (int)style->borderTopWidth()));
-      quad[2] = FloatPoint(
-          tx + w - max(topRight.width(), (int)style->borderRightWidth()),
-          ty + max(topRight.height(), (int)style->borderTopWidth()));
+      quad[1] = FloatPoint(tx + max(topLeft.width(), leftWidth),
+                           ty + max(topLeft.height(), topWidth));
+      quad[2] = FloatPoint(tx + w - max(topRight.width(), rightWidth),
+                           ty + max(topRight.height(), topWidth));
       quad[3] = FloatPoint(tx + w, ty);
       break;
     case BSLeft:
       quad[0] = FloatPoint(tx, ty);
-      quad[1] =
-          FloatPoint(tx + max(topLeft.width(), (int)style->borderLeftWidth()),
-                     ty + max(topLeft.height(), (int)style->borderTopWidth()));
-      quad[2] = FloatPoint(
-          tx + max(bottomLeft.width(), (int)style->borderLeftWidth()),
-          ty + h - max(bottomLeft.height(), (int)style->borderBottomWidth()));
+      quad[1] = FloatPoint(tx + max(topLeft.width(), leftWidth),
+                           ty + max(topLeft.height(), topWidth));
+      quad[2] = FloatPoint(tx + max(bottomLeft.width(), leftWidth),
+                           ty + h - max(bottomLeft.height(), bottomWidth));
       quad[3] = FloatPoint(tx, ty + h);
       break;
     case BSBottom:
       quad[0] = FloatPoint(tx, ty + h);
-      quad[1] = FloatPoint(
-          tx + max(bottomLeft.width(), (int)style->borderLeftWidth()),
-          ty + h - max(bottomLeft.height(), (int)style->borderBottomWidth()));
-      quad[2] = FloatPoint(
-          tx + w - max(bottomRight.width(), (int)style->borderRightWidth()),
-          ty + h - max(bottomRight.height(), (int)style->borderBottomWidth()));
+      quad[1] = FloatPoint(tx + max(bottomLeft.width(), leftWidth),
+                           ty + h - max(bottomLeft.height(), bottomWidth));
+      quad[2] = FloatPoint(tx + w - max(bottomRight.width(), rightWidth),
+                           ty + h - max(bottomRight.height(), bottomWidth));
       quad[3] = FloatPoint(tx + w, ty + h);
       break;
     case BSRight:
       quad[0] = FloatPoint(tx + w, ty);
-      quad[1] = FloatPoint(
-          tx + w - max(topRight.width(), (int)style->borderRightWidth()),
-          ty + max(topRight.height(), (int)style->borderTopWidth()));
-      quad[2] = FloatPoint(
-          tx + w - max(bottomRight.width(), (int)style->borderRightWidth()),
-          ty + h - max(bottomRight.height(), (int)style->borderBottomWidth()));
+      quad[1] = FloatPoint(tx + w - max(topRight.width(), rightWidth),
+                           ty + max(topRight.height(), topWidth));
+      quad[2] = FloatPoint(tx + w - max(bottomRight.width(), rightWidth),
+                           ty + h - max(bottomRight.height(), bottomWidth));
       quad[3] = FloatPoint(tx + w, ty + h);
       break;
     default:

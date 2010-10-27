@@ -137,8 +137,8 @@ class RenderBoxModelObject : public RenderObject {
                    int w,
                    int h,
                    const RenderStyle*,
-                   bool begin = true,
-                   bool end = true);
+                   bool includeLogicalLeftEdge = true,
+                   bool includeLogicalRightEdge = true);
   bool paintNinePieceImage(GraphicsContext*,
                            int tx,
                            int ty,
@@ -214,7 +214,9 @@ class RenderBoxModelObject : public RenderObject {
                              const BoxSide side,
                              bool firstEdgeMatches,
                              bool secondEdgeMatches,
-                             const RenderStyle* style);
+                             const RenderStyle* style,
+                             bool includeLogicalLeftEdge,
+                             bool includeLogicalRightEdge);
 
   friend class RenderView;
 
