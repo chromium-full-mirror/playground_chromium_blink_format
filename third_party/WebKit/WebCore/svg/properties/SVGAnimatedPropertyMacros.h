@@ -66,7 +66,10 @@ struct SVGSynchronizableAnimatedProperty {
                                                                               \
   void set##UpperProperty##BaseValue(const PropertyType& type) {              \
     m_##LowerProperty.value = type;                                           \
-    invalidateSVGAttributes();                                                \
+    SVGElement* contextElement = GetOwnerElementForType<                      \
+        OwnerType,                                                            \
+        IsDerivedFromSVGElement<OwnerType>::value>::ownerElement(this);       \
+    contextElement->invalidateSVGAttributes();                                \
   }                                                                           \
                                                                               \
   void synchronize##UpperProperty() {                                         \
@@ -74,17 +77,21 @@ struct SVGSynchronizableAnimatedProperty {
       return;                                                                 \
     AtomicString value(SVGPropertyTraits<PropertyType>::toString(             \
         LowerProperty##BaseValue()));                                         \
-    SVGAnimatedPropertySynchronizer<                                          \
-        IsDerivedFromSVGElement<OwnerType>::value>::synchronize(this,         \
-                                                                DOMAttribute, \
-                                                                value);       \
+    SVGElement* contextElement = GetOwnerElementForType<                      \
+        OwnerType,                                                            \
+        IsDerivedFromSVGElement<OwnerType>::value>::ownerElement(this);       \
+    SVGAnimatedPropertySynchronizer<IsDerivedFromSVGElement<                  \
+        OwnerType>::value>::synchronize(contextElement, DOMAttribute, value); \
   }                                                                           \
                                                                               \
   PassRefPtr<TearOffType> LowerProperty##Animated() {                         \
     m_##LowerProperty.shouldSynchronize = true;                               \
+    SVGElement* contextElement = GetOwnerElementForType<                      \
+        OwnerType,                                                            \
+        IsDerivedFromSVGElement<OwnerType>::value>::ownerElement(this);       \
     return SVGAnimatedProperty::lookupOrCreateWrapper<TearOffType,            \
                                                       PropertyType>(          \
-        this, DOMAttribute, SVGDOMAttributeIdentifier,                        \
+        contextElement, DOMAttribute, SVGDOMAttributeIdentifier,              \
         m_##LowerProperty.value);                                             \
   }                                                                           \
                                                                               \
@@ -114,9 +121,12 @@ struct SVGSynchronizableAnimatedProperty {
       UpperProperty, LowerProperty)                                        \
                                                                            \
   void detachAnimated##UpperProperty##ListWrappers(unsigned newListSize) { \
+    SVGElement* contextElement = GetOwnerElementForType<                   \
+        OwnerType,                                                         \
+        IsDerivedFromSVGElement<OwnerType>::value>::ownerElement(this);    \
     SVGAnimatedProperty* wrapper = SVGAnimatedProperty::lookupWrapper<     \
         SVGAnimatedListPropertyTearOff<PropertyType>>(                     \
-        this, DOMAttribute.localName());                                   \
+        contextElement, DOMAttribute.localName());                         \
     if (!wrapper)                                                          \
       return;                                                              \
     static_cast<SVGAnimatedListPropertyTearOff<PropertyType>*>(wrapper)    \

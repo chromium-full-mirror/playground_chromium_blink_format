@@ -127,11 +127,11 @@ class SVGMarkerElement : public SVGStyledElement,
                             externalResourcesRequired)
 
   // SVGFitToViewBox
-  DECLARE_ANIMATED_PROPERTY(SVGMarkerElement,
-                            SVGNames::viewBoxAttr,
-                            FloatRect,
-                            ViewBox,
-                            viewBox)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGMarkerElement,
+                                SVGNames::viewBoxAttr,
+                                FloatRect,
+                                ViewBox,
+                                viewBox)
   DECLARE_ANIMATED_PROPERTY(SVGMarkerElement,
                             SVGNames::preserveAspectRatioAttr,
                             SVGPreserveAspectRatio,
