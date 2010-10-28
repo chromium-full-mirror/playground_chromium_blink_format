@@ -40,6 +40,7 @@ namespace WebKit {
 class FindIndicator;
 class NativeWebKeyboardEvent;
 class WebEditCommandProxy;
+class NativeWebKeyboardEvent;
 class WebPopupMenuProxy;
 
 class PageClient {
@@ -65,7 +66,10 @@ class PageClient {
   virtual void setEditCommandState(const String& commandName,
                                    bool isEnabled,
                                    int state) = 0;
-
+#if PLATFORM(MAC)
+  virtual void interceptKeyEvent(const NativeWebKeyboardEvent&,
+                                 Vector<WebCore::KeypressCommand>&) = 0;
+#endif
   virtual WebCore::FloatRect convertToDeviceSpace(
       const WebCore::FloatRect&) = 0;
   virtual WebCore::FloatRect convertToUserSpace(const WebCore::FloatRect&) = 0;

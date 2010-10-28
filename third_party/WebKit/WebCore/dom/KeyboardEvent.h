@@ -34,10 +34,11 @@ class PlatformKeyboardEvent;
 
 #if PLATFORM(MAC)
 struct KeypressCommand {
+  KeypressCommand() {}
   KeypressCommand(const String& commandName) : commandName(commandName) {}
   KeypressCommand(const String& commandName, const String& text)
       : commandName(commandName), text(text) {
-    ASSERT(commandName == "insertText:");
+    ASSERT(commandName == "insertText:" || commandName == "insertText");
   }
 
   String commandName;

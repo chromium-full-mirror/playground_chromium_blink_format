@@ -240,6 +240,7 @@ void WebEditorClient::redo() {
   notImplemented();
 }
 
+#if !PLATFORM(MAC)
 void WebEditorClient::handleKeyboardEvent(KeyboardEvent* event) {
   if (m_page->handleEditingKeyboardEvent(event))
     event->setDefaultHandled();
@@ -248,6 +249,7 @@ void WebEditorClient::handleKeyboardEvent(KeyboardEvent* event) {
 void WebEditorClient::handleInputMethodKeydown(KeyboardEvent*) {
   notImplemented();
 }
+#endif
 
 void WebEditorClient::textFieldDidBeginEditing(Element* element) {
   if (!element->hasTagName(inputTag))

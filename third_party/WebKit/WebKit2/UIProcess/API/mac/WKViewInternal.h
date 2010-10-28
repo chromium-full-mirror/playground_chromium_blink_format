@@ -24,6 +24,7 @@
  */
 
 #import "WKView.h"
+#import <WebCore/KeyboardEvent.h>
 
 namespace WebKit {
 class FindIndicator;
@@ -38,7 +39,8 @@ class FindIndicator;
 - (void)_setUserInterfaceItemState:(NSString*)commandName
                            enabled:(BOOL)isEnabled
                              state:(int)newState;
-
+- (Vector<WebCore::KeypressCommand>&)_interceptKeyEvent:(NSEvent*)theEvent;
+- (void)_setEventBeingResent:(NSEvent*)event;
 - (NSRect)_convertToDeviceSpace:(NSRect)rect;
 - (NSRect)_convertToUserSpace:(NSRect)rect;
 

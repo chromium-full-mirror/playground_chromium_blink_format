@@ -109,8 +109,10 @@ class WebPage : public APIObject {
   void drawRect(WebCore::GraphicsContext&, const WebCore::IntRect&);
   void layoutIfNeeded();
 
-  // -- Called from WebCore clients.
+// -- Called from WebCore clients.
+#if !PLATFORM(MAC)
   bool handleEditingKeyboardEvent(WebCore::KeyboardEvent*);
+#endif
   void show();
   String userAgent() const;
   WebCore::IntRect windowResizerRect() const;
@@ -177,6 +179,7 @@ class WebPage : public APIObject {
   bool windowIsVisible() const { return m_windowIsVisible; }
   const WebCore::IntRect& windowFrame() const { return m_windowFrame; }
   bool windowIsFocused() const;
+  bool interceptEditingKeyboardEvent(WebCore::KeyboardEvent*, bool);
 #elif PLATFORM(WIN)
   HWND nativeWindow() const { return m_nativeWindow; }
 #endif

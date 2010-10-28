@@ -799,6 +799,7 @@ WebInspector* WebPage::inspector() {
   return m_inspector.get();
 }
 
+#if !PLATFORM(MAC)
 bool WebPage::handleEditingKeyboardEvent(KeyboardEvent* evt) {
   Node* node = evt->target()->toNode();
   ASSERT(node);
@@ -830,6 +831,7 @@ bool WebPage::handleEditingKeyboardEvent(KeyboardEvent* evt) {
 
   return frame->editor()->insertText(evt->keyEvent()->text(), evt);
 }
+#endif
 
 WebEditCommand* WebPage::webEditCommand(uint64_t commandID) {
   return m_editCommandMap.get(commandID).get();
