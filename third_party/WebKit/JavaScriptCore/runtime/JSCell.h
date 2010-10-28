@@ -212,7 +212,7 @@ inline JSObject* JSValue::getObject() const {
 
 inline CallType getCallData(JSValue value, CallData& callData) {
   CallType result =
-      value.isCell() ? asCell(value)->getCallData(callData) : CallTypeNone;
+      value.isCell() ? value.asCell()->getCallData(callData) : CallTypeNone;
   ASSERT(result == CallTypeNone || value.isValidCallee());
   return result;
 }
@@ -220,7 +220,7 @@ inline CallType getCallData(JSValue value, CallData& callData) {
 inline ConstructType getConstructData(JSValue value,
                                       ConstructData& constructData) {
   ConstructType result = value.isCell()
-                             ? asCell(value)->getConstructData(constructData)
+                             ? value.asCell()->getConstructData(constructData)
                              : ConstructTypeNone;
   ASSERT(result == ConstructTypeNone || value.isValidCallee());
   return result;

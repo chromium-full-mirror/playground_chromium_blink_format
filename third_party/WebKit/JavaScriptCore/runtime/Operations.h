@@ -418,7 +418,7 @@ inline size_t normalizePrototypeChain(CallFrame* callFrame,
                                       JSValue slotBase,
                                       const Identifier& propertyName,
                                       size_t& slotOffset) {
-  JSCell* cell = asCell(base);
+  JSCell* cell = base.asCell();
   size_t count = 0;
 
   while (slotBase != cell) {
@@ -430,7 +430,7 @@ inline size_t normalizePrototypeChain(CallFrame* callFrame,
     if (v.isNull())
       return 0;
 
-    cell = asCell(v);
+    cell = v.asCell();
 
     // Since we're accessing a prototype in a loop, it's a good bet that it
     // should not be treated as a dictionary.
@@ -454,7 +454,7 @@ inline size_t normalizePrototypeChain(CallFrame* callFrame, JSCell* base) {
     if (v.isNull())
       return count;
 
-    base = asCell(v);
+    base = v.asCell();
 
     // Since we're accessing a prototype in a loop, it's a good bet that it
     // should not be treated as a dictionary.

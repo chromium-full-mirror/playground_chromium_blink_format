@@ -109,8 +109,8 @@ inline JSValueRef toRef(JSC::ExecState* exec, JSC::JSValue v) {
     return 0;
   if (!v.isCell())
     return reinterpret_cast<JSValueRef>(
-        asCell(JSC::jsAPIValueWrapper(exec, v)));
-  return reinterpret_cast<JSValueRef>(asCell(v));
+        JSC::jsAPIValueWrapper(exec, v).asCell());
+  return reinterpret_cast<JSValueRef>(v.asCell());
 #else
   UNUSED_PARAM(exec);
   return reinterpret_cast<JSValueRef>(JSC::JSValue::encode(v));
