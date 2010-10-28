@@ -4188,7 +4188,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
           funcVal == globalObject->evalFunction()) {
         JSValue result =
             callEval(callFrame, registerFile, argv, argCount, registerOffset);
-        if (exceptionValue = globalData->exception)
+        if ((exceptionValue = globalData->exception))
           goto vm_throw;
         functionReturnValue = result;
 
