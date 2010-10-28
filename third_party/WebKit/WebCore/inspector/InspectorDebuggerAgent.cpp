@@ -66,7 +66,8 @@ InspectorDebuggerAgent::InspectorDebuggerAgent(
     : m_inspectorController(inspectorController),
       m_frontend(frontend),
       m_pausedScriptState(0),
-      m_breakpointsLoaded(false) {}
+      m_breakpointsLoaded(false),
+      m_javaScriptPauseScheduled(false) {}
 
 InspectorDebuggerAgent::~InspectorDebuggerAgent() {
   ScriptDebugServer::shared().removeListener(
@@ -158,6 +159,8 @@ void InspectorDebuggerAgent::getScriptSource(const String& sourceID,
 void InspectorDebuggerAgent::schedulePauseOnNextStatement(
     DebuggerEventType type,
     PassRefPtr<InspectorValue> data) {
+  if (m_javaScriptPauseScheduled)
+    return;
   m_breakProgramDetails = InspectorObject::create();
   m_breakProgramDetails->setNumber("eventType", type);
   m_breakProgramDetails->setValue("eventData", data);
@@ -165,6 +168,8 @@ void InspectorDebuggerAgent::schedulePauseOnNextStatement(
 }
 
 void InspectorDebuggerAgent::cancelPauseOnNextStatement() {
+  if (m_javaScriptPauseScheduled)
+    return;
   m_breakProgramDetails = 0;
   ScriptDebugServer::shared().setPauseOnNextStatement(false);
 }
@@ -172,6 +177,7 @@ void InspectorDebuggerAgent::cancelPauseOnNextStatement() {
 void InspectorDebuggerAgent::pause() {
   schedulePauseOnNextStatement(JavaScriptPauseEventType,
                                InspectorObject::create());
+  m_javaScriptPauseScheduled = true;
 }
 
 void InspectorDebuggerAgent::resume() {
@@ -334,6 +340,7 @@ void InspectorDebuggerAgent::didPause(ScriptState* scriptState) {
   m_breakProgramDetails->setValue("callFrames", currentCallFrames());
 
   m_frontend->pausedScript(m_breakProgramDetails);
+  m_javaScriptPauseScheduled = false;
 }
 
 void InspectorDebuggerAgent::didContinue() {
