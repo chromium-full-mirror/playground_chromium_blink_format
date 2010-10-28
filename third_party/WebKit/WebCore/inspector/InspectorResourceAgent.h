@@ -82,8 +82,7 @@ class InspectorResourceAgent : public RefCounted<InspectorResourceAgent> {
 
   void identifierForInitialRequest(unsigned long identifier,
                                    const KURL&,
-                                   DocumentLoader*,
-                                   bool isMainResource);
+                                   DocumentLoader*);
   void willSendRequest(unsigned long identifier,
                        ResourceRequest&,
                        const ResourceResponse& redirectResponse);

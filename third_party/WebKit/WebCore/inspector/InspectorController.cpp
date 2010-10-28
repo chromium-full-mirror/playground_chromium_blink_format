@@ -934,11 +934,11 @@ void InspectorController::identifierForInitialRequest(
     return;
   ASSERT(m_inspectedPage);
 
-  bool isMainResource = isMainResourceLoader(loader, request.url());
-
   if (m_resourceAgent)
     m_resourceAgent->identifierForInitialRequest(identifier, request.url(),
-                                                 loader, isMainResource);
+                                                 loader);
+
+  bool isMainResource = isMainResourceLoader(loader, request.url());
 
   ensureSettingsLoaded();
   if (!isMainResource && !resourceTrackingEnabled())
