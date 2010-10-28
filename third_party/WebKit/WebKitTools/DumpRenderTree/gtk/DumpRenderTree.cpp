@@ -761,25 +761,9 @@ static char* getFrameNameSuitableForTestResult(WebKitWebView* view,
   return frameName;
 }
 
-static void webViewLoadCommitted(WebKitWebView* view,
-                                 WebKitWebFrame* frame,
-                                 void*) {
-  if (!done && gLayoutTestController->dumpFrameLoadCallbacks()) {
-    char* frameName = getFrameNameSuitableForTestResult(view, frame);
-    printf("%s - didCommitLoadForFrame\n", frameName);
-    g_free(frameName);
-  }
-}
-
 static void webViewLoadFinished(WebKitWebView* view,
                                 WebKitWebFrame* frame,
                                 void*) {
-  if (!done && gLayoutTestController->dumpFrameLoadCallbacks()) {
-    char* frameName = getFrameNameSuitableForTestResult(view, frame);
-    printf("%s - didFinishLoadForFrame\n", frameName);
-    g_free(frameName);
-  }
-
   if (frame != topLoadingFrame)
     return;
 
@@ -1044,16 +1028,38 @@ static WebKitWebView* webInspectorInspectWebView(WebKitWebInspector*,
   return WEBKIT_WEB_VIEW(webView);
 }
 
-static void webViewLoadStatusNotified(WebKitWebView* view, gpointer user_data) {
-  WebKitLoadStatus loadStatus = webkit_web_view_get_load_status(view);
+static void webFrameLoadStatusNotified(WebKitWebFrame* frame,
+                                       gpointer user_data) {
+  WebKitLoadStatus loadStatus = webkit_web_frame_get_load_status(frame);
 
   if (gLayoutTestController->dumpFrameLoadCallbacks()) {
-    if (loadStatus == WEBKIT_LOAD_PROVISIONAL) {
-      char* frameName = getFrameNameSuitableForTestResult(view, mainFrame);
-      printf("%s - didStartProvisionalLoadForFrame\n", frameName);
-      g_free(frameName);
+    GOwnPtr<char> frameName(getFrameNameSuitableForTestResult(
+        webkit_web_frame_get_web_view(frame), frame));
+
+    switch (loadStatus) {
+      case WEBKIT_LOAD_PROVISIONAL:
+        if (!done)
+          printf("%s - didStartProvisionalLoadForFrame\n", frameName.get());
+        break;
+      case WEBKIT_LOAD_COMMITTED:
+        if (!done)
+          printf("%s - didCommitLoadForFrame\n", frameName.get());
+        break;
+      case WEBKIT_LOAD_FINISHED:
+        if (frame != topLoadingFrame || !done)
+          printf("%s - didFinishLoadForFrame\n", frameName.get());
+        break;
+      default:
+        break;
     }
   }
+}
+
+static void frameCreatedCallback(WebKitWebView* webView,
+                                 WebKitWebFrame* webFrame,
+                                 gpointer user_data) {
+  g_signal_connect(webFrame, "notify::load-status",
+                   G_CALLBACK(webFrameLoadStatusNotified), NULL);
 }
 
 static WebKitWebView* createWebView() {
@@ -1067,12 +1073,12 @@ static WebKitWebView* createWebView() {
 
   g_object_connect(
       G_OBJECT(view), "signal::load-started", webViewLoadStarted, 0,
-      "signal::load-finished", webViewLoadFinished, 0, "signal::load-committed",
-      webViewLoadCommitted, 0, "signal::window-object-cleared",
-      webViewWindowObjectCleared, 0, "signal::console-message",
-      webViewConsoleMessage, 0, "signal::script-alert", webViewScriptAlert, 0,
-      "signal::script-prompt", webViewScriptPrompt, 0, "signal::script-confirm",
-      webViewScriptConfirm, 0, "signal::title-changed", webViewTitleChanged, 0,
+      "signal::load-finished", webViewLoadFinished, 0,
+      "signal::window-object-cleared", webViewWindowObjectCleared, 0,
+      "signal::console-message", webViewConsoleMessage, 0,
+      "signal::script-alert", webViewScriptAlert, 0, "signal::script-prompt",
+      webViewScriptPrompt, 0, "signal::script-confirm", webViewScriptConfirm, 0,
+      "signal::title-changed", webViewTitleChanged, 0,
       "signal::navigation-policy-decision-requested",
       webViewNavigationPolicyDecisionRequested, 0,
       "signal::status-bar-text-changed", webViewStatusBarTextChanged, 0,
@@ -1083,12 +1089,9 @@ static WebKitWebView* createWebView() {
       geolocationPolicyDecisionRequested, 0, "signal::onload-event",
       webViewOnloadEvent, 0, "signal::drag-begin", dragBeginCallback, 0,
       "signal::drag-end", dragEndCallback, 0, "signal::drag-failed",
-      dragFailedCallback, 0,
+      dragFailedCallback, 0, "signal::frame-created", frameCreatedCallback, 0,
 
       NULL);
-
-  g_signal_connect(view, "notify::load-status",
-                   G_CALLBACK(webViewLoadStatusNotified), NULL);
 
   WebKitWebInspector* inspector = webkit_web_view_get_inspector(view);
   g_object_connect(G_OBJECT(inspector), "signal::inspect-web-view",
@@ -1100,6 +1103,11 @@ static WebKitWebView* createWebView() {
     WebKitWebSettings* settings = webkit_web_view_get_settings(webView);
     webkit_web_view_set_settings(view, settings);
   }
+
+  // frame-created is not issued for main frame. That's why we must do this here
+  WebKitWebFrame* frame = webkit_web_view_get_main_frame(view);
+  g_signal_connect(frame, "notify::load-status",
+                   G_CALLBACK(webFrameLoadStatusNotified), NULL);
 
   return view;
 }
