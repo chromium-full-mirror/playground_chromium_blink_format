@@ -41,7 +41,11 @@ namespace WebCore {
 class AudioDSPKernel {
  public:
   AudioDSPKernel(AudioDSPKernelProcessor* kernelProcessor)
-      : m_kernelProcessor(kernelProcessor) {}
+      : m_kernelProcessor(kernelProcessor),
+        m_sampleRate(kernelProcessor->sampleRate()) {}
+
+  AudioDSPKernel(double sampleRate)
+      : m_kernelProcessor(0), m_sampleRate(sampleRate) {}
 
   virtual ~AudioDSPKernel(){};
 
@@ -52,7 +56,7 @@ class AudioDSPKernel {
                        size_t framesToProcess) = 0;
   virtual void reset() = 0;
 
-  double sampleRate() const { return processor()->sampleRate(); }
+  double sampleRate() const { return m_sampleRate; }
   double nyquist() const { return 0.5 * sampleRate(); }
 
   AudioDSPKernelProcessor* processor() { return m_kernelProcessor; }
@@ -60,6 +64,7 @@ class AudioDSPKernel {
 
  protected:
   AudioDSPKernelProcessor* m_kernelProcessor;
+  double m_sampleRate;
 };
 
 }  // namespace WebCore
