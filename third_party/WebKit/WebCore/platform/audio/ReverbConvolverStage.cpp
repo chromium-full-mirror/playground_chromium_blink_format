@@ -32,7 +32,7 @@
 
 #include "ReverbConvolverStage.h"
 
-#include "Accelerate.h"
+#include "VectorMath.h"
 #include "ReverbAccumulationBuffer.h"
 #include "ReverbConvolver.h"
 #include "ReverbInputBuffer.h"
@@ -40,6 +40,8 @@
 #include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
+
+using namespace VectorMath;
 
 ReverbConvolverStage::ReverbConvolverStage(
     float* impulseResponse,
@@ -60,8 +62,8 @@ ReverbConvolverStage::ReverbConvolverStage(
   ASSERT(accumulationBuffer);
 
   m_fftKernel.doPaddedFFT(impulseResponse + stageOffset, stageLength);
-  m_convolver = new FFTConvolver(fftSize);
-  m_temporaryBuffer.allocate(renderSliceSize);
+  m_convolver = adoptPtr(new FFTConvolver(fftSize));
+  m_temporaryBuffer.resize(renderSliceSize);
 
   // The convolution stage at offset stageOffset needs to have a corresponding
   // delay to cancel out the offset.
@@ -87,8 +89,8 @@ ReverbConvolverStage::ReverbConvolverStage(
   m_preReadWriteIndex = 0;
   m_framesProcessed = 0;  // total frames processed so far
 
-  m_preDelayBuffer.allocate(m_preDelayLength < fftSize ? fftSize
-                                                       : m_preDelayLength);
+  m_preDelayBuffer.resize(m_preDelayLength < fftSize ? fftSize
+                                                     : m_preDelayLength);
 }
 
 void ReverbConvolverStage::processInBackground(ReverbConvolver* convolver,

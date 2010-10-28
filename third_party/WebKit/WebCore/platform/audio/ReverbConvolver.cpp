@@ -32,10 +32,12 @@
 
 #include "ReverbConvolver.h"
 
-#include "Accelerate.h"
+#include "VectorMath.h"
 #include "AudioBus.h"
 
 namespace WebCore {
+
+using namespace VectorMath;
 
 const int InputBufferSize = 8 * 16384;
 
@@ -68,8 +70,8 @@ ReverbConvolver::ReverbConvolver(AudioChannel* impulseResponse,
                                  size_t maxFFTSize,
                                  size_t convolverRenderPhase,
                                  bool useBackgroundThreads)
-    : m_impulseResponseLength(impulseResponse->frameSize()),
-      m_accumulationBuffer(impulseResponse->frameSize() + renderSliceSize),
+    : m_impulseResponseLength(impulseResponse->length()),
+      m_accumulationBuffer(impulseResponse->length() + renderSliceSize),
       m_inputBuffer(InputBufferSize),
       m_renderSliceSize(renderSliceSize),
       m_minFFTSize(MinFFTSize)  // First stage will have this size - successive
@@ -96,7 +98,7 @@ ReverbConvolver::ReverbConvolver(AudioChannel* impulseResponse,
   bool hasRealtimeConstraint = useBackgroundThreads;
 
   float* response = impulseResponse->data();
-  size_t totalResponseLength = impulseResponse->frameSize();
+  size_t totalResponseLength = impulseResponse->length();
 
   // Because we're not using direct-convolution in the leading portion, the
   // reverb has an overall latency of half the first-stage FFT size
@@ -204,8 +206,8 @@ void ReverbConvolver::process(AudioChannel* sourceChannel,
                               AudioChannel* destinationChannel,
                               size_t framesToProcess) {
   bool isSafe = sourceChannel && destinationChannel &&
-                sourceChannel->frameSize() >= framesToProcess &&
-                destinationChannel->frameSize() >= framesToProcess;
+                sourceChannel->length() >= framesToProcess &&
+                destinationChannel->length() >= framesToProcess;
   ASSERT(isSafe);
   if (!isSafe)
     return;
