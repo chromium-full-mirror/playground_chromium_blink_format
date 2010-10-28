@@ -349,14 +349,12 @@ Vector<IntRect> DocumentMarkerController::renderedRectsForMarkers(
   return result;
 }
 
-void DocumentMarkerController::removeMarkers(Node* node) {
-  MarkerMap::iterator i = m_markers.find(node);
-  if (i != m_markers.end()) {
-    delete i->second;
-    m_markers.remove(i);
-    if (RenderObject* renderer = node->renderer())
-      renderer->repaint();
-  }
+void DocumentMarkerController::removeMarkers(
+    Node* node,
+    DocumentMarker::MarkerType markerType) {
+  MarkerMap::iterator iterator = m_markers.find(node);
+  if (iterator != m_markers.end())
+    removeMarkersFromMarkerMapVectorPair(node, iterator->second, markerType);
 }
 
 void DocumentMarkerController::removeMarkers(
@@ -366,10 +364,23 @@ void DocumentMarkerController::removeMarkers(
   MarkerMap::iterator end = markerMapCopy.end();
   for (MarkerMap::iterator i = markerMapCopy.begin(); i != end; ++i) {
     Node* node = i->first.get();
-    bool nodeNeedsRepaint = false;
-
-    // inner loop: process each marker in the current node
     MarkerMapVectorPair* vectorPair = i->second;
+    removeMarkersFromMarkerMapVectorPair(node, vectorPair, markerType);
+  }
+}
+
+// This function may release node and vectorPair.
+void DocumentMarkerController::removeMarkersFromMarkerMapVectorPair(
+    Node* node,
+    MarkerMapVectorPair* vectorPair,
+    DocumentMarker::MarkerType markerType) {
+  if (markerType == DocumentMarker::AllMarkers) {
+    delete vectorPair;
+    m_markers.remove(node);
+    if (RenderObject* renderer = node->renderer())
+      renderer->repaint();
+  } else {
+    bool needsRepaint = false;
     Vector<DocumentMarker>& markers = vectorPair->first;
     Vector<IntRect>& rects = vectorPair->second;
     ASSERT(markers.size() == rects.size());
@@ -377,8 +388,7 @@ void DocumentMarkerController::removeMarkers(
       DocumentMarker marker = markers[i];
 
       // skip nodes that are not of the specified type
-      if (marker.type != markerType &&
-          markerType != DocumentMarker::AllMarkers) {
+      if (marker.type != markerType) {
         ++i;
         continue;
       }
@@ -386,14 +396,14 @@ void DocumentMarkerController::removeMarkers(
       // pitch the old marker
       markers.remove(i);
       rects.remove(i);
-      nodeNeedsRepaint = true;
-      // markerIterator now points to the next node
+      needsRepaint = true;
+      // i now is the index of the next marker
     }
 
     // Redraw the node if it changed. Do this before the node is removed from
     // m_markers, since
     // m_markers might contain the last reference to the node.
-    if (nodeNeedsRepaint) {
+    if (needsRepaint) {
       RenderObject* renderer = node->renderer();
       if (renderer)
         renderer->repaint();
@@ -564,6 +574,46 @@ void DocumentMarkerController::setMarkersActive(Node* node,
   // repaint the affected node
   if (docDirty && node->renderer())
     node->renderer()->repaint();
+}
+
+bool DocumentMarkerController::hasMarkers(
+    Range* range,
+    DocumentMarker::MarkerTypes markerTypes) {
+  if (m_markers.isEmpty())
+    return false;
+
+  Node* startContainer = range->startContainer();
+  ASSERT(startContainer);
+  Node* endContainer = range->endContainer();
+  ASSERT(endContainer);
+
+  Node* pastLastNode = range->pastLastNode();
+  for (Node* node = range->firstNode(); node != pastLastNode;
+       node = node->traverseNextNode()) {
+    Vector<DocumentMarker> markers = markersForNode(node);
+    Vector<DocumentMarker>::const_iterator end = markers.end();
+    for (Vector<DocumentMarker>::const_iterator it = markers.begin(); it != end;
+         ++it) {
+      if (!(markerTypes & it->type))
+        continue;
+      if (node == startContainer && node == endContainer) {
+        // The range spans only one node.
+        if (it->endOffset > static_cast<unsigned>(range->startOffset()) &&
+            it->startOffset < static_cast<unsigned>(range->endOffset()))
+          return true;
+      } else {
+        if (node == startContainer) {
+          if (it->endOffset > static_cast<unsigned>(range->startOffset()))
+            return true;
+        } else if (node == endContainer) {
+          if (it->startOffset < static_cast<unsigned>(range->endOffset()))
+            return true;
+        } else
+          return true;
+      }
+    }
+  }
+  return false;
 }
 
 }  // namespace WebCore

@@ -152,6 +152,14 @@ void TypingCommand::insertText(Document* document,
                                const VisibleSelection& selectionForInsertion,
                                bool selectInsertedText,
                                bool insertedTextIsComposition) {
+#if REMOVE_MARKERS_UPON_EDITING
+  if (!text.isEmpty())
+    document->frame()
+        ->editor()
+        ->removeSpellAndCorrectionMarkersFromWordsToBeEdited(
+            isSpaceOrNewline(text.characters()[0]));
+#endif
+
   ASSERT(document);
 
   RefPtr<Frame> frame = document->frame();
@@ -159,7 +167,6 @@ void TypingCommand::insertText(Document* document,
 
   VisibleSelection currentSelection = frame->selection()->selection();
   bool changeSelection = currentSelection != selectionForInsertion;
-
   String newText = text;
   Node* startNode = selectionForInsertion.start().node();
 
@@ -458,6 +465,12 @@ bool TypingCommand::makeEditableRootEmpty() {
 
 void TypingCommand::deleteKeyPressed(TextGranularity granularity,
                                      bool killRing) {
+#if REMOVE_MARKERS_UPON_EDITING
+  document()
+      ->frame()
+      ->editor()
+      ->removeSpellAndCorrectionMarkersFromWordsToBeEdited(false);
+#endif
   VisibleSelection selectionToDelete;
   VisibleSelection selectionAfterUndo;
 
@@ -586,6 +599,12 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity,
 
 void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity,
                                             bool killRing) {
+#if REMOVE_MARKERS_UPON_EDITING
+  document()
+      ->frame()
+      ->editor()
+      ->removeSpellAndCorrectionMarkersFromWordsToBeEdited(false);
+#endif
   VisibleSelection selectionToDelete;
   VisibleSelection selectionAfterUndo;
 

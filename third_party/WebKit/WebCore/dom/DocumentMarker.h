@@ -37,16 +37,18 @@ namespace WebCore {
 // for all types other than type TextMatch.
 struct DocumentMarker {
   enum MarkerType {
-    AllMarkers = -1,
-    Spelling,
-    Grammar,
-    TextMatch,
-    Replacement,
-    CorrectionIndicator,
-    RejectedCorrection
+    Spelling = 1 << 0,
+    Grammar = 1 << 1,
+    TextMatch = 1 << 2,
+    Replacement = 1 << 3,
+    CorrectionIndicator = 1 << 4,
+    RejectedCorrection = 1 << 5,
+    AllMarkers = Spelling | Grammar | TextMatch | Replacement |
+                 CorrectionIndicator |
+                 RejectedCorrection
   };
-
   MarkerType type;
+  typedef unsigned MarkerTypes;
   unsigned startOffset;
   unsigned endOffset;
   String description;

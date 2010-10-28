@@ -55,6 +55,8 @@ class DocumentMarkerController : public Noncopyable {
                    Node* dstNode,
                    int delta,
                    DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
+  bool hasMarkers(Range*,
+                  DocumentMarker::MarkerTypes = DocumentMarker::AllMarkers);
   void removeMarkers(Range*,
                      DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
   void removeMarkers(Node*,
@@ -62,7 +64,8 @@ class DocumentMarkerController : public Noncopyable {
                      int length,
                      DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
   void removeMarkers(DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
-  void removeMarkers(Node*);
+  void removeMarkers(Node*,
+                     DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
   void repaintMarkers(DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
   void setRenderedRectForMarker(Node*, const DocumentMarker&, const IntRect&);
   void invalidateRenderedRectsForMarkersInRect(const IntRect&);
@@ -85,6 +88,9 @@ class DocumentMarkerController : public Noncopyable {
       MarkerMapVectorPair;
   typedef HashMap<RefPtr<Node>, MarkerMapVectorPair*> MarkerMap;
   MarkerMap m_markers;
+  void removeMarkersFromMarkerMapVectorPair(Node*,
+                                            MarkerMapVectorPair*,
+                                            DocumentMarker::MarkerType);
 };
 
 }  // namespace WebCore
