@@ -448,7 +448,6 @@ void HTMLDocument::clear() {
 
 bool HTMLDocument::isFrameSet() const {
   HTMLElement* bodyElement = body();
-  return bodyElement && bodyElement->renderer() &&
-         bodyElement->hasTagName(framesetTag);
+  return bodyElement && bodyElement->hasTagName(framesetTag);
 }
 }
