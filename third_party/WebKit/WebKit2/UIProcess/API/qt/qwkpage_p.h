@@ -94,7 +94,7 @@ class QWKPagePrivate : WebKit::PageClient {
   QWKPreferences* preferences;
 
   RefPtr<WebKit::WebPageProxy> page;
-  WKPageNamespaceRef pageNamespaceRef;
+
   WebCore::ViewportArguments viewportArguments;
 
   QWKPage::CreateNewPageFn createNewPageFn;
