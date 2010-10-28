@@ -75,6 +75,8 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
                            String& url,
                            String& serviceType);
 
+  bool hasValidClassId();
+
   AtomicString m_id;
   String m_classId;
   bool m_docNamedItem : 1;
