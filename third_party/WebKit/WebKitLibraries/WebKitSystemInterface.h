@@ -399,7 +399,6 @@ void WKWindowSetScaledFrame(NSWindow* window,
 #endif
 
 #if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD)
-NSMutableArray* WKNoteOpenPanelFiles(NSArray* paths);
 void WKSyncSurfaceToView(NSView* view);
 #endif
 

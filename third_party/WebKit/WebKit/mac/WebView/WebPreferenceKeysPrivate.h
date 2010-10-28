@@ -126,7 +126,6 @@
 #define WebKitWebGLEnabledPreferenceKey @"WebKitWebGLEnabled"
 #define WebKitAccelerated2dCanvasEnabledPreferenceKey \
   @"WebKitAccelerated2dCanvasEnabled"
-#define WebKitUsesProxiedOpenPanelPreferenceKey @"WebKitUsesProxiedOpenPanel"
 #define WebKitPluginAllowedRunTimePreferenceKey @"WebKitPluginAllowedRunTime"
 #define WebKitFrameFlatteningEnabledPreferenceKey \
   @"WebKitFrameFlatteningEnabled"

@@ -68,8 +68,7 @@ class NetscapePluginHostManager {
  private:
   NetscapePluginHostProxy* hostForPlugin(const WTF::String& pluginPath,
                                          cpu_type_t pluginArchitecture,
-                                         const WTF::String& bundleIdentifier,
-                                         bool useProxiedOpenPanel);
+                                         const WTF::String& bundleIdentifier);
 
   NetscapePluginHostManager();
   ~NetscapePluginHostManager();
@@ -78,8 +77,7 @@ class NetscapePluginHostManager {
                        cpu_type_t pluginArchitecture,
                        mach_port_t clientPort,
                        mach_port_t& pluginHostPort,
-                       ProcessSerialNumber& pluginHostPSN,
-                       bool useProxiedOpenPanel);
+                       ProcessSerialNumber& pluginHostPSN);
 
   bool initializeVendorPort();
 
