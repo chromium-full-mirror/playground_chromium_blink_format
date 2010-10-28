@@ -39,6 +39,7 @@ namespace WebCore {
 
 class AsyncFileSystem;
 class AsyncFileWriter;
+class FileMetadata;
 
 class AsyncFileSystemCallbacks : public Noncopyable {
  public:
@@ -50,7 +51,7 @@ class AsyncFileSystemCallbacks : public Noncopyable {
                                  PassOwnPtr<AsyncFileSystem>) = 0;
 
   // Called when a file metadata is read successfully.
-  virtual void didReadMetadata(double modificationTime) = 0;
+  virtual void didReadMetadata(const FileMetadata&) = 0;
 
   // Called when a directory entry is read.
   virtual void didReadDirectoryEntry(const String& name, bool isDirectory) = 0;

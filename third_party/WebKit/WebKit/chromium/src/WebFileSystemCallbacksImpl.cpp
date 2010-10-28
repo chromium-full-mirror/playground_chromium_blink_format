@@ -34,6 +34,7 @@
 
 #include "AsyncFileSystemCallbacks.h"
 #include "AsyncFileSystemChromium.h"
+#include "FileMetadata.h"
 #include "ScriptExecutionContext.h"
 #include "WebFileSystemEntry.h"
 #include "WebFileInfo.h"
@@ -60,8 +61,13 @@ void WebFileSystemCallbacksImpl::didSucceed() {
   delete this;
 }
 
-void WebFileSystemCallbacksImpl::didReadMetadata(const WebFileInfo& info) {
-  m_callbacks->didReadMetadata(info.modificationTime);
+void WebFileSystemCallbacksImpl::didReadMetadata(
+    const WebFileInfo& webFileInfo) {
+  FileMetadata fileMetadata;
+  fileMetadata.modificationTime = webFileInfo.modificationTime;
+  fileMetadata.length = webFileInfo.length;
+  fileMetadata.type = static_cast<FileMetadata::Type>(webFileInfo.type);
+  m_callbacks->didReadMetadata(fileMetadata);
   delete this;
 }
 
