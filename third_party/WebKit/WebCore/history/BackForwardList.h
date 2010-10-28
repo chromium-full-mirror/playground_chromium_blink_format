@@ -55,7 +55,6 @@ class BackForwardListClient {
   virtual ~BackForwardListClient() {}
   virtual void addItem(PassRefPtr<HistoryItem>) = 0;
   virtual void goToItem(HistoryItem*) = 0;
-  virtual HistoryItem* currentItem() = 0;
   virtual HistoryItem* itemAtIndex(int) = 0;
   virtual int backListCount() = 0;
   virtual int forwardListCount() = 0;

@@ -50,7 +50,6 @@ class BackForwardListClientImpl : public WebCore::BackForwardListClient {
   // WebCore::BackForwardListClient methods:
   virtual void addItem(PassRefPtr<WebCore::HistoryItem>);
   virtual void goToItem(WebCore::HistoryItem*);
-  virtual WebCore::HistoryItem* currentItem();
   virtual WebCore::HistoryItem* itemAtIndex(int index);
   virtual int backListCount();
   virtual int forwardListCount();
