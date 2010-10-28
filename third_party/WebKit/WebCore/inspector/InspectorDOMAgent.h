@@ -248,8 +248,6 @@ class InspectorDOMAgent : public EventListener {
                                                   bool bind);
   void populateObjectWithStyleProperties(CSSStyleDeclaration*,
                                          InspectorObject* result);
-  PassRefPtr<InspectorArray> buildArrayForDisabledStyleProperties(
-      DisabledStyleDeclaration*);
   PassRefPtr<InspectorObject> buildObjectForRule(Document* ownerDocument,
                                                  CSSStyleRule*);
   PassRefPtr<InspectorObject> buildObjectForStyleSheet(Document* ownerDocument,
