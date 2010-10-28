@@ -44,6 +44,8 @@ class WebGLTexture : public WebGLObject {
   void setParameteri(unsigned long pname, int param);
   void setParameterf(unsigned long pname, float param);
 
+  int getMinFilter() const { return m_minFilter; }
+
   void setLevelInfo(unsigned long target,
                     int level,
                     unsigned long internalFormat,
