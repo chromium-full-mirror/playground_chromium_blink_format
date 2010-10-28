@@ -47,12 +47,7 @@
 
 namespace WebCore {
 
-class PageClientQWidget : public QWebPageClient
-#if USE(ACCELERATED_COMPOSITING) && USE(TEXTURE_MAPPER)
-                          ,
-                          public virtual TextureMapperLayerClient
-#endif
-{
+class PageClientQWidget : public QWebPageClient {
  public:
   PageClientQWidget(QWidget* newView, QWebPage* newPage)
       : view(newView),
@@ -140,12 +135,7 @@ class QGraphicsItemOverlay : public QGraphicsObject {
   QWebPage* page;
 };
 
-class PageClientQGraphicsWidget : public QWebPageClient
-#if USE(ACCELERATED_COMPOSITING) && USE(TEXTURE_MAPPER)
-                                  ,
-                                  public virtual TextureMapperLayerClient
-#endif
-{
+class PageClientQGraphicsWidget : public QWebPageClient {
  public:
   PageClientQGraphicsWidget(QGraphicsWebView* newView, QWebPage* newPage)
       : view(newView),

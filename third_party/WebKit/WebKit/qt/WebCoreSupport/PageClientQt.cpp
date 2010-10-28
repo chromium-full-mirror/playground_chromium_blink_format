@@ -95,12 +95,12 @@ class PlatformLayerProxyQWidget : public PlatformLayerProxyQt {
   QWidget* m_widget;
 };
 
-class PlatformLayerProxyQGraphicsObject : public PlatfromLayerProxyQt {
+class PlatformLayerProxyQGraphicsObject : public PlatformLayerProxyQt {
  public:
-  PlatformLayerProxyQGraphicsWidget(QWebFrame* frame,
+  PlatformLayerProxyQGraphicsObject(QWebFrame* frame,
                                     TextureMapperContentLayer* layer,
                                     QGraphicsObject* object)
-      : QObject(object), m_graphicsItem(graphicsObject) {}
+      : PlatformLayerProxyQt(frame, layer, object), m_graphicsItem(object) {}
 
   void setNeedsDisplay() {
     if (m_graphicsItem)
@@ -209,12 +209,16 @@ QRectF PageClientQWidget::windowRect() const {
 PageClientQGraphicsWidget::~PageClientQGraphicsWidget() {
   delete overlay;
 #if USE(ACCELERATED_COMPOSITING)
+#if USE(TEXTURE_MAPPER)
+  delete platformLayerProxy;
+#else
   if (!rootGraphicsLayer)
     return;
   // we don't need to delete the root graphics layer. The lifecycle is managed
   // in GraphicsLayerQt.cpp.
   rootGraphicsLayer.data()->setParentItem(0);
   view->scene()->removeItem(rootGraphicsLayer.data());
+#endif
 #endif
 }
 
@@ -278,7 +282,7 @@ void PageClientQGraphicsWidget::setRootGraphicsLayer(
     TextureMapperPlatformLayer* layer) {
   if (layer) {
     platformLayerProxy = new PlatformLayerProxyQGraphicsObject(
-        page->mainFrame(), static_cast<TextureMapperContentLayer*>(layer), 0,
+        page->mainFrame(), static_cast<TextureMapperContentLayer*>(layer),
         view);
     return;
   }
