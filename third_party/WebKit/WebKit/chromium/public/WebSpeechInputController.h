@@ -49,12 +49,6 @@ class WebSpeechInputController {
   virtual bool startRecognition(int requestId,
                                 const WebRect& elementRect,
                                 const WebString& grammar) {
-    startRecognition(requestId, elementRect);
-    return false;
-  }
-
-  // FIXME: Remove this method once chromium implements the above method.
-  virtual bool startRecognition(int requestId, const WebRect&) {
     WEBKIT_ASSERT_NOT_REACHED();
     return false;
   }
