@@ -254,6 +254,11 @@ class WebViewHost : public WebKit::WebViewClient,
   virtual void didRunInsecureContent(WebKit::WebFrame*,
                                      const WebKit::WebSecurityOrigin&);
   virtual bool allowScript(WebKit::WebFrame*, bool enabledPerSettings);
+  virtual void openFileSystem(WebKit::WebFrame*,
+                              WebKit::WebFileSystem::Type,
+                              long long size,
+                              bool create,
+                              WebKit::WebFileSystemCallbacks*);
 
  private:
   LayoutTestController* layoutTestController() const;
