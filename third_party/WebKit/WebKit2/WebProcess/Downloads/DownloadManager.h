@@ -26,6 +26,7 @@
 #ifndef DownloadManager_h
 #define DownloadManager_h
 
+#include <wtf/HashMap.h>
 #include <wtf/Noncopyable.h>
 
 namespace WebCore {
@@ -33,6 +34,8 @@ class ResourceRequest;
 }
 
 namespace WebKit {
+
+class Download;
 
 class DownloadManager {
   WTF_MAKE_NONCOPYABLE(DownloadManager);
@@ -44,6 +47,8 @@ class DownloadManager {
 
  private:
   DownloadManager();
+
+  HashMap<uint64_t, Download*> m_downloads;
 };
 
 }  // namespace WebKit
