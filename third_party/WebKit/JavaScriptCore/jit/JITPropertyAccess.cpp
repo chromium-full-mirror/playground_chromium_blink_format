@@ -701,13 +701,13 @@ void JIT::testPrototype(JSValue prototype, JumpList& failureCases) {
 // efficient because it uses
 // two less instructions and doesn't require any scratch registers.
 #if CPU(X86_64)
-  move(ImmPtr(asCell(prototype)->structure()), regT3);
+  move(ImmPtr(prototype.asCell()->structure()), regT3);
   failureCases.append(branchPtr(
-      NotEqual, AbsoluteAddress(&asCell(prototype)->m_structure), regT3));
+      NotEqual, AbsoluteAddress(&prototype.asCell()->m_structure), regT3));
 #else
   failureCases.append(
-      branchPtr(NotEqual, AbsoluteAddress(&asCell(prototype)->m_structure),
-                ImmPtr(asCell(prototype)->structure())));
+      branchPtr(NotEqual, AbsoluteAddress(&prototype.asCell()->m_structure),
+                ImmPtr(prototype.asCell()->structure())));
 #endif
 }
 
