@@ -118,6 +118,8 @@ class QTMOVIEWIN_API QTMovie : public RefCounted<QTMovie> {
 
   Movie getMovieHandle() const;
 
+  long timeScale() const;
+
  private:
   QTMoviePrivate* m_private;
   friend class QTMoviePrivate;
