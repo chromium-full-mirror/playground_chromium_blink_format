@@ -289,9 +289,12 @@ static void populateObjectWithFrameResources(
            allResources.begin();
        it != end; ++it) {
     CachedResource* cachedResource = it->second.get();
-    RefPtr<InspectorObject> cachedResourceObject = buildObjectForCachedResource(
-        frame->loader()->documentLoader(), *cachedResource);
-    subresources->pushValue(cachedResourceObject);
+    if (cachedResource) {
+      RefPtr<InspectorObject> cachedResourceObject =
+          buildObjectForCachedResource(frame->loader()->documentLoader(),
+                                       *cachedResource);
+      subresources->pushValue(cachedResourceObject);
+    }
   }
 }
 
