@@ -136,9 +136,14 @@ class AccessibilityUIElement {
   JSStringRef selectedTextRange();
   bool isEnabled();
   bool isRequired() const;
+
   bool isSelected() const;
   bool isSelectable() const;
   bool isMultiSelectable() const;
+  void setSelectedChild(AccessibilityUIElement*) const;
+  unsigned selectedChildrenCount() const;
+  AccessibilityUIElement selectedChildAtIndex(unsigned) const;
+
   bool isExpanded() const;
   bool isChecked() const;
   bool isVisible() const;

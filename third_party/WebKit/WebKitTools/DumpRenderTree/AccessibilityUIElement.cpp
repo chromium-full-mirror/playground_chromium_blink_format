@@ -319,6 +319,20 @@ static JSValueRef childAtIndexCallback(JSContextRef context,
       context, toAXElement(thisObject)->getChildAtIndex(indexNumber));
 }
 
+static JSValueRef selectedChildAtIndexCallback(JSContextRef context,
+                                               JSObjectRef function,
+                                               JSObjectRef thisObject,
+                                               size_t argumentCount,
+                                               const JSValueRef arguments[],
+                                               JSValueRef* exception) {
+  int indexNumber = -1;
+  if (argumentCount == 1)
+    indexNumber = JSValueToNumber(context, arguments[0], exception);
+
+  return AccessibilityUIElement::makeJSAccessibilityUIElement(
+      context, toAXElement(thisObject)->selectedChildAtIndex(indexNumber));
+}
+
 static JSValueRef linkedUIElementAtIndexCallback(JSContextRef context,
                                                  JSObjectRef function,
                                                  JSObjectRef thisObject,
@@ -403,6 +417,21 @@ static JSValueRef isEqualCallback(JSContextRef context,
 
   return JSValueMakeBoolean(
       context, toAXElement(thisObject)->isEqual(toAXElement(otherElement)));
+}
+
+static JSValueRef setSelectedChildCallback(JSContextRef context,
+                                           JSObjectRef function,
+                                           JSObjectRef thisObject,
+                                           size_t argumentCount,
+                                           const JSValueRef arguments[],
+                                           JSValueRef* exception) {
+  JSObjectRef element = 0;
+  if (argumentCount == 1)
+    element = JSValueToObject(context, arguments[0], exception);
+
+  toAXElement(thisObject)->setSelectedChild(toAXElement(element));
+
+  return JSValueMakeUndefined(context);
 }
 
 static JSValueRef elementAtPointCallback(JSContextRef context,
@@ -1056,6 +1085,14 @@ static JSValueRef speakCallback(JSContextRef context,
   return JSValueMakeString(context, speakString.get());
 }
 
+static JSValueRef selectedChildrenCountCallback(JSContextRef context,
+                                                JSObjectRef thisObject,
+                                                JSStringRef propertyName,
+                                                JSValueRef* exception) {
+  return JSValueMakeNumber(context,
+                           toAXElement(thisObject)->selectedChildrenCount());
+}
+
 static JSValueRef getHasPopupCallback(JSContextRef context,
                                       JSObjectRef thisObject,
                                       JSStringRef,
@@ -1148,6 +1185,14 @@ JSStringRef AccessibilityUIElement::speak() {
   return 0;
 }
 JSStringRef AccessibilityUIElement::rangeForLine(int line) {
+  return 0;
+}
+void AccessibilityUIElement::setSelectedChild(AccessibilityUIElement*) const {}
+unsigned AccessibilityUIElement::selectedChildrenCount() const {
+  return 0;
+}
+AccessibilityUIElement AccessibilityUIElement::selectedChildAtIndex(
+    unsigned) const {
   return 0;
 }
 #endif
@@ -1301,6 +1346,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"speak", speakCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"selectedChildrenCount", selectedChildrenCountCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0, 0}};
 
   static JSStaticFunction staticFunctions[] = {
@@ -1419,6 +1466,10 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"textMarkerRangeLength", textMarkerRangeLengthCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"textMarkerForPoint", textMarkerForPointCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setSelectedChild", setSelectedChildCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"selectedChildAtIndex", selectedChildAtIndexCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0}};
 
