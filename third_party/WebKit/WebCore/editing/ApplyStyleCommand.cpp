@@ -1252,9 +1252,11 @@ void ApplyStyleCommand::fixRangeAndApplyInlineStyle(
   // color="blue"><font size="4">hello</font></font>
   RefPtr<Range> range = Range::create(startNode->document(), start, end);
   Element* editableRoot = startNode->rootEditableElement();
-  while (editableRoot && startNode->parentNode() != editableRoot &&
-         isNodeVisiblyContainedWithin(startNode->parentNode(), range.get()))
-    startNode = startNode->parentNode();
+  if (startNode != editableRoot) {
+    while (editableRoot && startNode->parentNode() != editableRoot &&
+           isNodeVisiblyContainedWithin(startNode->parentNode(), range.get()))
+      startNode = startNode->parentNode();
+  }
 
   applyInlineStyleToNodeRange(style, startNode, pastEndNode);
 }
