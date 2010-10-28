@@ -265,6 +265,8 @@ class RenderBlock : public RenderBox {
   int collapsedMarginBeforeForChild(RenderBox* child) const;
   int collapsedMarginAfterForChild(RenderBox* child) const;
 
+  virtual void updateFirstLetter();
+
   class MarginValues {
    public:
     MarginValues(int beforePos, int beforeNeg, int afterPos, int afterNeg)
@@ -398,8 +400,6 @@ class RenderBlock : public RenderBox {
 
   virtual int firstLineBoxBaseline() const;
   virtual int lastLineBoxBaseline() const;
-
-  virtual void updateFirstLetter();
 
   virtual void updateHitTestResult(HitTestResult&, const IntPoint&);
 
