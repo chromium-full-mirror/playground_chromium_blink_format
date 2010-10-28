@@ -43,7 +43,6 @@
 #include <string>
 
 using namespace WebKit;
-using namespace std;
 
 TestShell* TextInputController::testShell = 0;
 
@@ -173,9 +172,10 @@ void TextInputController::markedRange(const CppArgumentList&,
     return;
 
   WebRange range = mainFrame->markedRange();
-  char buffer[30];
-  snprintf(buffer, 30, "%d,%d", range.startOffset(), range.endOffset());
-  result->set(string(buffer));
+  Vector<int> intArray(2);
+  intArray[0] = range.startOffset();
+  intArray[1] = range.endOffset();
+  result->set(WebBindings::makeIntArray(intArray));
 }
 
 void TextInputController::selectedRange(const CppArgumentList&,
@@ -187,9 +187,10 @@ void TextInputController::selectedRange(const CppArgumentList&,
     return;
 
   WebRange range = mainFrame->selectionRange();
-  char buffer[30];
-  snprintf(buffer, 30, "%d,%d", range.startOffset(), range.endOffset());
-  result->set(string(buffer));
+  Vector<int> intArray(2);
+  intArray[0] = range.startOffset();
+  intArray[1] = range.endOffset();
+  result->set(WebBindings::makeIntArray(intArray));
 }
 
 void TextInputController::firstRectForCharacterRange(
