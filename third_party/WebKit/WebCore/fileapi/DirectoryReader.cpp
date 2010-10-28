@@ -40,7 +40,7 @@
 
 namespace WebCore {
 
-DirectoryReader::DirectoryReader(DOMFileSystemBase* fileSystem,
+DirectoryReader::DirectoryReader(PassRefPtr<DOMFileSystemBase> fileSystem,
                                  const String& fullPath)
     : DirectoryReaderBase(fileSystem, fullPath) {}
 

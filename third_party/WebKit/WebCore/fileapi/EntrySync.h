@@ -50,7 +50,7 @@ class EntrySync : public EntryBase {
   static PassRefPtr<EntrySync> create(EntryBase*);
 
   DOMFileSystemSync* filesystem() const {
-    return static_cast<DOMFileSystemSync*>(m_fileSystem);
+    return static_cast<DOMFileSystemSync*>(m_fileSystem.get());
   }
 
   PassRefPtr<Metadata> getMetadata(ExceptionCode&);
@@ -64,7 +64,7 @@ class EntrySync : public EntryBase {
   PassRefPtr<EntrySync> getParent() const;
 
  protected:
-  EntrySync(DOMFileSystemBase*, const String& fullPath);
+  EntrySync(PassRefPtr<DOMFileSystemBase>, const String& fullPath);
 };
 }
 

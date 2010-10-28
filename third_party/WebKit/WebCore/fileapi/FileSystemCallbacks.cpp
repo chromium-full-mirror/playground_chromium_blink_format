@@ -106,7 +106,7 @@ void FileSystemCallbacksBase::didFail(int code) {
 PassOwnPtr<EntryCallbacks> EntryCallbacks::create(
     PassRefPtr<EntryCallback> successCallback,
     PassRefPtr<ErrorCallback> errorCallback,
-    DOMFileSystemBase* fileSystem,
+    PassRefPtr<DOMFileSystemBase> fileSystem,
     const String& expectedPath,
     bool isDirectory) {
   return adoptPtr(new EntryCallbacks(successCallback, errorCallback, fileSystem,
@@ -115,7 +115,7 @@ PassOwnPtr<EntryCallbacks> EntryCallbacks::create(
 
 EntryCallbacks::EntryCallbacks(PassRefPtr<EntryCallback> successCallback,
                                PassRefPtr<ErrorCallback> errorCallback,
-                               DOMFileSystemBase* fileSystem,
+                               PassRefPtr<DOMFileSystemBase> fileSystem,
                                const String& expectedPath,
                                bool isDirectory)
     : FileSystemCallbacksBase(errorCallback),
@@ -141,16 +141,17 @@ void EntryCallbacks::didSucceed() {
 PassOwnPtr<EntriesCallbacks> EntriesCallbacks::create(
     PassRefPtr<EntriesCallback> successCallback,
     PassRefPtr<ErrorCallback> errorCallback,
-    DirectoryReaderBase* directoryReader,
+    PassRefPtr<DirectoryReaderBase> directoryReader,
     const String& basePath) {
   return adoptPtr(new EntriesCallbacks(successCallback, errorCallback,
                                        directoryReader, basePath));
 }
 
-EntriesCallbacks::EntriesCallbacks(PassRefPtr<EntriesCallback> successCallback,
-                                   PassRefPtr<ErrorCallback> errorCallback,
-                                   DirectoryReaderBase* directoryReader,
-                                   const String& basePath)
+EntriesCallbacks::EntriesCallbacks(
+    PassRefPtr<EntriesCallback> successCallback,
+    PassRefPtr<ErrorCallback> errorCallback,
+    PassRefPtr<DirectoryReaderBase> directoryReader,
+    const String& basePath)
     : FileSystemCallbacksBase(errorCallback),
       m_successCallback(successCallback),
       m_directoryReader(directoryReader),

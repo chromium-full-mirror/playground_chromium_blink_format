@@ -46,8 +46,9 @@ class FileEntrySync;
 
 class DirectoryEntrySync : public EntrySync {
  public:
-  static PassRefPtr<DirectoryEntrySync> create(DOMFileSystemBase* fileSystem,
-                                               const String& fullPath) {
+  static PassRefPtr<DirectoryEntrySync> create(
+      PassRefPtr<DOMFileSystemBase> fileSystem,
+      const String& fullPath) {
     return adoptRef(new DirectoryEntrySync(fileSystem, fullPath));
   }
   virtual bool isDirectory() const { return true; }
@@ -63,7 +64,7 @@ class DirectoryEntrySync : public EntrySync {
 
  private:
   friend class EntrySync;
-  DirectoryEntrySync(DOMFileSystemBase*, const String& fullPath);
+  DirectoryEntrySync(PassRefPtr<DOMFileSystemBase>, const String& fullPath);
 };
 }
 

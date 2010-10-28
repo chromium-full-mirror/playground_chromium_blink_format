@@ -100,7 +100,7 @@ class DOMFileSystemBase : public RefCounted<DOMFileSystemBase> {
                     PassRefPtr<Flags>,
                     PassRefPtr<EntryCallback>,
                     PassRefPtr<ErrorCallback>);
-  bool readDirectory(DirectoryReaderBase*,
+  bool readDirectory(PassRefPtr<DirectoryReaderBase>,
                      const String& path,
                      PassRefPtr<EntriesCallback>,
                      PassRefPtr<ErrorCallback>);

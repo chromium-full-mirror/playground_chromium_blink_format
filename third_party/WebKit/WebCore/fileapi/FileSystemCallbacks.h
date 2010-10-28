@@ -93,7 +93,7 @@ class EntryCallbacks : public FileSystemCallbacksBase {
  public:
   static PassOwnPtr<EntryCallbacks> create(PassRefPtr<EntryCallback>,
                                            PassRefPtr<ErrorCallback>,
-                                           DOMFileSystemBase*,
+                                           PassRefPtr<DOMFileSystemBase>,
                                            const String& expectedPath,
                                            bool isDirectory);
   virtual void didSucceed();
@@ -101,11 +101,11 @@ class EntryCallbacks : public FileSystemCallbacksBase {
  private:
   EntryCallbacks(PassRefPtr<EntryCallback>,
                  PassRefPtr<ErrorCallback>,
-                 DOMFileSystemBase*,
+                 PassRefPtr<DOMFileSystemBase>,
                  const String& expectedPath,
                  bool isDirectory);
   RefPtr<EntryCallback> m_successCallback;
-  DOMFileSystemBase* m_fileSystem;
+  RefPtr<DOMFileSystemBase> m_fileSystem;
   String m_expectedPath;
   bool m_isDirectory;
 };
@@ -114,7 +114,7 @@ class EntriesCallbacks : public FileSystemCallbacksBase {
  public:
   static PassOwnPtr<EntriesCallbacks> create(PassRefPtr<EntriesCallback>,
                                              PassRefPtr<ErrorCallback>,
-                                             DirectoryReaderBase*,
+                                             PassRefPtr<DirectoryReaderBase>,
                                              const String& basePath);
   virtual void didReadDirectoryEntry(const String& name, bool isDirectory);
   virtual void didReadDirectoryEntries(bool hasMore);
@@ -122,10 +122,10 @@ class EntriesCallbacks : public FileSystemCallbacksBase {
  private:
   EntriesCallbacks(PassRefPtr<EntriesCallback>,
                    PassRefPtr<ErrorCallback>,
-                   DirectoryReaderBase*,
+                   PassRefPtr<DirectoryReaderBase>,
                    const String& basePath);
   RefPtr<EntriesCallback> m_successCallback;
-  DirectoryReaderBase* m_directoryReader;
+  RefPtr<DirectoryReaderBase> m_directoryReader;
   String m_basePath;
   RefPtr<EntryArray> m_entries;
 };

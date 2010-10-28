@@ -35,6 +35,7 @@
 
 #include "DOMFilePath.h"
 #include "DirectoryEntry.h"
+#include "DirectoryReaderBase.h"
 #include "EntriesCallback.h"
 #include "EntryArray.h"
 #include "EntryBase.h"
@@ -239,7 +240,7 @@ bool DOMFileSystemBase::getDirectory(const EntryBase* base,
 }
 
 bool DOMFileSystemBase::readDirectory(
-    DirectoryReaderBase* reader,
+    PassRefPtr<DirectoryReaderBase> reader,
     const String& path,
     PassRefPtr<EntriesCallback> successCallback,
     PassRefPtr<ErrorCallback> errorCallback) {

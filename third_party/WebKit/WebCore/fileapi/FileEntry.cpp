@@ -41,7 +41,8 @@
 
 namespace WebCore {
 
-FileEntry::FileEntry(DOMFileSystemBase* fileSystem, const String& fullPath)
+FileEntry::FileEntry(PassRefPtr<DOMFileSystemBase> fileSystem,
+                     const String& fullPath)
     : Entry(fileSystem, fullPath) {}
 
 void FileEntry::createWriter(PassRefPtr<FileWriterCallback> successCallback,

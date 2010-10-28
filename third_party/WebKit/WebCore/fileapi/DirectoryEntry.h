@@ -49,8 +49,9 @@ class VoidCallback;
 
 class DirectoryEntry : public Entry {
  public:
-  static PassRefPtr<DirectoryEntry> create(DOMFileSystemBase* fileSystem,
-                                           const String& fullPath) {
+  static PassRefPtr<DirectoryEntry> create(
+      PassRefPtr<DOMFileSystemBase> fileSystem,
+      const String& fullPath) {
     return adoptRef(new DirectoryEntry(fileSystem, fullPath));
   }
   virtual bool isDirectory() const { return true; }
@@ -68,7 +69,7 @@ class DirectoryEntry : public Entry {
                          PassRefPtr<ErrorCallback> = 0) const;
 
  private:
-  DirectoryEntry(DOMFileSystemBase*, const String& fullPath);
+  DirectoryEntry(PassRefPtr<DOMFileSystemBase>, const String& fullPath);
 };
 
 }  // namespace

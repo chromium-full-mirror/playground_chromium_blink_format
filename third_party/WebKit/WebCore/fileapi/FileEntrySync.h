@@ -44,8 +44,9 @@ class File;
 
 class FileEntrySync : public EntrySync {
  public:
-  static PassRefPtr<FileEntrySync> create(DOMFileSystemBase* fileSystem,
-                                          const String& fullPath) {
+  static PassRefPtr<FileEntrySync> create(
+      PassRefPtr<DOMFileSystemBase> fileSystem,
+      const String& fullPath) {
     return adoptRef(new FileEntrySync(fileSystem, fullPath));
   }
 
@@ -55,7 +56,7 @@ class FileEntrySync : public EntrySync {
 
  private:
   friend class EntrySync;
-  FileEntrySync(DOMFileSystemBase*, const String& fullPath);
+  FileEntrySync(PassRefPtr<DOMFileSystemBase>, const String& fullPath);
 };
 }
 

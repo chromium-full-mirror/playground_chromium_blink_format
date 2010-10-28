@@ -50,7 +50,7 @@ class VoidCallback;
 class Entry : public EntryBase {
  public:
   DOMFileSystem* filesystem() const {
-    return static_cast<DOMFileSystem*>(m_fileSystem);
+    return static_cast<DOMFileSystem*>(m_fileSystem.get());
   }
 
   void getMetadata(PassRefPtr<MetadataCallback> successCallback = 0,
@@ -71,7 +71,7 @@ class Entry : public EntryBase {
   String toURI(const String& mimeType = String());
 
  protected:
-  Entry(DOMFileSystemBase*, const String& fullPath);
+  Entry(PassRefPtr<DOMFileSystemBase>, const String& fullPath);
 };
 
 }  // namespace WebCore
