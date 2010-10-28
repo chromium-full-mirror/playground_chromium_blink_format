@@ -120,6 +120,14 @@ static WKPageRef createOtherPage(WKPageRef oldPage,
       0,  // setStatusText
       0,  // mouseDidMoveOverElement
       0,  // didNotHandleKeyEvent
+      0,  // toolbarsAreVisible
+      0,  // setToolbarsAreVisible
+      0,  // menuBarIsVisible
+      0,  // setMenuBarIsVisible
+      0,  // statusBarIsVisible
+      0,  // setStatusBarIsVisible
+      0,  // isResizable
+      0,  // setIsResizable
       getWindowFrameOtherPage,
       setWindowFrameOtherPage,
       0,  // runBeforeUnloadConfirmPanel
@@ -204,6 +212,14 @@ void TestController::initialize(int argc, const char* argv[]) {
       0,  // setStatusText
       0,  // mouseDidMoveOverElement
       0,  // didNotHandleKeyEvent
+      0,  // toolbarsAreVisible
+      0,  // setToolbarsAreVisible
+      0,  // menuBarIsVisible
+      0,  // setMenuBarIsVisible
+      0,  // statusBarIsVisible
+      0,  // setStatusBarIsVisible
+      0,  // isResizable
+      0,  // setIsResizable
       getWindowFrameMainPage,
       setWindowFrameMainPage,
       0,  // runBeforeUnloadConfirmPanel
