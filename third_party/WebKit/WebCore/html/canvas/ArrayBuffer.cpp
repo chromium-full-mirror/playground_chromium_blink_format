@@ -42,12 +42,15 @@ PassRefPtr<ArrayBuffer> ArrayBuffer::create(unsigned numElements,
 }
 
 PassRefPtr<ArrayBuffer> ArrayBuffer::create(ArrayBuffer* other) {
-  void* data = tryAllocate(other->byteLength(), 1);
+  return ArrayBuffer::create(other->data(), other->byteLength());
+}
+
+PassRefPtr<ArrayBuffer> ArrayBuffer::create(void* source, unsigned byteLength) {
+  void* data = tryAllocate(byteLength, 1);
   if (!data)
     return 0;
-  RefPtr<ArrayBuffer> buffer =
-      adoptRef(new ArrayBuffer(data, other->byteLength()));
-  memcpy(buffer->data(), other->data(), other->byteLength());
+  RefPtr<ArrayBuffer> buffer = adoptRef(new ArrayBuffer(data, byteLength));
+  memcpy(buffer->data(), source, byteLength);
   return buffer.release();
 }
 

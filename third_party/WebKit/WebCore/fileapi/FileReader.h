@@ -36,27 +36,22 @@
 #include "ActiveDOMObject.h"
 #include "EventTarget.h"
 #include "FileError.h"
-#include "KURL.h"
-#include "TextEncoding.h"
-#include "ThreadableLoaderClient.h"
-#include <wtf/PassRefPtr.h>
+#include "FileReaderLoader.h"
+#include "FileReaderLoaderClient.h"
+#include <wtf/Forward.h>
 #include <wtf/RefCounted.h>
-#include <wtf/RefPtr.h>
-#include <wtf/Vector.h>
-#include <wtf/text/StringBuilder.h>
 #include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
+class ArrayBuffer;
 class Blob;
 class ScriptExecutionContext;
-class TextResourceDecoder;
-class ThreadableLoader;
 
 class FileReader : public RefCounted<FileReader>,
                    public ActiveDOMObject,
                    public EventTarget,
-                   public ThreadableLoaderClient {
+                   public FileReaderLoaderClient {
  public:
   static PassRefPtr<FileReader> create(ScriptExecutionContext* context) {
     return adoptRef(new FileReader(context));
@@ -66,6 +61,7 @@ class FileReader : public RefCounted<FileReader>,
 
   enum ReadyState { EMPTY = 0, LOADING = 1, DONE = 2 };
 
+  void readAsArrayBuffer(Blob*);
   void readAsBinaryString(Blob*);
   void readAsText(Blob*, const String& encoding = "");
   void readAsDataURL(Blob*);
@@ -76,13 +72,9 @@ class FileReader : public RefCounted<FileReader>,
 
   ReadyState readyState() const;
   PassRefPtr<FileError> error() { return m_error; }
-  String result();
-
-  // Helper methods, also used by FileReaderSync.
-  static FileError::ErrorCode httpStatusCodeToErrorCode(int httpStatusCode);
-  static void convertToDataURL(const Vector<char>& rawData,
-                               const String& fileType,
-                               StringBuilder&);
+  FileReaderLoader::ReadType readType() const { return m_readType; }
+  PassRefPtr<ArrayBuffer> arrayBufferResult() const;
+  String stringResult();
 
   // ActiveDOMObject
   virtual bool canSuspend() const;
@@ -95,11 +87,11 @@ class FileReader : public RefCounted<FileReader>,
     return ActiveDOMObject::scriptExecutionContext();
   }
 
-  // ThreadableLoaderClient
-  virtual void didReceiveResponse(const ResourceResponse&);
-  virtual void didReceiveData(const char*, int);
-  virtual void didFinishLoading(unsigned long identifier);
-  virtual void didFail(const ResourceError&);
+  // FileReaderLoaderClient
+  virtual void didStartLoading();
+  virtual void didReceiveData();
+  virtual void didFinishLoading();
+  virtual void didFail(int errorCode);
 
   using RefCounted<FileReader>::ref;
   using RefCounted<FileReader>::deref;
@@ -112,7 +104,6 @@ class FileReader : public RefCounted<FileReader>,
   DEFINE_ATTRIBUTE_EVENT_LISTENER(loadend);
 
  private:
-  enum ReadType { ReadFileAsBinaryString, ReadFileAsText, ReadFileAsDataURL };
   enum InternalState { None, Starting, Opening, Reading, Aborting, Completed };
 
   FileReader(ScriptExecutionContext*);
@@ -126,39 +117,19 @@ class FileReader : public RefCounted<FileReader>,
   }
 
   void terminate();
-  void cleanup();
-  void readInternal(Blob*, ReadType);
-  void failed(int httpStatusCode);
+  void readInternal(Blob*, FileReaderLoader::ReadType);
   void fireErrorEvent(int httpStatusCode);
   void fireEvent(const AtomicString& type);
-  void convertToText();
-  void convertToDataURL();
 
   InternalState m_state;
   EventTargetData m_eventTargetData;
 
   RefPtr<Blob> m_blob;
-  KURL m_urlForReading;
-  ReadType m_readType;
-  TextEncoding m_encoding;
+  FileReaderLoader::ReadType m_readType;
+  String m_encoding;
 
-  StringBuilder m_builder;
-
-  // The raw data. We have to keep track of all the raw data for it to be
-  // converted to text or data URL data.
-  Vector<char> m_rawData;
-  bool m_isRawDataConverted;
-
-  // The decoder used to decode the text data.
-  RefPtr<TextResourceDecoder> m_decoder;
-
-  // Needed to create data URL.
-  String m_fileType;
-
-  RefPtr<ThreadableLoader> m_loader;
+  OwnPtr<FileReaderLoader> m_loader;
   RefPtr<FileError> m_error;
-  long long m_bytesLoaded;
-  long long m_totalBytes;
   double m_lastProgressNotificationTimeMS;
 };
 

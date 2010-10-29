@@ -34,13 +34,15 @@
 #if ENABLE(BLOB)
 
 #include "ExceptionCode.h"
-#include <wtf/PassRefPtr.h>
+#include <wtf/Forward.h>
 #include <wtf/RefCounted.h>
-#include <wtf/text/StringBuilder.h>
+#include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
+class ArrayBuffer;
 class Blob;
+class FileReaderLoader;
 class ScriptExecutionContext;
 
 class FileReaderSync : public RefCounted<FileReaderSync> {
@@ -51,6 +53,9 @@ class FileReaderSync : public RefCounted<FileReaderSync> {
 
   virtual ~FileReaderSync() {}
 
+  PassRefPtr<ArrayBuffer> readAsArrayBuffer(ScriptExecutionContext*,
+                                            Blob*,
+                                            ExceptionCode&);
   String readAsBinaryString(ScriptExecutionContext*, Blob*, ExceptionCode&);
   String readAsText(ScriptExecutionContext* scriptExecutionContext,
                     Blob* blob,
@@ -64,16 +69,12 @@ class FileReaderSync : public RefCounted<FileReaderSync> {
   String readAsDataURL(ScriptExecutionContext*, Blob*, ExceptionCode&);
 
  private:
-  enum ReadType { ReadAsBinaryString, ReadAsText, ReadAsDataURL };
+  FileReaderSync();
 
-  FileReaderSync() {}
-
-  void read(ScriptExecutionContext*, Blob*, ReadType, ExceptionCode&);
-  void convertToText(const char* data, int size, StringBuilder&);
-
-  StringBuilder m_builder;
-
-  String m_encoding;
+  void startLoading(ScriptExecutionContext*,
+                    FileReaderLoader&,
+                    Blob*,
+                    ExceptionCode&);
 };
 
 }  // namespace WebCore
