@@ -67,7 +67,7 @@
 #include <WebCore/AXObjectCache.h>
 #include <WebCore/ApplicationCacheStorage.h>
 #include <WebCore/BString.h>
-#include <WebCore/BackForwardList.h>
+#include <WebCore/BackForwardListImpl.h>
 #include <WebCore/BitmapInfo.h>
 #include <WebCore/Cache.h>
 #include <WebCore/Chrome.h>
@@ -3006,12 +3006,14 @@ HRESULT STDMETHODCALLTYPE WebView::focusedFrame(
 
   return webFrame->QueryInterface(IID_IWebFrame, (void**)frame);
 }
+
 HRESULT STDMETHODCALLTYPE WebView::backForwardList(
     /* [out][retval] */ IWebBackForwardList** list) {
   if (!m_useBackForwardList)
     return E_FAIL;
 
-  *list = WebBackForwardList::createInstance(m_page->backForwardList());
+  *list = WebBackForwardList::createInstance(
+      static_cast<WebCore::BackForwardListImpl*>(m_page->backForwardList()));
 
   return S_OK;
 }
