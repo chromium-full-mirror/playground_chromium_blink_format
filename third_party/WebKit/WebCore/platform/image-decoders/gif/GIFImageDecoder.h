@@ -29,7 +29,7 @@
 #include "ImageDecoder.h"
 #include <wtf/OwnPtr.h>
 
-class GIFImageReader;
+struct GIFImageReader;
 
 namespace WebCore {
 
