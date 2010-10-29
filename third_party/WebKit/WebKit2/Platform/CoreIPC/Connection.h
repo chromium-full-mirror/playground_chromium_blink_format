@@ -194,6 +194,7 @@ class Connection : public ThreadSafeShared<Connection> {
   // Called on the listener thread.
   void dispatchConnectionDidClose();
   void dispatchMessages();
+  void dispatchSyncMessage(MessageID, ArgumentDecoder*);
 
   Client* m_client;
   bool m_isServer;
