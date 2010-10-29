@@ -28,6 +28,7 @@
 #include "WebEvent.h"
 
 #include "ArgumentCoders.h"
+#include "Arguments.h"
 
 namespace WebKit {
 
@@ -50,7 +51,8 @@ WebTouchEvent::WebTouchEvent(WebEvent::Type type,
 
 void WebTouchEvent::encode(CoreIPC::ArgumentEncoder* encoder) const {
   WebEvent::encode(encoder);
-  encoder->encode(m_touchPoints);
+
+  encoder->encode(CoreIPC::In(m_touchPoints));
 }
 
 bool WebTouchEvent::decode(CoreIPC::ArgumentDecoder* decoder,
@@ -58,10 +60,7 @@ bool WebTouchEvent::decode(CoreIPC::ArgumentDecoder* decoder,
   if (!WebEvent::decode(decoder, t))
     return false;
 
-  if (!decoder->decode(t.m_touchPoints))
-    return false;
-
-  return true;
+  return decoder->decode(CoreIPC::Out(t.m_touchPoints));
 }
 
 bool WebTouchEvent::isTouchEventType(Type type) {
