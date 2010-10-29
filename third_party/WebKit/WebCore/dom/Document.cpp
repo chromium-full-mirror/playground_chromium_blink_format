@@ -4862,4 +4862,10 @@ PassRefPtr<TouchList> Document::createTouchList(ExceptionCode&) const {
 }
 #endif
 
+bool Document::mayCauseFlashOfUnstyledContent() const {
+  if (didLayoutWithPendingStylesheets())
+    return true;
+  return !body() && (isHTMLDocument() || isXHTMLDocument());
+}
+
 }  // namespace WebCore
