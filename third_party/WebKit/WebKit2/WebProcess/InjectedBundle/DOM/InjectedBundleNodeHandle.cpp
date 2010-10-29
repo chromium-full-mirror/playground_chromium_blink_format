@@ -103,6 +103,13 @@ void InjectedBundleNodeHandle::setHTMLInputElementValueForUser(
   static_cast<HTMLInputElement*>(m_node.get())->setValueForUser(value);
 }
 
+bool InjectedBundleNodeHandle::isHTMLInputElementAutofilled() const {
+  if (!m_node->hasTagName(inputTag))
+    return false;
+
+  return static_cast<HTMLInputElement*>(m_node.get())->isAutofilled();
+}
+
 void InjectedBundleNodeHandle::setHTMLInputElementAutofilled(bool filled) {
   if (!m_node->hasTagName(inputTag))
     return;
