@@ -352,14 +352,17 @@ class SVGListPropertyTearOff : public SVGProperty {
     // Spec: If newItem is already in a list, it is removed from its previous
     // list before it is inserted into this list.
     SVGAnimatedProperty* animatedPropertyOfItem = newItem->animatedProperty();
-    if (!animatedPropertyOfItem)
+    if (!animatedPropertyOfItem ||
+        !animatedPropertyOfItem->isAnimatedListTearOff())
       return;
 
     // 'newItem' is already living in another list. If it's not our list,
     // synchronize the other lists wrappers after the removal.
     bool livesInOtherList = animatedPropertyOfItem != m_animatedProperty;
     int removedIndex =
-        animatedPropertyOfItem->removeItemFromList(newItem, livesInOtherList);
+        static_cast<SVGAnimatedListPropertyTearOff<PropertyType>*>(
+            animatedPropertyOfItem)
+            ->removeItemFromList(newItem, livesInOtherList);
     ASSERT(removedIndex != -1);
 
     if (!indexToModify)
