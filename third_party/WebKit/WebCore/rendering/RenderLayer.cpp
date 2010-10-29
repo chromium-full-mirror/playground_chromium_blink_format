@@ -2574,7 +2574,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
   // It's ok not to draw, because later on, when all the stylesheets do load,
   // updateStyleSelector on the Document
   // will do a full repaint().
-  if (renderer()->document()->mayCauseFlashOfUnstyledContent() &&
+  if (renderer()->document()->didLayoutWithPendingStylesheets() &&
       !renderer()->isRenderView() && !renderer()->isRoot())
     return;
 

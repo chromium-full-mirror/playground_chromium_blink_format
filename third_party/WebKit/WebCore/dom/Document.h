@@ -1199,8 +1199,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   PassRefPtr<TouchList> createTouchList(ExceptionCode&) const;
 #endif
 
-  bool mayCauseFlashOfUnstyledContent() const;
-
  protected:
   Document(Frame*,
            const KURL& url,
