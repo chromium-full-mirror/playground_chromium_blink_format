@@ -389,6 +389,11 @@ void PluginProxy::setCookiesForURL(const String& urlString,
   m_pluginController->setCookiesForURL(urlString, cookieString);
 }
 
+void PluginProxy::getWindowScriptNPObject(uint64_t& windowScriptNPObjectID) {
+  // FIXME: Actually get the window script object here.
+  windowScriptNPObjectID = 0;
+}
+
 void PluginProxy::update(const IntRect& paintedRect) {
   if (paintedRect == m_frameRect)
     m_pluginBackingStoreContainsValidData = true;
