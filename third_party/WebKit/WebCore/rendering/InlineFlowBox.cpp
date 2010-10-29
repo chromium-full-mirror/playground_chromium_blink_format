@@ -822,6 +822,7 @@ bool InlineFlowBox::nodeAtPoint(const HitTestRequest& request,
 void InlineFlowBox::paint(PaintInfo& paintInfo, int tx, int ty) {
   IntRect overflowRect(visibleOverflowRect());
   overflowRect.inflate(renderer()->maximalOutlineSize(paintInfo.phase));
+  adjustForFlippedBlocksWritingMode(overflowRect);
   overflowRect.move(tx, ty);
 
   if (!paintInfo.rect.intersects(overflowRect))

@@ -3613,6 +3613,12 @@ void RenderBox::adjustForFlippedBlocksWritingMode(
         0);
 }
 
+int RenderBox::convertFromFlippedWritingMode(int logicalPosition) {
+  if (!style()->isFlippedBlocksWritingMode())
+    return logicalPosition;
+  return logicalHeight() - logicalPosition;
+}
+
 IntSize RenderBox::locationOffsetIncludingFlipping() {
   if (!parent() || !parent()->isBox())
     return locationOffset();

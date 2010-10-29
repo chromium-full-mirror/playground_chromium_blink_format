@@ -69,6 +69,23 @@ class RenderLineBoxList {
                HitTestAction) const;
 
  private:
+  bool anyLineIntersectsDirtyRect(RenderBoxModelObject*,
+                                  const PaintInfo&,
+                                  int x,
+                                  int y,
+                                  bool usePrintRect) const;
+  bool lineIntersectsDirtyRect(RenderBoxModelObject*,
+                               InlineFlowBox*,
+                               const PaintInfo&,
+                               int x,
+                               int y) const;
+  bool rangeIntersectsDirtyRect(RenderBoxModelObject*,
+                                int logicalTop,
+                                int logicalBottom,
+                                const PaintInfo&,
+                                int x,
+                                int y) const;
+
   // For block flows, each box represents the root inline box for a line in the
   // paragraph.
   // For inline flows, each box represents a portion of that inline.
