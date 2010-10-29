@@ -35,6 +35,7 @@
 
 namespace WebKit {
 
+class WebString;
 struct WebRect;
 class WebString;
 
@@ -48,6 +49,7 @@ class WebSpeechInputController {
   // text are returned via the listener interface.
   virtual bool startRecognition(int requestId,
                                 const WebRect& elementRect,
+                                const WebString& language,
                                 const WebString& grammar) {
     WEBKIT_ASSERT_NOT_REACHED();
     return false;

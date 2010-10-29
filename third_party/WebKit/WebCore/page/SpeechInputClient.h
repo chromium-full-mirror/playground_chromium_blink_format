@@ -54,6 +54,7 @@ class SpeechInputClient {
   // Starts speech recognition and audio recording.
   virtual bool startRecognition(int requestId,
                                 const IntRect& elementRect,
+                                const AtomicString& language,
                                 const String& grammar) = 0;
 
   // Stops audio recording and performs recognition with the audio recorded

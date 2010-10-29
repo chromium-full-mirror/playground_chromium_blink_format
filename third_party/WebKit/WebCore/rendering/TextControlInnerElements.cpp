@@ -457,6 +457,7 @@ void InputFieldSpeechButtonElement::defaultEventHandler(Event* event) {
       case Idle:
         if (speechInput()->startRecognition(
                 m_listenerId, input->renderer()->absoluteBoundingBoxRect(),
+                input->computeInheritedLanguage(),
                 input->getAttribute(webkitgrammarAttr)))
           setState(Recording);
         break;

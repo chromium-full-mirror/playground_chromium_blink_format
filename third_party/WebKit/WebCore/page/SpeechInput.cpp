@@ -92,9 +92,10 @@ void SpeechInput::setRecognitionResult(int listenerId,
 
 bool SpeechInput::startRecognition(int listenerId,
                                    const IntRect& elementRect,
+                                   const AtomicString& language,
                                    const String& grammar) {
   ASSERT(m_listeners.contains(listenerId));
-  return m_client->startRecognition(listenerId, elementRect, grammar);
+  return m_client->startRecognition(listenerId, elementRect, language, grammar);
 }
 
 void SpeechInput::stopRecording(int listenerId) {

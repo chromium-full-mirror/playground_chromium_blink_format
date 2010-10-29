@@ -32,14 +32,20 @@
 #include "SpeechInputClientImpl.h"
 
 #include "PlatformString.h"
+#include "SpeechInputListener.h"
 #include "WebSpeechInputController.h"
 #include "WebString.h"
 #include "WebViewClient.h"
-#include "page/SpeechInputListener.h"
+#include <wtf/PassOwnPtr.h>
 
 #if ENABLE(INPUT_SPEECH)
 
 namespace WebKit {
+
+PassOwnPtr<SpeechInputClientImpl> SpeechInputClientImpl::create(
+    WebViewClient* client) {
+  return adoptPtr(new SpeechInputClientImpl(client));
+}
 
 SpeechInputClientImpl::SpeechInputClientImpl(WebViewClient* web_view_client)
     : m_controller(
@@ -56,9 +62,11 @@ void SpeechInputClientImpl::setListener(
 bool SpeechInputClientImpl::startRecognition(
     int requestId,
     const WebCore::IntRect& elementRect,
-    const WTF::String& grammar) {
+    const AtomicString& language,
+    const String& grammar) {
   ASSERT(m_listener);
-  return m_controller->startRecognition(requestId, elementRect, grammar);
+  return m_controller->startRecognition(requestId, elementRect, language,
+                                        grammar);
 }
 
 void SpeechInputClientImpl::stopRecording(int requestId) {
