@@ -4497,19 +4497,17 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         asActivation(activationValue)->copyRegisters();
 
         if (JSValue argumentsValue =
-                callFrame->r(unmodifiedArgumentsRegister(arguments)).jsValue())
-          asArguments(argumentsValue)
-              ->setActivation(asActivation(activationValue));
+                callFrame->r(unmodifiedArgumentsRegister(arguments))
+                    .jsValue()) {
+          if (!codeBlock->isStrictMode())
+            asArguments(argumentsValue)
+                ->setActivation(asActivation(activationValue));
+        }
       } else if (JSValue argumentsValue =
                      callFrame->r(unmodifiedArgumentsRegister(arguments))
-                         .jsValue())
-        asArguments(argumentsValue)->copyRegisters();
-
-      if (JSValue argumentsValue =
-              callFrame->r(unmodifiedArgumentsRegister(arguments)).jsValue()) {
+                         .jsValue()) {
         if (!codeBlock->isStrictMode())
-          asArguments(argumentsValue)
-              ->setActivation(asActivation(activationValue));
+          asArguments(argumentsValue)->copyRegisters();
       }
 
       vPC += OPCODE_LENGTH(op_tear_off_activation);
