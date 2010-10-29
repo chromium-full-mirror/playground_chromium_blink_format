@@ -761,7 +761,8 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
     return;
 
 #if !LEGACY_RESOURCE_TRACKING_ENABLED
-  m_resourceAgent->didCommitLoad(loader);
+  if (m_resourceAgent)
+    m_resourceAgent->didCommitLoad(loader);
 #endif
 
   ASSERT(m_inspectedPage);
@@ -849,7 +850,8 @@ void InspectorController::frameDetachedFromParent(Frame* rootFrame) {
     if (ResourcesMap* resourceMap = m_frameResources.get(frame))
       removeAllResources(resourceMap);
 #else
-  m_resourceAgent->frameDetachedFromParent(rootFrame);
+  if (m_resourceAgent)
+    m_resourceAgent->frameDetachedFromParent(rootFrame);
 #endif
 }
 
@@ -943,7 +945,8 @@ void InspectorController::didLoadResourceFromMemoryCache(
   if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 #else
-  m_resourceAgent->didLoadResourceFromMemoryCache(loader, cachedResource);
+  if (m_resourceAgent)
+    m_resourceAgent->didLoadResourceFromMemoryCache(loader, cachedResource);
 #endif
 }
 
@@ -979,8 +982,9 @@ void InspectorController::identifierForInitialRequest(
       resource == m_mainResource)
     resource->updateScriptObject(m_frontend.get());
 #else
-  m_resourceAgent->identifierForInitialRequest(identifier, request.url(),
-                                               loader);
+  if (m_resourceAgent)
+    m_resourceAgent->identifierForInitialRequest(identifier, request.url(),
+                                                 loader);
 #endif
 }
 
@@ -1068,7 +1072,8 @@ void InspectorController::willSendRequest(
   if (resource != m_mainResource && m_frontend)
     resource->updateScriptObject(m_frontend.get());
 #else
-  m_resourceAgent->willSendRequest(identifier, request, redirectResponse);
+  if (m_resourceAgent)
+    m_resourceAgent->willSendRequest(identifier, request, redirectResponse);
 #endif
 }
 
@@ -1080,7 +1085,8 @@ void InspectorController::markResourceAsCached(unsigned long identifier) {
   if (RefPtr<InspectorResource> resource = getTrackedResource(identifier))
     resource->markAsCached();
 #else
-  m_resourceAgent->markResourceAsCached(identifier);
+  if (m_resourceAgent)
+    m_resourceAgent->markResourceAsCached(identifier);
 #endif
 }
 
@@ -1099,7 +1105,8 @@ void InspectorController::didReceiveResponse(unsigned long identifier,
   }
   UNUSED_PARAM(loader);
 #else
-  m_resourceAgent->didReceiveResponse(identifier, loader, response);
+  if (m_resourceAgent)
+    m_resourceAgent->didReceiveResponse(identifier, loader, response);
 #endif
 
   if (response.httpStatusCode() >= 400) {
@@ -1127,7 +1134,8 @@ void InspectorController::didReceiveContentLength(unsigned long identifier,
   if (resource != m_mainResource && m_frontend)
     resource->updateScriptObject(m_frontend.get());
 #else
-  m_resourceAgent->didReceiveContentLength(identifier, lengthReceived);
+  if (m_resourceAgent)
+    m_resourceAgent->didReceiveContentLength(identifier, lengthReceived);
 #endif
 }
 
@@ -1151,7 +1159,8 @@ void InspectorController::didFinishLoading(unsigned long identifier,
   if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 #else
-  m_resourceAgent->didFinishLoading(identifier, finishTime);
+  if (m_resourceAgent)
+    m_resourceAgent->didFinishLoading(identifier, finishTime);
 #endif
 }
 
@@ -1182,7 +1191,8 @@ void InspectorController::didFailLoading(unsigned long identifier,
   if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 #else
-  m_resourceAgent->didFailLoading(identifier, error);
+  if (m_resourceAgent)
+    m_resourceAgent->didFailLoading(identifier, error);
 #endif
 }
 
@@ -1213,8 +1223,9 @@ void InspectorController::resourceRetrievedByXMLHttpRequest(
   if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 #else
-  m_resourceAgent->setOverrideContent(identifier, sourceString,
-                                      InspectorResource::XHR);
+  if (m_resourceAgent)
+    m_resourceAgent->setOverrideContent(identifier, sourceString,
+                                        InspectorResource::XHR);
 #endif
 }
 
@@ -1236,8 +1247,9 @@ void InspectorController::scriptImported(unsigned long identifier,
   if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 #else
-  m_resourceAgent->setOverrideContent(identifier, sourceString,
-                                      InspectorResource::Script);
+  if (m_resourceAgent)
+    m_resourceAgent->setOverrideContent(identifier, sourceString,
+                                        InspectorResource::Script);
 #endif
 }
 
@@ -1638,7 +1650,8 @@ void InspectorController::didCreateWebSocket(unsigned long identifier,
   if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 #else
-  m_resourceAgent->didCreateWebSocket(identifier, requestURL);
+  if (m_resourceAgent)
+    m_resourceAgent->didCreateWebSocket(identifier, requestURL);
   UNUSED_PARAM(documentURL);
 #endif
 }
@@ -1655,7 +1668,8 @@ void InspectorController::willSendWebSocketHandshakeRequest(
   if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 #else
-  m_resourceAgent->willSendWebSocketHandshakeRequest(identifier, request);
+  if (m_resourceAgent)
+    m_resourceAgent->willSendWebSocketHandshakeRequest(identifier, request);
 #endif
 }
 
@@ -1676,7 +1690,8 @@ void InspectorController::didReceiveWebSocketHandshakeResponse(
   if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 #else
-  m_resourceAgent->didReceiveWebSocketHandshakeResponse(identifier, response);
+  if (m_resourceAgent)
+    m_resourceAgent->didReceiveWebSocketHandshakeResponse(identifier, response);
 #endif
 }
 
@@ -1690,7 +1705,8 @@ void InspectorController::didCloseWebSocket(unsigned long identifier) {
   if (m_frontend)
     resource->updateScriptObject(m_frontend.get());
 #else
-  m_resourceAgent->didCloseWebSocket(identifier);
+  if (m_resourceAgent)
+    m_resourceAgent->didCloseWebSocket(identifier);
 #endif
 }
 #endif  // ENABLE(WEB_SOCKETS)
