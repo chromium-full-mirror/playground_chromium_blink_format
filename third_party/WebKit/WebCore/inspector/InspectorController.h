@@ -111,7 +111,6 @@ class InspectorController : public Noncopyable {
   typedef HashMap<int, RefPtr<InspectorDOMStorageResource>>
       DOMStorageResourcesMap;
 
-  static const char* const LastActivePanel;
   static const char* const ConsolePanel;
   static const char* const ElementsPanel;
   static const char* const ProfilesPanel;
@@ -360,7 +359,6 @@ class InspectorController : public Noncopyable {
   void setSearchingForNode(bool enabled, bool* newState);
 
   void setMonitoringXHREnabled(bool enabled, bool* newState);
-  void storeLastActivePanel(const String& panelName);
   InspectorDOMAgent* domAgent() { return m_domAgent.get(); }
   void releaseFrontendLifetimeAgents();
 

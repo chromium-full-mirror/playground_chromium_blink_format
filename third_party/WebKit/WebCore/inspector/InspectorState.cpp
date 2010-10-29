@@ -50,8 +50,6 @@ InspectorState::InspectorState(InspectorClient* client) : m_client(client) {
                   "profilerEnabled");
   registerBoolean(debuggerAlwaysEnabled, false, (const char*)0,
                   "debuggerEnabled");
-  registerString(lastActivePanel, InspectorController::LastActivePanel,
-                 (const char*)0, "lastActivePanel");
   registerBoolean(inspectorStartsAttached, true, (const char*)0,
                   "InspectorStartsAttached");
   registerLong(inspectorAttachedHeight,
