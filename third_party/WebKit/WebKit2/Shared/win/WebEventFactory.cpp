@@ -29,6 +29,8 @@
 #include <windowsx.h>
 #include <wtf/ASCIICType.h>
 
+using namespace WebCore;
+
 namespace WebKit {
 
 static const unsigned short HIGH_BIT_MASK_SHORT = 0x8000;
@@ -66,19 +68,17 @@ static int verticalScrollLines() {
 
 static inline int clickCount(WebEvent::Type type,
                              WebMouseEvent::Button button,
-                             int positionX,
-                             int positionY,
+                             const POINT& position,
                              double timeStampSeconds) {
   static int gLastClickCount;
   static double gLastClickTime;
-  static int lastClickPositionX;
-  static int lastClickPositionY;
+  static POINT lastClickPosition;
   static WebMouseEvent::Button lastClickButton = WebMouseEvent::LeftButton;
 
   bool cancelPreviousClick =
-      (abs(lastClickPositionX - positionX) >
+      (abs(lastClickPosition.x - position.x) >
        (::GetSystemMetrics(SM_CXDOUBLECLK) / 2)) ||
-      (abs(lastClickPositionY - positionY) >
+      (abs(lastClickPosition.y - position.y) >
        (::GetSystemMetrics(SM_CYDOUBLECLK) / 2)) ||
       ((timeStampSeconds - gLastClickTime) * 1000.0 > ::GetDoubleClickTime());
 
@@ -87,16 +87,15 @@ static inline int clickCount(WebEvent::Type type,
       ++gLastClickCount;
     else {
       gLastClickCount = 1;
-      lastClickPositionX = positionX;
-      lastClickPositionY = positionY;
+      lastClickPosition = position;
     }
     gLastClickTime = timeStampSeconds;
     lastClickButton = button;
   } else if (type == WebEvent::MouseMove) {
     if (cancelPreviousClick) {
       gLastClickCount = 0;
-      lastClickPositionX = 0;
-      lastClickPositionY = 0;
+      lastClickPosition.x = 0;
+      lastClickPosition.y = 0;
       gLastClickTime = 0;
     }
   }
@@ -384,21 +383,15 @@ WebMouseEvent WebEventFactory::createWebMouseEvent(HWND hWnd,
   POINT globalPosition = position;
   ::ClientToScreen(hWnd, &globalPosition);
 
-  int positionX = position.x;
-  int positionY = position.y;
-  int globalPositionX = globalPosition.x;
-  int globalPositionY = globalPosition.y;
   double timestamp = ::GetTickCount() * 0.001;  // ::GetTickCount returns
                                                 // milliseconds (Chrome uses
                                                 // GetMessageTime() / 1000.0)
 
-  int clickCount =
-      WebKit::clickCount(type, button, positionX, positionY, timestamp);
+  int clickCount = WebKit::clickCount(type, button, position, timestamp);
   WebEvent::Modifiers modifiers = modifiersForEvent(wParam);
 
-  return WebMouseEvent(type, button, positionX, positionY, globalPositionX,
-                       globalPositionY, 0, 0, 0, clickCount, modifiers,
-                       timestamp);
+  return WebMouseEvent(type, button, position, globalPosition, 0, 0, 0,
+                       clickCount, modifiers, timestamp);
 }
 
 WebWheelEvent WebEventFactory::createWebWheelEvent(HWND hWnd,
@@ -411,11 +404,6 @@ WebWheelEvent WebEventFactory::createWebWheelEvent(HWND hWnd,
   POINT globalPosition = point(lParam);
   POINT position = globalPosition;
   ::ScreenToClient(hWnd, &position);
-
-  int positionX = position.x;
-  int positionY = position.y;
-  int globalPositionX = globalPosition.x;
-  int globalPositionY = globalPosition.y;
 
   WebWheelEvent::Granularity granularity =
       WebWheelEvent::ScrollByPixelWheelEvent;
@@ -459,9 +447,9 @@ WebWheelEvent WebEventFactory::createWebWheelEvent(HWND hWnd,
     }
   }
 
-  return WebWheelEvent(WebEvent::Wheel, positionX, positionY, globalPositionX,
-                       globalPositionY, deltaX, deltaY, wheelTicksX,
-                       wheelTicksY, granularity, modifiers, timestamp);
+  return WebWheelEvent(
+      WebEvent::Wheel, position, globalPosition, FloatSize(deltaX, deltaY),
+      FloatSize(wheelTicksX, wheelTicksY), granularity, modifiers, timestamp);
 }
 
 WebKeyboardEvent WebEventFactory::createWebKeyboardEvent(HWND hwnd,

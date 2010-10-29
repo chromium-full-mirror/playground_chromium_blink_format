@@ -97,34 +97,23 @@ static inline WebEvent::Modifiers modifiersForEvent(
 WebMouseEvent WebEventFactory::createWebMouseEvent(
     QGraphicsSceneMouseEvent* event,
     int eventClickCount) {
-  IntPoint position(event->pos().toPoint());
-  IntPoint globalPosition(event->screenPos());
   FloatPoint delta(event->pos().x() - event->lastPos().x(),
                    event->pos().y() - event->lastPos().y());
 
   WebEvent::Type type = webEventTypeForEvent(event);
   WebMouseEvent::Button button = mouseButtonForEvent(event);
-  int positionX = position.x();
-  int positionY = position.y();
-  int globalPositionX = globalPosition.x();
-  int globalPositionY = globalPosition.y();
   float deltaX = delta.x();
   float deltaY = delta.y();
   int clickCount = eventClickCount;
   WebEvent::Modifiers modifiers = modifiersForEvent(event->modifiers());
   double timestamp = WTF::currentTime();
 
-  return WebMouseEvent(type, button, positionX, positionY, globalPositionX,
-                       globalPositionY, deltaX, deltaY, 0.0f, clickCount,
-                       modifiers, timestamp);
+  return WebMouseEvent(type, button, event->pos().toPoint(), event->screenPos(),
+                       deltaX, deltaY, 0.0f, clickCount, modifiers, timestamp);
 }
 
 WebWheelEvent WebEventFactory::createWebWheelEvent(
     QGraphicsSceneWheelEvent* e) {
-  int x = e->pos().x();
-  int y = e->pos().y();
-  int globalX = e->screenPos().x();
-  int globalY = e->screenPos().y();
   float deltaX = 0;
   float deltaY = 0;
   float wheelTicksX = 0;
@@ -157,9 +146,10 @@ WebWheelEvent WebEventFactory::createWebWheelEvent(
       (fullTick) ? QApplication::wheelScrollLines() * cDefaultQtScrollStep : 1;
 #endif
 
-  return WebWheelEvent(WebEvent::Wheel, x, y, globalX, globalY, deltaX, deltaY,
-                       wheelTicksX, wheelTicksY, granularity, modifiers,
-                       timestamp);
+  return WebWheelEvent(WebEvent::Wheel, e->pos().toPoint(), e->screenPos(),
+                       FloatSize(deltaX, deltaY),
+                       FloatSize(wheelTicksX, wheelTicksY), granularity,
+                       modifiers, timestamp);
 }
 
 WebKeyboardEvent WebEventFactory::createWebKeyboardEvent(QKeyEvent* event) {
@@ -215,10 +205,9 @@ WebTouchEvent WebEventFactory::createWebTouchEvent(QTouchEvent* event) {
         break;
     }
 
-    m_touchPoints.append(WebPlatformTouchPoint(
-        id, state, points.at(i).screenPos().toPoint().x(),
-        points.at(i).screenPos().toPoint().y(),
-        points.at(i).pos().toPoint().x(), points.at(i).pos().toPoint().y()));
+    m_touchPoints.append(
+        WebPlatformTouchPoint(id, state, points.at(i).screenPos().toPoint(),
+                              points.at(i).pos().toPoint()));
   }
 
   bool m_ctrlKey = (event->modifiers() & Qt::ControlModifier);

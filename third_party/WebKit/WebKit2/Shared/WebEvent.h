@@ -30,6 +30,8 @@
 // trivial classes so that
 // we can use them as the event type.
 
+#include <WebCore/FloatSize.h>
+#include <WebCore/IntPoint.h>
 #include <wtf/text/WTFString.h>
 
 namespace CoreIPC {
@@ -103,10 +105,8 @@ class WebMouseEvent : public WebEvent {
 
   WebMouseEvent(Type,
                 Button,
-                int x,
-                int y,
-                int globalX,
-                int globalY,
+                const WebCore::IntPoint& position,
+                const WebCore::IntPoint& globalPosition,
                 float deltaX,
                 float deltaY,
                 float deltaZ,
@@ -115,10 +115,8 @@ class WebMouseEvent : public WebEvent {
                 double timestamp);
 
   Button button() const { return m_button; }
-  int positionX() const { return m_positionX; }
-  int positionY() const { return m_positionY; }
-  int globalPositionX() const { return m_globalPositionX; }
-  int globalPositionY() const { return m_globalPositionY; }
+  const WebCore::IntPoint& position() const { return m_position; }
+  const WebCore::IntPoint& globalPosition() const { return m_globalPosition; }
   float deltaX() const { return m_deltaX; }
   float deltaY() const { return m_deltaY; }
   float deltaZ() const { return m_deltaZ; }
@@ -131,10 +129,8 @@ class WebMouseEvent : public WebEvent {
   static bool isMouseEventType(Type);
 
   Button m_button;
-  int m_positionX;
-  int m_positionY;
-  int m_globalPositionX;
-  int m_globalPositionY;
+  WebCore::IntPoint m_position;
+  WebCore::IntPoint m_globalPosition;
   float m_deltaX;
   float m_deltaY;
   float m_deltaZ;
@@ -149,26 +145,18 @@ class WebWheelEvent : public WebEvent {
   WebWheelEvent() {}
 
   WebWheelEvent(Type,
-                int x,
-                int y,
-                int globalX,
-                int globalY,
-                float deltaX,
-                float deltaY,
-                float wheelTicksX,
-                float wheelTicksY,
+                const WebCore::IntPoint& position,
+                const WebCore::IntPoint& globalPosition,
+                const WebCore::FloatSize& delta,
+                const WebCore::FloatSize& wheelTicks,
                 Granularity,
                 Modifiers,
                 double timestamp);
 
-  int positionX() const { return m_positionX; }
-  int positionY() const { return m_positionY; }
-  int globalPositionX() const { return m_globalPositionX; }
-  int globalPositionY() const { return m_globalPositionY; }
-  float deltaX() const { return m_deltaX; }
-  float deltaY() const { return m_deltaY; }
-  float wheelTicksX() const { return m_wheelTicksX; }
-  float wheelTicksY() const { return m_wheelTicksY; }
+  const WebCore::IntPoint position() const { return m_position; }
+  const WebCore::IntPoint globalPosition() const { return m_globalPosition; }
+  const WebCore::FloatSize delta() const { return m_delta; }
+  const WebCore::FloatSize wheelTicks() const { return m_wheelTicks; }
   Granularity granularity() const { return (Granularity)m_granularity; }
 
   void encode(CoreIPC::ArgumentEncoder*) const;
@@ -177,14 +165,10 @@ class WebWheelEvent : public WebEvent {
  private:
   static bool isWheelEventType(Type);
 
-  int m_positionX;
-  int m_positionY;
-  int m_globalPositionX;
-  int m_globalPositionY;
-  float m_deltaX;
-  float m_deltaY;
-  float m_wheelTicksX;
-  float m_wheelTicksY;
+  WebCore::IntPoint m_position;
+  WebCore::IntPoint m_globalPosition;
+  WebCore::FloatSize m_delta;
+  WebCore::FloatSize m_wheelTicks;
   unsigned m_granularity;  // Granularity
 };
 
@@ -250,18 +234,14 @@ class WebPlatformTouchPoint {
 
   WebPlatformTouchPoint(unsigned id,
                         TouchPointState,
-                        int screenPosX,
-                        int screenPosY,
-                        int posX,
-                        int posY);
+                        const WebCore::IntPoint& screenPosition,
+                        const WebCore::IntPoint& position);
 
   unsigned id() const { return m_id; }
   TouchPointState state() const { return m_state; }
 
-  int screenPosX() const { return m_screenPosX; }
-  int screenPosY() const { return m_screenPosY; }
-  int32_t posX() const { return m_posX; }
-  int32_t posY() const { return m_posY; }
+  const WebCore::IntPoint& screenPosition() const { return m_screenPosition; }
+  const WebCore::IntPoint& position() const { return m_position; }
 
   void setState(TouchPointState state) { m_state = state; }
 
@@ -271,8 +251,8 @@ class WebPlatformTouchPoint {
  private:
   unsigned m_id;
   TouchPointState m_state;
-  int m_screenPosX, m_screenPosY;
-  int32_t m_posX, m_posY;
+  WebCore::IntPoint m_screenPosition;
+  WebCore::IntPoint m_position;
 };
 
 // FIXME: Move this class to its own header file.

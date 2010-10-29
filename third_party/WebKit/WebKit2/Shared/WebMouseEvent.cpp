@@ -28,14 +28,14 @@
 #include "ArgumentDecoder.h"
 #include "ArgumentEncoder.h"
 
+using namespace WebCore;
+
 namespace WebKit {
 
 WebMouseEvent::WebMouseEvent(Type type,
                              Button button,
-                             int x,
-                             int y,
-                             int globalX,
-                             int globalY,
+                             const IntPoint& position,
+                             const IntPoint& globalPosition,
                              float deltaX,
                              float deltaY,
                              float deltaZ,
@@ -44,10 +44,8 @@ WebMouseEvent::WebMouseEvent(Type type,
                              double timestamp)
     : WebEvent(type, modifiers, timestamp),
       m_button(button),
-      m_positionX(x),
-      m_positionY(y),
-      m_globalPositionX(globalX),
-      m_globalPositionY(globalY),
+      m_position(position),
+      m_globalPosition(globalPosition),
       m_deltaX(deltaX),
       m_deltaY(deltaY),
       m_deltaZ(deltaZ),
