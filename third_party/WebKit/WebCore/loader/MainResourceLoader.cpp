@@ -219,10 +219,8 @@ void MainResourceLoader::willSendRequest(
   if (!redirectResponse.isNull()) {
     // We checked application cache for initial URL, now we need to check it for
     // redirected one.
-    ASSERT(documentLoader()->applicationCacheHost()->status() ==
-           ApplicationCacheHost::UNCACHED);
     ASSERT(!m_substituteData.isValid());
-    documentLoader()->applicationCacheHost()->maybeLoadMainResource(
+    documentLoader()->applicationCacheHost()->maybeLoadMainResourceForRedirect(
         newRequest, m_substituteData);
   }
 #endif

@@ -94,6 +94,13 @@ void ApplicationCacheHost::maybeLoadMainResource(
   }
 }
 
+void ApplicationCacheHost::maybeLoadMainResourceForRedirect(
+    ResourceRequest& request,
+    SubstituteData& substituteData) {
+  ASSERT(status() == UNCACHED);
+  maybeLoadMainResource(request, substituteData);
+}
+
 bool ApplicationCacheHost::maybeLoadFallbackForMainResponse(
     const ResourceRequest& request,
     const ResourceResponse& r) {

@@ -131,6 +131,7 @@ class ApplicationCacheHost : public Noncopyable {
   void selectCacheWithManifest(const KURL& manifestURL);
 
   void maybeLoadMainResource(ResourceRequest&, SubstituteData&);
+  void maybeLoadMainResourceForRedirect(ResourceRequest&, SubstituteData&);
   bool maybeLoadFallbackForMainResponse(const ResourceRequest&,
                                         const ResourceResponse&);
   bool maybeLoadFallbackForMainError(const ResourceRequest&,
