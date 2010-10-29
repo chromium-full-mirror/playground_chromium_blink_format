@@ -154,8 +154,8 @@ class RenderBoxModelObject : public RenderObject {
                       int h,
                       const RenderStyle*,
                       ShadowStyle,
-                      bool begin = true,
-                      bool end = true);
+                      bool includeLogicalLeftEdge = true,
+                      bool includeLogicalRightEdge = true);
   void paintFillLayerExtended(const PaintInfo&,
                               const Color&,
                               const FillLayer*,
