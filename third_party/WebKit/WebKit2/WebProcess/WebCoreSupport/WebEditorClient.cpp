@@ -209,17 +209,14 @@ void WebEditorClient::registerCommandForUndo(PassRefPtr<EditCommand> command) {
   uint32_t editAction =
       static_cast<uint32_t>(webCommand->command()->editingAction());
 
-  WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::RegisterEditCommandForUndo(
-          webCommand->commandID(), editAction),
-      m_page->pageID());
+  m_page->send(Messages::WebPageProxy::RegisterEditCommandForUndo(
+      webCommand->commandID(), editAction));
 }
 
 void WebEditorClient::registerCommandForRedo(PassRefPtr<EditCommand>) {}
 
 void WebEditorClient::clearUndoRedoOperations() {
-  WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::ClearAllEditCommands(), m_page->pageID());
+  m_page->send(Messages::WebPageProxy::ClearAllEditCommands());
 }
 
 bool WebEditorClient::canUndo() const {

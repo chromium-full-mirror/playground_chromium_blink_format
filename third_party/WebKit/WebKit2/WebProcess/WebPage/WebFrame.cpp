@@ -75,9 +75,7 @@ static uint64_t generateListenerID() {
 PassRefPtr<WebFrame> WebFrame::createMainFrame(WebPage* page) {
   RefPtr<WebFrame> frame = create();
 
-  WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidCreateMainFrame(frame->frameID()),
-      page->pageID());
+  page->send(Messages::WebPageProxy::DidCreateMainFrame(frame->frameID()));
 
   frame->init(page, String(), 0);
 
@@ -90,9 +88,7 @@ PassRefPtr<WebFrame> WebFrame::createSubframe(
     HTMLFrameOwnerElement* ownerElement) {
   RefPtr<WebFrame> frame = create();
 
-  WebProcess::shared().connection()->send(
-      Messages::WebPageProxy::DidCreateSubFrame(frame->frameID()),
-      page->pageID());
+  page->send(Messages::WebPageProxy::DidCreateSubFrame(frame->frameID()));
 
   frame->init(page, frameName, ownerElement);
 
