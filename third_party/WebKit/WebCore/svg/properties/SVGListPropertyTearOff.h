@@ -342,11 +342,9 @@ class SVGListPropertyTearOff : public SVGProperty {
       item->setValue(m_values->at(i));
     }
 
+    ASSERT(!m_valuesIsCopy);
     ASSERT(m_animatedProperty);
-    SVGElement* contextElement = m_animatedProperty->contextElement();
-    ASSERT(contextElement);
-    contextElement->invalidateSVGAttributes();
-    contextElement->svgAttributeChanged(m_animatedProperty->attributeName());
+    m_animatedProperty->commitChange();
   }
 
   void removeItemFromListIfNeeded(ListItemTearOff* newItem,

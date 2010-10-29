@@ -120,11 +120,11 @@ class SVGMarkerElement : public SVGStyledElement,
                                                   orientAngle)
 
   // SVGExternalResourcesRequired
-  DECLARE_ANIMATED_PROPERTY(SVGMarkerElement,
-                            SVGNames::externalResourcesRequiredAttr,
-                            bool,
-                            ExternalResourcesRequired,
-                            externalResourcesRequired)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGMarkerElement,
+                                       SVGNames::externalResourcesRequiredAttr,
+                                       bool,
+                                       ExternalResourcesRequired,
+                                       externalResourcesRequired)
 
   // SVGFitToViewBox
   DECLARE_ANIMATED_PROPERTY_NEW(SVGMarkerElement,

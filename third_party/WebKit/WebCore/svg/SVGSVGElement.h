@@ -157,11 +157,11 @@ class SVGSVGElement : public SVGStyledLocatableElement,
                                 height)
 
   // SVGExternalResourcesRequired
-  DECLARE_ANIMATED_PROPERTY(SVGSVGElement,
-                            SVGNames::externalResourcesRequiredAttr,
-                            bool,
-                            ExternalResourcesRequired,
-                            externalResourcesRequired)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGSVGElement,
+                                       SVGNames::externalResourcesRequiredAttr,
+                                       bool,
+                                       ExternalResourcesRequired,
+                                       externalResourcesRequired)
 
   // SVGFitToViewBox
   DECLARE_ANIMATED_PROPERTY_NEW(SVGSVGElement,

@@ -111,11 +111,11 @@ class SVGPatternElement : public SVGStyledElement,
                             href)
 
   // SVGExternalResourcesRequired
-  DECLARE_ANIMATED_PROPERTY(SVGPatternElement,
-                            SVGNames::externalResourcesRequiredAttr,
-                            bool,
-                            ExternalResourcesRequired,
-                            externalResourcesRequired)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGPatternElement,
+                                       SVGNames::externalResourcesRequiredAttr,
+                                       bool,
+                                       ExternalResourcesRequired,
+                                       externalResourcesRequired)
 
   // SVGPatternElement
   DECLARE_ANIMATED_PROPERTY_NEW(SVGPatternElement,

@@ -66,15 +66,6 @@ class SVGPropertyTearOff : public SVGProperty {
     m_animatedProperty = animatedProperty;
   }
 
-  void commitChange() {
-    if (!m_animatedProperty || m_valueIsCopy)
-      return;
-    SVGElement* contextElement = m_animatedProperty->contextElement();
-    ASSERT(contextElement);
-    contextElement->invalidateSVGAttributes();
-    contextElement->svgAttributeChanged(m_animatedProperty->attributeName());
-  }
-
   SVGElement* contextElement() const {
     if (!m_animatedProperty || m_valueIsCopy)
       return 0;
@@ -94,6 +85,12 @@ class SVGPropertyTearOff : public SVGProperty {
     ASSERT(!m_valueIsCopy);
     m_value = new PropertyType(*m_value);
     m_valueIsCopy = true;
+  }
+
+  void commitChange() {
+    if (!m_animatedProperty || m_valueIsCopy)
+      return;
+    m_animatedProperty->commitChange();
   }
 
  private:

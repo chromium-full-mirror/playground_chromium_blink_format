@@ -23,6 +23,7 @@
 
 #if ENABLE(SVG)
 #include "RenderObject.h"
+#include "SVGAnimatedPropertyMacros.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledTransformableElement.h"
@@ -60,11 +61,11 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
                             clipPathUnits)
 
   // SVGExternalResourcesRequired
-  DECLARE_ANIMATED_PROPERTY(SVGClipPathElement,
-                            SVGNames::externalResourcesRequiredAttr,
-                            bool,
-                            ExternalResourcesRequired,
-                            externalResourcesRequired)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGClipPathElement,
+                                       SVGNames::externalResourcesRequiredAttr,
+                                       bool,
+                                       ExternalResourcesRequired,
+                                       externalResourcesRequired)
 };
 }
 

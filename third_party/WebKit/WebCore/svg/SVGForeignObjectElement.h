@@ -82,11 +82,11 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
                             href)
 
   // SVGExternalResourcesRequired
-  DECLARE_ANIMATED_PROPERTY(SVGForeignObjectElement,
-                            SVGNames::externalResourcesRequiredAttr,
-                            bool,
-                            ExternalResourcesRequired,
-                            externalResourcesRequired)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGForeignObjectElement,
+                                       SVGNames::externalResourcesRequiredAttr,
+                                       bool,
+                                       ExternalResourcesRequired,
+                                       externalResourcesRequired)
 };
 
 }  // namespace WebCore

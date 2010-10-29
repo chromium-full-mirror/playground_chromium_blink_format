@@ -99,11 +99,11 @@ class SVGFEConvolveMatrixElement : public SVGFilterPrimitiveStandardAttributes {
                                               float,
                                               KernelUnitLengthY,
                                               kernelUnitLengthY)
-  DECLARE_ANIMATED_PROPERTY(SVGFEConvolveMatrixElement,
-                            SVGNames::preserveAlphaAttr,
-                            bool,
-                            PreserveAlpha,
-                            preserveAlpha)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEConvolveMatrixElement,
+                                       SVGNames::preserveAlphaAttr,
+                                       bool,
+                                       PreserveAlpha,
+                                       preserveAlpha)
 };
 
 }  // namespace WebCore

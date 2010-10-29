@@ -22,7 +22,6 @@
 
 #if ENABLE(SVG)
 #include "SVGAnimatedProperty.h"
-#include "SVGAnimatedPropertyDescription.h"
 #include "SVGListPropertyTearOff.h"
 
 namespace WebCore {
@@ -46,10 +45,6 @@ class SVGAnimatedListPropertyTearOff : public SVGAnimatedProperty {
           this, AnimValRole, m_property);
     return m_animVal.get();
   }
-
-  // FIXME: No animVal support.
-  void setBaseVal(const PropertyType& property) { m_property = property; }
-  void setAnimVal(const PropertyType&) {}
 
   virtual int removeItemFromList(SVGProperty* property,
                                  bool shouldSynchronizeWrappers) {
@@ -94,6 +89,9 @@ class SVGAnimatedListPropertyTearOff : public SVGAnimatedProperty {
 
  private:
   PropertyType& m_property;
+
+  RefPtr<SVGProperty> m_baseVal;
+  RefPtr<SVGProperty> m_animVal;
 };
 }
 

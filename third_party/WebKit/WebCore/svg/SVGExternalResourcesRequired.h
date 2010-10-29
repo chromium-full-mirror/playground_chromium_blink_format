@@ -22,12 +22,10 @@
 #define SVGExternalResourcesRequired_h
 
 #if ENABLE(SVG)
-#include "SVGElement.h"
-#include "SVGNames.h"
-
 namespace WebCore {
 
 class Attribute;
+class QualifiedName;
 
 // Notes on a SVG 1.1 spec discrepancy:
 // The SVG DOM defines the attribute externalResourcesRequired as being of type
@@ -46,8 +44,7 @@ class SVGExternalResourcesRequired {
   bool isKnownAttribute(const QualifiedName&);
 
  protected:
-  virtual void setExternalResourcesRequiredBaseValue(
-      DeprecatedSVGAnimatedPropertyTraits<bool>::PassType) = 0;
+  virtual void setExternalResourcesRequiredBaseValue(const bool&) = 0;
 };
 
 }  // namespace WebCore

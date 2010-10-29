@@ -23,6 +23,7 @@
 
 #if ENABLE(SVG)
 #include "SVGAnimatedPoints.h"
+#include "SVGAnimatedPropertyMacros.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledTransformableElement.h"
@@ -52,11 +53,11 @@ class SVGPolyElement : public SVGStyledTransformableElement,
   virtual bool supportsMarkers() const { return true; }
 
   // SVGExternalResourcesRequired
-  DECLARE_ANIMATED_PROPERTY(SVGPolyElement,
-                            SVGNames::externalResourcesRequiredAttr,
-                            bool,
-                            ExternalResourcesRequired,
-                            externalResourcesRequired)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGPolyElement,
+                                       SVGNames::externalResourcesRequiredAttr,
+                                       bool,
+                                       ExternalResourcesRequired,
+                                       externalResourcesRequired)
 
   mutable RefPtr<SVGPointList> m_points;
 };
