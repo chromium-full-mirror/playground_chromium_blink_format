@@ -292,8 +292,6 @@ class MediaPlayer : public Noncopyable {
 
   bool hasSingleSecurityOrigin() const;
 
-  float mediaTimeForTimeValue(float) const;
-
  private:
   MediaPlayer(MediaPlayerClient*);
 

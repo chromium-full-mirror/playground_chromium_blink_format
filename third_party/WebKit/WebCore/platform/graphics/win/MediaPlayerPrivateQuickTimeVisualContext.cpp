@@ -1121,17 +1121,6 @@ void MediaPlayerPrivateQuickTimeVisualContext::setPreload(
     resumeLoad();
 }
 
-float MediaPlayerPrivateQuickTimeVisualContext::mediaTimeForTimeValue(
-    float timeValue) const {
-  long timeScale;
-  if (m_readyState < MediaPlayer::HaveMetadata ||
-      !(timeScale = m_movie->timeScale()))
-    return timeValue;
-
-  long mediaTimeValue = static_cast<long>(timeValue * timeScale);
-  return static_cast<float>(mediaTimeValue) / timeScale;
-}
-
 MediaPlayerPrivateQuickTimeVisualContext::MediaRenderingMode
 MediaPlayerPrivateQuickTimeVisualContext::currentRenderingMode() const {
   if (!m_movie)
