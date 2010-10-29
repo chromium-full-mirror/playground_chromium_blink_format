@@ -30,6 +30,7 @@
 #include "Document.h"
 #include "Element.h"
 #include "HTMLNames.h"
+#include "Position.h"
 #include "RenderBlock.h"
 #include "RenderLayer.h"
 #include "RenderObject.h"
@@ -856,7 +857,9 @@ VisiblePosition nextSentencePosition(const VisiblePosition& c) {
   return c.honorEditableBoundaryAtOrBefore(next);
 }
 
-VisiblePosition startOfParagraph(const VisiblePosition& c) {
+VisiblePosition startOfParagraph(
+    const VisiblePosition& c,
+    Position::EditingBoundaryCrossingRule boundaryCrossingRule) {
   Position p = c.deepEquivalent();
   Node* startNode = p.node();
 
@@ -873,7 +876,8 @@ VisiblePosition startOfParagraph(const VisiblePosition& c) {
 
   Node* n = startNode;
   while (n) {
-    if (n->isContentEditable() != startNode->isContentEditable())
+    if (boundaryCrossingRule == Position::CannotCrossEditingBoundary &&
+        n->isContentEditable() != startNode->isContentEditable())
       break;
     RenderObject* r = n->renderer();
     if (!r) {
@@ -889,7 +893,7 @@ VisiblePosition startOfParagraph(const VisiblePosition& c) {
     if (r->isBR() || isBlock(n))
       break;
 
-    if (r->isText()) {
+    if (r->isText() && r->caretMaxRenderedOffset() > 0) {
       if (style->preserveNewline()) {
         const UChar* chars = toRenderText(r)->characters();
         int i = toRenderText(r)->textLength();
@@ -915,7 +919,9 @@ VisiblePosition startOfParagraph(const VisiblePosition& c) {
   return VisiblePosition(node, offset, DOWNSTREAM);
 }
 
-VisiblePosition endOfParagraph(const VisiblePosition& c) {
+VisiblePosition endOfParagraph(
+    const VisiblePosition& c,
+    Position::EditingBoundaryCrossingRule boundaryCrossingRule) {
   if (c.isNull())
     return VisiblePosition();
 
@@ -933,7 +939,8 @@ VisiblePosition endOfParagraph(const VisiblePosition& c) {
 
   Node* n = startNode;
   while (n) {
-    if (n->isContentEditable() != startNode->isContentEditable())
+    if (boundaryCrossingRule == Position::CannotCrossEditingBoundary &&
+        n->isContentEditable() != startNode->isContentEditable())
       break;
     RenderObject* r = n->renderer();
     if (!r) {
@@ -951,7 +958,6 @@ VisiblePosition endOfParagraph(const VisiblePosition& c) {
 
     // FIXME: We avoid returning a position where the renderer can't accept the
     // caret.
-    // We should probably do this in other cases such as startOfParagraph.
     if (r->isText() && r->caretMaxRenderedOffset() > 0) {
       int length = toRenderText(r)->textLength();
       if (style->preserveNewline()) {
@@ -989,12 +995,16 @@ bool inSameParagraph(const VisiblePosition& a, const VisiblePosition& b) {
   return a.isNotNull() && startOfParagraph(a) == startOfParagraph(b);
 }
 
-bool isStartOfParagraph(const VisiblePosition& pos) {
-  return pos.isNotNull() && pos == startOfParagraph(pos);
+bool isStartOfParagraph(
+    const VisiblePosition& pos,
+    Position::EditingBoundaryCrossingRule boundaryCrossingRule) {
+  return pos.isNotNull() && pos == startOfParagraph(pos, boundaryCrossingRule);
 }
 
-bool isEndOfParagraph(const VisiblePosition& pos) {
-  return pos.isNotNull() && pos == endOfParagraph(pos);
+bool isEndOfParagraph(
+    const VisiblePosition& pos,
+    Position::EditingBoundaryCrossingRule boundaryCrossingRule) {
+  return pos.isNotNull() && pos == endOfParagraph(pos, boundaryCrossingRule);
 }
 
 VisiblePosition previousParagraphPosition(const VisiblePosition& p, int x) {

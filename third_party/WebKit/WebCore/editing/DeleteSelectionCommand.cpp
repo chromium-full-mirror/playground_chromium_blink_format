@@ -917,8 +917,10 @@ void DeleteSelectionCommand::doApply() {
 
   Position downstreamEnd = m_selectionToDelete.end().downstream();
   m_needPlaceholder =
-      isStartOfParagraph(m_selectionToDelete.visibleStart()) &&
-      isEndOfParagraph(m_selectionToDelete.visibleEnd()) &&
+      isStartOfParagraph(m_selectionToDelete.visibleStart(),
+                         Position::CanCrossEditingBoundary) &&
+      isEndOfParagraph(m_selectionToDelete.visibleEnd(),
+                       Position::CanCrossEditingBoundary) &&
       !lineBreakExistsAtVisiblePosition(m_selectionToDelete.visibleEnd());
   if (m_needPlaceholder) {
     // Don't need a placeholder when deleting a selection that starts just
