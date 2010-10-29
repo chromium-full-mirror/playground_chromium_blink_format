@@ -203,7 +203,7 @@ String PluginControllerProxy::proxiesForURL(const String& urlString) {
   if (!m_connection->connection()->sendSync(
           Messages::PluginProxy::CookiesForURL(urlString),
           Messages::PluginProxy::CookiesForURL::Reply(proxyString),
-          m_pluginInstanceID, 0))
+          m_pluginInstanceID))
     return String();
 
   return proxyString;
@@ -215,7 +215,7 @@ String PluginControllerProxy::cookiesForURL(const String& urlString) {
   if (!m_connection->connection()->sendSync(
           Messages::PluginProxy::CookiesForURL(urlString),
           Messages::PluginProxy::CookiesForURL::Reply(cookieString),
-          m_pluginInstanceID, 0))
+          m_pluginInstanceID))
     return String();
 
   return cookieString;

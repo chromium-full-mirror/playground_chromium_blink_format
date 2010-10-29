@@ -121,13 +121,13 @@ class Connection : public ThreadSafeShared<Connection> {
                 uint64_t destinationID,
                 const T& arguments,
                 const U& reply,
-                double timeout);
+                double timeout = NoTimeout);
 
   template <typename T>
   bool sendSync(const T& message,
                 const typename T::Reply& reply,
                 uint64_t destinationID,
-                double timeout);
+                double timeout = NoTimeout);
 
   template <typename E>
   PassOwnPtr<ArgumentDecoder> waitFor(E messageID,

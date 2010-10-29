@@ -67,7 +67,7 @@ FloatRect WebChromeClient::windowRect() {
   if (!WebProcess::shared().connection()->sendSync(
           Messages::WebPageProxy::GetWindowFrame(),
           Messages::WebPageProxy::GetWindowFrame::Reply(newWindowFrame),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout))
+          m_page->pageID()))
     return FloatRect();
 
   return newWindowFrame;
@@ -120,9 +120,8 @@ Page* WebChromeClient::createWindow(Frame*,
           Messages::WebPageProxy::CreateNewPage(windowFeatures, modifiers,
                                                 mouseButton),
           Messages::WebPageProxy::CreateNewPage::Reply(newPageID, parameters),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout)) {
+          m_page->pageID()))
     return 0;
-  }
 
   if (!newPageID)
     return 0;
@@ -156,7 +155,7 @@ bool WebChromeClient::toolbarsVisible() {
           Messages::WebPageProxy::GetToolbarsAreVisible(),
           Messages::WebPageProxy::GetToolbarsAreVisible::Reply(
               toolbarsAreVisible),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout))
+          m_page->pageID()))
     return true;
 
   return toolbarsAreVisible;
@@ -174,7 +173,7 @@ bool WebChromeClient::statusbarVisible() {
           Messages::WebPageProxy::GetStatusBarIsVisible(),
           Messages::WebPageProxy::GetStatusBarIsVisible::Reply(
               statusBarIsVisible),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout))
+          m_page->pageID()))
     return true;
 
   return statusBarIsVisible;
@@ -200,7 +199,7 @@ bool WebChromeClient::menubarVisible() {
   if (!WebProcess::shared().connection()->sendSync(
           Messages::WebPageProxy::GetMenuBarIsVisible(),
           Messages::WebPageProxy::GetMenuBarIsVisible::Reply(menuBarIsVisible),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout))
+          m_page->pageID()))
     return true;
 
   return menuBarIsVisible;
@@ -229,7 +228,7 @@ bool WebChromeClient::canRunBeforeUnloadConfirmPanel() {
   if (!WebProcess::shared().connection()->sendSync(
           Messages::WebPageProxy::CanRunBeforeUnloadConfirmPanel(),
           Messages::WebPageProxy::CanRunBeforeUnloadConfirmPanel::Reply(canRun),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout))
+          m_page->pageID()))
     return false;
 
   return canRun;
@@ -246,7 +245,7 @@ bool WebChromeClient::runBeforeUnloadConfirmPanel(const String& message,
               message, webFrame->frameID()),
           Messages::WebPageProxy::RunBeforeUnloadConfirmPanel::Reply(
               shouldClose),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout))
+          m_page->pageID()))
     return false;
 
   return shouldClose;
@@ -282,8 +281,7 @@ void WebChromeClient::runJavaScriptAlert(Frame* frame,
   WebProcess::shared().connection()->sendSync(
       Messages::WebPageProxy::RunJavaScriptAlert(webFrame->frameID(),
                                                  alertText),
-      Messages::WebPageProxy::RunJavaScriptAlert::Reply(), m_page->pageID(),
-      CoreIPC::Connection::NoTimeout);
+      Messages::WebPageProxy::RunJavaScriptAlert::Reply(), m_page->pageID());
 }
 
 bool WebChromeClient::runJavaScriptConfirm(Frame* frame,
@@ -300,7 +298,7 @@ bool WebChromeClient::runJavaScriptConfirm(Frame* frame,
           Messages::WebPageProxy::RunJavaScriptConfirm(webFrame->frameID(),
                                                        message),
           Messages::WebPageProxy::RunJavaScriptConfirm::Reply(result),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout))
+          m_page->pageID()))
     return false;
 
   return result;
@@ -321,7 +319,7 @@ bool WebChromeClient::runJavaScriptPrompt(Frame* frame,
           Messages::WebPageProxy::RunJavaScriptPrompt(webFrame->frameID(),
                                                       message, defaultValue),
           Messages::WebPageProxy::RunJavaScriptPrompt::Reply(result),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout))
+          m_page->pageID()))
     return false;
 
   return !result.isNull();

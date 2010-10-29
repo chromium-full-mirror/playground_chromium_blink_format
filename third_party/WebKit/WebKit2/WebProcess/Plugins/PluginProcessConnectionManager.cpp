@@ -60,8 +60,7 @@ PluginProcessConnectionManager::getPluginProcessConnection(
   CoreIPC::MachPort connectionMachPort;
   if (!WebProcess::shared().connection()->sendSync(
           WebProcessProxyMessage::GetPluginProcessConnection, 0,
-          CoreIPC::In(pluginPath), CoreIPC::Out(connectionMachPort),
-          CoreIPC::Connection::NoTimeout))
+          CoreIPC::In(pluginPath), CoreIPC::Out(connectionMachPort)))
     return 0;
 
   connectionIdentifier = connectionMachPort.port();

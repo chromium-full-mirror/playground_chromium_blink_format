@@ -80,8 +80,7 @@ void WebPlatformStrategies::populatePluginCache() {
   // FIXME: Should we do something in case of error here?
   WebProcess::shared().connection()->sendSync(
       WebProcessProxyMessage::GetPlugins, 0,
-      CoreIPC::In(m_shouldRefreshPlugins), CoreIPC::Out(plugins),
-      CoreIPC::Connection::NoTimeout);
+      CoreIPC::In(m_shouldRefreshPlugins), CoreIPC::Out(plugins));
   m_cachedPlugins.swap(plugins);
 
   m_shouldRefreshPlugins = false;

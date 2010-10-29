@@ -82,7 +82,7 @@ void InjectedBundle::postSynchronousMessage(const String& messageName,
   bool succeeded = WebProcess::shared().connection()->sendSync(
       WebContextMessage::PostSynchronousMessage, 0,
       CoreIPC::In(messageName, InjectedBundleUserMessageEncoder(messageBody)),
-      CoreIPC::Out(messageDecoder), CoreIPC::Connection::NoTimeout);
+      CoreIPC::Out(messageDecoder));
 
   if (!succeeded)
     return;

@@ -81,8 +81,7 @@ bool PluginProxy::initialize(PluginController* pluginController,
           Messages::WebProcessConnection::CreatePlugin(
               m_pluginInstanceID, parameters, pluginController->userAgent(),
               pluginController->isPrivateBrowsingEnabled()),
-          Messages::WebProcessConnection::CreatePlugin::Reply(result), 0,
-          CoreIPC::Connection::NoTimeout))
+          Messages::WebProcessConnection::CreatePlugin::Reply(result), 0))
     return false;
 
   if (!result)
@@ -99,8 +98,7 @@ void PluginProxy::destroy() {
 
   m_connection->connection()->sendSync(
       Messages::WebProcessConnection::DestroyPlugin(m_pluginInstanceID),
-      Messages::WebProcessConnection::DestroyPlugin::Reply(), 0,
-      CoreIPC::Connection::NoTimeout);
+      Messages::WebProcessConnection::DestroyPlugin::Reply(), 0);
 
   m_isStarted = false;
   m_connection->removePluginProxy(this);
@@ -115,7 +113,7 @@ void PluginProxy::paint(GraphicsContext* graphicsContext,
     m_connection->connection()->sendSync(
         Messages::PluginControllerProxy::PaintEntirePlugin(),
         Messages::PluginControllerProxy::PaintEntirePlugin::Reply(),
-        m_pluginInstanceID, CoreIPC::Connection::NoTimeout);
+        m_pluginInstanceID);
 
     // Blit the plug-in backing store into our own backing store.
     OwnPtr<WebCore::GraphicsContext> graphicsContext =
@@ -271,7 +269,7 @@ bool PluginProxy::handleMouseEvent(const WebMouseEvent& mouseEvent) {
   if (!m_connection->connection()->sendSync(
           Messages::PluginControllerProxy::HandleMouseEvent(mouseEvent),
           Messages::PluginControllerProxy::HandleMouseEvent::Reply(handled),
-          m_pluginInstanceID, CoreIPC::Connection::NoTimeout))
+          m_pluginInstanceID))
     return false;
 
   return handled;
@@ -282,7 +280,7 @@ bool PluginProxy::handleWheelEvent(const WebWheelEvent& wheelEvent) {
   if (!m_connection->connection()->sendSync(
           Messages::PluginControllerProxy::HandleWheelEvent(wheelEvent),
           Messages::PluginControllerProxy::HandleWheelEvent::Reply(handled),
-          m_pluginInstanceID, CoreIPC::Connection::NoTimeout))
+          m_pluginInstanceID))
     return false;
 
   return handled;
@@ -295,7 +293,7 @@ bool PluginProxy::handleMouseEnterEvent(const WebMouseEvent& mouseEnterEvent) {
               mouseEnterEvent),
           Messages::PluginControllerProxy::HandleMouseEnterEvent::Reply(
               handled),
-          m_pluginInstanceID, CoreIPC::Connection::NoTimeout))
+          m_pluginInstanceID))
     return false;
 
   return handled;
@@ -308,7 +306,7 @@ bool PluginProxy::handleMouseLeaveEvent(const WebMouseEvent& mouseLeaveEvent) {
               mouseLeaveEvent),
           Messages::PluginControllerProxy::HandleMouseLeaveEvent::Reply(
               handled),
-          m_pluginInstanceID, CoreIPC::Connection::NoTimeout))
+          m_pluginInstanceID))
     return false;
 
   return handled;
@@ -319,7 +317,7 @@ bool PluginProxy::handleKeyboardEvent(const WebKeyboardEvent& keyboardEvent) {
   if (!m_connection->connection()->sendSync(
           Messages::PluginControllerProxy::HandleKeyboardEvent(keyboardEvent),
           Messages::PluginControllerProxy::HandleKeyboardEvent::Reply(handled),
-          m_pluginInstanceID, CoreIPC::Connection::NoTimeout))
+          m_pluginInstanceID))
     return false;
 
   return handled;

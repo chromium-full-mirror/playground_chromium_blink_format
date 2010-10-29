@@ -126,9 +126,8 @@ HistoryItem* WebBackForwardListProxy::itemAtIndex(int itemIndex) {
   if (!WebProcess::shared().connection()->sendSync(
           Messages::WebPageProxy::BackForwardItemAtIndex(itemIndex),
           Messages::WebPageProxy::BackForwardItemAtIndex::Reply(itemID),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout)) {
+          m_page->pageID()))
     return 0;
-  }
 
   if (!itemID)
     return 0;
@@ -146,9 +145,8 @@ int WebBackForwardListProxy::backListCount() {
           Messages::WebPageProxy::BackForwardBackListCount(),
           Messages::WebPageProxy::BackForwardBackListCount::Reply(
               backListCount),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout)) {
+          m_page->pageID()))
     return 0;
-  }
 
   return backListCount;
 }
@@ -162,9 +160,8 @@ int WebBackForwardListProxy::forwardListCount() {
           Messages::WebPageProxy::BackForwardForwardListCount(),
           Messages::WebPageProxy::BackForwardForwardListCount::Reply(
               forwardListCount),
-          m_page->pageID(), CoreIPC::Connection::NoTimeout)) {
+          m_page->pageID()))
     return 0;
-  }
 
   return forwardListCount;
 }
