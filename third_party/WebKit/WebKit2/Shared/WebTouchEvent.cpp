@@ -27,6 +27,8 @@
 
 #include "WebEvent.h"
 
+#include "ArgumentCoders.h"
+
 namespace WebKit {
 
 WebTouchEvent::WebTouchEvent(WebEvent::Type type,

@@ -25,6 +25,9 @@
 
 #include "WebEvent.h"
 
+#include "ArgumentDecoder.h"
+#include "ArgumentEncoder.h"
+
 namespace WebKit {
 
 WebWheelEvent::WebWheelEvent(Type type,

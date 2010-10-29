@@ -25,6 +25,9 @@
 
 #include "WebEvent.h"
 
+#include "ArgumentDecoder.h"
+#include "ArgumentEncoder.h"
+
 namespace WebKit {
 
 WebMouseEvent::WebMouseEvent(Type type,

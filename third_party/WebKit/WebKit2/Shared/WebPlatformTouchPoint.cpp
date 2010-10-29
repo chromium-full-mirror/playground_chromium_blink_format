@@ -27,6 +27,9 @@
 
 #include "WebEvent.h"
 
+#include "ArgumentDecoder.h"
+#include "ArgumentEncoder.h"
+
 namespace WebKit {
 
 WebPlatformTouchPoint::WebPlatformTouchPoint(unsigned id,

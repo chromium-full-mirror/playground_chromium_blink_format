@@ -25,6 +25,8 @@
 
 #include "WebEvent.h"
 
+#include "WebCoreArgumentCoders.h"
+
 namespace WebKit {
 
 WebKeyboardEvent::WebKeyboardEvent(Type type,
