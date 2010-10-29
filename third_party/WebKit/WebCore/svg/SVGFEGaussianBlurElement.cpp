@@ -29,9 +29,6 @@
 
 namespace WebCore {
 
-char SVGStdDeviationXAttrIdentifier[] = "SVGStdDeviationXAttr";
-char SVGStdDeviationYAttrIdentifier[] = "SVGStdDeviationYAttr";
-
 inline SVGFEGaussianBlurElement::SVGFEGaussianBlurElement(
     const QualifiedName& tagName,
     Document* document)
@@ -41,6 +38,16 @@ PassRefPtr<SVGFEGaussianBlurElement> SVGFEGaussianBlurElement::create(
     const QualifiedName& tagName,
     Document* document) {
   return adoptRef(new SVGFEGaussianBlurElement(tagName, document));
+}
+
+const AtomicString& SVGFEGaussianBlurElement::stdDeviationXIdentifier() {
+  DEFINE_STATIC_LOCAL(AtomicString, s_identifier, ("SVGStdDeviationX"));
+  return s_identifier;
+}
+
+const AtomicString& SVGFEGaussianBlurElement::stdDeviationYIdentifier() {
+  DEFINE_STATIC_LOCAL(AtomicString, s_identifier, ("SVGStdDeviationY"));
+  return s_identifier;
 }
 
 void SVGFEGaussianBlurElement::setStdDeviation(float x, float y) {

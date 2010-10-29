@@ -87,16 +87,16 @@ class SVGPatternElement : public SVGStyledElement,
                                 SVGLength,
                                 Height,
                                 height)
-  DECLARE_ANIMATED_PROPERTY(SVGPatternElement,
-                            SVGNames::patternUnitsAttr,
-                            int,
-                            PatternUnits,
-                            patternUnits)
-  DECLARE_ANIMATED_PROPERTY(SVGPatternElement,
-                            SVGNames::patternContentUnitsAttr,
-                            int,
-                            PatternContentUnits,
-                            patternContentUnits)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGPatternElement,
+                                       SVGNames::patternUnitsAttr,
+                                       int,
+                                       PatternUnits,
+                                       patternUnits)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGPatternElement,
+                                       SVGNames::patternContentUnitsAttr,
+                                       int,
+                                       PatternContentUnits,
+                                       patternContentUnits)
   DECLARE_ANIMATED_PROPERTY(SVGPatternElement,
                             SVGNames::patternTransformAttr,
                             SVGTransformList*,

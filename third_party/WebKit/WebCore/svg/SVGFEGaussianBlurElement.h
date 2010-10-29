@@ -27,9 +27,6 @@
 
 namespace WebCore {
 
-extern char SVGStdDeviationXAttrIdentifier[];
-extern char SVGStdDeviationYAttrIdentifier[];
-
 class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
  public:
   static PassRefPtr<SVGFEGaussianBlurElement> create(const QualifiedName&,
@@ -45,6 +42,9 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 
+  static const AtomicString& stdDeviationXIdentifier();
+  static const AtomicString& stdDeviationYIdentifier();
+
   DECLARE_ANIMATED_PROPERTY(SVGFEGaussianBlurElement,
                             SVGNames::inAttr,
                             String,
@@ -52,13 +52,13 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
                             in1)
   DECLARE_ANIMATED_PROPERTY_MULTIPLE_WRAPPERS(SVGFEGaussianBlurElement,
                                               SVGNames::stdDeviationAttr,
-                                              SVGStdDeviationXAttrIdentifier,
+                                              stdDeviationXIdentifier(),
                                               float,
                                               StdDeviationX,
                                               stdDeviationX)
   DECLARE_ANIMATED_PROPERTY_MULTIPLE_WRAPPERS(SVGFEGaussianBlurElement,
                                               SVGNames::stdDeviationAttr,
-                                              SVGStdDeviationYAttrIdentifier,
+                                              stdDeviationYIdentifier(),
                                               float,
                                               StdDeviationY,
                                               stdDeviationY)

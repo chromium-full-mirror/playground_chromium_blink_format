@@ -28,9 +28,6 @@
 
 namespace WebCore {
 
-extern char SVGKernelUnitLengthXIdentifier[];
-extern char SVGKernelUnitLengthYIdentifier[];
-
 class FEDiffuseLighting;
 class SVGColor;
 
@@ -47,6 +44,9 @@ class SVGFEDiffuseLightingElement
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
+
+  static const AtomicString& kernelUnitLengthXIdentifier();
+  static const AtomicString& kernelUnitLengthYIdentifier();
 
   DECLARE_ANIMATED_PROPERTY(SVGFEDiffuseLightingElement,
                             SVGNames::inAttr,
@@ -65,13 +65,13 @@ class SVGFEDiffuseLightingElement
                             surfaceScale)
   DECLARE_ANIMATED_PROPERTY_MULTIPLE_WRAPPERS(SVGFEDiffuseLightingElement,
                                               SVGNames::kernelUnitLengthAttr,
-                                              SVGKernelUnitLengthXIdentifier,
+                                              kernelUnitLengthXIdentifier(),
                                               float,
                                               KernelUnitLengthX,
                                               kernelUnitLengthX)
   DECLARE_ANIMATED_PROPERTY_MULTIPLE_WRAPPERS(SVGFEDiffuseLightingElement,
                                               SVGNames::kernelUnitLengthAttr,
-                                              SVGKernelUnitLengthYIdentifier,
+                                              kernelUnitLengthYIdentifier(),
                                               float,
                                               KernelUnitLengthY,
                                               kernelUnitLengthY)

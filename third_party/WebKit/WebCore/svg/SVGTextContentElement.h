@@ -78,11 +78,11 @@ class SVGTextContentElement : public SVGStyledElement,
                                 SVGLength,
                                 TextLength,
                                 textLength)
-  DECLARE_ANIMATED_PROPERTY(SVGTextContentElement,
-                            SVGNames::lengthAdjustAttr,
-                            int,
-                            LengthAdjust,
-                            lengthAdjust)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGTextContentElement,
+                                       SVGNames::lengthAdjustAttr,
+                                       int,
+                                       LengthAdjust,
+                                       lengthAdjust)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGTextContentElement,

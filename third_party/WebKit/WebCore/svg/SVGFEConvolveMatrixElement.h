@@ -47,16 +47,16 @@ class SVGFEConvolveMatrixElement : public SVGFilterPrimitiveStandardAttributes {
                             String,
                             In1,
                             in1)
-  DECLARE_ANIMATED_PROPERTY(SVGFEConvolveMatrixElement,
-                            SVGNames::orderXAttr,
-                            long,
-                            OrderX,
-                            orderX)
-  DECLARE_ANIMATED_PROPERTY(SVGFEConvolveMatrixElement,
-                            SVGNames::orderYAttr,
-                            long,
-                            OrderY,
-                            orderY)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEConvolveMatrixElement,
+                                       SVGNames::orderXAttr,
+                                       long,
+                                       OrderX,
+                                       orderX)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEConvolveMatrixElement,
+                                       SVGNames::orderYAttr,
+                                       long,
+                                       OrderY,
+                                       orderY)
   DECLARE_ANIMATED_PROPERTY(SVGFEConvolveMatrixElement,
                             SVGNames::kernelMatrixAttr,
                             SVGNumberList*,
@@ -72,21 +72,21 @@ class SVGFEConvolveMatrixElement : public SVGFilterPrimitiveStandardAttributes {
                             float,
                             Bias,
                             bias)
-  DECLARE_ANIMATED_PROPERTY(SVGFEConvolveMatrixElement,
-                            SVGNames::targetXAttr,
-                            long,
-                            TargetX,
-                            targetX)
-  DECLARE_ANIMATED_PROPERTY(SVGFEConvolveMatrixElement,
-                            SVGNames::targetYAttr,
-                            long,
-                            TargetY,
-                            targetY)
-  DECLARE_ANIMATED_PROPERTY(SVGFEConvolveMatrixElement,
-                            SVGNames::operatorAttr,
-                            int,
-                            EdgeMode,
-                            edgeMode)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEConvolveMatrixElement,
+                                       SVGNames::targetXAttr,
+                                       long,
+                                       TargetX,
+                                       targetX)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEConvolveMatrixElement,
+                                       SVGNames::targetYAttr,
+                                       long,
+                                       TargetY,
+                                       targetY)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEConvolveMatrixElement,
+                                       SVGNames::operatorAttr,
+                                       int,
+                                       EdgeMode,
+                                       edgeMode)
   DECLARE_ANIMATED_PROPERTY_MULTIPLE_WRAPPERS(SVGFEConvolveMatrixElement,
                                               SVGNames::kernelUnitLengthAttr,
                                               SVGKernelUnitLengthXIdentifier,

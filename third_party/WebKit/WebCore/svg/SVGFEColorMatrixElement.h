@@ -46,11 +46,11 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
                             String,
                             In1,
                             in1)
-  DECLARE_ANIMATED_PROPERTY(SVGFEColorMatrixElement,
-                            SVGNames::typeAttr,
-                            int,
-                            Type,
-                            type)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEColorMatrixElement,
+                                       SVGNames::typeAttr,
+                                       int,
+                                       Type,
+                                       type)
   DECLARE_ANIMATED_PROPERTY(SVGFEColorMatrixElement,
                             SVGNames::valuesAttr,
                             SVGNumberList*,

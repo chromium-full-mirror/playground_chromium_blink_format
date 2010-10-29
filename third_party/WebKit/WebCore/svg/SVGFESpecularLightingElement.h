@@ -28,9 +28,6 @@
 
 namespace WebCore {
 
-extern char SVGKernelUnitLengthXIdentifier[];
-extern char SVGKernelUnitLengthYIdentifier[];
-
 class SVGFESpecularLightingElement
     : public SVGFilterPrimitiveStandardAttributes {
  public:
@@ -43,6 +40,9 @@ class SVGFESpecularLightingElement
   virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
+
+  static const AtomicString& kernelUnitLengthXIdentifier();
+  static const AtomicString& kernelUnitLengthYIdentifier();
 
   DECLARE_ANIMATED_PROPERTY(SVGFESpecularLightingElement,
                             SVGNames::inAttr,
@@ -66,13 +66,13 @@ class SVGFESpecularLightingElement
                             surfaceScale)
   DECLARE_ANIMATED_PROPERTY_MULTIPLE_WRAPPERS(SVGFESpecularLightingElement,
                                               SVGNames::kernelUnitLengthAttr,
-                                              SVGKernelUnitLengthXIdentifier,
+                                              kernelUnitLengthXIdentifier(),
                                               float,
                                               KernelUnitLengthX,
                                               kernelUnitLengthX)
   DECLARE_ANIMATED_PROPERTY_MULTIPLE_WRAPPERS(SVGFESpecularLightingElement,
                                               SVGNames::kernelUnitLengthAttr,
-                                              SVGKernelUnitLengthYIdentifier,
+                                              kernelUnitLengthYIdentifier(),
                                               float,
                                               KernelUnitLengthY,
                                               kernelUnitLengthY)

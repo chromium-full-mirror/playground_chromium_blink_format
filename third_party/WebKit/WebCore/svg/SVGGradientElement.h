@@ -52,16 +52,16 @@ class SVGGradientElement : public SVGStyledElement,
                                Node* afterChange = 0,
                                int childCountDelta = 0);
 
-  DECLARE_ANIMATED_PROPERTY(SVGGradientElement,
-                            SVGNames::spreadMethodAttr,
-                            int,
-                            SpreadMethod,
-                            spreadMethod)
-  DECLARE_ANIMATED_PROPERTY(SVGGradientElement,
-                            SVGNames::gradientUnitsAttr,
-                            int,
-                            GradientUnits,
-                            gradientUnits)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGGradientElement,
+                                       SVGNames::spreadMethodAttr,
+                                       int,
+                                       SpreadMethod,
+                                       spreadMethod)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGGradientElement,
+                                       SVGNames::gradientUnitsAttr,
+                                       int,
+                                       GradientUnits,
+                                       gradientUnits)
   DECLARE_ANIMATED_PROPERTY(SVGGradientElement,
                             SVGNames::gradientTransformAttr,
                             SVGTransformList*,

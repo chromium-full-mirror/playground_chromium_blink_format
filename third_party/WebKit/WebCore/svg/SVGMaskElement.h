@@ -60,16 +60,16 @@ class SVGMaskElement : public SVGStyledLocatableElement,
 
   virtual bool selfHasRelativeLengths() const;
 
-  DECLARE_ANIMATED_PROPERTY(SVGMaskElement,
-                            SVGNames::maskUnitsAttr,
-                            int,
-                            MaskUnits,
-                            maskUnits)
-  DECLARE_ANIMATED_PROPERTY(SVGMaskElement,
-                            SVGNames::maskContentUnitsAttr,
-                            int,
-                            MaskContentUnits,
-                            maskContentUnits)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGMaskElement,
+                                       SVGNames::maskUnitsAttr,
+                                       int,
+                                       MaskUnits,
+                                       maskUnits)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGMaskElement,
+                                       SVGNames::maskContentUnitsAttr,
+                                       int,
+                                       MaskContentUnits,
+                                       maskContentUnits)
   DECLARE_ANIMATED_PROPERTY_NEW(SVGMaskElement,
                                 SVGNames::xAttr,
                                 SVGLength,

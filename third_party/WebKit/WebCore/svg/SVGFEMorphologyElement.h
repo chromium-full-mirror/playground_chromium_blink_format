@@ -44,16 +44,19 @@ class SVGFEMorphologyElement : public SVGFilterPrimitiveStandardAttributes {
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 
+  static const AtomicString& radiusXIdentifier();
+  static const AtomicString& radiusYIdentifier();
+
   DECLARE_ANIMATED_PROPERTY(SVGFEMorphologyElement,
                             SVGNames::inAttr,
                             String,
                             In1,
                             in1)
-  DECLARE_ANIMATED_PROPERTY(SVGFEMorphologyElement,
-                            SVGNames::operatorAttr,
-                            int,
-                            _operator,
-                            _operator)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEMorphologyElement,
+                                       SVGNames::operatorAttr,
+                                       int,
+                                       _operator,
+                                       _operator)
   DECLARE_ANIMATED_PROPERTY_MULTIPLE_WRAPPERS(SVGFEMorphologyElement,
                                               SVGNames::radiusAttr,
                                               SVGRadiusXAttrIdentifier,

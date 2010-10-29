@@ -36,9 +36,6 @@ namespace WebCore {
 
 class Document;
 
-extern char SVGOrientTypeAttrIdentifier[];
-extern char SVGOrientAngleAttrIdentifier[];
-
 class SVGMarkerElement : public SVGStyledElement,
                          public SVGLangSpace,
                          public SVGExternalResourcesRequired,
@@ -81,6 +78,9 @@ class SVGMarkerElement : public SVGStyledElement,
 
   virtual bool selfHasRelativeLengths() const;
 
+  static const AtomicString& orientTypeIdentifier();
+  static const AtomicString& orientAngleIdentifier();
+
   DECLARE_ANIMATED_PROPERTY_NEW(SVGMarkerElement,
                                 SVGNames::refXAttr,
                                 SVGLength,
@@ -101,20 +101,20 @@ class SVGMarkerElement : public SVGStyledElement,
                                 SVGLength,
                                 MarkerHeight,
                                 markerHeight)
-  DECLARE_ANIMATED_PROPERTY(SVGMarkerElement,
-                            SVGNames::markerUnitsAttr,
-                            int,
-                            MarkerUnits,
-                            markerUnits)
-  DECLARE_ANIMATED_PROPERTY_MULTIPLE_WRAPPERS(SVGMarkerElement,
-                                              SVGNames::orientAttr,
-                                              SVGOrientTypeAttrIdentifier,
-                                              int,
-                                              OrientType,
-                                              orientType)
-  DECLARE_ANIMATED_PROPERTY_NEW_MULTIPLE_WRAPPERS(SVGMarkerElement,
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGMarkerElement,
+                                       SVGNames::markerUnitsAttr,
+                                       int,
+                                       MarkerUnits,
+                                       markerUnits)
+  DECLARE_ANIMATED_STATIC_PROPERTY_MULTIPLE_WRAPPERS_NEW(SVGMarkerElement,
+                                                         SVGNames::orientAttr,
+                                                         orientTypeIdentifier(),
+                                                         int,
+                                                         OrientType,
+                                                         orientType)
+  DECLARE_ANIMATED_PROPERTY_MULTIPLE_WRAPPERS_NEW(SVGMarkerElement,
                                                   SVGNames::orientAttr,
-                                                  SVGOrientAngleAttrIdentifier,
+                                                  orientAngleIdentifier(),
                                                   SVGAngle,
                                                   OrientAngle,
                                                   orientAngle)

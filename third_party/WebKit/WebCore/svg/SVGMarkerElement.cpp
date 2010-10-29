@@ -36,9 +36,6 @@
 
 namespace WebCore {
 
-char SVGOrientTypeAttrIdentifier[] = "SVGOrientTypeAttr";
-char SVGOrientAngleAttrIdentifier[] = "SVGOrientAngleAttr";
-
 SVGMarkerElement::SVGMarkerElement(const QualifiedName& tagName,
                                    Document* document)
     : SVGStyledElement(tagName, document),
@@ -56,6 +53,16 @@ PassRefPtr<SVGMarkerElement> SVGMarkerElement::create(
     const QualifiedName& tagName,
     Document* document) {
   return adoptRef(new SVGMarkerElement(tagName, document));
+}
+
+const AtomicString& SVGMarkerElement::orientTypeIdentifier() {
+  DEFINE_STATIC_LOCAL(AtomicString, s_identifier, ("SVGOrientType"));
+  return s_identifier;
+}
+
+const AtomicString& SVGMarkerElement::orientAngleIdentifier() {
+  DEFINE_STATIC_LOCAL(AtomicString, s_identifier, ("SVGOrientAngle"));
+  return s_identifier;
 }
 
 AffineTransform SVGMarkerElement::viewBoxToViewTransform(
