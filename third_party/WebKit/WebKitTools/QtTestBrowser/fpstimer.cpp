@@ -36,9 +36,9 @@
 // 60 FPS
 #define FPS_MEASURE_INTERVAL 1000 / 60
 
-FpsTimer::FpsTimer(QObject* parent) : QObject(parent) {}
+FpsTimer::FpsTimer(QObject* parent) : QObject(parent), m_timer(0) {}
 
-int FpsTimer::numFrames(int spanMillis) {
+int FpsTimer::numFrames(int spanMillis) const {
   const QTime now = QTime::currentTime();
 
   int count = 0;
@@ -57,6 +57,8 @@ void FpsTimer::start() {
 }
 
 void FpsTimer::stop() {
+  if (!m_timer)
+    return;
   killTimer(m_timer);
   m_frames.clear();
 }
