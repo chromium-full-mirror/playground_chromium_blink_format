@@ -47,6 +47,9 @@ class SpaceSplitStringData : public Noncopyable {
 
   bool containsAll(SpaceSplitStringData&);
 
+  void add(const AtomicString&);
+  void remove(const AtomicString&);
+
   size_t size() {
     ensureVector();
     return m_vector.size();
@@ -88,6 +91,8 @@ class SpaceSplitString {
   bool containsAll(const SpaceSplitString& names) const {
     return !names.m_data || (m_data && m_data->containsAll(*names.m_data));
   }
+  void add(const AtomicString&);
+  void remove(const AtomicString&);
 
   size_t size() const { return m_data ? m_data->size() : 0; }
   bool isNull() const { return !m_data; }

@@ -32,6 +32,7 @@
 #include "CSSParser.h"
 #include "CSSSelectorList.h"
 #include "CSSStyleSelector.h"
+#include "ClassList.h"
 #include "ClientRect.h"
 #include "ClientRectList.h"
 #include "DOMTokenList.h"
@@ -1681,7 +1682,7 @@ bool Element::webkitMatchesSelector(const String& selector, ExceptionCode& ec) {
 DOMTokenList* Element::classList() {
   ElementRareData* data = ensureRareData();
   if (!data->m_classList)
-    data->m_classList = DOMTokenList::create(this);
+    data->m_classList = ClassList::create(this);
   return data->m_classList.get();
 }
 
