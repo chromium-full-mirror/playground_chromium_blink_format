@@ -40,7 +40,6 @@ WebTouchEvent::WebTouchEvent(WebEvent::Type type,
                              Modifiers modifiers,
                              double timestamp)
     : WebEvent(type, modifiers, timestamp),
-      m_type(type),
       m_touchPoints(touchPoints),
       m_ctrlKey(ctrlKey),
       m_altKey(altKey),
