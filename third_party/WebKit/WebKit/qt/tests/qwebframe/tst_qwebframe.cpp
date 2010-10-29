@@ -2700,6 +2700,7 @@ void tst_QWebFrame::popupFocus() {
   view.setFocus();
   view.show();
   QTest::qWaitForWindowShown(&view);
+  view.activateWindow();
   QTRY_VERIFY(view.hasFocus());
 
   // open the popup by clicking. check if focus is on the popup
@@ -2725,6 +2726,7 @@ void tst_QWebFrame::inputFieldFocus() {
   view.resize(400, 100);
   view.show();
   QTest::qWaitForWindowShown(&view);
+  view.activateWindow();
   view.setFocus();
   QTRY_VERIFY(view.hasFocus());
 
