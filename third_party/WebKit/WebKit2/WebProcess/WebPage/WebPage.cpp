@@ -158,6 +158,10 @@ WebPage::~WebPage() {
 #endif
 }
 
+CoreIPC::Connection* WebPage::connection() const {
+  return WebProcess::shared().connection();
+}
+
 void WebPage::initializeInjectedBundleEditorClient(
     WKBundlePageEditorClient* client) {
   m_editorClient.initialize(client);
