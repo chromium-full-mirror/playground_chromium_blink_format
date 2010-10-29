@@ -232,6 +232,8 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void transitionToCommittedFromCachedFrame(WebCore::CachedFrame*);
   virtual void transitionToCommittedForNewPage();
 
+  virtual void dispatchDidBecomeFrameset(bool);
+
   virtual bool canCachePage() const;
   virtual void download(WebCore::ResourceHandle*,
                         const WebCore::ResourceRequest&,

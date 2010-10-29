@@ -778,6 +778,8 @@ void WebFrameLoaderClient::transitionToCommittedForNewPage() {
                    IntSize(), false);
 }
 
+void WebFrameLoaderClient::dispatchDidBecomeFrameset(bool) {}
+
 bool WebFrameLoaderClient::canCachePage() const {
   return true;
 }

@@ -258,6 +258,8 @@ class FrameLoaderClientEfl : public FrameLoaderClient {
   virtual void transitionToCommittedFromCachedFrame(CachedFrame*);
   virtual void transitionToCommittedForNewPage();
 
+  virtual void dispatchDidBecomeFrameset(bool);
+
   virtual bool canCachePage() const;
   virtual void download(ResourceHandle*,
                         const ResourceRequest&,

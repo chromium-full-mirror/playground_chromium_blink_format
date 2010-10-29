@@ -80,6 +80,9 @@ class HTMLFrameSetElement : public HTMLElement {
 
   virtual void recalcStyle(StyleChange);
 
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
+
   OwnArrayPtr<Length> m_rowLengths;
   OwnArrayPtr<Length> m_colLengths;
 

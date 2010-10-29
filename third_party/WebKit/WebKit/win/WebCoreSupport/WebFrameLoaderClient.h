@@ -139,6 +139,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void transitionToCommittedFromCachedFrame(WebCore::CachedFrame*);
   virtual void transitionToCommittedForNewPage();
 
+  virtual void dispatchDidBecomeFrameset(bool);
+
   virtual bool canCachePage() const;
 
   virtual PassRefPtr<WebCore::Frame> createFrame(

@@ -418,6 +418,8 @@ class EmptyFrameLoaderClient : public FrameLoaderClient, public Noncopyable {
   virtual void transitionToCommittedFromCachedFrame(CachedFrame*) {}
   virtual void transitionToCommittedForNewPage() {}
 
+  virtual void dispatchDidBecomeFrameset(bool) {}
+
   virtual void updateGlobalHistory() {}
   virtual void updateGlobalHistoryRedirectLinks() {}
   virtual bool shouldGoToHistoryItem(HistoryItem*) const { return false; }

@@ -282,6 +282,8 @@ void FrameLoaderClientQt::transitionToCommittedForNewPage() {
       preferredLayoutSize.isValid(), hScrollbar, hLock, vScrollbar, vLock);
 }
 
+void FrameLoaderClientQt::dispatchDidBecomeFrameset(bool) {}
+
 void FrameLoaderClientQt::makeRepresentation(DocumentLoader*) {
   m_hasRepresentation = true;
 }

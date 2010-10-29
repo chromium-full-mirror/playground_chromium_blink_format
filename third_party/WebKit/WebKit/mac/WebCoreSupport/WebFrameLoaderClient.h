@@ -227,6 +227,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void transitionToCommittedFromCachedFrame(WebCore::CachedFrame*);
   virtual void transitionToCommittedForNewPage();
 
+  virtual void dispatchDidBecomeFrameset(bool);
+
   virtual bool canHandleRequest(const WebCore::ResourceRequest&) const;
   virtual bool canShowMIMEType(const WTF::String& MIMEType) const;
   virtual bool canShowMIMETypeAsHTML(const WTF::String& MIMEType) const;

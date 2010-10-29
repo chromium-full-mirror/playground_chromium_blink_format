@@ -1009,6 +1009,16 @@ void WebFrameLoaderClient::transitionToCommittedForNewPage() {
                                    IntSize(), false);
 }
 
+void WebFrameLoaderClient::dispatchDidBecomeFrameset(bool value) {
+  WebPage* webPage = m_frame->page();
+  if (!webPage)
+    return;
+
+  WebProcess::shared().connection()->send(
+      Messages::WebPageProxy::FrameDidBecomeFrameSet(m_frame->frameID(), value),
+      webPage->pageID());
+}
+
 bool WebFrameLoaderClient::canCachePage() const {
   notImplemented();
   return false;

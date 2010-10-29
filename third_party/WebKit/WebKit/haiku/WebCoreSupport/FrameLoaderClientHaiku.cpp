@@ -811,4 +811,6 @@ void FrameLoaderClientHaiku::transitionToCommittedForNewPage() {
                                        owner->scrollingMode());
 }
 
+void FrameLoaderClientHaiku::dispatchDidBecomeFrameset(bool) {}
+
 }  // namespace WebCore
