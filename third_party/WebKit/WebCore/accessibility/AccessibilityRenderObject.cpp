@@ -2000,8 +2000,8 @@ PlainTextRange AccessibilityRenderObject::selectedTextRange() const {
 void AccessibilityRenderObject::setSelectedTextRange(
     const PlainTextRange& range) {
   if (isNativeTextControl()) {
-    RenderTextControl* textControl = toRenderTextControl(m_renderer);
-    textControl->setSelectionRange(range.start, range.start + range.length);
+    setSelectionRange(m_renderer->node(), range.start,
+                      range.start + range.length);
     return;
   }
 
