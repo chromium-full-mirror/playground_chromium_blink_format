@@ -96,6 +96,10 @@ class InspectorResource;
 class InspectorApplicationCacheAgent;
 #endif
 
+#if ENABLE(FILE_SYSTEM)
+class InspectorFileSystemAgent;
+#endif
+
 #if ENABLE(WEB_SOCKETS)
 class WebSocketHandshakeRequest;
 class WebSocketHandshakeResponse;
@@ -219,6 +223,12 @@ class InspectorController : public Noncopyable {
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   InspectorApplicationCacheAgent* applicationCacheAgent() {
     return m_applicationCacheAgent.get();
+  }
+#endif
+
+#if ENABLE(FILE_SYSTEM)
+  InspectorFileSystemAgent* fileSystemAgent() {
+    return m_fileSystemAgent.get();
   }
 #endif
 
@@ -420,6 +430,11 @@ class InspectorController : public Noncopyable {
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   OwnPtr<InspectorApplicationCacheAgent> m_applicationCacheAgent;
 #endif
+
+#if ENABLE(FILE_SYSTEM)
+  RefPtr<InspectorFileSystemAgent> m_fileSystemAgent;
+#endif
+
   RefPtr<Node> m_nodeToFocus;
 #if LEGACY_RESOURCE_TRACKING_ENABLED
   RefPtr<InspectorResource> m_mainResource;

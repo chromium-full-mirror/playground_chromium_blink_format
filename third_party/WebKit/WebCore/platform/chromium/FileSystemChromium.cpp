@@ -53,6 +53,10 @@ bool getFileModificationTime(const String& path, time_t& result) {
   return ChromiumBridge::getFileModificationTime(path, result);
 }
 
+void revealFolderInOS(const String& path) {
+  ChromiumBridge::revealFolderInOS(path);
+}
+
 String directoryName(const String& path) {
   return ChromiumBridge::directoryName(path);
 }

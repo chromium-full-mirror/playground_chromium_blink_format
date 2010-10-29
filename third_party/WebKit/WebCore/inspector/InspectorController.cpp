@@ -114,6 +114,10 @@
 #include "InspectorApplicationCacheAgent.h"
 #endif
 
+#if ENABLE(FILE_SYSTEM)
+#include "InspectorFileSystemAgent.h"
+#endif
+
 #if ENABLE(DOM_STORAGE)
 #include "Storage.h"
 #include "StorageArea.h"
@@ -508,6 +512,10 @@ void InspectorController::connectFrontend() {
       new InspectorApplicationCacheAgent(this, m_frontend.get());
 #endif
 
+#if ENABLE(FILE_SYSTEM)
+  m_fileSystemAgent = InspectorFileSystemAgent::create(this, m_frontend.get());
+#endif
+
   if (!InspectorInstrumentation::hasFrontends())
     ScriptController::setCaptureCallStackForUncaughtExceptions(true);
   InspectorInstrumentation::frontendCreated();
@@ -606,6 +614,12 @@ void InspectorController::releaseFrontendLifetimeAgents() {
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   m_applicationCacheAgent.clear();
+#endif
+
+#if ENABLE(FILE_SYSTEM)
+  if (m_fileSystemAgent)
+    m_fileSystemAgent->stop();
+  m_fileSystemAgent.clear();
 #endif
 }
 
