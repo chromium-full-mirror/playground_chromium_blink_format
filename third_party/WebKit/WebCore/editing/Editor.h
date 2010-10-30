@@ -476,9 +476,6 @@ class Editor {
                                 bool smartReplace);
   void writeSelectionToPasteboard(Pasteboard*);
   void revealSelectionAfterEditingOperation();
-  void markMisspellingsOrBadGrammar(const VisibleSelection&,
-                                    bool checkSpelling,
-                                    RefPtr<Range>& firstMisspellingRange);
 
   void selectComposition();
   void confirmComposition(const String&, bool preserveSelection);

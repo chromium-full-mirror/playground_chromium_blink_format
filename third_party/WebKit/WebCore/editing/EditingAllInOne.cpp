@@ -66,7 +66,6 @@
 #include <SplitElementCommand.cpp>
 #include <SplitTextNodeCommand.cpp>
 #include <SplitTextNodeContainingElementCommand.cpp>
-#include <TextCheckingHelper.cpp>
 #include <TextIterator.cpp>
 #include <TypingCommand.cpp>
 #include <UnlinkCommand.cpp>
