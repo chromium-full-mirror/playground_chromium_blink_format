@@ -1714,6 +1714,15 @@ PassRefPtr<ImageData> CanvasRenderingContext2D::getImageData(
     return 0;
   }
 
+  if (sw < 0) {
+    sx += sw;
+    sw = -sw;
+  }
+  if (sh < 0) {
+    sy += sh;
+    sh = -sh;
+  }
+
   FloatRect unscaledRect(sx, sy, sw, sh);
   IntRect scaledRect = canvas()->convertLogicalToDevice(unscaledRect);
   if (scaledRect.width() < 1)
