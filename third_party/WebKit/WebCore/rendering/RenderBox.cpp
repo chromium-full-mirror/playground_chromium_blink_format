@@ -3613,6 +3613,16 @@ void RenderBox::adjustForFlippedBlocksWritingMode(
         0);
 }
 
+void RenderBox::adjustForFlippedBlocksWritingMode(IntRect& rect) {
+  if (!style()->isFlippedBlocksWritingMode())
+    return;
+
+  if (style()->isHorizontalWritingMode())
+    rect.setY(height() - rect.bottom());
+  else
+    rect.setX(width() - rect.right());
+}
+
 int RenderBox::convertFromFlippedWritingMode(int logicalPosition) {
   if (!style()->isFlippedBlocksWritingMode())
     return logicalPosition;
