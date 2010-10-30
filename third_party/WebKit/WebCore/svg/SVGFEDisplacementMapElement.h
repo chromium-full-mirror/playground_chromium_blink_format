@@ -61,11 +61,11 @@ class SVGFEDisplacementMapElement
                                        int,
                                        YChannelSelector,
                                        yChannelSelector)
-  DECLARE_ANIMATED_PROPERTY(SVGFEDisplacementMapElement,
-                            SVGNames::scaleAttr,
-                            float,
-                            Scale,
-                            scale)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEDisplacementMapElement,
+                                       SVGNames::scaleAttr,
+                                       float,
+                                       Scale,
+                                       scale)
 };
 
 }  // namespace WebCore

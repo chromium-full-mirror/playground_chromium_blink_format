@@ -30,7 +30,6 @@
 namespace WebCore {
 
 class SVGElement;
-class SVGNumberList;
 class SVGPreserveAspectRatio;
 class SVGTransformList;
 class QualifiedName;
@@ -156,8 +155,6 @@ PassRefPtr<AnimatedTearOff> lookupOrCreateWrapper(
 }
 
 // Common type definitions, to ease IDL generation.
-typedef DeprecatedSVGAnimatedTemplate<float> SVGAnimatedNumber;
-typedef DeprecatedSVGAnimatedTemplate<SVGNumberList*> SVGAnimatedNumberList;
 typedef DeprecatedSVGAnimatedTemplate<SVGPreserveAspectRatio>
     SVGAnimatedPreserveAspectRatio;
 typedef DeprecatedSVGAnimatedTemplate<String> SVGAnimatedString;

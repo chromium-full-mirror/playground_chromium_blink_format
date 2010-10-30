@@ -75,22 +75,16 @@ static inline void extractFloatValuesFromSVGLengthList(
 }
 
 static inline void extractFloatValuesFromSVGNumberList(
-    SVGNumberList* list,
+    const SVGNumberList& list,
     Vector<float>& floatValues,
     unsigned textContentLength) {
-  ASSERT(list);
-
-  unsigned length = list->numberOfItems();
+  unsigned length = list.size();
   if (length > textContentLength)
     length = textContentLength;
   floatValues.reserveCapacity(length);
 
-  ExceptionCode ec = 0;
-  for (unsigned i = 0; i < length; ++i) {
-    float length = list->getItem(i, ec);
-    ASSERT(!ec);
-    floatValues.append(length);
-  }
+  for (unsigned i = 0; i < length; ++i)
+    floatValues.append(list.at(i));
 }
 
 void SVGTextLayoutAttributesBuilder::buildLayoutScope(

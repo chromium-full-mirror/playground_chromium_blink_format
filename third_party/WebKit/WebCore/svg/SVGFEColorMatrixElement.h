@@ -51,11 +51,11 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
                                        int,
                                        Type,
                                        type)
-  DECLARE_ANIMATED_PROPERTY(SVGFEColorMatrixElement,
-                            SVGNames::valuesAttr,
-                            SVGNumberList*,
-                            Values,
-                            values)
+  DECLARE_ANIMATED_LIST_PROPERTY_NEW(SVGFEColorMatrixElement,
+                                     SVGNames::valuesAttr,
+                                     SVGNumberList,
+                                     Values,
+                                     values)
 };
 
 }  // namespace WebCore

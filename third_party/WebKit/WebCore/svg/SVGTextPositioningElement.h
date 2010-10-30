@@ -65,11 +65,11 @@ class SVGTextPositioningElement : public SVGTextContentElement {
                                      SVGLengthList,
                                      Dy,
                                      dy)
-  DECLARE_ANIMATED_PROPERTY(SVGTextPositioningElement,
-                            SVGNames::rotateAttr,
-                            SVGNumberList*,
-                            Rotate,
-                            rotate)
+  DECLARE_ANIMATED_LIST_PROPERTY_NEW(SVGTextPositioningElement,
+                                     SVGNames::rotateAttr,
+                                     SVGNumberList,
+                                     Rotate,
+                                     rotate)
 };
 
 }  // namespace WebCore

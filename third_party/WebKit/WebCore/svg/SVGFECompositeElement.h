@@ -55,26 +55,26 @@ class SVGFECompositeElement : public SVGFilterPrimitiveStandardAttributes {
                                        int,
                                        _operator,
                                        _operator)
-  DECLARE_ANIMATED_PROPERTY(SVGFECompositeElement,
-                            SVGNames::k1Attr,
-                            float,
-                            K1,
-                            k1)
-  DECLARE_ANIMATED_PROPERTY(SVGFECompositeElement,
-                            SVGNames::k2Attr,
-                            float,
-                            K2,
-                            k2)
-  DECLARE_ANIMATED_PROPERTY(SVGFECompositeElement,
-                            SVGNames::k3Attr,
-                            float,
-                            K3,
-                            k3)
-  DECLARE_ANIMATED_PROPERTY(SVGFECompositeElement,
-                            SVGNames::k4Attr,
-                            float,
-                            K4,
-                            k4)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFECompositeElement,
+                                       SVGNames::k1Attr,
+                                       float,
+                                       K1,
+                                       k1)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFECompositeElement,
+                                       SVGNames::k2Attr,
+                                       float,
+                                       K2,
+                                       k2)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFECompositeElement,
+                                       SVGNames::k3Attr,
+                                       float,
+                                       K3,
+                                       k3)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFECompositeElement,
+                                       SVGNames::k4Attr,
+                                       float,
+                                       K4,
+                                       k4)
 };
 
 }  // namespace WebCore
