@@ -638,6 +638,9 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   COMPILE_ASSERT(static_cast<int>(WEBKIT_EDITING_BEHAVIOR_WINDOWS) ==
                      static_cast<int>(WebCore::EditingWindowsBehavior),
                  editing_behavior_type_windows_match);
+  COMPILE_ASSERT(static_cast<int>(WEBKIT_EDITING_BEHAVIOR_UNIX) ==
+                     static_cast<int>(WebCore::EditingUnixBehavior),
+                 editing_behavior_type_unix_match);
 
   /**
   * WebKitWebSettings:editing-behavior
@@ -661,7 +664,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
       g_param_spec_enum("editing-behavior", _("Editing behavior"),
                         _("The behavior mode to use in editing mode"),
                         WEBKIT_TYPE_EDITING_BEHAVIOR,
-                        WEBKIT_EDITING_BEHAVIOR_MAC, flags));
+                        WEBKIT_EDITING_BEHAVIOR_UNIX, flags));
 
   /**
    * WebKitWebSettings:enable-universal-access-from-file-uris

@@ -46,7 +46,11 @@ class WebURL;
 // WebCore/page/settings.h.
 class WebSettings {
  public:
-  enum EditingBehavior { EditingBehaviorMac, EditingBehaviorWin };
+  enum EditingBehavior {
+    EditingBehaviorMac,
+    EditingBehaviorWin,
+    EditingBehaviorUnix
+  };
 
   virtual void setStandardFontFamily(const WebString&) = 0;
   virtual void setFixedFontFamily(const WebString&) = 0;

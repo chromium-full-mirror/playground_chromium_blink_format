@@ -479,6 +479,8 @@ COMPILE_ASSERT_MATCHING_ENUM(WebSettings::EditingBehaviorMac,
                              EditingMacBehavior);
 COMPILE_ASSERT_MATCHING_ENUM(WebSettings::EditingBehaviorWin,
                              EditingWindowsBehavior);
+COMPILE_ASSERT_MATCHING_ENUM(WebSettings::EditingBehaviorUnix,
+                             EditingUnixBehavior);
 
 COMPILE_ASSERT_MATCHING_ENUM(WebTextAffinityUpstream, UPSTREAM);
 COMPILE_ASSERT_MATCHING_ENUM(WebTextAffinityDownstream, DOWNSTREAM);
