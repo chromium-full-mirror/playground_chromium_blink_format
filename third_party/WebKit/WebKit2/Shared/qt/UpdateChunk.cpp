@@ -82,7 +82,8 @@ bool UpdateChunk::decode(CoreIPC::ArgumentDecoder* decoder,
 }
 
 QImage UpdateChunk::createImage() {
-  return QImage(data(), m_rect.width(), m_rect.height(), QImage::Format_RGB32);
+  return QImage(data(), m_rect.width(), m_rect.height(), m_rect.width() * 4,
+                QImage::Format_RGB32);
 }
 
 }  // namespace WebKit
