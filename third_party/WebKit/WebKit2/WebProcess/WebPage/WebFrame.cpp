@@ -243,7 +243,7 @@ String WebFrame::name() const {
   if (!m_coreFrame)
     return String();
 
-  return m_coreFrame->tree()->uniqueName();
+  return m_coreFrame->tree()->name();
 }
 
 String WebFrame::url() const {

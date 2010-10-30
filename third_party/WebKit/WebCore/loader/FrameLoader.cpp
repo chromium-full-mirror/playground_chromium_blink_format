@@ -1007,7 +1007,7 @@ void FrameLoader::loadURLIntoChildFrame(const KURL& url,
   if (parentItem && parentItem->children().size() &&
       isBackForwardLoadType(loadType)) {
     HistoryItem* childItem =
-        parentItem->childItemWithTarget(childFrame->tree()->uniqueName());
+        parentItem->childItemWithTarget(childFrame->tree()->name());
     if (childItem) {
       // Use the original URL to ensure we get all the side-effects, such as
       // onLoad handlers, of any redirects that happened. An example of where
@@ -1019,8 +1019,7 @@ void FrameLoader::loadURLIntoChildFrame(const KURL& url,
   }
 
   RefPtr<Archive> subframeArchive =
-      activeDocumentLoader()->popArchiveForSubframe(
-          childFrame->tree()->uniqueName());
+      activeDocumentLoader()->popArchiveForSubframe(childFrame->tree()->name());
 
   if (subframeArchive)
     childFrame->loader()->loadArchive(subframeArchive.release());
@@ -2008,7 +2007,7 @@ void FrameLoader::commitProvisionalLoad() {
   LOG(PageCache,
       "WebCoreLoading %s: About to commit provisional load from previous URL "
       "'%s' to new URL '%s'",
-      m_frame->tree()->uniqueName().string().utf8().data(),
+      m_frame->tree()->name().string().utf8().data(),
       m_URL.string().utf8().data(), pdl ? pdl->url().string().utf8().data()
                                         : "<no provisional DocumentLoader>");
 
@@ -2067,7 +2066,7 @@ void FrameLoader::commitProvisionalLoad() {
 
   LOG(Loading,
       "WebCoreLoading %s: Finished committing provisional load to URL %s",
-      m_frame->tree()->uniqueName().string().utf8().data(),
+      m_frame->tree()->name().string().utf8().data(),
       m_URL.string().utf8().data());
 
   if (m_loadType == FrameLoadTypeStandard &&

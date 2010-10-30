@@ -97,7 +97,7 @@ void ProgressTracker::progressStarted(Frame* frame) {
   LOG(Progress,
       "Progress started (%p) - frame %p(\"%s\"), value %f, tracked frames %d, "
       "originating frame %p",
-      this, frame, frame->tree()->uniqueName().string().utf8().data(),
+      this, frame, frame->tree()->name().string().utf8().data(),
       m_progressValue, m_numProgressTrackedFrames,
       m_originatingProgressFrame.get());
 
@@ -121,7 +121,7 @@ void ProgressTracker::progressCompleted(Frame* frame) {
   LOG(Progress,
       "Progress completed (%p) - frame %p(\"%s\"), value %f, tracked frames "
       "%d, originating frame %p",
-      this, frame, frame->tree()->uniqueName().string().utf8().data(),
+      this, frame, frame->tree()->name().string().utf8().data(),
       m_progressValue, m_numProgressTrackedFrames,
       m_originatingProgressFrame.get());
 
