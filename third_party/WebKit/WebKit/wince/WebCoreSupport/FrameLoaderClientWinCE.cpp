@@ -191,7 +191,7 @@ void FrameLoaderClientWinCE::didTransferChildFrameToNewDocument(Page*) {}
 void FrameLoaderClientWinCE::transferLoadingResourceFromPage(
     unsigned long,
     DocumentLoader*,
-    const ResourceRequest&,
+    const WebCore::ResourceRequest&,
     Page*) {}
 
 void FrameLoaderClientWinCE::redirectDataToPlugin(Widget* pluginWidget) {
