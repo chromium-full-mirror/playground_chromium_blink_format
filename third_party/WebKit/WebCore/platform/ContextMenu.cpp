@@ -479,10 +479,12 @@ void ContextMenu::populate() {
                   ->inspectorController()
                   ->hasInspectorFrontendClient())) {
 #endif
-          if (frame->page() && frame->page()->canGoBackOrForward(-1))
+          if (frame->page() &&
+              frame->page()->backForward()->canGoBackOrForward(-1))
             appendItem(BackItem);
 
-          if (frame->page() && frame->page()->canGoBackOrForward(1))
+          if (frame->page() &&
+              frame->page()->backForward()->canGoBackOrForward(1))
             appendItem(ForwardItem);
 
           // use isLoadingInAPISense rather than isLoading because Stop/Reload
@@ -905,10 +907,12 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
 #endif
 #if PLATFORM(GTK)
     case ContextMenuItemTagGoBack:
-      shouldEnable = frame->page() && frame->page()->canGoBackOrForward(-1);
+      shouldEnable =
+          frame->page() && frame->page()->backForward()->canGoBackOrForward(-1);
       break;
     case ContextMenuItemTagGoForward:
-      shouldEnable = frame->page() && frame->page()->canGoBackOrForward(1);
+      shouldEnable =
+          frame->page() && frame->page()->backForward()->canGoBackOrForward(1);
       break;
     case ContextMenuItemTagStop:
       shouldEnable = frame->loader()->documentLoader()->isLoadingInAPISense();

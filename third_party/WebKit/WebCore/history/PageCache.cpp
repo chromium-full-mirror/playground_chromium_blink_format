@@ -27,7 +27,7 @@
 #include "PageCache.h"
 
 #include "ApplicationCacheHost.h"
-#include "BackForwardList.h"
+#include "BackForwardController.h"
 #include "Cache.h"
 #include "CachedPage.h"
 #include "DOMWindow.h"
@@ -206,7 +206,7 @@ static void logCanCachePageDecision(Page* page) {
   bool cannotCache = !logCanCacheFrameDecision(page->mainFrame(), 1);
 
   FrameLoadType loadType = page->mainFrame()->loader()->loadType();
-  if (!page->backForwardList()->isActive()) {
+  if (!page->backForward()->isActive()) {
     PCLOG("   -The back/forward list is disabled or has 0 capacity");
     cannotCache = true;
   }
@@ -332,8 +332,7 @@ bool PageCache::canCache(Page* page) {
   FrameLoadType loadType = page->mainFrame()->loader()->loadType();
 
   return canCachePageContainingThisFrame(page->mainFrame()) &&
-         page->backForwardList()->isActive() &&
-         page->settings()->usesPageCache()
+         page->backForward()->isActive() && page->settings()->usesPageCache()
 #if ENABLE(DEVICE_ORIENTATION)
          &&
          !(page->deviceMotionController() &&

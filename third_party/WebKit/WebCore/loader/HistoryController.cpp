@@ -32,7 +32,7 @@
 #include "config.h"
 #include "HistoryController.h"
 
-#include "BackForwardList.h"
+#include "BackForwardController.h"
 #include "CachedPage.h"
 #include "DocumentLoader.h"
 #include "Frame.h"
@@ -255,9 +255,8 @@ void HistoryController::goToItem(HistoryItem* targetItem, FrameLoadType type) {
   // frametree,
   // as opposed to happening for some/one of the page commits that might happen
   // soon
-  BackForwardList* bfList = page->backForwardList();
-  HistoryItem* currentItem = bfList->currentItem();
-  bfList->goToItem(targetItem);
+  HistoryItem* currentItem = page->backForward()->currentItem();
+  page->backForward()->setCurrentItem(targetItem);
   Settings* settings = m_frame->settings();
   page->setGlobalHistoryItem(
       (!settings || settings->privateBrowsingEnabled()) ? 0 : targetItem);
@@ -327,7 +326,7 @@ void HistoryController::updateForStandardLoad(HistoryUpdateType updateType) {
       }
       if (Page* page = m_frame->page())
         page->setGlobalHistoryItem(
-            needPrivacy ? 0 : page->backForwardList()->currentItem());
+            needPrivacy ? 0 : page->backForward()->currentItem());
     }
   } else if (frameLoader->documentLoader()->unreachableURL().isEmpty() &&
              m_currentItem) {
@@ -372,7 +371,7 @@ void HistoryController::updateForRedirectWithLockedBackForwardList() {
         }
         if (Page* page = m_frame->page())
           page->setGlobalHistoryItem(
-              needPrivacy ? 0 : page->backForwardList()->currentItem());
+              needPrivacy ? 0 : page->backForward()->currentItem());
       }
     }
     if (m_currentItem) {
@@ -702,7 +701,7 @@ void HistoryController::updateBackForwardListClippedAtTarget(bool doClip) {
       "WebCoreBackForward - Adding backforward item %p for frame %s",
       topItem.get(),
       m_frame->loader()->documentLoader()->url().string().ascii().data());
-  page->backForwardList()->addItem(topItem.release());
+  page->backForward()->addItem(topItem.release());
 }
 
 void HistoryController::pushState(PassRefPtr<SerializedScriptValue> stateObject,
@@ -724,7 +723,7 @@ void HistoryController::pushState(PassRefPtr<SerializedScriptValue> stateObject,
   m_currentItem->setStateObject(stateObject);
   m_currentItem->setURLString(urlString);
 
-  page->backForwardList()->addItem(topItem.release());
+  page->backForward()->addItem(topItem.release());
 }
 
 void HistoryController::replaceState(

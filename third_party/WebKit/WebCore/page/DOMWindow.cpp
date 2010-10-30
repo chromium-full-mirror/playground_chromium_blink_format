@@ -869,7 +869,7 @@ void DOMWindow::close() {
   bool allowScriptsToCloseWindows =
       settings && settings->allowScriptsToCloseWindows();
 
-  if (!(page->openedByDOM() || page->getHistoryLength() <= 1 ||
+  if (!(page->openedByDOM() || page->backForward()->count() <= 1 ||
         allowScriptsToCloseWindows))
     return;
 
