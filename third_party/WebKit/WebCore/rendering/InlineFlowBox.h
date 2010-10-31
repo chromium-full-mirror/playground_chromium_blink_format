@@ -255,12 +255,6 @@ class InlineFlowBox : public InlineBox {
   int rightVisibleOverflow() const {
     return std::max(rightLayoutOverflow(), rightVisualOverflow());
   }
-  int logicalLeftVisibleOverflow() const {
-    return std::min(logicalLeftLayoutOverflow(), logicalLeftVisualOverflow());
-  }
-  int logicalRightVisibleOverflow() const {
-    return std::max(logicalRightLayoutOverflow(), logicalRightVisualOverflow());
-  }
   int logicalTopVisibleOverflow() const {
     return std::min(logicalTopLayoutOverflow(), logicalTopVisualOverflow());
   }
@@ -278,13 +272,15 @@ class InlineFlowBox : public InlineBox {
     return m_overflow ? m_overflow->topLayoutOverflow() : m_y;
   }
   int bottomLayoutOverflow() const {
-    return m_overflow ? m_overflow->bottomLayoutOverflow() : m_y + height();
+    return m_overflow ? m_overflow->bottomLayoutOverflow()
+                      : m_y + logicalHeight();
   }
   int leftLayoutOverflow() const {
     return m_overflow ? m_overflow->leftLayoutOverflow() : m_x;
   }
   int rightLayoutOverflow() const {
-    return m_overflow ? m_overflow->rightLayoutOverflow() : m_x + width();
+    return m_overflow ? m_overflow->rightLayoutOverflow()
+                      : m_x + m_logicalWidth;
   }
   IntRect layoutOverflowRect() const {
     return m_overflow ? m_overflow->layoutOverflowRect()
@@ -314,13 +310,15 @@ class InlineFlowBox : public InlineBox {
     return m_overflow ? m_overflow->topVisualOverflow() : m_y;
   }
   int bottomVisualOverflow() const {
-    return m_overflow ? m_overflow->bottomVisualOverflow() : m_y + height();
+    return m_overflow ? m_overflow->bottomVisualOverflow()
+                      : m_y + logicalHeight();
   }
   int leftVisualOverflow() const {
     return m_overflow ? m_overflow->leftVisualOverflow() : m_x;
   }
   int rightVisualOverflow() const {
-    return m_overflow ? m_overflow->rightVisualOverflow() : m_x + width();
+    return m_overflow ? m_overflow->rightVisualOverflow()
+                      : m_x + m_logicalWidth;
   }
   IntRect visualOverflowRect() const {
     return m_overflow ? m_overflow->visualOverflowRect()
