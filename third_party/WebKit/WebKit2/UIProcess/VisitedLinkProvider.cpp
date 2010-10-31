@@ -39,6 +39,7 @@ static const int VisitedLinkTableMaxLoad = 2;
 VisitedLinkProvider::VisitedLinkProvider(WebContext* context)
     : m_context(context),
       m_visitedLinksPopulated(false),
+      m_webProcessHasVisitedLinkState(false),
       m_keyCount(0),
       m_tableSize(0),
       m_pendingVisitedLinksTimer(
@@ -46,7 +47,12 @@ VisitedLinkProvider::VisitedLinkProvider(WebContext* context)
           this,
           &VisitedLinkProvider::pendingVisitedLinksTimerFired) {}
 
-void VisitedLinkProvider::populateVisitedLinksIfNeeded() {
+void VisitedLinkProvider::processDidFinishLaunching() {
+  m_webProcessHasVisitedLinkState = false;
+
+  if (m_keyCount)
+    m_pendingVisitedLinksTimer.startOneShot(0);
+
   if (m_visitedLinksPopulated)
     return;
 
@@ -62,7 +68,7 @@ void VisitedLinkProvider::addVisitedLink(LinkHash linkHash) {
     m_pendingVisitedLinksTimer.startOneShot(0);
 }
 
-void VisitedLinkProvider::stopVisitedLinksTimer() {
+void VisitedLinkProvider::processDidClose() {
   m_pendingVisitedLinksTimer.stop();
 }
 
@@ -148,7 +154,7 @@ void VisitedLinkProvider::pendingVisitedLinksTimerFired() {
 
   m_keyCount += pendingVisitedLinks.size();
 
-  if (currentTableSize != newTableSize) {
+  if (!m_webProcessHasVisitedLinkState || currentTableSize != newTableSize) {
     // Send the new visited link table.
 
     SharedMemory::Handle handle;
@@ -160,7 +166,7 @@ void VisitedLinkProvider::pendingVisitedLinksTimerFired() {
   }
 
   // We now need to let the web process know that we've added links.
-  if (addedVisitedLinks.size() <= 20) {
+  if (m_webProcessHasVisitedLinkState && addedVisitedLinks.size() <= 20) {
     m_context->process()->send(
         Messages::WebProcess::VisitedLinkStateChanged(addedVisitedLinks), 0);
     return;
@@ -169,6 +175,7 @@ void VisitedLinkProvider::pendingVisitedLinksTimerFired() {
   // Just recalculate all the visited links.
   m_context->process()->send(Messages::WebProcess::AllVisitedLinkStateChanged(),
                              0);
+  m_webProcessHasVisitedLinkState = true;
 }
 
 }  // namespace WebKit
