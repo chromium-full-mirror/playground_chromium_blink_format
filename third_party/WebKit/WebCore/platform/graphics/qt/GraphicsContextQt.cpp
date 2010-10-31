@@ -503,14 +503,6 @@ void GraphicsContext::clipConvexPolygon(size_t numPoints,
   m_data->p()->setClipPath(path, Qt::IntersectClip);
 }
 
-QPen GraphicsContext::pen() {
-  if (paintingDisabled())
-    return QPen();
-
-  QPainter* p = m_data->p();
-  return p->pen();
-}
-
 void GraphicsContext::fillPath() {
   if (paintingDisabled())
     return;
