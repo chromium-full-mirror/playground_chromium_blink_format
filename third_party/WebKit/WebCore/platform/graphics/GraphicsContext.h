@@ -229,7 +229,6 @@ class GraphicsContext : public Noncopyable {
 
   void clearRect(const FloatRect&);
 
-  void strokeRect(const FloatRect&);
   void strokeRect(const FloatRect&, float lineWidth);
 
   void drawImage(Image*,
