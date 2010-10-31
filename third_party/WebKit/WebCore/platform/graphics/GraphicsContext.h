@@ -311,7 +311,6 @@ class GraphicsContext : public Noncopyable {
                           const IntSize& bottomRight);
   void addInnerRoundedRectClip(const IntRect&, int thickness);
   void clipOut(const IntRect&);
-  void clipOutEllipseInRect(const IntRect&);
   void clipOutRoundedRect(const IntRect&,
                           const IntSize& topLeft,
                           const IntSize& topRight,

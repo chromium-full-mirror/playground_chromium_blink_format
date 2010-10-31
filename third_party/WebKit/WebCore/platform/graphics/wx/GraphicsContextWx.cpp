@@ -339,10 +339,6 @@ void GraphicsContext::clipOut(const IntRect&) {
   notImplemented();
 }
 
-void GraphicsContext::clipOutEllipseInRect(const IntRect&) {
-  notImplemented();
-}
-
 void GraphicsContext::clipPath(WindRule) {
   notImplemented();
 }
