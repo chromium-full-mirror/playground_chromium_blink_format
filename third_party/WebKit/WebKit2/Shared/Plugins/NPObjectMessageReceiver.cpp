@@ -28,6 +28,7 @@
 #include "NPObjectMessageReceiver.h"
 
 #include "NPRuntimeUtilities.h"
+#include "NotImplemented.h"
 
 namespace WebKit {
 
@@ -43,6 +44,10 @@ NPObjectMessageReceiver::NPObjectMessageReceiver(NPObject* npObject)
 
 NPObjectMessageReceiver::~NPObjectMessageReceiver() {
   releaseNPObject(m_npObject);
+}
+
+void NPObjectMessageReceiver::deallocate() {
+  notImplemented();
 }
 
 }  // namespace WebKit
