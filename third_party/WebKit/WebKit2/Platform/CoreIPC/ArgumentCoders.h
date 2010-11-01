@@ -33,6 +33,7 @@
 #include <wtf/TypeTraits.h>
 #include <wtf/Vector.h>
 #include <wtf/text/AtomicString.h>
+#include <wtf/text/CString.h>
 #include <wtf/text/WTFString.h>
 
 namespace CoreIPC {
@@ -203,6 +204,49 @@ struct ArgumentCoder<
 };
 
 template <>
+struct ArgumentCoder<CString> {
+  static void encode(ArgumentEncoder* encoder, const CString& string) {
+    // Special case the null string.
+    if (string.isNull()) {
+      encoder->encodeUInt32(std::numeric_limits<uint32_t>::max());
+      return;
+    }
+
+    uint32_t length = string.length();
+    encoder->encode(length);
+    encoder->encodeBytes(reinterpret_cast<const uint8_t*>(string.data()),
+                         length);
+  }
+
+  static bool decode(ArgumentDecoder* decoder, CString& result) {
+    uint32_t length;
+    if (!decoder->decode(length))
+      return false;
+
+    if (length == std::numeric_limits<uint32_t>::max()) {
+      // This is the null string.
+      result = CString();
+      return true;
+    }
+
+    // Before allocating the string, make sure that the decoder buffer is big
+    // enough.
+    if (!decoder->bufferIsLargeEnoughToContain<char>(length)) {
+      decoder->markInvalid();
+      return false;
+    }
+
+    char* buffer;
+    CString string = CString::newUninitialized(length, buffer);
+    if (!decoder->decodeBytes(reinterpret_cast<uint8_t*>(buffer), length))
+      return false;
+
+    result = string;
+    return true;
+  }
+};
+
+template <>
 struct ArgumentCoder<String> {
   static void encode(ArgumentEncoder* encoder, const String& string) {
     // Special case the null string.
@@ -217,14 +261,14 @@ struct ArgumentCoder<String> {
                          length * sizeof(UChar));
   }
 
-  static bool decode(ArgumentDecoder* decoder, String& s) {
+  static bool decode(ArgumentDecoder* decoder, String& result) {
     uint32_t length;
     if (!decoder->decode(length))
       return false;
 
     if (length == std::numeric_limits<uint32_t>::max()) {
       // This is the null string.
-      s = String();
+      result = String();
       return true;
     }
 
@@ -241,7 +285,7 @@ struct ArgumentCoder<String> {
                               length * sizeof(UChar)))
       return false;
 
-    s = string;
+    result = string;
     return true;
   }
 };
