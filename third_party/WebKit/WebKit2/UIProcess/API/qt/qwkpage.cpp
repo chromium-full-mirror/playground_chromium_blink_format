@@ -351,7 +351,7 @@ QWKPage::ViewportAttributes& QWKPage::ViewportAttributes::operator=(
 }
 
 QWKPage::ViewportAttributes QWKPage::viewportAttributesForSize(
-    QSize availableSize) const {
+    const QSize& availableSize) const {
   static int desktopWidth = 980;
   static int deviceDPI = 160;
 
