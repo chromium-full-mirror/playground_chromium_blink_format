@@ -39,6 +39,8 @@ class WebProcessManager {
   WebProcessProxy* getWebProcess(WebContext*);
   void processDidClose(WebProcessProxy*, WebContext*);
 
+  void contextWasDestroyed(WebContext*);
+
  private:
   WebProcessManager();
 

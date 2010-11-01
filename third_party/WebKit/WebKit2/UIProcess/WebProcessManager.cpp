@@ -84,4 +84,8 @@ void WebProcessManager::processDidClose(WebProcessProxy* process,
   ASSERT_NOT_REACHED();
 }
 
+void WebProcessManager::contextWasDestroyed(WebContext* context) {
+  m_processMap.remove(context);
+}
+
 }  // namespace WebKit
