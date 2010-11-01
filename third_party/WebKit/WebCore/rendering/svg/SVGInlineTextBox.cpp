@@ -582,7 +582,7 @@ void SVGInlineTextBox::paintTextWithShadows(GraphicsContext* context,
     if (shadow)
       extraOffset = applyShadowToGraphicsContext(
           context, shadow, shadowRect, false /* stroked */, true /* opaque */,
-          false /* vertical */);
+          true /* horizontal */);
 
     font.drawText(context, textRun, textOrigin + extraOffset, startPosition,
                   endPosition);
