@@ -4877,15 +4877,19 @@ bool RenderBlock::hitTestFloats(const HitTestRequest& request,
   for (it.toLast(); (floatingObject = it.current()); --it) {
     if (floatingObject->m_shouldPaint &&
         !floatingObject->m_renderer->hasSelfPaintingLayer()) {
-      int xOffset = tx + floatingObject->left() +
+      int xOffset = floatingObject->left() +
                     floatingObject->m_renderer->marginLeft() -
                     floatingObject->m_renderer->x();
-      int yOffset = ty + floatingObject->top() +
+      int yOffset = floatingObject->top() +
                     floatingObject->m_renderer->marginTop() -
                     floatingObject->m_renderer->y();
+      IntPoint childPoint(tx + xOffset, ty + yOffset);
+      adjustForFlippedBlocksWritingMode(floatingObject->m_renderer, childPoint,
+                                        ParentToChildFlippingAdjustment);
       if (floatingObject->m_renderer->hitTest(request, result, IntPoint(x, y),
-                                              xOffset, yOffset)) {
-        updateHitTestResult(result, IntPoint(x - xOffset, y - yOffset));
+                                              childPoint.x(), childPoint.y())) {
+        updateHitTestResult(result,
+                            IntPoint(x - childPoint.x(), y - childPoint.y()));
         return true;
       }
     }
@@ -4955,8 +4959,12 @@ bool RenderBlock::hitTestContents(const HitTestRequest& request,
       childHitTest = HitTestChildBlockBackground;
     for (RenderBox* child = lastChildBox(); child;
          child = child->previousSiblingBox()) {
+      IntPoint childPoint(tx, ty);
+      adjustForFlippedBlocksWritingMode(child, childPoint,
+                                        ParentToChildFlippingAdjustment);
       if (!child->hasSelfPaintingLayer() && !child->isFloating() &&
-          child->nodeAtPoint(request, result, x, y, tx, ty, childHitTest))
+          child->nodeAtPoint(request, result, x, y, childPoint.x(),
+                             childPoint.y(), childHitTest))
         return true;
     }
   }

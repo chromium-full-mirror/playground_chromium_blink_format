@@ -551,6 +551,8 @@ class RenderBox : public RenderBoxModelObject {
   void adjustForFlippedBlocksWritingMode(RenderBox* child,
                                          IntPoint&,
                                          FlippingAdjustment);
+  void adjustForFlippedBlocksWritingMode(
+      IntRect&);  // Unflips a rect in our coordinate space.
   int convertFromFlippedWritingMode(int position);
   IntSize locationOffsetIncludingFlipping();
 
