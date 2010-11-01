@@ -69,12 +69,6 @@ class WebSpeechInputControllerMockImpl : public WebCore::SpeechInputListener,
   void setMockRecognitionResult(const WebString& result,
                                 const WebString& language);
 
-  // FIXME: this is a fix for a two-sided patch. Delete as soon as the chromium
-  // side is patched.
-  // Chromium patch not uploaded yet, but will depend on
-  // http://codereview.chromium.org/3615005/show patch.
-  void setMockRecognitionResult(const WebString& result);
-
  private:
   OwnPtr<WebCore::SpeechInputClientMock> m_webcoreMock;
   WebSpeechInputListener* m_listener;
