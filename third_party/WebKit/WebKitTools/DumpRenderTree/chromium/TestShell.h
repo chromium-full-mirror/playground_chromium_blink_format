@@ -168,9 +168,7 @@ class TestShell {
   // testing it is possible to specify
   // separate sets of flags to each load.
   std::string javaScriptFlagsForLoad(size_t load) {
-    return (load >= 0 && load < m_javaScriptFlags.size())
-               ? m_javaScriptFlags[load]
-               : "";
+    return (load < m_javaScriptFlags.size()) ? m_javaScriptFlags[load] : "";
   }
   void setJavaScriptFlags(Vector<std::string> javaScriptFlags) {
     m_javaScriptFlags = javaScriptFlags;
