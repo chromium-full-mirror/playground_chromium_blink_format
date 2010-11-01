@@ -27,8 +27,6 @@
 #include "config.h"
 #include "ImageDecoder.h"
 
-#include "NotImplemented.h"
-
 namespace WebCore {
 
 RGBA32Buffer::RGBA32Buffer()
@@ -99,10 +97,6 @@ bool RGBA32Buffer::hasAlpha() const {
 
 void RGBA32Buffer::setHasAlpha(bool alpha) {
   m_bitmap.setIsOpaque(!alpha);
-}
-
-void RGBA32Buffer::setColorProfile(const ColorProfile& colorProfile) {
-  notImplemented();
 }
 
 void RGBA32Buffer::setStatus(FrameStatus status) {
