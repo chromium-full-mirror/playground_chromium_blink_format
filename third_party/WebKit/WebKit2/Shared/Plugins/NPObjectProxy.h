@@ -33,11 +33,14 @@
 
 namespace WebKit {
 
+class NPRemoteObjectMap;
+
 class NPObjectProxy : public NPObject {
   WTF_MAKE_NONCOPYABLE(NPObjectProxy);
 
  public:
-  static NPObjectProxy* create(uint64_t npObjectID);
+  static NPObjectProxy* create(NPRemoteObjectMap* npRemoteObjectMap,
+                               uint64_t npObjectID);
 
   static bool isNPObjectProxy(NPObject*);
 
@@ -50,7 +53,9 @@ class NPObjectProxy : public NPObject {
   NPObjectProxy();
   ~NPObjectProxy();
 
-  void initialize(uint64_t npObjectID);
+  void initialize(NPRemoteObjectMap* npRemoteObjectMap, uint64_t npObjectID);
+
+  bool getProperty(NPIdentifier propertyName, NPVariant* result);
 
   static NPClass* npClass();
   static NPObject* NP_Allocate(NPP, NPClass*);
@@ -81,6 +86,7 @@ class NPObjectProxy : public NPObject {
                            uint32_t argumentCount,
                            NPVariant* result);
 
+  NPRemoteObjectMap* m_npRemoteObjectMap;
   uint64_t m_npObjectID;
 };
 

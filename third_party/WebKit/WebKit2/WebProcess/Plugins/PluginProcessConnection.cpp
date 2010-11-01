@@ -89,6 +89,10 @@ CoreIPC::SyncReplyMode PluginProcessConnection::didReceiveSyncMessage(
     CoreIPC::MessageID messageID,
     CoreIPC::ArgumentDecoder* arguments,
     CoreIPC::ArgumentEncoder* reply) {
+  if (messageID.is<CoreIPC::MessageClassNPObjectMessageReceiver>())
+    return m_npRemoteObjectMap.didReceiveSyncMessage(connection, messageID,
+                                                     arguments, reply);
+
   if (PluginProxy* pluginProxy = m_plugins.get(arguments->destinationID()))
     return pluginProxy->didReceiveSyncPluginProxyMessage(connection, messageID,
                                                          arguments, reply);

@@ -109,12 +109,18 @@ CoreIPC::SyncReplyMode WebProcessConnection::didReceiveSyncMessage(
     CoreIPC::MessageID messageID,
     CoreIPC::ArgumentDecoder* arguments,
     CoreIPC::ArgumentEncoder* reply) {
-  if (!arguments->destinationID())
+  uint64_t destinationID = arguments->destinationID();
+
+  if (!destinationID)
     return didReceiveSyncWebProcessConnectionMessage(connection, messageID,
                                                      arguments, reply);
 
+  if (messageID.is<CoreIPC::MessageClassNPObjectMessageReceiver>())
+    return m_npRemoteObjectMap.didReceiveSyncMessage(connection, messageID,
+                                                     arguments, reply);
+
   if (PluginControllerProxy* pluginControllerProxy =
-          m_pluginControllers.get(arguments->destinationID()))
+          m_pluginControllers.get(destinationID))
     return pluginControllerProxy->didReceiveSyncPluginControllerProxyMessage(
         connection, messageID, arguments, reply);
 
