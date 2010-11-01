@@ -1676,7 +1676,15 @@ ResourceError WebFrame::pluginWillHandleLoadError(
 }
 
 bool WebFrame::shouldFallBack(const ResourceError& error) {
-  return error.errorCode() != WebURLErrorCancelled;
+  if (error.errorCode() == WebURLErrorCancelled &&
+      error.domain() == String(WebURLErrorDomain))
+    return false;
+
+  if (error.errorCode() == WebKitErrorPlugInWillHandleLoad &&
+      error.domain() == String(WebKitErrorDomain))
+    return false;
+
+  return true;
 }
 
 COMPtr<WebFramePolicyListener> WebFrame::setUpPolicyListener(

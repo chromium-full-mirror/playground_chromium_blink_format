@@ -539,12 +539,20 @@ void WebFrameLoaderClient::committedLoad(DocumentLoader* loader,
   if (!m_manualLoader)
     loader->commitData(data, length);
 
+  // If the document is a stand-alone media document, now is the right time to
+  // cancel the WebKit load.
+  // FIXME: This code should be shared across all ports.
+  // <http://webkit.org/b/48762>.
+  Frame* coreFrame = core(m_webFrame);
+  if (coreFrame->document()->isMediaDocument())
+    loader->cancelMainResourceLoad(
+        pluginWillHandleLoadError(loader->response()));
+
   if (!m_manualLoader)
     return;
 
   if (!m_hasSentResponseToPlugin) {
-    m_manualLoader->didReceiveResponse(
-        core(m_webFrame)->loader()->documentLoader()->response());
+    m_manualLoader->didReceiveResponse(loader->response());
     // didReceiveResponse sets up a new stream to the plug-in. on a full-page
     // plug-in, a failure in
     // setting up this stream can cause the main document load to be cancelled,
