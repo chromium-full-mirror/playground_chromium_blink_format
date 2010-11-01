@@ -102,6 +102,9 @@ class WebPreferences : public APIObject {
   void setFantasyFontFamily(const String&);
   const String& fantasyFontFamily() const;
 
+  void setMinimumFontSize(uint32_t);
+  uint32_t minimumFontSize() const;
+
   void setAcceleratedCompositingEnabled(bool);
   bool acceleratedCompositingEnabled() const;
 
