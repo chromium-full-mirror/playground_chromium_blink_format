@@ -1038,6 +1038,9 @@ void SVGUseElement::associateInstancesWithShadowTreeElements(
     while (node && !node->isSVGElement())
       node = node->nextSibling();
 
+    if (!node)
+      break;
+
     associateInstancesWithShadowTreeElements(node, instance);
     node = node->nextSibling();
   }
