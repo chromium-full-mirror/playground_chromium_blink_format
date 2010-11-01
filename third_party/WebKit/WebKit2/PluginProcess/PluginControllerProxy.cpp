@@ -180,7 +180,7 @@ NPObject* PluginControllerProxy::windowScriptNPObject() {
   if (!windowScriptNPObjectID)
     return 0;
 
-  return m_connection->npRemoteObjectMap().getOrCreateNPObjectProxy(
+  return m_connection->npRemoteObjectMap().createNPObjectProxy(
       windowScriptNPObjectID);
 }
 

@@ -28,6 +28,7 @@
 #include "NPRemoteObjectMap.h"
 
 #include "NPObjectMessageReceiver.h"
+#include "NPObjectProxy.h"
 #include <wtf/OwnPtr.h>
 
 namespace WebKit {
@@ -40,10 +41,8 @@ static uint64_t generateNPObjectID() {
 NPRemoteObjectMap::NPRemoteObjectMap(CoreIPC::Connection* connection)
     : m_connection(connection) {}
 
-NPObjectProxy* NPRemoteObjectMap::getOrCreateNPObjectProxy(
-    uint64_t remoteObjectID) {
-  // FIXME: Implement.
-  return 0;
+NPObjectProxy* NPRemoteObjectMap::createNPObjectProxy(uint64_t remoteObjectID) {
+  return NPObjectProxy::create(remoteObjectID);
 }
 
 uint64_t NPRemoteObjectMap::registerNPObject(NPObject* npObject) {

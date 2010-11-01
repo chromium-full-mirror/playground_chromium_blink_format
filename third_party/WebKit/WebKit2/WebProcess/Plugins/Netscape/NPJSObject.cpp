@@ -334,7 +334,7 @@ NPClass* NPJSObject::npClass() {
   return &npClass;
 }
 
-NPObject* NPJSObject::NP_Allocate(NPP npp, NPClass* npClass) {
+NPObject* NPJSObject::NP_Allocate(NPP npp, NPClass*) {
   ASSERT_UNUSED(npp, !npp);
 
   return new NPJSObject;
