@@ -72,4 +72,10 @@ ResourceError fileDoesNotExistError(const ResourceResponse& response) {
   return ResourceError();
 }
 
+ResourceError pluginWillHandleLoadError(const ResourceResponse& response) {
+  return ResourceError(WebError::webKitErrorDomain(),
+                       kWKErrorCodePlugInWillHandleLoad,
+                       response.url().string(), String());
+}
+
 }  // namespace WebKit

@@ -723,13 +723,20 @@ void WebFrameLoaderClient::committedLoad(DocumentLoader* loader,
   if (!m_pluginView)
     loader->commitData(data, length);
 
+  // If the document is a stand-alone media document, now is the right time to
+  // cancel the WebKit load.
+  // FIXME: This code should be shared across all ports.
+  // <http://webkit.org/b/48762>.
+  if (m_frame->coreFrame()->document()->isMediaDocument())
+    loader->cancelMainResourceLoad(
+        pluginWillHandleLoadError(loader->response()));
+
   // Calling commitData did not create the plug-in view.
   if (!m_pluginView)
     return;
 
   if (!m_hasSentResponseToPluginView) {
-    m_pluginView->manualLoadDidReceiveResponse(
-        m_frame->coreFrame()->loader()->documentLoader()->response());
+    m_pluginView->manualLoadDidReceiveResponse(loader->response());
     // manualLoadDidReceiveResponse sets up a new stream to the plug-in. on a
     // full-page plug-in, a failure in
     // setting up this stream can cause the main document load to be cancelled,
@@ -873,14 +880,25 @@ ResourceError WebFrameLoaderClient::fileDoesNotExistError(
 }
 
 ResourceError WebFrameLoaderClient::pluginWillHandleLoadError(
-    const ResourceResponse&) {
-  notImplemented();
-  return ResourceError();
+    const ResourceResponse& response) {
+  return WebKit::pluginWillHandleLoadError(response);
 }
 
-bool WebFrameLoaderClient::shouldFallBack(const ResourceError&) {
-  notImplemented();
-  return false;
+bool WebFrameLoaderClient::shouldFallBack(const ResourceError& error) {
+  DEFINE_STATIC_LOCAL(const ResourceError, cancelledError,
+                      (this->cancelledError(ResourceRequest())));
+  DEFINE_STATIC_LOCAL(const ResourceError, pluginWillHandleLoadError,
+                      (this->pluginWillHandleLoadError(ResourceResponse())));
+
+  if (error.errorCode() == cancelledError.errorCode() &&
+      error.domain() == cancelledError.domain())
+    return false;
+
+  if (error.errorCode() == pluginWillHandleLoadError.errorCode() &&
+      error.domain() == pluginWillHandleLoadError.domain())
+    return false;
+
+  return true;
 }
 
 bool WebFrameLoaderClient::canHandleRequest(const ResourceRequest&) const {

@@ -40,6 +40,8 @@ WebCore::ResourceError interruptForPolicyChangeError(
 WebCore::ResourceError cannotShowMIMETypeError(
     const WebCore::ResourceResponse&);
 WebCore::ResourceError fileDoesNotExistError(const WebCore::ResourceResponse&);
+WebCore::ResourceError pluginWillHandleLoadError(
+    const WebCore::ResourceResponse&);
 
 }  // namespace WebKit
 

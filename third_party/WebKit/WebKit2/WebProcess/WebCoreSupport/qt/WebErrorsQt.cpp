@@ -26,6 +26,7 @@
 
 #include "WebErrors.h"
 
+#include "NotImplemented.h"
 #include <WebCore/ResourceRequest.h>
 #include <WebCore/ResourceResponse.h>
 
@@ -92,6 +93,11 @@ ResourceError fileDoesNotExistError(const ResourceResponse& response) {
       "QtNetwork", QNetworkReply::ContentNotFoundError, response.url().string(),
       QCoreApplication::translate("QWebFrame", "File does not exist", 0,
                                   QCoreApplication::UnicodeUTF8));
+}
+
+ResourceError pluginWillHandleLoadError(const ResourceResponse&) {
+  notImplemented();
+  return ResourceError();
 }
 
 }  // namespace WebKit
