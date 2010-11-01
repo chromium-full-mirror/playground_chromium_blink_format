@@ -29,6 +29,7 @@
 
 #include "BackingStore.h"
 #include "DataReference.h"
+#include "NPRuntimeUtilities.h"
 #include "NotImplemented.h"
 #include "PluginController.h"
 #include "PluginControllerProxyMessages.h"
@@ -394,8 +395,15 @@ void PluginProxy::setCookiesForURL(const String& urlString,
 }
 
 void PluginProxy::getWindowScriptNPObject(uint64_t& windowScriptNPObjectID) {
-  // FIXME: Actually get the window script object here.
-  windowScriptNPObjectID = 0;
+  NPObject* windowScriptNPObject = m_pluginController->windowScriptNPObject();
+  if (!windowScriptNPObject) {
+    windowScriptNPObjectID = 0;
+    return;
+  }
+
+  windowScriptNPObjectID =
+      m_connection->npRemoteObjectMap().registerNPObject(windowScriptNPObject);
+  releaseNPObject(windowScriptNPObject);
 }
 
 void PluginProxy::update(const IntRect& paintedRect) {

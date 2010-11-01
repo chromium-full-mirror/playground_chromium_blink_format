@@ -38,9 +38,12 @@ PluginProcessConnection::PluginProcessConnection(
     const String& pluginPath,
     CoreIPC::Connection::Identifier connectionIdentifier)
     : m_pluginProcessConnectionManager(pluginProcessConnectionManager),
-      m_pluginPath(pluginPath) {
-  m_connection = CoreIPC::Connection::createClientConnection(
-      connectionIdentifier, this, WebProcess::shared().runLoop());
+      m_pluginPath(pluginPath),
+      m_connection(CoreIPC::Connection::createClientConnection(
+          connectionIdentifier,
+          this,
+          WebProcess::shared().runLoop())),
+      m_npRemoteObjectMap(m_connection.get()) {
   m_connection->open();
 }
 
