@@ -29,6 +29,7 @@
 #include "Interpreter.h"
 #include "JSArray.h"
 #include "JSByteArray.h"
+#include "JSDocument.h"
 #include "JSDOMBinding.h"
 #include "JSDOMWindow.h"
 #include <JSFunction.h>
@@ -785,6 +786,9 @@ QVariant convertValueToQVariant(ExecState* exec,
         if (object && object->inherits(&JSHTMLElement::s_info))
           ret = QVariant::fromValue<QWebElement>(QtWebElementRuntime::create(
               (static_cast<JSHTMLElement*>(object))->impl()));
+        else if (object && object->inherits(&JSDocument::s_info))
+          ret = QVariant::fromValue<QWebElement>(QtWebElementRuntime::create(
+              (static_cast<JSDocument*>(object))->impl()->documentElement()));
         else
           ret = QVariant::fromValue<QWebElement>(QWebElement());
       } else if (hint == (QMetaType::Type)qMetaTypeId<QVariant>()) {
