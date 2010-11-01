@@ -31,7 +31,6 @@
 #ifndef InspectorResourceAgent_h
 #define InspectorResourceAgent_h
 
-#include "InspectorResource.h"
 #include "PlatformString.h"
 
 #include <wtf/PassRefPtr.h>
@@ -48,6 +47,7 @@ namespace WebCore {
 class CachedResource;
 class Document;
 class DocumentLoader;
+class Frame;
 class InspectorArray;
 class InspectorObject;
 class InspectorFrontend;
@@ -96,7 +96,7 @@ class InspectorResourceAgent : public RefCounted<InspectorResourceAgent> {
   void didLoadResourceFromMemoryCache(DocumentLoader*, const CachedResource*);
   void setOverrideContent(unsigned long identifier,
                           const String& sourceString,
-                          InspectorResource::Type);
+                          const String& type);
   void didCommitLoad(DocumentLoader*);
   void frameDetachedFromParent(Frame*);
 
