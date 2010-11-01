@@ -210,6 +210,10 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual PassRefPtr<WebCore::SearchPopupMenu> createSearchPopupMenu(
       WebCore::PopupMenuClient*) const;
 
+#if ENABLE(CONTEXT_MENUS)
+  virtual void showContextMenu();
+#endif
+
 #if USE(ACCELERATED_COMPOSITING)
   virtual void attachRootGraphicsLayer(WebCore::Frame*,
                                        WebCore::GraphicsLayer*);

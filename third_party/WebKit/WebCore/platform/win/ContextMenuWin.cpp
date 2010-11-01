@@ -149,4 +149,9 @@ HMENU ContextMenu::releasePlatformDescription() {
   m_platformDescription = 0;
   return description;
 }
+
+Vector<ContextMenuItem> contextMenuItemVector(PlatformMenuDescription) {
+  // FIXME - Implement
+  return Vector<ContextMenuItem>();
+}
 }

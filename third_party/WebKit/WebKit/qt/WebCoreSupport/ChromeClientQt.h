@@ -146,6 +146,9 @@ class ChromeClientQt : public ChromeClient {
   virtual void reachedMaxAppCacheSize(int64_t spaceNeeded);
   virtual void reachedApplicationCacheOriginQuota(SecurityOrigin*);
 #endif
+#if ENABLE(CONTEXT_MENUS)
+  virtual void showContextMenu() {}
+#endif
 
 #if ENABLE(NOTIFICATIONS)
   virtual NotificationPresenter* notificationPresenter() const;

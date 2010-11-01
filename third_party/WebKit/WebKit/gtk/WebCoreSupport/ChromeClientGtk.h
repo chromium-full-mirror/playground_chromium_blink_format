@@ -131,6 +131,9 @@ class ChromeClient : public WebCore::ChromeClient {
   virtual void reachedMaxAppCacheSize(int64_t spaceNeeded);
   virtual void reachedApplicationCacheOriginQuota(WebCore::SecurityOrigin*);
 #endif
+#if ENABLE(CONTEXT_MENUS)
+  virtual void showContextMenu() {}
+#endif
   virtual void runOpenPanel(WebCore::Frame*, PassRefPtr<WebCore::FileChooser>);
   virtual void chooseIconForFiles(const Vector<WTF::String>&,
                                   WebCore::FileChooser*);

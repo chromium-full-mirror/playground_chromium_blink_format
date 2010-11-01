@@ -164,6 +164,10 @@ class EmptyChromeClient : public ChromeClient {
     return adoptRef(new EmptySearchPopupMenu());
   }
 
+#if ENABLE(CONTEXT_MENUS)
+  virtual void showContextMenu() {}
+#endif
+
   virtual void setStatusbarText(const String&) {}
 
   virtual bool tabsToLinks() const { return false; }

@@ -138,6 +138,10 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void reachedApplicationCacheOriginQuota(WebCore::SecurityOrigin*);
 #endif
 
+#if ENABLE(CONTEXT_MENUS)
+  virtual void showContextMenu() {}
+#endif
+
   virtual void populateVisitedLinks();
 
   virtual bool paintCustomScrollbar(WebCore::GraphicsContext*,

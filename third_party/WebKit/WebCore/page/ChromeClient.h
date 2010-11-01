@@ -301,6 +301,10 @@ class ChromeClient {
   virtual PassRefPtr<SearchPopupMenu> createSearchPopupMenu(
       PopupMenuClient*) const = 0;
 
+#if ENABLE(CONTEXT_MENUS)
+  virtual void showContextMenu() = 0;
+#endif
+
   virtual void postAccessibilityNotification(AccessibilityObject*,
                                              AXObjectCache::AXNotification) {}
 

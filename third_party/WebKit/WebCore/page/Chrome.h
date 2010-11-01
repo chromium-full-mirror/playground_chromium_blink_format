@@ -161,6 +161,10 @@ class Chrome : public HostWindow {
   PassRefPtr<PopupMenu> createPopupMenu(PopupMenuClient*) const;
   PassRefPtr<SearchPopupMenu> createSearchPopupMenu(PopupMenuClient*) const;
 
+#if ENABLE(CONTEXT_MENUS)
+  void showContextMenu();
+#endif
+
  private:
   Page* m_page;
   ChromeClient* m_client;

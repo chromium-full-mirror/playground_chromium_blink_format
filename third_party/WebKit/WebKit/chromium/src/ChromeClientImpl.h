@@ -194,6 +194,10 @@ class ChromeClientImpl : public WebCore::ChromeClientChromium {
   virtual PassRefPtr<WebCore::SearchPopupMenu> createSearchPopupMenu(
       WebCore::PopupMenuClient*) const;
 
+#if ENABLE(CONTEXT_MENUS)
+  virtual void showContextMenu() {}
+#endif
+
  private:
   void getPopupMenuInfo(WebCore::PopupContainer*, WebPopupMenuInfo*);
 

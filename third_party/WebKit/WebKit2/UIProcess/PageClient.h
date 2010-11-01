@@ -39,8 +39,9 @@ namespace WebKit {
 
 class FindIndicator;
 class NativeWebKeyboardEvent;
-class WebEditCommandProxy;
 class NativeWebKeyboardEvent;
+class WebContextMenuProxy;
+class WebEditCommandProxy;
 class WebPopupMenuProxy;
 
 class PageClient {
@@ -77,6 +78,8 @@ class PageClient {
   virtual void didNotHandleKeyEvent(const NativeWebKeyboardEvent&) = 0;
 
   virtual PassRefPtr<WebPopupMenuProxy> createPopupMenuProxy() = 0;
+  virtual PassRefPtr<WebContextMenuProxy> createContextMenuProxy(
+      WebPageProxy*) = 0;
 
   virtual void setFindIndicator(PassRefPtr<FindIndicator>, bool fadeOut) = 0;
 

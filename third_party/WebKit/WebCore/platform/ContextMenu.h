@@ -89,6 +89,8 @@ class ContextMenu : public Noncopyable {
   PlatformMenuDescription m_platformDescription;
 #endif
 };
+
+Vector<ContextMenuItem> contextMenuItemVector(PlatformMenuDescription);
 }
 
 #endif  // ContextMenu_h

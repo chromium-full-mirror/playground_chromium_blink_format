@@ -212,6 +212,9 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual PassRefPtr<WebCore::SearchPopupMenu> createSearchPopupMenu(
       WebCore::PopupMenuClient*) const;
 
+#if ENABLE(CONTEXT_MENUS)
+  virtual void showContextMenu() {}
+#endif
  private:
   WebView* m_webView;
 };

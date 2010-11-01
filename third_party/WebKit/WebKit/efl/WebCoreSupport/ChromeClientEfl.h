@@ -128,6 +128,10 @@ class ChromeClientEfl : public ChromeClient {
   virtual void reachedApplicationCacheOriginQuota(SecurityOrigin*);
 #endif
 
+#if ENABLE(CONTEXT_MENUS)
+  virtual void showContextMenu() {}
+#endif
+
   virtual void runOpenPanel(Frame*, PassRefPtr<FileChooser>);
   virtual void chooseIconForFiles(const Vector<String>&, FileChooser*);
   virtual void formStateDidChange(const Node*);
