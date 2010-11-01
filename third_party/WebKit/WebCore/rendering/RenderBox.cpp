@@ -3576,21 +3576,21 @@ int RenderBox::baselinePosition(bool /*firstLine*/,
   return 0;
 }
 
-void RenderBox::blockDirectionOverflow(bool isLineVertical,
+void RenderBox::blockDirectionOverflow(bool isLineHorizontal,
                                        int& logicalTopLayoutOverflow,
                                        int& logicalBottomLayoutOverflow,
                                        int& logicalTopVisualOverflow,
                                        int& logicalBottomVisualOverflow) {
-  if (isLineVertical) {
-    logicalTopLayoutOverflow = leftLayoutOverflow();
-    logicalBottomLayoutOverflow = rightLayoutOverflow();
-    logicalTopVisualOverflow = leftVisualOverflow();
-    logicalBottomVisualOverflow = rightVisualOverflow();
-  } else {
+  if (isLineHorizontal) {
     logicalTopLayoutOverflow = topLayoutOverflow();
     logicalBottomLayoutOverflow = bottomLayoutOverflow();
     logicalTopVisualOverflow = topVisualOverflow();
     logicalBottomVisualOverflow = bottomVisualOverflow();
+  } else {
+    logicalTopLayoutOverflow = leftLayoutOverflow();
+    logicalBottomLayoutOverflow = rightLayoutOverflow();
+    logicalTopVisualOverflow = leftVisualOverflow();
+    logicalBottomVisualOverflow = rightVisualOverflow();
   }
 }
 

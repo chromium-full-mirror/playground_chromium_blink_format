@@ -220,7 +220,7 @@ class RenderBox : public RenderBoxModelObject {
   void addOverflowFromChild(RenderBox* child, const IntSize& delta);
   void clearLayoutOverflow();
 
-  void blockDirectionOverflow(bool isLineVertical,
+  void blockDirectionOverflow(bool isLineHorizontal,
                               int& logicalTopLayoutOverflow,
                               int& logicalBottomLayoutOverflow,
                               int& logicalTopVisualOverflow,

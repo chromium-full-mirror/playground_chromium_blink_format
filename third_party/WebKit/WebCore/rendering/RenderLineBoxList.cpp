@@ -319,13 +319,13 @@ bool RenderLineBoxList::hitTest(RenderBoxModelObject* renderer,
   if (!firstLineBox())
     return false;
 
-  bool isVertical = firstLineBox()->isVertical();
+  bool isHorizontal = firstLineBox()->isHorizontal();
 
   int logicalPointStart =
-      isVertical ? x - result.leftPadding() : y - result.topPadding();
+      isHorizontal ? y - result.topPadding() : x - result.leftPadding();
   int logicalPointEnd =
-      isVertical ? x + result.rightPadding() : y + result.bottomPadding();
-  int offset = isVertical ? tx : ty;
+      isHorizontal ? y + result.bottomPadding() : x + result.rightPadding();
+  int offset = isHorizontal ? ty : tx;
 
   // We can check the first box and last box and avoid hit testing if we don't
   // contain the point.  This is a quick short-circuit that we can take to avoid

@@ -539,17 +539,17 @@ void RenderBoxModelObject::paintFillLayerExtended(
 
     if (!includeLeftEdge) {
       topLeft = IntSize();
-      if (box->isVertical())
-        topRight = IntSize();
-      else
+      if (box->isHorizontal())
         bottomLeft = IntSize();
+      else
+        topRight = IntSize();
     }
 
     if (!includeRightEdge) {
-      if (box->isVertical())
-        bottomLeft = IntSize();
-      else
+      if (box->isHorizontal())
         topRight = IntSize();
+      else
+        bottomLeft = IntSize();
       bottomRight = IntSize();
     }
 

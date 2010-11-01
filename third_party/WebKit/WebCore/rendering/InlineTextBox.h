@@ -153,7 +153,7 @@ class InlineTextBox : public InlineBox {
                                                 const FloatRect& textRect,
                                                 bool stroked,
                                                 bool opaque,
-                                                bool vertical);
+                                                bool horizontal);
 
  private:
   InlineTextBox*

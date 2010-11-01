@@ -115,12 +115,12 @@ class RootInlineBox : public InlineFlowBox {
 
   virtual int baselinePosition() const {
     return boxModelObject()->baselinePosition(
-        m_firstLine, m_isVertical ? VerticalLine : HorizontalLine,
+        m_firstLine, isHorizontal() ? HorizontalLine : VerticalLine,
         PositionOfInteriorLineBoxes);
   }
   virtual int lineHeight() const {
     return boxModelObject()->lineHeight(
-        m_firstLine, m_isVertical ? VerticalLine : HorizontalLine,
+        m_firstLine, isHorizontal() ? HorizontalLine : VerticalLine,
         PositionOfInteriorLineBoxes);
   }
 

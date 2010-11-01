@@ -53,7 +53,7 @@ class InlineBox {
         m_hasVirtualLogicalHeight(false)
 #endif
         ,
-        m_isVertical(false),
+        m_isHorizontal(true),
         m_endsWithBreak(false),
         m_hasSelectedChildren(false),
         m_hasEllipsisBoxOrHyphen(false),
@@ -79,7 +79,7 @@ class InlineBox {
             bool constructed,
             bool dirty,
             bool extracted,
-            bool isVertical,
+            bool isHorizontal,
             InlineBox* next,
             InlineBox* prev,
             InlineFlowBox* parent)
@@ -100,7 +100,7 @@ class InlineBox {
         m_hasVirtualLogicalHeight(false)
 #endif
         ,
-        m_isVertical(isVertical),
+        m_isHorizontal(isHorizontal),
         m_endsWithBreak(false),
         m_hasSelectedChildren(false),
         m_hasEllipsisBoxOrHyphen(false),
@@ -172,8 +172,8 @@ class InlineBox {
     return 0;
   }
 
-  bool isVertical() const { return m_isVertical; }
-  void setIsVertical(bool v) { m_isVertical = v; }
+  bool isHorizontal() const { return m_isHorizontal; }
+  void setIsHorizontal(bool horizontal) { m_isHorizontal = horizontal; }
 
   virtual IntRect calculateBoundaries() const {
     ASSERT_NOT_REACHED();
@@ -232,15 +232,19 @@ class InlineBox {
   void setY(int y) { m_y = y; }
   int y() const { return m_y; }
 
-  int width() const { return m_isVertical ? logicalHeight() : logicalWidth(); }
-  int height() const { return m_isVertical ? logicalWidth() : logicalHeight(); }
+  int width() const {
+    return isHorizontal() ? logicalWidth() : logicalHeight();
+  }
+  int height() const {
+    return isHorizontal() ? logicalHeight() : logicalWidth();
+  }
 
   // The logicalLeft position is the left edge of the line box in a horizontal
   // line and the top edge in a vertical line.
-  int logicalLeft() const { return !m_isVertical ? m_x : m_y; }
+  int logicalLeft() const { return isHorizontal() ? m_x : m_y; }
   int logicalRight() const { return logicalLeft() + logicalWidth(); }
   void setLogicalLeft(int left) {
-    if (!m_isVertical)
+    if (isHorizontal())
       m_x = left;
     else
       m_y = left;
@@ -248,10 +252,10 @@ class InlineBox {
 
   // The logicalTop[ position is the top edge of the line box in a horizontal
   // line and the left edge in a vertical line.
-  int logicalTop() const { return !m_isVertical ? m_y : m_x; }
+  int logicalTop() const { return isHorizontal() ? m_y : m_x; }
   int logicalBottom() const { return logicalTop() + logicalHeight(); }
   void setLogicalTop(int top) {
-    if (!m_isVertical)
+    if (isHorizontal())
       m_y = top;
     else
       m_x = top;
@@ -268,12 +272,12 @@ class InlineBox {
 
   virtual int baselinePosition() const {
     return boxModelObject()->baselinePosition(
-        m_firstLine, m_isVertical ? VerticalLine : HorizontalLine,
+        m_firstLine, isHorizontal() ? HorizontalLine : VerticalLine,
         PositionOnContainingLine);
   }
   virtual int lineHeight() const {
     return boxModelObject()->lineHeight(
-        m_firstLine, m_isVertical ? VerticalLine : HorizontalLine,
+        m_firstLine, isHorizontal() ? HorizontalLine : VerticalLine,
         PositionOnContainingLine);
   }
 
@@ -361,7 +365,7 @@ class InlineBox {
   bool m_extracted : 1;
   bool m_hasVirtualLogicalHeight : 1;
 
-  bool m_isVertical : 1;
+  bool m_isHorizontal : 1;
 
   // for RootInlineBox
   bool m_endsWithBreak : 1;        // Whether the line ends with a <br>.
