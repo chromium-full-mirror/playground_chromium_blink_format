@@ -745,6 +745,13 @@ void QTMovie::setClosedCaptionsVisible(bool visible) {
                      &doDisplay);
 }
 
+long QTMovie::timeScale() const {
+  if (!m_private->m_movie)
+    return 0;
+
+  return GetMovieTimeScale(m_private->m_movie);
+}
+
 static void initializeSupportedTypes() {
   if (gSupportedTypes)
     return;

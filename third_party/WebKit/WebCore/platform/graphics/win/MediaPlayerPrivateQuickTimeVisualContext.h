@@ -180,6 +180,8 @@ class MediaPlayerPrivateQuickTimeVisualContext
 
   void retrieveAndResetMovieTransform();
 
+  virtual float mediaTimeForTimeValue(float) const;
+
   MediaPlayer* m_player;
   RefPtr<QTMovie> m_movie;
 #if USE(ACCELERATED_COMPOSITING)
