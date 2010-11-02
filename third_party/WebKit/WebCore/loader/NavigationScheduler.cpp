@@ -411,9 +411,9 @@ void NavigationScheduler::scheduleHistoryNavigation(int steps) {
   // have the side effect of cancelling any scheduled
   // redirects. We also avoid the possibility of cancelling the current load by
   // avoiding the scheduled redirection altogether.
-  HistoryItem* specifiedEntry =
-      m_frame->page()->backForward()->itemAtIndex(steps);
-  if (!specifiedEntry) {
+  BackForwardController* backForward = m_frame->page()->backForward();
+  if (steps > backForward->forwardCount() ||
+      -steps > backForward->backCount()) {
     cancel();
     return;
   }
