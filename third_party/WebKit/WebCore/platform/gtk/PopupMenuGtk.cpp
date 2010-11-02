@@ -98,7 +98,7 @@ void PopupMenuGtk::show(const IntRect& rect, FrameView* view, int index) {
 
   GList* children = gtk_container_get_children(GTK_CONTAINER(m_popup.get()));
   GList* p = children;
-  if (size)
+  if (size) {
     for (int i = 0; i < size; i++) {
       if (i > index)
         break;
@@ -114,9 +114,10 @@ void PopupMenuGtk::show(const IntRect& rect, FrameView* view, int index) {
 
       p = g_list_next(p);
     }
-  else
+  } else {
     // Center vertically the empty popup in the combo box area
     m_menuPosition.setY(m_menuPosition.y() - rect.height() / 2);
+  }
 
   g_list_free(children);
   gtk_menu_popup(m_popup.get(), 0, 0,
