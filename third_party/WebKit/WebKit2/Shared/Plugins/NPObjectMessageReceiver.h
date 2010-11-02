@@ -62,6 +62,11 @@ class NPObjectMessageReceiver {
 
   // Message handlers.
   void deallocate();
+  void hasMethod(const NPIdentifierData&, bool& returnValue);
+  void invoke(const NPIdentifierData&,
+              const Vector<NPVariantData>& argumentsData,
+              bool& returnValue,
+              NPVariantData& resultData);
   void hasProperty(const NPIdentifierData&, bool& returnValue);
   void getProperty(const NPIdentifierData&,
                    bool& returnValue,
