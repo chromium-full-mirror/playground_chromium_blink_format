@@ -46,7 +46,27 @@ class WebInspectorProxy : public APIObject {
 
   void invalidate();
 
+  // Public APIs
   WebPageProxy* page() { return m_page; }
+
+  bool isVisible() const { return m_isVisible; }
+  void show();
+  void close();
+
+  void showConsole();
+
+  bool isAttached() const { return m_isAttached; }
+  void attach();
+  void detach();
+
+  bool isDebuggingJavaScript() const { return m_isDebuggingJavaScript; }
+  void toggleJavaScriptDebugging();
+
+  bool isProfilingJavaScript() const { return m_isProfilingJavaScript; }
+  void toggleJavaScriptProfiling();
+
+  bool isProfilingPage() const { return m_isProfilingPage; }
+  void togglePageProfiling();
 
  private:
   WebInspectorProxy(WebPageProxy* page);
@@ -54,6 +74,12 @@ class WebInspectorProxy : public APIObject {
   virtual Type type() const { return APIType; }
 
   WebPageProxy* m_page;
+
+  bool m_isVisible;
+  bool m_isAttached;
+  bool m_isDebuggingJavaScript;
+  bool m_isProfilingJavaScript;
+  bool m_isProfilingPage;
 };
 
 }  // namespace WebKit
