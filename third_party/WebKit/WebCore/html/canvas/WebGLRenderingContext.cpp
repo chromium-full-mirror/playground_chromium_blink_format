@@ -3142,7 +3142,7 @@ void WebGLRenderingContext::vertexAttribPointer(unsigned long index,
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
-  if (size < 1 || size > 4 || stride < 0 || offset < 0) {
+  if (size < 1 || size > 4 || stride < 0 || stride > 255 || offset < 0) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
