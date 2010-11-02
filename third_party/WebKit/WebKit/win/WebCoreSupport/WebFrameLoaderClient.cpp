@@ -815,10 +815,27 @@ void WebFrameLoaderClient::didTransferChildFrameToNewDocument(Page*) {
 }
 
 void WebFrameLoaderClient::transferLoadingResourceFromPage(
-    unsigned long,
-    DocumentLoader*,
-    const ResourceRequest&,
-    Page*) {}
+    unsigned long identifier,
+    DocumentLoader* loader,
+    const ResourceRequest& request,
+    Page* oldPage) {
+  assignIdentifierToInitialRequest(identifier, loader, request);
+
+  WebView* oldWebView = kit(oldPage);
+  if (!oldWebView)
+    return;
+
+  COMPtr<IWebResourceLoadDelegate> oldResourceLoadDelegate;
+  if (FAILED(oldWebView->resourceLoadDelegate(&oldResourceLoadDelegate)))
+    return;
+
+  COMPtr<IWebResourceLoadDelegatePrivate2> oldResourceLoadDelegatePrivate2(
+      Query, oldResourceLoadDelegate);
+  if (!oldResourceLoadDelegatePrivate2)
+    return;
+  oldResourceLoadDelegatePrivate2->removeIdentifierForRequest(oldWebView,
+                                                              identifier);
+}
 
 PassRefPtr<Frame> WebFrameLoaderClient::createFrame(
     const KURL& URL,

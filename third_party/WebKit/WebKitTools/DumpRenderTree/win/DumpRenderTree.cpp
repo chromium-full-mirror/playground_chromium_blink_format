@@ -102,7 +102,6 @@ PolicyDelegate* policyDelegate;
 COMPtr<FrameLoadDelegate> sharedFrameLoadDelegate;
 COMPtr<UIDelegate> sharedUIDelegate;
 COMPtr<EditingDelegate> sharedEditingDelegate;
-COMPtr<ResourceLoadDelegate> sharedResourceLoadDelegate;
 COMPtr<HistoryDelegate> sharedHistoryDelegate;
 
 IWebFrame* frame;
@@ -1238,8 +1237,11 @@ IWebView* createWebViewAndOffscreenWindow(HWND* webViewWindow) {
   if (FAILED(viewEditing->setEditingDelegate(sharedEditingDelegate.get())))
     return 0;
 
-  if (FAILED(
-          webView->setResourceLoadDelegate(sharedResourceLoadDelegate.get())))
+  ResourceLoadDelegate* resourceLoadDelegate = new ResourceLoadDelegate();
+  HRESULT result = webView->setResourceLoadDelegate(resourceLoadDelegate);
+  resourceLoadDelegate->Release();  // The delegate is owned by the WebView, so
+                                    // release our reference to it.
+  if (FAILED(result))
     return 0;
 
   openWindows().append(hostWindow);
@@ -1324,7 +1326,6 @@ int main(int argc, char* argv[]) {
   sharedFrameLoadDelegate.adoptRef(new FrameLoadDelegate);
   sharedUIDelegate.adoptRef(new UIDelegate);
   sharedEditingDelegate.adoptRef(new EditingDelegate);
-  sharedResourceLoadDelegate.adoptRef(new ResourceLoadDelegate);
   sharedHistoryDelegate.adoptRef(new HistoryDelegate);
 
   // FIXME - need to make DRT pass with Windows native controls
