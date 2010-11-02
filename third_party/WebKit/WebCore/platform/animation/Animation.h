@@ -98,7 +98,9 @@ class Animation : public RefCounted<Animation> {
   enum { IterationCountInfinite = -1 };
   int iterationCount() const { return m_iterationCount; }
   const String& name() const { return m_name; }
-  unsigned playState() const { return m_playState; }
+  EAnimPlayState playState() const {
+    return static_cast<EAnimPlayState>(m_playState);
+  }
   int property() const { return m_property; }
   const PassRefPtr<TimingFunction> timingFunction() const {
     return m_timingFunction;
@@ -129,7 +131,7 @@ class Animation : public RefCounted<Animation> {
     m_name = n;
     m_nameSet = true;
   }
-  void setPlayState(unsigned d) {
+  void setPlayState(EAnimPlayState d) {
     m_playState = d;
     m_playStateSet = true;
   }
@@ -198,7 +200,9 @@ class Animation : public RefCounted<Animation> {
   static unsigned initialAnimationFillMode() { return AnimationFillModeNone; }
   static int initialAnimationIterationCount() { return 1; }
   static String initialAnimationName() { return String("none"); }
-  static unsigned initialAnimationPlayState() { return AnimPlayStatePlaying; }
+  static EAnimPlayState initialAnimationPlayState() {
+    return AnimPlayStatePlaying;
+  }
   static int initialAnimationProperty() { return cAnimateAll; }
   static PassRefPtr<TimingFunction> initialAnimationTimingFunction() {
     return CubicBezierTimingFunction::create();

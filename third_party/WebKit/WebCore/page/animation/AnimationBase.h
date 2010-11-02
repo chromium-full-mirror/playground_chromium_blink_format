@@ -29,6 +29,7 @@
 #ifndef AnimationBase_h
 #define AnimationBase_h
 
+#include "RenderStyleConstants.h"
 #include <wtf/HashMap.h>
 #include <wtf/text/AtomicString.h>
 
@@ -116,7 +117,7 @@ class AnimationBase : public RefCounted<AnimationBase> {
   }
 
   // Called to change to or from paused state
-  void updatePlayState(bool running);
+  void updatePlayState(EAnimPlayState);
   bool playStatePlaying() const;
 
   bool waitingToStart() const {

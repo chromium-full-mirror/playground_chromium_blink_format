@@ -69,7 +69,7 @@ class CompositeAnimation : public RefCounted<CompositeAnimation> {
 
   void suspendAnimations();
   void resumeAnimations();
-  bool isSuspended() const { return m_isSuspended; }
+  bool suspended() const { return m_suspended; }
 
   bool hasAnimations() const {
     return !m_transitions.isEmpty() || !m_keyframeAnimations.isEmpty();
@@ -93,7 +93,7 @@ class CompositeAnimation : public RefCounted<CompositeAnimation> {
   CompositeAnimation(AnimationControllerPrivate* animationController)
       : m_animationController(animationController),
         m_numStyleAvailableWaiters(0),
-        m_isSuspended(false) {}
+        m_suspended(false) {}
 
   void updateTransitions(RenderObject*,
                          RenderStyle* currentStyle,
@@ -111,7 +111,7 @@ class CompositeAnimation : public RefCounted<CompositeAnimation> {
   AnimationNameMap m_keyframeAnimations;
   Vector<AtomicStringImpl*> m_keyframeAnimationOrderMap;
   unsigned m_numStyleAvailableWaiters;
-  bool m_isSuspended;
+  bool m_suspended;
 };
 
 }  // namespace WebCore

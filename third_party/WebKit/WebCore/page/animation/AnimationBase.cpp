@@ -1467,7 +1467,8 @@ void AnimationBase::fireAnimationEventsIfNeeded() {
   }
 }
 
-void AnimationBase::updatePlayState(bool run) {
+void AnimationBase::updatePlayState(EAnimPlayState playState) {
+  bool run = playState == AnimPlayStatePlaying;
   if (paused() == run || isNew())
     updateStateMachine(run ? AnimationStateInputPlayStateRunning
                            : AnimationStateInputPlayStatePaused,

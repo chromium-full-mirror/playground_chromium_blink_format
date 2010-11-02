@@ -271,8 +271,7 @@ void CompositeAnimation::updateKeyframeAnimations(RenderObject* renderer,
           // This one is still active.
 
           // Animations match, but play states may differ. Update if needed.
-          keyframeAnim->updatePlayState(anim->playState() ==
-                                        AnimPlayStatePlaying);
+          keyframeAnim->updatePlayState(anim->playState());
 
           // Set the saved animation to this new one, just in case the play
           // state has changed.
@@ -450,10 +449,10 @@ PassRefPtr<KeyframeAnimation> CompositeAnimation::getAnimationForProperty(
 }
 
 void CompositeAnimation::suspendAnimations() {
-  if (m_isSuspended)
+  if (m_suspended)
     return;
 
-  m_isSuspended = true;
+  m_suspended = true;
 
   if (!m_keyframeAnimations.isEmpty()) {
     m_keyframeAnimations.checkConsistency();
@@ -461,7 +460,7 @@ void CompositeAnimation::suspendAnimations() {
     for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
          it != animationsEnd; ++it) {
       if (KeyframeAnimation* anim = it->second.get())
-        anim->updatePlayState(false);
+        anim->updatePlayState(AnimPlayStatePaused);
     }
   }
   if (!m_transitions.isEmpty()) {
@@ -471,16 +470,16 @@ void CompositeAnimation::suspendAnimations() {
          it != transitionsEnd; ++it) {
       ImplicitAnimation* anim = it->second.get();
       if (anim && anim->hasStyle())
-        anim->updatePlayState(false);
+        anim->updatePlayState(AnimPlayStatePaused);
     }
   }
 }
 
 void CompositeAnimation::resumeAnimations() {
-  if (!m_isSuspended)
+  if (!m_suspended)
     return;
 
-  m_isSuspended = false;
+  m_suspended = false;
 
   if (!m_keyframeAnimations.isEmpty()) {
     m_keyframeAnimations.checkConsistency();
@@ -489,7 +488,7 @@ void CompositeAnimation::resumeAnimations() {
          it != animationsEnd; ++it) {
       KeyframeAnimation* anim = it->second.get();
       if (anim && anim->playStatePlaying())
-        anim->updatePlayState(true);
+        anim->updatePlayState(AnimPlayStatePlaying);
     }
   }
 
@@ -500,7 +499,7 @@ void CompositeAnimation::resumeAnimations() {
          it != transitionsEnd; ++it) {
       ImplicitAnimation* anim = it->second.get();
       if (anim && anim->hasStyle())
-        anim->updatePlayState(true);
+        anim->updatePlayState(AnimPlayStatePlaying);
     }
   }
 }
