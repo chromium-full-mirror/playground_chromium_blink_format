@@ -324,6 +324,8 @@ void InspectorResourceAgent::didReceiveResponse(
     unsigned long identifier,
     DocumentLoader* loader,
     const ResourceResponse& response) {
+  RefPtr<InspectorObject> resourceResponse =
+      buildObjectForResourceResponse(response);
   String type = "Other";
   if (loader) {
     if (equalIgnoringFragmentIdentifier(response.url(),
@@ -338,10 +340,16 @@ void InspectorResourceAgent::didReceiveResponse(
       if (equalIgnoringFragmentIdentifier(response.url(), loader->url()) &&
           type == "Other")
         type = "Document";
+
+      // Use mime type from cached resource in case the one in response is
+      // empty.
+      if (response.mimeType().isEmpty() && cachedResource)
+        resourceResponse->setString("mimeType",
+                                    cachedResource->response().mimeType());
     }
   }
   m_frontend->didReceiveResponse(identifier, currentTime(), type,
-                                 buildObjectForResourceResponse(response));
+                                 resourceResponse);
 }
 
 void InspectorResourceAgent::didReceiveContentLength(unsigned long identifier,
