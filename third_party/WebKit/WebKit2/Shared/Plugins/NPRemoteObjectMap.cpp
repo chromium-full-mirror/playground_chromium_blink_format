@@ -88,8 +88,14 @@ NPVariantData NPRemoteObjectMap::npVariantToNPVariantData(
     case NPVariantType_Void:
       return NPVariantData::makeVoid();
 
+    case NPVariantType_Null:
+      return NPVariantData::makeNull();
+
     case NPVariantType_Bool:
       return NPVariantData::makeBool(variant.value.boolValue);
+
+    case NPVariantType_Int32:
+      return NPVariantData::makeInt32(variant.value.intValue);
 
     case NPVariantType_Double:
       return NPVariantData::makeDouble(variant.value.doubleValue);
@@ -97,11 +103,6 @@ NPVariantData NPRemoteObjectMap::npVariantToNPVariantData(
     case NPVariantType_String:
       return NPVariantData::makeString(variant.value.stringValue.UTF8Characters,
                                        variant.value.stringValue.UTF8Length);
-
-    case NPVariantType_Null:
-    case NPVariantType_Int32:
-      notImplemented();
-      return NPVariantData::makeVoid();
 
     case NPVariantType_Object: {
       NPObject* npObject = variant.value.objectValue;
@@ -128,8 +129,14 @@ NPVariant NPRemoteObjectMap::npVariantDataToNPVariant(
     case NPVariantData::Void:
       VOID_TO_NPVARIANT(npVariant);
       break;
+    case NPVariantData::Null:
+      NULL_TO_NPVARIANT(npVariant);
+      break;
     case NPVariantData::Bool:
       BOOLEAN_TO_NPVARIANT(npVariantData.boolValue(), npVariant);
+      break;
+    case NPVariantData::Int32:
+      INT32_TO_NPVARIANT(npVariantData.int32Value(), npVariant);
       break;
     case NPVariantData::Double:
       DOUBLE_TO_NPVARIANT(npVariantData.doubleValue(), npVariant);
