@@ -81,6 +81,7 @@ class WebPluginContainerImpl : public WebCore::Widget,
   virtual WebElement element();
   virtual void invalidate();
   virtual void invalidateRect(const WebRect&);
+  virtual void scrollRect(int dx, int dy, const WebRect&);
   virtual void reportGeometry();
   virtual void clearScriptObjects();
   virtual NPObject* scriptableObjectForElement();
