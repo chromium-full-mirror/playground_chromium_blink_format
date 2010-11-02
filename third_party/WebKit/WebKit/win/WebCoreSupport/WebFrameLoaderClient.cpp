@@ -850,8 +850,8 @@ PassRefPtr<Frame> WebFrameLoaderClient::createFrame(
   RefPtr<Frame> childFrame =
       webFrame->init(m_webFrame->webView(), coreFrame->page(), ownerElement);
 
-  coreFrame->tree()->appendChild(childFrame);
   childFrame->tree()->setName(name);
+  coreFrame->tree()->appendChild(childFrame);
   childFrame->init();
 
   coreFrame->loader()->loadURLIntoChildFrame(URL, referrer, childFrame.get());
