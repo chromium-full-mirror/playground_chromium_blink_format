@@ -684,10 +684,20 @@ void FrameLoaderClient::didTransferChildFrameToNewDocument(WebCore::Page*) {
 }
 
 void FrameLoaderClient::transferLoadingResourceFromPage(
-    unsigned long,
-    WebCore::DocumentLoader*,
-    const WebCore::ResourceRequest&,
-    WebCore::Page*) {}
+    unsigned long identifier,
+    WebCore::DocumentLoader* docLoader,
+    const WebCore::ResourceRequest& request,
+    WebCore::Page* oldPage) {
+  ASSERT(oldPage != core(m_frame)->page());
+
+  GOwnPtr<gchar> identifierString(toString(identifier));
+  ASSERT(!webkit_web_view_get_resource(getViewFromFrame(m_frame),
+                                       identifierString.get()));
+
+  assignIdentifierToInitialRequest(identifier, docLoader, request);
+
+  webkit_web_view_remove_resource(kit(oldPage), identifierString.get());
+}
 
 void FrameLoaderClient::redirectDataToPlugin(Widget* pluginWidget) {
   ASSERT(!m_pluginView);
