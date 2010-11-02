@@ -402,6 +402,11 @@ CoreIPC::SyncReplyMode WebProcessProxy::didReceiveSyncMessage(
 }
 
 void WebProcessProxy::didClose(CoreIPC::Connection*) {
+  // Protect ourselves, as the call to the shared WebProcessManager's
+  // processDidClose()
+  // below may otherwise cause us to be deleted before we can finish our work.
+  RefPtr<WebProcessProxy> protect(this);
+
   m_connection = nullptr;
   m_responsivenessTimer.stop();
 
@@ -415,13 +420,12 @@ void WebProcessProxy::didClose(CoreIPC::Connection*) {
   Vector<RefPtr<WebPageProxy>> pages;
   copyValuesToVector(m_pageMap, pages);
 
-  for (size_t i = 0, size = pages.size(); i < size; ++i)
-    pages[i]->processDidCrash();
-
   m_context->processDidClose(this);
 
-  // This may cause us to be deleted.
   WebProcessManager::shared().processDidClose(this, m_context);
+
+  for (size_t i = 0, size = pages.size(); i < size; ++i)
+    pages[i]->processDidCrash();
 }
 
 void WebProcessProxy::didReceiveInvalidMessage(CoreIPC::Connection*,
