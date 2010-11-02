@@ -27,6 +27,7 @@
 
 #include "PluginProcessConnection.h"
 
+#include "NPRemoteObjectMap.h"
 #include "PluginProcessConnectionManager.h"
 #include "PluginProxy.h"
 #include "WebProcess.h"
@@ -38,12 +39,11 @@ PluginProcessConnection::PluginProcessConnection(
     const String& pluginPath,
     CoreIPC::Connection::Identifier connectionIdentifier)
     : m_pluginProcessConnectionManager(pluginProcessConnectionManager),
-      m_pluginPath(pluginPath),
-      m_connection(CoreIPC::Connection::createClientConnection(
-          connectionIdentifier,
-          this,
-          WebProcess::shared().runLoop())),
-      m_npRemoteObjectMap(m_connection.get()) {
+      m_pluginPath(pluginPath) {
+  m_connection = CoreIPC::Connection::createClientConnection(
+      connectionIdentifier, this, WebProcess::shared().runLoop());
+  m_npRemoteObjectMap = NPRemoteObjectMap::create(m_connection.get());
+
   m_connection->open();
 }
 
@@ -90,8 +90,8 @@ CoreIPC::SyncReplyMode PluginProcessConnection::didReceiveSyncMessage(
     CoreIPC::ArgumentDecoder* arguments,
     CoreIPC::ArgumentEncoder* reply) {
   if (messageID.is<CoreIPC::MessageClassNPObjectMessageReceiver>())
-    return m_npRemoteObjectMap.didReceiveSyncMessage(connection, messageID,
-                                                     arguments, reply);
+    return m_npRemoteObjectMap->didReceiveSyncMessage(connection, messageID,
+                                                      arguments, reply);
 
   if (PluginProxy* pluginProxy = m_plugins.get(arguments->destinationID()))
     return pluginProxy->didReceiveSyncPluginProxyMessage(connection, messageID,

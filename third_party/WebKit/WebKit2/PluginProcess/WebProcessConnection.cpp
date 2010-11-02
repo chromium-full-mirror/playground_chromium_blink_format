@@ -27,6 +27,7 @@
 
 #include "WebProcessConnection.h"
 
+#include "NPRemoteObjectMap.h"
 #include "PluginControllerProxy.h"
 #include "PluginProcess.h"
 #include "RunLoop.h"
@@ -43,12 +44,11 @@ WebProcessConnection::~WebProcessConnection() {
 }
 
 WebProcessConnection::WebProcessConnection(
-    CoreIPC::Connection::Identifier connectionIdentifier)
-    : m_connection(
-          CoreIPC::Connection::createServerConnection(connectionIdentifier,
-                                                      this,
-                                                      RunLoop::main())),
-      m_npRemoteObjectMap(m_connection.get()) {
+    CoreIPC::Connection::Identifier connectionIdentifier) {
+  m_connection = CoreIPC::Connection::createServerConnection(
+      connectionIdentifier, this, RunLoop::main());
+  m_npRemoteObjectMap = NPRemoteObjectMap::create(m_connection.get());
+
   m_connection->open();
 }
 
@@ -116,8 +116,8 @@ CoreIPC::SyncReplyMode WebProcessConnection::didReceiveSyncMessage(
                                                      arguments, reply);
 
   if (messageID.is<CoreIPC::MessageClassNPObjectMessageReceiver>())
-    return m_npRemoteObjectMap.didReceiveSyncMessage(connection, messageID,
-                                                     arguments, reply);
+    return m_npRemoteObjectMap->didReceiveSyncMessage(connection, messageID,
+                                                      arguments, reply);
 
   if (PluginControllerProxy* pluginControllerProxy =
           m_pluginControllers.get(destinationID))
