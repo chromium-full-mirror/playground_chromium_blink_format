@@ -89,7 +89,8 @@ class WebProcess : CoreIPC::Connection::Client {
   WebProcess();
   void shutdown();
 
-  void initializeWebProcess(const WebProcessCreationParameters&);
+  void initializeWebProcess(const WebProcessCreationParameters&,
+                            CoreIPC::ArgumentDecoder*);
   void setShouldTrackVisitedLinks(bool);
   void registerURLSchemeAsEmptyDocument(const String&);
   void registerURLSchemeAsSecure(const String&) const;

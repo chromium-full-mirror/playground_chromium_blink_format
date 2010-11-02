@@ -41,12 +41,19 @@ InjectedBundleController& InjectedBundleController::shared() {
 InjectedBundleController::InjectedBundleController()
     : m_bundle(0), m_currentTest(0) {}
 
-void InjectedBundleController::initialize(WKBundleRef bundle) {
+void InjectedBundleController::initialize(WKBundleRef bundle,
+                                          WKTypeRef initializationUserData) {
   m_bundle = bundle;
 
   WKBundleClient client = {0, this, didCreatePage, willDestroyPage,
                            didReceiveMessage};
   WKBundleSetClient(m_bundle, &client);
+
+  // Initialize the test from the "initializationUserData".
+  assert(WKGetTypeID(initializationUserData) == WKStringGetTypeID());
+  WKStringRef testName = static_cast<WKStringRef>(initializationUserData);
+
+  initializeTestNamed(bundle, Util::toSTD(testName));
 }
 
 void InjectedBundleController::didCreatePage(WKBundleRef bundle,
@@ -73,16 +80,6 @@ void InjectedBundleController::didReceiveMessage(WKBundleRef bundle,
                                                  const void* clientInfo) {
   InjectedBundleController* self =
       static_cast<InjectedBundleController*>(const_cast<void*>(clientInfo));
-
-  if (WKStringIsEqualToUTF8CString(messageName, "BundleTestInstantiator")) {
-    assert(WKGetTypeID(messageBody) == WKStringGetTypeID());
-    WKStringRef messageBodyString = static_cast<WKStringRef>(messageBody);
-
-    self->initializeTestNamed(bundle, Util::toSTD(messageBodyString));
-
-    return;
-  }
-
   assert(self->m_currentTest);
   self->m_currentTest->didReceiveMessage(bundle, messageName, messageBody);
 }

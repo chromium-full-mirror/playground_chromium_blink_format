@@ -119,6 +119,9 @@ WK_EXPORT void WKContextSetInjectedBundleClient(
     WKContextRef context,
     const WKContextInjectedBundleClient* client);
 
+WK_EXPORT void WKContextSetInitializationUserDataForInjectedBundle(
+    WKContextRef context,
+    WKTypeRef userData);
 WK_EXPORT void WKContextPostMessageToInjectedBundle(WKContextRef context,
                                                     WKStringRef messageName,
                                                     WKTypeRef messageBody);

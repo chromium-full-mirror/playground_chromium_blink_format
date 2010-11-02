@@ -31,6 +31,8 @@ extern "C" __declspec(dllexport)
 #else
 extern "C"
 #endif
-    void WKBundleInitialize(WKBundleRef bundle) {
-  TestWebKitAPI::InjectedBundleController::shared().initialize(bundle);
+    void WKBundleInitialize(WKBundleRef bundle,
+                            WKTypeRef initializationUserData) {
+  TestWebKitAPI::InjectedBundleController::shared().initialize(
+      bundle, initializationUserData);
 }

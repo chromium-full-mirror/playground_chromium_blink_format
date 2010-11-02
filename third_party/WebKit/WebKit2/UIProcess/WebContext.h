@@ -83,6 +83,13 @@ class WebContext : public APIObject {
 
   const String& injectedBundlePath() const { return m_injectedBundlePath; }
 
+  void setInjectedBundleInitializationUserData(PassRefPtr<APIObject> userData) {
+    m_injectedBundleInitializationUserData = userData;
+  }
+  APIObject* injectedBundleInitializationUserData() const {
+    return m_injectedBundleInitializationUserData.get();
+  }
+
   void postMessageToInjectedBundle(const String&, APIObject*);
 
   // InjectedBundle client
@@ -157,6 +164,7 @@ class WebContext : public APIObject {
   HashSet<WebPageNamespace*> m_pageNamespaces;
   RefPtr<WebPreferences> m_preferences;
 
+  RefPtr<APIObject> m_injectedBundleInitializationUserData;
   String m_injectedBundlePath;
   WebContextInjectedBundleClient m_injectedBundleClient;
 

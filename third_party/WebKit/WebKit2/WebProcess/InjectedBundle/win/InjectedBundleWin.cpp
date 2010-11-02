@@ -52,7 +52,7 @@ static String directoryName(const String& path) {
   return dirName;
 }
 
-bool InjectedBundle::load() {
+bool InjectedBundle::load(APIObject* initializationUserData) {
   WCHAR currentPath[MAX_PATH];
   if (!::GetCurrentDirectoryW(MAX_PATH, currentPath))
     return false;
@@ -78,7 +78,7 @@ bool InjectedBundle::load() {
   if (!initializeFunction)
     return false;
 
-  initializeFunction(toAPI(this));
+  initializeFunction(toAPI(this), toAPI(initializationUserData));
   return true;
 }
 

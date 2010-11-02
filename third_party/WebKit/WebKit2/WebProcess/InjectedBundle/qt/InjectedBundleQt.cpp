@@ -33,7 +33,7 @@ using namespace WebCore;
 
 namespace WebKit {
 
-bool InjectedBundle::load() {
+bool InjectedBundle::load(APIObject* initializationUserData) {
   m_platformBundle.setFileName(static_cast<QString>(m_path));
   if (!m_platformBundle.load()) {
     qWarning("Error loading the injected bundle: %s",
@@ -51,7 +51,7 @@ bool InjectedBundle::load() {
     return false;
   }
 
-  initializeFunction(toAPI(this));
+  initializeFunction(toAPI(this), toAPI(initializationUserData));
   return true;
 }
 
