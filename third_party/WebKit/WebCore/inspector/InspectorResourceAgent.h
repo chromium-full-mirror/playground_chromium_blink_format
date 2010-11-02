@@ -109,6 +109,8 @@ class InspectorResourceAgent : public RefCounted<InspectorResourceAgent> {
   void didCloseWebSocket(unsigned long identifier);
 #endif
 
+  Frame* frameForId(unsigned long);
+
   // Called from frontend
   void cachedResources(RefPtr<InspectorObject>*);
   void resourceContent(unsigned long frameID,
