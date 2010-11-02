@@ -354,7 +354,7 @@ class Element : public ContainerNode {
   void webkitRequestFullScreen(unsigned short flags);
 #endif
 
-  bool isSpellCheckingEnabled() const;
+  virtual bool isSpellCheckingEnabled() const;
 
  protected:
   Element(const QualifiedName& tagName,

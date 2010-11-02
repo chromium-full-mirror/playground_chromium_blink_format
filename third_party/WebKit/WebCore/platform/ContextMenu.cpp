@@ -508,7 +508,7 @@ void ContextMenu::populate() {
     SelectionController* selection = frame->selection();
     bool inPasswordField = selection->isInPasswordField();
     bool spellCheckingEnabled =
-        frame->editor()->isSpellCheckingEnabledInFocusedNode();
+        frame->editor()->isSpellCheckingEnabledFor(node);
 
     if (!inPasswordField && spellCheckingEnabled) {
       // Consider adding spelling-related or grammar-related context menu items
