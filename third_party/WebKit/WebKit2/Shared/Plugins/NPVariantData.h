@@ -43,12 +43,15 @@ class NPVariantData {
     Void,
     Bool,
     Double,
+    LocalNPObjectID,
+    RemoteNPObjectID,
   };
   NPVariantData();
 
   static NPVariantData makeVoid();
   static NPVariantData makeBool(bool value);
   static NPVariantData makeDouble(double value);
+  static NPVariantData makeLocalNPObjectID(uint64_t value);
 
   Type type() const { return static_cast<Type>(m_type); }
 
@@ -62,6 +65,16 @@ class NPVariantData {
     return m_doubleValue;
   }
 
+  uint64_t localNPObjectIDValue() const {
+    ASSERT(type() == NPVariantData::LocalNPObjectID);
+    return m_localNPObjectIDValue;
+  }
+
+  uint64_t remoteNPObjectIDValue() const {
+    ASSERT(type() == NPVariantData::RemoteNPObjectID);
+    return m_remoteNPObjectIDValue;
+  }
+
   void encode(CoreIPC::ArgumentEncoder*) const;
   static bool decode(CoreIPC::ArgumentDecoder*, NPVariantData&);
 
@@ -69,6 +82,8 @@ class NPVariantData {
   uint32_t m_type;
   bool m_boolValue;
   double m_doubleValue;
+  uint64_t m_localNPObjectIDValue;
+  uint64_t m_remoteNPObjectIDValue;
 };
 
 }  // namespace WebKit
