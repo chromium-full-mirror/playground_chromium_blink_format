@@ -42,13 +42,6 @@ class AutoTableLayout : public TableLayout {
   void fullRecalc();
   void recalcColumn(int effCol);
 
-  void calcPercentages() const;
-  int totalPercent() const {
-    if (m_percentagesDirty)
-      calcPercentages();
-    return m_totalPercent;
-  }
-
   int calcEffectiveWidth();
 
   void insertSpanCell(RenderTableCell*);
@@ -74,9 +67,7 @@ class AutoTableLayout : public TableLayout {
   Vector<Layout, 4> m_layoutStruct;
   Vector<RenderTableCell*, 4> m_spanCells;
   bool m_hasPercent : 1;
-  mutable bool m_percentagesDirty : 1;
   mutable bool m_effWidthDirty : 1;
-  mutable unsigned short m_totalPercent;
 };
 
 }  // namespace WebCore

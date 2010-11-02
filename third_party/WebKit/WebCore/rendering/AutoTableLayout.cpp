@@ -32,11 +32,7 @@ using namespace std;
 namespace WebCore {
 
 AutoTableLayout::AutoTableLayout(RenderTable* table)
-    : TableLayout(table),
-      m_hasPercent(false),
-      m_percentagesDirty(true),
-      m_effWidthDirty(true),
-      m_totalPercent(0) {}
+    : TableLayout(table), m_hasPercent(false), m_effWidthDirty(true) {}
 
 AutoTableLayout::~AutoTableLayout() {}
 
@@ -157,7 +153,6 @@ void AutoTableLayout::recalcColumn(int effCol) {
 }
 
 void AutoTableLayout::fullRecalc() {
-  m_percentagesDirty = true;
   m_hasPercent = false;
   m_effWidthDirty = true;
 
@@ -818,16 +813,4 @@ void AutoTableLayout::layout() {
   }
   m_table->columnPositions()[m_table->columnPositions().size() - 1] = pos;
 }
-
-void AutoTableLayout::calcPercentages() const {
-  unsigned totalPercent = 0;
-  for (unsigned i = 0; i < m_layoutStruct.size(); i++) {
-    if (m_layoutStruct[i].width.isPercent())
-      totalPercent += m_layoutStruct[i].width.rawValue();
-  }
-  m_totalPercent = totalPercent / percentScaleFactor;
-  m_percentagesDirty = false;
-}
-
-#undef DEBUG_LAYOUT
 }
