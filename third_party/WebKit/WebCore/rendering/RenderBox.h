@@ -53,6 +53,7 @@ class RenderBox : public RenderBoxModelObject {
   int logicalLeft() const {
     return style()->isHorizontalWritingMode() ? x() : y();
   }
+  int logicalRight() const { return logicalLeft() + logicalWidth(); }
   int logicalTop() const {
     return style()->isHorizontalWritingMode() ? y() : x();
   }
@@ -62,6 +63,7 @@ class RenderBox : public RenderBoxModelObject {
   int logicalHeight() const {
     return style()->isHorizontalWritingMode() ? height() : width();
   }
+
   void setLogicalLeft(int left) {
     if (style()->isHorizontalWritingMode())
       setX(left);
@@ -548,12 +550,12 @@ class RenderBox : public RenderBoxModelObject {
     ChildToParentFlippingAdjustment,
     ParentToChildFlippingAdjustment
   };
-  void adjustForFlippedBlocksWritingMode(RenderBox* child,
-                                         IntPoint&,
-                                         FlippingAdjustment);
-  void adjustForFlippedBlocksWritingMode(
-      IntRect&);  // Unflips a rect in our coordinate space.
-  int convertFromFlippedWritingMode(int position);
+  IntPoint flipForWritingMode(RenderBox* child,
+                              const IntPoint&,
+                              FlippingAdjustment);
+  int flipForWritingMode(int position);
+  IntPoint flipForWritingMode(const IntPoint&);
+  void flipForWritingMode(IntRect&);
   IntSize locationOffsetIncludingFlipping();
 
  protected:
