@@ -61,15 +61,14 @@ class PlatformRefPtr {
   }
 
   ~PlatformRefPtr() {
-    T* ptr = m_ptr;
-    if (ptr && ptr != hashTableDeletedValue())
+    if (T* ptr = m_ptr)
       derefPlatformPtr(ptr);
   }
 
   void clear() {
     T* ptr = m_ptr;
     m_ptr = 0;
-    if (ptr && ptr != hashTableDeletedValue())
+    if (ptr)
       derefPlatformPtr(ptr);
   }
 
@@ -117,7 +116,7 @@ inline PlatformRefPtr<T>& PlatformRefPtr<T>::operator=(
     refPlatformPtr(optr);
   T* ptr = m_ptr;
   m_ptr = optr;
-  if (ptr && ptr != hashTableDeletedValue())
+  if (ptr)
     derefPlatformPtr(ptr);
   return *this;
 }
@@ -128,7 +127,7 @@ inline PlatformRefPtr<T>& PlatformRefPtr<T>::operator=(T* optr) {
   if (optr)
     refPlatformPtr(optr);
   m_ptr = optr;
-  if (ptr && ptr != hashTableDeletedValue())
+  if (ptr)
     derefPlatformPtr(ptr);
   return *this;
 }

@@ -127,7 +127,8 @@ FontPlatformData::FontPlatformData(FcPattern* pattern,
       m_size(fontDescription.computedPixelSize()),
       m_syntheticBold(false),
       m_syntheticOblique(false),
-      m_fixedWidth(false) {
+      m_fixedWidth(false),
+      m_scaledFont(0) {
   PlatformRefPtr<cairo_font_face_t> fontFace =
       adoptPlatformRef(cairo_ft_font_face_create_for_pattern(m_pattern.get()));
   initializeWithFontFace(fontFace.get());
@@ -151,7 +152,8 @@ FontPlatformData::FontPlatformData(float size, bool bold, bool italic)
       m_size(size),
       m_syntheticBold(bold),
       m_syntheticOblique(italic),
-      m_fixedWidth(false) {
+      m_fixedWidth(false),
+      m_scaledFont(0) {
   // We cannot create a scaled font here.
 }
 
@@ -162,13 +164,14 @@ FontPlatformData::FontPlatformData(cairo_font_face_t* fontFace,
     : m_fallbacks(0),
       m_size(size),
       m_syntheticBold(bold),
-      m_syntheticOblique(italic) {
+      m_syntheticOblique(italic),
+      m_scaledFont(0) {
   initializeWithFontFace(fontFace);
 
-  FT_Face fontConfigFace = cairo_ft_scaled_font_lock_face(m_scaledFont.get());
+  FT_Face fontConfigFace = cairo_ft_scaled_font_lock_face(m_scaledFont);
   if (fontConfigFace) {
     m_fixedWidth = fontConfigFace->face_flags & FT_FACE_FLAG_FIXED_WIDTH;
-    cairo_ft_scaled_font_unlock_face(m_scaledFont.get());
+    cairo_ft_scaled_font_unlock_face(m_scaledFont);
   }
 }
 
@@ -181,7 +184,6 @@ FontPlatformData& FontPlatformData::operator=(const FontPlatformData& other) {
   m_syntheticBold = other.m_syntheticBold;
   m_syntheticOblique = other.m_syntheticOblique;
   m_fixedWidth = other.m_fixedWidth;
-  m_scaledFont = other.m_scaledFont;
   m_pattern = other.m_pattern;
 
   if (m_fallbacks) {
@@ -190,11 +192,15 @@ FontPlatformData& FontPlatformData::operator=(const FontPlatformData& other) {
     m_fallbacks = 0;
   }
 
+  if (m_scaledFont && m_scaledFont != hashTableDeletedFontValue())
+    cairo_scaled_font_destroy(m_scaledFont);
+  m_scaledFont = cairo_scaled_font_reference(other.m_scaledFont);
+
   return *this;
 }
 
 FontPlatformData::FontPlatformData(const FontPlatformData& other)
-    : m_fallbacks(0) {
+    : m_fallbacks(0), m_scaledFont(0) {
   *this = other;
 }
 
@@ -204,7 +210,7 @@ FontPlatformData::FontPlatformData(const FontPlatformData& other, float size) {
   // We need to reinitialize the instance, because the difference in size
   // necessitates a new scaled font instance.
   m_size = size;
-  initializeWithFontFace(cairo_scaled_font_get_font_face(m_scaledFont.get()));
+  initializeWithFontFace(cairo_scaled_font_get_font_face(m_scaledFont));
 }
 
 FontPlatformData::~FontPlatformData() {
@@ -212,6 +218,9 @@ FontPlatformData::~FontPlatformData() {
     FcFontSetDestroy(m_fallbacks);
     m_fallbacks = 0;
   }
+
+  if (m_scaledFont && m_scaledFont != hashTableDeletedFontValue())
+    cairo_scaled_font_destroy(m_scaledFont);
 }
 
 bool FontPlatformData::isFixedPitch() {
@@ -221,8 +230,7 @@ bool FontPlatformData::isFixedPitch() {
 bool FontPlatformData::operator==(const FontPlatformData& other) const {
   if (m_pattern == other.m_pattern)
     return true;
-  if (!m_pattern || m_pattern.isHashTableDeletedValue() || !other.m_pattern ||
-      other.m_pattern.isHashTableDeletedValue())
+  if (!m_pattern || !other.m_pattern)
     return false;
   return FcPatternEqual(m_pattern.get(), other.m_pattern.get());
 }
@@ -267,8 +275,7 @@ void FontPlatformData::initializeWithFontFace(cairo_font_face_t* fontFace) {
     cairo_matrix_scale(&fontMatrix, m_size, m_size);
   }
 
-  m_scaledFont = adoptPlatformRef(
-      cairo_scaled_font_create(fontFace, &fontMatrix, &ctm, options));
+  m_scaledFont = cairo_scaled_font_create(fontFace, &fontMatrix, &ctm, options);
   cairo_font_options_destroy(options);
 }
 }

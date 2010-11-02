@@ -43,13 +43,14 @@ class FontPlatformData {
         m_size(0),
         m_syntheticBold(false),
         m_syntheticOblique(false),
-        m_scaledFont(WTF::HashTableDeletedValue) {}
+        m_scaledFont(hashTableDeletedFontValue()) {}
 
   FontPlatformData()
       : m_fallbacks(0),
         m_size(0),
         m_syntheticBold(false),
-        m_syntheticOblique(false) {}
+        m_syntheticOblique(false),
+        m_scaledFont(0) {}
 
   FontPlatformData(FcPattern*, const FontDescription&);
   FontPlatformData(cairo_font_face_t* fontFace,
@@ -68,16 +69,16 @@ class FontPlatformData {
   bool syntheticBold() const { return m_syntheticBold; }
   bool syntheticOblique() const { return m_syntheticOblique; }
 
-  cairo_scaled_font_t* scaledFont() const { return m_scaledFont.get(); }
+  cairo_scaled_font_t* scaledFont() const { return m_scaledFont; }
 
   unsigned hash() const {
-    return PtrHash<cairo_scaled_font_t*>::hash(m_scaledFont.get());
+    return PtrHash<cairo_scaled_font_t*>::hash(m_scaledFont);
   }
 
   bool operator==(const FontPlatformData&) const;
   FontPlatformData& operator=(const FontPlatformData&);
   bool isHashTableDeletedValue() const {
-    return m_scaledFont.isHashTableDeletedValue();
+    return m_scaledFont == hashTableDeletedFontValue();
   }
 
 #ifndef NDEBUG
@@ -90,10 +91,13 @@ class FontPlatformData {
   bool m_syntheticBold;
   bool m_syntheticOblique;
   bool m_fixedWidth;
-  PlatformRefPtr<cairo_scaled_font_t> m_scaledFont;
+  cairo_scaled_font_t* m_scaledFont;
 
  private:
   void initializeWithFontFace(cairo_font_face_t*);
+  static cairo_scaled_font_t* hashTableDeletedFontValue() {
+    return reinterpret_cast<cairo_scaled_font_t*>(-1);
+  }
 };
 }
 

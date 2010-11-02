@@ -49,8 +49,8 @@ bool GlyphPage::fill(unsigned offset,
   if (bufferLength > GlyphPage::size)
     return false;
 
-  FT_Face face = cairo_ft_scaled_font_lock_face(
-      fontData->platformData().m_scaledFont.get());
+  FT_Face face =
+      cairo_ft_scaled_font_lock_face(fontData->platformData().scaledFont());
   if (!face)
     return false;
 
@@ -65,7 +65,7 @@ bool GlyphPage::fill(unsigned offset,
     }
   }
 
-  cairo_ft_scaled_font_unlock_face(fontData->platformData().m_scaledFont.get());
+  cairo_ft_scaled_font_unlock_face(fontData->platformData().scaledFont());
 
   return haveGlyphs;
 }
