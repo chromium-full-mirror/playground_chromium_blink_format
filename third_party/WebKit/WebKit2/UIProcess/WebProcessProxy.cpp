@@ -404,7 +404,7 @@ CoreIPC::SyncReplyMode WebProcessProxy::didReceiveSyncMessage(
 }
 
 void WebProcessProxy::didClose(CoreIPC::Connection*) {
-  m_connection = 0;
+  m_connection = nullptr;
   m_responsivenessTimer.stop();
 
   Vector<RefPtr<WebFrameProxy>> frames;

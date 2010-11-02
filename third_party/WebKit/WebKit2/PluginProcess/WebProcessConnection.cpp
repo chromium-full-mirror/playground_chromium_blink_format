@@ -41,6 +41,8 @@ PassRefPtr<WebProcessConnection> WebProcessConnection::create(
 
 WebProcessConnection::~WebProcessConnection() {
   ASSERT(m_pluginControllers.isEmpty());
+  ASSERT(!m_npRemoteObjectMap);
+  ASSERT(!m_connection);
 }
 
 WebProcessConnection::WebProcessConnection(
@@ -81,9 +83,13 @@ void WebProcessConnection::removePluginControllerProxy(
   if (!m_pluginControllers.isEmpty())
     return;
 
+  // Invalidate our remote object map.
+  m_npRemoteObjectMap->invalidate();
+  m_npRemoteObjectMap = nullptr;
+
   // The last plug-in went away, close this connection.
   m_connection->invalidate();
-  m_connection = 0;
+  m_connection = nullptr;
 
   // This will cause us to be deleted.
   PluginProcess::shared().removeWebProcessConnection(this);

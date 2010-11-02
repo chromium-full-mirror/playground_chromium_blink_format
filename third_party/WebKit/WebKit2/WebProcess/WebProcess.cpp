@@ -279,7 +279,7 @@ void WebProcess::shutdown() {
 
   // Invalidate our connection.
   m_connection->invalidate();
-  m_connection = 0;
+  m_connection = nullptr;
 
   m_runLoop->stop();
 }
