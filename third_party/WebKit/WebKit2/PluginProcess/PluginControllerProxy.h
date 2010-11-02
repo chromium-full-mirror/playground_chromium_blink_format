@@ -130,6 +130,8 @@ class PluginControllerProxy : PluginController {
   void paintEntirePlugin();
   void setFocus(bool);
   void didUpdate();
+  void getPluginScriptableNPObject(uint64_t& pluginScriptableNPObjectID);
+
 #if PLATFORM(MAC)
   void windowFocusChanged(bool);
   void windowFrameChanged(const WebCore::IntRect&);
