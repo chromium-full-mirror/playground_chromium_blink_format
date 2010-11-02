@@ -31,6 +31,7 @@
 #include "Connection.h"
 #include <WebCore/npruntime.h>
 #include <wtf/HashMap.h>
+#include <wtf/HashSet.h>
 #include <wtf/RefCounted.h>
 
 namespace WebKit {
@@ -47,6 +48,7 @@ class NPRemoteObjectMap : public RefCounted<NPRemoteObjectMap> {
   // Creates an NPObjectProxy wrapper for the remote object with the given
   // remote object ID.
   NPObject* createNPObjectProxy(uint64_t remoteObjectID);
+  void npObjectProxyDestroyed(NPObject*);
 
   // Expose the given NPObject as a remote object. Returns the objectID.
   uint64_t registerNPObject(NPObject*);
@@ -77,6 +79,9 @@ class NPRemoteObjectMap : public RefCounted<NPRemoteObjectMap> {
   // to the
   // other end of the connection.
   HashMap<uint64_t, NPObjectMessageReceiver*> m_registeredNPObjects;
+
+  // A set of NPObjectProxy objects associated with this map.
+  HashSet<NPObject*> m_npObjectProxies;
 };
 
 }  // namespace WebKit

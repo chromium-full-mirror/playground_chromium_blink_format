@@ -48,10 +48,24 @@ PassRefPtr<NPRemoteObjectMap> NPRemoteObjectMap::create(
 NPRemoteObjectMap::NPRemoteObjectMap(CoreIPC::Connection* connection)
     : m_connection(connection) {}
 
-NPRemoteObjectMap::~NPRemoteObjectMap() {}
+NPRemoteObjectMap::~NPRemoteObjectMap() {
+  ASSERT(m_npObjectProxies.isEmpty());
+  ASSERT(m_registeredNPObjects.isEmpty());
+}
 
 NPObject* NPRemoteObjectMap::createNPObjectProxy(uint64_t remoteObjectID) {
-  return NPObjectProxy::create(this, remoteObjectID);
+  NPObjectProxy* npObjectProxy = NPObjectProxy::create(this, remoteObjectID);
+
+  m_npObjectProxies.add(npObjectProxy);
+
+  return npObjectProxy;
+}
+
+void NPRemoteObjectMap::npObjectProxyDestroyed(NPObject* npObject) {
+  ASSERT(NPObjectProxy::isNPObjectProxy(npObject));
+  ASSERT(m_npObjectProxies.contains(npObject));
+
+  m_npObjectProxies.remove(npObject);
 }
 
 uint64_t NPRemoteObjectMap::registerNPObject(NPObject* npObject) {
@@ -111,8 +125,19 @@ NPVariant NPRemoteObjectMap::npVariantDataToNPVariant(
 }
 
 void NPRemoteObjectMap::invalidate() {
-  // FIXME: Invalidate NPObjectProxy and NPObjectMessageReceiver objects.
-  notImplemented();
+  Vector<NPObjectMessageReceiver*> messageReceivers;
+  copyValuesToVector(m_registeredNPObjects, messageReceivers);
+
+  // Now delete all the receivers.
+  deleteAllValues(messageReceivers);
+
+  ASSERT(m_registeredNPObjects.isEmpty());
+
+  for (HashSet<NPObject *>::const_iterator it = m_npObjectProxies.begin(),
+                                           end = m_npObjectProxies.end();
+       it != end; ++it)
+    NPObjectProxy::toNPObjectProxy(*it)->invalidate();
+  m_npObjectProxies.clear();
 }
 
 CoreIPC::SyncReplyMode NPRemoteObjectMap::didReceiveSyncMessage(
