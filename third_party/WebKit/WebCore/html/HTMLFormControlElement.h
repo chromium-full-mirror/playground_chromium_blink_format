@@ -195,8 +195,8 @@ class HTMLTextFormControlElement : public HTMLFormControlElementWithState {
   String strippedPlaceholder() const;
   bool placeholderShouldBeVisible() const;
 
-  int selectionStart();
-  int selectionEnd();
+  int selectionStart() const;
+  int selectionEnd() const;
   void setSelectionStart(int);
   void setSelectionEnd(int);
   void select();

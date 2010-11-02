@@ -531,7 +531,7 @@ void HTMLTextFormControlElement::setSelectionRange(int start, int end) {
   WebCore::setSelectionRange(this, start, end);
 }
 
-int HTMLTextFormControlElement::selectionStart() {
+int HTMLTextFormControlElement::selectionStart() const {
   if (!isTextFormControl())
     return 0;
   if (document()->focusedNode() != this && cachedSelectionStart() >= 0)
@@ -541,7 +541,7 @@ int HTMLTextFormControlElement::selectionStart() {
   return toRenderTextControl(renderer())->selectionStart();
 }
 
-int HTMLTextFormControlElement::selectionEnd() {
+int HTMLTextFormControlElement::selectionEnd() const {
   if (!isTextFormControl())
     return 0;
   if (document()->focusedNode() != this && cachedSelectionEnd() >= 0)
