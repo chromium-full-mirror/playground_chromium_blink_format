@@ -28,6 +28,8 @@
 
 #if ENABLE(PLUGIN_PROCESS)
 
+#include <wtf/text/CString.h>
+
 namespace CoreIPC {
 class ArgumentDecoder;
 class ArgumentEncoder;
@@ -43,6 +45,7 @@ class NPVariantData {
     Void,
     Bool,
     Double,
+    String,
     LocalNPObjectID,
     RemoteNPObjectID,
   };
@@ -51,6 +54,7 @@ class NPVariantData {
   static NPVariantData makeVoid();
   static NPVariantData makeBool(bool value);
   static NPVariantData makeDouble(double value);
+  static NPVariantData makeString(const char* string, unsigned length);
   static NPVariantData makeLocalNPObjectID(uint64_t value);
 
   Type type() const { return static_cast<Type>(m_type); }
@@ -63,6 +67,11 @@ class NPVariantData {
   double doubleValue() const {
     ASSERT(type() == NPVariantData::Double);
     return m_doubleValue;
+  }
+
+  const CString& stringValue() const {
+    ASSERT(type() == NPVariantData::String);
+    return m_stringValue;
   }
 
   uint64_t localNPObjectIDValue() const {
@@ -82,6 +91,7 @@ class NPVariantData {
   uint32_t m_type;
   bool m_boolValue;
   double m_doubleValue;
+  CString m_stringValue;
   uint64_t m_localNPObjectIDValue;
   uint64_t m_remoteNPObjectIDValue;
 };
