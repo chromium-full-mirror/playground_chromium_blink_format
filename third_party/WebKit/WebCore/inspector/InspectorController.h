@@ -137,6 +137,9 @@ class InspectorController : public Noncopyable {
   void highlightDOMNode(long nodeId);
   void hideDOMNodeHighlight() { hideHighlight(); }
 
+  void highlightFrame(unsigned long frameId);
+  void hideFrameHighlight() { hideHighlight(); }
+
   void show();
   void showPanel(const String&);
   void close();
