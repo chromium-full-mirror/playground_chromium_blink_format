@@ -27,6 +27,7 @@
 #include "Attr.h"
 #include "Document.h"
 #include "FloatRect.h"
+#include "SVGDocumentExtensions.h"
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
 #include "SVGPreserveAspectRatio.h"
@@ -99,7 +100,7 @@ AffineTransform SVGFitToViewBox::viewBoxToViewTransform(
 
   return preserveAspectRatio.getCTM(viewBoxRect.x(), viewBoxRect.y(),
                                     viewBoxRect.width(), viewBoxRect.height(),
-                                    0, 0, viewWidth, viewHeight);
+                                    viewWidth, viewHeight);
 }
 
 bool SVGFitToViewBox::parseMappedAttribute(Document* document,

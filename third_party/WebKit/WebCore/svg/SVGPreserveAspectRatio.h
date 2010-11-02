@@ -22,14 +22,13 @@
 #define SVGPreserveAspectRatio_h
 
 #if ENABLE(SVG)
-#include "FloatRect.h"
-#include "PlatformString.h"
-#include "SVGNames.h"
-#include <wtf/Forward.h>
+#include "ExceptionCode.h"
+#include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
 class AffineTransform;
+class FloatRect;
 
 class SVGPreserveAspectRatio {
  public:
@@ -55,11 +54,11 @@ class SVGPreserveAspectRatio {
 
   SVGPreserveAspectRatio();
 
-  void setAlign(unsigned short);
-  unsigned short align() const;
+  void setAlign(unsigned short align, ExceptionCode&);
+  unsigned short align() const { return m_align; }
 
-  void setMeetOrSlice(unsigned short);
-  unsigned short meetOrSlice() const;
+  void setMeetOrSlice(unsigned short, ExceptionCode&);
+  unsigned short meetOrSlice() const { return m_meetOrSlice; }
 
   void transformRect(FloatRect& destRect, FloatRect& srcRect);
 
@@ -67,8 +66,6 @@ class SVGPreserveAspectRatio {
                          double logicY,
                          double logicWidth,
                          double logicHeight,
-                         double physX,
-                         double physY,
                          double physWidth,
                          double physHeight) const;
 
@@ -95,8 +92,8 @@ class SVGPreserveAspectRatio {
   String valueAsString() const;
 
  private:
-  unsigned short m_align;
-  unsigned short m_meetOrSlice;
+  SVGPreserveAspectRatioType m_align;
+  SVGMeetOrSliceType m_meetOrSlice;
 };
 
 }  // namespace WebCore

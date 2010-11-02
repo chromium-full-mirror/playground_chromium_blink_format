@@ -86,11 +86,11 @@ class SVGImageElement : public SVGStyledTransformableElement,
                                 SVGLength,
                                 Height,
                                 height)
-  DECLARE_ANIMATED_PROPERTY(SVGImageElement,
-                            SVGNames::preserveAspectRatioAttr,
-                            SVGPreserveAspectRatio,
-                            PreserveAspectRatio,
-                            preserveAspectRatio)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGImageElement,
+                                SVGNames::preserveAspectRatioAttr,
+                                SVGPreserveAspectRatio,
+                                PreserveAspectRatio,
+                                preserveAspectRatio)
 
   // SVGURIReference
   DECLARE_ANIMATED_PROPERTY(SVGImageElement,

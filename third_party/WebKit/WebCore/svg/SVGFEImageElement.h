@@ -56,11 +56,11 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
 
   void requestImageResource();
 
-  DECLARE_ANIMATED_PROPERTY(SVGFEImageElement,
-                            SVGNames::preserveAspectRatioAttr,
-                            SVGPreserveAspectRatio,
-                            PreserveAspectRatio,
-                            preserveAspectRatio)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGFEImageElement,
+                                SVGNames::preserveAspectRatioAttr,
+                                SVGPreserveAspectRatio,
+                                PreserveAspectRatio,
+                                preserveAspectRatio)
 
   // SVGURIReference
   DECLARE_ANIMATED_PROPERTY(SVGFEImageElement,

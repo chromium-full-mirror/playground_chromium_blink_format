@@ -61,11 +61,11 @@ class SVGViewElement : public SVGStyledElement,
                                 FloatRect,
                                 ViewBox,
                                 viewBox)
-  DECLARE_ANIMATED_PROPERTY(SVGViewElement,
-                            SVGNames::preserveAspectRatioAttr,
-                            SVGPreserveAspectRatio,
-                            PreserveAspectRatio,
-                            preserveAspectRatio)
+  DECLARE_ANIMATED_PROPERTY_NEW(SVGViewElement,
+                                SVGNames::preserveAspectRatioAttr,
+                                SVGPreserveAspectRatio,
+                                PreserveAspectRatio,
+                                preserveAspectRatio)
 
   mutable RefPtr<SVGStringList> m_viewTarget;
 };
