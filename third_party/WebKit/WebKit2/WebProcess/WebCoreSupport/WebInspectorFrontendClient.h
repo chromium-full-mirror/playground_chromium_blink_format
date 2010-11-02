@@ -26,22 +26,18 @@
 #ifndef WebInspectorFrontendClient_h
 #define WebInspectorFrontendClient_h
 
-#include <WebCore/InspectorFrontendClient.h>
+#include <WebCore/InspectorFrontendClientLocal.h>
 
 namespace WebKit {
 
 class WebPage;
 
-class WebInspectorFrontendClient : public WebCore::InspectorFrontendClient {
+class WebInspectorFrontendClient
+    : public WebCore::InspectorFrontendClientLocal {
  public:
-  WebInspectorFrontendClient(WebPage* page) : m_page(page) {}
+  WebInspectorFrontendClient(WebPage* page, WebPage* inspectorPage);
 
  private:
-  virtual void windowObjectCleared();
-  virtual void frontendLoaded();
-
-  virtual void moveWindowBy(float x, float y);
-
   virtual String localizedStringsURL();
   virtual String hiddenPanels();
 
@@ -49,9 +45,9 @@ class WebInspectorFrontendClient : public WebCore::InspectorFrontendClient {
   virtual void closeWindow();
   virtual void disconnectFromBackend();
 
-  virtual void requestAttachWindow();
-  virtual void requestDetachWindow();
-  virtual void changeAttachedWindowHeight(unsigned);
+  virtual void attachWindow();
+  virtual void detachWindow();
+  virtual void setAttachedWindowHeight(unsigned);
 
   virtual void inspectedURLChanged(const String&);
 
