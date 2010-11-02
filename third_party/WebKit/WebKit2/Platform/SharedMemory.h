@@ -31,6 +31,10 @@
 #include <wtf/RefCounted.h>
 
 #if PLATFORM(QT)
+#include <QtGlobal>
+QT_BEGIN_NAMESPACE
+class QSharedMemory;
+QT_END_NAMESPACE
 #include <wtf/text/WTFString.h>
 #endif
 
@@ -62,7 +66,7 @@ class SharedMemory : public RefCounted<SharedMemory> {
 #elif PLATFORM(WIN)
     mutable HANDLE m_handle;
 #elif PLATFORM(QT)
-    mutable String m_fileName;
+    mutable String m_key;
 #endif
     size_t m_size;
   };
@@ -90,6 +94,8 @@ class SharedMemory : public RefCounted<SharedMemory> {
   void* m_data;
 #if PLATFORM(WIN)
   HANDLE m_handle;
+#elif PLATFORM(QT)
+  QSharedMemory* m_impl;
 #endif
 };
 };
