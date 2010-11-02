@@ -56,6 +56,7 @@ class SocketStreamHandle : public RefCounted<SocketStreamHandle>,
   void connected(GSocketConnection*, GError*);
   void readBytes(signed long, GError*);
   void writeReady();
+  void* id() { return m_id; }
 
  protected:
   virtual int platformSend(const char* data, int length);
@@ -67,6 +68,7 @@ class SocketStreamHandle : public RefCounted<SocketStreamHandle>,
   PlatformRefPtr<GOutputStream> m_outputStream;
   PlatformRefPtr<GSource> m_writeReadySource;
   char* m_readBuffer;
+  void* m_id;
 
   SocketStreamHandle(const KURL&, SocketStreamHandleClient*);
 
