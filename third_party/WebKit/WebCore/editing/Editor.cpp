@@ -2845,6 +2845,8 @@ void Editor::removeSpellAndCorrectionMarkersFromWordsToBeEdited(
   for (TextIterator textIterator(wordRange.get()); !textIterator.atEnd();
        textIterator.advance()) {
     Node* node = textIterator.node();
+    if (!node)
+      continue;
     if (node == startOfFirstWord.deepEquivalent().containerNode() ||
         node == endOfLastWord.deepEquivalent().containerNode()) {
       // First word and last word can belong to the same node
