@@ -317,6 +317,11 @@ void ScrollView::setScrollPosition(const IntPoint& scrollPoint) {
     return;
   }
 
+  if (delegatesScrolling()) {
+    scrollContents(IntSize(scrollPoint.x(), scrollPoint.y()));
+    return;
+  }
+
   IntPoint newScrollPosition = scrollPoint.shrunkTo(maximumScrollPosition());
   newScrollPosition.clampNegativeToZero();
 
