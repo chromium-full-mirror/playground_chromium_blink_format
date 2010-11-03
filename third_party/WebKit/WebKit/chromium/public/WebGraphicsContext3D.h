@@ -136,11 +136,7 @@ class WebGraphicsContext3D : public WebNonCopyable {
   // getError in the order they were added.
   virtual void synthesizeGLError(unsigned long error) = 0;
 
-  // EXT_texture_format_BGRA8888
-  virtual bool supportsBGRA() = 0;
-
   // GL_CHROMIUM_map_sub
-  virtual bool supportsMapSubCHROMIUM() = 0;
   virtual void* mapBufferSubDataCHROMIUM(unsigned target,
                                          int offset,
                                          int size,
@@ -158,7 +154,6 @@ class WebGraphicsContext3D : public WebNonCopyable {
   virtual void unmapTexSubImage2DCHROMIUM(const void*) = 0;
 
   // GL_CHROMIUM_copy_texture_to_parent_texture
-  virtual bool supportsCopyTextureToParentTextureCHROMIUM() = 0;
   virtual void copyTextureToParentTextureCHROMIUM(unsigned texture,
                                                   unsigned parentTexture) = 0;
 

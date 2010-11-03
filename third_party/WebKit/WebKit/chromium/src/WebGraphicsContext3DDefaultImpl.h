@@ -83,8 +83,6 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
   virtual void prepareTexture();
 
   virtual void synthesizeGLError(unsigned long error);
-  virtual bool supportsBGRA();
-  virtual bool supportsMapSubCHROMIUM();
   virtual void* mapBufferSubDataCHROMIUM(unsigned target,
                                          int offset,
                                          int size,
@@ -100,7 +98,6 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
                                          unsigned type,
                                          unsigned access);
   virtual void unmapTexSubImage2DCHROMIUM(const void*);
-  virtual bool supportsCopyTextureToParentTextureCHROMIUM();
   virtual void copyTextureToParentTextureCHROMIUM(unsigned texture,
                                                   unsigned parentTexture);
 

@@ -34,6 +34,7 @@
 
 #include "AffineTransform.h"
 #include "DrawingBuffer.h"
+#include "Extensions3D.h"
 #include "GraphicsContext.h"
 #include "GraphicsContext3D.h"
 #include "ImageBuffer.h"
@@ -831,8 +832,7 @@ void PlatformContextSkia::readbackHardwareToSoftware() const {
   for (int y = 0; y < height; ++y) {
     uint32_t* pixels = bitmap.getAddr32(0, y);
     if (context->supportsBGRA())
-      context->readPixels(0, height - 1 - y, width, 1,
-                          GraphicsContext3D::BGRA_EXT,
+      context->readPixels(0, height - 1 - y, width, 1, Extensions3D::BGRA_EXT,
                           GraphicsContext3D::UNSIGNED_BYTE, pixels);
     else {
       context->readPixels(0, height - 1 - y, width, 1, GraphicsContext3D::RGBA,

@@ -32,6 +32,7 @@
 
 #include "DrawingBuffer.h"
 
+#include "Extensions3DChromium.h"
 #include "GraphicsContext3D.h"
 #include "SharedGraphicsContext3D.h"
 
@@ -80,8 +81,14 @@ static unsigned generateColorTexture(GraphicsContext3D* context,
 DrawingBuffer::DrawingBuffer(GraphicsContext3D* context, const IntSize& size)
     : m_context(context),
       m_size(size),
-      m_fbo(context->createFramebuffer()),
+      m_fbo(0),
       m_internal(new DrawingBufferInternal) {
+  if (!m_context->getExtensions()->supports(
+          "GL_CHROMIUM_copy_texture_to_parent_texture")) {
+    m_context.clear();
+    return;
+  }
+  m_fbo = context->createFramebuffer();
   context->bindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_fbo);
   m_internal->offscreenColorTexture = generateColorTexture(context, size);
 }
@@ -120,8 +127,9 @@ void DrawingBuffer::publishToPlatformLayer() {
   // would insert a fence into the child command stream that the compositor
   // could wait for.
   m_context->makeContextCurrent();
-  m_context->copyTextureToParentTextureCHROMIUM(
-      m_internal->offscreenColorTexture, parentTexture);
+  static_cast<Extensions3DChromium*>(m_context->getExtensions())
+      ->copyTextureToParentTextureCHROMIUM(m_internal->offscreenColorTexture,
+                                           parentTexture);
   m_context->flush();
 }
 #endif

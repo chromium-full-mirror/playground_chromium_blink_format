@@ -23,6 +23,7 @@
 
 #include "WebGLObject.h"
 #include "CanvasRenderingContext.h"
+#include "Extensions3DQt.h"
 #include "GraphicsContext.h"
 #include "HTMLCanvasElement.h"
 #include "HostWindow.h"
@@ -333,6 +334,8 @@ class GraphicsContext3DInternal {
   GLuint m_depthBuffer;
   QImage m_pixels;
   ListHashSet<unsigned long> m_syntheticErrors;
+
+  OwnPtr<Extensions3DQt> m_extensions;
 
  private:
   void* getProcAddress(const String& proc);
@@ -1790,6 +1793,12 @@ int GraphicsContext3D::sizeInBytes(int type) {
 
 void GraphicsContext3D::synthesizeGLError(unsigned long error) {
   m_internal->m_syntheticErrors.add(error);
+}
+
+Extensions3D* GraphicsContext3D::getExtensions() {
+  if (!m_internal->m_extensions)
+    m_internal->m_extensions = adoptPtr(new Extensions3DQt);
+  return m_internal->m_extensions;
 }
 
 bool GraphicsContext3D::getImageData(Image* image,

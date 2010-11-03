@@ -40,7 +40,8 @@
 #include "WebView.h"
 #include <wtf/OwnArrayPtr.h>
 #include <wtf/PassOwnPtr.h>
-#include <wtf/text/CString.h>
+#include <wtf/text/StringBuilder.h>
+#include <wtf/text/WTFString.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -544,18 +545,6 @@ void WebGraphicsContext3DDefaultImpl::synthesizeGLError(unsigned long error) {
   m_syntheticErrors.add(error);
 }
 
-bool WebGraphicsContext3DDefaultImpl::supportsBGRA() {
-  // Supported since OpenGL 1.2. However, glTexImage2D() must be modified
-  // to translate the internalFormat from GL_BGRA to GL_RGBA, since the
-  // former is not accepted by desktop GL. Return false until this is done.
-  return false;
-}
-
-bool WebGraphicsContext3DDefaultImpl::supportsMapSubCHROMIUM() {
-  // We don't claim support for this extension at this time
-  return false;
-}
-
 void* WebGraphicsContext3DDefaultImpl::mapBufferSubDataCHROMIUM(
     unsigned target,
     int offset,
@@ -583,16 +572,12 @@ void* WebGraphicsContext3DDefaultImpl::mapTexSubImage2DCHROMIUM(
 void WebGraphicsContext3DDefaultImpl::unmapTexSubImage2DCHROMIUM(
     const void* mem) {}
 
-bool WebGraphicsContext3DDefaultImpl::
-    supportsCopyTextureToParentTextureCHROMIUM() {
-  // This extension requires this desktopGL-only function (GLES2 doesn't
-  // support it), so check for its existence here.
-  return glGetTexLevelParameteriv;
-}
-
 void WebGraphicsContext3DDefaultImpl::copyTextureToParentTextureCHROMIUM(
     unsigned id,
     unsigned id2) {
+  if (!glGetTexLevelParameteriv)
+    return;
+
   makeContextCurrent();
   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_copyTextureToParentTextureFBO);
   glFramebufferTexture2DEXT(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
@@ -1208,7 +1193,16 @@ WebString WebGraphicsContext3DDefaultImpl::getShaderSource(WebGLId shader) {
 
 WebString WebGraphicsContext3DDefaultImpl::getString(unsigned long name) {
   makeContextCurrent();
-  return WebString::fromUTF8(reinterpret_cast<const char*>(glGetString(name)));
+  StringBuilder result;
+  result.append(reinterpret_cast<const char*>(glGetString(name)));
+  if (name == GL_EXTENSIONS) {
+    // GL_CHROMIUM_copy_texture_to_parent_texture requires this
+    // desktopGL-only function (GLES2 doesn't support it), so
+    // check for its existence here.
+    if (glGetTexLevelParameteriv)
+      result.append(" GL_CHROMIUM_copy_texture_to_parent_texture");
+  }
+  return WebString(result.toString());
 }
 
 DELEGATE_TO_GL_3(getTexParameterfv,

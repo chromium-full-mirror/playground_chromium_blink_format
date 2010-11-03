@@ -34,6 +34,7 @@
 
 #include "Texture.h"
 
+#include "Extensions3D.h"
 #include "FloatRect.h"
 #include "GraphicsContext3D.h"
 #include "IntRect.h"
@@ -73,8 +74,9 @@ static void convertFormat(GraphicsContext3D* context,
       *glType = GraphicsContext3D::UNSIGNED_BYTE;
       break;
     case Texture::BGRA8:
-      if (context->supportsBGRA()) {
-        *glFormat = GraphicsContext3D::BGRA_EXT;
+      if (context->getExtensions()->supports(
+              "GL_EXT_texture_format_BGRA8888")) {
+        *glFormat = Extensions3D::BGRA_EXT;
         *glType = GraphicsContext3D::UNSIGNED_BYTE;
       } else {
         *glFormat = GraphicsContext3D::RGBA;
