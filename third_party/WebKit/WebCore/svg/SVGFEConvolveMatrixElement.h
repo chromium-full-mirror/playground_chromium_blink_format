@@ -45,11 +45,11 @@ class SVGFEConvolveMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   static const AtomicString& kernelUnitLengthXIdentifier();
   static const AtomicString& kernelUnitLengthYIdentifier();
 
-  DECLARE_ANIMATED_PROPERTY(SVGFEConvolveMatrixElement,
-                            SVGNames::inAttr,
-                            String,
-                            In1,
-                            in1)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEConvolveMatrixElement,
+                                       SVGNames::inAttr,
+                                       String,
+                                       In1,
+                                       in1)
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEConvolveMatrixElement,
                                        SVGNames::orderXAttr,
                                        long,

@@ -34,23 +34,17 @@ namespace WebCore {
 
 inline SVGViewElement::SVGViewElement(const QualifiedName& tagName,
                                       Document* document)
-    : SVGStyledElement(tagName, document) {}
+    : SVGStyledElement(tagName, document),
+      m_viewTarget(SVGNames::viewTargetAttr) {}
 
 PassRefPtr<SVGViewElement> SVGViewElement::create(const QualifiedName& tagName,
                                                   Document* document) {
   return adoptRef(new SVGViewElement(tagName, document));
 }
 
-SVGStringList* SVGViewElement::viewTarget() const {
-  if (!m_viewTarget)
-    m_viewTarget = SVGStringList::create(SVGNames::viewTargetAttr);
-
-  return m_viewTarget.get();
-}
-
 void SVGViewElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::viewTargetAttr)
-    viewTarget()->reset(attr->value());
+    viewTarget().reset(attr->value());
   else {
     if (SVGExternalResourcesRequired::parseMappedAttribute(attr) ||
         SVGFitToViewBox::parseMappedAttribute(document(), attr) ||

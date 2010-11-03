@@ -93,11 +93,11 @@ class SVGImageElement : public SVGStyledTransformableElement,
                                 preserveAspectRatio)
 
   // SVGURIReference
-  DECLARE_ANIMATED_PROPERTY(SVGImageElement,
-                            XLinkNames::hrefAttr,
-                            String,
-                            Href,
-                            href)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGImageElement,
+                                       XLinkNames::hrefAttr,
+                                       String,
+                                       Href,
+                                       href)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGImageElement,

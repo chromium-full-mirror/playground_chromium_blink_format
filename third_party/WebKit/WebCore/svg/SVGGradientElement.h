@@ -69,11 +69,11 @@ class SVGGradientElement : public SVGStyledElement,
                             gradientTransform)
 
   // SVGURIReference
-  DECLARE_ANIMATED_PROPERTY(SVGGradientElement,
-                            XLinkNames::hrefAttr,
-                            String,
-                            Href,
-                            href)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGGradientElement,
+                                       XLinkNames::hrefAttr,
+                                       String,
+                                       Href,
+                                       href)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGGradientElement,

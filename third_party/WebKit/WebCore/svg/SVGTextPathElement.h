@@ -84,11 +84,11 @@ class SVGTextPathElement : public SVGTextContentElement,
                                        spacing)
 
   // SVGURIReference
-  DECLARE_ANIMATED_PROPERTY(SVGTextPathElement,
-                            XLinkNames::hrefAttr,
-                            String,
-                            Href,
-                            href)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGTextPathElement,
+                                       XLinkNames::hrefAttr,
+                                       String,
+                                       Href,
+                                       href)
 };
 
 }  // namespace WebCore

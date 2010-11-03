@@ -22,23 +22,20 @@
 #define SVGTests_h
 
 #if ENABLE(SVG)
-#include <wtf/Forward.h>
-#include <wtf/RefPtr.h>
+#include "SVGStringList.h"
 
 namespace WebCore {
 
 class Attribute;
 class QualifiedName;
-class SVGStringList;
 
 class SVGTests {
  public:
-  SVGStringList* requiredFeatures() const;
-  SVGStringList* requiredExtensions() const;
-  SVGStringList* systemLanguage() const;
+  SVGStringList& requiredFeatures() { return m_features; }
+  SVGStringList& requiredExtensions() { return m_extensions; }
+  SVGStringList& systemLanguage() { return m_systemLanguage; }
 
-  bool hasExtension(const String&) const { return false; }
-
+  bool hasExtension(const String&) const;
   bool isValid() const;
 
   bool parseMappedAttribute(Attribute*);
@@ -46,12 +43,11 @@ class SVGTests {
 
  protected:
   SVGTests();
-  ~SVGTests();
 
  private:
-  mutable RefPtr<SVGStringList> m_features;
-  mutable RefPtr<SVGStringList> m_extensions;
-  mutable RefPtr<SVGStringList> m_systemLanguage;
+  SVGStringList m_features;
+  SVGStringList m_extensions;
+  SVGStringList m_systemLanguage;
 };
 
 }  // namespace WebCore

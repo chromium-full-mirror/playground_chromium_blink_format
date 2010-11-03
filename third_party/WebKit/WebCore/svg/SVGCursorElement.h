@@ -66,11 +66,11 @@ class SVGCursorElement : public SVGElement,
                                 y)
 
   // SVGURIReference
-  DECLARE_ANIMATED_PROPERTY(SVGCursorElement,
-                            XLinkNames::hrefAttr,
-                            String,
-                            Href,
-                            href)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGCursorElement,
+                                       XLinkNames::hrefAttr,
+                                       String,
+                                       Href,
+                                       href)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGCursorElement,

@@ -38,16 +38,16 @@ class SVGFEBlendElement : public SVGFilterPrimitiveStandardAttributes {
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 
-  DECLARE_ANIMATED_PROPERTY(SVGFEBlendElement,
-                            SVGNames::inAttr,
-                            String,
-                            In1,
-                            in1)
-  DECLARE_ANIMATED_PROPERTY(SVGFEBlendElement,
-                            SVGNames::in2Attr,
-                            String,
-                            In2,
-                            in2)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEBlendElement,
+                                       SVGNames::inAttr,
+                                       String,
+                                       In1,
+                                       in1)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEBlendElement,
+                                       SVGNames::in2Attr,
+                                       String,
+                                       In2,
+                                       in2)
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEBlendElement,
                                        SVGNames::modeAttr,
                                        int,

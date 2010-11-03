@@ -44,11 +44,11 @@ class SVGFESpecularLightingElement
   static const AtomicString& kernelUnitLengthXIdentifier();
   static const AtomicString& kernelUnitLengthYIdentifier();
 
-  DECLARE_ANIMATED_PROPERTY(SVGFESpecularLightingElement,
-                            SVGNames::inAttr,
-                            String,
-                            In1,
-                            in1)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFESpecularLightingElement,
+                                       SVGNames::inAttr,
+                                       String,
+                                       In1,
+                                       in1)
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFESpecularLightingElement,
                                        SVGNames::specularConstantAttr,
                                        float,

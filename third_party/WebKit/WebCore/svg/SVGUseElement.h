@@ -96,11 +96,11 @@ class SVGUseElement : public SVGStyledTransformableElement,
                                 height)
 
   // SVGURIReference
-  DECLARE_ANIMATED_PROPERTY(SVGUseElement,
-                            XLinkNames::hrefAttr,
-                            String,
-                            Href,
-                            href)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGUseElement,
+                                       XLinkNames::hrefAttr,
+                                       String,
+                                       Href,
+                                       href)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGUseElement,

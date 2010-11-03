@@ -111,11 +111,11 @@ class SVGFilterElement : public SVGStyledElement,
       filterResY)
 
   // SVGURIReference
-  DECLARE_ANIMATED_PROPERTY(SVGFilterElement,
-                            XLinkNames::hrefAttr,
-                            String,
-                            Href,
-                            href)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFilterElement,
+                                       XLinkNames::hrefAttr,
+                                       String,
+                                       Href,
+                                       href)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFilterElement,

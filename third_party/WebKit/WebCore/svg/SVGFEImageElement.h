@@ -63,11 +63,11 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
                                 preserveAspectRatio)
 
   // SVGURIReference
-  DECLARE_ANIMATED_PROPERTY(SVGFEImageElement,
-                            XLinkNames::hrefAttr,
-                            String,
-                            Href,
-                            href)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEImageElement,
+                                       XLinkNames::hrefAttr,
+                                       String,
+                                       Href,
+                                       href)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEImageElement,

@@ -41,16 +41,16 @@ class SVGFEDisplacementMapElement
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 
-  DECLARE_ANIMATED_PROPERTY(SVGFEDisplacementMapElement,
-                            SVGNames::inAttr,
-                            String,
-                            In1,
-                            in1)
-  DECLARE_ANIMATED_PROPERTY(SVGFEDisplacementMapElement,
-                            SVGNames::in2Attr,
-                            String,
-                            In2,
-                            in2)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEDisplacementMapElement,
+                                       SVGNames::inAttr,
+                                       String,
+                                       In1,
+                                       in1)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEDisplacementMapElement,
+                                       SVGNames::in2Attr,
+                                       String,
+                                       In2,
+                                       in2)
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEDisplacementMapElement,
                                        SVGNames::xChannelSelectorAttr,
                                        int,

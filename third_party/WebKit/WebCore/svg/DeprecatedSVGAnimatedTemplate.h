@@ -154,7 +154,6 @@ PassRefPtr<AnimatedTearOff> lookupOrCreateWrapper(
 }
 
 // Common type definitions, to ease IDL generation.
-typedef DeprecatedSVGAnimatedTemplate<String> SVGAnimatedString;
 typedef DeprecatedSVGAnimatedTemplate<SVGTransformList*>
     SVGAnimatedTransformList;
 }

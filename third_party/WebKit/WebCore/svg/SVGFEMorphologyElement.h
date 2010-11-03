@@ -44,11 +44,11 @@ class SVGFEMorphologyElement : public SVGFilterPrimitiveStandardAttributes {
   static const AtomicString& radiusXIdentifier();
   static const AtomicString& radiusYIdentifier();
 
-  DECLARE_ANIMATED_PROPERTY(SVGFEMorphologyElement,
-                            SVGNames::inAttr,
-                            String,
-                            In1,
-                            in1)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEMorphologyElement,
+                                       SVGNames::inAttr,
+                                       String,
+                                       In1,
+                                       in1)
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEMorphologyElement,
                                        SVGNames::operatorAttr,
                                        int,

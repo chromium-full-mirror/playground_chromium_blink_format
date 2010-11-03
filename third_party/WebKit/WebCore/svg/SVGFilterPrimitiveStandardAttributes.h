@@ -85,11 +85,11 @@ class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
                                 SVGLength,
                                 Height,
                                 height)
-  DECLARE_ANIMATED_PROPERTY(SVGFilterPrimitiveStandardAttributes,
-                            SVGNames::resultAttr,
-                            String,
-                            Result,
-                            result)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFilterPrimitiveStandardAttributes,
+                                       SVGNames::resultAttr,
+                                       String,
+                                       Result,
+                                       result)
 };
 
 }  // namespace WebCore

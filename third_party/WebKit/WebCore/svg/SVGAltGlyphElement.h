@@ -52,11 +52,11 @@ class SVGAltGlyphElement : public SVGTextPositioningElement,
   virtual bool childShouldCreateRenderer(Node*) const;
 
   // SVGURIReference
-  DECLARE_ANIMATED_PROPERTY(SVGAltGlyphElement,
-                            XLinkNames::hrefAttr,
-                            String,
-                            Href,
-                            href)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGAltGlyphElement,
+                                       XLinkNames::hrefAttr,
+                                       String,
+                                       Href,
+                                       href)
 };
 
 }  // namespace WebCore

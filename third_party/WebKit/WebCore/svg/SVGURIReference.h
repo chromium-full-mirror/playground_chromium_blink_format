@@ -39,8 +39,7 @@ class SVGURIReference {
   static String getTarget(const String& url);
 
  protected:
-  virtual void setHrefBaseValue(
-      DeprecatedSVGAnimatedPropertyTraits<String>::PassType) = 0;
+  virtual void setHrefBaseValue(const String&) = 0;
 };
 
 }  // namespace WebCore

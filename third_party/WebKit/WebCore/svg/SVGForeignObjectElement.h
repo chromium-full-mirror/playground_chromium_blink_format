@@ -75,11 +75,11 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
                                 height)
 
   // SVGURIReference
-  DECLARE_ANIMATED_PROPERTY(SVGForeignObjectElement,
-                            XLinkNames::hrefAttr,
-                            String,
-                            Href,
-                            href)
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGForeignObjectElement,
+                                       XLinkNames::hrefAttr,
+                                       String,
+                                       Href,
+                                       href)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGForeignObjectElement,
