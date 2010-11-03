@@ -52,8 +52,6 @@ class SVGPropertyTearOff : public SVGProperty {
     return m_animatedProperty.get();
   }
 
-  virtual int removeItemFromList(SVGAnimatedProperty*) { return -1; }
-
   // Used only by the list tear offs!
   void setValue(PropertyType& value) {
     if (m_valueIsCopy)
@@ -85,6 +83,7 @@ class SVGPropertyTearOff : public SVGProperty {
     ASSERT(!m_valueIsCopy);
     m_value = new PropertyType(*m_value);
     m_valueIsCopy = true;
+    m_animatedProperty = 0;
   }
 
   void commitChange() {
