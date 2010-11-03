@@ -70,7 +70,10 @@ using namespace WebKit;
 using namespace std;
 
 LayoutTestController::LayoutTestController(TestShell* shell)
-    : m_shell(shell), m_workQueue(this) {
+    : m_shell(shell),
+      m_closeRemainingWindows(false),
+      m_deferMainResourceDataLoad(false),
+      m_workQueue(this) {
   // Initialize the map that associates methods of this class with the names
   // they will use when called by JavaScript.  The actual binding of those
   // names to their methods will be done by calling bindToJavaScript() (defined
