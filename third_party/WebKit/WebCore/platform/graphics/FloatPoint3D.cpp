@@ -37,8 +37,4 @@ void FloatPoint3D::normalize() {
   }
 }
 
-float FloatPoint3D::length() const {
-  return sqrtf(lengthSquared());
-}
-
 }  // namespace WebCore

@@ -42,7 +42,7 @@ void PointLightSource::updatePaintingData(PaintingData& paintingData,
   paintingData.lightVector.setX(m_position.x() - x);
   paintingData.lightVector.setY(m_position.y() - y);
   paintingData.lightVector.setZ(m_position.z() - z);
-  paintingData.lightVector.normalize();
+  paintingData.lightVectorLength = paintingData.lightVector.length();
 }
 
 // spot-light edge darkening depends on an absolute treshold
@@ -86,9 +86,11 @@ void SpotLightSource::updatePaintingData(PaintingData& paintingData,
   paintingData.lightVector.setX(m_position.x() - x);
   paintingData.lightVector.setY(m_position.y() - y);
   paintingData.lightVector.setZ(m_position.z() - z);
-  paintingData.lightVector.normalize();
+  paintingData.lightVectorLength = paintingData.lightVector.length();
 
-  float cosineOfAngle = paintingData.lightVector * paintingData.directionVector;
+  float cosineOfAngle =
+      (paintingData.lightVector * paintingData.directionVector) /
+      paintingData.lightVectorLength;
   if (cosineOfAngle > paintingData.coneCutOffLimit) {
     // No light is produced, scanlines are not updated
     paintingData.colorVector.setX(0.0f);
@@ -133,6 +135,7 @@ void DistantLightSource::initPaintingData(PaintingData& paintingData) {
   paintingData.lightVector.setX(cosf(azimuth) * cosf(elevation));
   paintingData.lightVector.setY(sinf(azimuth) * cosf(elevation));
   paintingData.lightVector.setZ(sinf(elevation));
+  paintingData.lightVectorLength = 1;
 }
 
 void DistantLightSource::updatePaintingData(PaintingData&, int, int, float) {}
