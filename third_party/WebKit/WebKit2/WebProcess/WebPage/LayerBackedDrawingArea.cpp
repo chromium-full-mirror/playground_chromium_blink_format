@@ -105,10 +105,17 @@ void LayerBackedDrawingArea::setSize(const IntSize& viewSize) {
   m_backingLayer->setSize(viewSize);
   scheduleCompositingLayerSync();
 
-  m_webPage->setSize(viewSize);
+  // Laying out the page can cause the drawing area to change so we keep an
+  // extra reference.
+  RefPtr<LayerBackedDrawingArea> protect(this);
 
-  // Layout if necessary.
+  m_webPage->setSize(viewSize);
   m_webPage->layoutIfNeeded();
+
+  if (m_webPage->drawingArea() != this) {
+    // The drawing area changed, return early.
+    return;
+  }
 
   WebProcess::shared().connection()->send(DrawingAreaProxyMessage::DidSetSize,
                                           m_webPage->pageID(), CoreIPC::In());
