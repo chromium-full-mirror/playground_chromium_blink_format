@@ -78,7 +78,8 @@ class RunUntilConditionLoop : public QObject {
 
 void TestController::platformInitialize() {}
 
-void TestController::runUntil(bool& done) {
+void TestController::platformRunUntil(bool& done, double) {
+  // FIXME: Honor the timeout parameter <http://webkit.org/b/48941>.
   RunUntilConditionLoop::start(done);
   ASSERT(done);
 }

@@ -120,7 +120,12 @@ void TestInvocation::invoke() {
   WKContextPostMessageToInjectedBundle(TestController::shared().context(),
                                        messageName.get(), 0);
 
-  TestController::runUntil(m_gotInitialResponse);
+  TestController::shared().runUntil(m_gotInitialResponse,
+                                    TestController::ShortTimeout);
+  if (!m_gotInitialResponse) {
+    dump("Timed out waiting for initial response from web process\n");
+    return;
+  }
   if (m_error) {
     dump("FAIL\n");
     return;
@@ -128,7 +133,12 @@ void TestInvocation::invoke() {
 
   WKPageLoadURL(TestController::shared().mainWebView()->page(), m_url.get());
 
-  TestController::runUntil(m_gotFinalMessage);
+  TestController::shared().runUntil(m_gotFinalMessage,
+                                    TestController::LongTimeout);
+  if (!m_gotFinalMessage) {
+    dump("Timed out waiting for final message from web process\n");
+    return;
+  }
   if (m_error) {
     dump("FAIL\n");
     return;
