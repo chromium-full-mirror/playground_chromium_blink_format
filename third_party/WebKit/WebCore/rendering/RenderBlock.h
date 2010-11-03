@@ -149,36 +149,34 @@ class RenderBlock : public RenderBox {
   bool containsNonZeroBidiLevel() const;
 
   GapRects selectionGapRectsForRepaint(RenderBoxModelObject* repaintContainer);
-  IntRect fillLeftSelectionGap(RenderObject* selObj,
+  IntRect fillLogicalLeftSelectionGap(RenderObject* selObj,
+                                      int xPos,
+                                      int yPos,
+                                      int height,
+                                      RenderBlock* rootBlock,
+                                      int blockX,
+                                      int blockY,
+                                      int tx,
+                                      int ty,
+                                      const PaintInfo*);
+  IntRect fillLogicalRightSelectionGap(RenderObject* selObj,
+                                       int xPos,
+                                       int yPos,
+                                       int height,
+                                       RenderBlock* rootBlock,
+                                       int blockX,
+                                       int blockY,
+                                       int tx,
+                                       int ty,
+                                       const PaintInfo*);
+  IntRect fillLineSelectionGap(RenderObject* selObj,
                                int xPos,
                                int yPos,
+                               int width,
                                int height,
-                               RenderBlock* rootBlock,
-                               int blockX,
-                               int blockY,
-                               int tx,
-                               int ty,
                                const PaintInfo*);
-  IntRect fillRightSelectionGap(RenderObject* selObj,
-                                int xPos,
-                                int yPos,
-                                int height,
-                                RenderBlock* rootBlock,
-                                int blockX,
-                                int blockY,
-                                int tx,
-                                int ty,
-                                const PaintInfo*);
-  IntRect fillHorizontalSelectionGap(RenderObject* selObj,
-                                     int xPos,
-                                     int yPos,
-                                     int width,
-                                     int height,
-                                     const PaintInfo*);
 
-  void getHorizontalSelectionGapInfo(SelectionState,
-                                     bool& leftGap,
-                                     bool& rightGap);
+  void getSelectionGapInfo(SelectionState, bool& leftGap, bool& rightGap);
 
   // Helper methods for computing line counts and heights for line counts.
   RootInlineBox* lineAtIndex(int);
@@ -803,16 +801,16 @@ class RenderBlock : public RenderBox {
                                   int& lastLeft,
                                   int& lastRight,
                                   const PaintInfo*);
-  IntRect fillVerticalSelectionGap(int lastTop,
-                                   int lastLeft,
-                                   int lastRight,
-                                   int bottomY,
-                                   RenderBlock* rootBlock,
-                                   int blockX,
-                                   int blockY,
-                                   const PaintInfo*);
-  int leftSelectionOffset(RenderBlock* rootBlock, int y);
-  int rightSelectionOffset(RenderBlock* rootBlock, int y);
+  IntRect fillBlockSelectionGap(int lastTop,
+                                int lastLeft,
+                                int lastRight,
+                                int bottomY,
+                                RenderBlock* rootBlock,
+                                int blockX,
+                                int blockY,
+                                const PaintInfo*);
+  int logicalLeftSelectionOffset(RenderBlock* rootBlock, int y);
+  int logicalRightSelectionOffset(RenderBlock* rootBlock, int y);
 
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
   virtual void absoluteQuads(Vector<FloatQuad>&);

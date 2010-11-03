@@ -294,18 +294,18 @@ GapRects RootInlineBox::fillLineSelectionGap(int selTop,
   RenderObject::SelectionState lineState = selectionState();
 
   bool leftGap, rightGap;
-  block()->getHorizontalSelectionGapInfo(lineState, leftGap, rightGap);
+  block()->getSelectionGapInfo(lineState, leftGap, rightGap);
 
   GapRects result;
 
   InlineBox* firstBox = firstSelectedBox();
   InlineBox* lastBox = lastSelectedBox();
   if (leftGap)
-    result.uniteLeft(block()->fillLeftSelectionGap(
+    result.uniteLeft(block()->fillLogicalLeftSelectionGap(
         firstBox->parent()->renderer(), firstBox->x(), selTop, selHeight,
         rootBlock, blockX, blockY, tx, ty, paintInfo));
   if (rightGap)
-    result.uniteRight(block()->fillRightSelectionGap(
+    result.uniteRight(block()->fillLogicalRightSelectionGap(
         lastBox->parent()->renderer(), lastBox->x() + lastBox->logicalWidth(),
         selTop, selHeight, rootBlock, blockX, blockY, tx, ty, paintInfo));
 
@@ -330,7 +330,7 @@ GapRects RootInlineBox::fillLineSelectionGap(int selTop,
       if (box->selectionState() != RenderObject::SelectionNone) {
         if (isPreviousBoxSelected)  // VisibleSelection may be non-contiguous,
                                     // see comment above.
-          result.uniteCenter(block()->fillHorizontalSelectionGap(
+          result.uniteCenter(block()->fillLineSelectionGap(
               box->parent()->renderer(), lastX + tx, selTop + ty,
               box->x() - lastX, selHeight, paintInfo));
         lastX = box->x() + box->logicalWidth();
