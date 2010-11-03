@@ -1000,7 +1000,6 @@ Color GraphicsLayerQtImpl::tiledBackingStoreBackgroundColor() const {
   // We return a transparent color so that the tiles initialize with alpha.
   return Color(0, 0, 0, 0);
 }
-#endif
 
 IntRect GraphicsLayerQtImpl::tiledBackingStoreVisibleRect() {
   const QGraphicsView* view =
@@ -1016,6 +1015,7 @@ IntRect GraphicsLayerQtImpl::tiledBackingStoreVisibleRect() {
       .boundingRect()
       .toAlignedRect();
 }
+#endif
 
 void GraphicsLayerQtImpl::notifyAnimationStarted() {
   // WebCore notifies javascript when the animation starts. Here we're letting
