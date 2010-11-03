@@ -680,6 +680,12 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   bool m_unpackPremultiplyAlpha;
   bool m_contextLost;
 
+  long m_stencilBits;
+  unsigned long m_stencilMask;
+  long m_stencilFuncRef;  // Note that this is the user specified value, not the
+                          // internal clamped value.
+  unsigned long m_stencilFuncMask;
+
   // Helpers for getParameter and others
   WebGLGetInfo getBooleanParameter(unsigned long pname);
   WebGLGetInfo getBooleanArrayParameter(unsigned long pname);
@@ -775,6 +781,12 @@ class WebGLRenderingContext : public CanvasRenderingContext {
 
   // Helper function to validate mode for draw{Arrays/Elements}.
   bool validateDrawMode(unsigned long);
+
+  // Helper function to validate face.
+  bool validateFace(unsigned long);
+
+  // Helper function to validate stencil func.
+  bool validateStencilFunc(unsigned long);
 
   // Helper function for texParameterf and texParameteri.
   void texParameter(unsigned long target,

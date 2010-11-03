@@ -101,7 +101,10 @@ WebGLRenderingContext::WebGLRenderingContext(
     : CanvasRenderingContext(passedCanvas),
       m_context(context),
       m_videoCache(4),
-      m_contextLost(false) {
+      m_contextLost(false),
+      m_stencilMask(0xFFFFFFFF),
+      m_stencilFuncRef(0),
+      m_stencilFuncMask(0xFFFFFFFF) {
   ASSERT(m_context);
   initializeNewContext();
 }
@@ -2340,6 +2343,10 @@ void WebGLRenderingContext::stencilFunc(unsigned long func,
                                         unsigned long mask) {
   if (isContextLost())
     return;
+  if (!validateStencilFunc(func))
+    return;
+  m_stencilFuncRef = ref;
+  m_stencilFuncMask = mask;
   m_context->stencilFunc(func, ref, mask);
   cleanupAfterGraphicsCall(false);
 }
@@ -2350,6 +2357,17 @@ void WebGLRenderingContext::stencilFuncSeparate(unsigned long face,
                                                 unsigned long mask) {
   if (isContextLost())
     return;
+  if (!validateFace(face) || !validateStencilFunc(func))
+    return;
+  if (face == GraphicsContext3D::FRONT_AND_BACK) {
+    m_stencilFuncRef = ref;
+    m_stencilFuncMask = mask;
+  } else if (m_stencilFuncRef != ref || m_stencilFuncMask != mask) {
+    // for ref value, we generate an error if user specify a different value
+    // for front/back faces even if they clamp to the same value internally.
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+    return;
+  }
   m_context->stencilFuncSeparate(face, func, ref, mask);
   cleanupAfterGraphicsCall(false);
 }
@@ -2357,6 +2375,7 @@ void WebGLRenderingContext::stencilFuncSeparate(unsigned long face,
 void WebGLRenderingContext::stencilMask(unsigned long mask) {
   if (isContextLost())
     return;
+  m_stencilMask = mask;
   m_context->stencilMask(mask);
   cleanupAfterGraphicsCall(false);
 }
@@ -2365,6 +2384,14 @@ void WebGLRenderingContext::stencilMaskSeparate(unsigned long face,
                                                 unsigned long mask) {
   if (isContextLost())
     return;
+  if (!validateFace(face))
+    return;
+  if (face == GraphicsContext3D::FRONT_AND_BACK)
+    m_stencilMask = mask;
+  else if (m_stencilMask != mask) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+    return;
+  }
   m_context->stencilMaskSeparate(face, mask);
   cleanupAfterGraphicsCall(false);
 }
@@ -3881,6 +3908,35 @@ bool WebGLRenderingContext::validateDrawMode(unsigned long mode) {
     case GraphicsContext3D::TRIANGLE_STRIP:
     case GraphicsContext3D::TRIANGLE_FAN:
     case GraphicsContext3D::TRIANGLES:
+      return true;
+    default:
+      m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
+      return false;
+  }
+}
+
+bool WebGLRenderingContext::validateFace(unsigned long face) {
+  switch (face) {
+    case GraphicsContext3D::FRONT:
+    case GraphicsContext3D::BACK:
+    case GraphicsContext3D::FRONT_AND_BACK:
+      return true;
+    default:
+      m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
+      return false;
+  }
+}
+
+bool WebGLRenderingContext::validateStencilFunc(unsigned long func) {
+  switch (func) {
+    case GraphicsContext3D::NEVER:
+    case GraphicsContext3D::LESS:
+    case GraphicsContext3D::LEQUAL:
+    case GraphicsContext3D::GREATER:
+    case GraphicsContext3D::GEQUAL:
+    case GraphicsContext3D::EQUAL:
+    case GraphicsContext3D::NOTEQUAL:
+    case GraphicsContext3D::ALWAYS:
       return true;
     default:
       m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
