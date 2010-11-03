@@ -616,7 +616,7 @@ PassRefPtr<LegacyWebArchive> LegacyWebArchive::create(
 
   PassRefPtr<ArchiveResource> mainResource = ArchiveResource::create(
       utf8Buffer(markupString), responseURL, response.mimeType(), "UTF-8",
-      frame->tree()->name());
+      frame->tree()->uniqueName());
 
   Vector<PassRefPtr<LegacyWebArchive>> subframeArchives;
   Vector<PassRefPtr<ArchiveResource>> subresources;
@@ -637,7 +637,7 @@ PassRefPtr<LegacyWebArchive> LegacyWebArchive::create(
         subframeArchives.append(subframeArchive);
       else
         LOG_ERROR("Unabled to archive subframe %s",
-                  childFrame->tree()->name().string().utf8().data());
+                  childFrame->tree()->uniqueName().string().utf8().data());
     } else {
       ListHashSet<KURL> subresourceURLs;
       node->getSubresourceURLs(subresourceURLs);

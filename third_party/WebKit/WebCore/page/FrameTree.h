@@ -36,7 +36,7 @@ class FrameTree : public Noncopyable {
         m_childCount(0) {}
   ~FrameTree();
 
-  const AtomicString& name() const { return m_name; }
+  const AtomicString& uniqueName() const { return m_uniqueName; }
   void setName(const AtomicString&);
   void clearName();
   Frame* parent(bool checkForDisconnectedFrame = false) const;
@@ -71,7 +71,7 @@ class FrameTree : public Noncopyable {
   Frame* m_thisFrame;
 
   Frame* m_parent;
-  AtomicString m_name;
+  AtomicString m_uniqueName;
 
   // FIXME: use ListRefPtr?
   RefPtr<Frame> m_nextSibling;
