@@ -47,7 +47,8 @@ void AXObjectCache::attachWrapper(AccessibilityObject*) {
 
 void AXObjectCache::postPlatformNotification(AccessibilityObject* obj,
                                              AXNotification notification) {
-  if (obj->isAccessibilityScrollbar() && notification == AXValueChanged) {
+  if (obj && obj->isAccessibilityScrollbar() &&
+      notification == AXValueChanged) {
     // Send document value changed on scrollbar value changed notification.
     Scrollbar* scrollBar =
         static_cast<AccessibilityScrollbar*>(obj)->scrollbar();
