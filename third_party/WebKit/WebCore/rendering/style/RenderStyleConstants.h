@@ -207,6 +207,8 @@ enum WritingMode {
   BottomToTopWritingMode
 };
 
+enum TextCombine { TextCombineNone, TextCombineCluster, TextCombineUpright };
+
 enum EFillAttachment {
   ScrollBackgroundAttachment,
   LocalBackgroundAttachment,

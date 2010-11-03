@@ -126,12 +126,13 @@ static const int computedProperties[] = {
     CSSPropertyWebkitMaskPosition, CSSPropertyWebkitMaskRepeat,
     CSSPropertyWebkitMaskSize, CSSPropertyWebkitNbspMode,
     CSSPropertyWebkitPerspective, CSSPropertyWebkitPerspectiveOrigin,
-    CSSPropertyWebkitRtlOrdering, CSSPropertyWebkitTextDecorationsInEffect,
-    CSSPropertyWebkitTextFillColor, CSSPropertyWebkitTextSecurity,
-    CSSPropertyWebkitTextStrokeColor, CSSPropertyWebkitTextStrokeWidth,
-    CSSPropertyWebkitTransform, CSSPropertyWebkitTransformOrigin,
-    CSSPropertyWebkitTransformStyle, CSSPropertyWebkitTransitionDelay,
-    CSSPropertyWebkitTransitionDuration, CSSPropertyWebkitTransitionProperty,
+    CSSPropertyWebkitRtlOrdering, CSSPropertyWebkitTextCombine,
+    CSSPropertyWebkitTextDecorationsInEffect, CSSPropertyWebkitTextFillColor,
+    CSSPropertyWebkitTextSecurity, CSSPropertyWebkitTextStrokeColor,
+    CSSPropertyWebkitTextStrokeWidth, CSSPropertyWebkitTransform,
+    CSSPropertyWebkitTransformOrigin, CSSPropertyWebkitTransformStyle,
+    CSSPropertyWebkitTransitionDelay, CSSPropertyWebkitTransitionDuration,
+    CSSPropertyWebkitTransitionProperty,
     CSSPropertyWebkitTransitionTimingFunction, CSSPropertyWebkitUserDrag,
     CSSPropertyWebkitUserModify, CSSPropertyWebkitUserSelect,
     CSSPropertyWebkitWritingMode
@@ -1645,6 +1646,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return CSSPrimitiveValue::create(style->colorSpace());
     case CSSPropertyWebkitWritingMode:
       return CSSPrimitiveValue::create(style->writingMode());
+    case CSSPropertyWebkitTextCombine:
+      return CSSPrimitiveValue::create(style->textCombine());
 
     /* Shorthand properties, currently not supported see bug 13658*/
     case CSSPropertyBackground:

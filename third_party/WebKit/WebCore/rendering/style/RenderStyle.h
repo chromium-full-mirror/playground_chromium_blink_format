@@ -1024,6 +1024,10 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return rareNonInheritedData->m_mask.hasImage() ||
            rareNonInheritedData->m_maskBoxImage.hasImage();
   }
+
+  TextCombine textCombine() const {
+    return static_cast<TextCombine>(rareNonInheritedData->m_textCombine);
+  }
   // End CSS3 Getters
 
   // Apple-specific property getter methods
@@ -1657,6 +1661,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
     SET_VAR(rareNonInheritedData.access()->m_transform, m_z, f);
   }
   void setSpeak(ESpeak s) { SET_VAR(rareInheritedData, speak, s); }
+  void setTextCombine(TextCombine v) {
+    SET_VAR(rareNonInheritedData, m_textCombine, v);
+  }
   // End CSS3 Setters
 
   // Apple-specific property setters
@@ -1854,6 +1861,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   static EClear initialClear() { return CNONE; }
   static TextDirection initialDirection() { return LTR; }
   static WritingMode initialWritingMode() { return TopToBottomWritingMode; }
+  static TextCombine initialTextCombine() { return TextCombineNone; }
   static EDisplay initialDisplay() { return INLINE; }
   static EEmptyCell initialEmptyCells() { return SHOW; }
   static EFloat initialFloating() { return FNONE; }

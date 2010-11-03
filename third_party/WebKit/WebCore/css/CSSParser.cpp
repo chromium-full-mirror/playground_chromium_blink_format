@@ -1916,6 +1916,11 @@ bool CSSParser::parseValue(int propId, bool important) {
         validPrimitive = true;
       break;
 
+    case CSSPropertyWebkitTextCombine:
+      if (id == CSSValueNone || id == CSSValueCluster || id == CSSValueUpright)
+        validPrimitive = true;
+      break;
+
 #if ENABLE(SVG)
     default:
       return parseSVGValue(propId, important);

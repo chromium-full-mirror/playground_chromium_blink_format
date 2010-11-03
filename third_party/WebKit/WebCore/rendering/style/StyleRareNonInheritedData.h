@@ -117,6 +117,7 @@ class StyleRareNonInheritedData : public RefCounted<StyleRareNonInheritedData> {
                                             // been added.
   unsigned m_appearance : 6;                // EAppearance
   unsigned m_borderFit : 1;                 // EBorderFit
+  unsigned m_textCombine : 2;               // CSS3 text-combine properties
 
   short m_counterIncrement;
   short m_counterReset;

@@ -43,6 +43,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
           RenderStyle::initialMatchNearestMailBlockquoteColor()),
       m_appearance(RenderStyle::initialAppearance()),
       m_borderFit(RenderStyle::initialBorderFit()),
+      m_textCombine(RenderStyle::initialTextCombine()),
       m_counterIncrement(0),
       m_counterReset(0)
 #if USE(ACCELERATED_COMPOSITING)
@@ -81,6 +82,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(
       matchNearestMailBlockquoteColor(o.matchNearestMailBlockquoteColor),
       m_appearance(o.m_appearance),
       m_borderFit(o.m_borderFit),
+      m_textCombine(o.m_textCombine),
       m_counterIncrement(o.m_counterIncrement),
       m_counterReset(o.m_counterReset)
 #if USE(ACCELERATED_COMPOSITING)
@@ -120,6 +122,7 @@ bool StyleRareNonInheritedData::operator==(
          marginAfterCollapse == o.marginAfterCollapse &&
          matchNearestMailBlockquoteColor == o.matchNearestMailBlockquoteColor &&
          m_appearance == o.m_appearance && m_borderFit == o.m_borderFit &&
+         m_textCombine == o.m_textCombine &&
          m_counterIncrement == o.m_counterIncrement &&
          m_counterReset == o.m_counterReset
 #if USE(ACCELERATED_COMPOSITING)

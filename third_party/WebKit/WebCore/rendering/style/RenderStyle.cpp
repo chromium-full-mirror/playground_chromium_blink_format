@@ -489,6 +489,11 @@ StyleDifference RenderStyle::diff(
   if (inherited_flags.m_writingMode != other->inherited_flags.m_writingMode)
     return StyleDifferenceLayout;
 
+  // Check text combine mode.
+  if (rareNonInheritedData->m_textCombine !=
+      other->rareNonInheritedData->m_textCombine)
+    return StyleDifferenceLayout;
+
   // Overflow returns a layout hint.
   if (noninherited_flags._overflowX != other->noninherited_flags._overflowX ||
       noninherited_flags._overflowY != other->noninherited_flags._overflowY)
