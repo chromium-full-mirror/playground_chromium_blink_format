@@ -31,9 +31,10 @@
 #ifndef WebPluginContainerImpl_h
 #define WebPluginContainerImpl_h
 
+#include "PluginViewBase.h"
 #include "WebPluginContainer.h"
-
 #include "Widget.h"
+
 #include <wtf/PassRefPtr.h>
 #include <wtf/Vector.h>
 
@@ -43,7 +44,9 @@ namespace WebCore {
 class HTMLPlugInElement;
 class IntRect;
 class KeyboardEvent;
+class LayerChromium;
 class MouseEvent;
+class PluginLayerChromium;
 class ResourceError;
 class ResourceResponse;
 class WheelEvent;
@@ -54,7 +57,7 @@ namespace WebKit {
 class WebPlugin;
 class WebPluginLoadObserver;
 
-class WebPluginContainerImpl : public WebCore::Widget,
+class WebPluginContainerImpl : public WebCore::PluginViewBase,
                                public WebPluginContainer {
  public:
   static PassRefPtr<WebPluginContainerImpl> create(
@@ -83,6 +86,7 @@ class WebPluginContainerImpl : public WebCore::Widget,
   virtual void invalidateRect(const WebRect&);
   virtual void scrollRect(int dx, int dy, const WebRect&);
   virtual void reportGeometry();
+  virtual void commitBackingTexture();
   virtual void clearScriptObjects();
   virtual NPObject* scriptableObjectForElement();
   virtual WebString executeScriptURL(const WebURL&, bool popupsAllowed);
@@ -124,10 +128,13 @@ class WebPluginContainerImpl : public WebCore::Widget,
 
   void willDestroyPluginLoadObserver(WebPluginLoadObserver*);
 
+#if USE(ACCELERATED_COMPOSITING)
+  virtual WebCore::LayerChromium* platformLayer() const;
+#endif
+
  private:
   WebPluginContainerImpl(WebCore::HTMLPlugInElement* element,
-                         WebPlugin* webPlugin)
-      : m_element(element), m_webPlugin(webPlugin) {}
+                         WebPlugin* webPlugin);
   ~WebPluginContainerImpl();
 
   void handleMouseEvent(WebCore::MouseEvent*);
@@ -145,6 +152,10 @@ class WebPluginContainerImpl : public WebCore::Widget,
   WebCore::HTMLPlugInElement* m_element;
   WebPlugin* m_webPlugin;
   Vector<WebPluginLoadObserver*> m_pluginLoadObservers;
+
+#if USE(ACCELERATED_COMPOSITING)
+  RefPtr<WebCore::PluginLayerChromium> m_platformLayer;
+#endif
 };
 
 }  // namespace WebKit
