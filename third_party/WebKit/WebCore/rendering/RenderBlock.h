@@ -809,8 +809,8 @@ class RenderBlock : public RenderBox {
                                 int blockX,
                                 int blockY,
                                 const PaintInfo*);
-  int logicalLeftSelectionOffset(RenderBlock* rootBlock, int y);
-  int logicalRightSelectionOffset(RenderBlock* rootBlock, int y);
+  int logicalLeftSelectionOffset(RenderBlock* rootBlock, int position);
+  int logicalRightSelectionOffset(RenderBlock* rootBlock, int position);
 
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
   virtual void absoluteQuads(Vector<FloatQuad>&);
