@@ -30,6 +30,7 @@
 #include "MachPort.h"
 #include "NetscapePluginModule.h"
 #include "PluginProcessProxyMessages.h"
+#include "PluginProcessCreationParameters.h"
 #include "WebProcessConnection.h"
 
 namespace WebKit {
@@ -42,9 +43,13 @@ PluginProcess& PluginProcess::shared() {
 }
 
 PluginProcess::PluginProcess()
-    : m_shutdownTimer(RunLoop::main(),
-                      this,
-                      &PluginProcess::shutdownTimerFired) {}
+    : m_shutdownTimer(RunLoop::main(), this, &PluginProcess::shutdownTimerFired)
+#if USE(ACCELERATED_COMPOSITING) && PLATFORM(MAC)
+      ,
+      m_compositingRenderServerPort(MACH_PORT_NULL)
+#endif
+{
+}
 
 PluginProcess::~PluginProcess() {}
 
@@ -86,10 +91,15 @@ void PluginProcess::didClose(CoreIPC::Connection*) {
 void PluginProcess::didReceiveInvalidMessage(CoreIPC::Connection*,
                                              CoreIPC::MessageID) {}
 
-void PluginProcess::initialize(const String& pluginPath) {
+void PluginProcess::initialize(
+    const PluginProcessCreationParameters& parameters) {
   ASSERT(!m_pluginModule);
 
-  m_pluginModule = NetscapePluginModule::getOrCreate(pluginPath);
+  m_pluginModule = NetscapePluginModule::getOrCreate(parameters.pluginPath);
+
+#if USE(ACCELERATED_COMPOSITING) && PLATFORM(MAC)
+  m_compositingRenderServerPort = parameters.acceleratedCompositingPort.port();
+#endif
 }
 
 void PluginProcess::createWebProcessConnection() {

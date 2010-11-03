@@ -35,6 +35,7 @@
 namespace WebKit {
 
 class NetscapePluginModule;
+class PluginProcessCreationParameters;
 class WebProcessConnection;
 
 class PluginProcess : Noncopyable, CoreIPC::Connection::Client {
@@ -64,7 +65,7 @@ class PluginProcess : Noncopyable, CoreIPC::Connection::Client {
   void didReceivePluginProcessMessage(CoreIPC::Connection*,
                                       CoreIPC::MessageID,
                                       CoreIPC::ArgumentDecoder*);
-  void initialize(const String& pluginPath);
+  void initialize(const PluginProcessCreationParameters&);
   void createWebProcessConnection();
 
   void shutdownTimerFired();
@@ -80,6 +81,11 @@ class PluginProcess : Noncopyable, CoreIPC::Connection::Client {
 
   // A timer used for the shutdown timeout.
   RunLoop::Timer<PluginProcess> m_shutdownTimer;
+
+#if USE(ACCELERATED_COMPOSITING) && PLATFORM(MAC)
+  // The Mach port used for accelerated compositing.
+  mach_port_t m_compositingRenderServerPort;
+#endif
 };
 
 }  // namespace WebKit

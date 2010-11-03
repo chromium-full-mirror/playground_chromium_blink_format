@@ -40,6 +40,7 @@ class MachPort;
 
 namespace WebKit {
 
+class PluginProcessCreationParameters;
 class PluginProcessManager;
 class WebProcessProxy;
 
@@ -81,6 +82,9 @@ class PluginProcessProxy : CoreIPC::Connection::Client,
                                            CoreIPC::MessageID,
                                            CoreIPC::ArgumentDecoder*);
   void didCreateWebProcessConnection(const CoreIPC::MachPort&);
+
+  void platformInitializePluginProcess(
+      PluginProcessCreationParameters& parameters);
 
   // The plug-in host process manager.
   PluginProcessManager* m_pluginProcessManager;
