@@ -5538,7 +5538,7 @@ void RenderBlock::computePreferredLogicalWidths() {
     }
 
     if (isTableCell()) {
-      Length w = toRenderTableCell(this)->styleOrColWidth();
+      Length w = toRenderTableCell(this)->styleOrColLogicalWidth();
       if (w.isFixed() && w.value() > 0)
         m_maxPreferredLogicalWidth =
             max(m_minPreferredLogicalWidth,

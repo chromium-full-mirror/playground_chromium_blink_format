@@ -83,7 +83,7 @@ void AutoTableLayout::recalcColumn(int effCol) {
             maxContributor = cell;
           }
 
-          Length w = cell->styleOrColWidth();
+          Length w = cell->styleOrColLogicalWidth();
           // FIXME: What is this arbitrary value?
           if (w.rawValue() > 32760)
             w.setRawValue(32760);
@@ -312,7 +312,7 @@ int AutoTableLayout::calcEffectiveWidth() {
       break;
     int span = cell->colSpan();
 
-    Length w = cell->styleOrColWidth();
+    Length w = cell->styleOrColLogicalWidth();
     if (!w.isRelative() && w.isZero())
       w = Length();  // make it Auto
 
