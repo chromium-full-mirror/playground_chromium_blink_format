@@ -17,10 +17,10 @@
  *  Boston, MA 02110-1301, USA.
  */
 
-#ifndef PlatformRefPtrCairo_h
-#define PlatformRefPtrCairo_h
+#ifndef RefPtrCairo_h
+#define RefPtrCairo_h
 
-#include "PlatformRefPtr.h"
+#include "RefPtr.h"
 
 typedef struct _cairo cairo_t;
 typedef struct _cairo_surface cairo_surface_t;
@@ -34,31 +34,31 @@ typedef struct _FcPattern FcPattern;
 namespace WTF {
 
 template <>
-cairo_t* refPlatformPtr(cairo_t* ptr);
+void refIfNotNull(cairo_t* ptr);
 template <>
-void derefPlatformPtr(cairo_t* ptr);
+void derefIfNotNull(cairo_t* ptr);
 
 template <>
-cairo_surface_t* refPlatformPtr(cairo_surface_t* ptr);
+void refIfNotNull(cairo_surface_t* ptr);
 template <>
-void derefPlatformPtr(cairo_surface_t* ptr);
+void derefIfNotNull(cairo_surface_t* ptr);
 
 template <>
-cairo_font_face_t* refPlatformPtr(cairo_font_face_t*);
+void refIfNotNull(cairo_font_face_t* ptr);
 template <>
-void derefPlatformPtr(cairo_font_face_t*);
+void derefIfNotNull(cairo_font_face_t* ptr);
 
 template <>
-cairo_scaled_font_t* refPlatformPtr(cairo_scaled_font_t*);
+void refIfNotNull(cairo_scaled_font_t* ptr);
 template <>
-void derefPlatformPtr(cairo_scaled_font_t*);
+void derefIfNotNull(cairo_scaled_font_t* ptr);
 
 #if defined(USE_FREETYPE)
 template <>
-FcPattern* refPlatformPtr(FcPattern*);
+void refIfNotNull(FcPattern* ptr);
 template <>
-void derefPlatformPtr(FcPattern*);
+void derefIfNotNull(FcPattern* ptr);
 #endif
 }
 
-#endif
+#endif  // RefPtrCairo_h
