@@ -35,7 +35,6 @@
 
 #include "DOMWindow.h"
 #include "Event.h"
-#include "EventContext.h"
 #include "InspectorController.h"
 #include "InspectorDOMAgent.h"
 #include "InspectorDebuggerAgent.h"
@@ -57,7 +56,7 @@ int InspectorInstrumentation::s_frontendCounter = 0;
 static bool eventHasListeners(const AtomicString& eventType,
                               DOMWindow* window,
                               Node* node,
-                              const Vector<EventContext>& ancestors) {
+                              const Vector<RefPtr<ContainerNode>>& ancestors) {
   if (window && window->hasEventListeners(eventType))
     return true;
 
@@ -65,7 +64,7 @@ static bool eventHasListeners(const AtomicString& eventType,
     return true;
 
   for (size_t i = 0; i < ancestors.size(); i++) {
-    Node* ancestor = ancestors[i].node();
+    ContainerNode* ancestor = ancestors[i].get();
     if (ancestor->hasEventListeners(eventType))
       return true;
   }
@@ -252,7 +251,7 @@ InspectorInstrumentationCookie InspectorInstrumentation::willDispatchEventImpl(
     const Event& event,
     DOMWindow* window,
     Node* node,
-    const Vector<EventContext>& ancestors) {
+    const Vector<RefPtr<ContainerNode>>& ancestors) {
   pauseOnNativeEventIfNeeded(inspectorController, listenerEventCategoryType,
                              event.type(), false);
 

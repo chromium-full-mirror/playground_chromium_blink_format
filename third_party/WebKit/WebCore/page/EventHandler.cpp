@@ -1930,6 +1930,8 @@ void EventHandler::updateMouseEventTargetNode(
     // rdar://4196646
     if (result && result->isTextNode())
       result = result->parentNode();
+    if (result)
+      result = result->shadowAncestorNode();
   }
   m_nodeUnderMouse = result;
 #if ENABLE(SVG)

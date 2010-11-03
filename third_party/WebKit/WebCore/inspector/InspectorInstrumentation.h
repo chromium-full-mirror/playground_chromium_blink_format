@@ -40,7 +40,6 @@ namespace WebCore {
 
 class CharacterData;
 class Element;
-class EventContext;
 class InspectorController;
 class InspectorTimelineAgent;
 class KURL;
@@ -86,7 +85,7 @@ class InspectorInstrumentation {
       const Event& event,
       DOMWindow* window,
       Node* node,
-      const Vector<EventContext>& ancestors);
+      const Vector<RefPtr<ContainerNode>>& ancestors);
   static void didDispatchEvent(const InspectorInstrumentationCookie&);
   static InspectorInstrumentationCookie
   willDispatchEventOnWindow(Frame*, const Event& event, DOMWindow* window);
@@ -183,7 +182,7 @@ class InspectorInstrumentation {
       const Event& event,
       DOMWindow* window,
       Node* node,
-      const Vector<EventContext>& ancestors);
+      const Vector<RefPtr<ContainerNode>>& ancestors);
   static void didDispatchEventImpl(const InspectorInstrumentationCookie&);
   static InspectorInstrumentationCookie willDispatchEventOnWindowImpl(
       InspectorController*,
@@ -411,7 +410,7 @@ InspectorInstrumentation::willDispatchEvent(
     const Event& event,
     DOMWindow* window,
     Node* node,
-    const Vector<EventContext>& ancestors) {
+    const Vector<RefPtr<ContainerNode>>& ancestors) {
 #if ENABLE(INSPECTOR)
   if (InspectorController* inspectorController =
           inspectorControllerForDocument(document))
