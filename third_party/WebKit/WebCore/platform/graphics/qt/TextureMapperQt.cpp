@@ -64,8 +64,9 @@ class TextureMapperQt : public TextureMapper {
                            const BitmapTexture* maskTexture);
   virtual void bindSurface(BitmapTexture* surface);
   virtual void setClip(const IntRect&);
+  virtual void setGraphicsContext(GraphicsContext*);
   virtual bool allowSurfaceForRoot() const { return false; }
-  TextureMapperQt(GraphicsContext* context);
+  TextureMapperQt();
   virtual const char* type() const { return "TextureMapperQt"; }
   virtual PassRefPtr<BitmapTexture> createTexture();
 
@@ -128,11 +129,11 @@ void TextureMapperQt::setClip(const IntRect& rect) {
   painter->setClipRect(rect);
 }
 
-TextureMapperQt::TextureMapperQt(GraphicsContext* context)
-    : TextureMapper(context),
-      m_painter(context->platformContext()),
-      m_currentSurface(0) {
-  TextureMapperQt::initialize(m_painter);
+TextureMapperQt::TextureMapperQt() : m_currentSurface(0) {}
+
+void TextureMapperQt::setGraphicsContext(GraphicsContext* context) {
+  m_painter = context->platformContext();
+  initialize(m_painter);
 }
 
 void TextureMapperQt::bindSurface(BitmapTexture* surface) {
@@ -189,10 +190,12 @@ void TextureMapperQt::drawTexture(const BitmapTexture& texture,
 PassRefPtr<TextureMapper> TextureMapper::create(GraphicsContext* context) {
 #ifdef QT_OPENGL_LIB
   if (context->platformContext()->paintEngine()->type() ==
-      QPaintEngine::OpenGL2)
-    return adoptRef(new TextureMapperGL(context));
+      QPaintEngine::OpenGL2) {
+    TextureMapperGL* texmapGL = new TextureMapperGL;
+    return adoptRef(texmapGL);
+  }
 #endif
-  return adoptRef(new TextureMapperQt(context));
+  return adoptRef(new TextureMapperQt);
 }
 
 PassRefPtr<BitmapTexture> TextureMapperQt::createTexture() {

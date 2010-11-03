@@ -25,6 +25,7 @@ namespace WebCore {
 class GraphicsContext;
 class IntRect;
 class IntSize;
+class TextureMapper;
 class TransformationMatrix;
 
 // Glue layer to connect the texmap layer to the platform specific container.
@@ -46,15 +47,17 @@ class TextureMapperPlatformLayer {
 
 class TextureMapperContentLayer : public TextureMapperPlatformLayer {
  public:
+  struct PaintOptions {
+    IntRect visibleRect;
+    IntRect targetRect;
+    IntSize viewportSize;
+    TransformationMatrix transform;
+    float opacity;
+  };
+
   virtual void setPlatformLayerClient(TextureMapperLayerClient*) = 0;
-  virtual void paint(GraphicsContext*,
-                     const IntSize&,
-                     const IntRect& targetRect,
-                     const IntRect& exposedRect,
-                     const TransformationMatrix& transform,
-                     float opacity) {}
+  virtual void paint(TextureMapper*, const PaintOptions&) {}
   virtual IntSize size() const = 0;
-  virtual void cleanupTextureMapper() {}
   virtual Type layerType() const { return ContentLayer; }
 };
 

@@ -40,7 +40,6 @@ namespace WebCore {
 struct TexmapPaintOptions {
   BitmapTexture* surface;
   TextureMapper* textureMapper;
-  GraphicsContext* context;
   TextureMapperNode* rootLayer;
   float opacity;
   IntRect scissorRect;
@@ -219,12 +218,8 @@ class TextureMapperNode : public TextureMapperContentLayer {
   IntSize size() const { return m_size; }
 
   virtual void setPlatformLayerClient(TextureMapperLayerClient*);
-  virtual void paint(GraphicsContext*,
-                     const IntSize&,
-                     const IntRect& targetRect,
-                     const IntRect& exposedRect,
-                     const TransformationMatrix& transform,
-                     float opacity);
+  virtual void paint(TextureMapper*,
+                     const TextureMapperContentLayer::PaintOptions&);
 
   static TextureMapperNode* toTextureMapperNode(GraphicsLayer*);
 
@@ -405,12 +400,9 @@ bool TextureMapperNode::hasSurfaceDescendants() const {
   return false;
 }
 
-void TextureMapperNode::paint(GraphicsContext* context,
-                              const IntSize& size,
-                              const IntRect& targetRect,
-                              const IntRect& exposedRect,
-                              const TransformationMatrix& transform,
-                              float opacity) {
+void TextureMapperNode::paint(
+    TextureMapper* textureMapper,
+    const TextureMapperContentLayer::PaintOptions& options) {
   ASSERT(m_layerType == RootLayer);
   if (m_size.isEmpty())
     return;
@@ -420,8 +412,6 @@ void TextureMapperNode::paint(GraphicsContext* context,
     ("[TextureMapper] RootPaint!!\n");
 #endif
 
-  RefPtr<TextureMapper> textureMapper = TextureMapper::create(context);
-
   if (textureMapper->type() != m_lastTextureMapperType)
     gTextureMapperCache.m_data.clear();
 
@@ -429,17 +419,17 @@ void TextureMapperNode::paint(GraphicsContext* context,
   TexmapPaintOptions opt;
   opt.opacity = 1;
   opt.rootLayer = this;
-  opt.scissorRect = targetRect;
-  opt.visibleRect = exposedRect;
-  opt.textureMapper = textureMapper.get();
-  opt.context = textureMapper->graphicsContext();
+  opt.scissorRect = options.targetRect;
+  opt.visibleRect = options.visibleRect;
+  opt.textureMapper = textureMapper;
   opt.surface = 0;
   paintRecursive(opt);
 
   if (textureMapper->allowSurfaceForRoot() || m_state.hasSurfaceDescendants) {
     textureMapper->bindSurface(0);
-    textureMapper->paintToTarget(*m_surface.get(), size, transform,
-                                 opacity * m_state.opacity, targetRect);
+    textureMapper->paintToTarget(
+        *m_surface.get(), options.viewportSize, options.transform,
+        options.opacity * m_state.opacity, options.targetRect);
   }
   gTextureMapperCache.purge();
 }
@@ -733,11 +723,10 @@ void TextureMapperNode::uploadTextureFromContent(TextureMapper* textureMapper,
 
   {
     GraphicsContext context(m_texture->beginPaint(dirtyRect));
-    if (textureMapper && textureMapper->graphicsContext()) {
-      GraphicsContext* originalContext = textureMapper->graphicsContext();
+    if (textureMapper) {
       context.setImageInterpolationQuality(
-          originalContext->imageInterpolationQuality());
-      context.setTextDrawingMode(originalContext->textDrawingMode());
+          textureMapper->imageInterpolationQuality());
+      context.setTextDrawingMode(textureMapper->textDrawingMode());
     }
     m_layer->paintGraphicsLayerContents(context, dirtyRect);
   }

@@ -33,6 +33,10 @@
 #include "Frame.h"
 #include "ViewportArguments.h"
 
+#if USE(ACCELERATED_COMPOSITING) && USE(TEXTURE_MAPPER)
+#include "texmap/TextureMapper.h"
+#endif
+
 namespace WebCore {
 class FrameLoaderClientQt;
 class FrameView;
@@ -102,6 +106,10 @@ class QWebFramePrivate {
                                    const QRegion& clip);
 #endif
 
+#if USE(ACCELERATED_COMPOSITING) && USE(TEXTURE_MAPPER)
+  void renderCompositedLayers(WebCore::GraphicsContext* context,
+                              const WebCore::IntRect& clip);
+#endif
   QWebFrame* q;
   Qt::ScrollBarPolicy horizontalScrollBarPolicy;
   Qt::ScrollBarPolicy verticalScrollBarPolicy;
@@ -114,6 +122,7 @@ class QWebFramePrivate {
   int marginHeight;
 #if USE(ACCELERATED_COMPOSITING) && USE(TEXTURE_MAPPER)
   WebCore::TextureMapperContentLayer* rootGraphicsLayer;
+  RefPtr<WebCore::TextureMapper> textureMapper;
 #endif
   bool zoomTextOnly;
 };
