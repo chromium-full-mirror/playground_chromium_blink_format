@@ -470,8 +470,7 @@ class TransparentLayerDC : Noncopyable {
   RefPtr<SharedBitmap> m_bitmap;
   RefPtr<SharedBitmap> m_rotatedBitmap;
   RECT m_bmpRect;
-  unsigned m_key1;
-  unsigned m_key2;
+  unsigned m_key;
   RotationTransform m_rotation;
   float m_oldOpacity;
   AlphaPaintType m_alphaPaintType;
@@ -553,25 +552,25 @@ TransparentLayerDC::TransparentLayerDC(GraphicsContextPlatformPrivate* data,
     m_bitmap = m_data->getTransparentLayerBitmap(
         m_origRect, m_alphaPaintType, m_bmpRect, true, mustCreateLayer);
   if (m_bitmap)
-    m_memDc = m_bitmap->getDC(&m_key1, &m_key2);
+    m_memDc = m_bitmap->getDC(&m_key);
   else
     m_memDc = m_data->m_dc;
 }
 
 TransparentLayerDC::~TransparentLayerDC() {
   if (m_rotatedBitmap) {
-    m_bitmap->releaseDC(m_memDc, m_key1, m_key2);
-    m_key1 = m_key2 = 0;
+    m_bitmap->releaseDC(m_memDc, m_key);
+    m_key = 0;
     rotateBitmap(m_rotatedBitmap.get(), m_bitmap.get(), m_rotation);
-    m_memDc = m_rotatedBitmap->getDC(&m_key1, &m_key2);
+    m_memDc = m_rotatedBitmap->getDC(&m_key);
     m_data->paintBackTransparentLayerBitmap(m_memDc, m_rotatedBitmap.get(),
                                             m_rotatedOrigRect, m_alphaPaintType,
                                             m_bmpRect);
-    m_rotatedBitmap->releaseDC(m_memDc, m_key1, m_key2);
+    m_rotatedBitmap->releaseDC(m_memDc, m_key);
   } else if (m_bitmap) {
     m_data->paintBackTransparentLayerBitmap(m_memDc, m_bitmap.get(), m_origRect,
                                             m_alphaPaintType, m_bmpRect);
-    m_bitmap->releaseDC(m_memDc, m_key1, m_key2);
+    m_bitmap->releaseDC(m_memDc, m_key);
   }
   m_data->m_opacity = m_oldOpacity;
 }
@@ -593,19 +592,18 @@ class ScopeDCProvider : Noncopyable {
   explicit ScopeDCProvider(GraphicsContextPlatformPrivate* data)
       : m_data(data) {
     if (m_data->m_bitmap)
-      m_data->m_dc = m_data->m_bitmap->getDC(&m_key1, &m_key2);
+      m_data->m_dc = m_data->m_bitmap->getDC(&m_key);
   }
   ~ScopeDCProvider() {
     if (m_data->m_bitmap) {
-      m_data->m_bitmap->releaseDC(m_data->m_dc, m_key1, m_key2);
+      m_data->m_bitmap->releaseDC(m_data->m_dc, m_key);
       m_data->m_dc = 0;
     }
   }
 
  private:
   GraphicsContextPlatformPrivate* m_data;
-  unsigned m_key1;
-  unsigned m_key2;
+  unsigned m_key;
 };
 
 GraphicsContext::GraphicsContext(PlatformGraphicsContext* dc)
@@ -1598,12 +1596,12 @@ void GraphicsContext::drawText(const Font& font,
       gc.scale(FloatSize(m_data->m_transform.a(), m_data->m_transform.d()));
       font.drawText(&gc, run, IntPoint(0, font.ascent()), from, to);
     }
-    unsigned key1, key2;
-    HDC memDC = bmp->getDC(&key1, &key2);
+    unsigned key1;
+    HDC memDC = bmp->getDC(&key1);
     if (memDC) {
       m_data->paintBackTransparentLayerBitmap(memDC, bmp.get(), trRect,
                                               alphaPaintType, bmpRect);
-      bmp->releaseDC(memDC, key1, key2);
+      bmp->releaseDC(memDC, key1);
     }
   }
 
