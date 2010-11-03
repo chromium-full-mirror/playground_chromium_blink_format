@@ -275,8 +275,6 @@ void WebGLRenderingContext::bindFramebuffer(unsigned long target,
   }
   m_framebufferBinding = buffer;
   m_context->bindFramebuffer(target, objectOrZero(buffer));
-  if (m_framebufferBinding)
-    m_framebufferBinding->onBind();
   cleanupAfterGraphicsCall(false);
 }
 
@@ -479,6 +477,8 @@ unsigned long WebGLRenderingContext::checkFramebufferStatus(
   }
   if (!m_framebufferBinding || !m_framebufferBinding->object())
     return GraphicsContext3D::FRAMEBUFFER_COMPLETE;
+  if (m_framebufferBinding->isIncomplete())
+    return GraphicsContext3D::FRAMEBUFFER_UNSUPPORTED;
   return m_context->checkFramebufferStatus(target);
   cleanupAfterGraphicsCall(false);
 }
@@ -489,6 +489,11 @@ void WebGLRenderingContext::clear(unsigned long mask) {
         GraphicsContext3D::DEPTH_BUFFER_BIT |
         GraphicsContext3D::STENCIL_BUFFER_BIT)) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+    return;
+  }
+  if (m_framebufferBinding && !m_framebufferBinding->onAccess()) {
+    m_context->synthesizeGLError(
+        GraphicsContext3D::INVALID_FRAMEBUFFER_OPERATION);
     return;
   }
   m_context->clear(mask);
@@ -562,14 +567,17 @@ void WebGLRenderingContext::copyTexImage2D(unsigned long target,
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
+  if (m_framebufferBinding && !m_framebufferBinding->onAccess()) {
+    m_context->synthesizeGLError(
+        GraphicsContext3D::INVALID_FRAMEBUFFER_OPERATION);
+    return;
+  }
   m_context->copyTexImage2D(target, level, internalformat, x, y, width, height,
                             border);
   // FIXME: if the framebuffer is not complete, none of the below should be
   // executed.
   tex->setLevelInfo(target, level, internalformat, width, height,
                     GraphicsContext3D::UNSIGNED_BYTE);
-  if (m_framebufferBinding)
-    m_framebufferBinding->onAttachedObjectChange(tex);
   cleanupAfterGraphicsCall(false);
 }
 
@@ -592,6 +600,11 @@ void WebGLRenderingContext::copyTexSubImage2D(unsigned long target,
       m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
       return;
     }
+  }
+  if (m_framebufferBinding && !m_framebufferBinding->onAccess()) {
+    m_context->synthesizeGLError(
+        GraphicsContext3D::INVALID_FRAMEBUFFER_OPERATION);
+    return;
   }
   m_context->copyTexSubImage2D(target, level, xoffset, yoffset, x, y, width,
                                height);
@@ -1002,6 +1015,12 @@ void WebGLRenderingContext::drawArrays(unsigned long mode,
     }
   }
 
+  if (m_framebufferBinding && !m_framebufferBinding->onAccess()) {
+    m_context->synthesizeGLError(
+        GraphicsContext3D::INVALID_FRAMEBUFFER_OPERATION);
+    return;
+  }
+
   bool vertexAttrib0Simulated = false;
   if (!isGLES2Compliant())
     vertexAttrib0Simulated = simulateVertexAttrib0(first + count - 1);
@@ -1064,6 +1083,12 @@ void WebGLRenderingContext::drawElements(unsigned long mode,
       m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
       return;
     }
+  }
+
+  if (m_framebufferBinding && !m_framebufferBinding->onAccess()) {
+    m_context->synthesizeGLError(
+        GraphicsContext3D::INVALID_FRAMEBUFFER_OPERATION);
+    return;
   }
 
   bool vertexAttrib0Simulated = false;
@@ -1139,36 +1164,6 @@ void WebGLRenderingContext::framebufferRenderbuffer(
   if (!m_framebufferBinding || !m_framebufferBinding->object()) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
     return;
-  }
-  if (buffer && buffer->object()) {
-    bool isConflicted = false;
-    switch (attachment) {
-      case GraphicsContext3D::DEPTH_ATTACHMENT:
-        if (m_framebufferBinding->isDepthStencilAttached() ||
-            m_framebufferBinding->isStencilAttached())
-          isConflicted = true;
-        if (buffer->getInternalFormat() != GraphicsContext3D::DEPTH_COMPONENT16)
-          isConflicted = true;
-        break;
-      case GraphicsContext3D::STENCIL_ATTACHMENT:
-        if (m_framebufferBinding->isDepthStencilAttached() ||
-            m_framebufferBinding->isDepthAttached())
-          isConflicted = true;
-        if (buffer->getInternalFormat() != GraphicsContext3D::STENCIL_INDEX8)
-          isConflicted = true;
-        break;
-      case GraphicsContext3D::DEPTH_STENCIL_ATTACHMENT:
-        if (m_framebufferBinding->isDepthAttached() ||
-            m_framebufferBinding->isStencilAttached())
-          isConflicted = true;
-        if (buffer->getInternalFormat() != GraphicsContext3D::DEPTH_STENCIL)
-          isConflicted = true;
-        break;
-    }
-    if (isConflicted) {
-      m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-      return;
-    }
   }
   m_context->framebufferRenderbuffer(target, attachment, renderbuffertarget,
                                      objectOrZero(buffer));
@@ -2119,6 +2114,11 @@ void WebGLRenderingContext::readPixels(long x,
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
     return;
   }
+  if (m_framebufferBinding && !m_framebufferBinding->onAccess()) {
+    m_context->synthesizeGLError(
+        GraphicsContext3D::INVALID_FRAMEBUFFER_OPERATION);
+    return;
+  }
   // Calculate array size, taking into consideration of PACK_ALIGNMENT.
   unsigned long bytesPerRow = componentsPerPixel * bytesPerComponent * width;
   unsigned long padding = 0;
@@ -2175,12 +2175,8 @@ void WebGLRenderingContext::renderbufferStorage(unsigned long target,
     case GraphicsContext3D::STENCIL_INDEX8:
     case GraphicsContext3D::DEPTH_STENCIL:
       m_context->renderbufferStorage(target, internalformat, width, height);
-      if (m_renderbufferBinding) {
+      if (m_renderbufferBinding)
         m_renderbufferBinding->setInternalFormat(internalformat);
-        if (m_framebufferBinding)
-          m_framebufferBinding->onAttachedObjectChange(
-              m_renderbufferBinding.get());
-      }
       cleanupAfterGraphicsCall(false);
       break;
     default:
@@ -2279,8 +2275,6 @@ void WebGLRenderingContext::texImage2DBase(unsigned target,
   m_context->texImage2D(target, level, internalformat, width, height, border,
                         format, type, pixels);
   tex->setLevelInfo(target, level, internalformat, width, height, type);
-  if (m_framebufferBinding)
-    m_framebufferBinding->onAttachedObjectChange(tex);
   cleanupAfterGraphicsCall(false);
 }
 
