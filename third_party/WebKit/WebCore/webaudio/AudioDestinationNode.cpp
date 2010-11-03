@@ -65,7 +65,7 @@ void AudioDestinationNode::initialize() {
   m_destination = AudioDestination::create(*this, hardwareSampleRate);
   m_destination->start();
 
-  m_isInitialized = true;
+  AudioNode::initialize();
 }
 
 void AudioDestinationNode::uninitialize() {
@@ -74,7 +74,7 @@ void AudioDestinationNode::uninitialize() {
 
   m_destination->stop();
 
-  m_isInitialized = false;
+  AudioNode::uninitialize();
 }
 
 // The audio hardware calls us back here to gets its input stream.
@@ -86,6 +86,10 @@ void AudioDestinationNode::provideInput(AudioBus* destinationBus,
     destinationBus->zero();
     return;
   }
+
+  // Let the context take care of any business at the start of each render
+  // quantum.
+  context()->handlePreRenderTasks();
 
   // This will cause the node(s) connected to us to process, which in turn will
   // pull on their input(s),

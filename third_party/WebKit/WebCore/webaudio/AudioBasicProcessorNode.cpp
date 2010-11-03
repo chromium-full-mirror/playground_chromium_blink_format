@@ -32,6 +32,7 @@
 #include "AudioBasicProcessorNode.h"
 
 #include "AudioBus.h"
+#include "AudioContext.h"
 #include "AudioNodeInput.h"
 #include "AudioNodeOutput.h"
 #include "AudioProcessor.h"
@@ -111,7 +112,7 @@ void AudioBasicProcessorNode::reset() {
 // uninitialize and then re-initialize with the new channel count.
 void AudioBasicProcessorNode::checkNumberOfChannelsForInput(
     AudioNodeInput* input) {
-  ASSERT(isMainThread());
+  ASSERT(context()->isAudioThread() && context()->isGraphOwner());
 
   ASSERT(input == this->input(0));
   if (input != this->input(0))
@@ -131,13 +132,15 @@ void AudioBasicProcessorNode::checkNumberOfChannelsForInput(
     uninitialize();
   }
 
-  // This will propagate the channel count to any nodes connected further down
-  // the chain...
-  output(0)->setNumberOfChannels(numberOfChannels);
+  if (!isInitialized()) {
+    // This will propagate the channel count to any nodes connected further down
+    // the chain...
+    output(0)->setNumberOfChannels(numberOfChannels);
 
-  // Re-initialize the processor with the new channel count.
-  processor()->setNumberOfChannels(numberOfChannels);
-  initialize();
+    // Re-initialize the processor with the new channel count.
+    processor()->setNumberOfChannels(numberOfChannels);
+    initialize();
+  }
 }
 
 unsigned AudioBasicProcessorNode::numberOfChannels() {
