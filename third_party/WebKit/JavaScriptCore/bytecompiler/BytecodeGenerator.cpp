@@ -1795,11 +1795,15 @@ RegisterID* BytecodeGenerator::emitCall(OpcodeID opcodeID,
 }
 
 RegisterID* BytecodeGenerator::emitLoadVarargs(RegisterID* argCountDst,
+                                               RegisterID* thisRegister,
                                                RegisterID* arguments) {
   ASSERT(argCountDst->index() < arguments->index());
   emitOpcode(op_load_varargs);
   instructions().append(argCountDst->index());
   instructions().append(arguments->index());
+  instructions().append(
+      thisRegister->index() +
+      RegisterFile::CallFrameHeaderSize);  // initial registerOffset
   return argCountDst;
 }
 
