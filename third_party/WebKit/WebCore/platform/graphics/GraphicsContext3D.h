@@ -406,6 +406,7 @@ class GraphicsContext3D : public RefCounted<GraphicsContext3D> {
     // WebGL-specific enums
     UNPACK_FLIP_Y_WEBGL = 0x9240,
     UNPACK_PREMULTIPLY_ALPHA_WEBGL = 0x9241,
+    CONTEXT_LOST_WEBGL = 0x9242,
   };
 
   // Context creation attributes.

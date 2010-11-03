@@ -257,6 +257,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
 
   void hint(unsigned long target, unsigned long mode);
   bool isBuffer(WebGLBuffer*);
+  bool isContextLost() const;
   bool isEnabled(unsigned long cap);
   bool isFramebuffer(WebGLFramebuffer*);
   bool isProgram(WebGLProgram*);
@@ -522,6 +523,9 @@ class WebGLRenderingContext : public CanvasRenderingContext {
 
   void viewport(long x, long y, unsigned long width, unsigned long height);
 
+  void loseContext();
+  void restoreContext();
+
   GraphicsContext3D* graphicsContext3D() const { return m_context.get(); }
 #if USE(ACCELERATED_COMPOSITING)
   virtual PlatformLayer* platformLayer() const {
@@ -539,6 +543,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   friend class WebGLObject;
 
   WebGLRenderingContext(HTMLCanvasElement*, PassRefPtr<GraphicsContext3D>);
+  void initializeNewContext();
 
   void addObject(WebGLObject*);
   void detachAndRemoveAllObjects();
@@ -587,8 +592,6 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   RefPtr<GraphicsContext3D> m_context;
   bool m_needsUpdate;
   bool m_markedCanvasDirty;
-  // FIXME: I think this is broken -- it does not increment any
-  // reference counts, so may refer to destroyed objects.
   HashSet<RefPtr<WebGLObject>> m_canvasObjects;
 
   // List of bound VBO's. Used to maintain info about sizes for ARRAY_BUFFER and
@@ -675,6 +678,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   unsigned long m_implementationColorReadType;
   bool m_unpackFlipY;
   bool m_unpackPremultiplyAlpha;
+  bool m_contextLost;
 
   // Helpers for getParameter and others
   WebGLGetInfo getBooleanParameter(unsigned long pname);
