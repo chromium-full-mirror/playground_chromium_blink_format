@@ -779,7 +779,7 @@ QIcon QWebFrame::icon() const {
   The name of this frame as defined by the parent frame.
 */
 QString QWebFrame::frameName() const {
-  return d->frame->tree()->name();
+  return d->frame->tree()->uniqueName();
 }
 
 /*!
