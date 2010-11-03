@@ -83,7 +83,8 @@ class WebProcessConnection : public RefCounted<WebProcessConnection>,
                     const Plugin::Parameters&,
                     const String& userAgent,
                     bool isPrivateBrowsingEnabled,
-                    bool& result);
+                    bool& result,
+                    uint32_t& remoteLayerClientID);
   void destroyPlugin(uint64_t pluginInstanceID);
 
   RefPtr<CoreIPC::Connection> m_connection;

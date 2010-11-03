@@ -49,6 +49,12 @@ class PluginProcess : Noncopyable, CoreIPC::Connection::Client {
     return m_pluginModule.get();
   }
 
+#if USE(ACCELERATED_COMPOSITING) && PLATFORM(MAC)
+  mach_port_t compositingRenderServerPort() const {
+    return m_compositingRenderServerPort;
+  }
+#endif
+
  private:
   PluginProcess();
   ~PluginProcess();

@@ -35,6 +35,12 @@
 #include "SharedMemory.h"
 #include <wtf/Noncopyable.h>
 
+#if PLATFORM(MAC)
+#include <wtf/RetainPtr.h>
+
+typedef struct __WKCARemoteLayerClientRef* WKCARemoteLayerClientRef;
+#endif
+
 namespace CoreIPC {
 class DataReference;
 }
@@ -68,6 +74,10 @@ class PluginControllerProxy : PluginController {
       CoreIPC::MessageID,
       CoreIPC::ArgumentDecoder*,
       CoreIPC::ArgumentEncoder*);
+
+#if PLATFORM(MAC)
+  uint32_t remoteLayerClientID() const;
+#endif
 
  private:
   PluginControllerProxy(WebProcessConnection* connection,
@@ -139,6 +149,11 @@ class PluginControllerProxy : PluginController {
 #endif
   void privateBrowsingStateChanged(bool);
 
+  void platformInitialize();
+  void platformDestroy();
+  void platformGeometryDidChange(const WebCore::IntRect& frameRect,
+                                 const WebCore::IntRect& clipRect);
+
   WebProcessConnection* m_connection;
   uint64_t m_pluginInstanceID;
 
@@ -164,6 +179,12 @@ class PluginControllerProxy : PluginController {
 
   // The backing store that this plug-in draws into.
   RefPtr<BackingStore> m_backingStore;
+
+#if PLATFORM(MAC)
+  // For CA plug-ins, this holds the information needed to export the layer
+  // hierarchy to the UI process.
+  RetainPtr<WKCARemoteLayerClientRef> m_remoteLayerClient;
+#endif
 };
 
 }  // namespace WebKit

@@ -78,6 +78,8 @@ bool PluginControllerProxy::initialize(const Plugin::Parameters& parameters) {
     return false;
   }
 
+  platformInitialize();
+
   return true;
 }
 
@@ -86,6 +88,8 @@ void PluginControllerProxy::destroy() {
 
   m_plugin->destroy();
   m_plugin = 0;
+
+  platformDestroy();
 }
 
 void PluginControllerProxy::paint() {
@@ -203,8 +207,7 @@ void PluginControllerProxy::setStatusbarText(const WTF::String&) {
 }
 
 bool PluginControllerProxy::isAcceleratedCompositingEnabled() {
-  notImplemented();
-  return false;
+  return PluginProcess::shared().compositingRenderServerPort();
 }
 
 void PluginControllerProxy::pluginProcessCrashed() {
@@ -261,6 +264,8 @@ void PluginControllerProxy::geometryDidChange(
   }
 
   m_plugin->geometryDidChange(frameRect, clipRect);
+
+  platformGeometryDidChange(frameRect, clipRect);
 }
 
 void PluginControllerProxy::didEvaluateJavaScript(
