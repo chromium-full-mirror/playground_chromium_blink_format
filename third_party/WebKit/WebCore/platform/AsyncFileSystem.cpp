@@ -55,6 +55,7 @@ void AsyncFileSystem::openFileSystem(
     const String& basePath,
     const String& storageIdentifier,
     Type type,
+    bool,
     PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
   String typeString = (type == Persistent) ? "Persistent" : "Temporary";
 

@@ -57,6 +57,19 @@ LocalFileSystem& LocalFileSystem::localFileSystem() {
   return *localFileSystem;
 }
 
+void LocalFileSystem::readFileSystem(
+    ScriptExecutionContext* context,
+    AsyncFileSystem::Type type,
+    long long size,
+    PassOwnPtr<AsyncFileSystemCallbacks> callbacks) {
+  ASSERT(context && context->isDocument());
+  Document* document = static_cast<Document*>(context);
+  WebFrameImpl* webFrame = WebFrameImpl::fromFrame(document->frame());
+  webFrame->client()->openFileSystem(
+      webFrame, static_cast<WebFileSystem::Type>(type), size, false,
+      new WebFileSystemCallbacksImpl(callbacks));
+}
+
 void LocalFileSystem::requestFileSystem(
     ScriptExecutionContext* context,
     AsyncFileSystem::Type type,
@@ -68,7 +81,7 @@ void LocalFileSystem::requestFileSystem(
     Document* document = static_cast<Document*>(context);
     WebFrameImpl* webFrame = WebFrameImpl::fromFrame(document->frame());
     webFrame->client()->openFileSystem(
-        webFrame, static_cast<WebFileSystem::Type>(type), size,
+        webFrame, static_cast<WebFileSystem::Type>(type), size, true,
         new WebFileSystemCallbacksImpl(callbacks));
   } else {
     WorkerContext* workerContext = static_cast<WorkerContext*>(context);

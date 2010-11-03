@@ -68,10 +68,12 @@ class AsyncFileSystem : public Noncopyable {
   // platform has its own implementation.
   static PassOwnPtr<AsyncFileSystem> create(const String& rootPath);
 
-  // Opens a new file system.
+  // Opens a new file system. The create parameter specifies whether or not to
+  // create the path if it does not already exists.
   static void openFileSystem(const String& basePath,
                              const String& storageIdentifier,
                              Type,
+                             bool create,
                              PassOwnPtr<AsyncFileSystemCallbacks>);
 
   // Moves a file or directory from srcPath to destPath.
