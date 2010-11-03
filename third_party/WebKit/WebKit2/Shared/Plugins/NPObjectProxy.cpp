@@ -172,6 +172,28 @@ bool NPObjectProxy::getProperty(NPIdentifier propertyName, NPVariant* result) {
   return true;
 }
 
+bool NPObjectProxy::setProperty(NPIdentifier propertyName,
+                                const NPVariant* value) {
+  if (!m_npRemoteObjectMap)
+    return false;
+
+  NPIdentifierData propertyNameData =
+      NPIdentifierData::fromNPIdentifier(propertyName);
+  NPVariantData propertyValueData =
+      m_npRemoteObjectMap->npVariantToNPVariantData(*value);
+
+  bool returnValue = false;
+
+  if (!m_npRemoteObjectMap->connection()->sendSync(
+          Messages::NPObjectMessageReceiver::SetProperty(propertyNameData,
+                                                         propertyValueData),
+          Messages::NPObjectMessageReceiver::SetProperty::Reply(returnValue),
+          m_npObjectID))
+    return false;
+
+  return returnValue;
+}
+
 NPClass* NPObjectProxy::npClass() {
   static NPClass npClass = {NP_CLASS_STRUCT_VERSION,
                             NP_Allocate,
@@ -233,11 +255,10 @@ bool NPObjectProxy::NP_GetProperty(NPObject* npObject,
   return toNPObjectProxy(npObject)->getProperty(propertyName, result);
 }
 
-bool NPObjectProxy::NP_SetProperty(NPObject*,
+bool NPObjectProxy::NP_SetProperty(NPObject* npObject,
                                    NPIdentifier propertyName,
                                    const NPVariant* value) {
-  notImplemented();
-  return false;
+  return toNPObjectProxy(npObject)->setProperty(propertyName, value);
 }
 
 bool NPObjectProxy::NP_RemoveProperty(NPObject*, NPIdentifier propertyName) {

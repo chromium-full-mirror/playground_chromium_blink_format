@@ -64,6 +64,7 @@ class NPObjectProxy : public NPObject {
               NPVariant* result);
   bool hasProperty(NPIdentifier propertyName);
   bool getProperty(NPIdentifier propertyName, NPVariant* result);
+  bool setProperty(NPIdentifier propertyName, const NPVariant* value);
 
   static NPClass* npClass();
   static NPObject* NP_Allocate(NPP, NPClass*);
