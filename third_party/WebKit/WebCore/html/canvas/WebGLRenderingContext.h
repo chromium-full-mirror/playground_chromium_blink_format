@@ -686,6 +686,8 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                           // internal clamped value.
   unsigned long m_stencilFuncMask;
 
+  bool m_isDepthStencilSupported;
+
   // Helpers for getParameter and others
   WebGLGetInfo getBooleanParameter(unsigned long pname);
   WebGLGetInfo getBooleanArrayParameter(unsigned long pname);

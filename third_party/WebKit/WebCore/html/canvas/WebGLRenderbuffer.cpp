@@ -41,7 +41,10 @@ PassRefPtr<WebGLRenderbuffer> WebGLRenderbuffer::create(
 WebGLRenderbuffer::WebGLRenderbuffer(WebGLRenderingContext* ctx)
     : WebGLObject(ctx),
       m_internalFormat(GraphicsContext3D::RGBA4),
-      m_initialized(false) {
+      m_initialized(false),
+      m_width(0),
+      m_height(0),
+      m_isValid(true) {
   setObject(context()->graphicsContext3D()->createRenderbuffer());
 }
 
