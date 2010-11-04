@@ -106,11 +106,11 @@ class ApplyStyleCommand : public CompositeEditCommand {
   // style-removal helpers
   bool isStyledInlineElementToRemove(Element*) const;
   bool removeStyleFromRunBeforeApplyingStyle(CSSMutableStyleDeclaration* style,
-                                             Node*& runStart,
-                                             Node*& runEnd);
+                                             RefPtr<Node>& runStart,
+                                             RefPtr<Node>& runEnd);
   bool removeInlineStyleFromElement(
       CSSMutableStyleDeclaration*,
-      HTMLElement*,
+      PassRefPtr<HTMLElement>,
       InlineStyleRemovalMode = RemoveIfNeeded,
       CSSMutableStyleDeclaration* extractedStyle = 0);
   inline bool shouldRemoveInlineStyleFromElement(
