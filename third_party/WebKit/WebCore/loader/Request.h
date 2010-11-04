@@ -40,15 +40,15 @@ class Request : public Noncopyable {
           bool sendResourceLoadCallbacks);
   ~Request();
 
-  CachedResource* cachedResource() { return m_object; }
-  CachedResourceLoader* cachedResourceLoader() {
+  CachedResource* cachedResource() const { return m_object; }
+  CachedResourceLoader* cachedResourceLoader() const {
     return m_cachedResourceLoader;
   }
 
-  bool isIncremental() { return m_incremental; }
+  bool isIncremental() const { return m_incremental; }
   void setIsIncremental(bool b = true) { m_incremental = b; }
 
-  bool isMultipart() { return m_multipart; }
+  bool isMultipart() const { return m_multipart; }
   void setIsMultipart(bool b = true) { m_multipart = b; }
 
   SecurityCheckPolicy shouldDoSecurityCheck() const {
