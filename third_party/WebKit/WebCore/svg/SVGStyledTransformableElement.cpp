@@ -54,7 +54,7 @@ AffineTransform SVGStyledTransformableElement::getScreenCTM(
 
 AffineTransform SVGStyledTransformableElement::animatedLocalTransform() const {
   return m_supplementalTransform
-             ? transform()->concatenate().matrix() * *m_supplementalTransform
+             ? *m_supplementalTransform * transform()->concatenate().matrix()
              : transform()->concatenate().matrix();
 }
 
