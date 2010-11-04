@@ -32,6 +32,7 @@ namespace WebCore {
 class FormDataList;
 class HTMLFormElement;
 class RenderTextControl;
+class ValidationMessage;
 class ValidityState;
 class VisibleSelection;
 
@@ -90,6 +91,8 @@ class HTMLFormControlElement : public HTMLElement {
 
   virtual bool willValidate() const;
   String validationMessage();
+  void updateVisibleValidationMessage();
+  void hideVisibleValidationMessage();
   bool checkValidity(
       Vector<RefPtr<HTMLFormControlElement>>* unhandledInvalidControls = 0);
   // This must be called when a validation constraint or control value is
@@ -121,6 +124,7 @@ class HTMLFormControlElement : public HTMLElement {
 
   virtual void dispatchFocusEvent();
   virtual void dispatchBlurEvent();
+  virtual void detach();
 
   void removeFromForm();
 
@@ -141,9 +145,11 @@ class HTMLFormControlElement : public HTMLElement {
   virtual HTMLFormElement* virtualForm() const;
   virtual bool isDefaultButtonForForm() const;
   virtual bool isValidFormControlElement();
+  String visibleValidationMessage() const;
 
   HTMLFormElement* m_form;
   OwnPtr<ValidityState> m_validityState;
+  OwnPtr<ValidationMessage> m_validationMessage;
   bool m_disabled : 1;
   bool m_readOnly : 1;
   bool m_required : 1;
