@@ -55,6 +55,7 @@ class CachedScript : public CachedResource {
 
  private:
   void decodedDataDeletionTimerFired(Timer<CachedScript>*);
+  virtual PurgePriority purgePriority() const { return PurgeLast; }
 
   String m_script;
   RefPtr<TextResourceDecoder> m_decoder;

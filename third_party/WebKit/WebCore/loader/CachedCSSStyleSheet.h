@@ -57,6 +57,7 @@ class CachedCSSStyleSheet : public CachedResource {
 
  private:
   bool canUseSheet(bool enforceMIMEType, bool* hasValidMIMEType) const;
+  virtual PurgePriority purgePriority() const { return PurgeLast; }
 
  protected:
   RefPtr<TextResourceDecoder> m_decoder;
