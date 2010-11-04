@@ -40,9 +40,9 @@ class MachPort;
 
 namespace WebKit {
 
-class PluginProcessCreationParameters;
 class PluginProcessManager;
 class WebProcessProxy;
+struct PluginProcessCreationParameters;
 
 class PluginProcessProxy : CoreIPC::Connection::Client,
                            ProcessLauncher::Client {
