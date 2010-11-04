@@ -87,7 +87,7 @@ void TestController::platformRunUntil(bool& done, double) {
 static bool isExistingLibrary(const QString& path) {
 #if OS(WINDOWS) || OS(SYMBIAN)
   const char* librarySuffixes[] = {".dll"};
-#elif PLATFORM(MAC)
+#elif OS(MAC_OS_X)
   const char* librarySuffixes[] = {".bundle", ".dylib", ".so"};
 #elif OS(UNIX)
   const char* librarySuffixes[] = {".so"};
