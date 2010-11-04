@@ -63,13 +63,15 @@ class WebGraphicsContext3D : public WebNonCopyable {
           depth(true),
           stencil(true),
           antialias(true),
-          premultipliedAlpha(true) {}
+          premultipliedAlpha(true),
+          canRecoverFromContextLoss(true) {}
 
     bool alpha;
     bool depth;
     bool stencil;
     bool antialias;
     bool premultipliedAlpha;
+    bool canRecoverFromContextLoss;
   };
 
   // This destructor needs to be public so that using classes can destroy

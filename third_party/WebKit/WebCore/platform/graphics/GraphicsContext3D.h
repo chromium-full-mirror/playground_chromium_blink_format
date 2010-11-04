@@ -416,13 +416,15 @@ class GraphicsContext3D : public RefCounted<GraphicsContext3D> {
           depth(true),
           stencil(false),
           antialias(true),
-          premultipliedAlpha(true) {}
+          premultipliedAlpha(true),
+          canRecoverFromContextLoss(true) {}
 
     bool alpha;
     bool depth;
     bool stencil;
     bool antialias;
     bool premultipliedAlpha;
+    bool canRecoverFromContextLoss;
   };
 
   enum RenderStyle { RenderOffscreen, RenderDirectlyToHostWindow };

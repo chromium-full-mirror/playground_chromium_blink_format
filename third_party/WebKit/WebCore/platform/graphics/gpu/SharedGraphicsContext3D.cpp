@@ -53,6 +53,8 @@ namespace WebCore {
 PassRefPtr<SharedGraphicsContext3D> SharedGraphicsContext3D::create(
     HostWindow* hostWindow) {
   GraphicsContext3D::Attributes attr;
+  attr.canRecoverFromContextLoss =
+      false;  // Canvas contexts can not handle lost contexts.
   RefPtr<GraphicsContext3D> context =
       GraphicsContext3D::create(attr, hostWindow);
   if (!context)
