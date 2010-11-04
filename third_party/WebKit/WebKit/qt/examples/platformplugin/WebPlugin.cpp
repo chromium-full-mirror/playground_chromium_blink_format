@@ -208,6 +208,8 @@ bool WebPlugin::supportsExtension(Extension extension) const {
     case Notifications:
       return true;
 #endif
+    case TouchInteraction:
+      return true;
     default:
       return false;
   }
@@ -221,6 +223,8 @@ QObject* WebPlugin::createExtension(Extension extension) const {
     case Notifications:
       return new WebNotificationPresenter();
 #endif
+    case TouchInteraction:
+      return new TouchModifier();
     default:
       return 0;
   }
