@@ -70,6 +70,7 @@ class RootObject : public RefCounted<RootObject> {
 
   const void* nativeHandle() const;
   JSGlobalObject* globalObject() const;
+  void updateGlobalObject(JSGlobalObject*);
 
   void addRuntimeObject(RuntimeObject*);
   void removeRuntimeObject(RuntimeObject*);

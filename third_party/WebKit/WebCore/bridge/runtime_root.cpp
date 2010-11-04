@@ -166,6 +166,10 @@ JSGlobalObject* RootObject::globalObject() const {
   return m_globalObject;
 }
 
+void RootObject::updateGlobalObject(JSGlobalObject* globalObject) {
+  m_globalObject = globalObject;
+}
+
 void RootObject::addRuntimeObject(RuntimeObject* object) {
   ASSERT(m_isValid);
   ASSERT(!m_runtimeObjects.contains(object));
