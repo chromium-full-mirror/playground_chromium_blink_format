@@ -99,6 +99,7 @@ class WebViewGraphicsBased : public QGraphicsView {
   void animatedFlip();
   void animatedYFlip();
   void contentsSizeChanged(const QSize&);
+  void scrollRequested(int, int);
 
  signals:
   void currentFPSUpdated(int fps);
