@@ -105,6 +105,7 @@ static inline FORMATETC* fileContentFormatZero() {
   return &fileContentFormat;
 }
 
+#if !OS(WINCE)
 static inline void pathRemoveBadFSCharacters(PWSTR psz, size_t length) {
   size_t writeTo = 0;
   size_t readFrom = 0;
@@ -117,11 +118,16 @@ static inline void pathRemoveBadFSCharacters(PWSTR psz, size_t length) {
   }
   psz[writeTo] = 0;
 }
+#endif
 
 static String filesystemPathFromUrlOrTitle(const String& url,
                                            const String& title,
                                            TCHAR* extension,
                                            bool isLink) {
+#if OS(WINCE)
+  notImplemented();
+  return String();
+#else
   static const size_t fsPathMaxLengthExcludingNullTerminator = MAX_PATH - 1;
   bool usedURL = false;
   WCHAR fsPathBuffer[MAX_PATH];
@@ -170,6 +176,7 @@ static String filesystemPathFromUrlOrTitle(const String& url,
   String result(static_cast<UChar*>(fsPathBuffer));
   result += String(static_cast<UChar*>(extension));
   return result;
+#endif
 }
 
 static HGLOBAL createGlobalImageFileContent(SharedBuffer* data) {
@@ -205,6 +212,10 @@ static HGLOBAL createGlobalHDropContent(const KURL& url,
     else
       return 0;
   } else {
+#if OS(WINCE)
+    notImplemented();
+    return 0;
+#else
     WCHAR tempPath[MAX_PATH];
     WCHAR extension[MAX_PATH];
     if (!::GetTempPath(ARRAYSIZE(tempPath), tempPath))
@@ -238,6 +249,7 @@ static HGLOBAL createGlobalHDropContent(const KURL& url,
     CloseHandle(tempFileHandle);
     if (!tempWriteSucceeded)
       return 0;
+#endif
   }
 
   SIZE_T dropFilesSize =
@@ -549,6 +561,10 @@ HashSet<String> ClipboardWin::types() const {
 }
 
 PassRefPtr<FileList> ClipboardWin::files() const {
+#if OS(WINCE)
+  notImplemented();
+  return 0;
+#else
   RefPtr<FileList> files = FileList::create();
   if (policy() != ClipboardReadable && policy() != ClipboardTypesReadable)
     return files.release();
@@ -575,6 +591,7 @@ PassRefPtr<FileList> ClipboardWin::files() const {
   GlobalUnlock(medium.hGlobal);
   ReleaseStgMedium(&medium);
   return files.release();
+#endif
 }
 
 void ClipboardWin::setDragImage(CachedImage* image,
