@@ -239,6 +239,7 @@ class WebViewHost : public WebKit::WebViewClient,
   virtual void assignIdentifierToRequest(WebKit::WebFrame*,
                                          unsigned identifier,
                                          const WebKit::WebURLRequest&);
+  virtual void removeIdentifierForRequest(unsigned identifier);
   virtual void willSendRequest(WebKit::WebFrame*,
                                unsigned identifier,
                                WebKit::WebURLRequest&,
