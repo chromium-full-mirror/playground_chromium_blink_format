@@ -1132,6 +1132,15 @@ void WebPageProxy::backForwardForwardListCount(int32_t& count) {
   count = m_backForwardList->forwardListCount();
 }
 
+// Selection change support
+void WebPageProxy::didSelectionChange(bool isNone,
+                                      bool isContentEditable,
+                                      bool isPasswordField,
+                                      bool hasComposition) {
+  m_pageClient->selectionChanged(isNone, isContentEditable, isPasswordField,
+                                 hasComposition);
+}
+
 // Undo management
 
 void WebPageProxy::registerEditCommandForUndo(uint64_t commandID,

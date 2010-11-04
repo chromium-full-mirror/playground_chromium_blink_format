@@ -35,11 +35,13 @@
 #include <WebCore/ArchiveResource.h>
 #include <WebCore/DocumentFragment.h>
 #include <WebCore/EditCommand.h>
+#include <WebCore/FocusController.h>
 #include <WebCore/Frame.h>
 #include <WebCore/HTMLInputElement.h>
 #include <WebCore/HTMLNames.h>
 #include <WebCore/HTMLTextAreaElement.h>
 #include <WebCore/KeyboardEvent.h>
+#include <WebCore/Page.h>
 #include <WebCore/UserTypingGestureIndicator.h>
 
 using namespace WebCore;
@@ -178,7 +180,13 @@ void WebEditorClient::respondToChangedSelection() {
       "WebViewDidChangeSelectionNotification";
   m_page->injectedBundleEditorClient().didChangeSelection(
       m_page, WebViewDidChangeSelectionNotification.impl());
-  notImplemented();
+  Frame* frame = m_page->corePage()->focusController()->focusedFrame();
+  if (!frame)
+    return;
+  m_page->send(Messages::WebPageProxy::DidSelectionChange(
+      frame->selection()->isNone(), frame->selection()->isContentEditable(),
+      frame->selection()->isInPasswordField(),
+      frame->editor()->hasComposition()));
 }
 
 void WebEditorClient::didEndEditing() {
