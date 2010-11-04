@@ -65,6 +65,7 @@ class InspectorFileSystemAgent : public RefCounted<InspectorFileSystemAgent> {
                             AsyncFileSystem::Type,
                             const String& origin);
   void didGetFileSystemError(AsyncFileSystem::Type, const String& origin);
+  void didGetFileSystemDisabled();
 
  private:
   InspectorFileSystemAgent(InspectorController*, InspectorFrontend*);

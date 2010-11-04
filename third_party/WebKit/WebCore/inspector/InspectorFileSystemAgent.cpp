@@ -43,6 +43,7 @@
 #include "InspectorFrontend.h"
 #include "LocalFileSystem.h"
 #include "Page.h"
+#include "RuntimeEnabledFeatures.h"
 
 namespace WebCore {
 
@@ -107,13 +108,18 @@ void InspectorFileSystemAgent::revealFolderInOS(const String& path) {
 
 void InspectorFileSystemAgent::getFileSystemPathAsync(unsigned int type,
                                                       const String& origin) {
+  if (!RuntimeEnabledFeatures::fileSystemEnabled()) {
+    m_frontend->didGetFileSystemDisabled();
+    return;
+  }
+
   AsyncFileSystem::Type asyncFileSystemType =
       static_cast<AsyncFileSystem::Type>(type);
   Frame* mainFrame = m_inspectorController->inspectedPage()->mainFrame();
   for (Frame* frame = mainFrame; frame; frame = frame->tree()->traverseNext()) {
     Document* document = frame->document();
     if (document && document->securityOrigin()->toString() == origin) {
-      LocalFileSystem::localFileSystem().requestFileSystem(
+      LocalFileSystem::localFileSystem().readFileSystem(
           document, asyncFileSystemType, 0,
           new InspectorFileSystemAgentCallbacks(this, asyncFileSystemType,
                                                 origin));
