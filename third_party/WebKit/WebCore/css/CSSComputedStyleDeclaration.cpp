@@ -65,13 +65,13 @@ static const int computedProperties[] = {
     CSSPropertyBorderRightStyle, CSSPropertyBorderRightWidth,
     CSSPropertyBorderTopColor, CSSPropertyBorderTopLeftRadius,
     CSSPropertyBorderTopRightRadius, CSSPropertyBorderTopStyle,
-    CSSPropertyBorderTopWidth, CSSPropertyBottom, CSSPropertyCaptionSide,
-    CSSPropertyClear, CSSPropertyClip, CSSPropertyColor, CSSPropertyCursor,
-    CSSPropertyDirection, CSSPropertyDisplay, CSSPropertyEmptyCells,
-    CSSPropertyFloat, CSSPropertyFontFamily, CSSPropertyFontSize,
-    CSSPropertyFontStyle, CSSPropertyFontVariant, CSSPropertyFontWeight,
-    CSSPropertyHeight, CSSPropertyLeft, CSSPropertyLetterSpacing,
-    CSSPropertyLineHeight, CSSPropertyListStyleImage,
+    CSSPropertyBorderTopWidth, CSSPropertyBottom, CSSPropertyBoxSizing,
+    CSSPropertyCaptionSide, CSSPropertyClear, CSSPropertyClip, CSSPropertyColor,
+    CSSPropertyCursor, CSSPropertyDirection, CSSPropertyDisplay,
+    CSSPropertyEmptyCells, CSSPropertyFloat, CSSPropertyFontFamily,
+    CSSPropertyFontSize, CSSPropertyFontStyle, CSSPropertyFontVariant,
+    CSSPropertyFontWeight, CSSPropertyHeight, CSSPropertyLeft,
+    CSSPropertyLetterSpacing, CSSPropertyLineHeight, CSSPropertyListStyleImage,
     CSSPropertyListStylePosition, CSSPropertyListStyleType,
     CSSPropertyMarginBottom, CSSPropertyMarginLeft, CSSPropertyMarginRight,
     CSSPropertyMarginTop, CSSPropertyMaxHeight, CSSPropertyMaxWidth,
@@ -105,13 +105,12 @@ static const int computedProperties[] = {
     CSSPropertyWebkitBoxFlexGroup, CSSPropertyWebkitBoxLines,
     CSSPropertyWebkitBoxOrdinalGroup, CSSPropertyWebkitBoxOrient,
     CSSPropertyWebkitBoxPack, CSSPropertyWebkitBoxReflect,
-    CSSPropertyWebkitBoxShadow, CSSPropertyWebkitBoxSizing,
-    CSSPropertyWebkitColorCorrection, CSSPropertyWebkitColumnBreakAfter,
-    CSSPropertyWebkitColumnBreakBefore, CSSPropertyWebkitColumnBreakInside,
-    CSSPropertyWebkitColumnCount, CSSPropertyWebkitColumnGap,
-    CSSPropertyWebkitColumnRuleColor, CSSPropertyWebkitColumnRuleStyle,
-    CSSPropertyWebkitColumnRuleWidth, CSSPropertyWebkitColumnSpan,
-    CSSPropertyWebkitColumnWidth,
+    CSSPropertyWebkitBoxShadow, CSSPropertyWebkitColorCorrection,
+    CSSPropertyWebkitColumnBreakAfter, CSSPropertyWebkitColumnBreakBefore,
+    CSSPropertyWebkitColumnBreakInside, CSSPropertyWebkitColumnCount,
+    CSSPropertyWebkitColumnGap, CSSPropertyWebkitColumnRuleColor,
+    CSSPropertyWebkitColumnRuleStyle, CSSPropertyWebkitColumnRuleWidth,
+    CSSPropertyWebkitColumnSpan, CSSPropertyWebkitColumnWidth,
 #if ENABLE(DASHBOARD_SUPPORT)
     CSSPropertyWebkitDashboardRegion,
 #endif
@@ -1377,7 +1376,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyZoom:
       return CSSPrimitiveValue::create(style->zoom(),
                                        CSSPrimitiveValue::CSS_NUMBER);
-    case CSSPropertyWebkitBoxSizing:
+    case CSSPropertyBoxSizing:
       if (style->boxSizing() == CONTENT_BOX)
         return CSSPrimitiveValue::createIdentifier(CSSValueContentBox);
       return CSSPrimitiveValue::createIdentifier(CSSValueBorderBox);
