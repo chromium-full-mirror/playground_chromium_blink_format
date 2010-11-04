@@ -901,6 +901,10 @@ void GraphicsContext::setCompositeOperation(CompositeOperator op) {
   platformContext()->setXfermodeMode(WebCoreCompositeToSkiaComposite(op));
 }
 
+InterpolationQuality GraphicsContext::imageInterpolationQuality() const {
+  return platformContext()->interpolationQuality();
+}
+
 void GraphicsContext::setImageInterpolationQuality(InterpolationQuality q) {
   platformContext()->setInterpolationQuality(q);
 }
