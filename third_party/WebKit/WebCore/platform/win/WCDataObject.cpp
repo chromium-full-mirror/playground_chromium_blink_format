@@ -265,6 +265,7 @@ void WCDataObject::CopyMedium(STGMEDIUM* pMedDest,
                               STGMEDIUM* pMedSrc,
                               FORMATETC* pFmtSrc) {
   switch (pMedSrc->tymed) {
+#if !OS(WINCE)
     case TYMED_HGLOBAL:
       pMedDest->hGlobal =
           (HGLOBAL)OleDuplicateData(pMedSrc->hGlobal, pFmtSrc->cfFormat, 0);
@@ -285,6 +286,7 @@ void WCDataObject::CopyMedium(STGMEDIUM* pMedDest,
       pMedSrc->lpszFileName = (LPOLESTR)OleDuplicateData(pMedSrc->lpszFileName,
                                                          pFmtSrc->cfFormat, 0);
       break;
+#endif
     case TYMED_ISTREAM:
       pMedDest->pstm = pMedSrc->pstm;
       pMedSrc->pstm->AddRef();
