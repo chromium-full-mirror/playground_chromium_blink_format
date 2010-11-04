@@ -35,6 +35,7 @@
 #include "Color.h"
 #include "ContainerNode.h"
 #include "DocumentMarkerController.h"
+#include "DocumentTiming.h"
 #include "QualifiedName.h"
 #include "ScriptExecutionContext.h"
 #include "Timer.h"
@@ -1199,6 +1200,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   PassRefPtr<TouchList> createTouchList(ExceptionCode&) const;
 #endif
 
+  const DocumentTiming* timing() const { return &m_documentTiming; }
+
  protected:
   Document(Frame*,
            const KURL& url,
@@ -1527,6 +1530,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   bool m_directionSetOnDocumentElement;
   bool m_writingModeSetOnDocumentElement;
+
+  DocumentTiming m_documentTiming;
 };
 
 inline bool Document::hasElementWithId(AtomicStringImpl* id) const {
