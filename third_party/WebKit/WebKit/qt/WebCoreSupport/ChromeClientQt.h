@@ -126,6 +126,9 @@ class ChromeClientQt : public ChromeClient {
   virtual void scroll(const IntSize& scrollDelta,
                       const IntRect& rectToScroll,
                       const IntRect& clipRect);
+#if ENABLE(TILED_BACKING_STORE)
+  virtual void delegatedScrollRequested(const IntSize& scrollDelta);
+#endif
 
   virtual IntPoint screenToWindow(const IntPoint&) const;
   virtual IntRect windowToScreen(const IntRect&) const;

@@ -118,6 +118,9 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void scroll(const WebCore::IntSize& scrollDelta,
                       const WebCore::IntRect& rectToScroll,
                       const WebCore::IntRect& clipRect);
+#if ENABLE(TILED_BACKING_STORE)
+  virtual void delegatedScrollRequested(const WebCore::IntSize& scrollDelta);
+#endif
   virtual WebCore::IntPoint screenToWindow(const WebCore::IntPoint&) const;
   virtual WebCore::IntRect windowToScreen(const WebCore::IntRect&) const;
   virtual PlatformPageClient platformPageClient() const;

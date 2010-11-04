@@ -361,6 +361,12 @@ void WebChromeClient::scroll(const IntSize& scrollDelta,
   m_page->drawingArea()->scroll(scrollDelta, rectToScroll, clipRect);
 }
 
+#if ENABLE(TILED_BACKING_STORE)
+void WebChromeClient::delegatedScrollRequested(const IntSize& scrollDelta) {
+  notImplemented();
+}
+#endif
+
 IntPoint WebChromeClient::screenToWindow(const IntPoint&) const {
   notImplemented();
   return IntPoint();
