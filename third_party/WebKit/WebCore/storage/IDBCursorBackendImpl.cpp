@@ -37,6 +37,7 @@
 #include "IDBKeyRange.h"
 #include "IDBObjectStoreBackendImpl.h"
 #include "IDBRequest.h"
+#include "IDBSQLiteDatabase.h"
 #include "IDBTransactionBackendInterface.h"
 #include "SQLiteDatabase.h"
 #include "SQLiteStatement.h"
@@ -45,28 +46,13 @@
 namespace WebCore {
 
 IDBCursorBackendImpl::IDBCursorBackendImpl(
-    PassRefPtr<IDBObjectStoreBackendImpl> idbObjectStore,
-    PassRefPtr<IDBKeyRange> keyRange,
-    IDBCursor::Direction direction,
-    PassOwnPtr<SQLiteStatement> query,
-    IDBTransactionBackendInterface* transaction)
-    : m_idbObjectStore(idbObjectStore),
-      m_keyRange(keyRange),
-      m_direction(direction),
-      m_query(query),
-      m_isSerializedScriptValueCursor(true),
-      m_transaction(transaction) {
-  loadCurrentRow();
-}
-
-IDBCursorBackendImpl::IDBCursorBackendImpl(
-    PassRefPtr<IDBIndexBackendImpl> idbIndex,
+    IDBSQLiteDatabase* database,
     PassRefPtr<IDBKeyRange> keyRange,
     IDBCursor::Direction direction,
     PassOwnPtr<SQLiteStatement> query,
     bool isSerializedScriptValueCursor,
     IDBTransactionBackendInterface* transaction)
-    : m_idbIndex(idbIndex),
+    : m_database(database),
       m_keyRange(keyRange),
       m_direction(direction),
       m_query(query),
@@ -124,7 +110,7 @@ void IDBCursorBackendImpl::updateInternal(
   }
 
   String sql = "UPDATE ObjectStoreData SET value = ? WHERE id = ?";
-  SQLiteStatement updateQuery(cursor->database()->sqliteDatabase(), sql);
+  SQLiteStatement updateQuery(cursor->database(), sql);
 
   bool ok = updateQuery.prepare() == SQLResultOk;
   ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
@@ -215,7 +201,7 @@ void IDBCursorBackendImpl::removeInternal(
   }
 
   String sql = "DELETE FROM ObjectStoreData WHERE id = ?";
-  SQLiteStatement deleteQuery(cursor->database()->sqliteDatabase(), sql);
+  SQLiteStatement deleteQuery(cursor->database(), sql);
 
   bool ok = deleteQuery.prepare() == SQLResultOk;
   ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
@@ -241,10 +227,8 @@ void IDBCursorBackendImpl::loadCurrentRow() {
     m_currentIDBKeyValue = IDBKey::fromQuery(*m_query, 4);
 }
 
-IDBDatabaseBackendImpl* IDBCursorBackendImpl::database() const {
-  if (m_idbObjectStore)
-    return m_idbObjectStore->database();
-  return m_idbIndex->objectStore()->database();
+SQLiteDatabase& IDBCursorBackendImpl::database() const {
+  return m_database->db();
 }
 
 }  // namespace WebCore

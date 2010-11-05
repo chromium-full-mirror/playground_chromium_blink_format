@@ -40,6 +40,7 @@
 #include "IDBKeyPath.h"
 #include "IDBKeyPathBackendImpl.h"
 #include "IDBKeyRange.h"
+#include "IDBSQLiteDatabase.h"
 #include "IDBTransactionBackendInterface.h"
 #include "ScriptExecutionContext.h"
 #include "SQLiteDatabase.h"
@@ -51,7 +52,7 @@ namespace WebCore {
 IDBObjectStoreBackendImpl::~IDBObjectStoreBackendImpl() {}
 
 IDBObjectStoreBackendImpl::IDBObjectStoreBackendImpl(
-    IDBDatabaseBackendImpl* database,
+    IDBSQLiteDatabase* database,
     int64_t id,
     const String& name,
     const String& keyPath,
@@ -65,7 +66,7 @@ IDBObjectStoreBackendImpl::IDBObjectStoreBackendImpl(
 }
 
 IDBObjectStoreBackendImpl::IDBObjectStoreBackendImpl(
-    IDBDatabaseBackendImpl* database,
+    IDBSQLiteDatabase* database,
     const String& name,
     const String& keyPath,
     bool autoIncrement)
@@ -387,8 +388,8 @@ PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreBackendImpl::createIndex(
     return 0;
   }
 
-  RefPtr<IDBIndexBackendImpl> index =
-      IDBIndexBackendImpl::create(this, name, keyPath, unique);
+  RefPtr<IDBIndexBackendImpl> index = IDBIndexBackendImpl::create(
+      m_database.get(), name, m_name, keyPath, unique);
   ASSERT(index->name() == name);
 
   RefPtr<IDBObjectStoreBackendImpl> objectStore = this;
@@ -552,7 +553,8 @@ void IDBObjectStoreBackendImpl::openCursorInternal(
   }
 
   RefPtr<IDBCursorBackendInterface> cursor = IDBCursorBackendImpl::create(
-      objectStore, range, direction, query.release(), transaction.get());
+      objectStore->m_database.get(), range, direction, query.release(), true,
+      transaction.get());
   callbacks->onSuccess(cursor.release());
 }
 
@@ -571,13 +573,13 @@ void IDBObjectStoreBackendImpl::loadIndexes() {
     String keyPath = indexQuery.getColumnText(2);
     bool unique = !!indexQuery.getColumnInt(3);
 
-    m_indexes.set(name,
-                  IDBIndexBackendImpl::create(this, id, name, keyPath, unique));
+    m_indexes.set(name, IDBIndexBackendImpl::create(m_database.get(), id, name,
+                                                    m_name, keyPath, unique));
   }
 }
 
 SQLiteDatabase& IDBObjectStoreBackendImpl::sqliteDatabase() const {
-  return m_database->sqliteDatabase();
+  return m_database->db();
 }
 
 void IDBObjectStoreBackendImpl::removeIndexFromMap(

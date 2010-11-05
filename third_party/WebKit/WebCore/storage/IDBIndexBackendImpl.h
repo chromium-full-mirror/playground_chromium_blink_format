@@ -34,27 +34,28 @@ namespace WebCore {
 
 class IDBKey;
 class IDBObjectStoreBackendImpl;
+class IDBSQLiteDatabase;
 class SQLiteDatabase;
 class ScriptExecutionContext;
 
 class IDBIndexBackendImpl : public IDBIndexBackendInterface {
  public:
-  static PassRefPtr<IDBIndexBackendImpl> create(
-      IDBObjectStoreBackendImpl* objectStore,
-      int64_t id,
-      const String& name,
-      const String& keyPath,
-      bool unique) {
-    return adoptRef(
-        new IDBIndexBackendImpl(objectStore, id, name, keyPath, unique));
+  static PassRefPtr<IDBIndexBackendImpl> create(IDBSQLiteDatabase* database,
+                                                int64_t id,
+                                                const String& name,
+                                                const String& storeName,
+                                                const String& keyPath,
+                                                bool unique) {
+    return adoptRef(new IDBIndexBackendImpl(database, id, name, storeName,
+                                            keyPath, unique));
   }
-  static PassRefPtr<IDBIndexBackendImpl> create(
-      IDBObjectStoreBackendImpl* objectStore,
-      const String& name,
-      const String& keyPath,
-      bool unique) {
+  static PassRefPtr<IDBIndexBackendImpl> create(IDBSQLiteDatabase* database,
+                                                const String& name,
+                                                const String& storeName,
+                                                const String& keyPath,
+                                                bool unique) {
     return adoptRef(
-        new IDBIndexBackendImpl(objectStore, name, keyPath, unique));
+        new IDBIndexBackendImpl(database, name, storeName, keyPath, unique));
   }
   virtual ~IDBIndexBackendImpl();
 
@@ -68,7 +69,7 @@ class IDBIndexBackendImpl : public IDBIndexBackendInterface {
 
   // Implements IDBIndexBackendInterface.
   virtual String name() { return m_name; }
-  virtual String storeName();
+  virtual String storeName() { return m_storeName; }
   virtual String keyPath() { return m_keyPath; }
   virtual bool unique() { return m_unique; }
 
@@ -91,16 +92,16 @@ class IDBIndexBackendImpl : public IDBIndexBackendInterface {
                       IDBTransactionBackendInterface*,
                       ExceptionCode&);
 
-  IDBObjectStoreBackendImpl* objectStore() const { return m_objectStore.get(); }
-
  private:
-  IDBIndexBackendImpl(IDBObjectStoreBackendImpl*,
+  IDBIndexBackendImpl(IDBSQLiteDatabase*,
                       int64_t id,
                       const String& name,
+                      const String& storeName,
                       const String& keyPath,
                       bool unique);
-  IDBIndexBackendImpl(IDBObjectStoreBackendImpl*,
+  IDBIndexBackendImpl(IDBSQLiteDatabase*,
                       const String& name,
+                      const String& storeName,
                       const String& keyPath,
                       bool unique);
 
@@ -121,10 +122,11 @@ class IDBIndexBackendImpl : public IDBIndexBackendInterface {
 
   static const int64_t InvalidId = 0;
 
-  RefPtr<IDBObjectStoreBackendImpl> m_objectStore;
+  RefPtr<IDBSQLiteDatabase> m_database;
 
   int64_t m_id;
   String m_name;
+  String m_storeName;
   String m_keyPath;
   bool m_unique;
 };

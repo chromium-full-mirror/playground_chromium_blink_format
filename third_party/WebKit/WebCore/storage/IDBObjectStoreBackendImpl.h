@@ -36,6 +36,7 @@ namespace WebCore {
 
 class IDBDatabaseBackendImpl;
 class IDBIndexBackendImpl;
+class IDBSQLiteDatabase;
 class IDBTransactionBackendInterface;
 class SQLiteDatabase;
 class ScriptExecutionContext;
@@ -43,7 +44,7 @@ class ScriptExecutionContext;
 class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
  public:
   static PassRefPtr<IDBObjectStoreBackendImpl> create(
-      IDBDatabaseBackendImpl* database,
+      IDBSQLiteDatabase* database,
       int64_t id,
       const String& name,
       const String& keyPath,
@@ -52,7 +53,7 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
                                                   autoIncrement));
   }
   static PassRefPtr<IDBObjectStoreBackendImpl> create(
-      IDBDatabaseBackendImpl* database,
+      IDBSQLiteDatabase* database,
       const String& name,
       const String& keyPath,
       bool autoIncrement) {
@@ -106,15 +107,13 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
                           IDBTransactionBackendInterface*,
                           ExceptionCode&);
 
-  IDBDatabaseBackendImpl* database() const { return m_database.get(); }
-
  private:
-  IDBObjectStoreBackendImpl(IDBDatabaseBackendImpl*,
+  IDBObjectStoreBackendImpl(IDBSQLiteDatabase*,
                             int64_t id,
                             const String& name,
                             const String& keyPath,
                             bool autoIncrement);
-  IDBObjectStoreBackendImpl(IDBDatabaseBackendImpl*,
+  IDBObjectStoreBackendImpl(IDBSQLiteDatabase*,
                             const String& name,
                             const String& keyPath,
                             bool autoIncrement);
@@ -160,7 +159,7 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
                             PassRefPtr<IDBObjectStoreBackendImpl>,
                             PassRefPtr<IDBIndexBackendImpl>);
 
-  RefPtr<IDBDatabaseBackendImpl> m_database;
+  RefPtr<IDBSQLiteDatabase> m_database;
 
   int64_t m_id;
   String m_name;
