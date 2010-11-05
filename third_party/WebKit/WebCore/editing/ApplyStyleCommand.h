@@ -156,8 +156,8 @@ class ApplyStyleCommand : public CompositeEditCommand {
   void addBlockStyle(const StyleChange&, HTMLElement*);
   void addInlineStyleIfNeeded(
       CSSMutableStyleDeclaration*,
-      Node* start,
-      Node* end,
+      PassRefPtr<Node> start,
+      PassRefPtr<Node> end,
       EAddStyledElement addStyledElement = AddStyledElement);
   void splitTextAtStart(const Position& start, const Position& end);
   void splitTextAtEnd(const Position& start, const Position& end);
@@ -170,8 +170,8 @@ class ApplyStyleCommand : public CompositeEditCommand {
   bool mergeEndWithNextIfIdentical(const Position& start, const Position& end);
   void cleanupUnstyledAppleStyleSpans(Node* dummySpanAncestor);
 
-  void surroundNodeRangeWithElement(Node* start,
-                                    Node* end,
+  void surroundNodeRangeWithElement(PassRefPtr<Node> start,
+                                    PassRefPtr<Node> end,
                                     PassRefPtr<Element>);
   float computedFontSize(const Node*);
   void joinChildTextNodes(Node*, const Position& start, const Position& end);
