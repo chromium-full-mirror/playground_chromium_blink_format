@@ -1519,8 +1519,7 @@ static bool executeYankAndSelect(Frame* frame,
   return true;
 }
 
-#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
-    !defined(BUILDING_ON_LEOPARD) && !defined(BUILDING_ON_SNOW_LEOPARD)
+#if SUPPORT_AUTOCORRECTION_PANEL
 static bool executeCancelOperation(Frame* frame,
                                    Event*,
                                    EditorCommandSource,
@@ -1570,8 +1569,7 @@ static bool supportedPaste(Frame* frame, EditorCommandSource source) {
   return false;
 }
 
-#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
-    !defined(BUILDING_ON_LEOPARD) && !defined(BUILDING_ON_SNOW_LEOPARD)
+#if SUPPORT_AUTOCORRECTION_PANEL
 static bool supportedDismissCorrectionPanel(Frame* frame,
                                             EditorCommandSource source) {
   return supportedFromMenuOrKeyBinding(frame, source) &&
@@ -2292,8 +2290,7 @@ static const CommandMap& createCommandMap() {
      {executeYankAndSelect, supportedFromMenuOrKeyBinding,
       enabledInEditableText, stateNone, valueNull, notTextInsertion,
       doNotAllowExecutionWhenDisabled}},
-#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
-    !defined(BUILDING_ON_LEOPARD) && !defined(BUILDING_ON_SNOW_LEOPARD)
+#if SUPPORT_AUTOCORRECTION_PANEL
     {"CancelOperation",
      {executeCancelOperation, supportedDismissCorrectionPanel,
       enabledInEditableText, stateNone, valueNull, notTextInsertion,

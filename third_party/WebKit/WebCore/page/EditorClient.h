@@ -27,6 +27,7 @@
 #ifndef EditorClient_h
 #define EditorClient_h
 
+#include "CorrectionPanelInfo.h"
 #include "EditorInsertAction.h"
 #include "FloatRect.h"
 #include "PlatformString.h"
@@ -207,13 +208,13 @@ class EditorClient {
                                     Vector<TextCheckingResult>& results) = 0;
 #endif
 
-#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
-    !defined(BUILDING_ON_LEOPARD) && !defined(BUILDING_ON_SNOW_LEOPARD)
-  virtual void showCorrectionPanel(const FloatRect& boundingBoxOfReplacedString,
+#if SUPPORT_AUTOCORRECTION_PANEL
+  virtual void showCorrectionPanel(CorrectionPanelInfo::PanelType,
+                                   const FloatRect& boundingBoxOfReplacedString,
                                    const String& replacedString,
                                    const String& replacmentString,
                                    Editor*) = 0;
-  virtual void dismissCorrectionPanel(bool correctionAccepted) = 0;
+  virtual void dismissCorrectionPanel(CorrectionWasRejectedOrNot) = 0;
   virtual bool isShowingCorrectionPanel() = 0;
 #endif
 

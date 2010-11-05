@@ -648,13 +648,13 @@ class EmptyEditorClient : public EditorClient, public Noncopyable {
                                     uint64_t,
                                     Vector<TextCheckingResult>&){};
 #endif
-#if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
-    !defined(BUILDING_ON_LEOPARD) && !defined(BUILDING_ON_SNOW_LEOPARD)
-  virtual void showCorrectionPanel(const FloatRect&,
+#if SUPPORT_AUTOCORRECTION_PANEL
+  virtual void showCorrectionPanel(CorrectionPanelInfo::PanelType,
+                                   const FloatRect&,
                                    const String&,
                                    const String&,
                                    Editor*) {}
-  virtual void dismissCorrectionPanel(bool) {}
+  virtual void dismissCorrectionPanel(CorrectionWasRejectedOrNot) {}
   virtual bool isShowingCorrectionPanel() { return false; }
 #endif
   virtual void updateSpellingUIWithGrammarString(const String&,
