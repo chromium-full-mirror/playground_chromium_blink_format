@@ -66,7 +66,7 @@ PassRefPtr<BitmapContext> createBitmapContextFromWebView(
 
   HDC memoryDC = CreateCompatibleDC(0);
   SelectObject(memoryDC, bitmap);
-  SendMessage(webViewWindow, WM_PRINTCLIENT, reinterpret_cast<WPARAM>(memoryDC),
+  SendMessage(webViewWindow, WM_PRINT, reinterpret_cast<WPARAM>(memoryDC),
               PRF_CLIENT | PRF_CHILDREN | PRF_OWNED);
   DeleteDC(memoryDC);
 
@@ -78,8 +78,7 @@ PassRefPtr<BitmapContext> createBitmapContextFromWebView(
   RetainPtr<CGColorSpaceRef> colorSpace(AdoptCF, CGColorSpaceCreateDeviceRGB());
   CGContextRef context = CGBitmapContextCreate(
       info.bmBits, info.bmWidth, info.bmHeight, 8, info.bmWidthBytes,
-      colorSpace.get(),
-      kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+      colorSpace.get(), kCGBitmapByteOrder32Host | kCGImageAlphaNoneSkipFirst);
 #elif PLATFORM(CAIRO)
   cairo_surface_t* image = cairo_image_surface_create_for_data(
       (unsigned char*)info.bmBits, CAIRO_FORMAT_ARGB32, info.bmWidth,
