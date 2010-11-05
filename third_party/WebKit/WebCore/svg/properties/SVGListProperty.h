@@ -376,11 +376,10 @@ class SVGListProperty : public SVGProperty {
 
     // Detach the existing wrapper.
     RefPtr<ListItemTearOff>& oldItem = wrappers.at(index);
-    if (oldItem) {
+    if (oldItem)
       oldItem->detachWrapper();
-      wrappers.remove(index);
-    }
 
+    wrappers.remove(index);
     values.remove(index);
 
     commitChange();
