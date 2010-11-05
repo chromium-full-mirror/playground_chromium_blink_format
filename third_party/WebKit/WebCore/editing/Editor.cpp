@@ -2766,6 +2766,8 @@ void Editor::dismissCorrectionPanel(
   m_correctionPanelInfo.m_rangeToBeReplaced.clear();
   if (client())
     client()->dismissCorrectionPanel(correctionWasRejectedOrNot);
+#else
+  UNUSED_PARAM(correctionWasRejectedOrNot);
 #endif
 }
 void Editor::removeSpellAndCorrectionMarkersFromWordsToBeEdited(
