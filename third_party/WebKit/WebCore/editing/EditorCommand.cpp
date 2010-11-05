@@ -813,10 +813,9 @@ static bool executeMoveDown(Frame* frame,
                             Event*,
                             EditorCommandSource,
                             const String&) {
-  frame->selection()->modify(SelectionController::AlterationMove,
-                             SelectionController::DirectionForward,
-                             LineGranularity, true);
-  return true;
+  return frame->selection()->modify(SelectionController::AlterationMove,
+                                    SelectionController::DirectionForward,
+                                    LineGranularity, true);
 }
 
 static bool executeMoveDownAndModifySelection(Frame* frame,
@@ -853,10 +852,9 @@ static bool executeMoveLeft(Frame* frame,
                             Event*,
                             EditorCommandSource,
                             const String&) {
-  frame->selection()->modify(SelectionController::AlterationMove,
-                             SelectionController::DirectionLeft,
-                             CharacterGranularity, true);
-  return true;
+  return frame->selection()->modify(SelectionController::AlterationMove,
+                                    SelectionController::DirectionLeft,
+                                    CharacterGranularity, true);
 }
 
 static bool executeMoveLeftAndModifySelection(Frame* frame,
@@ -921,10 +919,9 @@ static bool executeMoveRight(Frame* frame,
                              Event*,
                              EditorCommandSource,
                              const String&) {
-  frame->selection()->modify(SelectionController::AlterationMove,
-                             SelectionController::DirectionRight,
-                             CharacterGranularity, true);
-  return true;
+  return frame->selection()->modify(SelectionController::AlterationMove,
+                                    SelectionController::DirectionRight,
+                                    CharacterGranularity, true);
 }
 
 static bool executeMoveRightAndModifySelection(Frame* frame,
@@ -1124,10 +1121,9 @@ static bool executeMoveUp(Frame* frame,
                           Event*,
                           EditorCommandSource,
                           const String&) {
-  frame->selection()->modify(SelectionController::AlterationMove,
-                             SelectionController::DirectionBackward,
-                             LineGranularity, true);
-  return true;
+  return frame->selection()->modify(SelectionController::AlterationMove,
+                                    SelectionController::DirectionBackward,
+                                    LineGranularity, true);
 }
 
 static bool executeMoveUpAndModifySelection(Frame* frame,

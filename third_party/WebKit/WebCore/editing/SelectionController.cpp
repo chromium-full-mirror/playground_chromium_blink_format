@@ -702,6 +702,8 @@ bool SelectionController::modify(EAlteration alter,
 
   willBeModified(alter, direction);
 
+  bool wasRange = m_selection.isRange();
+  Position originalStartPosition = m_selection.start();
   VisiblePosition position;
   switch (direction) {
     case DirectionRight:
@@ -732,6 +734,12 @@ bool SelectionController::modify(EAlteration alter,
 
   if (position.isNull())
     return false;
+
+  if (m_frame && m_frame->settings() &&
+      m_frame->settings()->isSpatialNavigationEnabled())
+    if (!wasRange && alter == AlterationMove &&
+        position == originalStartPosition)
+      return false;
 
   // Some of the above operations set an xPosForVerticalArrowNavigation.
   // Setting a selection will clear it, so save it to possibly restore later.
