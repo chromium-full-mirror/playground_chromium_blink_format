@@ -89,8 +89,8 @@ class Instance : public RefCounted<Instance> {
 
   virtual Class* getClass() const = 0;
   JSObject* createRuntimeObject(ExecState*);
-  void willInvalidateRuntimeObject();
-  void willDestroyRuntimeObject();
+  void willInvalidateRuntimeObject(RuntimeObject*);
+  void willDestroyRuntimeObject(RuntimeObject*);
 
   // Returns false if the value was not set successfully.
   virtual bool setValueOfUndefinedField(ExecState*,
@@ -147,7 +147,7 @@ class Instance : public RefCounted<Instance> {
   RefPtr<RootObject> m_rootObject;
 
  private:
-  RuntimeObject* m_runtimeObject;
+  WeakGCPtr<RuntimeObject> m_runtimeObject;
 };
 
 class Array : public Noncopyable {

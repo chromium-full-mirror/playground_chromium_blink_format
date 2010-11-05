@@ -46,12 +46,13 @@ Array::Array(PassRefPtr<RootObject> rootObject) : m_rootObject(rootObject) {
 Array::~Array() {}
 
 Instance::Instance(PassRefPtr<RootObject> rootObject)
-    : m_rootObject(rootObject), m_runtimeObject(0) {
+    : m_rootObject(rootObject) {
   ASSERT(m_rootObject);
 }
 
 Instance::~Instance() {
   ASSERT(!m_runtimeObject);
+  ASSERT(!m_runtimeObject.hasDeadObject());
 }
 
 static KJSDidExecuteFunctionPtr s_didExecuteFunction;
@@ -75,12 +76,14 @@ void Instance::end() {
 JSObject* Instance::createRuntimeObject(ExecState* exec) {
   ASSERT(m_rootObject);
   ASSERT(m_rootObject->isValid());
-  if (m_runtimeObject)
-    return m_runtimeObject;
+  if (RuntimeObject* existingObject = m_runtimeObject.get())
+    return existingObject;
+
   JSLock lock(SilenceAssertionsOnly);
-  m_runtimeObject = newRuntimeObject(exec);
-  m_rootObject->addRuntimeObject(m_runtimeObject);
-  return m_runtimeObject;
+  RuntimeObject* newObject = newRuntimeObject(exec);
+  m_runtimeObject = newObject;
+  m_rootObject->addRuntimeObject(newObject);
+  return newObject;
 }
 
 RuntimeObject* Instance::newRuntimeObject(ExecState* exec) {
@@ -88,17 +91,16 @@ RuntimeObject* Instance::newRuntimeObject(ExecState* exec) {
   return new (exec) RuntimeObject(exec, exec->lexicalGlobalObject(), this);
 }
 
-void Instance::willDestroyRuntimeObject() {
+void Instance::willDestroyRuntimeObject(RuntimeObject* object) {
   ASSERT(m_rootObject);
   ASSERT(m_rootObject->isValid());
-  ASSERT(m_runtimeObject);
-  m_rootObject->removeRuntimeObject(m_runtimeObject);
-  m_runtimeObject = 0;
+  m_rootObject->removeRuntimeObject(object);
+  m_runtimeObject.clear(object);
 }
 
-void Instance::willInvalidateRuntimeObject() {
-  ASSERT(m_runtimeObject);
-  m_runtimeObject = 0;
+void Instance::willInvalidateRuntimeObject(RuntimeObject* object) {
+  ASSERT(object);
+  m_runtimeObject.clear(object);
 }
 
 RootObject* Instance::rootObject() const {
