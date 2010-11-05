@@ -93,7 +93,7 @@ struct IdentifierCStringTranslator {
   static void translate(StringImpl*& location, const char* c, unsigned hash) {
     size_t length = strlen(c);
     UChar* d;
-    StringImpl* r = StringImpl::createUninitialized(length, d).releaseRef();
+    StringImpl* r = StringImpl::createUninitialized(length, d).leakRef();
     for (size_t i = 0; i != length; i++)
       d[i] = static_cast<unsigned char>(
           c[i]);  // use unsigned char to zero-extend instead of sign-extend
@@ -155,7 +155,7 @@ struct IdentifierUCharBufferTranslator {
                         const UCharBuffer& buf,
                         unsigned hash) {
     UChar* d;
-    StringImpl* r = StringImpl::createUninitialized(buf.length, d).releaseRef();
+    StringImpl* r = StringImpl::createUninitialized(buf.length, d).leakRef();
     for (unsigned i = 0; i != buf.length; i++)
       d[i] = buf.s[i];
     r->setHash(hash);

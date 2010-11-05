@@ -48,9 +48,9 @@ JSStringRef JSStringCreateWithCFString(CFStringRef string) {
                    unichar_and_uchar_must_be_same_size);
     return OpaqueJSString::create(reinterpret_cast<UChar*>(buffer.get()),
                                   length)
-        .releaseRef();
+        .leakRef();
   } else {
-    return OpaqueJSString::create(0, 0).releaseRef();
+    return OpaqueJSString::create(0, 0).leakRef();
   }
 }
 

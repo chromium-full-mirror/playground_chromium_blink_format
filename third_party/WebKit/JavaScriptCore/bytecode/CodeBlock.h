@@ -838,7 +838,7 @@ class FunctionCodeBlock : public CodeBlock {
                   globalObject,
                   sourceProvider,
                   sourceOffset,
-                  SharedSymbolTable::create().releaseRef(),
+                  SharedSymbolTable::create().leakRef(),
                   isConstructor) {}
   ~FunctionCodeBlock() { sharedSymbolTable()->deref(); }
 };

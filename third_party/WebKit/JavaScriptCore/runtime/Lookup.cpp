@@ -35,7 +35,7 @@ void HashTable::createTable(JSGlobalData* globalData) const {
     entries[i].setKey(0);
   for (int i = 0; values[i].key; ++i) {
     StringImpl* identifier =
-        Identifier::add(globalData, values[i].key).releaseRef();
+        Identifier::add(globalData, values[i].key).leakRef();
     int hashIndex = identifier->existingHash() & compactHashSizeMask;
     HashEntry* entry = &entries[hashIndex];
 

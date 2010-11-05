@@ -374,7 +374,7 @@ int main(int argc, char** argv) {
   // Structured Exception Handling
   int res = 0;
   JSGlobalData* globalData =
-      JSGlobalData::create(ThreadStackTypeLarge).releaseRef();
+      JSGlobalData::create(ThreadStackTypeLarge).leakRef();
   TRY res = jscmain(argc, argv, globalData);
   EXCEPT(res = 3)
 

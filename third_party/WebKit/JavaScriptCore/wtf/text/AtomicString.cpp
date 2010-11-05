@@ -84,7 +84,7 @@ struct CStringTranslator {
   static void translate(StringImpl*& location,
                         const char* const& c,
                         unsigned hash) {
-    location = StringImpl::create(c).releaseRef();
+    location = StringImpl::create(c).leakRef();
     location->setHash(hash);
     location->setIsAtomic(true);
   }
@@ -170,7 +170,7 @@ struct UCharBufferTranslator {
   static void translate(StringImpl*& location,
                         const UCharBuffer& buf,
                         unsigned hash) {
-    location = StringImpl::create(buf.s, buf.length).releaseRef();
+    location = StringImpl::create(buf.s, buf.length).leakRef();
     location->setHash(hash);
     location->setIsAtomic(true);
   }
@@ -197,8 +197,7 @@ struct HashAndCharactersTranslator {
   static void translate(StringImpl*& location,
                         const HashAndCharacters& buffer,
                         unsigned hash) {
-    location =
-        StringImpl::create(buffer.characters, buffer.length).releaseRef();
+    location = StringImpl::create(buffer.characters, buffer.length).leakRef();
     location->setHash(hash);
     location->setIsAtomic(true);
   }

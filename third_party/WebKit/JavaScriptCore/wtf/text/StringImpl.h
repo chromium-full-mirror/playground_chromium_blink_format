@@ -121,7 +121,7 @@ class StringImpl : public StringImplBase {
              PassRefPtr<StringImpl> base)
       : StringImplBase(length, BufferSubstring),
         m_data(characters),
-        m_substringBuffer(base.releaseRef()),
+        m_substringBuffer(base.leakRef()),
         m_hash(0) {
     ASSERT(m_data);
     ASSERT(m_length);
@@ -135,7 +135,7 @@ class StringImpl : public StringImplBase {
              PassRefPtr<SharedUChar> sharedBuffer)
       : StringImplBase(length, BufferShared),
         m_data(characters),
-        m_sharedBuffer(sharedBuffer.releaseRef()),
+        m_sharedBuffer(sharedBuffer.leakRef()),
         m_hash(0) {
     ASSERT(m_data);
     ASSERT(m_length);
