@@ -1268,7 +1268,7 @@ HRESULT WebFrame::suspendAnimations() {
   if (!frame)
     return E_FAIL;
 
-  frame->suspendAnimations();
+  frame->animation()->suspendAnimations();
   return S_OK;
 }
 
@@ -1277,7 +1277,7 @@ HRESULT WebFrame::resumeAnimations() {
   if (!frame)
     return E_FAIL;
 
-  frame->resumeAnimations();
+  frame->animation()->resumeAnimations();
   return S_OK;
 }
 
