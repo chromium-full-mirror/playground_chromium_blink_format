@@ -82,6 +82,10 @@ class Connection : public ThreadSafeShared<Connection> {
    public:
     virtual void didClose(Connection*) = 0;
     virtual void didReceiveInvalidMessage(Connection*, MessageID) = 0;
+
+    // Called on the connection work queue when the connection is closed, before
+    // didCall is called on the client thread.
+    virtual void didCloseOnConnectionWorkQueue(WorkQueue*, Connection*) {}
   };
 
 #if PLATFORM(MAC)
