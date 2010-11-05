@@ -31,6 +31,7 @@
 #include "CrossThreadTask.h"
 #include "DOMStringList.h"
 #include "IDBDatabaseException.h"
+#include "IDBFactoryBackendImpl.h"
 #include "IDBObjectStoreBackendImpl.h"
 #include "IDBSQLiteDatabase.h"
 #include "IDBTransactionBackendInterface.h"
@@ -101,12 +102,16 @@ IDBDatabaseBackendImpl::IDBDatabaseBackendImpl(
     const String& name,
     const String& description,
     IDBSQLiteDatabase* sqliteDatabase,
-    IDBTransactionCoordinator* coordinator)
+    IDBTransactionCoordinator* coordinator,
+    IDBFactoryBackendImpl* factory,
+    const String& uniqueIdentifier)
     : m_sqliteDatabase(sqliteDatabase),
       m_id(InvalidId),
       m_name(name),
       m_description(description),
       m_version(""),
+      m_identifier(uniqueIdentifier),
+      m_factory(factory),
       m_transactionCoordinator(coordinator) {
   ASSERT(!m_name.isNull());
   ASSERT(!m_description.isNull());
@@ -120,7 +125,9 @@ IDBDatabaseBackendImpl::IDBDatabaseBackendImpl(
   loadObjectStores();
 }
 
-IDBDatabaseBackendImpl::~IDBDatabaseBackendImpl() {}
+IDBDatabaseBackendImpl::~IDBDatabaseBackendImpl() {
+  m_factory->removeIDBDatabaseBackend(m_identifier);
+}
 
 void IDBDatabaseBackendImpl::setDescription(const String& description) {
   if (description == m_description)

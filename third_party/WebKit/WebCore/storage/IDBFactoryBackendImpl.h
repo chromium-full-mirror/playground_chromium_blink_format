@@ -49,9 +49,9 @@ class IDBFactoryBackendImpl : public IDBFactoryBackendInterface {
   }
   virtual ~IDBFactoryBackendImpl();
 
-  // IDBSQLiteDatabase's lifetime may be shorter than ours, so we need
-  // notification when it dies.
-  void removeSQLiteDatabase(const String& filePath);
+  // Notifications from weak pointers.
+  void removeIDBDatabaseBackend(const String& uniqueIdentifier);
+  void removeSQLiteDatabase(const String& uniqueIdentifier);
 
   virtual void open(const String& name,
                     const String& description,
@@ -66,8 +66,7 @@ class IDBFactoryBackendImpl : public IDBFactoryBackendInterface {
  private:
   IDBFactoryBackendImpl();
 
-  // FIXME: Just hold a weak pointer.
-  typedef HashMap<String, RefPtr<IDBDatabaseBackendImpl>> IDBDatabaseBackendMap;
+  typedef HashMap<String, IDBDatabaseBackendImpl*> IDBDatabaseBackendMap;
   IDBDatabaseBackendMap m_databaseBackendMap;
 
   typedef HashMap<String, IDBSQLiteDatabase*> SQLiteDatabaseMap;
