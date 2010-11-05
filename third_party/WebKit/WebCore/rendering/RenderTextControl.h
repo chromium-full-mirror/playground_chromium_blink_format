@@ -45,8 +45,8 @@ class RenderTextControl : public RenderBlock {
   bool lastChangeWasUserEdit() const { return m_lastChangeWasUserEdit; }
   void setLastChangeWasUserEdit(bool lastChangeWasUserEdit);
 
-  int selectionStart();
-  int selectionEnd();
+  int selectionStart() const;
+  int selectionEnd() const;
   PassRefPtr<Range> selection(int start, int end) const;
 
   virtual void subtreeHasChanged();
@@ -54,8 +54,8 @@ class RenderTextControl : public RenderBlock {
   String textWithHardLineBreaks();
   void selectionChanged(bool userTriggered);
 
-  VisiblePosition visiblePositionForIndex(int index);
-  int indexForVisiblePosition(const VisiblePosition&);
+  VisiblePosition visiblePositionForIndex(int index) const;
+  int indexForVisiblePosition(const VisiblePosition&) const;
 
   void updatePlaceholderVisibility(bool, bool);
 

@@ -124,12 +124,12 @@ void WebInputElement::setSelectionRange(int start, int end) {
   unwrap<HTMLInputElement>()->setSelectionRange(start, end);
 }
 
-int WebInputElement::selectionStart() {
-  return unwrap<HTMLInputElement>()->selectionStart();
+int WebInputElement::selectionStart() const {
+  return constUnwrap<HTMLInputElement>()->selectionStart();
 }
 
-int WebInputElement::selectionEnd() {
-  return unwrap<HTMLInputElement>()->selectionEnd();
+int WebInputElement::selectionEnd() const {
+  return constUnwrap<HTMLInputElement>()->selectionEnd();
 }
 
 bool WebInputElement::isValidValue(const WebString& value) const {
