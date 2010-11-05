@@ -64,14 +64,16 @@ JSValue JSCallbackData::invokeCallback(MarkedArgumentBuffer& args,
   if (!context)
     return JSValue();
 
+  bool contextIsDocument = context->isDocument();
   JSValue result =
-      context->isDocument()
+      contextIsDocument
           ? JSMainThreadExecState::call(exec, function, callType, callData,
                                         callback(), args)
           : JSC::call(exec, function, callType, callData, callback(), args);
   globalObject()->globalData().timeoutChecker.stop();
 
-  Document::updateStyleForAllDocuments();
+  if (contextIsDocument)
+    Document::updateStyleForAllDocuments();
 
   if (exec->hadException()) {
     reportCurrentException(exec);

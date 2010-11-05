@@ -1591,6 +1591,7 @@ bail_out:
 }
 
 void Document::updateStyleIfNeeded() {
+  ASSERT(isMainThread());
   ASSERT(!view() || (!view()->isInLayout() && !view()->isPainting()));
 
   if ((!m_pendingStyleRecalcShouldForce && !childNeedsStyleRecalc()) ||
@@ -1609,6 +1610,7 @@ void Document::updateStyleIfNeeded() {
 }
 
 void Document::updateStyleForAllDocuments() {
+  ASSERT(isMainThread());
   if (!documentsThatNeedStyleRecalc)
     return;
 
@@ -1621,6 +1623,7 @@ void Document::updateStyleForAllDocuments() {
 }
 
 void Document::updateLayout() {
+  ASSERT(isMainThread());
   if (Element* oe = ownerElement())
     oe->document()->updateLayout();
 
