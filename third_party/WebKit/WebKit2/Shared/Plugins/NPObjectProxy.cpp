@@ -194,6 +194,53 @@ bool NPObjectProxy::setProperty(NPIdentifier propertyName,
   return returnValue;
 }
 
+bool NPObjectProxy::removeProperty(NPIdentifier propertyName) {
+  if (!m_npRemoteObjectMap)
+    return false;
+
+  NPIdentifierData propertyNameData =
+      NPIdentifierData::fromNPIdentifier(propertyName);
+
+  bool returnValue = false;
+
+  if (!m_npRemoteObjectMap->connection()->sendSync(
+          Messages::NPObjectMessageReceiver::RemoveProperty(propertyNameData),
+          Messages::NPObjectMessageReceiver::RemoveProperty::Reply(returnValue),
+          m_npObjectID))
+    return false;
+
+  return returnValue;
+}
+
+bool NPObjectProxy::enumerate(NPIdentifier** identifiers,
+                              uint32_t* identifierCount) {
+  if (!m_npRemoteObjectMap)
+    return false;
+
+  bool returnValue;
+  Vector<NPIdentifierData> identifiersData;
+
+  if (!m_npRemoteObjectMap->connection()->sendSync(
+          Messages::NPObjectMessageReceiver::Enumerate(),
+          Messages::NPObjectMessageReceiver::Enumerate::Reply(returnValue,
+                                                              identifiersData),
+          m_npObjectID))
+    return false;
+
+  if (!returnValue)
+    return false;
+
+  NPIdentifier* nameIdentifiers =
+      npnMemNewArray<NPIdentifier>(identifiersData.size());
+
+  for (size_t i = 0; i < identifiersData.size(); ++i)
+    nameIdentifiers[i] = identifiersData[i].createNPIdentifier();
+
+  *identifiers = nameIdentifiers;
+  *identifierCount = identifiersData.size();
+  return true;
+}
+
 NPClass* NPObjectProxy::npClass() {
   static NPClass npClass = {NP_CLASS_STRUCT_VERSION,
                             NP_Allocate,
@@ -261,16 +308,15 @@ bool NPObjectProxy::NP_SetProperty(NPObject* npObject,
   return toNPObjectProxy(npObject)->setProperty(propertyName, value);
 }
 
-bool NPObjectProxy::NP_RemoveProperty(NPObject*, NPIdentifier propertyName) {
-  notImplemented();
-  return false;
+bool NPObjectProxy::NP_RemoveProperty(NPObject* npObject,
+                                      NPIdentifier propertyName) {
+  return toNPObjectProxy(npObject)->removeProperty(propertyName);
 }
 
-bool NPObjectProxy::NP_Enumerate(NPObject*,
+bool NPObjectProxy::NP_Enumerate(NPObject* npObject,
                                  NPIdentifier** identifiers,
                                  uint32_t* identifierCount) {
-  notImplemented();
-  return false;
+  return toNPObjectProxy(npObject)->enumerate(identifiers, identifierCount);
 }
 
 bool NPObjectProxy::NP_Construct(NPObject*,

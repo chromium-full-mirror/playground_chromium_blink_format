@@ -74,6 +74,8 @@ class NPObjectMessageReceiver {
   void setProperty(const NPIdentifierData&,
                    const NPVariantData& propertyValueData,
                    bool& returnValue);
+  void removeProperty(const NPIdentifierData&, bool& returnValue);
+  void enumerate(bool& returnValue, Vector<NPIdentifierData>& identifiersData);
 
   NPRemoteObjectMap* m_npRemoteObjectMap;
   uint64_t m_npObjectID;
