@@ -1075,11 +1075,7 @@ void webkit_web_frame_suspend_animations(WebKitWebFrame* frame) {
   if (!coreFrame)
     return;
 
-  AnimationController* controller = coreFrame->animation();
-  if (!controller)
-    return;
-
-  controller->suspendAnimations(coreFrame->document());
+  frame->suspendAnimations();
 }
 
 void webkit_web_frame_resume_animations(WebKitWebFrame* frame) {
@@ -1087,11 +1083,7 @@ void webkit_web_frame_resume_animations(WebKitWebFrame* frame) {
   if (!coreFrame)
     return;
 
-  AnimationController* controller = coreFrame->animation();
-  if (!controller)
-    return;
-
-  controller->resumeAnimations(coreFrame->document());
+  frame->resumeAnimations();
 }
 
 gchar* webkit_web_frame_get_response_mime_type(WebKitWebFrame* frame) {
