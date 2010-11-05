@@ -74,6 +74,14 @@ namespace WebCore {
 
 static const DOMTimeStamp typeAheadTimeout = 1000;
 
+static bool isSpatialNavigationEnabled(const Frame* frame) {
+  if (frame && frame->settings() &&
+      frame->settings()->isSpatialNavigationEnabled())
+    return true;
+
+  return false;
+}
+
 void SelectElement::selectAll(SelectElementData& data, Element* element) {
   ASSERT(!data.usesMenuList());
   if (!element->renderer() || !data.multiple())
@@ -611,10 +619,9 @@ void SelectElement::menuListDefaultEventHandler(SelectElementData& data,
     // the select element
     // when the user hits any of the arrow keys, instead of changing the
     // selection.
-    if (Frame* frame = element->document()->frame()) {
-      if (frame->settings() && frame->settings()->isSpatialNavigationEnabled())
+    if (isSpatialNavigationEnabled(element->document()->frame()))
+      if (!data.activeSelectionState())
         return;
-    }
 
     UNUSED_PARAM(htmlForm);
     const Vector<Element*>& listItems = data.listItems(element);
@@ -707,6 +714,12 @@ void SelectElement::menuListDefaultEventHandler(SelectElementData& data,
       // handler.
       setSelectedIndex(data, element,
                        listToOptionIndex(data, element, listIndex), true, true);
+      handled = true;
+    } else if (keyCode == ' ' &&
+               isSpatialNavigationEnabled(element->document()->frame())) {
+      // Use space to trigger arrow key handling for selection change or spatial
+      // navigation.
+      data.setActiveSelectionState(!data.activeSelectionState());
       handled = true;
     }
 #endif
@@ -859,16 +872,12 @@ void SelectElement::listBoxDefaultEventHandler(SelectElementData& data,
                                                data.activeSelectionEndIndex());
     }
 
-    if (Frame* frame = element->document()->frame()) {
-      if (frame->settings() &&
-          frame->settings()->isSpatialNavigationEnabled()) {
-        // Check if the selection moves to the boundary.
-        if (keyIdentifier == "Left" || keyIdentifier == "Right" ||
-            ((keyIdentifier == "Down" || keyIdentifier == "Up") &&
-             endIndex == data.activeSelectionEndIndex()))
-          return;
-      }
-    }
+    if (isSpatialNavigationEnabled(element->document()->frame()))
+      // Check if the selection moves to the boundary.
+      if (keyIdentifier == "Left" || keyIdentifier == "Right" ||
+          ((keyIdentifier == "Down" || keyIdentifier == "Up") &&
+           endIndex == data.activeSelectionEndIndex()))
+        return;
 
     if (keyIdentifier == "Down" || keyIdentifier == "Up") {
       // Save the selection so it can be compared to the new selection when
