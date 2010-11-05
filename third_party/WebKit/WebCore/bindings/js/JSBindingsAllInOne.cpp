@@ -85,6 +85,7 @@
 #include "JSHTMLInputElementCustom.cpp"
 #include "JSHTMLObjectElementCustom.cpp"
 #include "JSHTMLOptionsCollectionCustom.cpp"
+#include "JSHTMLOutputElementCustom.cpp"
 #include "JSHTMLSelectElementCustom.cpp"
 #include "JSHistoryCustom.cpp"
 #include "JSImageConstructor.cpp"

@@ -40,7 +40,7 @@ v8::Handle<v8::Value> V8DOMSettableTokenList::indexedPropertyGetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.DOMSettableTokenList.IndexedPropertyGetter");
   DOMSettableTokenList* list = V8DOMSettableTokenList::toNative(info.Holder());
-  return v8String(list->item(index));
+  return v8StringOrNull(list->item(index));
 }
 
 }  // namespace WebCore
