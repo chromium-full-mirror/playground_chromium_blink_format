@@ -52,10 +52,6 @@ class WebIDBTransaction {
   }
   virtual void abort() { WEBKIT_ASSERT_NOT_REACHED(); }
   virtual void didCompleteTaskEvents() { WEBKIT_ASSERT_NOT_REACHED(); }
-  virtual int id() const {
-    WEBKIT_ASSERT_NOT_REACHED();
-    return 0;
-  }
   virtual void setCallbacks(WebIDBTransactionCallbacks*) {
     WEBKIT_ASSERT_NOT_REACHED();
   }

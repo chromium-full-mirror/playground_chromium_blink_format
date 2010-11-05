@@ -34,7 +34,7 @@
 #include "IDBFactoryBackendImpl.h"
 #include "IDBObjectStoreBackendImpl.h"
 #include "IDBSQLiteDatabase.h"
-#include "IDBTransactionBackendInterface.h"
+#include "IDBTransactionBackendImpl.h"
 #include "IDBTransactionCoordinator.h"
 #include "SQLiteStatement.h"
 #include "SQLiteTransaction.h"
@@ -268,7 +268,7 @@ void IDBDatabaseBackendImpl::setVersion(const String& version,
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
   RefPtr<DOMStringList> objectStores = DOMStringList::create();
   RefPtr<IDBTransactionBackendInterface> transaction =
-      m_transactionCoordinator->createTransaction(
+      IDBTransactionBackendImpl::create(
           objectStores.get(), IDBTransaction::VERSION_CHANGE, 0, this);
   if (!transaction->scheduleTask(
           createCallbackTask(&IDBDatabaseBackendImpl::setVersionInternal,
@@ -306,8 +306,7 @@ PassRefPtr<IDBTransactionBackendInterface> IDBDatabaseBackendImpl::transaction(
     unsigned long timeout,
     ExceptionCode&) {
   // FIXME: Return not allowed err if close has been called.
-  return m_transactionCoordinator->createTransaction(objectStores, mode,
-                                                     timeout, this);
+  return IDBTransactionBackendImpl::create(objectStores, mode, timeout, this);
 }
 
 void IDBDatabaseBackendImpl::close() {

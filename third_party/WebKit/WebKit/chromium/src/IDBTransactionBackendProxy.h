@@ -52,7 +52,6 @@ class IDBTransactionBackendProxy : public IDBTransactionBackendInterface {
   virtual bool scheduleTask(PassOwnPtr<ScriptExecutionContext::Task>,
                             PassOwnPtr<ScriptExecutionContext::Task>);
   virtual void didCompleteTaskEvents();
-  virtual int id() const;
   virtual void setCallbacks(IDBTransactionCallbacks*);
 
   WebKit::WebIDBTransaction* getWebIDBTransaction() const {

@@ -38,29 +38,34 @@ PassRefPtr<IDBTransactionBackendImpl> IDBTransactionBackendImpl::create(
     DOMStringList* objectStores,
     unsigned short mode,
     unsigned long timeout,
-    int id,
     IDBDatabaseBackendImpl* database) {
   return adoptRef(
-      new IDBTransactionBackendImpl(objectStores, mode, timeout, id, database));
+      new IDBTransactionBackendImpl(objectStores, mode, timeout, database));
 }
 
 IDBTransactionBackendImpl::IDBTransactionBackendImpl(
     DOMStringList* objectStores,
     unsigned short mode,
     unsigned long timeout,
-    int id,
     IDBDatabaseBackendImpl* database)
     : m_objectStoreNames(objectStores),
       m_mode(mode),
       m_timeout(timeout)  // FIXME: Implement timeout.
       ,
-      m_id(id),
       m_state(Unused),
       m_database(database),
       m_transaction(new SQLiteTransaction(database->sqliteDatabase())),
       m_taskTimer(this, &IDBTransactionBackendImpl::taskTimerFired),
       m_taskEventTimer(this, &IDBTransactionBackendImpl::taskEventTimerFired),
-      m_pendingEvents(0) {}
+      m_pendingEvents(0) {
+  m_database->transactionCoordinator()->didCreateTransaction(this);
+}
+
+IDBTransactionBackendImpl::~IDBTransactionBackendImpl() {
+  // It shouldn't be possible for this object to get deleted until it's either
+  // complete or aborted.
+  ASSERT(m_state == Finished);
+}
 
 PassRefPtr<IDBObjectStoreBackendInterface>
 IDBTransactionBackendImpl::objectStore(const String& name) {
@@ -104,6 +109,8 @@ void IDBTransactionBackendImpl::abort() {
 
   m_callbacks->onAbort();
   m_database->transactionCoordinator()->didFinishTransaction(this);
+  ASSERT(!m_database->transactionCoordinator()->isActive(this));
+  m_database = 0;
 }
 
 void IDBTransactionBackendImpl::didCompleteTaskEvents() {
@@ -139,6 +146,7 @@ void IDBTransactionBackendImpl::commit() {
   m_transaction->commit();
   m_callbacks->onComplete();
   m_database->transactionCoordinator()->didFinishTransaction(this);
+  m_database = 0;
 }
 
 void IDBTransactionBackendImpl::taskTimerFired(

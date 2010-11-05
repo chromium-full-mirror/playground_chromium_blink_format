@@ -46,9 +46,8 @@ class IDBTransactionBackendImpl : public IDBTransactionBackendInterface {
       DOMStringList* objectStores,
       unsigned short mode,
       unsigned long timeout,
-      int id,
       IDBDatabaseBackendImpl*);
-  virtual ~IDBTransactionBackendImpl() { abort(); }
+  virtual ~IDBTransactionBackendImpl();
 
   virtual PassRefPtr<IDBObjectStoreBackendInterface> objectStore(
       const String& name);
@@ -57,7 +56,6 @@ class IDBTransactionBackendImpl : public IDBTransactionBackendInterface {
                             PassOwnPtr<ScriptExecutionContext::Task> abortTask);
   virtual void didCompleteTaskEvents();
   virtual void abort();
-  virtual int id() const { return m_id; }
   virtual void setCallbacks(IDBTransactionCallbacks* callbacks) {
     m_callbacks = callbacks;
   }
@@ -68,7 +66,6 @@ class IDBTransactionBackendImpl : public IDBTransactionBackendInterface {
   IDBTransactionBackendImpl(DOMStringList* objectStores,
                             unsigned short mode,
                             unsigned long timeout,
-                            int id,
                             IDBDatabaseBackendImpl*);
 
   enum State {
@@ -87,7 +84,6 @@ class IDBTransactionBackendImpl : public IDBTransactionBackendInterface {
   RefPtr<DOMStringList> m_objectStoreNames;
   unsigned short m_mode;
   unsigned long m_timeout;
-  int m_id;
 
   State m_state;
   RefPtr<IDBTransactionCallbacks> m_callbacks;
