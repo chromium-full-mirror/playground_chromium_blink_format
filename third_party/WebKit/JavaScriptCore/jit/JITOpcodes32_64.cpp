@@ -1690,7 +1690,7 @@ void JIT::emit_op_convert_this_strict(Instruction* currentInstruction) {
   Jump isImmediate = branch32(NotEqual, regT1, Imm32(JSValue::CellTag));
   loadPtr(Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)), regT2);
   Jump notAnObject = branch8(
-      NotEqual, Address(regT3, OBJECT_OFFSETOF(Structure, m_typeInfo.m_type)),
+      NotEqual, Address(regT2, OBJECT_OFFSETOF(Structure, m_typeInfo.m_type)),
       Imm32(ObjectType));
   addSlowCase(branchTest8(
       NonZero, Address(regT2, OBJECT_OFFSETOF(Structure, m_typeInfo.m_flags)),
