@@ -1075,7 +1075,7 @@ void webkit_web_frame_suspend_animations(WebKitWebFrame* frame) {
   if (!coreFrame)
     return;
 
-  frame->suspendAnimations();
+  coreFrame->suspendAnimations();
 }
 
 void webkit_web_frame_resume_animations(WebKitWebFrame* frame) {
@@ -1083,7 +1083,7 @@ void webkit_web_frame_resume_animations(WebKitWebFrame* frame) {
   if (!coreFrame)
     return;
 
-  frame->resumeAnimations();
+  coreFrame->resumeAnimations();
 }
 
 gchar* webkit_web_frame_get_response_mime_type(WebKitWebFrame* frame) {
