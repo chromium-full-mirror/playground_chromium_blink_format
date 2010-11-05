@@ -368,7 +368,7 @@ SimpleFontData* FontCache::getLastResortFallbackFont(
       AtomicString("Tahoma"), AtomicString("Lucida Sans Unicode"),
       AtomicString("Arial")};
   SimpleFontData* simpleFont;
-  for (int i = 0; i < ARRAYSIZE(fallbackFonts); ++i) {
+  for (size_t i = 0; i < WTF_ARRAY_LENGTH(fallbackFonts); ++i) {
     if (simpleFont = getCachedFontData(fontDescription, fallbackFonts[i])) {
       fallbackFontName = fallbackFonts[i];
       return simpleFont;

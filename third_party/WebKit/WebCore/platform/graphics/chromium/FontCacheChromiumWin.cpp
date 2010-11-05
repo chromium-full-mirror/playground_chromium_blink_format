@@ -401,10 +401,10 @@ const SimpleFontData* FontCache::getFontDataForCharacters(
   int numFonts = 0;
   if (script == USCRIPT_HAN) {
     panUniFonts = cjkFonts;
-    numFonts = ARRAYSIZE(cjkFonts);
+    numFonts = WTF_ARRAY_LENGTH(cjkFonts);
   } else {
     panUniFonts = commonFonts;
-    numFonts = ARRAYSIZE(commonFonts);
+    numFonts = WTF_ARRAY_LENGTH(commonFonts);
   }
   // Font returned from GetFallbackFamily may not cover |characters|
   // because it's based on script to font mapping. This problem is

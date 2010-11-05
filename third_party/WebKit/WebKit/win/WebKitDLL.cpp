@@ -75,7 +75,7 @@ DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID /*lpReserved*/) {
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv) {
   bool found = false;
-  for (int i = 0; i < ARRAYSIZE(gRegCLSIDs); i++) {
+  for (size_t i = 0; i < WTF_ARRAY_LENGTH(gRegCLSIDs); ++i) {
     if (IsEqualGUID(rclsid, gRegCLSIDs[i])) {
       found = true;
       break;

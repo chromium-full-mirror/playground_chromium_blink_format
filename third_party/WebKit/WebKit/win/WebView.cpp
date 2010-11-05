@@ -1733,9 +1733,10 @@ bool WebView::mouseWheel(WPARAM wParam, LPARAM lParam, bool isMouseHWheel) {
     TCHAR className[256];
 
     // Make sure truncation won't affect the comparison.
-    ASSERT(ARRAYSIZE(className) > _tcslen(PopupMenuWin::popupClassName()));
+    ASSERT(WTF_ARRAY_LENGTH(className) >
+           _tcslen(PopupMenuWin::popupClassName()));
 
-    if (GetClassName(focusedWindow, className, ARRAYSIZE(className)) &&
+    if (GetClassName(focusedWindow, className, WTF_ARRAY_LENGTH(className)) &&
         !_tcscmp(className, PopupMenuWin::popupClassName())) {
       // We don't let the WebView scroll here for two reasons - 1) To match
       // Firefox behavior, 2) If we do scroll, we lose the
@@ -2459,7 +2460,7 @@ static String webKitVersion() {
   } * lpTranslate;
 
   TCHAR path[MAX_PATH];
-  GetModuleFileName(gInstance, path, ARRAYSIZE(path));
+  GetModuleFileName(gInstance, path, WTF_ARRAY_LENGTH(path));
   DWORD handle;
   DWORD versionSize = GetFileVersionInfoSize(path, &handle);
   if (!versionSize)
@@ -2474,7 +2475,7 @@ static String webKitVersion() {
                      (LPVOID*)&lpTranslate, &cbTranslate))
     goto exit;
   TCHAR key[256];
-  _stprintf_s(key, ARRAYSIZE(key),
+  _stprintf_s(key, WTF_ARRAY_LENGTH(key),
               TEXT("\\StringFileInfo\\%04x%04x\\ProductVersion"),
               lpTranslate[0].wLanguage, lpTranslate[0].wCodePage);
   LPCTSTR productVersion;
