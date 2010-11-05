@@ -4,7 +4,8 @@
  *           (C) 1998 Waldo Bastian (bastian@kde.org)
  *           (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  * Copyright (C) 2006 Alexey Proskuryakov (ap@nypop.com)
  *
  * This library is free software; you can redistribute it and/or
@@ -43,12 +44,12 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-static inline void setRowHeightToRowStyleHeightIfNotRelative(
+static inline void setRowLogicalHeightToRowStyleLogicalHeightIfNotRelative(
     RenderTableSection::RowStruct* row) {
   ASSERT(row && row->rowRenderer);
-  row->height = row->rowRenderer->style()->height();
-  if (row->height.isRelative())
-    row->height = Length();
+  row->logicalHeight = row->rowRenderer->style()->logicalHeight();
+  if (row->logicalHeight.isRelative())
+    row->logicalHeight = Length();
 }
 
 RenderTableSection::RenderTableSection(Node* node)
@@ -56,10 +57,10 @@ RenderTableSection::RenderTableSection(Node* node)
       m_gridRows(0),
       m_cCol(0),
       m_cRow(-1),
-      m_outerBorderLeft(0),
-      m_outerBorderRight(0),
-      m_outerBorderTop(0),
-      m_outerBorderBottom(0),
+      m_outerBorderStart(0),
+      m_outerBorderEnd(0),
+      m_outerBorderBefore(0),
+      m_outerBorderAfter(0),
       m_needsCellRecalc(false),
       m_hasOverflowingCell(false),
       m_hasMultipleCellLevels(false) {
@@ -134,7 +135,7 @@ void RenderTableSection::addChild(RenderObject* child,
   m_grid[m_cRow].rowRenderer = toRenderTableRow(child);
 
   if (!beforeChild)
-    setRowHeightToRowStyleHeightIfNotRelative(&m_grid[m_cRow]);
+    setRowLogicalHeightToRowStyleLogicalHeightIfNotRelative(&m_grid[m_cRow]);
 
   // If the next renderer is actually wrapped in an anonymous table row, we need
   // to go up and find that.
@@ -165,7 +166,7 @@ bool RenderTableSection::ensureRows(int numRows) {
       m_grid[r].row = new Row(nCols);
       m_grid[r].rowRenderer = 0;
       m_grid[r].baseline = 0;
-      m_grid[r].height = Length();
+      m_grid[r].logicalHeight = Length();
     }
   }
 
@@ -191,20 +192,22 @@ void RenderTableSection::addCell(RenderTableCell* cell, RenderTableRow* row) {
 
   if (rSpan == 1) {
     // we ignore height settings on rowspan cells
-    Length height = cell->style()->height();
-    if (height.isPositive() || (height.isRelative() && height.value() >= 0)) {
-      Length cRowHeight = m_grid[m_cRow].height;
-      switch (height.type()) {
+    Length logicalHeight = cell->style()->logicalHeight();
+    if (logicalHeight.isPositive() ||
+        (logicalHeight.isRelative() && logicalHeight.value() >= 0)) {
+      Length cRowLogicalHeight = m_grid[m_cRow].logicalHeight;
+      switch (logicalHeight.type()) {
         case Percent:
-          if (!(cRowHeight.isPercent()) ||
-              (cRowHeight.isPercent() &&
-               cRowHeight.rawValue() < height.rawValue()))
-            m_grid[m_cRow].height = height;
+          if (!(cRowLogicalHeight.isPercent()) ||
+              (cRowLogicalHeight.isPercent() &&
+               cRowLogicalHeight.rawValue() < logicalHeight.rawValue()))
+            m_grid[m_cRow].logicalHeight = logicalHeight;
           break;
         case Fixed:
-          if (cRowHeight.type() < Percent ||
-              (cRowHeight.isFixed() && cRowHeight.value() < height.value()))
-            m_grid[m_cRow].height = height;
+          if (cRowLogicalHeight.type() < Percent ||
+              (cRowLogicalHeight.isFixed() &&
+               cRowLogicalHeight.value() < logicalHeight.value()))
+            m_grid[m_cRow].logicalHeight = logicalHeight;
           break;
         case Relative:
         default:
@@ -250,7 +253,7 @@ void RenderTableSection::addCell(RenderTableCell* cell, RenderTableRow* row) {
   cell->setCol(table()->effColToCol(col));
 }
 
-void RenderTableSection::setCellWidths() {
+void RenderTableSection::setCellLogicalWidths() {
   Vector<int>& columnPos = table()->columnPositions();
 
   LayoutStateMaintainer statePusher(view());
@@ -271,8 +274,8 @@ void RenderTableSection::setCellWidths() {
         endCol++;
       }
       int w = columnPos[endCol] - columnPos[j] - table()->hBorderSpacing();
-      int oldWidth = cell->width();
-      if (w != oldWidth) {
+      int oldLogicalWidth = cell->logicalWidth();
+      if (w != oldLogicalWidth) {
         cell->setNeedsLayout(true);
         if (!table()->selfNeedsLayout() &&
             cell->checkForRepaintDuringLayout()) {
@@ -291,7 +294,7 @@ void RenderTableSection::setCellWidths() {
   statePusher.pop();  // only pops if we pushed
 }
 
-int RenderTableSection::calcRowHeight() {
+int RenderTableSection::calcRowLogicalHeight() {
 #ifndef NDEBUG
   setNeedsLayoutIsForbidden(true);
 #endif
@@ -312,7 +315,7 @@ int RenderTableSection::calcRowHeight() {
     m_grid[r].baseline = 0;
     int baseline = 0;
     int bdesc = 0;
-    int ch = m_grid[r].height.calcMinValue(0);
+    int ch = m_grid[r].logicalHeight.calcMinValue(0);
     int pos = m_rowPos[r] + ch + (m_grid[r].rowRenderer ? spacing : 0);
 
     m_rowPos[r + 1] = max(m_rowPos[r + 1], pos);
@@ -343,22 +346,23 @@ int RenderTableSection::calcRowHeight() {
         cell->layoutIfNeeded();
       }
 
-      int adjustedPaddingTop =
-          cell->paddingTop() - cell->intrinsicPaddingBefore();
-      int adjustedPaddingBottom =
-          cell->paddingBottom() - cell->intrinsicPaddingAfter();
-      int adjustedHeight = cell->height() - (cell->intrinsicPaddingBefore() +
-                                             cell->intrinsicPaddingAfter());
+      int adjustedPaddingBefore =
+          cell->paddingBefore() - cell->intrinsicPaddingBefore();
+      int adjustedPaddingAfter =
+          cell->paddingAfter() - cell->intrinsicPaddingAfter();
+      int adjustedLogicalHeight =
+          cell->logicalHeight() -
+          (cell->intrinsicPaddingBefore() + cell->intrinsicPaddingAfter());
 
       // Explicit heights use the border box in quirks mode.  In strict mode do
       // the right
       // thing and actually add in the border and padding.
-      ch = cell->style()->height().calcValue(0) +
+      ch = cell->style()->logicalHeight().calcValue(0) +
            (document()->inQuirksMode()
                 ? 0
-                : (adjustedPaddingTop + adjustedPaddingBottom +
-                   cell->borderTop() + cell->borderBottom()));
-      ch = max(ch, adjustedHeight);
+                : (adjustedPaddingBefore + adjustedPaddingAfter +
+                   cell->borderBefore() + cell->borderAfter()));
+      ch = max(ch, adjustedLogicalHeight);
 
       pos = m_rowPos[indx] + ch + (m_grid[r].rowRenderer ? spacing : 0);
 
@@ -369,7 +373,7 @@ int RenderTableSection::calcRowHeight() {
       if (va == BASELINE || va == TEXT_BOTTOM || va == TEXT_TOP ||
           va == SUPER || va == SUB) {
         int b = cell->baselinePosition();
-        if (b > cell->borderTop() + cell->paddingTop()) {
+        if (b > cell->borderBefore() + cell->paddingBefore()) {
           baseline = max(baseline, b - cell->intrinsicPaddingBefore());
           bdesc = max(bdesc, m_rowPos[indx] + ch -
                                  (b - cell->intrinsicPaddingBefore()));
@@ -427,7 +431,7 @@ int RenderTableSection::layoutRows(int toAdd) {
   int totalRows = m_gridRows;
 
   // Set the width of our section now.  The rows will also be this width.
-  setWidth(table()->contentWidth());
+  setLogicalWidth(table()->contentLogicalWidth());
   m_overflow.clear();
   m_hasOverflowingCell = false;
 
@@ -438,10 +442,10 @@ int RenderTableSection::layoutRows(int toAdd) {
     int totalPercent = 0;
     int numAuto = 0;
     for (int r = 0; r < totalRows; r++) {
-      if (m_grid[r].height.isAuto())
+      if (m_grid[r].logicalHeight.isAuto())
         numAuto++;
-      else if (m_grid[r].height.isPercent())
-        totalPercent += m_grid[r].height.rawValue();
+      else if (m_grid[r].logicalHeight.isPercent())
+        totalPercent += m_grid[r].logicalHeight.rawValue();
     }
     if (totalPercent) {
       // try to satisfy percent
@@ -449,17 +453,18 @@ int RenderTableSection::layoutRows(int toAdd) {
       totalPercent = min(totalPercent, 100 * percentScaleFactor);
       int rh = m_rowPos[1] - m_rowPos[0];
       for (int r = 0; r < totalRows; r++) {
-        if (totalPercent > 0 && m_grid[r].height.isPercent()) {
-          int toAdd = min(dh, (totalHeight * m_grid[r].height.rawValue() /
-                               (100 * percentScaleFactor)) -
-                                  rh);
+        if (totalPercent > 0 && m_grid[r].logicalHeight.isPercent()) {
+          int toAdd =
+              min(dh, (totalHeight * m_grid[r].logicalHeight.rawValue() /
+                       (100 * percentScaleFactor)) -
+                          rh);
           // If toAdd is negative, then we don't want to shrink the row (this
           // bug
           // affected Outlook Web Access).
           toAdd = max(0, toAdd);
           add += toAdd;
           dh -= toAdd;
-          totalPercent -= m_grid[r].height.rawValue();
+          totalPercent -= m_grid[r].logicalHeight.rawValue();
         }
         if (r < totalRows - 1)
           rh = m_rowPos[r + 2] - m_rowPos[r + 1];
@@ -470,7 +475,7 @@ int RenderTableSection::layoutRows(int toAdd) {
       // distribute over variable cols
       int add = 0;
       for (int r = 0; r < totalRows; r++) {
-        if (numAuto > 0 && m_grid[r].height.isAuto()) {
+        if (numAuto > 0 && m_grid[r].logicalHeight.isAuto()) {
           int toAdd = dh / numAuto;
           add += toAdd;
           dh -= toAdd;
@@ -503,8 +508,8 @@ int RenderTableSection::layoutRows(int toAdd) {
     // Set the row's x/y position and width/height.
     if (RenderTableRow* rowRenderer = m_grid[r].rowRenderer) {
       rowRenderer->setLocation(0, m_rowPos[r]);
-      rowRenderer->setWidth(width());
-      rowRenderer->setHeight(m_rowPos[r + 1] - m_rowPos[r] - vspacing);
+      rowRenderer->setLogicalWidth(logicalWidth());
+      rowRenderer->setLogicalHeight(m_rowPos[r + 1] - m_rowPos[r] - vspacing);
     }
 
     for (int c = 0; c < nEffCols; c++) {
@@ -534,12 +539,12 @@ int RenderTableSection::layoutRows(int toAdd) {
       // discover new
       // bugs. :)
       bool cellChildrenFlex = false;
-      bool flexAllChildren =
-          cell->style()->height().isFixed() ||
-          (!table()->style()->height().isAuto() && rHeight != cell->height());
+      bool flexAllChildren = cell->style()->logicalHeight().isFixed() ||
+                             (!table()->style()->logicalHeight().isAuto() &&
+                              rHeight != cell->logicalHeight());
 
       for (RenderObject* o = cell->firstChild(); o; o = o->nextSibling()) {
-        if (!o->isText() && o->style()->height().isPercent() &&
+        if (!o->isText() && o->style()->logicalHeight().isPercent() &&
             (flexAllChildren || o->isReplaced() ||
              (o->isBox() && toRenderBox(o)->scrollsOverflow()))) {
           // Tables with no sections do not flex.
@@ -579,8 +584,8 @@ int RenderTableSection::layoutRows(int toAdd) {
         // height, which becomes irrelevant once the cell has
         // been resized based off its percentage.
         cell->setOverrideSize(
-            max(0, rHeight - cell->borderTop() - cell->paddingTop() -
-                       cell->borderBottom() - cell->paddingBottom()));
+            max(0, rHeight - cell->borderBefore() - cell->paddingBefore() -
+                       cell->borderAfter() - cell->paddingAfter()));
         cell->layoutIfNeeded();
 
         // If the baseline moved, we may have to update the data for our row.
@@ -589,16 +594,18 @@ int RenderTableSection::layoutRows(int toAdd) {
         if (va == BASELINE || va == TEXT_BOTTOM || va == TEXT_TOP ||
             va == SUPER || va == SUB) {
           int b = cell->baselinePosition();
-          if (b > cell->borderTop() + cell->paddingTop())
+          if (b > cell->borderBefore() + cell->paddingBefore())
             m_grid[r].baseline = max(m_grid[r].baseline, b);
         }
       }
 
-      int oldTe = cell->intrinsicPaddingBefore();
-      int oldBe = cell->intrinsicPaddingAfter();
-      int heightWithoutIntrinsicPadding = cell->height() - oldTe - oldBe;
+      int oldIntrinsicPaddingBefore = cell->intrinsicPaddingBefore();
+      int oldIntrinsicPaddingAfter = cell->intrinsicPaddingAfter();
+      int logicalHeightWithoutIntrinsicPadding = cell->logicalHeight() -
+                                                 oldIntrinsicPaddingBefore -
+                                                 oldIntrinsicPaddingAfter;
 
-      int te = 0;
+      int intrinsicPaddingBefore = 0;
       switch (cell->style()->verticalAlign()) {
         case SUB:
         case SUPER:
@@ -606,42 +613,48 @@ int RenderTableSection::layoutRows(int toAdd) {
         case TEXT_BOTTOM:
         case BASELINE: {
           int b = cell->baselinePosition();
-          if (b > cell->borderTop() + cell->paddingTop())
-            te = getBaseline(r) - (b - oldTe);
+          if (b > cell->borderBefore() + cell->paddingBefore())
+            intrinsicPaddingBefore =
+                getBaseline(r) - (b - oldIntrinsicPaddingBefore);
           break;
         }
         case TOP:
-          te = 0;
           break;
         case MIDDLE:
-          te = (rHeight - heightWithoutIntrinsicPadding) / 2;
+          intrinsicPaddingBefore =
+              (rHeight - logicalHeightWithoutIntrinsicPadding) / 2;
           break;
         case BOTTOM:
-          te = rHeight - heightWithoutIntrinsicPadding;
+          intrinsicPaddingBefore =
+              rHeight - logicalHeightWithoutIntrinsicPadding;
           break;
         default:
           break;
       }
 
-      int be = rHeight - heightWithoutIntrinsicPadding - te;
-      cell->setIntrinsicPaddingBefore(te);
-      cell->setIntrinsicPaddingAfter(be);
+      int intrinsicPaddingAfter = rHeight -
+                                  logicalHeightWithoutIntrinsicPadding -
+                                  intrinsicPaddingBefore;
+      cell->setIntrinsicPaddingBefore(intrinsicPaddingBefore);
+      cell->setIntrinsicPaddingAfter(intrinsicPaddingAfter);
 
       IntRect oldCellRect(cell->x(), cell->y(), cell->width(), cell->height());
 
       if (!style()->isLeftToRightDirection())
-        cell->setLocation(table()->columnPositions()[nEffCols] -
-                              table()->columnPositions()[table()->colToEffCol(
-                                  cell->col() + cell->colSpan())] +
-                              hspacing,
-                          m_rowPos[rindx]);
+        cell->setLogicalLocation(
+            table()->columnPositions()[nEffCols] -
+                table()->columnPositions()[table()->colToEffCol(
+                    cell->col() + cell->colSpan())] +
+                hspacing,
+            m_rowPos[rindx]);
       else
-        cell->setLocation(table()->columnPositions()[c] + hspacing,
-                          m_rowPos[rindx]);
+        cell->setLogicalLocation(table()->columnPositions()[c] + hspacing,
+                                 m_rowPos[rindx]);
       view()->addLayoutDelta(
           IntSize(oldCellRect.x() - cell->x(), oldCellRect.y() - cell->y()));
 
-      if (te != oldTe || be != oldBe)
+      if (intrinsicPaddingBefore != oldIntrinsicPaddingBefore ||
+          intrinsicPaddingAfter != oldIntrinsicPaddingAfter)
         cell->setNeedsLayout(true, false);
 
       if (!cell->needsLayout() && view()->layoutState()->m_pageHeight &&
@@ -650,7 +663,9 @@ int RenderTableSection::layoutRows(int toAdd) {
 
       cell->layoutIfNeeded();
 
-      if (view()->layoutState()->m_pageHeight && cell->height() != rHeight)
+      // FIXME: Make pagination work with vertical tables.
+      if (style()->isHorizontalWritingMode() &&
+          view()->layoutState()->m_pageHeight && cell->height() != rHeight)
         cell->setHeight(rHeight);  // FIXME: Pagination might have made us
                                    // change size.  For now just shrink or grow
                                    // the cell to fit without doing a relayout.
@@ -677,7 +692,7 @@ int RenderTableSection::layoutRows(int toAdd) {
 
   ASSERT(!needsLayout());
 
-  setHeight(m_rowPos[totalRows]);
+  setLogicalHeight(m_rowPos[totalRows]);
 
   // Now that our height has been determined, add in overflow from cells.
   for (int r = 0; r < totalRows; r++) {
@@ -785,20 +800,20 @@ int RenderTableSection::leftmostPosition(bool includeOverflowInterior,
   return left;
 }
 
-int RenderTableSection::calcOuterBorderTop() const {
+int RenderTableSection::calcOuterBorderBefore() const {
   int totalCols = table()->numEffCols();
   if (!m_gridRows || !totalCols)
     return 0;
 
   unsigned borderWidth = 0;
 
-  const BorderValue& sb = style()->borderTop();
+  const BorderValue& sb = style()->borderBefore();
   if (sb.style() == BHIDDEN)
     return -1;
   if (sb.style() > BHIDDEN)
     borderWidth = sb.width();
 
-  const BorderValue& rb = firstChild()->style()->borderTop();
+  const BorderValue& rb = firstChild()->style()->borderBefore();
   if (rb.style() == BHIDDEN)
     return -1;
   if (rb.style() > BHIDDEN && rb.width() > borderWidth)
@@ -809,11 +824,15 @@ int RenderTableSection::calcOuterBorderTop() const {
     const CellStruct& current = cellAt(0, c);
     if (current.inColSpan || !current.hasCells())
       continue;
-    const BorderValue& cb = current.primaryCell()->style()->borderTop();
+    const BorderValue& cb =
+        current.primaryCell()->style()->borderBefore();  // FIXME: Make this
+                                                         // work with
+                                                         // perpendicular and
+                                                         // flipped cells.
     // FIXME: Don't repeat for the same col group
     RenderTableCol* colGroup = table()->colElement(c);
     if (colGroup) {
-      const BorderValue& gb = colGroup->style()->borderTop();
+      const BorderValue& gb = colGroup->style()->borderBefore();
       if (gb.style() == BHIDDEN || cb.style() == BHIDDEN)
         continue;
       allHidden = false;
@@ -835,20 +854,20 @@ int RenderTableSection::calcOuterBorderTop() const {
   return borderWidth / 2;
 }
 
-int RenderTableSection::calcOuterBorderBottom() const {
+int RenderTableSection::calcOuterBorderAfter() const {
   int totalCols = table()->numEffCols();
   if (!m_gridRows || !totalCols)
     return 0;
 
   unsigned borderWidth = 0;
 
-  const BorderValue& sb = style()->borderBottom();
+  const BorderValue& sb = style()->borderAfter();
   if (sb.style() == BHIDDEN)
     return -1;
   if (sb.style() > BHIDDEN)
     borderWidth = sb.width();
 
-  const BorderValue& rb = lastChild()->style()->borderBottom();
+  const BorderValue& rb = lastChild()->style()->borderAfter();
   if (rb.style() == BHIDDEN)
     return -1;
   if (rb.style() > BHIDDEN && rb.width() > borderWidth)
@@ -859,11 +878,14 @@ int RenderTableSection::calcOuterBorderBottom() const {
     const CellStruct& current = cellAt(m_gridRows - 1, c);
     if (current.inColSpan || !current.hasCells())
       continue;
-    const BorderValue& cb = current.primaryCell()->style()->borderBottom();
+    const BorderValue& cb =
+        current.primaryCell()->style()->borderAfter();  // FIXME: Make this work
+                                                        // with perpendicular
+                                                        // and flipped cells.
     // FIXME: Don't repeat for the same col group
     RenderTableCol* colGroup = table()->colElement(c);
     if (colGroup) {
-      const BorderValue& gb = colGroup->style()->borderBottom();
+      const BorderValue& gb = colGroup->style()->borderAfter();
       if (gb.style() == BHIDDEN || cb.style() == BHIDDEN)
         continue;
       allHidden = false;
@@ -885,23 +907,21 @@ int RenderTableSection::calcOuterBorderBottom() const {
   return (borderWidth + 1) / 2;
 }
 
-int RenderTableSection::calcOuterBorderLeft(bool rtl) const {
+int RenderTableSection::calcOuterBorderStart() const {
   int totalCols = table()->numEffCols();
   if (!m_gridRows || !totalCols)
     return 0;
 
   unsigned borderWidth = 0;
 
-  const BorderValue& sb = style()->borderLeft();
+  const BorderValue& sb = style()->borderStart();
   if (sb.style() == BHIDDEN)
     return -1;
   if (sb.style() > BHIDDEN)
     borderWidth = sb.width();
 
-  int leftmostColumn = rtl ? totalCols - 1 : 0;
-  RenderTableCol* colGroup = table()->colElement(leftmostColumn);
-  if (colGroup) {
-    const BorderValue& gb = colGroup->style()->borderLeft();
+  if (RenderTableCol* colGroup = table()->colElement(0)) {
+    const BorderValue& gb = colGroup->style()->borderStart();
     if (gb.style() == BHIDDEN)
       return -1;
     if (gb.style() > BHIDDEN && gb.width() > borderWidth)
@@ -910,13 +930,16 @@ int RenderTableSection::calcOuterBorderLeft(bool rtl) const {
 
   bool allHidden = true;
   for (int r = 0; r < m_gridRows; r++) {
-    const CellStruct& current = cellAt(r, leftmostColumn);
+    const CellStruct& current = cellAt(r, 0);
     if (!current.hasCells())
       continue;
     // FIXME: Don't repeat for the same cell
-    const BorderValue& cb = current.primaryCell()->style()->borderLeft();
+    const BorderValue& cb =
+        current.primaryCell()->style()->borderStart();  // FIXME: Make this work
+                                                        // with perpendicular
+                                                        // and flipped cells.
     const BorderValue& rb =
-        current.primaryCell()->parent()->style()->borderLeft();
+        current.primaryCell()->parent()->style()->borderStart();
     if (cb.style() == BHIDDEN || rb.style() == BHIDDEN)
       continue;
     allHidden = false;
@@ -928,26 +951,25 @@ int RenderTableSection::calcOuterBorderLeft(bool rtl) const {
   if (allHidden)
     return -1;
 
-  return borderWidth / 2;
+  return (borderWidth + (table()->style()->isLeftToRightDirection() ? 0 : 1)) /
+         2;
 }
 
-int RenderTableSection::calcOuterBorderRight(bool rtl) const {
+int RenderTableSection::calcOuterBorderEnd() const {
   int totalCols = table()->numEffCols();
   if (!m_gridRows || !totalCols)
     return 0;
 
   unsigned borderWidth = 0;
 
-  const BorderValue& sb = style()->borderRight();
+  const BorderValue& sb = style()->borderEnd();
   if (sb.style() == BHIDDEN)
     return -1;
   if (sb.style() > BHIDDEN)
     borderWidth = sb.width();
 
-  int rightmostColumn = rtl ? 0 : totalCols - 1;
-  RenderTableCol* colGroup = table()->colElement(rightmostColumn);
-  if (colGroup) {
-    const BorderValue& gb = colGroup->style()->borderRight();
+  if (RenderTableCol* colGroup = table()->colElement(totalCols - 1)) {
+    const BorderValue& gb = colGroup->style()->borderEnd();
     if (gb.style() == BHIDDEN)
       return -1;
     if (gb.style() > BHIDDEN && gb.width() > borderWidth)
@@ -956,13 +978,16 @@ int RenderTableSection::calcOuterBorderRight(bool rtl) const {
 
   bool allHidden = true;
   for (int r = 0; r < m_gridRows; r++) {
-    const CellStruct& current = cellAt(r, rightmostColumn);
+    const CellStruct& current = cellAt(r, totalCols - 1);
     if (!current.hasCells())
       continue;
     // FIXME: Don't repeat for the same cell
-    const BorderValue& cb = current.primaryCell()->style()->borderRight();
+    const BorderValue& cb =
+        current.primaryCell()->style()->borderEnd();  // FIXME: Make this work
+                                                      // with perpendicular and
+                                                      // flipped cells.
     const BorderValue& rb =
-        current.primaryCell()->parent()->style()->borderRight();
+        current.primaryCell()->parent()->style()->borderEnd();
     if (cb.style() == BHIDDEN || rb.style() == BHIDDEN)
       continue;
     allHidden = false;
@@ -974,15 +999,15 @@ int RenderTableSection::calcOuterBorderRight(bool rtl) const {
   if (allHidden)
     return -1;
 
-  return (borderWidth + 1) / 2;
+  return (borderWidth + (table()->style()->isLeftToRightDirection() ? 1 : 0)) /
+         2;
 }
 
 void RenderTableSection::recalcOuterBorder() {
-  bool rtl = !table()->style()->isLeftToRightDirection();
-  m_outerBorderTop = calcOuterBorderTop();
-  m_outerBorderBottom = calcOuterBorderBottom();
-  m_outerBorderLeft = calcOuterBorderLeft(rtl);
-  m_outerBorderRight = calcOuterBorderRight(rtl);
+  m_outerBorderBefore = calcOuterBorderBefore();
+  m_outerBorderAfter = calcOuterBorderAfter();
+  m_outerBorderStart = calcOuterBorderStart();
+  m_outerBorderEnd = calcOuterBorderEnd();
 }
 
 int RenderTableSection::firstLineBoxBaseline() const {
@@ -1000,8 +1025,9 @@ int RenderTableSection::firstLineBoxBaseline() const {
     RenderTableCell* cell = cs.primaryCell();
     if (cell)
       firstLineBaseline =
-          max(firstLineBaseline, cell->y() + cell->paddingTop() +
-                                     cell->borderTop() + cell->contentHeight());
+          max(firstLineBaseline, cell->logicalTop() + cell->paddingBefore() +
+                                     cell->borderBefore() +
+                                     cell->contentLogicalHeight());
   }
 
   return firstLineBaseline;
@@ -1039,6 +1065,8 @@ void RenderTableSection::paintCell(RenderTableCell* cell,
                                    PaintInfo& paintInfo,
                                    int tx,
                                    int ty) {
+  IntPoint cellPoint = flipForWritingMode(cell, IntPoint(tx, ty),
+                                          ParentToChildFlippingAdjustment);
   PaintPhase paintPhase = paintInfo.phase;
   RenderTableRow* row = toRenderTableRow(cell->parent());
 
@@ -1060,21 +1088,25 @@ void RenderTableSection::paintCell(RenderTableCell* cell,
     // Note that we deliberately ignore whether or not the cell has a layer,
     // since these backgrounds paint "behind" the
     // cell.
-    cell->paintBackgroundsBehindCell(paintInfo, tx, ty, colGroup);
-    cell->paintBackgroundsBehindCell(paintInfo, tx, ty, col);
+    cell->paintBackgroundsBehindCell(paintInfo, cellPoint.x(), cellPoint.y(),
+                                     colGroup);
+    cell->paintBackgroundsBehindCell(paintInfo, cellPoint.x(), cellPoint.y(),
+                                     col);
 
     // Paint the row group next.
-    cell->paintBackgroundsBehindCell(paintInfo, tx, ty, this);
+    cell->paintBackgroundsBehindCell(paintInfo, cellPoint.x(), cellPoint.y(),
+                                     this);
 
     // Paint the row next, but only if it doesn't have a layer.  If a row has a
     // layer, it will be responsible for
     // painting the row background for the cell.
     if (!row->hasSelfPaintingLayer())
-      cell->paintBackgroundsBehindCell(paintInfo, tx, ty, row);
+      cell->paintBackgroundsBehindCell(paintInfo, cellPoint.x(), cellPoint.y(),
+                                       row);
   }
   if ((!cell->hasSelfPaintingLayer() && !row->hasSelfPaintingLayer()) ||
       paintInfo.phase == PaintPhaseCollapsedTableBorders)
-    cell->paint(paintInfo, tx, ty);
+    cell->paint(paintInfo, cellPoint.x(), cellPoint.y());
 }
 
 void RenderTableSection::paintObject(PaintInfo& paintInfo, int tx, int ty) {
@@ -1204,7 +1236,7 @@ void RenderTableSection::recalcCells() {
 
       RenderTableRow* tableRow = toRenderTableRow(row);
       m_grid[m_cRow].rowRenderer = tableRow;
-      setRowHeightToRowStyleHeightIfNotRelative(&m_grid[m_cRow]);
+      setRowLogicalHeightToRowStyleLogicalHeightIfNotRelative(&m_grid[m_cRow]);
 
       for (RenderObject* cell = row->firstChild(); cell;
            cell = cell->nextSibling()) {
