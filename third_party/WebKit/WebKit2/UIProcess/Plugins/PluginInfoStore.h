@@ -51,6 +51,8 @@ class PluginInfoStore {
     cpu_type_t pluginArchitecture;
     String bundleIdentifier;
     unsigned versionNumber;
+#elif PLATFORM(WIN)
+    uint64_t fileVersion;
 #endif
   };
 
@@ -82,8 +84,7 @@ class PluginInfoStore {
   // pluginsDirectories/pluginPathsInDirectory.
   static Vector<String> individualPluginPaths();
   static bool getPluginInfo(const String& pluginPath, Plugin& plugin);
-  static bool shouldUsePlugin(const Plugin& plugin,
-                              const Vector<Plugin>& loadedPlugins);
+  bool shouldUsePlugin(const Plugin& plugin);
   static String getMIMETypeForExtension(const String& extension);
 
   Vector<String> m_additionalPluginsDirectories;
