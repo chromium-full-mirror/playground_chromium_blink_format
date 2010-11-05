@@ -190,8 +190,20 @@ NPObject* PluginControllerProxy::windowScriptNPObject() {
 }
 
 NPObject* PluginControllerProxy::pluginElementNPObject() {
-  notImplemented();
-  return 0;
+  uint64_t pluginElementNPObjectID = 0;
+
+  if (!m_connection->connection()->sendSync(
+          Messages::PluginProxy::GetPluginElementNPObject(),
+          Messages::PluginProxy::GetPluginElementNPObject::Reply(
+              pluginElementNPObjectID),
+          m_pluginInstanceID))
+    return 0;
+
+  if (!pluginElementNPObjectID)
+    return 0;
+
+  return m_connection->npRemoteObjectMap()->createNPObjectProxy(
+      pluginElementNPObjectID);
 }
 
 bool PluginControllerProxy::evaluate(NPObject*,

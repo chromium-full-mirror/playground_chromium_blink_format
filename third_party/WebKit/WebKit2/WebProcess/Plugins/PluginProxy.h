@@ -136,6 +136,7 @@ class PluginProxy : public Plugin {
   void cookiesForURL(const String& urlString, String& cookieString);
   void setCookiesForURL(const String& urlString, const String& cookieString);
   void getWindowScriptNPObject(uint64_t& windowScriptNPObjectID);
+  void getPluginElementNPObject(uint64_t& pluginElementNPObjectID);
 
   RefPtr<PluginProcessConnection> m_connection;
   uint64_t m_pluginInstanceID;
