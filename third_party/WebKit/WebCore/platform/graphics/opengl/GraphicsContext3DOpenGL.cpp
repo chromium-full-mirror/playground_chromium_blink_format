@@ -609,15 +609,8 @@ void GraphicsContext3D::framebufferRenderbuffer(
     unsigned long renderbuffertarget,
     Platform3DObject buffer) {
   makeContextCurrent();
-  GLuint renderbuffer = (GLuint)buffer;
-  if (attachment == DEPTH_STENCIL_ATTACHMENT) {
-    ::glFramebufferRenderbufferEXT(target, DEPTH_ATTACHMENT, renderbuffertarget,
-                                   renderbuffer);
-    ::glFramebufferRenderbufferEXT(target, STENCIL_ATTACHMENT,
-                                   renderbuffertarget, renderbuffer);
-  } else
-    ::glFramebufferRenderbufferEXT(target, attachment, renderbuffertarget,
-                                   renderbuffer);
+  ::glFramebufferRenderbufferEXT(target, attachment, renderbuffertarget,
+                                 (GLuint)buffer);
 }
 
 void GraphicsContext3D::framebufferTexture2D(unsigned long target,

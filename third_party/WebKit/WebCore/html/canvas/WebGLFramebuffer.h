@@ -42,6 +42,7 @@ class WebGLFramebuffer : public WebGLObject {
   void setAttachment(unsigned long, WebGLObject*);
   // If an object is attached to the framebuffer, remove it.
   void removeAttachment(WebGLObject*);
+  WebGLObject* getAttachment(unsigned long) const;
 
   unsigned long getColorBufferFormat() const;
 
@@ -53,7 +54,7 @@ class WebGLFramebuffer : public WebGLObject {
   bool onAccess();
 
   // Return false does not mean COMPLETE, might still be INCOMPLETE.
-  bool isIncomplete() const;
+  bool isIncomplete(bool checkInternalFormat) const;
 
  protected:
   WebGLFramebuffer(WebGLRenderingContext*);
