@@ -41,7 +41,7 @@ class AccessibilityScrollbar : public AccessibilityObject {
 
   void setScrollbar(Scrollbar* scrollbar) { m_scrollbar = scrollbar; }
 
-  Scrollbar* scrollbar() const { return m_scrollbar; }
+  Scrollbar* scrollbar() const { return m_scrollbar.get(); }
 
   virtual bool isAccessibilityScrollbar() const { return true; }
 
@@ -70,7 +70,7 @@ class AccessibilityScrollbar : public AccessibilityObject {
     return 0;
   }
 
-  Scrollbar* m_scrollbar;
+  RefPtr<Scrollbar> m_scrollbar;
 };
 
 }  // namespace WebCore
