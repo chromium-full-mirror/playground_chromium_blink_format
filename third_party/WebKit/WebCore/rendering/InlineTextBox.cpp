@@ -62,6 +62,10 @@ int InlineTextBox::selectionTop() {
   return root()->selectionTop();
 }
 
+int InlineTextBox::selectionBottom() {
+  return root()->selectionBottom();
+}
+
 int InlineTextBox::selectionHeight() {
   return root()->selectionHeight();
 }
@@ -789,7 +793,9 @@ void InlineTextBox::paintSelection(GraphicsContext* context,
     ePos = length;
   }
 
-  int deltaY = logicalTop() - selectionTop();
+  int deltaY = renderer()->style()->isFlippedLinesWritingMode()
+                   ? selectionBottom() - logicalBottom()
+                   : logicalTop() - selectionTop();
   int selHeight = selectionHeight();
   IntPoint localOrigin(boxOrigin.x(), boxOrigin.y() - deltaY);
   context->clip(IntRect(localOrigin, IntSize(m_logicalWidth, selHeight)));
@@ -821,7 +827,9 @@ void InlineTextBox::paintCompositionBackground(GraphicsContext* context,
   updateGraphicsContext(context, c, c, 0,
                         style->colorSpace());  // Don't draw text at all!
 
-  int deltaY = logicalTop() - selectionTop();
+  int deltaY = renderer()->style()->isFlippedLinesWritingMode()
+                   ? selectionBottom() - logicalBottom()
+                   : logicalTop() - selectionTop();
   int selHeight = selectionHeight();
   IntPoint localOrigin(boxOrigin.x(), boxOrigin.y() - deltaY);
   context->drawHighlightForText(
@@ -1007,7 +1015,9 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
       endPosition = min<int>(endPosition, m_truncation);
 
     // Calculate start & width
-    int deltaY = logicalTop() - selectionTop();
+    int deltaY = renderer()->style()->isFlippedLinesWritingMode()
+                     ? selectionBottom() - logicalBottom()
+                     : logicalTop() - selectionTop();
     int selHeight = selectionHeight();
     IntPoint startPoint(boxOrigin.x(), boxOrigin.y() - deltaY);
     TextRun run(textRenderer()->text()->characters() + m_start, m_len,
@@ -1069,7 +1079,9 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
   // Use same y positioning and height as for selection, so that when the
   // selection and this highlight are on
   // the same word there are no pieces sticking out.
-  int deltaY = logicalTop() - selectionTop();
+  int deltaY = renderer()->style()->isFlippedLinesWritingMode()
+                   ? selectionBottom() - logicalBottom()
+                   : logicalTop() - selectionTop();
   int selHeight = selectionHeight();
 
   int sPos = max(marker.startOffset - m_start, (unsigned)0);

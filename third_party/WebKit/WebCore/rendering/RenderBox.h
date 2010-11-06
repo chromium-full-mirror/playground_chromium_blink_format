@@ -57,6 +57,7 @@ class RenderBox : public RenderBoxModelObject {
   int logicalTop() const {
     return style()->isHorizontalWritingMode() ? y() : x();
   }
+  int logicalBottom() const { return logicalTop() + logicalHeight(); }
   int logicalWidth() const {
     return style()->isHorizontalWritingMode() ? width() : height();
   }
@@ -555,6 +556,7 @@ class RenderBox : public RenderBoxModelObject {
                               FlippingAdjustment);
   int flipForWritingMode(int position);
   IntPoint flipForWritingMode(const IntPoint&);
+  IntSize flipForWritingMode(const IntSize&);
   void flipForWritingMode(IntRect&);
   IntSize locationOffsetIncludingFlipping();
 

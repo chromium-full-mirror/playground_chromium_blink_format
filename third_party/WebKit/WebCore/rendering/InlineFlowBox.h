@@ -211,7 +211,8 @@ class InlineFlowBox : public InlineBox {
                                   int maxAscent,
                                   bool strictMode,
                                   int& lineTop,
-                                  int& lineBottom);
+                                  int& lineBottom,
+                                  bool& setLineTop);
   void flipLinesInBlockDirection(int lineTop, int lineBottom);
   void computeBlockDirectionOverflow(int lineTop,
                                      int lineBottom,

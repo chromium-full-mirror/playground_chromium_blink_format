@@ -78,8 +78,9 @@ class InlineTextBox : public InlineBox {
   virtual int lineHeight() const;
 
  private:
-  virtual int selectionTop();
-  virtual int selectionHeight();
+  int selectionTop();
+  int selectionBottom();
+  int selectionHeight();
 
  public:
   virtual IntRect calculateBoundaries() const {

@@ -566,7 +566,8 @@ void InlineFlowBox::placeBoxesInBlockDirection(int top,
                                                int maxAscent,
                                                bool strictMode,
                                                int& lineTop,
-                                               int& lineBottom) {
+                                               int& lineBottom,
+                                               bool& setLineTop) {
   if (isRootInlineBox())
     setLogicalTop(top + maxAscent - baselinePosition());  // Place our root box.
 
@@ -580,7 +581,8 @@ void InlineFlowBox::placeBoxesInBlockDirection(int top,
     bool isInlineFlow = curr->isInlineFlowBox();
     if (isInlineFlow)
       static_cast<InlineFlowBox*>(curr)->placeBoxesInBlockDirection(
-          top, maxHeight, maxAscent, strictMode, lineTop, lineBottom);
+          top, maxHeight, maxAscent, strictMode, lineTop, lineBottom,
+          setLineTop);
 
     bool childAffectsTopBottomPos = true;
     if (curr->logicalTop() == PositionTop)
@@ -620,7 +622,11 @@ void InlineFlowBox::placeBoxesInBlockDirection(int top,
 
     if (childAffectsTopBottomPos) {
       int boxHeight = curr->logicalHeight();
-      lineTop = min(lineTop, newLogicalTop);
+      if (!setLineTop) {
+        setLineTop = true;
+        lineTop = newLogicalTop;
+      } else
+        lineTop = min(lineTop, newLogicalTop);
       lineBottom = max(lineBottom, newLogicalTop + boxHeight);
     }
   }
@@ -630,7 +636,11 @@ void InlineFlowBox::placeBoxesInBlockDirection(int top,
     setLogicalTop(logicalTop() + baselinePosition() - font.ascent());
 
     if (hasTextChildren() || strictMode) {
-      lineTop = min(lineTop, logicalTop());
+      if (!setLineTop) {
+        setLineTop = true;
+        lineTop = logicalTop();
+      } else
+        lineTop = min(lineTop, logicalTop());
       lineBottom = max(lineBottom, logicalTop() + logicalHeight());
     }
 
