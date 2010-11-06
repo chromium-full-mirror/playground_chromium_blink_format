@@ -640,8 +640,9 @@ WritingDirection Editor::textDirectionForSelection(
   }
 
   if (m_frame->selection()->isCaret()) {
-    if (CSSMutableStyleDeclaration* typingStyle =
-            m_frame->selection()->typingStyle()) {
+    RefPtr<CSSMutableStyleDeclaration> typingStyle =
+        m_frame->selection()->typingStyle();
+    if (typingStyle) {
       RefPtr<CSSValue> unicodeBidi =
           typingStyle->getPropertyCSSValue(CSSPropertyUnicodeBidi);
       if (unicodeBidi) {
@@ -3439,7 +3440,8 @@ void Editor::computeAndSetTypingStyle(CSSStyleDeclaration* style,
                                            blockStyle.get(), editingAction));
 
   // Set the remaining style as the typing style.
-  m_frame->selection()->setTypingStyle(mutableStyle.release());
+  m_frame->selection()->setTypingStyle(
+      EditingStyle::create(mutableStyle.get()));
 }
 
 PassRefPtr<CSSMutableStyleDeclaration> Editor::selectionComputedStyle(

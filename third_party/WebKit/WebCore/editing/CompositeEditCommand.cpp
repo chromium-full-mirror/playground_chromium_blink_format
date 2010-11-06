@@ -1045,10 +1045,10 @@ void CompositeEditCommand::moveParagraphs(
   // style
   // too, <div><b><br></b></div> for example.  Save it so that we can preserve
   // it later.
-  RefPtr<CSSMutableStyleDeclaration> styleInEmptyParagraph;
+  RefPtr<EditingStyle> styleInEmptyParagraph;
   if (startOfParagraphToMove == endOfParagraphToMove && preserveStyle) {
-    styleInEmptyParagraph = ApplyStyleCommand::editingStyleAtPosition(
-        startOfParagraphToMove.deepEquivalent(), IncludeTypingStyle);
+    styleInEmptyParagraph = editingStyleIncludingTypingStyle(
+        startOfParagraphToMove.deepEquivalent());
     // The moved paragraph should assume the block style of the destination.
     styleInEmptyParagraph->removeBlockProperties();
   }
@@ -1108,7 +1108,7 @@ void CompositeEditCommand::moveParagraphs(
       isStartOfParagraph(endingSelection().visibleStart()) &&
       isEndOfParagraph(endingSelection().visibleStart());
   if (styleInEmptyParagraph && selectionIsEmptyParagraph)
-    applyStyle(styleInEmptyParagraph.get());
+    applyStyle(styleInEmptyParagraph->style());
 
   if (preserveSelection && startIndex != -1) {
     // Fragment creation (using createMarkup) incorrectly uses regular
@@ -1133,9 +1133,8 @@ bool CompositeEditCommand::breakOutOfEmptyListItem() {
   if (!emptyListItem)
     return false;
 
-  RefPtr<CSSMutableStyleDeclaration> style =
-      ApplyStyleCommand::editingStyleAtPosition(endingSelection().start(),
-                                                IncludeTypingStyle);
+  RefPtr<EditingStyle> style =
+      editingStyleIncludingTypingStyle(endingSelection().start());
 
   ContainerNode* listNode = emptyListItem->parentNode();
   // FIXME: Can't we do something better when the immediate parent wasn't a list
@@ -1198,9 +1197,9 @@ bool CompositeEditCommand::breakOutOfEmptyListItem() {
   appendBlockPlaceholder(newBlock);
   setEndingSelection(VisibleSelection(Position(newBlock.get(), 0), DOWNSTREAM));
 
-  prepareEditingStyleToApplyAt(style.get(), endingSelection().start());
-  if (style->length())
-    applyStyle(style.get());
+  style->prepareToApplyAt(endingSelection().start());
+  if (!style->isEmpty())
+    applyStyle(style->style());
 
   return true;
 }
