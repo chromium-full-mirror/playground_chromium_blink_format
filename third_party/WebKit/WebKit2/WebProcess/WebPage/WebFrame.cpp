@@ -317,6 +317,28 @@ bool WebFrame::pauseAnimationOnElementWithId(const String& animationName,
                                           time);
 }
 
+void WebFrame::suspendAnimations() {
+  if (!m_coreFrame)
+    return;
+
+  AnimationController* controller = m_coreFrame->animation();
+  if (!controller)
+    return;
+
+  controller->suspendAnimations();
+}
+
+void WebFrame::resumeAnimations() {
+  if (!m_coreFrame)
+    return;
+
+  AnimationController* controller = m_coreFrame->animation();
+  if (!controller)
+    return;
+
+  controller->resumeAnimations();
+}
+
 String WebFrame::layerTreeAsText() const {
   if (!m_coreFrame)
     return "";

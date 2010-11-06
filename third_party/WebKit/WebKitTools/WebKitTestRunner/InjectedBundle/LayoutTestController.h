@@ -102,6 +102,8 @@ class LayoutTestController : public JSWrappable {
   bool pauseAnimationAtTimeOnElementWithId(JSStringRef animationName,
                                            double time,
                                            JSStringRef elementId);
+  void suspendAnimations();
+  void resumeAnimations();
 
   // Compositing testing.
   JSRetainPtr<JSStringRef> layerTreeAsText() const;

@@ -156,6 +156,18 @@ bool LayoutTestController::pauseAnimationAtTimeOnElementWithId(
       mainFrame, toWK(animationName).get(), toWK(elementId).get(), time);
 }
 
+void LayoutTestController::suspendAnimations() {
+  WKBundleFrameRef mainFrame =
+      WKBundlePageGetMainFrame(InjectedBundle::shared().page()->page());
+  WKBundleFrameSuspendAnimations(mainFrame);
+}
+
+void LayoutTestController::resumeAnimations() {
+  WKBundleFrameRef mainFrame =
+      WKBundlePageGetMainFrame(InjectedBundle::shared().page()->page());
+  WKBundleFrameResumeAnimations(mainFrame);
+}
+
 JSRetainPtr<JSStringRef> LayoutTestController::layerTreeAsText() const {
   WKBundleFrameRef mainFrame =
       WKBundlePageGetMainFrame(InjectedBundle::shared().page()->page());
