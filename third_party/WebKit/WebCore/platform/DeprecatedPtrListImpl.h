@@ -26,6 +26,8 @@
 #ifndef DeprecatedPtrListImpl_h
 #define DeprecatedPtrListImpl_h
 
+#include <wtf/Noncopyable.h>
+
 namespace WebCore {
 
 class DeprecatedListNode;
@@ -89,6 +91,15 @@ class DeprecatedPtrListImpl {
   friend class DeprecatedPtrListImplIterator;
 };
 
+class DeprecatedListNode : public Noncopyable {
+ public:
+  DeprecatedListNode(void* d) : data(d), next(0), prev(0) {}
+
+  void* data;
+  DeprecatedListNode* next;
+  DeprecatedListNode* prev;
+};
+
 class DeprecatedPtrListImplIterator {
  public:
   DeprecatedPtrListImplIterator();
@@ -102,10 +113,15 @@ class DeprecatedPtrListImplIterator {
   unsigned count() const;
   void* toFirst();
   void* toLast();
-  void* current() const;
+  void* current() const { return node ? node->data : 0; }
 
   void* operator--();
-  void* operator++();
+  void* operator++() {
+    if (node)
+      node = node->next;
+
+    return current();
+  }
 
  private:
   const DeprecatedPtrListImpl* list;
