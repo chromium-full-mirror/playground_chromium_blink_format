@@ -2988,7 +2988,7 @@ void EventHandler::defaultArrowEventHandler(FocusDirection focusDirection,
   if (!page)
     return;
 
-  if (!page->settings() || !page->settings()->isSpatialNavigationEnabled())
+  if (!isSpatialNavigationEnabled(m_frame))
     return;
 
   // Arrows and other possible directional navigation keys can be used in design

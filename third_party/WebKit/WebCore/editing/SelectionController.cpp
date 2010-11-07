@@ -735,8 +735,7 @@ bool SelectionController::modify(EAlteration alter,
   if (position.isNull())
     return false;
 
-  if (m_frame && m_frame->settings() &&
-      m_frame->settings()->isSpatialNavigationEnabled())
+  if (isSpatialNavigationEnabled(m_frame))
     if (!wasRange && alter == AlterationMove &&
         position == originalStartPosition)
       return false;

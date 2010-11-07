@@ -35,8 +35,9 @@
 #include "HTMLFrameOwnerElement.h"
 #include "IntRect.h"
 #include "Node.h"
-#include "RenderLayer.h"
 #include "Page.h"
+#include "RenderLayer.h"
+#include "Settings.h"
 
 namespace WebCore {
 
@@ -56,6 +57,11 @@ static bool areRectsPartiallyAligned(FocusDirection,
 static bool isRectInDirection(FocusDirection, const IntRect&, const IntRect&);
 static void deflateIfOverlapped(IntRect&, IntRect&);
 static bool checkNegativeCoordsForNode(Node*, const IntRect&);
+
+bool isSpatialNavigationEnabled(const Frame* frame) {
+  return (frame && frame->settings() &&
+          frame->settings()->isSpatialNavigationEnabled());
+}
 
 void distanceDataForNode(FocusDirection direction,
                          Node* start,
