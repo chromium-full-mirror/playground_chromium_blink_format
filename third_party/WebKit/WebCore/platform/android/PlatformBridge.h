@@ -107,6 +107,8 @@ class PlatformBridge {
   static bool cookiesEnabled();
   // Plugin
   static NPObject* pluginScriptableObject(Widget*);
+  // Language
+  static String computeDefaultLanguage();
 };
 }
 #endif  // PlatformBridge_h
