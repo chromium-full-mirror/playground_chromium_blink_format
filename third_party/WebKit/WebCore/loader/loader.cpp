@@ -158,7 +158,7 @@ void Loader::load(CachedResourceLoader* cachedResourceLoader,
     // Handle asynchronously so early low priority requests don't get scheduled
     // before later high priority ones
     InspectorInstrumentation::didScheduleResourceRequest(
-        cachedResourceLoader->doc(), resource->url());
+        cachedResourceLoader->document(), resource->url());
     scheduleServePendingRequests();
   }
 }
@@ -337,8 +337,8 @@ void Loader::Host::servePendingRequests(RequestQueue& requestsPending,
     // limit if the document isn't done parsing
     // and we don't know all stylesheets yet.
     bool shouldLimitRequests =
-        !m_name.isNull() || cachedResourceLoader->doc()->parsing() ||
-        !cachedResourceLoader->doc()->haveStylesheetsLoaded();
+        !m_name.isNull() || cachedResourceLoader->document()->parsing() ||
+        !cachedResourceLoader->document()->haveStylesheetsLoaded();
     if (shouldLimitRequests &&
         m_requestsLoading.size() + m_nonCachedRequestsInFlight >=
             m_maxRequestsInFlight) {
@@ -383,7 +383,7 @@ void Loader::Host::servePendingRequests(RequestQueue& requestsPending,
 #endif
 
     RefPtr<SubresourceLoader> loader = SubresourceLoader::create(
-        cachedResourceLoader->doc()->frame(), this, resourceRequest,
+        cachedResourceLoader->document()->frame(), this, resourceRequest,
         request->shouldDoSecurityCheck(), request->sendResourceLoadCallbacks());
     if (loader) {
       m_requestsLoading.add(loader.release(), request);
@@ -423,7 +423,7 @@ void Loader::Host::didFinishLoading(SubresourceLoader* loader) {
   // Prevent the document from being destroyed before we are done with
   // the cachedResourceLoader that it will delete when the document gets
   // deleted.
-  RefPtr<Document> protector(cachedResourceLoader->doc());
+  RefPtr<Document> protector(cachedResourceLoader->document());
   if (!request->isMultipart())
     cachedResourceLoader->decrementRequestCount(request->cachedResource());
 
@@ -470,7 +470,7 @@ void Loader::Host::didFail(SubresourceLoader* loader, bool cancelled) {
   // Prevent the document from being destroyed before we are done with
   // the cachedResourceLoader that it will delete when the document gets
   // deleted.
-  RefPtr<Document> protector(cachedResourceLoader->doc());
+  RefPtr<Document> protector(cachedResourceLoader->document());
   if (!request->isMultipart())
     cachedResourceLoader->decrementRequestCount(request->cachedResource());
 

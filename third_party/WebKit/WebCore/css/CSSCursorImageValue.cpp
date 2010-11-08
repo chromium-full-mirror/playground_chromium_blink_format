@@ -117,9 +117,9 @@ StyleCachedImage* CSSCursorImageValue::cachedImage(
   String url = getStringValue();
 
 #if ENABLE(SVG)
-  if (isSVGCursorIdentifier(url) && loader && loader->doc()) {
+  if (isSVGCursorIdentifier(url) && loader && loader->document()) {
     if (SVGCursorElement* cursorElement =
-            resourceReferencedByCursorElement(url, loader->doc()))
+            resourceReferencedByCursorElement(url, loader->document()))
       url = cursorElement->href();
   }
 #endif

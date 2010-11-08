@@ -51,9 +51,9 @@
 
 namespace WebCore {
 
-CachedResourceLoader::CachedResourceLoader(Document* doc)
+CachedResourceLoader::CachedResourceLoader(Document* document)
     : m_cache(cache()),
-      m_doc(doc),
+      m_document(document),
       m_requestCount(0),
       m_autoLoadImages(true),
       m_loadInProgress(false),
@@ -77,7 +77,7 @@ CachedResourceLoader::~CachedResourceLoader() {
 }
 
 Frame* CachedResourceLoader::frame() const {
-  return m_doc->frame();
+  return m_document->frame();
 }
 
 void CachedResourceLoader::checkForReload(const KURL& fullURL) {
@@ -126,7 +126,7 @@ CachedImage* CachedResourceLoader::requestImage(const String& url) {
       return 0;
 
     if (f->loader()->pageDismissalEventBeingDispatched()) {
-      KURL completeURL = m_doc->completeURL(url);
+      KURL completeURL = m_document->completeURL(url);
       if (completeURL.isValid() &&
           canRequest(CachedResource::ImageResource, completeURL))
         PingLoader::loadImage(f, completeURL);
@@ -199,7 +199,7 @@ bool CachedResourceLoader::canRequest(CachedResource::Type type,
       break;
 #if ENABLE(XSLT)
     case CachedResource::XSLStyleSheet:
-      if (!m_doc->securityOrigin()->canRequest(url)) {
+      if (!m_document->securityOrigin()->canRequest(url)) {
         printAccessDeniedMessage(url);
         return false;
       }
@@ -224,7 +224,8 @@ bool CachedResourceLoader::canRequest(CachedResource::Type type,
 #endif
       // These resource can inject script into the current document.
       if (Frame* f = frame())
-        f->loader()->checkIfRunInsecureContent(m_doc->securityOrigin(), url);
+        f->loader()->checkIfRunInsecureContent(m_document->securityOrigin(),
+                                               url);
       break;
     case CachedResource::ImageResource:
     case CachedResource::CSSStyleSheet:
@@ -254,7 +255,7 @@ CachedResource* CachedResourceLoader::requestResource(CachedResource::Type type,
                                                       const String& url,
                                                       const String& charset,
                                                       bool isPreload) {
-  KURL fullURL = m_doc->completeURL(url);
+  KURL fullURL = m_document->completeURL(url);
 
   if (!fullURL.isValid() || !canRequest(type, fullURL))
     return 0;
@@ -298,10 +299,10 @@ void CachedResourceLoader::printAccessDeniedMessage(const KURL& url) const {
     return;
 
   String message =
-      m_doc->url().isNull()
+      m_document->url().isNull()
           ? makeString("Unsafe attempt to load URL ", url.string(), '.')
           : makeString("Unsafe attempt to load URL ", url.string(),
-                       " from frame with URL ", m_doc->url().string(),
+                       " from frame with URL ", m_document->url().string(),
                        ". Domains, protocols and ports must match.\n");
 
   // FIXME: provide a real line number and source URL.
@@ -390,7 +391,7 @@ void CachedResourceLoader::preload(CachedResource::Type type,
                                    const String& url,
                                    const String& charset,
                                    bool referencedFromBody) {
-  bool hasRendering = m_doc->body() && m_doc->body()->renderer();
+  bool hasRendering = m_document->body() && m_document->body()->renderer();
   if (!hasRendering &&
       (referencedFromBody || type == CachedResource::ImageResource)) {
     // Don't preload images or body resources before we have something to draw.
@@ -405,14 +406,14 @@ void CachedResourceLoader::preload(CachedResource::Type type,
 
 void CachedResourceLoader::checkForPendingPreloads() {
   unsigned count = m_pendingPreloads.size();
-  if (!count || !m_doc->body() || !m_doc->body()->renderer())
+  if (!count || !m_document->body() || !m_document->body()->renderer())
     return;
   for (unsigned i = 0; i < count; ++i) {
     PendingPreload& preload = m_pendingPreloads[i];
     // Don't request preload if the resource already loaded normally (this will
     // result in double load if the page is being reloaded with cached results
     // ignored).
-    if (!cachedResource(m_doc->completeURL(preload.m_url)))
+    if (!cachedResource(m_document->completeURL(preload.m_url)))
       requestPreload(preload.m_type, preload.m_url, preload.m_charset);
   }
   m_pendingPreloads.clear();
@@ -424,7 +425,7 @@ void CachedResourceLoader::requestPreload(CachedResource::Type type,
   String encoding;
   if (type == CachedResource::Script || type == CachedResource::CSSStyleSheet)
     encoding = charset.isEmpty()
-                   ? m_doc->frame()->loader()->writer()->encoding()
+                   ? m_document->frame()->loader()->writer()->encoding()
                    : charset;
 
   CachedResource* resource = requestResource(type, url, encoding, true);
