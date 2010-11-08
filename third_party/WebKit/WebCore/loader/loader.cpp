@@ -379,7 +379,7 @@ void Loader::Host::servePendingRequests(RequestQueue& requestsPending,
 
 #if ENABLE(LINK_PREFETCH)
     if (request->cachedResource()->type() == CachedResource::LinkPrefetch)
-      resourceRequest.setHTTPHeaderField("X-Purpose", "prefetch");
+      resourceRequest.setHTTPHeaderField("Purpose", "prefetch");
 #endif
 
     RefPtr<SubresourceLoader> loader = SubresourceLoader::create(
