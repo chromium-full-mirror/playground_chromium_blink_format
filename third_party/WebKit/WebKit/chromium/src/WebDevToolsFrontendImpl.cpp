@@ -88,8 +88,7 @@ WebDevToolsFrontendImpl::WebDevToolsFrontendImpl(
     const String& applicationLocale)
     : m_webViewImpl(webViewImpl),
       m_client(client),
-      m_applicationLocale(applicationLocale),
-      m_loaded(false) {
+      m_applicationLocale(applicationLocale) {
   InspectorController* ic = m_webViewImpl->page()->inspectorController();
   ic->setInspectorFrontendClient(
       new InspectorFrontendClientImpl(m_webViewImpl->page(), m_client, this));
@@ -110,7 +109,10 @@ void WebDevToolsFrontendImpl::dispatchOnInspectorFrontend(
   v8::Context::Scope contextScope(frameContext);
   v8::Handle<v8::Value> dispatchFunction =
       frameContext->Global()->Get(v8::String::New("WebInspector_syncDispatch"));
-  ASSERT(dispatchFunction->IsFunction());
+  // The frame might have navigated away from the front-end page (which is still
+  // weird).
+  if (!dispatchFunction->IsFunction())
+    return;
   v8::Handle<v8::Function> function =
       v8::Handle<v8::Function>::Cast(dispatchFunction);
   Vector<v8::Handle<v8::Value>> args;
