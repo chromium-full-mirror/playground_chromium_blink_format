@@ -6232,7 +6232,8 @@ int RenderBlock::baselinePosition(bool firstLine,
                ? (layer()->verticalScrollbar() || layer()->scrollYOffset() != 0)
                : (layer()->horizontalScrollbar() ||
                   layer()->scrollXOffset() != 0)))) ||
-        isWritingModeRoot();
+        (isWritingModeRoot() && !isRubyRun());
+
     int baselinePos = ignoreBaseline ? -1 : lastLineBoxBaseline();
 
     int bottomOfContent = direction == HorizontalLine
@@ -6251,7 +6252,7 @@ int RenderBlock::baselinePosition(bool firstLine,
 }
 
 int RenderBlock::firstLineBoxBaseline() const {
-  if (!isBlockFlow() || isWritingModeRoot())
+  if (!isBlockFlow() || (isWritingModeRoot() && !isRubyRun()))
     return -1;
 
   if (childrenInline()) {
@@ -6275,7 +6276,7 @@ int RenderBlock::firstLineBoxBaseline() const {
 }
 
 int RenderBlock::lastLineBoxBaseline() const {
-  if (!isBlockFlow() || isWritingModeRoot())
+  if (!isBlockFlow() || (isWritingModeRoot() && !isRubyRun()))
     return -1;
 
   LineDirectionMode lineDirection =
