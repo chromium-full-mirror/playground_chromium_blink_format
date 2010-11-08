@@ -292,15 +292,13 @@ void RenderBox::styleDidChange(StyleDifference diff,
   // new zoomed coordinate space.
   if (hasOverflowClip() && oldStyle && style() &&
       oldStyle->effectiveZoom() != style()->effectiveZoom()) {
-    int left = scrollLeft();
-    if (left) {
+    if (int left = layer()->scrollXOffset()) {
       left = (left / oldStyle->effectiveZoom()) * style()->effectiveZoom();
-      setScrollLeft(left);
+      layer()->scrollToXOffset(left);
     }
-    int top = scrollTop();
-    if (top) {
+    if (int top = layer()->scrollYOffset()) {
       top = (top / oldStyle->effectiveZoom()) * style()->effectiveZoom();
-      setScrollTop(top);
+      layer()->scrollToYOffset(top);
     }
   }
 
