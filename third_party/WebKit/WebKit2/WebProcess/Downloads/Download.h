@@ -37,13 +37,14 @@ class WKDownloadAsDelegate;
 #endif
 #endif
 
+#include "MessageSender.h"
 #include <WebCore/ResourceRequest.h>
 #include <wtf/Noncopyable.h>
 #include <wtf/PassOwnPtr.h>
 
 namespace WebKit {
 
-class Download {
+class Download : public CoreIPC::MessageSender<Download> {
   WTF_MAKE_NONCOPYABLE(Download);
 
  public:
@@ -51,10 +52,15 @@ class Download {
                                      const WebCore::ResourceRequest&);
   ~Download();
 
+  // Used by MessageSender.
+  CoreIPC::Connection* connection() const;
+  uint64_t destinationID() const { return m_downloadID; }
+
   void start();
 
   void didBegin();
   void didReceiveData(uint64_t length);
+  void didCreateDestination(const String& path);
   void didFinish();
 
  private:

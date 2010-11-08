@@ -436,9 +436,18 @@ uint64_t WebContext::createDownloadProxy() {
   return downloadID;
 }
 
-void WebContext::didReceiveMessage(CoreIPC::Connection*,
+void WebContext::didReceiveMessage(CoreIPC::Connection* connection,
                                    CoreIPC::MessageID messageID,
                                    CoreIPC::ArgumentDecoder* arguments) {
+  if (messageID.is<CoreIPC::MessageClassDownloadProxy>()) {
+    if (DownloadProxy* downloadProxy =
+            m_downloads.get(arguments->destinationID()).get())
+      downloadProxy->didReceiveDownloadProxyMessage(connection, messageID,
+                                                    arguments);
+
+    return;
+  }
+
   switch (messageID.get<WebContextMessage::Kind>()) {
     case WebContextMessage::PostMessage: {
       String messageName;
