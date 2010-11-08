@@ -204,7 +204,8 @@ jvalue convertValueToJValue(ExecState* exec,
           // Input is a Javascript Array. We need to create it to a Java Array.
           result.l = convertArrayInstanceToJavaArray(exec, asArray(value),
                                                      javaClassName);
-        } else if (!result.l && (!strcmp(javaClassName, "java.lang.Object")) ||
+        } else if ((!result.l &&
+                    (!strcmp(javaClassName, "java.lang.Object"))) ||
                    (!strcmp(javaClassName, "netscape.javascript.JSObject"))) {
           // Wrap objects in JSObject instances.
           JNIEnv* env = getJNIEnv();
