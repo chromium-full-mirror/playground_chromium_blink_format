@@ -1180,7 +1180,8 @@ void FrameLoaderClient::dispatchDidFailLoad(const ResourceError& error) {
     if (!loaded)
       content = makeString("<html><body>", webError->message, "</body></html>");
     else
-      content = makeString(fileContent, error.failingURL(), webError->message);
+      content = String::format(fileContent, error.failingURL().utf8().data(),
+                               webError->message);
   }
 
   webkit_web_frame_load_alternate_string(m_frame, content.utf8().data(), 0,
