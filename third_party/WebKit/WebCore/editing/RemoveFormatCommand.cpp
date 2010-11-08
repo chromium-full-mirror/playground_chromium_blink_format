@@ -28,18 +28,11 @@
 #include "RemoveFormatCommand.h"
 
 #include "ApplyStyleCommand.h"
-#include "CSSComputedStyleDeclaration.h"
-#include "CSSMutableStyleDeclaration.h"
-#include "CSSValueKeywords.h"
-#include "Editor.h"
+#include "EditingStyle.h"
+#include "Element.h"
 #include "Frame.h"
-#include "HTMLElement.h"
 #include "HTMLNames.h"
-#include "VisibleSelection.h"
 #include "SelectionController.h"
-#include "TextIterator.h"
-#include "TypingCommand.h"
-#include "htmlediting.h"
 
 namespace WebCore {
 
@@ -89,11 +82,10 @@ void RemoveFormatCommand::doApply() {
   // give the
   // content that we're operating on.
   Node* root = frame->selection()->rootEditableElement();
-  RefPtr<CSSMutableStyleDeclaration> defaultStyle =
-      ApplyStyleCommand::editingStyleAtPosition(Position(root, 0));
+  RefPtr<EditingStyle> defaultStyle = EditingStyle::create(root);
 
   applyCommandToComposite(ApplyStyleCommand::create(
-      document(), defaultStyle.get(), isElementForRemoveFormatCommand,
+      document(), defaultStyle->style(), isElementForRemoveFormatCommand,
       editingAction()));
 }
 }

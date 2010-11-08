@@ -30,6 +30,8 @@
 
 namespace WebCore {
 
+class EditingStyle;
+
 class InsertParagraphSeparatorCommand : public CompositeEditCommand {
  public:
   static PassRefPtr<InsertParagraphSeparatorCommand> create(
@@ -57,7 +59,7 @@ class InsertParagraphSeparatorCommand : public CompositeEditCommand {
 
   virtual bool preservesTypingStyle() const;
 
-  RefPtr<CSSMutableStyleDeclaration> m_style;
+  RefPtr<EditingStyle> m_style;
 
   bool m_mustUseDefaultParagraphElement;
 };

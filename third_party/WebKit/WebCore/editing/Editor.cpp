@@ -3480,11 +3480,11 @@ PassRefPtr<CSSMutableStyleDeclaration> Editor::selectionComputedStyle(
   if (!m_frame->selection()->typingStyle())
     return mutableStyle;
 
-  RefPtr<CSSMutableStyleDeclaration> typingStyle =
-      m_frame->selection()->typingStyle()->copy();
-  ApplyStyleCommand::removeNonEditingProperties(typingStyle.get());
-  prepareEditingStyleToApplyAt(typingStyle.get(), position);
-  mutableStyle->merge(typingStyle.get());
+  RefPtr<EditingStyle> typingStyle =
+      EditingStyle::create(m_frame->selection()->typingStyle());
+  typingStyle->removeNonEditingProperties();
+  typingStyle->prepareToApplyAt(position);
+  mutableStyle->merge(typingStyle->style());
 
   return mutableStyle;
 }

@@ -76,12 +76,6 @@ class ApplyStyleCommand : public CompositeEditCommand {
         document, style, isInlineElementToRemoveFunction, action));
   }
 
-  static RefPtr<CSSMutableStyleDeclaration> removeNonEditingProperties(
-      CSSStyleDeclaration* style);
-  static PassRefPtr<CSSMutableStyleDeclaration> editingStyleAtPosition(
-      Position pos,
-      ShouldIncludeTypingStyle shouldIncludeTypingStyle = IgnoreTypingStyle);
-
  private:
   ApplyStyleCommand(Document*,
                     CSSStyleDeclaration*,
@@ -202,9 +196,6 @@ PassRefPtr<HTMLElement> createStyleSpanElement(Document*);
 RefPtr<CSSMutableStyleDeclaration> getPropertiesNotIn(
     CSSStyleDeclaration* styleWithRedundantProperties,
     CSSStyleDeclaration* baseStyle);
-
-void prepareEditingStyleToApplyAt(CSSMutableStyleDeclaration*, Position);
-void removeStylesAddedByNode(CSSMutableStyleDeclaration*, Node*);
 
 }  // namespace WebCore
 

@@ -31,6 +31,7 @@
 namespace WebCore {
 
 class DocumentFragment;
+class EditingStyle;
 class ReplacementFragment;
 
 class ReplaceSelectionCommand : public CompositeEditCommand {
@@ -100,7 +101,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
 
   RefPtr<Node> m_firstNodeInserted;
   RefPtr<Node> m_lastLeafInserted;
-  RefPtr<CSSMutableStyleDeclaration> m_insertionStyle;
+  RefPtr<EditingStyle> m_insertionStyle;
   bool m_selectReplacement;
   bool m_smartReplace;
   bool m_matchStyle;

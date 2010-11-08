@@ -31,7 +31,6 @@
 #include "BreakBlockquoteCommand.h"
 #include "CSSComputedStyleDeclaration.h"
 #include "CSSMutableStyleDeclaration.h"
-#include "CSSProperty.h"
 #include "CSSPropertyNames.h"
 #include "CSSValueKeywords.h"
 #include "Document.h"
@@ -618,12 +617,12 @@ static bool handleStyleSpansBeforeInsertion(ReplacementFragment& fragment,
   Node* sourceDocumentStyleSpan = topNode;
   RefPtr<Node> copiedRangeStyleSpan = sourceDocumentStyleSpan->firstChild();
 
-  RefPtr<CSSMutableStyleDeclaration> styleAtInsertionPos =
-      ApplyStyleCommand::editingStyleAtPosition(
-          rangeCompliantEquivalent(insertionPos));
+  RefPtr<EditingStyle> styleAtInsertionPos =
+      EditingStyle::create(rangeCompliantEquivalent(insertionPos));
+  String styleText = styleAtInsertionPos->style()->cssText();
 
-  String styleText = styleAtInsertionPos->cssText();
-
+  // FIXME: This string comparison is a naive way of comparing two styles.
+  // We should be taking the diff and check that the diff is empty.
   if (styleText ==
       static_cast<Element*>(sourceDocumentStyleSpan)->getAttribute(styleAttr)) {
     fragment.removeNodePreservingChildren(sourceDocumentStyleSpan);
@@ -684,10 +683,8 @@ void ReplaceSelectionCommand::handleStyleSpans() {
   if (!sourceDocumentStyleSpan)
     return;
 
-  RefPtr<CSSMutableStyleDeclaration> sourceDocumentStyle =
-      static_cast<HTMLElement*>(sourceDocumentStyleSpan)
-          ->getInlineStyleDecl()
-          ->copy();
+  RefPtr<EditingStyle> sourceDocumentStyle = EditingStyle::create(
+      static_cast<HTMLElement*>(sourceDocumentStyleSpan)->getInlineStyleDecl());
   ContainerNode* context = sourceDocumentStyleSpan->parentNode();
 
   // If Mail wraps the fragment with a Paste as Quotation blockquote, or if
@@ -698,27 +695,13 @@ void ReplaceSelectionCommand::handleStyleSpans() {
                              ? context
                              : nearestMailBlockquote(context);
   if (blockquoteNode) {
-    RefPtr<CSSMutableStyleDeclaration> blockquoteStyle =
-        ApplyStyleCommand::editingStyleAtPosition(Position(blockquoteNode, 0));
-    RefPtr<CSSMutableStyleDeclaration> parentStyle =
-        ApplyStyleCommand::editingStyleAtPosition(
-            Position(blockquoteNode->parentNode(), 0));
-    parentStyle->diff(blockquoteStyle.get());
-
-    CSSMutableStyleDeclaration::const_iterator end = blockquoteStyle->end();
-    for (CSSMutableStyleDeclaration::const_iterator it =
-             blockquoteStyle->begin();
-         it != end; ++it) {
-      const CSSProperty& property = *it;
-      sourceDocumentStyle->removeProperty(property.id());
-    }
-
+    sourceDocumentStyle->removeStyleConflictingWithStyleOfNode(blockquoteNode);
     context = blockquoteNode->parentNode();
   }
 
   // This operation requires that only editing styles to be removed from
   // sourceDocumentStyle.
-  prepareEditingStyleToApplyAt(sourceDocumentStyle.get(), Position(context, 0));
+  sourceDocumentStyle->prepareToApplyAt(firstPositionInNode(context));
 
   // Remove block properties in the span's style. This prevents properties that
   // probably have no effect
@@ -734,7 +717,7 @@ void ReplaceSelectionCommand::handleStyleSpans() {
   // The styles on sourceDocumentStyleSpan are all redundant, and there is no
   // copiedRangeStyleSpan
   // to consider.  We're finished.
-  if (sourceDocumentStyle->length() == 0 && !copiedRangeStyleSpan) {
+  if (sourceDocumentStyle->isEmpty() && !copiedRangeStyleSpan) {
     removeNodePreservingChildren(sourceDocumentStyleSpan);
     return;
   }
@@ -743,34 +726,27 @@ void ReplaceSelectionCommand::handleStyleSpans() {
   // copiedRangeStyleSpan.  Remove the span, because it could be surrounding
   // block elements,
   // and apply the styles to its children.
-  if (sourceDocumentStyle->length() > 0 && !copiedRangeStyleSpan) {
-    copyStyleToChildren(sourceDocumentStyleSpan, sourceDocumentStyle.get());
+  if (!sourceDocumentStyle->isEmpty() && !copiedRangeStyleSpan) {
+    copyStyleToChildren(sourceDocumentStyleSpan, sourceDocumentStyle->style());
     removeNodePreservingChildren(sourceDocumentStyleSpan);
     return;
   }
 
-  RefPtr<CSSMutableStyleDeclaration> copiedRangeStyle =
-      static_cast<HTMLElement*>(copiedRangeStyleSpan)
-          ->getInlineStyleDecl()
-          ->copy();
+  RefPtr<EditingStyle> copiedRangeStyle = EditingStyle::create(
+      static_cast<HTMLElement*>(copiedRangeStyleSpan)->getInlineStyleDecl());
 
   // We're going to put sourceDocumentStyleSpan's non-redundant styles onto
   // copiedRangeStyleSpan,
   // as long as they aren't overridden by ones on copiedRangeStyleSpan.
-  sourceDocumentStyle->merge(copiedRangeStyle.get(), true);
-  copiedRangeStyle = sourceDocumentStyle;
+  copiedRangeStyle->style()->merge(sourceDocumentStyle->style(), false);
 
   removeNodePreservingChildren(sourceDocumentStyleSpan);
 
   // Remove redundant styles.
   context = copiedRangeStyleSpan->parentNode();
-  prepareEditingStyleToApplyAt(copiedRangeStyle.get(), Position(context, 0));
-
-  // See the comments above about removing block properties.
+  copiedRangeStyle->prepareToApplyAt(firstPositionInNode(context));
   copiedRangeStyle->removeBlockProperties();
-
-  // All the styles on copiedRangeStyleSpan are redundant, remove it.
-  if (copiedRangeStyle->length() == 0) {
+  if (copiedRangeStyle->isEmpty()) {
     removeNodePreservingChildren(copiedRangeStyleSpan);
     return;
   }
@@ -780,7 +756,7 @@ void ReplaceSelectionCommand::handleStyleSpans() {
   // font-size should stay, even if it
   // appears redundant.
   setNodeAttribute(static_cast<Element*>(copiedRangeStyleSpan), styleAttr,
-                   copiedRangeStyle->cssText());
+                   copiedRangeStyle->style()->cssText());
 }
 
 // Take the style attribute of a span and apply it to it's children instead.
@@ -923,8 +899,7 @@ void ReplaceSelectionCommand::doApply() {
     m_matchStyle = false;
 
   if (m_matchStyle)
-    m_insertionStyle = ApplyStyleCommand::editingStyleAtPosition(
-        selection.start(), IncludeTypingStyle);
+    m_insertionStyle = editingStyleIncludingTypingStyle(selection.start());
 
   VisiblePosition visibleStart = selection.visibleStart();
   VisiblePosition visibleEnd = selection.visibleEnd();
@@ -1365,7 +1340,7 @@ void ReplaceSelectionCommand::completeHTMLReplacement(
 
     if (m_matchStyle) {
       ASSERT(m_insertionStyle);
-      applyStyle(m_insertionStyle.get(), start, end);
+      applyStyle(m_insertionStyle->style(), start, end);
     }
 
     if (lastPositionToSelect.isNotNull())
