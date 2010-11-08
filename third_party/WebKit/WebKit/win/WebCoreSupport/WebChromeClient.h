@@ -57,6 +57,7 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void takeFocus(WebCore::FocusDirection);
 
   virtual void focusedNodeChanged(WebCore::Node*);
+  virtual void focusedFrameChanged(Frame*);
 
   virtual WebCore::Page* createWindow(WebCore::Frame*,
                                       const WebCore::FrameLoadRequest&,

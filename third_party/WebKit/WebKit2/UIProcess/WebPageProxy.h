@@ -108,6 +108,7 @@ class WebPageProxy : public APIObject {
   uint64_t pageID() const { return m_pageID; }
 
   WebFrameProxy* mainFrame() const { return m_mainFrame.get(); }
+  WebFrameProxy* focusedFrame() const { return m_focusedFrame.get(); }
 
   DrawingAreaProxy* drawingArea() { return m_drawingArea.get(); }
   void setDrawingArea(PassOwnPtr<DrawingAreaProxy>);
@@ -421,6 +422,8 @@ class WebPageProxy : public APIObject {
   void didGetRenderTreeExternalRepresentation(const String&, uint64_t);
   void didGetSourceForFrame(const String&, uint64_t);
 
+  void focusedFrameChanged(uint64_t frameID);
+
   WebPageCreationParameters creationParameters(const WebCore::IntSize&) const;
 
 #if USE(ACCELERATED_COMPOSITING)
@@ -438,6 +441,7 @@ class WebPageProxy : public APIObject {
   OwnPtr<DrawingAreaProxy> m_drawingArea;
   RefPtr<WebPageNamespace> m_pageNamespace;
   RefPtr<WebFrameProxy> m_mainFrame;
+  RefPtr<WebFrameProxy> m_focusedFrame;
   String m_pageTitle;
 
   String m_customUserAgent;

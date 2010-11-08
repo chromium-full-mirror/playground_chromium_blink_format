@@ -71,6 +71,7 @@ class ChromeClientQt : public ChromeClient {
   virtual void takeFocus(FocusDirection);
 
   virtual void focusedNodeChanged(Node*);
+  virtual void focusedFrameChanged(Frame*);
 
   virtual Page* createWindow(Frame*,
                              const FrameLoadRequest&,

@@ -88,6 +88,7 @@ FocusController::FocusController(Page* page)
       m_isChangingFocusedFrame(false) {}
 
 void FocusController::setFocusedFrame(PassRefPtr<Frame> frame) {
+  ASSERT(!frame || frame->page() == m_page);
   if (m_focusedFrame == frame || m_isChangingFocusedFrame)
     return;
 
@@ -111,6 +112,8 @@ void FocusController::setFocusedFrame(PassRefPtr<Frame> frame) {
     newFrame->document()->dispatchWindowEvent(
         Event::create(eventNames().focusEvent, false, false));
   }
+
+  m_page->chrome()->focusedFrameChanged(newFrame.get());
 
   m_isChangingFocusedFrame = false;
 }

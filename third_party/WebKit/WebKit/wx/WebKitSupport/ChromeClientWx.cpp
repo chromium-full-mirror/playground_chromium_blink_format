@@ -123,6 +123,8 @@ void ChromeClientWx::takeFocus(FocusDirection) {
 
 void ChromeClientWx::focusedNodeChanged(Node*) {}
 
+void ChromeClientWx::focusedFrameChanged(Frame*) {}
+
 Page* ChromeClientWx::createWindow(Frame*,
                                    const FrameLoadRequest& request,
                                    const WindowFeatures& features,

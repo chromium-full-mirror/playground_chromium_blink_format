@@ -154,7 +154,9 @@ void ChromeClientQt::takeFocus(FocusDirection) {
   // here.
 }
 
-void ChromeClientQt::focusedNodeChanged(WebCore::Node*) {}
+void ChromeClientQt::focusedNodeChanged(Node*) {}
+
+void ChromeClientQt::focusedFrameChanged(Frame*) {}
 
 Page* ChromeClientQt::createWindow(Frame*,
                                    const FrameLoadRequest& request,

@@ -58,6 +58,7 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void takeFocus(WebCore::FocusDirection);
 
   virtual void focusedNodeChanged(WebCore::Node*);
+  virtual void focusedFrameChanged(WebCore::Frame*);
 
   // The Frame pointer provides the ChromeClient with context about which
   // Frame wants to create the new Page.  Also, the newly created window

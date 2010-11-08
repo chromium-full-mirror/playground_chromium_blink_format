@@ -97,6 +97,7 @@ class Chrome : public HostWindow {
   void takeFocus(FocusDirection) const;
 
   void focusedNodeChanged(Node*) const;
+  void focusedFrameChanged(Frame*) const;
 
   Page* createWindow(Frame*,
                      const FrameLoadRequest&,

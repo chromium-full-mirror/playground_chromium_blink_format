@@ -152,6 +152,10 @@ void Chrome::focusedNodeChanged(Node* node) const {
   m_client->focusedNodeChanged(node);
 }
 
+void Chrome::focusedFrameChanged(Frame* frame) const {
+  m_client->focusedFrameChanged(frame);
+}
+
 Page* Chrome::createWindow(Frame* frame,
                            const FrameLoadRequest& request,
                            const WindowFeatures& features,

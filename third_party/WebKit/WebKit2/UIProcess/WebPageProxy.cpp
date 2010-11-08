@@ -1328,6 +1328,10 @@ void WebPageProxy::didGetSourceForFrame(const String& resultString,
   callback->performCallbackWithReturnValue(resultString.impl());
 }
 
+void WebPageProxy::focusedFrameChanged(uint64_t frameID) {
+  m_focusedFrame = process()->webFrame(frameID);
+}
+
 #if USE(ACCELERATED_COMPOSITING)
 void WebPageProxy::didChangeAcceleratedCompositing(
     bool compositing,
