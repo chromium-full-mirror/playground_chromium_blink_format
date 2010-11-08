@@ -21,15 +21,19 @@
 #include "config.h"
 
 #include "PageClientQt.h"
+#include "TextureMapperQt.h"
 #include "texmap/TextureMapperPlatformLayer.h"
-
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #if defined(Q_WS_X11)
 #include <QX11Info>
 #endif
 
 #ifdef QT_OPENGL_LIB
+#include "opengl/TextureMapperGL.h"
 #include <QGLWidget>
 #endif
+
 namespace WebCore {
 
 #if USE(ACCELERATED_COMPOSITING) && USE(TEXTURE_MAPPER)
@@ -45,11 +49,19 @@ class PlatformLayerProxyQt : public QObject,
     m_frame->d->rootGraphicsLayer = m_layer;
   }
 
+  void setTextureMapper(PassOwnPtr<TextureMapper> textureMapper) {
+    m_frame->d->textureMapper = textureMapper;
+  }
+
   virtual ~PlatformLayerProxyQt() {
     if (m_layer)
       m_layer->setPlatformLayerClient(0);
     if (m_frame->d)
       m_frame->d->rootGraphicsLayer = 0;
+  }
+
+  virtual TextureMapper* textureMapper() {
+    return m_frame->d->textureMapper.get();
   }
 
   // Since we just paint the composited tree and never create a special item for
@@ -69,6 +81,11 @@ class PlatformLayerProxyQWidget : public PlatformLayerProxyQt {
       : PlatformLayerProxyQt(frame, layer, widget), m_widget(widget) {
     if (m_widget)
       m_widget->installEventFilter(this);
+
+    if (textureMapper())
+      return;
+
+    setTextureMapper(TextureMapperQt::create());
   }
 
   // We don't want a huge region-clip on the compositing layers; instead we
@@ -100,7 +117,19 @@ class PlatformLayerProxyQGraphicsObject : public PlatformLayerProxyQt {
   PlatformLayerProxyQGraphicsObject(QWebFrame* frame,
                                     TextureMapperContentLayer* layer,
                                     QGraphicsObject* object)
-      : PlatformLayerProxyQt(frame, layer, object), m_graphicsItem(object) {}
+      : PlatformLayerProxyQt(frame, layer, object), m_graphicsItem(object) {
+    if (textureMapper())
+      return;
+
+#ifdef QT_OPENGL_LIB
+    QGraphicsView* view = object->scene()->views()[0];
+    if (view && view->viewport() && view->viewport()->inherits("QGLWidget")) {
+      setTextureMapper(TextureMapperGL::create());
+      return;
+    }
+#endif
+    setTextureMapper(TextureMapperQt::create());
+  }
 
   void setNeedsDisplay() {
     if (m_graphicsItem)

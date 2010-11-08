@@ -240,6 +240,7 @@ class BitmapTextureGL : public BitmapTexture {
   virtual PlatformGraphicsContext* beginPaint(const IntRect& dirtyRect);
   virtual void endPaint();
   virtual void setContentsToImage(Image*);
+  ~BitmapTextureGL() { destroy(); }
 
  private:
   GLuint m_id;
@@ -252,13 +253,14 @@ class BitmapTextureGL : public BitmapTexture {
   GLuint m_fbo;
   IntSize m_actualSize;
   bool m_surfaceNeedsReset;
-  RefPtr<TextureMapperGL> m_textureMapper;
+  TextureMapperGL* m_textureMapper;
   BitmapTextureGL()
       : m_id(0),
         m_image(0),
         m_opaque(false),
         m_fbo(0),
-        m_surfaceNeedsReset(true) {}
+        m_surfaceNeedsReset(true),
+        m_textureMapper(0) {}
 
   friend class TextureMapperGL;
 };
@@ -276,6 +278,7 @@ class BitmapTextureGL : public BitmapTexture {
 
 TextureMapperGL::TextureMapperGL() : m_data(new TextureMapperGLData) {
   static bool shadersCompiled = false;
+  obtainCurrentContext();
   if (shadersCompiled)
     return;
   shadersCompiled = true;
@@ -501,9 +504,9 @@ void TextureMapperGL::drawTexture(const BitmapTexture& texture,
                               0,
                               0,
                               1};
-    glUniformMatrix4fv(
+    GL_CMD(glUniformMatrix4fv(
         programInfo.vars[TextureMapperGLData::ShaderInfo::InMaskMatrixVariable],
-        1, GL_FALSE, m4mask);
+        1, GL_FALSE, m4mask));
     GL_CMD(glUniform1i(
         programInfo.vars[TextureMapperGLData::ShaderInfo::MaskTextureVariable],
         1))

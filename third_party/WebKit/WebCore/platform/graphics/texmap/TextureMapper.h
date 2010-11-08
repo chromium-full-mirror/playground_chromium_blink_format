@@ -58,6 +58,10 @@ class BitmapTexture : public RefCounted<BitmapTexture> {
     m_contentSize = size;
   }
 
+  virtual void pack() {}
+  virtual void unpack() {}
+  virtual bool isPacked() const { return false; }
+
   virtual PlatformGraphicsContext* beginPaint(const IntRect& dirtyRect) = 0;
   virtual void endPaint() = 0;
   virtual PlatformGraphicsContext* beginPaintMedia() {
@@ -73,6 +77,7 @@ class BitmapTexture : public RefCounted<BitmapTexture> {
   inline void setOffset(const IntPoint& o) { m_offset = o; }
   inline IntPoint offset() const { return m_offset; }
 
+ protected:
  private:
   int m_lockCount;
   IntSize m_contentSize;
@@ -84,11 +89,11 @@ class BitmapTexture : public RefCounted<BitmapTexture> {
 // i.e. drawing a texture
 // onto the screen or into another texture with a specified transform, opacity
 // and mask.
-class TextureMapper : public RefCounted<TextureMapper> {
+class TextureMapper {
   friend class BitmapTexture;
 
  public:
-  static PassRefPtr<TextureMapper> create(GraphicsContext*);
+  static PassOwnPtr<TextureMapper> create(GraphicsContext* graphicsContext = 0);
   virtual ~TextureMapper() {}
 
   virtual void drawTexture(
@@ -114,8 +119,6 @@ class TextureMapper : public RefCounted<TextureMapper> {
   virtual void setClip(const IntRect&) = 0;
   virtual bool allowSurfaceForRoot() const = 0;
   virtual PassRefPtr<BitmapTexture> createTexture() = 0;
-  virtual const char* type() const = 0;
-  virtual void cleanup() {}
 
   void setImageInterpolationQuality(InterpolationQuality quality) {
     m_interpolationQuality = quality;

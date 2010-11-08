@@ -24,12 +24,11 @@
 #include "GraphicsLayer.h"
 #include "GraphicsLayerClient.h"
 #include "Image.h"
+#include "TextureMapperNode.h"
 
 #if ENABLE(3D_CANVAS)
 #include "GraphicsContext3D.h"
 #endif
-
-#define ENABLE_TEXMAP_ANIMATION 0
 
 namespace WebCore {
 
@@ -94,8 +93,23 @@ class GraphicsLayerTextureMapper : public GraphicsLayer {
     return false;
   }
 
+  void notifyChange(TextureMapperNode::ChangeMask changeMask);
+  inline TextureMapperNode::ContentData& pendingContent() {
+    return m_pendingContent;
+  }
+  inline int changeMask() const { return m_changeMask; }
+  void didSynchronize();
+
  private:
   OwnPtr<TextureMapperNode> m_node;
+  bool m_syncQueued;
+  int m_changeMask;
+  TextureMapperNode::ContentData m_pendingContent;
 };
+
+inline static GraphicsLayerTextureMapper* toGraphicsLayerTextureMapper(
+    GraphicsLayer* layer) {
+  return static_cast<GraphicsLayerTextureMapper*>(layer);
+}
 }
 #endif  // GraphicsLayerTextureMapper_h
