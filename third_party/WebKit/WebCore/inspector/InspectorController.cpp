@@ -81,6 +81,7 @@
 #include "RenderInline.h"
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
+#include "ScriptArguments.h"
 #include "ScriptCallStack.h"
 #include "ScriptFunctionCall.h"
 #include "ScriptObject.h"
@@ -317,19 +318,18 @@ void InspectorController::setConsoleMessagesEnabled(bool enabled) {
                                         m_injectedScriptHost.get());
 }
 
-void InspectorController::addMessageToConsole(MessageSource source,
-                                              MessageType type,
-                                              MessageLevel level,
-                                              ScriptCallStack* callStack,
-                                              const String& message) {
+void InspectorController::addMessageToConsole(
+    MessageSource source,
+    MessageType type,
+    MessageLevel level,
+    const String& message,
+    PassOwnPtr<ScriptArguments> arguments,
+    PassOwnPtr<ScriptCallStack> callStack) {
   if (!enabled())
     return;
 
-  bool storeStackTrace = type == TraceMessageType ||
-                         type == UncaughtExceptionMessageType ||
-                         type == AssertMessageType;
-  addConsoleMessage(new ConsoleMessage(source, type, level, message, callStack,
-                                       m_groupLevel, storeStackTrace));
+  addConsoleMessage(new ConsoleMessage(source, type, level, message, arguments,
+                                       callStack, m_groupLevel));
 }
 
 void InspectorController::addMessageToConsole(MessageSource source,
@@ -383,15 +383,15 @@ void InspectorController::clearConsoleMessages() {
     m_frontend->consoleMessagesCleared();
 }
 
-void InspectorController::startGroup(MessageSource source,
-                                     ScriptCallStack* callStack,
+void InspectorController::startGroup(PassOwnPtr<ScriptArguments> arguments,
+                                     PassOwnPtr<ScriptCallStack> callStack,
                                      bool collapsed) {
   ++m_groupLevel;
 
   addConsoleMessage(new ConsoleMessage(
-      source,
+      JSMessageSource,
       collapsed ? StartGroupCollapsedMessageType : StartGroupMessageType,
-      LogMessageLevel, String(), callStack, m_groupLevel));
+      LogMessageLevel, "", arguments, callStack, m_groupLevel));
 }
 
 void InspectorController::endGroup(MessageSource source,
