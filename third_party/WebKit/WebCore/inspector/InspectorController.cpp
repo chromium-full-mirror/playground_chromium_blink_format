@@ -230,8 +230,10 @@ void InspectorController::restoreInspectorStateFromCookie(
   m_state->restoreFromInspectorCookie(inspectorStateCookie);
   if (m_state->getBoolean(InspectorState::timelineProfilerEnabled))
     startTimelineProfiler();
+#if ENABLE(JAVASCRIPT_DEBUGGER)
   if (m_state->getBoolean(InspectorState::userInitiatedProfiling))
     startUserInitiatedProfiling();
+#endif
 }
 
 void InspectorController::inspect(Node* node) {
