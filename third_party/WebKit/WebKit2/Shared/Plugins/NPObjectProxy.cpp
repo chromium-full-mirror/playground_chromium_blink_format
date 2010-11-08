@@ -34,7 +34,6 @@
 #include "NPRemoteObjectMap.h"
 #include "NPRuntimeUtilities.h"
 #include "NPVariantData.h"
-#include "NotImplemented.h"
 
 namespace WebKit {
 
@@ -120,6 +119,34 @@ bool NPObjectProxy::invoke(NPIdentifier methodName,
                                                     argumentsData),
           Messages::NPObjectMessageReceiver::Invoke::Reply(returnValue,
                                                            resultData),
+          m_npObjectID))
+    return false;
+
+  if (!returnValue)
+    return false;
+
+  *result = m_npRemoteObjectMap->npVariantDataToNPVariant(resultData);
+  return true;
+}
+
+bool NPObjectProxy::invokeDefault(const NPVariant* arguments,
+                                  uint32_t argumentCount,
+                                  NPVariant* result) {
+  if (!m_npRemoteObjectMap)
+    return false;
+
+  Vector<NPVariantData> argumentsData;
+  for (uint32_t i = 0; i < argumentCount; ++i)
+    argumentsData.append(
+        m_npRemoteObjectMap->npVariantToNPVariantData(arguments[i]));
+
+  bool returnValue = false;
+  NPVariantData resultData;
+
+  if (!m_npRemoteObjectMap->connection()->sendSync(
+          Messages::NPObjectMessageReceiver::InvokeDefault(argumentsData),
+          Messages::NPObjectMessageReceiver::InvokeDefault::Reply(returnValue,
+                                                                  resultData),
           m_npObjectID))
     return false;
 
@@ -241,6 +268,34 @@ bool NPObjectProxy::enumerate(NPIdentifier** identifiers,
   return true;
 }
 
+bool NPObjectProxy::construct(const NPVariant* arguments,
+                              uint32_t argumentCount,
+                              NPVariant* result) {
+  if (!m_npRemoteObjectMap)
+    return false;
+
+  Vector<NPVariantData> argumentsData;
+  for (uint32_t i = 0; i < argumentCount; ++i)
+    argumentsData.append(
+        m_npRemoteObjectMap->npVariantToNPVariantData(arguments[i]));
+
+  bool returnValue = false;
+  NPVariantData resultData;
+
+  if (!m_npRemoteObjectMap->connection()->sendSync(
+          Messages::NPObjectMessageReceiver::Construct(argumentsData),
+          Messages::NPObjectMessageReceiver::Construct::Reply(returnValue,
+                                                              resultData),
+          m_npObjectID))
+    return false;
+
+  if (!returnValue)
+    return false;
+
+  *result = m_npRemoteObjectMap->npVariantDataToNPVariant(resultData);
+  return true;
+}
+
 NPClass* NPObjectProxy::npClass() {
   static NPClass npClass = {NP_CLASS_STRUCT_VERSION,
                             NP_Allocate,
@@ -283,12 +338,12 @@ bool NPObjectProxy::NP_Invoke(NPObject* npObject,
                                            result);
 }
 
-bool NPObjectProxy::NP_InvokeDefault(NPObject*,
+bool NPObjectProxy::NP_InvokeDefault(NPObject* npObject,
                                      const NPVariant* arguments,
                                      uint32_t argumentCount,
                                      NPVariant* result) {
-  notImplemented();
-  return false;
+  return toNPObjectProxy(npObject)->invokeDefault(arguments, argumentCount,
+                                                  result);
 }
 
 bool NPObjectProxy::NP_HasProperty(NPObject* npObject,
@@ -319,12 +374,11 @@ bool NPObjectProxy::NP_Enumerate(NPObject* npObject,
   return toNPObjectProxy(npObject)->enumerate(identifiers, identifierCount);
 }
 
-bool NPObjectProxy::NP_Construct(NPObject*,
+bool NPObjectProxy::NP_Construct(NPObject* npObject,
                                  const NPVariant* arguments,
                                  uint32_t argumentCount,
                                  NPVariant* result) {
-  notImplemented();
-  return false;
+  return toNPObjectProxy(npObject)->construct(arguments, argumentCount, result);
 }
 
 }  // namespace WebKit

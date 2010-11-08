@@ -31,7 +31,6 @@
 #include "NPRemoteObjectMap.h"
 #include "NPRuntimeUtilities.h"
 #include "NPVariantData.h"
-#include "NotImplemented.h"
 
 namespace WebKit {
 
@@ -89,14 +88,47 @@ void NPObjectMessageReceiver::invoke(const NPIdentifierData& methodNameData,
         m_npRemoteObjectMap->npVariantDataToNPVariant(argumentsData[i]));
 
   NPVariant result;
+  VOID_TO_NPVARIANT(result);
+
   returnValue = m_npObject->_class->invoke(
       m_npObject, methodNameData.createNPIdentifier(), arguments.data(),
       arguments.size(), &result);
-  if (!returnValue)
-    return;
+  if (returnValue) {
+    // Convert the NPVariant to an NPVariantData.
+    resultData = m_npRemoteObjectMap->npVariantToNPVariantData(result);
+  }
 
-  // Convert the NPVariant to an NPVariantData.
-  resultData = m_npRemoteObjectMap->npVariantToNPVariantData(result);
+  // Release all arguments.
+  for (size_t i = 0; i < argumentsData.size(); ++i)
+    releaseNPVariantValue(&arguments[i]);
+
+  // And release the result.
+  releaseNPVariantValue(&result);
+}
+
+void NPObjectMessageReceiver::invokeDefault(
+    const Vector<NPVariantData>& argumentsData,
+    bool& returnValue,
+    NPVariantData& resultData) {
+  if (!m_npObject->_class->invokeDefault) {
+    returnValue = false;
+    return;
+  }
+
+  Vector<NPVariant> arguments;
+  for (size_t i = 0; i < argumentsData.size(); ++i)
+    arguments.append(
+        m_npRemoteObjectMap->npVariantDataToNPVariant(argumentsData[i]));
+
+  NPVariant result;
+  VOID_TO_NPVARIANT(result);
+
+  returnValue = m_npObject->_class->invokeDefault(m_npObject, arguments.data(),
+                                                  arguments.size(), &result);
+  if (returnValue) {
+    // Convert the NPVariant to an NPVariantData.
+    resultData = m_npRemoteObjectMap->npVariantToNPVariantData(result);
+  }
 
   // Release all arguments.
   for (size_t i = 0; i < argumentsData.size(); ++i)
@@ -193,6 +225,39 @@ void NPObjectMessageReceiver::enumerate(
     identifiersData.append(NPIdentifierData::fromNPIdentifier(identifiers[i]));
 
   npnMemFree(identifiers);
+}
+
+void NPObjectMessageReceiver::construct(
+    const Vector<NPVariantData>& argumentsData,
+    bool& returnValue,
+    NPVariantData& resultData) {
+  if (!NP_CLASS_STRUCT_VERSION_HAS_CTOR(m_npObject->_class) ||
+      !m_npObject->_class->construct) {
+    returnValue = false;
+    return;
+  }
+
+  Vector<NPVariant> arguments;
+  for (size_t i = 0; i < argumentsData.size(); ++i)
+    arguments.append(
+        m_npRemoteObjectMap->npVariantDataToNPVariant(argumentsData[i]));
+
+  NPVariant result;
+  VOID_TO_NPVARIANT(result);
+
+  returnValue = m_npObject->_class->construct(m_npObject, arguments.data(),
+                                              arguments.size(), &result);
+  if (returnValue) {
+    // Convert the NPVariant to an NPVariantData.
+    resultData = m_npRemoteObjectMap->npVariantToNPVariantData(result);
+  }
+
+  // Release all arguments.
+  for (size_t i = 0; i < argumentsData.size(); ++i)
+    releaseNPVariantValue(&arguments[i]);
+
+  // And release the result.
+  releaseNPVariantValue(&result);
 }
 
 }  // namespace WebKit
