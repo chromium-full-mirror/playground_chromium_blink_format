@@ -55,6 +55,8 @@ class NPObjectMessageReceiver {
       CoreIPC::ArgumentDecoder*,
       CoreIPC::ArgumentEncoder*);
 
+  NPObject* npObject() const { return m_npObject; }
+
  private:
   NPObjectMessageReceiver(NPRemoteObjectMap* npRemoteObjectMap,
                           uint64_t npObjectID,
