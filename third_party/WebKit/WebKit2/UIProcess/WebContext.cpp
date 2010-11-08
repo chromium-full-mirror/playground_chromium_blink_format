@@ -25,6 +25,7 @@
 
 #include "WebContext.h"
 
+#include "DownloadProxy.h"
 #include "ImmutableArray.h"
 #include "InjectedBundleMessageKinds.h"
 #include "RunLoop.h"
@@ -215,6 +216,14 @@ void WebContext::processDidClose(WebProcessProxy* process) {
   ASSERT_UNUSED(process, process == m_process);
 
   m_visitedLinkProvider.processDidClose();
+
+  // Invalidate all outstanding downloads.
+  for (HashMap<uint64_t, RefPtr<DownloadProxy>>::iterator::Values
+           it = m_downloads.begin().values(),
+           end = m_downloads.end().values();
+       it != end; ++it)
+    (*it)->invalidate();
+  m_downloads.clear();
 
   m_process = 0;
 }
@@ -418,9 +427,13 @@ void WebContext::setCacheModel(CacheModel cacheModel) {
       0);
 }
 
-uint64_t WebContext::generateDownloadID() {
-  static uint64_t uniqueDownloadID = 0;
-  return ++uniqueDownloadID;
+uint64_t WebContext::createDownloadProxy() {
+  RefPtr<DownloadProxy> downloadProxy = DownloadProxy::create(this);
+  uint64_t downloadID = downloadProxy->downloadID();
+
+  m_downloads.set(downloadID, downloadProxy.release());
+
+  return downloadID;
 }
 
 void WebContext::didReceiveMessage(CoreIPC::Connection*,
