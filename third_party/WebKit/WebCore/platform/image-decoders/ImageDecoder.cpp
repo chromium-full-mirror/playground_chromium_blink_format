@@ -142,7 +142,7 @@ void RGBA32Buffer::zeroFill() {
   m_hasAlpha = true;
 }
 
-#if !PLATFORM(CF)
+#if !PLATFORM(CG)
 
 void RGBA32Buffer::copyReferenceToBitmapData(const RGBA32Buffer& other) {
   ASSERT(this != &other);
