@@ -156,7 +156,9 @@ class RootInlineBox : public InlineFlowBox {
 
   RenderBlock* block() const;
 
-  InlineBox* closestLeafChildForXPos(int x, bool onlyEditableLeaves = false);
+  InlineBox* closestLeafChildForLogicalLeftPosition(
+      int,
+      bool onlyEditableLeaves = false);
 
   Vector<RenderBox*>& floats() {
     ASSERT(!isDirty());

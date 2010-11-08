@@ -453,7 +453,7 @@ VisiblePosition RenderText::positionForPoint(const IntPoint& point) {
   // FIXME: We should be able to roll these special cases into the general cases
   // in the loop below.
   if (firstTextBox() &&
-      pointBlockDirection < firstTextBox()->root()->lineBottom() &&
+      pointBlockDirection < firstTextBox()->root()->selectionBottom() &&
       pointLineDirection < firstTextBox()->logicalLeft()) {
     // at the y coordinate of the first line or above
     // and the x coordinate is to the left of the first text box left edge
@@ -461,7 +461,7 @@ VisiblePosition RenderText::positionForPoint(const IntPoint& point) {
     return createVisiblePosition(offset + firstTextBox()->start(), DOWNSTREAM);
   }
   if (lastTextBox() &&
-      pointBlockDirection >= lastTextBox()->root()->lineTop() &&
+      pointBlockDirection >= lastTextBox()->root()->selectionTop() &&
       pointLineDirection >= lastTextBox()->logicalRight()) {
     // at the y coordinate of the last line or below
     // and the x coordinate is to the right of the last text box right edge
@@ -474,8 +474,8 @@ VisiblePosition RenderText::positionForPoint(const IntPoint& point) {
   for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox()) {
     if (pointBlockDirection >= box->root()->lineTop()) {
       int bottom = box->root()->nextRootBox()
-                       ? box->root()->nextRootBox()->lineTop()
-                       : box->root()->lineBottom();
+                       ? box->root()->nextRootBox()->selectionTop()
+                       : box->root()->selectionBottom();
       if (pointBlockDirection < bottom) {
         offset = box->offsetForPosition(pointLineDirection);
 

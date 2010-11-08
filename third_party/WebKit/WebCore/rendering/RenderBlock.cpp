@@ -4909,7 +4909,8 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
     IntRect boundsRect(tx, ty, width(), height());
     if (visibleToHitTesting() &&
         boundsRect.intersects(result.rectForPoint(_x, _y))) {
-      updateHitTestResult(result, IntPoint(_x - tx, _y - ty));
+      updateHitTestResult(result,
+                          flipForWritingMode(IntPoint(_x - tx, _y - ty)));
       if (!result.addNodeToRectBasedTestResult(node(), _x, _y, boundsRect))
         return true;
     }
@@ -5072,9 +5073,11 @@ Position RenderBlock::positionForRenderer(RenderObject* renderer,
 // all cases in which positionForPoint recurs could call this instead to
 // prevent crossing editable boundaries. This would require many tests.
 static VisiblePosition positionForPointRespectingEditingBoundaries(
-    RenderBox* parent,
+    RenderBlock* parent,
     RenderBox* child,
     const IntPoint& pointInParentCoordinates) {
+  // FIXME: This is wrong if the child's writing-mode is different from the
+  // parent's.
   IntPoint pointInChildCoordinates(pointInParentCoordinates -
                                    child->location());
 
@@ -5098,15 +5101,18 @@ static VisiblePosition positionForPointRespectingEditingBoundaries(
     return child->positionForPoint(pointInChildCoordinates);
 
   // Otherwise return before or after the child, depending on if the click was
-  // left or right of the child
-  int childMidX = child->width() / 2;
-  if (pointInChildCoordinates.x() < childMidX)
+  // to the logical left or logical right of the child
+  int childMiddle = parent->logicalWidthForChild(child) / 2;
+  int logicalLeft = parent->style()->isHorizontalWritingMode()
+                        ? pointInChildCoordinates.x()
+                        : pointInChildCoordinates.y();
+  if (logicalLeft < childMiddle)
     return ancestor->createVisiblePosition(childNode->nodeIndex(), DOWNSTREAM);
   return ancestor->createVisiblePosition(childNode->nodeIndex() + 1, UPSTREAM);
 }
 
 VisiblePosition RenderBlock::positionForPointWithInlineChildren(
-    const IntPoint& pointInContents) {
+    const IntPoint& pointInLogicalContents) {
   ASSERT(childrenInline());
 
   if (!firstRootBox())
@@ -5125,8 +5131,9 @@ VisiblePosition RenderBlock::positionForPointWithInlineChildren(
     lastRootBoxWithChildren = root;
 
     // check if this root line box is located at this y coordinate
-    if (pointInContents.y() < root->selectionBottom()) {
-      closestBox = root->closestLeafChildForXPos(pointInContents.x());
+    if (pointInLogicalContents.y() < root->selectionBottom()) {
+      closestBox = root->closestLeafChildForLogicalLeftPosition(
+          pointInLogicalContents.x());
       if (closestBox)
         break;
     }
@@ -5142,12 +5149,13 @@ VisiblePosition RenderBlock::positionForPointWithInlineChildren(
   if (!moveCaretToBoundary && !closestBox && lastRootBoxWithChildren) {
     // y coordinate is below last root line box, pretend we hit it
     closestBox =
-        lastRootBoxWithChildren->closestLeafChildForXPos(pointInContents.x());
+        lastRootBoxWithChildren->closestLeafChildForLogicalLeftPosition(
+            pointInLogicalContents.x());
   }
 
   if (closestBox) {
     if (moveCaretToBoundary &&
-        pointInContents.y() < firstRootBoxWithChildren->selectionTop()) {
+        pointInLogicalContents.y() < firstRootBoxWithChildren->selectionTop()) {
       // y coordinate is above first root line box, so return the start of the
       // first
       return VisiblePosition(
@@ -5155,9 +5163,14 @@ VisiblePosition RenderBlock::positionForPointWithInlineChildren(
           DOWNSTREAM);
     }
 
-    // pass the box a y position that is inside it
-    return closestBox->renderer()->positionForPoint(
-        IntPoint(pointInContents.x(), closestBox->m_y));
+    // pass the box a top position that is inside it
+    IntPoint point(pointInLogicalContents.x(), closestBox->logicalTop());
+    if (!style()->isHorizontalWritingMode())
+      point = point.transposedPoint();
+    if (closestBox->renderer()->isReplaced())
+      return positionForPointRespectingEditingBoundaries(
+          this, toRenderBox(closestBox->renderer()), point);
+    return closestBox->renderer()->positionForPoint(point);
   }
 
   if (lastRootBoxWithChildren) {
@@ -5185,9 +5198,18 @@ VisiblePosition RenderBlock::positionForPoint(const IntPoint& point) {
     return RenderBox::positionForPoint(point);
 
   if (isReplaced()) {
-    if (point.y() < 0 || (point.y() < height() && point.x() < 0))
+    // FIXME: This seems wrong when the object's writing-mode doesn't match the
+    // line's writing-mode.
+    int pointLogicalLeft =
+        style()->isHorizontalWritingMode() ? point.x() : point.y();
+    int pointLogicalTop =
+        style()->isHorizontalWritingMode() ? point.y() : point.x();
+
+    if (pointLogicalTop < 0 ||
+        (pointLogicalTop < logicalHeight() && pointLogicalLeft < 0))
       return createVisiblePosition(caretMinOffset(), DOWNSTREAM);
-    if (point.y() >= height() || (point.y() >= 0 && point.x() >= width()))
+    if (pointLogicalTop >= logicalHeight() ||
+        (pointLogicalTop >= 0 && pointLogicalLeft >= logicalWidth()))
       return createVisiblePosition(caretMaxOffset(), DOWNSTREAM);
   }
 
@@ -5195,11 +5217,14 @@ VisiblePosition RenderBlock::positionForPoint(const IntPoint& point) {
   int contentsY = point.y();
   offsetForContents(contentsX, contentsY);
   IntPoint pointInContents(contentsX, contentsY);
+  IntPoint pointInLogicalContents(pointInContents);
+  if (!style()->isHorizontalWritingMode())
+    pointInLogicalContents = pointInLogicalContents.transposedPoint();
 
   if (childrenInline())
-    return positionForPointWithInlineChildren(pointInContents);
+    return positionForPointWithInlineChildren(pointInLogicalContents);
 
-  if (lastChildBox() && contentsY > lastChildBox()->y()) {
+  if (lastChildBox() && pointInContents.y() > lastChildBox()->logicalTop()) {
     for (RenderBox* childBox = lastChildBox(); childBox;
          childBox = childBox->previousSiblingBox()) {
       if (isChildHitTestCandidate(childBox))
@@ -5212,7 +5237,7 @@ VisiblePosition RenderBlock::positionForPoint(const IntPoint& point) {
       // We hit child if our click is above the bottom of its padding box (like
       // IE6/7 and FF3).
       if (isChildHitTestCandidate(childBox) &&
-          contentsY < childBox->frameRect().bottom())
+          pointInContents.y() < childBox->logicalBottom())
         return positionForPointRespectingEditingBoundaries(this, childBox,
                                                            pointInContents);
     }
