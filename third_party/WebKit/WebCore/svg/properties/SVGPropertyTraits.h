@@ -28,6 +28,7 @@
 #include "SVGLength.h"
 #include "SVGLengthList.h"
 #include "SVGNumberList.h"
+#include "SVGPointList.h"
 #include "SVGPreserveAspectRatio.h"
 #include "SVGStringList.h"
 #include <wtf/text/StringBuilder.h>
@@ -129,6 +130,12 @@ struct SVGPropertyTraits<String> {
 template <>
 struct SVGPropertyTraits<SVGStringList> {
   typedef String ListItemType;
+};
+
+template <>
+struct SVGPropertyTraits<SVGPointList> {
+  static SVGPointList initialValue() { return SVGPointList(); }
+  typedef FloatPoint ListItemType;
 };
 }
 

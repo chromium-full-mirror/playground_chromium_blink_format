@@ -26,9 +26,7 @@
 #include "SVGParserUtilities.h"
 
 #include "Document.h"
-#include "ExceptionCode.h"
 #include "FloatPoint.h"
-#include "PlatformString.h"
 #include "SVGPointList.h"
 #include <wtf/ASCIICType.h>
 
@@ -172,7 +170,7 @@ bool parseNumberOptionalNumber(const String& s, float& x, float& y) {
   return cur == end;
 }
 
-bool pointsListFromSVGData(SVGPointList* pointsList, const String& points) {
+bool pointsListFromSVGData(SVGPointList& pointsList, const String& points) {
   if (points.isEmpty())
     return true;
   const UChar* cur = points.characters();
@@ -199,8 +197,7 @@ bool pointsListFromSVGData(SVGPointList* pointsList, const String& points) {
     }
     skipOptionalSpaces(cur, end);
 
-    ExceptionCode ec = 0;
-    pointsList->appendItem(FloatPoint(xPos, yPos), ec);
+    pointsList.append(FloatPoint(xPos, yPos));
   }
   return cur == end && !delimParsed;
 }

@@ -22,27 +22,24 @@
 #define SVGPointList_h
 
 #if ENABLE(SVG)
-#include "SVGList.h"
-#include "FloatPoint.h"
-#include <wtf/Forward.h>
-#include <wtf/PassRefPtr.h>
+#include "QualifiedName.h"
+#include <wtf/Vector.h>
+#include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
-class SVGPointList : public SVGPODList<FloatPoint> {
+class FloatPoint;
+
+class SVGPointList : public Vector<FloatPoint> {
  public:
-  static PassRefPtr<SVGPointList> create(const QualifiedName& attributeName) {
-    return adoptRef(new SVGPointList(attributeName));
-  }
+  SVGPointList() {}
 
   String valueAsString() const;
 
-  static PassRefPtr<SVGPointList> createAnimated(const SVGPointList* fromList,
-                                                 const SVGPointList* toList,
-                                                 float progress);
-
- private:
-  SVGPointList(const QualifiedName&);
+  static bool createAnimated(const SVGPointList& fromList,
+                             const SVGPointList& toList,
+                             SVGPointList& resultList,
+                             float progress);
 };
 
 }  // namespace WebCore

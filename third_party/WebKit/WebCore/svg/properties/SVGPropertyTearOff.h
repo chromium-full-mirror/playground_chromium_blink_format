@@ -32,8 +32,8 @@ class SVGPropertyTearOff : public SVGProperty {
  public:
   typedef SVGPropertyTearOff<PropertyType> Self;
 
-  // Used for [SVGAnimatedProperty] types (for example:
-  // SVGAnimatedLength::baseVal()).
+  // Used for child types (baseVal/animVal) of a SVGAnimated* property (for
+  // example: SVGAnimatedLength::baseVal()).
   // Also used for list tear offs (for example: text.x.baseVal.getItem(0)).
   static PassRefPtr<Self> create(SVGAnimatedProperty* animatedProperty,
                                  SVGPropertyRole,
@@ -42,7 +42,8 @@ class SVGPropertyTearOff : public SVGProperty {
     return adoptRef(new Self(animatedProperty, value));
   }
 
-  // Used for non-animated POD types (for example: SVGLength).
+  // Used for non-animated POD types (for example:
+  // SVGSVGElement::createSVGLength()).
   static PassRefPtr<Self> create(const PropertyType& initialValue) {
     return adoptRef(new Self(initialValue));
   }
@@ -86,13 +87,13 @@ class SVGPropertyTearOff : public SVGProperty {
     m_animatedProperty = 0;
   }
 
-  void commitChange() {
+  virtual void commitChange() {
     if (!m_animatedProperty || m_valueIsCopy)
       return;
     m_animatedProperty->commitChange();
   }
 
- private:
+ protected:
   SVGPropertyTearOff(SVGAnimatedProperty* animatedProperty, PropertyType& value)
       : m_animatedProperty(animatedProperty),
         m_value(&value),

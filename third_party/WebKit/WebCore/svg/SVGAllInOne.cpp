@@ -32,7 +32,6 @@
 #include "SVGAngle.cpp"
 #include "SVGAnimateColorElement.cpp"
 #include "SVGAnimatedPathData.cpp"
-#include "SVGAnimatedPoints.cpp"
 #include "SVGAnimateElement.cpp"
 #include "SVGAnimateMotionElement.cpp"
 #include "SVGAnimateTransformElement.cpp"

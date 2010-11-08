@@ -65,7 +65,7 @@ inline bool skipOptionalSpacesOrDelimiter(const UChar*& ptr,
   return ptr < end;
 }
 
-bool pointsListFromSVGData(SVGPointList* pointsList, const String& points);
+bool pointsListFromSVGData(SVGPointList& pointsList, const String& points);
 Vector<String> parseDelimitedString(const String& input, const char seperator);
 bool parseKerningUnicodeString(const String& input,
                                UnicodeRanges&,

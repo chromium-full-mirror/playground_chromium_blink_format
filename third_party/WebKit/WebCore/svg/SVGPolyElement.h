@@ -22,10 +22,10 @@
 #define SVGPolyElement_h
 
 #if ENABLE(SVG)
-#include "SVGAnimatedPoints.h"
 #include "SVGAnimatedPropertyMacros.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
+#include "SVGPointList.h"
 #include "SVGStyledTransformableElement.h"
 #include "SVGTests.h"
 
@@ -34,11 +34,12 @@ namespace WebCore {
 class SVGPolyElement : public SVGStyledTransformableElement,
                        public SVGTests,
                        public SVGLangSpace,
-                       public SVGExternalResourcesRequired,
-                       public SVGAnimatedPoints {
+                       public SVGExternalResourcesRequired {
  public:
-  virtual SVGPointList* points() const;
-  virtual SVGPointList* animatedPoints() const;
+  SVGListPropertyTearOff<SVGPointList>* points();
+  SVGListPropertyTearOff<SVGPointList>* animatedPoints();
+
+  SVGPointList& pointList() const { return m_points.value; }
 
  protected:
   SVGPolyElement(const QualifiedName&, Document*);
@@ -59,7 +60,11 @@ class SVGPolyElement : public SVGStyledTransformableElement,
                                        ExternalResourcesRequired,
                                        externalResourcesRequired)
 
-  mutable RefPtr<SVGPointList> m_points;
+  void synchronizePoints();
+
+ protected:
+  mutable SVGSynchronizableAnimatedProperty<SVGPointList> m_points;
+  RefPtr<SVGAnimatedListPropertyTearOff<SVGPointList>> m_animatablePointsList;
 };
 
 }  // namespace WebCore
