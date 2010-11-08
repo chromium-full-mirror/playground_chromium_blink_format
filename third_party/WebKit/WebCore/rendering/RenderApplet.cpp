@@ -26,6 +26,7 @@
 #include "HTMLAppletElement.h"
 #include "HTMLNames.h"
 #include "HTMLParamElement.h"
+#include "PluginViewBase.h"
 #include "Widget.h"
 
 namespace WebCore {
@@ -91,5 +92,19 @@ void RenderApplet::layout() {
   createWidgetIfNecessary();
   setNeedsLayout(false);
 }
+
+#if USE(ACCELERATED_COMPOSITING)
+bool RenderApplet::requiresLayer() const {
+  if (RenderWidget::requiresLayer())
+    return true;
+
+  return allowsAcceleratedCompositing();
+}
+
+bool RenderApplet::allowsAcceleratedCompositing() const {
+  return widget() && widget()->isPluginViewBase() &&
+         static_cast<PluginViewBase*>(widget())->platformLayer();
+}
+#endif
 
 }  // namespace WebCore

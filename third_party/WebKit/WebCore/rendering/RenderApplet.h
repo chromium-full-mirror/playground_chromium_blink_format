@@ -36,6 +36,10 @@ class RenderApplet : public RenderWidget {
 
   void createWidgetIfNecessary();
 
+#if USE(ACCELERATED_COMPOSITING)
+  virtual bool allowsAcceleratedCompositing() const;
+#endif
+
  private:
   virtual const char* renderName() const { return "RenderApplet"; }
 
@@ -43,6 +47,10 @@ class RenderApplet : public RenderWidget {
 
   virtual void layout();
   virtual IntSize intrinsicSize() const;
+
+#if USE(ACCELERATED_COMPOSITING)
+  virtual bool requiresLayer() const;
+#endif
 
   HashMap<String, String> m_args;
 };
