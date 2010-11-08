@@ -55,6 +55,8 @@ InspectorState::InspectorState(InspectorClient* client) : m_client(client) {
                (const char*)0);
   registerBoolean(consoleMessagesEnabled, false, "consoleMessagesEnabled",
                   (const char*)0);
+  registerBoolean(userInitiatedProfiling, false, "userInitiatedProfiling",
+                  (const char*)0);
 }
 
 void InspectorState::restoreFromInspectorCookie(const String& json) {

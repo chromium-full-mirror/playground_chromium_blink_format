@@ -296,7 +296,9 @@ class InspectorController : public Noncopyable {
   bool isRecordingUserInitiatedProfile() const;
   String getCurrentUserInitiatedProfileName(
       bool incrementProfileNumber = false);
+  void startProfiling() { startUserInitiatedProfiling(); }
   void startUserInitiatedProfiling();
+  void stopProfiling() { stopUserInitiatedProfiling(); }
   void stopUserInitiatedProfiling();
   void enableProfiler(bool always = false, bool skipRecompile = false);
   void disableProfiler(bool always = false);
@@ -342,9 +344,14 @@ class InspectorController : public Noncopyable {
   friend class InspectorInstrumentation;
   friend class InjectedScriptHost;
 
+  enum ProfilerRestoreAction {
+    ProfilerRestoreNoAction = 0,
+    ProfilerRestoreResetAgent = 1
+  };
+
   void populateScriptObjects();
   void restoreDebugger();
-  void restoreProfiler();
+  void restoreProfiler(ProfilerRestoreAction action);
   void unbindAllResources();
   void setSearchingForNode(bool enabled);
 

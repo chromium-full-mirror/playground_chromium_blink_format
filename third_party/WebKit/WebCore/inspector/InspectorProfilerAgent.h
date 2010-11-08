@@ -77,10 +77,8 @@ class InspectorProfilerAgent : public Noncopyable {
   void removeProfile(const String& type, unsigned uid);
   void resetState();
   void setFrontend(InspectorFrontend* frontend) { m_frontend = frontend; }
-  void startProfiling() { startUserInitiatedProfiling(); }
   void startUserInitiatedProfiling();
-  void stopProfiling() { stopUserInitiatedProfiling(); }
-  void stopUserInitiatedProfiling();
+  void stopUserInitiatedProfiling(bool ignoreProfile = false);
   void takeHeapSnapshot();
   void toggleRecordButton(bool isProfiling);
 

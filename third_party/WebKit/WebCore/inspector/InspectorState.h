@@ -54,6 +54,7 @@ class InspectorState {
     inspectorAttachedHeight,
     pauseOnExceptionsState,
     consoleMessagesEnabled,
+    userInitiatedProfiling,
     lastPropertyId
   };
 

@@ -230,6 +230,8 @@ void InspectorController::restoreInspectorStateFromCookie(
   m_state->restoreFromInspectorCookie(inspectorStateCookie);
   if (m_state->getBoolean(InspectorState::timelineProfilerEnabled))
     startTimelineProfiler();
+  if (m_state->getBoolean(InspectorState::userInitiatedProfiling))
+    startUserInitiatedProfiling();
 }
 
 void InspectorController::inspect(Node* node) {
@@ -517,7 +519,7 @@ void InspectorController::connectFrontend() {
 void InspectorController::reuseFrontend() {
   connectFrontend();
   restoreDebugger();
-  restoreProfiler();
+  restoreProfiler(ProfilerRestoreResetAgent);
 }
 
 void InspectorController::show() {
@@ -582,7 +584,7 @@ void InspectorController::disconnectFrontend() {
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   m_profilerAgent->setFrontend(0);
-  m_profilerAgent->stopUserInitiatedProfiling();
+  m_profilerAgent->stopUserInitiatedProfiling(true);
 #endif
 
   releaseFrontendLifetimeAgents();
@@ -664,7 +666,7 @@ void InspectorController::populateScriptObjects() {
   m_pendingEvaluateTestCommands.clear();
 
   restoreDebugger();
-  restoreProfiler();
+  restoreProfiler(ProfilerRestoreNoAction);
 }
 
 void InspectorController::restoreDebugger() {
@@ -680,13 +682,15 @@ void InspectorController::restoreDebugger() {
 #endif
 }
 
-void InspectorController::restoreProfiler() {
+void InspectorController::restoreProfiler(ProfilerRestoreAction action) {
   ASSERT(m_frontend);
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   m_profilerAgent->setFrontend(m_frontend.get());
   if (!ScriptProfiler::isProfilerAlwaysEnabled() &&
       m_state->getBoolean(InspectorState::profilerAlwaysEnabled))
     enableProfiler();
+  if (action == ProfilerRestoreResetAgent)
+    m_profilerAgent->resetState();
 #endif
 }
 
@@ -734,6 +738,7 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
 #endif
 
 #if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
+    m_profilerAgent->stopUserInitiatedProfiling(true);
     m_profilerAgent->resetState();
 #endif
 
@@ -1364,12 +1369,14 @@ void InspectorController::startUserInitiatedProfiling() {
   if (!enabled())
     return;
   m_profilerAgent->startUserInitiatedProfiling();
+  m_state->setBoolean(InspectorState::userInitiatedProfiling, true);
 }
 
 void InspectorController::stopUserInitiatedProfiling() {
   if (!enabled())
     return;
   m_profilerAgent->stopUserInitiatedProfiling();
+  m_state->setBoolean(InspectorState::userInitiatedProfiling, false);
 }
 
 bool InspectorController::profilerEnabled() const {
