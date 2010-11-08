@@ -36,7 +36,7 @@
 
 namespace WebCore {
 
-class Cache;
+class MemoryCache;
 class CachedMetadata;
 class CachedResourceClient;
 class CachedResourceHandleBase;
@@ -53,7 +53,7 @@ class Request;
 // This class also does the actual communication with the loader to obtain the
 // resource from the network.
 class CachedResource : public Noncopyable {
-  friend class Cache;
+  friend class MemoryCache;
   friend class InspectorResource;
 
  public:
@@ -260,7 +260,7 @@ class CachedResource : public Noncopyable {
  private:
   void addClientToSet(CachedResourceClient*);
 
-  // These are called by the friendly Cache only
+  // These are called by the friendly MemoryCache only
   void setResourceToRevalidate(CachedResource*);
   void switchClientsToRevalidatedResource();
   void clearResourceToRevalidate();

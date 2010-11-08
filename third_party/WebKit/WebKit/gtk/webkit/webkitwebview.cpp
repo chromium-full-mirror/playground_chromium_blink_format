@@ -44,7 +44,7 @@
 #include "AXObjectCache.h"
 #include "AbstractDatabase.h"
 #include "BackForwardListImpl.h"
-#include "Cache.h"
+#include "MemoryCache.h"
 #include "ChromeClientGtk.h"
 #include "ClipboardUtilitiesGtk.h"
 #include "ContextMenuClientGtk.h"

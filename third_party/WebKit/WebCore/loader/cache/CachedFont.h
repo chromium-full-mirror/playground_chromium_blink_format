@@ -39,7 +39,7 @@
 namespace WebCore {
 
 class CachedResourceLoader;
-class Cache;
+class MemoryCache;
 class FontPlatformData;
 class SVGFontElement;
 
@@ -86,7 +86,7 @@ class CachedFont : public CachedResource {
   RefPtr<SVGDocument> m_externalSVGDocument;
 #endif
 
-  friend class Cache;
+  friend class MemoryCache;
 };
 }
 
