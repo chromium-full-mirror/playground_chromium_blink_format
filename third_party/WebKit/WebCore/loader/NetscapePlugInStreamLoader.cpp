@@ -43,8 +43,13 @@ NetscapePlugInStreamLoader::~NetscapePlugInStreamLoader() {}
 
 PassRefPtr<NetscapePlugInStreamLoader> NetscapePlugInStreamLoader::create(
     Frame* frame,
-    NetscapePlugInStreamLoaderClient* client) {
-  return adoptRef(new NetscapePlugInStreamLoader(frame, client));
+    NetscapePlugInStreamLoaderClient* client,
+    const ResourceRequest& request) {
+  RefPtr<NetscapePlugInStreamLoader> loader(
+      adoptRef(new NetscapePlugInStreamLoader(frame, client)));
+  loader->setShouldBufferData(false);
+  loader->documentLoader()->addPlugInStreamLoader(loader.get());
+  return loader->load(request) ? loader.release() : 0;
 }
 
 bool NetscapePlugInStreamLoader::isDone() const {

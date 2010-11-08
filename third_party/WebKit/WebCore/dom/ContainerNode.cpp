@@ -36,11 +36,11 @@
 #include "InlineTextBox.h"
 #include "InspectorInstrumentation.h"
 #include "MutationEvent.h"
+#include "ResourceLoadScheduler.h"
 #include "Page.h"
 #include "RenderBox.h"
 #include "RenderTheme.h"
 #include "RootInlineBox.h"
-#include "loader.h"
 #include <wtf/CurrentTime.h>
 #include <wtf/Vector.h>
 
@@ -667,7 +667,7 @@ void ContainerNode::suspendPostAttachCallbacks() {
         s_shouldReEnableMemoryCacheCallsAfterAttach = true;
       }
     }
-    cache()->loader()->suspendPendingRequests();
+    resourceLoadScheduler()->suspendPendingRequests();
   }
   ++s_attachDepth;
 }
@@ -681,7 +681,7 @@ void ContainerNode::resumePostAttachCallbacks() {
       if (Page* page = document()->page())
         page->setMemoryCacheClientCallsEnabled(true);
     }
-    cache()->loader()->resumePendingRequests();
+    resourceLoadScheduler()->resumePendingRequests();
   }
   --s_attachDepth;
 }

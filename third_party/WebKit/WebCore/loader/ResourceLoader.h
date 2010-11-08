@@ -162,8 +162,13 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
   virtual AsyncFileStream* createAsyncFileStream(FileStreamClient*);
 #endif
 
+  const KURL& url() const { return m_request.url(); }
   ResourceHandle* handle() const { return m_handle.get(); }
   bool sendResourceLoadCallbacks() const { return m_sendResourceLoadCallbacks; }
+
+  // Called by ResourceLoadScheduler to create a ResourceHandle and actually
+  // begin the load.
+  bool start();
 
   void setShouldBufferData(bool shouldBufferData);
 
