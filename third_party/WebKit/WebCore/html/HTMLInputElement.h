@@ -71,6 +71,7 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   // double pointer.
   // Returns false if there is no "allowed value step."
   bool getAllowedValueStep(double*) const;
+  bool getAllowedValueStepWithDecimalPlaces(double*, unsigned*) const;
   // For ValidityState.
   bool stepMismatch(const String&) const;
 

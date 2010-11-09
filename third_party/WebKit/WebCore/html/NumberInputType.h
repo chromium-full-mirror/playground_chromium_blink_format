@@ -52,10 +52,15 @@ class NumberInputType : public TextFieldInputType {
   virtual double maximum() const;
   virtual bool stepMismatch(const String&, double) const;
   virtual double stepBase() const;
+  virtual double stepBaseWithDecimalPlaces(unsigned*) const;
   virtual double defaultStep() const;
   virtual double stepScaleFactor() const;
   virtual double parseToDouble(const String&, double) const;
+  virtual double parseToDoubleWithDecimalPlaces(const String&,
+                                                double,
+                                                unsigned*) const;
   virtual String serialize(double) const;
+  virtual double acceptableError(double) const;
 };
 
 }  // namespace WebCore

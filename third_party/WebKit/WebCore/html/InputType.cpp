@@ -218,6 +218,12 @@ double InputType::stepBase() const {
   return 0;
 }
 
+double InputType::stepBaseWithDecimalPlaces(unsigned* decimalPlaces) const {
+  if (decimalPlaces)
+    *decimalPlaces = 0;
+  return stepBase();
+}
+
 double InputType::defaultStep() const {
   return numeric_limits<double>::quiet_NaN();
 }
@@ -234,6 +240,10 @@ bool InputType::scaledStepValeuShouldBeInteger() const {
   return false;
 }
 
+double InputType::acceptableError(double) const {
+  return 0;
+}
+
 RenderObject* InputType::createRenderer(RenderArena*,
                                         RenderStyle* style) const {
   return RenderObject::createObject(element(), style);
@@ -241,6 +251,15 @@ RenderObject* InputType::createRenderer(RenderArena*,
 
 double InputType::parseToDouble(const String&, double defaultValue) const {
   return defaultValue;
+}
+
+double InputType::parseToDoubleWithDecimalPlaces(
+    const String& src,
+    double defaultValue,
+    unsigned* decimalPlaces) const {
+  if (decimalPlaces)
+    *decimalPlaces = 0;
+  return parseToDouble(src, defaultValue);
 }
 
 bool InputType::parseToDateComponents(const String&, DateComponents*) const {
