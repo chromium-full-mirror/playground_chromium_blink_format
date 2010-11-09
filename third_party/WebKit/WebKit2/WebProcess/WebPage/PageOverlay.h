@@ -46,6 +46,8 @@ class PageOverlay : public RefCounted<PageOverlay> {
     virtual ~Client() {}
 
    public:
+    virtual void willMoveToWebPage(PageOverlay*, WebPage*) = 0;
+    virtual void didMoveToWebPage(PageOverlay*, WebPage*) = 0;
     virtual void drawRect(PageOverlay*,
                           WebCore::GraphicsContext&,
                           const WebCore::IntRect& dirtyRect) = 0;

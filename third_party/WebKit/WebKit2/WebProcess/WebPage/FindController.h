@@ -39,10 +39,9 @@ class IntRect;
 
 namespace WebKit {
 
-class FindPageOverlay;
 class WebPage;
 
-class FindController {
+class FindController : private PageOverlay::Client {
   WTF_MAKE_NONCOPYABLE(FindController);
 
  public:
@@ -58,27 +57,24 @@ class FindController {
                           bool caseInsensitive,
                           unsigned maxMatchCount);
 
-  void findPageOverlayDestroyed();
-
   void hideFindIndicator();
 
  private:
-  bool updateFindIndicator(WebCore::Frame* selectedFrame,
-                           bool isShowingOverlay);
-
-  // FIXME: These three member functions should be private once FindPageOverlay
-  // has been removed.
- public:
-  Vector<WebCore::IntRect> rectsForTextMatches();
   // PageOverlay::Client.
+  virtual void willMoveToWebPage(PageOverlay*, WebPage*);
+  virtual void didMoveToWebPage(PageOverlay*, WebPage*);
   virtual bool mouseEvent(PageOverlay*, const WebMouseEvent&);
   virtual void drawRect(PageOverlay*,
                         WebCore::GraphicsContext&,
                         const WebCore::IntRect& dirtyRect);
 
+  Vector<WebCore::IntRect> rectsForTextMatches();
+  bool updateFindIndicator(WebCore::Frame* selectedFrame,
+                           bool isShowingOverlay);
+
  private:
   WebPage* m_webPage;
-  FindPageOverlay* m_findPageOverlay;
+  PageOverlay* m_findPageOverlay;
 
   // Whether the UI process is showing the find indicator. Note that this can be
   // true even if

@@ -26,7 +26,6 @@
 #include "FindController.h"
 
 #include "BackingStore.h"
-#include "FindPageOverlay.h"
 #include "WKPage.h"
 #include "WebCoreArgumentCoders.h"
 #include "WebPage.h"
@@ -132,7 +131,7 @@ void FindController::findString(const String& string,
   }
 
   if (!m_findPageOverlay) {
-    OwnPtr<FindPageOverlay> findPageOverlay = FindPageOverlay::create(this);
+    RefPtr<PageOverlay> findPageOverlay = PageOverlay::create(this);
     m_findPageOverlay = findPageOverlay.get();
     m_webPage->installPageOverlay(findPageOverlay.release());
   } else {
@@ -146,11 +145,6 @@ void FindController::hideFindUI() {
     m_webPage->uninstallPageOverlay();
 
   hideFindIndicator();
-}
-
-void FindController::findPageOverlayDestroyed() {
-  ASSERT(m_findPageOverlay);
-  m_findPageOverlay = 0;
 }
 
 bool FindController::updateFindIndicator(Frame* selectedFrame,
@@ -247,6 +241,17 @@ Vector<IntRect> FindController::rectsForTextMatches() {
 
   return rects;
 }
+
+void FindController::willMoveToWebPage(PageOverlay*, WebPage* webPage) {
+  if (webPage)
+    return;
+
+  // The page overlay is moving away from the web page, reset it.
+  ASSERT(m_findPageOverlay);
+  m_findPageOverlay = 0;
+}
+
+void FindController::didMoveToWebPage(PageOverlay*, WebPage*) {}
 
 static const float shadowOffsetX = 0.0;
 static const float shadowOffsetY = 1.0;
