@@ -837,7 +837,8 @@ class RenderLayer : public ScrollbarClient {
 
 #ifndef NDEBUG
 // Outside the WebCore namespace for ease of invocation from gdb.
-void showLayerTree(const WebCore::RenderLayer* layer);
+void showLayerTree(const WebCore::RenderLayer*);
+void showLayerTree(const WebCore::RenderObject*);
 #endif
 
 #endif  // RenderLayer_h
