@@ -77,8 +77,8 @@ class TestPopupMenuClient : public PopupMenuClient {
   virtual bool itemIsEnabled(unsigned listIndex) const { return true; }
   virtual PopupMenuStyle itemStyle(unsigned listIndex) const {
     Font font(FontPlatformData(12.0, false, false), false);
-    return PopupMenuStyle(Color::black, Color::white, font, true, Length(),
-                          TextDirection());
+    return PopupMenuStyle(Color::black, Color::white, font, true, false,
+                          Length(), TextDirection());
   }
   virtual PopupMenuStyle menuStyle() const { return itemStyle(0); }
   virtual int clientInsetLeft() const { return 0; }
