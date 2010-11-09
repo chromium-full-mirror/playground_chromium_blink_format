@@ -40,13 +40,15 @@ class ResourceRequest : public ResourceRequestBase {
       : ResourceRequestBase(KURL(ParsedURLString, url), UseProtocolCachePolicy),
         m_requestorID(0),
         m_requestorProcessID(0),
-        m_appCacheHostID(0) {}
+        m_appCacheHostID(0),
+        m_hasUserGesture(false) {}
 
   ResourceRequest(const KURL& url)
       : ResourceRequestBase(url, UseProtocolCachePolicy),
         m_requestorID(0),
         m_requestorProcessID(0),
-        m_appCacheHostID(0) {}
+        m_appCacheHostID(0),
+        m_hasUserGesture(false) {}
 
   ResourceRequest(const KURL& url,
                   const String& referrer,
@@ -54,7 +56,8 @@ class ResourceRequest : public ResourceRequestBase {
       : ResourceRequestBase(url, policy),
         m_requestorID(0),
         m_requestorProcessID(0),
-        m_appCacheHostID(0) {
+        m_appCacheHostID(0),
+        m_hasUserGesture(false) {
     setHTTPReferrer(referrer);
   }
 
@@ -62,7 +65,8 @@ class ResourceRequest : public ResourceRequestBase {
       : ResourceRequestBase(KURL(), UseProtocolCachePolicy),
         m_requestorID(0),
         m_requestorProcessID(0),
-        m_appCacheHostID(0) {}
+        m_appCacheHostID(0),
+        m_hasUserGesture(false) {}
 
   // Allows the request to be matched up with its requestor.
   int requestorID() const { return m_requestorID; }
@@ -81,6 +85,12 @@ class ResourceRequest : public ResourceRequestBase {
   int appCacheHostID() const { return m_appCacheHostID; }
   void setAppCacheHostID(int id) { m_appCacheHostID = id; }
 
+  // True if request was user initiated.
+  bool hasUserGesture() const { return m_hasUserGesture; }
+  void setHasUserGesture(bool hasUserGesture) {
+    m_hasUserGesture = hasUserGesture;
+  }
+
  private:
   friend class ResourceRequestBase;
 
@@ -94,6 +104,7 @@ class ResourceRequest : public ResourceRequestBase {
   int m_requestorID;
   int m_requestorProcessID;
   int m_appCacheHostID;
+  bool m_hasUserGesture;
 };
 
 struct CrossThreadResourceRequestData
@@ -101,6 +112,7 @@ struct CrossThreadResourceRequestData
   int m_requestorID;
   int m_requestorProcessID;
   int m_appCacheHostID;
+  bool m_hasUserGesture;
 };
 
 }  // namespace WebCore

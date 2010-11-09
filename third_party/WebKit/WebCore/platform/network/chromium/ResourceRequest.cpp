@@ -42,6 +42,7 @@ PassOwnPtr<CrossThreadResourceRequestData> ResourceRequest::doPlatformCopyData(
   data->m_requestorID = m_requestorID;
   data->m_requestorProcessID = m_requestorProcessID;
   data->m_appCacheHostID = m_appCacheHostID;
+  data->m_hasUserGesture = m_hasUserGesture;
   return data;
 }
 
@@ -50,6 +51,7 @@ void ResourceRequest::doPlatformAdopt(
   m_requestorID = data->m_requestorID;
   m_requestorProcessID = data->m_requestorProcessID;
   m_appCacheHostID = data->m_appCacheHostID;
+  m_hasUserGesture = data->m_hasUserGesture;
 }
 
 }  // namespace WebCore
