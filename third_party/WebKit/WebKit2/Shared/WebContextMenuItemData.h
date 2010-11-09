@@ -61,6 +61,8 @@ class WebContextMenuItemData {
   bool checked() const { return m_checked; }
   const Vector<WebContextMenuItemData>& submenu() const { return m_submenu; }
 
+  WebCore::ContextMenuItem core() const;
+
   void encode(CoreIPC::ArgumentEncoder*) const;
   static bool decode(CoreIPC::ArgumentDecoder*, WebContextMenuItemData&);
 
@@ -75,6 +77,8 @@ class WebContextMenuItemData {
 
 Vector<WebContextMenuItemData> kitItems(Vector<WebCore::ContextMenuItem>&,
                                         WebCore::ContextMenu*);
+Vector<WebCore::ContextMenuItem> coreItems(
+    const Vector<WebContextMenuItemData>&);
 
 }  // namespace WebKit
 

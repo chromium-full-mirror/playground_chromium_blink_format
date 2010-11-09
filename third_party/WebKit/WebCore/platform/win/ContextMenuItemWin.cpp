@@ -94,6 +94,22 @@ ContextMenuItem::ContextMenuItem(ContextMenuItemType type,
   m_platformDescription->dwTypeData = wcsdup(t.charactersWithNullTermination());
 }
 
+ContextMenuItem::ContextMenuItem(ContextMenuItemType,
+                                 ContextMenuAction,
+                                 const String&,
+                                 bool,
+                                 bool) {
+  // FIXME: Implement
+}
+
+ContextMenuItem::ContextMenuItem(ContextMenuAction,
+                                 const String&,
+                                 bool,
+                                 bool,
+                                 Vector<ContextMenuItem>&) {
+  // FIXME: Implement
+}
+
 ContextMenuItem::~ContextMenuItem() {
   if (m_platformDescription) {
     if (m_platformDescription->fType == MFT_STRING)
@@ -162,6 +178,10 @@ void ContextMenuItem::setSubMenu(ContextMenu* subMenu) {
 
   m_platformDescription->fMask |= MIIM_SUBMENU;
   m_platformDescription->hSubMenu = subMenu->releasePlatformDescription();
+}
+
+void ContextMenuItem::setSubMenu(Vector<ContextMenuItem>&) {
+  // FIXME: Implement
 }
 
 void ContextMenuItem::setChecked(bool checked) {

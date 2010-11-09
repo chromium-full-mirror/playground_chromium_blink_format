@@ -68,5 +68,11 @@ Vector<ContextMenuItem> contextMenuItemVector(PlatformMenuDescription) {
   // FIXME - Implement
   return Vector<ContextMenuItem>();
 }
+
+PlatformMenuDescription platformMenuDescription(
+    Vector<ContextMenuItem>& menuItemVector) {
+  // FIXME - Implement
+  return 0;
+}
 }
 // vim: ts=4 sw=4 et

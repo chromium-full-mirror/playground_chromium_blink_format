@@ -29,6 +29,7 @@
 #include "APIObject.h"
 #include "DrawingArea.h"
 #include "FindController.h"
+#include "InjectedBundlePageContextMenuClient.h"
 #include "InjectedBundlePageEditorClient.h"
 #include "InjectedBundlePageFormClient.h"
 #include "InjectedBundlePageLoaderClient.h"
@@ -136,11 +137,16 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
                          CoreIPC::ArgumentDecoder*);
 
   // -- InjectedBundle methods
+  void initializeInjectedBundleContextMenuClient(
+      WKBundlePageContextMenuClient*);
   void initializeInjectedBundleEditorClient(WKBundlePageEditorClient*);
   void initializeInjectedBundleFormClient(WKBundlePageFormClient*);
   void initializeInjectedBundleLoaderClient(WKBundlePageLoaderClient*);
   void initializeInjectedBundleUIClient(WKBundlePageUIClient*);
 
+  InjectedBundlePageContextMenuClient& injectedBundleContextMenuClient() {
+    return m_contextMenuClient;
+  }
   InjectedBundlePageEditorClient& injectedBundleEditorClient() {
     return m_editorClient;
   }
@@ -321,6 +327,7 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
 
   WebCore::IntSize m_windowResizerSize;
 
+  InjectedBundlePageContextMenuClient m_contextMenuClient;
   InjectedBundlePageEditorClient m_editorClient;
   InjectedBundlePageFormClient m_formClient;
   InjectedBundlePageLoaderClient m_loaderClient;

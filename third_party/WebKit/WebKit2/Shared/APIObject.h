@@ -37,6 +37,7 @@ class APIObject : public RefCounted<APIObject> {
     TypeNull = 0,
     TypeArray,
     TypeCertificateInfo,
+    TypeContextMenuItem,
     TypeData,
     TypeDictionary,
     TypeError,

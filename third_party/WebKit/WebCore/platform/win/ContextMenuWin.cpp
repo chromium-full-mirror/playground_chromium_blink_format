@@ -154,4 +154,10 @@ Vector<ContextMenuItem> contextMenuItemVector(PlatformMenuDescription) {
   // FIXME - Implement
   return Vector<ContextMenuItem>();
 }
+
+PlatformMenuDescription platformMenuDescription(
+    Vector<ContextMenuItem>& menuItemVector) {
+  // FIXME - Implement
+  return 0;
+}
 }

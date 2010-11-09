@@ -35,4 +35,8 @@ void MutableArray::append(APIObject* item) {
   m_entries.append(item);
 }
 
+void MutableArray::reserveCapacity(unsigned capacity) {
+  m_entries.reserveCapacity(capacity);
+}
+
 }  // namespace WebKit
