@@ -268,7 +268,7 @@ void AutoFillPopupMenuClient::initialize(HTMLInputElement* textField,
   font.update(textField->document()->styleSelector()->fontSelector());
   // The direction of text in popup menu is set the same as the direction of
   // the input element: textField.
-  m_style.set(new PopupMenuStyle(Color::black, Color::white, font, true,
+  m_style.set(new PopupMenuStyle(Color::black, Color::white, font, true, false,
                                  Length(WebCore::Fixed),
                                  textField->renderer()->style()->direction()));
 }

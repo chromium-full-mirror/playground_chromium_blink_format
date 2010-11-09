@@ -432,7 +432,8 @@ PopupMenuStyle RenderMenuList::itemStyle(unsigned listIndex) const {
   return style ? PopupMenuStyle(style->visitedDependentColor(CSSPropertyColor),
                                 itemBackgroundColor(listIndex), style->font(),
                                 style->visibility() == VISIBLE,
-                                style->textIndent(), style->direction())
+                                style->display() == NONE, style->textIndent(),
+                                style->direction())
                : menuStyle();
 }
 
@@ -468,8 +469,8 @@ PopupMenuStyle RenderMenuList::menuStyle() const {
   RenderStyle* s = m_innerBlock ? m_innerBlock->style() : style();
   return PopupMenuStyle(s->visitedDependentColor(CSSPropertyColor),
                         s->visitedDependentColor(CSSPropertyBackgroundColor),
-                        s->font(), s->visibility() == VISIBLE, s->textIndent(),
-                        s->direction());
+                        s->font(), s->visibility() == VISIBLE,
+                        s->display() == NONE, s->textIndent(), s->direction());
 }
 
 HostWindow* RenderMenuList::hostWindow() const {

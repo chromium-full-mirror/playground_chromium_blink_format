@@ -39,12 +39,14 @@ class PopupMenuStyle {
                  const Color& background,
                  const Font& font,
                  bool visible,
+                 bool isDisplayNone,
                  Length textIndent,
                  TextDirection textDirection)
       : m_foregroundColor(foreground),
         m_backgroundColor(background),
         m_font(font),
         m_visible(visible),
+        m_isDisplayNone(isDisplayNone),
         m_textIndent(textIndent),
         m_textDirection(textDirection) {}
 
@@ -52,6 +54,7 @@ class PopupMenuStyle {
   const Color& backgroundColor() const { return m_backgroundColor; }
   const Font& font() const { return m_font; }
   bool isVisible() const { return m_visible; }
+  bool isDisplayNone() const { return m_isDisplayNone; }
   Length textIndent() const { return m_textIndent; }
   TextDirection textDirection() const { return m_textDirection; }
 
@@ -60,6 +63,7 @@ class PopupMenuStyle {
   Color m_backgroundColor;
   Font m_font;
   bool m_visible;
+  bool m_isDisplayNone;
   Length m_textIndent;
   TextDirection m_textDirection;
 };
