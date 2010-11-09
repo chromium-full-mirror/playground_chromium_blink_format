@@ -260,7 +260,7 @@ void ProgressTracker::incrementProgress(unsigned long identifier,
 void ProgressTracker::completeProgress(unsigned long identifier) {
   ProgressItem* item = m_progressItems.get(identifier);
 
-  // FIXME: Can this happen?
+  // This can happen if a load fails without receiving any response data.
   if (!item)
     return;
 
