@@ -359,7 +359,8 @@ void ScrollView::windowResizerRectChanged() {
 static const unsigned cMaxUpdateScrollbarsPass = 2;
 
 void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
-  if (m_inUpdateScrollbars || prohibitsScrolling() || platformWidget())
+  if (m_inUpdateScrollbars || prohibitsScrolling() || delegatesScrolling() ||
+      platformWidget())
     return;
 
   // If we came in here with the view already needing a layout, then go ahead
