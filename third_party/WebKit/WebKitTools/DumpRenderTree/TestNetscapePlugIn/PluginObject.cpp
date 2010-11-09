@@ -176,6 +176,7 @@ static const NPUTF8* pluginPropertyIdentifierNames[NUM_PROPERTY_IDENTIFIERS] = {
 
 enum {
   ID_TEST_CALLBACK_METHOD = 0,
+  ID_TEST_CALLBACK_METHOD_RETURN,
   ID_TEST_GETURL,
   ID_TEST_DOM_ACCESS,
   ID_TEST_GET_URL_NOTIFY,
@@ -213,6 +214,7 @@ enum {
 static NPIdentifier pluginMethodIdentifiers[NUM_METHOD_IDENTIFIERS];
 static const NPUTF8* pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
     "testCallback",
+    "testCallbackReturn",
     "getURL",
     "testDOMAccess",
     "getURLNotify",
@@ -525,6 +527,38 @@ static bool testCallback(PluginObject* obj,
   browser->releaseobject(windowScriptObject);
 
   VOID_TO_NPVARIANT(*result);
+  return true;
+}
+
+static bool testCallbackReturn(PluginObject* obj,
+                               const NPVariant* args,
+                               uint32_t argCount,
+                               NPVariant* result) {
+  if (argCount != 1 || !NPVARIANT_IS_STRING(args[0]))
+    return false;
+
+  NPObject* windowScriptObject;
+  browser->getvalue(obj->npp, NPNVWindowNPObject, &windowScriptObject);
+
+  NPUTF8* callbackString = createCStringFromNPVariant(&args[0]);
+  NPIdentifier callbackIdentifier =
+      browser->getstringidentifier(callbackString);
+  free(callbackString);
+
+  NPVariant callbackArgs[1];
+  OBJECT_TO_NPVARIANT(windowScriptObject, callbackArgs[0]);
+
+  NPVariant browserResult;
+  browser->invoke(obj->npp, windowScriptObject, callbackIdentifier,
+                  callbackArgs, 1, &browserResult);
+
+  if (NPVARIANT_IS_OBJECT(browserResult))
+    OBJECT_TO_NPVARIANT(NPVARIANT_TO_OBJECT(browserResult), *result);
+  else {
+    browser->releasevariantvalue(&browserResult);
+    VOID_TO_NPVARIANT(*result);
+  }
+
   return true;
 }
 
@@ -1008,6 +1042,8 @@ static bool pluginInvoke(NPObject* header,
   PluginObject* plugin = reinterpret_cast<PluginObject*>(header);
   if (name == pluginMethodIdentifiers[ID_TEST_CALLBACK_METHOD])
     return testCallback(plugin, args, argCount, result);
+  if (name == pluginMethodIdentifiers[ID_TEST_CALLBACK_METHOD_RETURN])
+    return testCallbackReturn(plugin, args, argCount, result);
   if (name == pluginMethodIdentifiers[ID_TEST_GETURL])
     return getURL(plugin, args, argCount, result);
   if (name == pluginMethodIdentifiers[ID_TEST_DOM_ACCESS])
