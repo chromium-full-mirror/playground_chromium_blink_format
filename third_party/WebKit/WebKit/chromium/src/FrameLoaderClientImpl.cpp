@@ -51,6 +51,7 @@
 #include "PlatformString.h"
 #include "PluginData.h"
 #include "PluginDataChromium.h"
+#include "ProgressTracker.h"
 #include "Settings.h"
 #include "StringExtras.h"
 #include "WebDataSourceImpl.h"
@@ -976,7 +977,12 @@ void FrameLoaderClientImpl::postProgressStartedNotification() {
 }
 
 void FrameLoaderClientImpl::postProgressEstimateChangedNotification() {
-  // FIXME
+  WebViewImpl* webview = m_webFrame->viewImpl();
+  if (webview && webview->client()) {
+    webview->client()->didChangeLoadProgress(
+        m_webFrame,
+        m_webFrame->frame()->page()->progress()->estimatedProgress());
+  }
 }
 
 void FrameLoaderClientImpl::postProgressFinishedNotification() {
