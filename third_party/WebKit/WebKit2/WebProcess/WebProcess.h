@@ -106,6 +106,16 @@ class WebProcess : ChildProcess {
 
   void setCacheModel(uint32_t);
   void platformSetCacheModel(CacheModel);
+  static void calculateCacheSizes(CacheModel cacheModel,
+                                  uint64_t memorySize,
+                                  uint64_t diskFreeSize,
+                                  unsigned& cacheTotalCapacity,
+                                  unsigned& cacheMinDeadCapacity,
+                                  unsigned& cacheMaxDeadCapacity,
+                                  double& deadDecodedDataDeletionInterval,
+                                  unsigned& pageCacheCapacity,
+                                  unsigned long& urlCacheMemoryCapacity,
+                                  unsigned long& urlCacheDiskCapacity);
 
   // CoreIPC::Connection::Client
   void didReceiveMessage(CoreIPC::Connection*,
