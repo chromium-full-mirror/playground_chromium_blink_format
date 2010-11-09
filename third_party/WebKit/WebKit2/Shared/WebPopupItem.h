@@ -44,7 +44,8 @@ struct WebPopupItem {
                const String& text,
                const String& toolTip,
                const String& accessibilityText,
-               bool isEnabled);
+               bool isEnabled,
+               bool m_isLabel);
 
   void encode(CoreIPC::ArgumentEncoder*) const;
   static bool decode(CoreIPC::ArgumentDecoder*, WebPopupItem&);
@@ -54,6 +55,7 @@ struct WebPopupItem {
   String m_toolTip;
   String m_accessibilityText;
   bool m_isEnabled;
+  bool m_isLabel;
 };
 
 }  // namespace WebKit

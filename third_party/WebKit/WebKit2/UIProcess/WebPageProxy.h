@@ -88,6 +88,7 @@ class WebPopupMenuProxy;
 class WebProcessProxy;
 class WebURLRequest;
 class WebWheelEvent;
+struct PlatformPopupMenuData;
 struct WebNavigationDataStore;
 struct WebPageCreationParameters;
 struct WebPopupItem;
@@ -405,7 +406,8 @@ class WebPageProxy : public APIObject {
   // Popup Menu.
   void showPopupMenu(const WebCore::IntRect& rect,
                      const Vector<WebPopupItem>& items,
-                     int32_t selectedIndex);
+                     int32_t selectedIndex,
+                     const PlatformPopupMenuData&);
   void hidePopupMenu();
 
   // Context Menu.

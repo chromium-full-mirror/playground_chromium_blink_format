@@ -36,6 +36,7 @@ class IntRect;
 
 namespace WebKit {
 
+struct PlatformPopupMenuData;
 struct WebPopupItem;
 
 class WebPopupMenuProxy : public RefCounted<WebPopupMenuProxy> {
@@ -44,6 +45,7 @@ class WebPopupMenuProxy : public RefCounted<WebPopupMenuProxy> {
 
   virtual void showPopupMenu(const WebCore::IntRect& rect,
                              const Vector<WebPopupItem>& items,
+                             const PlatformPopupMenuData&,
                              int32_t selectedIndex,
                              int32_t& newSelectedIndex) = 0;
   virtual void hidePopupMenu() = 0;

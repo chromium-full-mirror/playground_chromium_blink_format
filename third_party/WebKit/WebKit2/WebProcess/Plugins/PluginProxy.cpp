@@ -132,7 +132,7 @@ void PluginProxy::paint(GraphicsContext* graphicsContext,
         m_backingStore->createGraphicsContext();
 
     m_pluginBackingStore->paint(
-        graphicsContext.get(),
+        *graphicsContext, IntPoint(),
         IntRect(0, 0, m_frameRect.width(), m_frameRect.height()));
 
     m_pluginBackingStoreContainsValidData = true;
@@ -141,12 +141,8 @@ void PluginProxy::paint(GraphicsContext* graphicsContext,
   IntRect dirtyRectInPluginCoordinates = dirtyRect;
   dirtyRectInPluginCoordinates.move(-m_frameRect.x(), -m_frameRect.y());
 
-  graphicsContext->save();
-
-  graphicsContext->translate(m_frameRect.x(), m_frameRect.y());
-  m_backingStore->paint(graphicsContext, dirtyRectInPluginCoordinates);
-
-  graphicsContext->restore();
+  m_backingStore->paint(*graphicsContext, m_frameRect.location(),
+                        dirtyRectInPluginCoordinates);
 
   if (m_waitingForPaintInResponseToUpdate) {
     m_waitingForPaintInResponseToUpdate = false;
@@ -475,10 +471,10 @@ void PluginProxy::update(const IntRect& paintedRect) {
 
   if (m_backingStore) {
     // Blit the plug-in backing store into our own backing store.
-    OwnPtr<WebCore::GraphicsContext> graphicsContext =
+    OwnPtr<GraphicsContext> graphicsContext =
         m_backingStore->createGraphicsContext();
 
-    m_pluginBackingStore->paint(graphicsContext.get(),
+    m_pluginBackingStore->paint(*graphicsContext, IntPoint(),
                                 paintedRectPluginCoordinates);
   }
 

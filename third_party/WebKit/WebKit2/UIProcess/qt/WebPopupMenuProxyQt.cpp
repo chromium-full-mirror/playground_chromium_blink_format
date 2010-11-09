@@ -25,6 +25,7 @@
 
 #include "WebPopupMenuProxyQt.h"
 
+#include "PlatformPopupMenuData.h"
 #include "WebPopupItem.h"
 
 using namespace WebCore;
@@ -37,6 +38,7 @@ WebPopupMenuProxyQt::~WebPopupMenuProxyQt() {}
 
 void WebPopupMenuProxyQt::showPopupMenu(const IntRect& rect,
                                         const Vector<WebPopupItem>& items,
+                                        const PlatformPopupMenuData&,
                                         int32_t selectedIndex,
                                         int32_t& newSelectedIndex) {}
 

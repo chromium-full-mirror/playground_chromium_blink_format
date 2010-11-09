@@ -32,22 +32,25 @@ namespace WebKit {
 
 WebPopupItem::WebPopupItem() : m_type(Item), m_isEnabled(true) {}
 
-WebPopupItem::WebPopupItem(Type type) : m_type(type), m_isEnabled(true) {}
+WebPopupItem::WebPopupItem(Type type)
+    : m_type(type), m_isEnabled(true), m_isLabel(false) {}
 
 WebPopupItem::WebPopupItem(Type type,
                            const String& text,
                            const String& toolTip,
                            const String& accessibilityText,
-                           bool isEnabled)
+                           bool isEnabled,
+                           bool isLabel)
     : m_type(type),
       m_text(text),
       m_toolTip(toolTip),
       m_accessibilityText(accessibilityText),
-      m_isEnabled(isEnabled) {}
+      m_isEnabled(isEnabled),
+      m_isLabel(isLabel) {}
 
 void WebPopupItem::encode(CoreIPC::ArgumentEncoder* encoder) const {
   encoder->encode(CoreIPC::In(static_cast<uint32_t>(m_type), m_text, m_toolTip,
-                              m_accessibilityText, m_isEnabled));
+                              m_accessibilityText, m_isEnabled, m_isLabel));
 }
 
 bool WebPopupItem::decode(CoreIPC::ArgumentDecoder* decoder,
@@ -57,12 +60,13 @@ bool WebPopupItem::decode(CoreIPC::ArgumentDecoder* decoder,
   String toolTip;
   String accessibilityText;
   bool isEnabled;
-  if (!decoder->decode(
-          CoreIPC::Out(type, text, toolTip, accessibilityText, isEnabled)))
+  bool isLabel;
+  if (!decoder->decode(CoreIPC::Out(type, text, toolTip, accessibilityText,
+                                    isEnabled, isLabel)))
     return false;
 
   item = WebPopupItem(static_cast<Type>(type), text, toolTip, accessibilityText,
-                      isEnabled);
+                      isEnabled, isLabel);
   return true;
 }
 
