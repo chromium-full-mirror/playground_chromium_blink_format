@@ -40,6 +40,7 @@
 #include "WebChromeClient.h"
 #include "WebContextMenu.h"
 #include "WebContextMenuClient.h"
+#include "WebContextMessages.h"
 #include "WebCoreArgumentCoders.h"
 #include "WebDragClient.h"
 #include "WebEditorClient.h"
@@ -187,9 +188,9 @@ PassRefPtr<Plugin> WebPage::createPlugin(const Plugin::Parameters& parameters) {
   String pluginPath;
 
   if (!WebProcess::shared().connection()->sendSync(
-          Messages::WebProcessProxy::GetPluginPath(parameters.mimeType,
-                                                   parameters.url.string()),
-          Messages::WebProcessProxy::GetPluginPath::Reply(pluginPath), 0)) {
+          Messages::WebContext::GetPluginPath(parameters.mimeType,
+                                              parameters.url.string()),
+          Messages::WebContext::GetPluginPath::Reply(pluginPath), 0)) {
     return 0;
   }
 

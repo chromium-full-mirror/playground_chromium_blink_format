@@ -114,35 +114,15 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
 
   bool sendMessage(CoreIPC::MessageID, PassOwnPtr<CoreIPC::ArgumentEncoder>);
 
-#if ENABLE(PLUGIN_PROCESS)
-  void getPluginProcessConnection(const String& pluginPath,
-                                  CoreIPC::ArgumentEncoder* reply);
-#endif
-  void getPluginPath(const String& mimeType,
-                     const String& urlString,
-                     String& pluginPath);
-  void getPlugins(bool refresh, Vector<WebCore::PluginInfo>&);
-
   void addBackForwardItem(uint64_t itemID,
                           const String& originalURLString,
                           const String& urlString,
                           const String& title);
-  void addVisitedLink(WebCore::LinkHash);
-  void didNavigateWithNavigationData(uint64_t pageID,
-                                     const WebNavigationDataStore& store,
-                                     uint64_t frameID);
-  void didPerformClientRedirect(uint64_t pageID,
-                                const String& sourceURLString,
-                                const String& destinationURLString,
-                                uint64_t frameID);
-  void didPerformServerRedirect(uint64_t pageID,
-                                const String& sourceURLString,
-                                const String& destinationURLString,
-                                uint64_t frameID);
-  void didUpdateHistoryTitle(uint64_t pageID,
-                             const String& title,
-                             const String& url,
-                             uint64_t frameID);
+
+#if ENABLE(PLUGIN_PROCESS)
+  void getPluginProcessConnection(const String& pluginPath,
+                                  CoreIPC::ArgumentEncoder* reply);
+#endif
 
   // CoreIPC::Connection::Client
   void didReceiveMessage(CoreIPC::Connection*,
@@ -173,11 +153,6 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   void didReceiveWebProcessProxyMessage(CoreIPC::Connection*,
                                         CoreIPC::MessageID,
                                         CoreIPC::ArgumentDecoder*);
-  CoreIPC::SyncReplyMode didReceiveSyncWebProcessProxyMessage(
-      CoreIPC::Connection*,
-      CoreIPC::MessageID,
-      CoreIPC::ArgumentDecoder*,
-      CoreIPC::ArgumentEncoder*);
 
   ResponsivenessTimer m_responsivenessTimer;
   RefPtr<CoreIPC::Connection> m_connection;

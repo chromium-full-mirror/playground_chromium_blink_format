@@ -69,7 +69,7 @@ void InjectedBundle::initializeClient(WKBundleClient* client) {
 void InjectedBundle::postMessage(const String& messageName,
                                  APIObject* messageBody) {
   WebProcess::shared().connection()->send(
-      WebContextMessage::PostMessage, 0,
+      WebContextLegacyMessage::PostMessage, 0,
       CoreIPC::In(messageName, InjectedBundleUserMessageEncoder(messageBody)));
 }
 
@@ -80,7 +80,7 @@ void InjectedBundle::postSynchronousMessage(const String& messageName,
   InjectedBundleUserMessageDecoder messageDecoder(returnDataTmp);
 
   bool succeeded = WebProcess::shared().connection()->sendSync(
-      WebContextMessage::PostSynchronousMessage, 0,
+      WebContextLegacyMessage::PostSynchronousMessage, 0,
       CoreIPC::In(messageName, InjectedBundleUserMessageEncoder(messageBody)),
       CoreIPC::Out(messageDecoder));
 

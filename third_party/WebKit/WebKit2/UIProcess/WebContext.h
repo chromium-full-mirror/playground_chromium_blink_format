@@ -101,18 +101,6 @@ class WebContext : public APIObject {
       APIObject*,
       RefPtr<APIObject>& returnData);
 
-  // History client
-  void didNavigateWithNavigationData(WebFrameProxy*,
-                                     const WebNavigationDataStore&);
-  void didPerformClientRedirect(WebFrameProxy*,
-                                const String& sourceURLString,
-                                const String& destinationURLString);
-  void didPerformServerRedirect(WebFrameProxy*,
-                                const String& sourceURLString,
-                                const String& destinationURLString);
-  void didUpdateHistoryTitle(WebFrameProxy*,
-                             const String& title,
-                             const String& url);
   void populateVisitedLinks();
 
   void getStatistics(WKContextStatistics* statistics);
@@ -126,15 +114,15 @@ class WebContext : public APIObject {
   void setDomainRelaxationForbiddenForURLScheme(const String&);
 
   void addVisitedLink(const String&);
-  void addVisitedLink(WebCore::LinkHash);
+  void addVisitedLinkHash(WebCore::LinkHash);
 
   void didReceiveMessage(CoreIPC::Connection*,
                          CoreIPC::MessageID,
                          CoreIPC::ArgumentDecoder*);
-  void didReceiveSyncMessage(CoreIPC::Connection*,
-                             CoreIPC::MessageID,
-                             CoreIPC::ArgumentDecoder*,
-                             CoreIPC::ArgumentEncoder*);
+  CoreIPC::SyncReplyMode didReceiveSyncMessage(CoreIPC::Connection*,
+                                               CoreIPC::MessageID,
+                                               CoreIPC::ArgumentDecoder*,
+                                               CoreIPC::ArgumentEncoder*);
 
   void setCacheModel(CacheModel);
   CacheModel cacheModel() const { return m_cacheModel; }
@@ -155,6 +143,39 @@ class WebContext : public APIObject {
   void ensureWebProcess();
   bool hasValidProcess() const { return m_process && m_process->isValid(); }
   void platformInitializeWebProcess(WebProcessCreationParameters&);
+
+  // History client
+  void didNavigateWithNavigationData(uint64_t pageID,
+                                     const WebNavigationDataStore& store,
+                                     uint64_t frameID);
+  void didPerformClientRedirect(uint64_t pageID,
+                                const String& sourceURLString,
+                                const String& destinationURLString,
+                                uint64_t frameID);
+  void didPerformServerRedirect(uint64_t pageID,
+                                const String& sourceURLString,
+                                const String& destinationURLString,
+                                uint64_t frameID);
+  void didUpdateHistoryTitle(uint64_t pageID,
+                             const String& title,
+                             const String& url,
+                             uint64_t frameID);
+
+  // Plugins
+  void getPlugins(bool refresh, Vector<WebCore::PluginInfo>& plugins);
+  void getPluginPath(const String& mimeType,
+                     const String& urlString,
+                     String& pluginPath);
+
+  // Implemented in generated WebContextMessageReceiver.cpp
+  void didReceiveWebContextMessage(CoreIPC::Connection*,
+                                   CoreIPC::MessageID,
+                                   CoreIPC::ArgumentDecoder*);
+  CoreIPC::SyncReplyMode didReceiveSyncWebContextMessage(
+      CoreIPC::Connection*,
+      CoreIPC::MessageID,
+      CoreIPC::ArgumentDecoder*,
+      CoreIPC::ArgumentEncoder*);
 
   static void languageChanged(void* context);
   void languageChanged();
