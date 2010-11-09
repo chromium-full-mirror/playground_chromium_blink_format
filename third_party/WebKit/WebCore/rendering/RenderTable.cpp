@@ -1248,10 +1248,16 @@ bool RenderTable::nodeAtPoint(const HitTestRequest& request,
     for (RenderObject* child = lastChild(); child;
          child = child->previousSibling()) {
       if (child->isBox() && !toRenderBox(child)->hasSelfPaintingLayer() &&
-          (child->isTableSection() || child == m_caption) &&
-          child->nodeAtPoint(request, result, xPos, yPos, tx, ty, action)) {
-        updateHitTestResult(result, IntPoint(xPos - tx, yPos - ty));
-        return true;
+          (child->isTableSection() || child == m_caption)) {
+        IntPoint childPoint =
+            flipForWritingMode(toRenderBox(child), IntPoint(tx, ty),
+                               ParentToChildFlippingAdjustment);
+        if (child->nodeAtPoint(request, result, xPos, yPos, childPoint.x(),
+                               childPoint.y(), action)) {
+          updateHitTestResult(
+              result, IntPoint(xPos - childPoint.x(), yPos - childPoint.y()));
+          return true;
+        }
       }
     }
   }
@@ -1261,7 +1267,8 @@ bool RenderTable::nodeAtPoint(const HitTestRequest& request,
   if (visibleToHitTesting() && (action == HitTestBlockBackground ||
                                 action == HitTestChildBlockBackground) &&
       boundsRect.intersects(result.rectForPoint(xPos, yPos))) {
-    updateHitTestResult(result, IntPoint(xPos - tx, yPos - ty));
+    updateHitTestResult(result,
+                        flipForWritingMode(IntPoint(xPos - tx, yPos - ty)));
     if (!result.addNodeToRectBasedTestResult(node(), xPos, yPos, boundsRect))
       return true;
   }
