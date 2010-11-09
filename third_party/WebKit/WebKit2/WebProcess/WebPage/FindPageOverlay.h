@@ -42,9 +42,6 @@ class FindPageOverlay : public PageOverlay, public PageOverlay::Client {
  private:
   explicit FindPageOverlay(FindController*);
 
-  Vector<WebCore::IntRect> rectsForTextMatches();
-  WebCore::IntRect bounds() const;
-
   // PageOverlay::Client.
   virtual void drawRect(PageOverlay*,
                         WebCore::GraphicsContext&,

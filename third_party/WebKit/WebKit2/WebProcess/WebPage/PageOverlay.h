@@ -67,6 +67,8 @@ class PageOverlay : public RefCounted<PageOverlay> {
   WebPage* webPage() const { return m_webPage; }
 
  private:
+  WebCore::IntRect bounds() const;
+
   Client* m_client;
 
   WebPage* m_webPage;
