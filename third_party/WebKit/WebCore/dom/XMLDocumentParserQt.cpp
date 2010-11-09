@@ -196,6 +196,10 @@ void XMLDocumentParser::doWrite(const String& parseString) {
 
   QString data(parseString);
   if (!data.isEmpty()) {
+    // JavaScript may cause the parser to detach,
+    // keep this alive until this function is done.
+    RefPtr<XMLDocumentParser> protect(this);
+
     m_stream.addData(data);
     parse();
   }
