@@ -293,12 +293,6 @@ void RenderView::repaintRectangleInViewAndCompositedLayers(const IntRect& ur,
   repaintViewRectangle(ur, immediate);
 
 #if USE(ACCELERATED_COMPOSITING)
-  // If we're a frame, repaintViewRectangle will have repainted via a
-  // RenderObject in the
-  // parent document.
-  if (document()->ownerElement())
-    return;
-
   if (compositor()->inCompositingMode())
     compositor()->repaintCompositedLayersAbsoluteRect(ur);
 #endif
