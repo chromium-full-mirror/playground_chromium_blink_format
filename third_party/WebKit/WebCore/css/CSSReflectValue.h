@@ -59,6 +59,8 @@ class CSSReflectValue : public CSSValue {
                   PassRefPtr<CSSValue> mask)
       : m_direction(direction), m_offset(offset), m_mask(mask) {}
 
+  virtual bool isReflectValue() const { return true; }
+
   CSSReflectionDirection m_direction;
   RefPtr<CSSPrimitiveValue> m_offset;
   RefPtr<CSSValue> m_mask;

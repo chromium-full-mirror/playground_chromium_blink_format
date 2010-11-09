@@ -57,6 +57,8 @@ class ShadowValue : public CSSValue {
               PassRefPtr<CSSPrimitiveValue> spread,
               PassRefPtr<CSSPrimitiveValue> style,
               PassRefPtr<CSSPrimitiveValue> color);
+
+  virtual bool isShadowValue() const { return true; }
 };
 
 }  // namespace

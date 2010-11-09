@@ -46,8 +46,6 @@ class CSSImageValue : public CSSPrimitiveValue, private CachedResourceClient {
   // StylePendingImage.
   StyleImage* cachedOrPendingImage();
 
-  virtual bool isImageValue() const { return true; }
-
  protected:
   CSSImageValue(const String& url);
 
@@ -57,6 +55,7 @@ class CSSImageValue : public CSSPrimitiveValue, private CachedResourceClient {
 
  private:
   CSSImageValue();
+  virtual bool isImageValue() const { return true; }
 
   RefPtr<StyleImage> m_image;
   bool m_accessedImage;

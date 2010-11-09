@@ -40,6 +40,7 @@ class FontFamilyValue : public CSSPrimitiveValue {
 
  private:
   FontFamilyValue(const String& familyName);
+  virtual bool isFontFamilyValue() const { return true; }
 
   String m_familyName;
 };

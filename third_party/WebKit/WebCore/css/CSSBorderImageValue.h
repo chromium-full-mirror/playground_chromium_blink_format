@@ -66,6 +66,7 @@ class CSSBorderImageValue : public CSSValue {
                       PassRefPtr<Rect> sliceRect,
                       int horizontalRule,
                       int verticalRule);
+  virtual bool isBorderImageValue() const { return true; }
 };
 
 }  // namespace WebCore
