@@ -51,8 +51,8 @@ CoreIPC::Connection* Download::connection() const {
   return WebProcess::shared().connection();
 }
 
-void Download::didBegin() {
-  send(Messages::DownloadProxy::DidBegin());
+void Download::didStart() {
+  send(Messages::DownloadProxy::DidStart());
 }
 
 void Download::didReceiveData(uint64_t length) {}

@@ -58,7 +58,7 @@ class Download : public CoreIPC::MessageSender<Download> {
 
   void start();
 
-  void didBegin();
+  void didStart();
   void didReceiveData(uint64_t length);
   void didCreateDestination(const String& path);
   void didFinish();

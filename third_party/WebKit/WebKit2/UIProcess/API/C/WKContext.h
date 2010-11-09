@@ -103,6 +103,28 @@ struct WKContextHistoryClient {
 };
 typedef struct WKContextHistoryClient WKContextHistoryClient;
 
+// Download Client
+typedef void (*WKContextDownloadDidStartCallback)(WKContextRef context,
+                                                  WKDownloadRef download,
+                                                  const void* clientInfo);
+typedef void (*WKContextDownloadDidFinishCallback)(WKContextRef context,
+                                                   WKDownloadRef download,
+                                                   const void* clientInfo);
+typedef void (*WKContextDownloadDidCreateDestinationCallback)(
+    WKContextRef context,
+    WKDownloadRef download,
+    WKStringRef path,
+    const void* clientInfo);
+
+struct WKContextDownloadClient {
+  int version;
+  const void* clientInfo;
+  WKContextDownloadDidStartCallback didStart;
+  WKContextDownloadDidCreateDestinationCallback didCreateDestination;
+  WKContextDownloadDidFinishCallback didFinish;
+};
+typedef struct WKContextDownloadClient WKContextDownloadClient;
+
 WK_EXPORT WKTypeID WKContextGetTypeID();
 
 WK_EXPORT WKContextRef WKContextCreate();
@@ -113,11 +135,14 @@ WK_EXPORT void WKContextSetPreferences(WKContextRef context,
                                        WKPreferencesRef preferences);
 WK_EXPORT WKPreferencesRef WKContextGetPreferences(WKContextRef context);
 
-WK_EXPORT void WKContextSetHistoryClient(WKContextRef context,
-                                         const WKContextHistoryClient* client);
 WK_EXPORT void WKContextSetInjectedBundleClient(
     WKContextRef context,
     const WKContextInjectedBundleClient* client);
+WK_EXPORT void WKContextSetHistoryClient(WKContextRef context,
+                                         const WKContextHistoryClient* client);
+WK_EXPORT void WKContextSetDownloadClient(
+    WKContextRef context,
+    const WKContextDownloadClient* client);
 
 WK_EXPORT void WKContextSetInitializationUserDataForInjectedBundle(
     WKContextRef context,
