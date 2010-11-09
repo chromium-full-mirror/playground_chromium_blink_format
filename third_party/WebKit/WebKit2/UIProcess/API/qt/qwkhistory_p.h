@@ -28,6 +28,7 @@
 #ifndef qwkhistory_p_h
 #define qwkhistory_p_h
 
+#include <QSharedData>
 #include "qwebkitglobal.h"
 #include <WebKit2/WKBase.h>
 #include <WebKit2/WKRetainPtr.h>
@@ -39,10 +40,12 @@ class WebBackForwardList;
 
 class QWKHistory;
 
-class QWEBKIT_EXPORT QWKHistoryItemPrivate {
+class QWEBKIT_EXPORT QWKHistoryItemPrivate : public QSharedData {
+ public:
+  ~QWKHistoryItemPrivate();
+
  private:
   QWKHistoryItemPrivate(WKBackForwardListItemRef listItem);
-
   WKRetainPtr<WKBackForwardListItemRef> m_backForwardListItem;
 
   friend class QWKHistory;
