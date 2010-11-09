@@ -474,6 +474,20 @@ WK_EXPORT void WKPageGetSourceForFrame_b(WKPageRef page,
                                          WKPageGetSourceForFrameBlock block);
 #endif
 
+typedef void (*WKPageGetContentsAsStringFunction)(WKStringRef,
+                                                  WKErrorRef,
+                                                  void*);
+WK_EXPORT void WKPageGetContentsAsString(
+    WKPageRef page,
+    void* context,
+    WKPageGetContentsAsStringFunction function);
+#ifdef __BLOCKS__
+typedef void (^WKPageGetContentsAsStringBlock)(WKStringRef, WKErrorRef);
+WK_EXPORT void WKPageGetContentsAsString_b(
+    WKPageRef page,
+    WKPageGetContentsAsStringBlock block);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

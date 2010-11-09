@@ -336,3 +336,27 @@ void WKPageGetSourceForFrame_b(WKPageRef pageRef,
                           callGetSourceForFrameBlockBlockAndDispose);
 }
 #endif
+
+void WKPageGetContentsAsString(WKPageRef pageRef,
+                               void* context,
+                               WKPageGetContentsAsStringFunction callback) {
+  toImpl(pageRef)->getContentsAsString(
+      ContentsAsStringCallback::create(context, callback));
+}
+
+#ifdef __BLOCKS__
+static void callContentsAsStringBlockBlockAndDispose(WKStringRef resultValue,
+                                                     WKErrorRef error,
+                                                     void* context) {
+  WKPageGetContentsAsStringBlock block =
+      (WKPageGetContentsAsStringBlock)context;
+  block(resultValue, error);
+  Block_release(block);
+}
+
+void WKPageGetContentsAsString_b(WKPageRef pageRef,
+                                 WKPageGetSourceForFrameBlock block) {
+  WKPageGetContentsAsString(pageRef, Block_copy(block),
+                            callContentsAsStringBlockBlockAndDispose);
+}
+#endif

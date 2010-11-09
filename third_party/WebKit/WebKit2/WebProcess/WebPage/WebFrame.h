@@ -77,6 +77,7 @@ class WebFrame : public APIObject {
   void startDownload(const WebCore::ResourceRequest&);
 
   String source() const;
+  String contentsAsString() const;
 
   // WKBundleFrame API and SPI functions
   bool isMainFrame() const;
@@ -127,6 +128,8 @@ class WebFrame : public APIObject {
   void init(WebPage*, const String& frameName, WebCore::HTMLFrameOwnerElement*);
 
   virtual Type type() const { return APIType; }
+
+  bool isFrameSet() const;
 
   WebCore::Frame* m_coreFrame;
 

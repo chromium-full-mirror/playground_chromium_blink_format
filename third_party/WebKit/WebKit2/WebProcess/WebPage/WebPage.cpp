@@ -762,6 +762,12 @@ void WebPage::runJavaScriptInMainFrame(const String& script,
                                                            callbackID));
 }
 
+void WebPage::getContentsAsString(uint64_t callbackID) {
+  String resultString = m_mainFrame->contentsAsString();
+  send(
+      Messages::WebPageProxy::DidGetContentsAsString(resultString, callbackID));
+}
+
 void WebPage::getRenderTreeExternalRepresentation(uint64_t callbackID) {
   String resultString = renderTreeExternalRepresentation();
   send(Messages::WebPageProxy::DidGetRenderTreeExternalRepresentation(
