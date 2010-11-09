@@ -34,7 +34,7 @@ namespace WebKit {
 
 class FindController;
 
-class FindPageOverlay : public PageOverlay {
+class FindPageOverlay : public PageOverlay, public PageOverlay::Client {
  public:
   static PassOwnPtr<FindPageOverlay> create(FindController*);
   virtual ~FindPageOverlay();
@@ -45,10 +45,11 @@ class FindPageOverlay : public PageOverlay {
   Vector<WebCore::IntRect> rectsForTextMatches();
   WebCore::IntRect bounds() const;
 
-  // PageOverlay.
-  virtual void drawRect(WebCore::GraphicsContext&,
+  // PageOverlay::Client.
+  virtual void drawRect(PageOverlay*,
+                        WebCore::GraphicsContext&,
                         const WebCore::IntRect& dirtyRect);
-  virtual bool mouseEvent(const WebMouseEvent&);
+  virtual bool mouseEvent(PageOverlay*, const WebMouseEvent&);
 
   FindController* m_findController;
 };

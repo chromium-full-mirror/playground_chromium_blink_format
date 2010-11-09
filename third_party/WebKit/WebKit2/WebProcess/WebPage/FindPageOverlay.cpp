@@ -52,7 +52,7 @@ PassOwnPtr<FindPageOverlay> FindPageOverlay::create(
 }
 
 FindPageOverlay::FindPageOverlay(FindController* findController)
-    : m_findController(findController) {}
+    : PageOverlay(this), m_findController(findController) {}
 
 FindPageOverlay::~FindPageOverlay() {
   m_findController->findPageOverlayDestroyed();
@@ -104,7 +104,8 @@ static Color overlayBackgroundColor() {
                overlayBackgroundBlue, overlayBackgroundAlpha);
 }
 
-void FindPageOverlay::drawRect(GraphicsContext& graphicsContext,
+void FindPageOverlay::drawRect(PageOverlay*,
+                               GraphicsContext& graphicsContext,
                                const IntRect& dirtyRect) {
   Vector<IntRect> rects = rectsForTextMatches();
   ASSERT(!rects.isEmpty());
@@ -146,7 +147,7 @@ void FindPageOverlay::drawRect(GraphicsContext& graphicsContext,
   graphicsContext.endTransparencyLayer();
 }
 
-bool FindPageOverlay::mouseEvent(const WebMouseEvent& event) {
+bool FindPageOverlay::mouseEvent(PageOverlay*, const WebMouseEvent& event) {
   // If we get a mouse down event inside the page overlay we should hide the
   // find UI.
   if (event.type() == WebEvent::MouseDown &&
