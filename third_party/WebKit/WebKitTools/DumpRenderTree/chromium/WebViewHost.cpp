@@ -1041,30 +1041,8 @@ void WebViewHost::openFileSystem(WebFrame* frame,
 
 // Public functions -----------------------------------------------------------
 
-WebViewHost::WebViewHost(TestShell* shell)
-    : m_policyDelegateEnabled(false),
-      m_policyDelegateIsPermissive(false),
-      m_policyDelegateShouldNotifyDone(false),
-      m_shell(shell),
-      m_webWidget(0),
-      m_topLoadingFrame(0),
-      m_pageId(-1),
-      m_lastPageIdUpdated(-1),
-      m_hasWindow(false),
-      m_inModalLoop(false),
-      m_smartInsertDeleteEnabled(true)
-#if OS(WINDOWS)
-      ,
-      m_selectTrailingWhitespaceEnabled(true)
-#else
-      ,
-      m_selectTrailingWhitespaceEnabled(false)
-#endif
-      ,
-      m_blocksRedirects(false),
-      m_requestReturnNull(false),
-      m_isPainting(false) {
-  m_navigationController.set(new TestNavigationController(this));
+WebViewHost::WebViewHost(TestShell* shell) : m_shell(shell), m_webWidget(0) {
+  reset();
 }
 
 WebViewHost::~WebViewHost() {}
@@ -1081,13 +1059,43 @@ WebWidget* WebViewHost::webWidget() const {
 }
 
 void WebViewHost::reset() {
-  // Do a little placement new dance...
-  TestShell* shell = m_shell;
-  WebWidget* widget = m_webWidget;
-  this->~WebViewHost();
-  new (this) WebViewHost(shell);
-  setWebWidget(widget);
-  webView()->mainFrame()->setName(WebString());
+  m_policyDelegateEnabled = false;
+  m_policyDelegateIsPermissive = false;
+  m_policyDelegateShouldNotifyDone = false;
+  m_topLoadingFrame = 0;
+  m_pageId = -1;
+  m_lastPageIdUpdated = -1;
+  m_hasWindow = false;
+  m_inModalLoop = false;
+  m_smartInsertDeleteEnabled = true;
+#if OS(WINDOWS)
+  m_selectTrailingWhitespaceEnabled = true;
+#else
+  m_selectTrailingWhitespaceEnabled = false;
+#endif
+  m_blocksRedirects = false;
+  m_requestReturnNull = false;
+  m_isPainting = false;
+  m_canvas.clear();
+
+  m_navigationController.set(new TestNavigationController(this));
+
+  m_pendingExtraData.clear();
+  m_resourceIdentifierMap.clear();
+  m_clearHeaders.clear();
+  m_editCommandName.clear();
+  m_editCommandValue.clear();
+
+#if !ENABLE(CLIENT_BASED_GEOLOCATION)
+  m_geolocationServiceMock.clear();
+#endif
+
+  m_currentCursor = WebCursorInfo();
+  m_windowRect = WebRect();
+  m_paintRect = WebRect();
+
+  if (m_webWidget)
+    webView()->mainFrame()->setName(WebString());
 }
 
 void WebViewHost::setSelectTrailingWhitespaceEnabled(bool enabled) {
