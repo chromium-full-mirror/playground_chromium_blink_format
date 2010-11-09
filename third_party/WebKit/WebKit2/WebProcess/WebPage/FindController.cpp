@@ -242,6 +242,8 @@ Vector<IntRect> FindController::rectsForTextMatches() {
   return rects;
 }
 
+void FindController::pageOverlayDestroyed(PageOverlay*) {}
+
 void FindController::willMoveToWebPage(PageOverlay*, WebPage* webPage) {
   if (webPage)
     return;

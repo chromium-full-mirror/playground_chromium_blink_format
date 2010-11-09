@@ -61,6 +61,7 @@ class FindController : private PageOverlay::Client {
 
  private:
   // PageOverlay::Client.
+  virtual void pageOverlayDestroyed(PageOverlay*);
   virtual void willMoveToWebPage(PageOverlay*, WebPage*);
   virtual void didMoveToWebPage(PageOverlay*, WebPage*);
   virtual bool mouseEvent(PageOverlay*, const WebMouseEvent&);

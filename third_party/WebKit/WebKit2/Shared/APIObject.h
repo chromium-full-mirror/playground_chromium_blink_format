@@ -75,6 +75,7 @@ class APIObject : public RefCounted<APIObject> {
     TypeBundleHitTestResult,
     TypeBundleNodeHandle,
     TypeBundlePage,
+    TypeBundlePageOverlay,
     TypeBundleRangeHandle,
     TypeBundleScriptWorld,
 
