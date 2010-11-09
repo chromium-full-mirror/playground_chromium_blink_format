@@ -175,7 +175,7 @@ JSValue JSDeviceMotionEvent::rotationRate(ExecState* exec) const {
                                   exec);
 }
 
-JSValue JSDeviceMotionEvent::interval(ExecState* exec) const {
+JSValue JSDeviceMotionEvent::interval(ExecState*) const {
   DeviceMotionEvent* imp = static_cast<DeviceMotionEvent*>(impl());
   if (!imp->deviceMotionData()->canProvideInterval())
     return jsNull();
