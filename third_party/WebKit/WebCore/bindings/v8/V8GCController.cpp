@@ -38,6 +38,7 @@
 #include "HTMLImageElement.h"
 #include "HTMLNames.h"
 #include "MessagePort.h"
+#include "PlatformBridge.h"
 #include "SVGElement.h"
 #include "V8Binding.h"
 #include "V8DOMMap.h"
@@ -389,16 +390,16 @@ int V8GCController::workingSetEstimateMB = 0;
 namespace {
 
 int getMemoryUsageInMB() {
-#if PLATFORM(CHROMIUM)
-  return ChromiumBridge::memoryUsageMB();
+#if PLATFORM(CHROMIUM) || PLATFORM(ANDROID)
+  return PlatformBridge::memoryUsageMB();
 #else
   return 0;
 #endif
 }
 
 int getActualMemoryUsageInMB() {
-#if PLATFORM(CHROMIUM)
-  return ChromiumBridge::actualMemoryUsageMB();
+#if PLATFORM(CHROMIUM) || PLATFORM(ANDROID)
+  return PlatformBridge::actualMemoryUsageMB();
 #else
   return 0;
 #endif
@@ -439,6 +440,17 @@ void V8GCController::checkMemoryUsage() {
   const int highUsageDeltaMB = 128;  // Delta of memory usage growth (vs. last
                                      // workingSetEstimateMB) to force GC when
                                      // memory usage is high.
+#elif PLATFORM(ANDROID)
+  // Query the PlatformBridge for memory thresholds as these vary device to
+  // device.
+  static const int lowUsageMB = PlatformBridge::lowMemoryUsageMB();
+  static const int highUsageMB = PlatformBridge::highMemoryUsageMB();
+  // We use a delta of -1 to ensure that when we are in a low memory situation
+  // we always trigger a GC.
+  static const int highUsageDeltaMB = -1;
+#else
+  return;
+#endif
 
   int memoryUsageMB = getMemoryUsageInMB();
   if ((memoryUsageMB > lowUsageMB &&
@@ -446,7 +458,6 @@ void V8GCController::checkMemoryUsage() {
       (memoryUsageMB > highUsageMB &&
        memoryUsageMB > workingSetEstimateMB + highUsageDeltaMB))
     v8::V8::LowMemoryNotification();
-#endif
 }
 
 }  // namespace WebCore
