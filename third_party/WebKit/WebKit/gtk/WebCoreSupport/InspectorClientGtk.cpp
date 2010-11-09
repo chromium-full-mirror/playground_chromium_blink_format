@@ -88,6 +88,10 @@ void InspectorClient::openInspectorFrontend(InspectorController* controller) {
       m_inspectedWebView, inspectorWebView, webInspector, m_frontendPage, this);
   m_frontendPage->inspectorController()->setInspectorFrontendClient(
       m_frontendClient);
+
+  // The inspector must be in it's own PageGroup to avoid deadlock while
+  // debugging.
+  m_frontendPage->setGroupName("");
 }
 
 void InspectorClient::releaseFrontendPage() {
