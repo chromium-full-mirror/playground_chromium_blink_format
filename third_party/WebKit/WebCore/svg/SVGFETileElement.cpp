@@ -46,6 +46,13 @@ void SVGFETileElement::parseMappedAttribute(Attribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
+void SVGFETileElement::svgAttributeChanged(const QualifiedName& attrName) {
+  SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
+
+  if (attrName == SVGNames::inAttr)
+    invalidate();
+}
+
 void SVGFETileElement::synchronizeProperty(const QualifiedName& attrName) {
   SVGFilterPrimitiveStandardAttributes::synchronizeProperty(attrName);
 
