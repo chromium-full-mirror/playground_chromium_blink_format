@@ -528,8 +528,8 @@ IntRect RenderText::localCaretRect(InlineBox* inlineBox,
 
   InlineTextBox* box = static_cast<InlineTextBox*>(inlineBox);
 
-  int height = box->root()->lineBottom() - box->root()->lineTop();
-  int top = box->root()->lineTop();
+  int height = box->root()->selectionHeight();
+  int top = box->root()->selectionTop();
 
   int left = box->positionForOffset(caretOffset);
 
