@@ -39,7 +39,7 @@ PassRefPtr<WebContextMenuProxyWin> WebContextMenuProxyWin::create() {
 
 void WebContextMenuProxyWin::showContextMenu(
     const IntPoint&,
-    const Vector<WebContextMenuItem>&) {
+    const Vector<WebContextMenuItemData>&) {
   notImplemented();
 }
 

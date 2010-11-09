@@ -50,15 +50,15 @@ class WebContextMenuProxyMac : public WebContextMenuProxy {
   ~WebContextMenuProxyMac();
 
   virtual void showContextMenu(const WebCore::IntPoint&,
-                               const Vector<WebContextMenuItem>&);
+                               const Vector<WebContextMenuItemData>&);
   virtual void hideContextMenu();
 
-  void contextMenuItemSelected(const WebContextMenuItem&);
+  void contextMenuItemSelected(const WebContextMenuItemData&);
 
  private:
   WebContextMenuProxyMac(WKView*, WebPageProxy*);
 
-  void populate(const Vector<WebContextMenuItem>&);
+  void populate(const Vector<WebContextMenuItemData>&);
 
   RetainPtr<NSPopUpButtonCell> m_popup;
   WKView* m_webView;

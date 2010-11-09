@@ -911,7 +911,7 @@ void WebPage::didChangeSelectedIndexForActivePopupMenu(int32_t newIndex) {
 }
 
 void WebPage::didSelectItemFromActiveContextMenu(
-    const WebContextMenuItem& item) {
+    const WebContextMenuItemData& item) {
   ASSERT(m_contextMenu);
   m_contextMenu->itemSelected(item);
   m_contextMenu = 0;

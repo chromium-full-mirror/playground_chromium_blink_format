@@ -39,7 +39,7 @@ class WebContextMenuProxyQt : public WebContextMenuProxy {
   WebContextMenuProxyQt();
 
   virtual void showContextMenu(const WebCore::IntPoint&,
-                               const Vector<WebContextMenuItem>&);
+                               const Vector<WebContextMenuItemData>&);
   virtual void hideContextMenu();
 };
 

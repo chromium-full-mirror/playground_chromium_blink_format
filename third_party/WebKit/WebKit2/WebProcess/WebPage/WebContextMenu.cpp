@@ -52,7 +52,7 @@ void WebContextMenu::show() {
       m_page->pageID());
 }
 
-void WebContextMenu::itemSelected(const WebContextMenuItem& item) {
+void WebContextMenu::itemSelected(const WebContextMenuItemData& item) {
   WebCore::ContextMenuItem coreItem(
       WebCore::ActionType,
       static_cast<WebCore::ContextMenuAction>(item.action()), item.title());

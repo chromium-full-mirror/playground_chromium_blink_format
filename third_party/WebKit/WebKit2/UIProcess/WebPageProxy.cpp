@@ -1205,8 +1205,9 @@ void WebPageProxy::hidePopupMenu() {
   m_activePopupMenu = 0;
 }
 
-void WebPageProxy::showContextMenu(const WebCore::IntPoint& menuLocation,
-                                   const Vector<WebContextMenuItem>& items) {
+void WebPageProxy::showContextMenu(
+    const WebCore::IntPoint& menuLocation,
+    const Vector<WebContextMenuItemData>& items) {
   if (m_activeContextMenu)
     m_activeContextMenu->hideContextMenu();
   else
@@ -1215,7 +1216,7 @@ void WebPageProxy::showContextMenu(const WebCore::IntPoint& menuLocation,
   m_activeContextMenu->showContextMenu(menuLocation, items);
 }
 
-void WebPageProxy::contextMenuItemSelected(const WebContextMenuItem& item) {
+void WebPageProxy::contextMenuItemSelected(const WebContextMenuItemData& item) {
   process()->send(Messages::WebPage::DidSelectItemFromActiveContextMenu(item),
                   m_pageID);
 }

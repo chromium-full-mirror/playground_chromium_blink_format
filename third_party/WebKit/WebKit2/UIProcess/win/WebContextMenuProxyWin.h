@@ -38,7 +38,7 @@ class WebContextMenuProxyWin : public WebContextMenuProxy {
   WebContextMenuProxyWin();
 
   virtual void showContextMenu(const WebCore::IntPoint&,
-                               const Vector<WebContextMenuItem>&);
+                               const Vector<WebContextMenuItemData>&);
   virtual void hideContextMenu();
 };
 

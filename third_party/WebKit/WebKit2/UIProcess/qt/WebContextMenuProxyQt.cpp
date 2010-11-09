@@ -38,8 +38,9 @@ PassRefPtr<WebContextMenuProxyQt> WebContextMenuProxyQt::create() {
   return adoptRef(new WebContextMenuProxyQt);
 }
 
-void WebContextMenuProxyQt::showContextMenu(const IntPoint&,
-                                            const Vector<WebContextMenuItem>&) {
+void WebContextMenuProxyQt::showContextMenu(
+    const IntPoint&,
+    const Vector<WebContextMenuItemData>&) {
   notImplemented();
 }
 

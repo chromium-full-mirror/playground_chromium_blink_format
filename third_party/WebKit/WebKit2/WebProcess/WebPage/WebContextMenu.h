@@ -21,7 +21,7 @@
 #ifndef WebContextMenu_h
 #define WebContextMenu_h
 
-#include "WebContextMenuItem.h"
+#include "WebContextMenuItemData.h"
 
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -39,7 +39,7 @@ class WebContextMenu : public RefCounted<WebContextMenu> {
   ~WebContextMenu();
 
   void show();
-  void itemSelected(const WebContextMenuItem&);
+  void itemSelected(const WebContextMenuItemData&);
 
  private:
   WebContextMenu(WebPage*);
