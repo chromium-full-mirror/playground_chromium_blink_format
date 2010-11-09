@@ -109,6 +109,7 @@ class QWEBKIT_EXPORT QWKPage : public QObject {
   Q_SIGNAL void initialLayoutCompleted();
   Q_SIGNAL void urlChanged(const QUrl&);
   Q_SIGNAL void contentsSizeChanged(const QSize&);
+  Q_SIGNAL void scrollRequested(int dx, int dy);
   Q_SIGNAL void cursorChanged(const QCursor&);
   Q_SIGNAL void viewportChangeRequested();
 

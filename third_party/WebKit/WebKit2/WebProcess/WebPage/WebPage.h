@@ -198,6 +198,9 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
   FindController& findController() { return m_findController; }
 
   void pageDidScroll();
+#if ENABLE(TILED_BACKING_STORE)
+  void pageDidRequestScroll(const WebCore::IntSize& delta);
+#endif
 
   WebContextMenu* contextMenu();
 

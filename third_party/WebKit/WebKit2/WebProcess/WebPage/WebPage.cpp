@@ -487,6 +487,12 @@ void WebPage::pageDidScroll() {
   send(Messages::WebPageProxy::PageDidScroll());
 }
 
+#if ENABLE(TILED_BACKING_STORE)
+void WebPage::pageDidRequestScroll(const IntSize& delta) {
+  send(Messages::WebPageProxy::PageDidRequestScroll(delta));
+}
+#endif
+
 WebContextMenu* WebPage::contextMenu() {
   if (!m_contextMenu)
     m_contextMenu = WebContextMenu::create(this);
