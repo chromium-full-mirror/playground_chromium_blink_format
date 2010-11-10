@@ -1074,10 +1074,15 @@ bool RenderListMarker::isImage() const {
 IntRect RenderListMarker::localSelectionRect() {
   InlineBox* box = inlineBoxWrapper();
   if (!box)
-    return IntRect();
-  RootInlineBox* root = box->root();
-  return IntRect(x(), root->selectionTop() - y(), width(),
-                 root->selectionHeight());
+    return IntRect(0, 0, width(), height());
+  RootInlineBox* root = m_inlineBoxWrapper->root();
+  int newLogicalTop =
+      root->block()->style()->isFlippedBlocksWritingMode()
+          ? m_inlineBoxWrapper->logicalBottom() - root->selectionBottom()
+          : root->selectionTop() - m_inlineBoxWrapper->logicalTop();
+  if (root->block()->style()->isHorizontalWritingMode())
+    return IntRect(0, newLogicalTop, width(), root->selectionHeight());
+  return IntRect(newLogicalTop, 0, root->selectionHeight(), height());
 }
 
 void RenderListMarker::paint(PaintInfo& paintInfo, int tx, int ty) {
@@ -1087,17 +1092,18 @@ void RenderListMarker::paint(PaintInfo& paintInfo, int tx, int ty) {
   if (style()->visibility() != VISIBLE)
     return;
 
-  IntRect marker = getRelativeMarkerRect();
-  marker.move(tx, ty);
+  IntPoint boxOrigin(tx + x(), ty + y());
+  IntRect overflowRect(visibleOverflowRect());
+  overflowRect.move(boxOrigin.x(), boxOrigin.y());
+  overflowRect.inflate(maximalOutlineSize(paintInfo.phase));
 
-  IntRect box(tx + x(), ty + y(), width(), height());
-
-  if (box.y() > paintInfo.rect.bottom() ||
-      box.y() + box.height() < paintInfo.rect.y())
+  if (!paintInfo.rect.intersects(overflowRect))
     return;
 
-  if (hasBoxDecorations())
-    paintBoxDecorations(paintInfo, box.x(), box.y());
+  IntRect box(boxOrigin, IntSize(width(), height()));
+
+  IntRect marker = getRelativeMarkerRect();
+  marker.move(boxOrigin.x(), boxOrigin.y());
 
   GraphicsContext* context = paintInfo.context;
 
@@ -1108,10 +1114,10 @@ void RenderListMarker::paint(PaintInfo& paintInfo, int tx, int ty) {
       paintCustomHighlight(tx, ty, style()->highlight(), true);
 #endif
     context->drawImage(m_image->image(this, marker.size()),
-                       style()->colorSpace(), marker.location());
+                       style()->colorSpace(), marker);
     if (selectionState() != SelectionNone) {
       IntRect selRect = localSelectionRect();
-      selRect.move(tx, ty);
+      selRect.move(boxOrigin.x(), boxOrigin.y());
       context->fillRect(selRect, selectionBackgroundColor(),
                         style()->colorSpace());
     }
@@ -1127,7 +1133,7 @@ void RenderListMarker::paint(PaintInfo& paintInfo, int tx, int ty) {
 
   if (selectionState() != SelectionNone) {
     IntRect selRect = localSelectionRect();
-    selRect.move(tx, ty);
+    selRect.move(boxOrigin.x(), boxOrigin.y());
     context->fillRect(selRect, selectionBackgroundColor(),
                       style()->colorSpace());
   }
@@ -1140,10 +1146,6 @@ void RenderListMarker::paint(PaintInfo& paintInfo, int tx, int ty) {
 
   EListStyleType type = style()->listStyleType();
   switch (type) {
-    case Asterisks:
-    case Footnotes:
-      context->drawText(style()->font(), TextRun(m_text), marker.location());
-      return;
     case Disc:
       context->drawEllipse(marker);
       return;
@@ -1229,6 +1231,8 @@ void RenderListMarker::paint(PaintInfo& paintInfo, int tx, int ty) {
     case UpperNorwegian:
     case UpperRoman:
     case Urdu:
+    case Asterisks:
+    case Footnotes:
       break;
   }
   if (m_text.isEmpty())
@@ -1236,35 +1240,55 @@ void RenderListMarker::paint(PaintInfo& paintInfo, int tx, int ty) {
 
   TextRun textRun(m_text);
 
-  // Text is not arbitrary. We can judge whether it's RTL from the first
-  // character,
-  // and we only need to handle the direction RightToLeft for now.
-  bool textNeedsReversing = direction(m_text[0]) == RightToLeft;
-  Vector<UChar> reversedText;
-  if (textNeedsReversing) {
-    int length = m_text.length();
-    reversedText.grow(length);
-    for (int i = 0; i < length; ++i)
-      reversedText[length - i - 1] = m_text[i];
-    textRun = TextRun(reversedText.data(), length);
+  if (!style()->isHorizontalWritingMode()) {
+    marker.move(-boxOrigin.x(), -boxOrigin.y());
+    marker = marker.transposedRect();
+    marker.move(box.x(), box.y() - logicalHeight());
+    context->save();
+    context->translate(marker.x(), marker.bottom());
+    context->rotate(static_cast<float>(deg2rad(90.)));
+    context->translate(-marker.x(), -marker.bottom());
   }
 
-  const Font& font = style()->font();
-  const UChar suffix = listMarkerSuffix(type, m_listItem->value());
-  if (style()->isLeftToRightDirection()) {
-    int width = font.width(textRun);
-    context->drawText(style()->font(), textRun, marker.location());
-    UChar suffixSpace[2] = {suffix, ' '};
-    context->drawText(style()->font(), TextRun(suffixSpace, 2),
-                      marker.location() + IntSize(width, 0));
-  } else {
-    UChar spaceSuffix[2] = {' ', suffix};
-    TextRun spaceSuffixRun(spaceSuffix, 2);
-    int width = font.width(spaceSuffixRun);
-    context->drawText(style()->font(), spaceSuffixRun, marker.location());
-    context->drawText(style()->font(), textRun,
-                      marker.location() + IntSize(width, 0));
+  IntPoint textOrigin =
+      IntPoint(marker.x(), marker.y() + style()->font().ascent());
+
+  if (type == Asterisks || type == Footnotes)
+    context->drawText(style()->font(), textRun, textOrigin);
+  else {
+    // Text is not arbitrary. We can judge whether it's RTL from the first
+    // character,
+    // and we only need to handle the direction RightToLeft for now.
+    bool textNeedsReversing = direction(m_text[0]) == RightToLeft;
+    Vector<UChar> reversedText;
+    if (textNeedsReversing) {
+      int length = m_text.length();
+      reversedText.grow(length);
+      for (int i = 0; i < length; ++i)
+        reversedText[length - i - 1] = m_text[i];
+      textRun = TextRun(reversedText.data(), length);
+    }
+
+    const Font& font = style()->font();
+    const UChar suffix = listMarkerSuffix(type, m_listItem->value());
+    if (style()->isLeftToRightDirection()) {
+      int width = font.width(textRun);
+      context->drawText(style()->font(), textRun, textOrigin);
+      UChar suffixSpace[2] = {suffix, ' '};
+      context->drawText(style()->font(), TextRun(suffixSpace, 2),
+                        textOrigin + IntSize(width, 0));
+    } else {
+      UChar spaceSuffix[2] = {' ', suffix};
+      TextRun spaceSuffixRun(spaceSuffix, 2);
+      int width = font.width(spaceSuffixRun);
+      context->drawText(style()->font(), spaceSuffixRun, textOrigin);
+      context->drawText(style()->font(), textRun,
+                        textOrigin + IntSize(width, 0));
+    }
   }
+
+  if (!style()->isHorizontalWritingMode())
+    context->restore();
 }
 
 void RenderListMarker::layout() {
@@ -1274,18 +1298,19 @@ void RenderListMarker::layout() {
     setWidth(m_image->imageSize(this, style()->effectiveZoom()).width());
     setHeight(m_image->imageSize(this, style()->effectiveZoom()).height());
   } else {
-    setWidth(minPreferredLogicalWidth());
-    setHeight(style()->font().height());
+    setLogicalWidth(minPreferredLogicalWidth());
+    setLogicalHeight(style()->font().height());
   }
 
-  m_marginLeft = m_marginRight = 0;
+  setMarginStart(0);
+  setMarginEnd(0);
 
-  Length leftMargin = style()->marginLeft();
-  Length rightMargin = style()->marginRight();
-  if (leftMargin.isFixed())
-    m_marginLeft = leftMargin.value();
-  if (rightMargin.isFixed())
-    m_marginRight = rightMargin.value();
+  Length startMargin = style()->marginStart();
+  Length endMargin = style()->marginEnd();
+  if (startMargin.isFixed())
+    setMarginStart(startMargin.value());
+  if (endMargin.isFixed())
+    setMarginEnd(endMargin.value());
 
   setNeedsLayout(false);
 }
@@ -1318,14 +1343,16 @@ void RenderListMarker::computePreferredLogicalWidths() {
     // width and height of the marker box.
     int bulletWidth = font.ascent() / 2;
     m_image->setImageContainerSize(IntSize(bulletWidth, bulletWidth));
+    IntSize imageSize = m_image->imageSize(this, style()->effectiveZoom());
     m_minPreferredLogicalWidth = m_maxPreferredLogicalWidth =
-        m_image->imageSize(this, style()->effectiveZoom()).width();
+        style()->isHorizontalWritingMode() ? imageSize.width()
+                                           : imageSize.height();
     setPreferredLogicalWidthsDirty(false);
     updateMargins();
     return;
   }
 
-  int width = 0;
+  int logicalWidth = 0;
   EListStyleType type = style()->listStyleType();
   switch (type) {
     case NoneListStyle:
@@ -1333,13 +1360,13 @@ void RenderListMarker::computePreferredLogicalWidths() {
     case Asterisks:
     case Footnotes:
       m_text = listMarkerText(type, m_listItem->value());
-      width = font.width(m_text);  // no suffix for these types
+      logicalWidth = font.width(m_text);  // no suffix for these types
       break;
     case Circle:
     case Disc:
     case Square:
       m_text = listMarkerText(type, 0);  // value is ignored for these types
-      width = (font.ascent() * 2 / 3 + 1) / 2 + 2;
+      logicalWidth = (font.ascent() * 2 / 3 + 1) / 2 + 2;
       break;
     case Afar:
     case Amharic:
@@ -1416,19 +1443,19 @@ void RenderListMarker::computePreferredLogicalWidths() {
     case Urdu:
       m_text = listMarkerText(type, m_listItem->value());
       if (m_text.isEmpty())
-        width = 0;
+        logicalWidth = 0;
       else {
         int itemWidth = font.width(m_text);
         UChar suffixSpace[2] = {listMarkerSuffix(type, m_listItem->value()),
                                 ' '};
         int suffixSpaceWidth = font.width(TextRun(suffixSpace, 2));
-        width = itemWidth + suffixSpaceWidth;
+        logicalWidth = itemWidth + suffixSpaceWidth;
       }
       break;
   }
 
-  m_minPreferredLogicalWidth = width;
-  m_maxPreferredLogicalWidth = width;
+  m_minPreferredLogicalWidth = logicalWidth;
+  m_maxPreferredLogicalWidth = logicalWidth;
 
   setPreferredLogicalWidthsDirty(false);
 
@@ -1438,27 +1465,19 @@ void RenderListMarker::computePreferredLogicalWidths() {
 void RenderListMarker::updateMargins() {
   const Font& font = style()->font();
 
-  int marginLeft = 0;
-  int marginRight = 0;
+  int marginStart = 0;
+  int marginEnd = 0;
 
   if (isInside()) {
-    if (isImage()) {
-      if (style()->isLeftToRightDirection())
-        marginRight = cMarkerPadding;
-      else
-        marginLeft = cMarkerPadding;
-    } else
+    if (isImage())
+      marginEnd = cMarkerPadding;
+    else
       switch (style()->listStyleType()) {
         case Disc:
         case Circle:
         case Square:
-          if (style()->isLeftToRightDirection()) {
-            marginLeft = -1;
-            marginRight = font.ascent() - minPreferredLogicalWidth() + 1;
-          } else {
-            marginLeft = font.ascent() - minPreferredLogicalWidth() + 1;
-            marginRight = -1;
-          }
+          marginStart = -1;
+          marginEnd = font.ascent() - minPreferredLogicalWidth() + 1;
           break;
         default:
           break;
@@ -1466,46 +1485,47 @@ void RenderListMarker::updateMargins() {
   } else {
     if (style()->isLeftToRightDirection()) {
       if (isImage())
-        marginLeft = -minPreferredLogicalWidth() - cMarkerPadding;
+        marginStart = -minPreferredLogicalWidth() - cMarkerPadding;
       else {
         int offset = font.ascent() * 2 / 3;
         switch (style()->listStyleType()) {
           case Disc:
           case Circle:
           case Square:
-            marginLeft = -offset - cMarkerPadding - 1;
+            marginStart = -offset - cMarkerPadding - 1;
             break;
           case NoneListStyle:
             break;
           default:
-            marginLeft =
+            marginStart =
                 m_text.isEmpty() ? 0 : -minPreferredLogicalWidth() - offset / 2;
         }
       }
+      marginEnd = -marginStart - minPreferredLogicalWidth();
     } else {
       if (isImage())
-        marginLeft = cMarkerPadding;
+        marginEnd = cMarkerPadding;
       else {
         int offset = font.ascent() * 2 / 3;
         switch (style()->listStyleType()) {
           case Disc:
           case Circle:
           case Square:
-            marginLeft =
+            marginEnd =
                 offset + cMarkerPadding + 1 - minPreferredLogicalWidth();
             break;
           case NoneListStyle:
             break;
           default:
-            marginLeft = m_text.isEmpty() ? 0 : offset / 2;
+            marginEnd = m_text.isEmpty() ? 0 : offset / 2;
         }
       }
+      marginStart = -marginEnd - minPreferredLogicalWidth();
     }
-    marginRight = -marginLeft - minPreferredLogicalWidth();
   }
 
-  style()->setMarginLeft(Length(marginLeft, Fixed));
-  style()->setMarginRight(Length(marginRight, Fixed));
+  style()->setMarginStart(Length(marginStart, Fixed));
+  style()->setMarginEnd(Length(marginEnd, Fixed));
 }
 
 int RenderListMarker::lineHeight(bool firstLine,
@@ -1551,17 +1571,18 @@ bool RenderListMarker::isInside() const {
 
 IntRect RenderListMarker::getRelativeMarkerRect() {
   if (isImage())
-    return IntRect(x(), y(),
+    return IntRect(0, 0,
                    m_image->imageSize(this, style()->effectiveZoom()).width(),
                    m_image->imageSize(this, style()->effectiveZoom()).height());
 
+  IntRect relativeRect;
   EListStyleType type = style()->listStyleType();
   switch (type) {
     case Asterisks:
     case Footnotes: {
       const Font& font = style()->font();
-      return IntRect(x(), y() + font.ascent(), font.width(m_text),
-                     font.height());
+      relativeRect = IntRect(0, 0, font.width(m_text), font.height());
+      break;
     }
     case Disc:
     case Circle:
@@ -1570,8 +1591,9 @@ IntRect RenderListMarker::getRelativeMarkerRect() {
       const Font& font = style()->font();
       int ascent = font.ascent();
       int bulletWidth = (ascent * 2 / 3 + 1) / 2;
-      return IntRect(x() + 1, y() + 3 * (ascent - ascent * 2 / 3) / 2,
-                     bulletWidth, bulletWidth);
+      relativeRect = IntRect(1, 3 * (ascent - ascent * 2 / 3) / 2, bulletWidth,
+                             bulletWidth);
+      break;
     }
     case NoneListStyle:
       return IntRect();
@@ -1654,11 +1676,15 @@ IntRect RenderListMarker::getRelativeMarkerRect() {
       int itemWidth = font.width(m_text);
       UChar suffixSpace[2] = {listMarkerSuffix(type, m_listItem->value()), ' '};
       int suffixSpaceWidth = font.width(TextRun(suffixSpace, 2));
-      return IntRect(x(), y() + font.ascent(), itemWidth + suffixSpaceWidth,
-                     font.height());
+      relativeRect = IntRect(0, 0, itemWidth + suffixSpaceWidth, font.height());
   }
 
-  return IntRect();
+  if (!style()->isHorizontalWritingMode()) {
+    relativeRect = relativeRect.transposedRect();
+    relativeRect.setX(width() - relativeRect.x() - relativeRect.width());
+  }
+
+  return relativeRect;
 }
 
 void RenderListMarker::setSelectionState(SelectionState state) {

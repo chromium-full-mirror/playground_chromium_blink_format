@@ -162,7 +162,8 @@ static RenderObject* getParentOfFirstLineBox(RenderBlock* curr,
     if (currChild->isFloating() || currChild->isPositioned())
       continue;
 
-    if (currChild->isTable() || !currChild->isRenderBlock())
+    if (currChild->isTable() || !currChild->isRenderBlock() ||
+        (currChild->isBox() && toRenderBox(currChild)->isWritingModeRoot()))
       break;
 
     if (curr->isListItem() && inQuirksMode && currChild->node() &&
@@ -244,16 +245,16 @@ void RenderListItem::layout() {
 void RenderListItem::positionListMarker() {
   if (m_marker && m_marker->parent()->isBox() && !m_marker->isInside() &&
       m_marker->inlineBoxWrapper()) {
-    int markerOldX = m_marker->x();
-    int yOffset = 0;
-    int xOffset = 0;
+    int markerOldLogicalLeft = m_marker->logicalLeft();
+    int blockOffset = 0;
+    int lineOffset = 0;
     for (RenderBox* o = m_marker->parentBox(); o != this; o = o->parentBox()) {
-      yOffset += o->y();
-      xOffset += o->x();
+      blockOffset += o->logicalTop();
+      lineOffset += o->logicalLeft();
     }
 
     bool adjustOverflow = false;
-    int markerXPos;
+    int markerLogicalLeft;
     RootInlineBox* root = m_marker->inlineBoxWrapper()->root();
 
     // FIXME: Inline flows in the line box hierarchy that have self-painting
@@ -263,32 +264,38 @@ void RenderListItem::positionListMarker() {
     // not being as tight as it could be though.
     if (style()->isLeftToRightDirection()) {
       int leftLineOffset = logicalLeftOffsetForLine(
-          yOffset, logicalLeftOffsetForLine(yOffset, false), false);
-      markerXPos = leftLineOffset - xOffset - paddingLeft() - borderLeft() +
-                   m_marker->marginLeft();
-      m_marker->inlineBoxWrapper()->adjustPosition(markerXPos - markerOldX, 0);
+          blockOffset, logicalLeftOffsetForLine(blockOffset, false), false);
+      markerLogicalLeft = leftLineOffset - lineOffset - paddingStart() -
+                          borderStart() + m_marker->marginStart();
+      m_marker->inlineBoxWrapper()->adjustLineDirectionPosition(
+          markerLogicalLeft - markerOldLogicalLeft);
       for (InlineFlowBox* box = m_marker->inlineBoxWrapper()->parent(); box;
            box = box->parent()) {
-        if (markerXPos < box->leftLayoutOverflow()) {
+        if (markerLogicalLeft < box->logicalLeftLayoutOverflow()) {
           box->setInlineDirectionOverflowPositions(
-              markerXPos, box->rightLayoutOverflow(), box->leftVisualOverflow(),
-              box->rightVisualOverflow());
+              markerLogicalLeft, box->logicalRightLayoutOverflow(),
+              box->logicalLeftVisualOverflow(),
+              box->logicalRightVisualOverflow());
           if (box == root)
             adjustOverflow = true;
         }
       }
     } else {
       int rightLineOffset = logicalRightOffsetForLine(
-          yOffset, logicalRightOffsetForLine(yOffset, false), false);
-      markerXPos = rightLineOffset - xOffset + paddingRight() + borderRight() +
-                   m_marker->marginLeft();
-      m_marker->inlineBoxWrapper()->adjustPosition(markerXPos - markerOldX, 0);
+          blockOffset, logicalRightOffsetForLine(blockOffset, false), false);
+      markerLogicalLeft = rightLineOffset - lineOffset + paddingStart() +
+                          borderStart() + m_marker->marginEnd();
+      m_marker->inlineBoxWrapper()->adjustLineDirectionPosition(
+          markerLogicalLeft - markerOldLogicalLeft);
       for (InlineFlowBox* box = m_marker->inlineBoxWrapper()->parent(); box;
            box = box->parent()) {
-        if (markerXPos + m_marker->width() > box->rightLayoutOverflow()) {
+        if (markerLogicalLeft + m_marker->logicalWidth() >
+            box->logicalRightLayoutOverflow()) {
           box->setInlineDirectionOverflowPositions(
-              box->leftLayoutOverflow(), markerXPos + m_marker->width(),
-              box->leftVisualOverflow(), box->rightVisualOverflow());
+              box->logicalLeftLayoutOverflow(),
+              markerLogicalLeft + m_marker->logicalWidth(),
+              box->logicalLeftVisualOverflow(),
+              box->logicalRightVisualOverflow());
           if (box == root)
             adjustOverflow = true;
         }
@@ -296,8 +303,10 @@ void RenderListItem::positionListMarker() {
     }
 
     if (adjustOverflow) {
-      IntRect markerRect(markerXPos + xOffset, yOffset, m_marker->width(),
-                         m_marker->height());
+      IntRect markerRect(markerLogicalLeft + lineOffset, blockOffset,
+                         m_marker->width(), m_marker->height());
+      if (!style()->isHorizontalWritingMode())
+        markerRect = markerRect.transposedRect();
       RenderBox* o = m_marker;
       do {
         o = o->parentBox();
@@ -310,7 +319,7 @@ void RenderListItem::positionListMarker() {
 }
 
 void RenderListItem::paint(PaintInfo& paintInfo, int tx, int ty) {
-  if (!height())
+  if (!logicalHeight())
     return;
 
   RenderBlock::paint(paintInfo, tx, ty);

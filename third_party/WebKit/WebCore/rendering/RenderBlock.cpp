@@ -4707,11 +4707,12 @@ void RenderBlock::addIntrudingFloats(RenderBlock* prev,
         // into account.  Only apply this code if prev is the parent, since
         // otherwise the left margin
         // will get applied twice.
-        if (prev != parent())
-          floatingObj->setLeft(floatingObj->left() +
-                               (style()->isHorizontalWritingMode()
-                                    ? prev->marginLeft()
-                                    : prev->marginTop()));
+        if (prev != parent()) {
+          if (style()->isHorizontalWritingMode())
+            floatingObj->setLeft(floatingObj->left() + prev->marginLeft());
+          else
+            floatingObj->setTop(floatingObj->top() + prev->marginTop());
+        }
 
         floatingObj->m_shouldPaint = false;  // We are not in the direct
                                              // inheritance chain for this

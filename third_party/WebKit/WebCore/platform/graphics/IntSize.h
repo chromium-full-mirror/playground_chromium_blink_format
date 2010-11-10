@@ -100,6 +100,8 @@ class IntSize {
 
   void clampNegativeToZero() { *this = expandedTo(IntSize()); }
 
+  IntSize transposedSize() const { return IntSize(m_height, m_width); }
+
 #if PLATFORM(CG)
   explicit IntSize(const CGSize&);  // don't do this implicitly since it's lossy
   operator CGSize() const;

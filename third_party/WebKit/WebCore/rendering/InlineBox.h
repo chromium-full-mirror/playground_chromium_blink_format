@@ -129,6 +129,12 @@ class InlineBox {
   virtual bool isLineBreak() const { return false; }
 
   virtual void adjustPosition(int dx, int dy);
+  void adjustLineDirectionPosition(int delta) {
+    if (isHorizontal())
+      adjustPosition(delta, 0);
+    else
+      adjustPosition(0, delta);
+  }
 
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
