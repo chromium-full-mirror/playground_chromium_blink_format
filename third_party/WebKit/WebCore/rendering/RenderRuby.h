@@ -31,8 +31,6 @@
 #ifndef RenderRuby_h
 #define RenderRuby_h
 
-#if ENABLE(RUBY)
-
 #include "RenderBlock.h"
 #include "RenderInline.h"
 
@@ -93,7 +91,5 @@ class RenderRubyAsBlock : public RenderBlock {
 };
 
 }  // namespace WebCore
-
-#endif
 
 #endif  // RenderRuby_h
