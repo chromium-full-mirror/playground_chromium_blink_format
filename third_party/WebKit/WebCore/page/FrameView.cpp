@@ -1847,9 +1847,6 @@ void FrameView::dispatchScheduledEvents() {
 IntRect FrameView::windowClipRect(bool clipToContents) const {
   ASSERT(m_frame->view() == this);
 
-  if (paintsEntireContents())
-    return IntRect(IntPoint(0, 0), contentsSize());
-
   // Set our clip rect to be our contents.
   IntRect clipRect = contentsToWindow(visibleContentRect(!clipToContents));
   if (!m_frame || !m_frame->document() || !m_frame->document()->ownerElement())
