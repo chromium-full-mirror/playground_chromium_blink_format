@@ -3475,7 +3475,8 @@ bool RenderBox::shrinkToAvoidFloats() const {
 }
 
 bool RenderBox::avoidsFloats() const {
-  return isReplaced() || hasOverflowClip() || isHR() || isWritingModeRoot();
+  return isReplaced() || hasOverflowClip() || isHR() || isLegend() ||
+         isWritingModeRoot();
 }
 
 void RenderBox::addShadowOverflow() {
