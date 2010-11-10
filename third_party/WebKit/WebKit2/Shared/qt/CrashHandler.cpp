@@ -25,6 +25,7 @@
 
 #include "CrashHandler.h"
 
+#include "MappedMemoryPool.h"
 #include <csignal>
 #include <cstdlib>
 #include <wtf/AlwaysInline.h>
@@ -52,6 +53,8 @@ NO_RETURN void CrashHandler::signalHandler(int) {
 void CrashHandler::deleteObjects() {
   m_inDeleteObjects = true;
   qDeleteAll(m_objects);
+
+  MappedMemoryPool::instance()->clear();
 }
 
 }  // namespace WebKit

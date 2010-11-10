@@ -37,7 +37,11 @@ namespace WebKit {
 class MappedMemoryPool;
 
 struct MappedMemory {
-  QFile* mappedFile() const { return file; }
+  QString mappedFileName() const {
+    ASSERT(file);
+    ASSERT(mappedBytes);
+    return fileName;
+  }
 
   void markFree() {
     ASSERT(mappedBytes);
@@ -65,6 +69,7 @@ struct MappedMemory {
   };
 
   QFile* file;
+  QString fileName;
   union {
     uchar* mappedBytes;
     Data* dataPtr;
@@ -82,8 +87,11 @@ class MappedMemoryPool {
   MappedMemory* mapMemory(size_t size);
   MappedMemory* mapFile(QString fileName, size_t size);
 
+  void clear();
+
  private:
   MappedMemoryPool(){};
+  ~MappedMemoryPool();
 
   Vector<MappedMemory> m_pool;
 };
