@@ -65,12 +65,11 @@ OSStatus ComplexTextController::ComplexTextRun::overrideLayoutOperation(
 
   count--;
   ItemCount j = 0;
-  CFIndex indexOffset = 0;
+  CFIndex indexOffset = complexTextRun->m_indexOffset;
 
   if (complexTextRun->m_directionalOverride) {
     j++;
     count -= 2;
-    indexOffset = -1;
   }
 
   complexTextRun->m_glyphCount = count;
@@ -180,6 +179,7 @@ ComplexTextController::ComplexTextRun::ComplexTextRun(
       m_stringLocation(stringLocation),
       m_stringLength(stringLength),
       m_directionalOverride(directionalOverride),
+      m_indexOffset(0),
       m_isMonotonic(true) {
   OSStatus status;
 
@@ -242,7 +242,7 @@ ComplexTextController::ComplexTextRun::ComplexTextRun(
         leadingCharacter == leftToRightOverride ||
         leadingCharacter == rightToLeftEmbed ||
         leadingCharacter == rightToLeftOverride ||
-        leadingCharacter == popDirectionalFormatting)
+        leadingCharacter == popDirectionalFormatting) {
       if (substituteCharacters.isEmpty()) {
         substituteCharacters.grow(stringLength - 1);
         memcpy(substituteCharacters.data(), characters + 1,
@@ -252,6 +252,8 @@ ComplexTextController::ComplexTextRun::ComplexTextRun(
         substituteCharacters.remove(0);
         ATSUTextDeleted(atsuTextLayout, 0, 1);
       }
+      m_indexOffset++;
+    }
   }
 
   if (directionalOverride) {
@@ -268,6 +270,7 @@ ComplexTextController::ComplexTextRun::ComplexTextRun(
       substituteCharacters.append(popDirectionalFormatting);
     }
     ATSUTextInserted(atsuTextLayout, 0, 2);
+    m_indexOffset--;
   }
 
   ATSULayoutOperationOverrideSpecifier overrideSpecifier;
