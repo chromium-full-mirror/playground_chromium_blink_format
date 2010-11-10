@@ -145,7 +145,8 @@ void LayerRendererChromium::setRootLayerCanvasSize(const IntSize& size) {
   RetainPtr<CGColorSpaceRef> colorSpace(AdoptCF, CGColorSpaceCreateDeviceRGB());
   m_rootLayerCGContext.adoptCF(CGBitmapContextCreate(
       m_rootLayerBackingStore.data(), size.width(), size.height(), 8, rowBytes,
-      colorSpace.get(), kCGImageAlphaPremultipliedLast));
+      colorSpace.get(),
+      kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host));
   CGContextTranslateCTM(m_rootLayerCGContext.get(), 0, size.height());
   CGContextScaleCTM(m_rootLayerCGContext.get(), 1, -1);
   m_rootLayerGraphicsContext = new GraphicsContext(m_rootLayerCGContext.get());

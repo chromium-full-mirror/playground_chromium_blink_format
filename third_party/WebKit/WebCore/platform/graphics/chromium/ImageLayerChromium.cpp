@@ -130,8 +130,9 @@ void ImageLayerChromium::updateContents() {
   }
   RetainPtr<CGContextRef> tempContext(
       AdoptCF,
-      CGBitmapContextCreate(tempVector.data(), width, height, 8, tempRowBytes,
-                            colorSpace, kCGImageAlphaPremultipliedLast));
+      CGBitmapContextCreate(
+          tempVector.data(), width, height, 8, tempRowBytes, colorSpace,
+          kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host));
   CGContextSetBlendMode(tempContext.get(), kCGBlendModeCopy);
   CGContextDrawImage(tempContext.get(),
                      CGRectMake(0, 0, static_cast<CGFloat>(width),
