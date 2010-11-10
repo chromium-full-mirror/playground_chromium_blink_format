@@ -808,16 +808,6 @@ void CanvasRenderingContext2D::rect(float x,
     return;
   }
 
-  if (width < 0) {
-    width = -width;
-    x -= width;
-  }
-
-  if (height < 0) {
-    height = -height;
-    y -= height;
-  }
-
   m_path.addRect(FloatRect(x, y, width, height));
 }
 
