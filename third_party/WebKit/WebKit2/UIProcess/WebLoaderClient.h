@@ -26,6 +26,7 @@
 #ifndef WebLoaderClient_h
 #define WebLoaderClient_h
 
+#include "APIClient.h"
 #include "WKPage.h"
 #include <wtf/Forward.h>
 
@@ -39,11 +40,8 @@ class APIObject;
 class WebPageProxy;
 class WebFrameProxy;
 
-class WebLoaderClient {
+class WebLoaderClient : public APIClient<WKPageLoaderClient> {
  public:
-  WebLoaderClient();
-  void initialize(const WKPageLoaderClient*);
-
   void didStartProvisionalLoadForFrame(WebPageProxy*,
                                        WebFrameProxy*,
                                        APIObject*);
@@ -85,9 +83,6 @@ class WebLoaderClient {
   void processDidCrash(WebPageProxy*);
 
   void didChangeBackForwardList(WebPageProxy*);
-
- private:
-  WKPageLoaderClient m_pageLoaderClient;
 };
 
 }  // namespace WebKit

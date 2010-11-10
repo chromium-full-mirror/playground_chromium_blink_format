@@ -26,6 +26,7 @@
 #ifndef InjectedBundlePageUIClient_h
 #define InjectedBundlePageUIClient_h
 
+#include "APIClient.h"
 #include "WKBundlePage.h"
 #include "WebEvent.h"
 #include <wtf/Forward.h>
@@ -40,11 +41,8 @@ class APIObject;
 class WebFrame;
 class WebPage;
 
-class InjectedBundlePageUIClient {
+class InjectedBundlePageUIClient : public APIClient<WKBundlePageUIClient> {
  public:
-  InjectedBundlePageUIClient();
-  void initialize(WKBundlePageUIClient*);
-
   void willAddMessageToConsole(WebPage*,
                                const String& message,
                                int32_t lineNumber);
@@ -60,9 +58,6 @@ class InjectedBundlePageUIClient {
                                WebEvent::Modifiers,
                                RefPtr<APIObject>& userData);
   void pageDidScroll(WebPage*);
-
- private:
-  WKBundlePageUIClient m_client;
 };
 
 }  // namespace WebKit

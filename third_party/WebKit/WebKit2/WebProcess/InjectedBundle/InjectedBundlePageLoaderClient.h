@@ -26,6 +26,7 @@
 #ifndef InjectedBundlePageLoaderClient_h
 #define InjectedBundlePageLoaderClient_h
 
+#include "APIClient.h"
 #include "WKBundlePage.h"
 #include <JavaScriptCore/JSBase.h>
 #include <wtf/Forward.h>
@@ -41,11 +42,9 @@ class APIObject;
 class WebPage;
 class WebFrame;
 
-class InjectedBundlePageLoaderClient {
+class InjectedBundlePageLoaderClient
+    : public APIClient<WKBundlePageLoaderClient> {
  public:
-  InjectedBundlePageLoaderClient();
-  void initialize(WKBundlePageLoaderClient*);
-
   void didStartProvisionalLoadForFrame(WebPage*,
                                        WebFrame*,
                                        RefPtr<APIObject>& userData);
@@ -95,9 +94,6 @@ class InjectedBundlePageLoaderClient {
   void didRunInsecureContentForFrame(WebPage*,
                                      WebFrame*,
                                      RefPtr<APIObject>& userData);
-
- private:
-  WKBundlePageLoaderClient m_client;
 };
 
 }  // namespace WebKit

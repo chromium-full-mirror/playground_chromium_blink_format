@@ -32,17 +32,6 @@ using namespace WebCore;
 
 namespace WebKit {
 
-WebPolicyClient::WebPolicyClient() {
-  initialize(0);
-}
-
-void WebPolicyClient::initialize(const WKPagePolicyClient* client) {
-  if (client && !client->version)
-    m_pagePolicyClient = *client;
-  else
-    memset(&m_pagePolicyClient, 0, sizeof(m_pagePolicyClient));
-}
-
 bool WebPolicyClient::decidePolicyForNavigationAction(
     WebPageProxy* page,
     NavigationType type,
@@ -51,13 +40,12 @@ bool WebPolicyClient::decidePolicyForNavigationAction(
     const String& url,
     WebFrameProxy* frame,
     WebFramePolicyListenerProxy* listener) {
-  if (!m_pagePolicyClient.decidePolicyForNavigationAction)
+  if (!m_client.decidePolicyForNavigationAction)
     return false;
 
-  m_pagePolicyClient.decidePolicyForNavigationAction(
+  m_client.decidePolicyForNavigationAction(
       toAPI(page), toAPI(type), toAPI(modifiers), toAPI(mouseButton),
-      toURLRef(url.impl()), toAPI(frame), toAPI(listener),
-      m_pagePolicyClient.clientInfo);
+      toURLRef(url.impl()), toAPI(frame), toAPI(listener), m_client.clientInfo);
   return true;
 }
 
@@ -69,13 +57,12 @@ bool WebPolicyClient::decidePolicyForNewWindowAction(
     const String& url,
     WebFrameProxy* frame,
     WebFramePolicyListenerProxy* listener) {
-  if (!m_pagePolicyClient.decidePolicyForNewWindowAction)
+  if (!m_client.decidePolicyForNewWindowAction)
     return false;
 
-  m_pagePolicyClient.decidePolicyForNewWindowAction(
+  m_client.decidePolicyForNewWindowAction(
       toAPI(page), toAPI(type), toAPI(modifiers), toAPI(mouseButton),
-      toURLRef(url.impl()), toAPI(frame), toAPI(listener),
-      m_pagePolicyClient.clientInfo);
+      toURLRef(url.impl()), toAPI(frame), toAPI(listener), m_client.clientInfo);
   return true;
 }
 
@@ -85,12 +72,12 @@ bool WebPolicyClient::decidePolicyForMIMEType(
     const String& url,
     WebFrameProxy* frame,
     WebFramePolicyListenerProxy* listener) {
-  if (!m_pagePolicyClient.decidePolicyForMIMEType)
+  if (!m_client.decidePolicyForMIMEType)
     return false;
 
-  m_pagePolicyClient.decidePolicyForMIMEType(
-      toAPI(page), toAPI(MIMEType.impl()), toURLRef(url.impl()), toAPI(frame),
-      toAPI(listener), m_pagePolicyClient.clientInfo);
+  m_client.decidePolicyForMIMEType(toAPI(page), toAPI(MIMEType.impl()),
+                                   toURLRef(url.impl()), toAPI(frame),
+                                   toAPI(listener), m_client.clientInfo);
   return true;
 }
 

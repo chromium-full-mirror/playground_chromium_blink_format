@@ -26,6 +26,7 @@
 #ifndef WebPolicyClient_h
 #define WebPolicyClient_h
 
+#include "APIClient.h"
 #include "WKPage.h"
 #include "WebEvent.h"
 #include <WebCore/FrameLoaderTypes.h>
@@ -37,11 +38,8 @@ class WebPageProxy;
 class WebFrameProxy;
 class WebFramePolicyListenerProxy;
 
-class WebPolicyClient {
+class WebPolicyClient : public APIClient<WKPagePolicyClient> {
  public:
-  WebPolicyClient();
-  void initialize(const WKPagePolicyClient*);
-
   bool decidePolicyForNavigationAction(WebPageProxy*,
                                        WebCore::NavigationType,
                                        WebEvent::Modifiers,
@@ -61,9 +59,6 @@ class WebPolicyClient {
                                const String& url,
                                WebFrameProxy*,
                                WebFramePolicyListenerProxy*);
-
- private:
-  WKPagePolicyClient m_pagePolicyClient;
 };
 
 }  // namespace WebKit
