@@ -400,6 +400,7 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
   WebGraphicsContext3D::Attributes m_attributes;
   bool m_initialized;
   bool m_renderDirectlyToWebView;
+  bool m_isGLES2;
 
   unsigned int m_texture;
   unsigned int m_fbo;
