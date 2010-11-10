@@ -35,10 +35,11 @@ class HTMLStyleElement : public HTMLElement, private StyleElement {
   static PassRefPtr<HTMLStyleElement> create(const QualifiedName&,
                                              Document*,
                                              bool createdByParser);
+  virtual ~HTMLStyleElement();
 
   void setType(const AtomicString&);
 
-  StyleSheet* sheet();
+  using StyleElement::sheet;
 
  private:
   HTMLStyleElement(const QualifiedName&, Document*, bool createdByParser);

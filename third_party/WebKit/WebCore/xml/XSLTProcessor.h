@@ -46,6 +46,7 @@ class XSLTProcessor : public RefCounted<XSLTProcessor> {
   static PassRefPtr<XSLTProcessor> create() {
     return adoptRef(new XSLTProcessor);
   }
+  ~XSLTProcessor();
 
   void setXSLStyleSheet(PassRefPtr<XSLStyleSheet> styleSheet) {
     m_stylesheet = styleSheet;

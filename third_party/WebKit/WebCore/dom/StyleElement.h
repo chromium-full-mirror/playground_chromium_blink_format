@@ -37,7 +37,7 @@ class StyleElement {
   virtual const AtomicString& type() const = 0;
   virtual const AtomicString& media() const = 0;
 
-  StyleSheet* sheet(Element*);
+  StyleSheet* sheet() { return m_sheet.get(); }
 
   bool isLoading() const;
   bool sheetLoaded(Document*);

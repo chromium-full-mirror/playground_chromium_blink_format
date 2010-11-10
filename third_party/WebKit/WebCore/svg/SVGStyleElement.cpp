@@ -39,6 +39,11 @@ inline SVGStyleElement::SVGStyleElement(const QualifiedName& tagName,
                                         bool createdByParser)
     : SVGElement(tagName, document), StyleElement(document, createdByParser) {}
 
+SVGStyleElement::~SVGStyleElement() {
+  if (m_sheet)
+    m_sheet->clearOwnerNode();
+}
+
 PassRefPtr<SVGStyleElement> SVGStyleElement::create(
     const QualifiedName& tagName,
     Document* document,
@@ -106,10 +111,6 @@ void SVGStyleElement::childrenChanged(bool changedByParser,
   StyleElement::childrenChanged(this);
   SVGElement::childrenChanged(changedByParser, beforeChange, afterChange,
                               childCountDelta);
-}
-
-StyleSheet* SVGStyleElement::sheet() {
-  return StyleElement::sheet(this);
 }
 }
 

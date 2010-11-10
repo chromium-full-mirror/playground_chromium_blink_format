@@ -41,6 +41,11 @@ inline HTMLStyleElement::HTMLStyleElement(const QualifiedName& tagName,
   ASSERT(hasTagName(styleTag));
 }
 
+HTMLStyleElement::~HTMLStyleElement() {
+  if (m_sheet)
+    m_sheet->clearOwnerNode();
+}
+
 PassRefPtr<HTMLStyleElement> HTMLStyleElement::create(
     const QualifiedName& tagName,
     Document* document,
@@ -80,10 +85,6 @@ void HTMLStyleElement::childrenChanged(bool changedByParser,
   StyleElement::childrenChanged(this);
   HTMLElement::childrenChanged(changedByParser, beforeChange, afterChange,
                                childCountDelta);
-}
-
-StyleSheet* HTMLStyleElement::sheet() {
-  return StyleElement::sheet(this);
 }
 
 const AtomicString& HTMLStyleElement::media() const {

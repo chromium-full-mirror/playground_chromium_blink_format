@@ -40,12 +40,6 @@ StyleElement::StyleElement(Document* document, bool createdByParser)
 
 StyleElement::~StyleElement() {}
 
-StyleSheet* StyleElement::sheet(Element* e) {
-  if (!m_sheet)
-    createSheet(e, 0);
-  return m_sheet.get();
-}
-
 void StyleElement::insertedIntoDocument(Document* document, Element* element) {
   ASSERT(document);
   ASSERT(element);
@@ -61,12 +55,15 @@ void StyleElement::removedFromDocument(Document* document, Element* element) {
   ASSERT(element);
   document->removeStyleSheetCandidateNode(element);
 
+  if (m_sheet) {
+    ASSERT(m_sheet->ownerNode() == element);
+    m_sheet->clearOwnerNode();
+    m_sheet = 0;
+  }
+
   // If we're in document teardown, then we don't need to do any notification of
   // our sheet's removal.
-  if (!document->renderer())
-    return;
-
-  if (m_sheet)
+  if (document->renderer())
     document->styleSelectorChanged(DeferRecalcStyle);
 }
 
@@ -81,7 +78,6 @@ void StyleElement::childrenChanged(Element* element) {
 void StyleElement::finishParsingChildren(Element* element) {
   ASSERT(element);
   process(element);
-  sheet(element);
   m_createdByParser = false;
 }
 
@@ -119,6 +115,7 @@ void StyleElement::createSheet(Element* e,
                                int startLineNumber,
                                const String& text) {
   ASSERT(e);
+  ASSERT(e->inDocument());
   Document* document = e->document();
   if (m_sheet) {
     if (m_sheet->isLoading())
