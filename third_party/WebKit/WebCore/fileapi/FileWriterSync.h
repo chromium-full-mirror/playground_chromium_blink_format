@@ -50,6 +50,7 @@ class FileWriterSync : public RefCounted<FileWriterSync>,
   static PassRefPtr<FileWriterSync> create(ScriptExecutionContext* context) {
     return adoptRef(new FileWriterSync(context));
   }
+  virtual ~FileWriterSync();
 
   void write(Blob* data, ExceptionCode&);
   void seek(long long position, ExceptionCode&);
@@ -68,7 +69,6 @@ class FileWriterSync : public RefCounted<FileWriterSync>,
 
  private:
   FileWriterSync(ScriptExecutionContext*);
-  virtual ~FileWriterSync();
 
   friend class RefCounted<FileWriterSync>;
 
