@@ -27,6 +27,7 @@
 
 namespace WebCore {
 
+#if !ASSERT_DISABLED
 static bool isAcceptableStyleSheetParent(Node* parentNode) {
   // Only these nodes can be parents of StyleSheets, and they need to call
   // clearOwnerNode() when moved out of document.
@@ -39,6 +40,7 @@ static bool isAcceptableStyleSheetParent(Node* parentNode) {
 #endif
       ;
 }
+#endif
 
 StyleSheet::StyleSheet(StyleSheet* parentSheet,
                        const String& originalURL,
