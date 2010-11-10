@@ -20,7 +20,9 @@
 #ifndef GObjectEventListener_h
 #define GObjectEventListener_h
 
+#include "DOMWindow.h"
 #include "EventListener.h"
+#include "Node.h"
 
 #include <wtf/RefPtr.h>
 #include <wtf/text/CString.h>
@@ -28,9 +30,6 @@
 typedef struct _GObject GObject;
 
 namespace WebCore {
-
-class DOMWindow;
-class Node;
 
 class GObjectEventListener : public EventListener {
  public:
@@ -40,6 +39,7 @@ class GObjectEventListener : public EventListener {
                                const char* signalName) {
     RefPtr<GObjectEventListener> listener(adoptRef(
         new GObjectEventListener(object, window, 0, domEventName, signalName)));
+    window->addEventListener(domEventName, listener.release(), false);
   }
 
   static void addEventListener(GObject* object,
@@ -48,6 +48,7 @@ class GObjectEventListener : public EventListener {
                                const char* signalName) {
     RefPtr<GObjectEventListener> listener(adoptRef(
         new GObjectEventListener(object, 0, node, domEventName, signalName)));
+    node->addEventListener(domEventName, listener.release(), false);
   }
 
   static void gobjectDestroyedCallback(GObjectEventListener* listener,

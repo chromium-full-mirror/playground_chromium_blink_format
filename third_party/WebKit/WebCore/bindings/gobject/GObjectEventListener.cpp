@@ -20,10 +20,8 @@
 #include "config.h"
 #include "GObjectEventListener.h"
 
-#include "DOMWindow.h"
 #include "Event.h"
 #include "EventListener.h"
-#include "Node.h"
 #include "webkit/WebKitDOMEvent.h"
 #include "webkit/WebKitDOMEventPrivate.h"
 #include <glib-object.h>
@@ -44,10 +42,7 @@ GObjectEventListener::GObjectEventListener(GObject* object,
       m_domEventName(domEventName),
       m_signalName(signalName) {
   ASSERT(!m_coreWindow || !m_coreNode);
-  if (m_coreWindow)
-    m_coreWindow->addEventListener(domEventName, this, false);
-  if (m_coreNode)
-    m_coreNode->addEventListener(domEventName, this, false);
+
   g_object_weak_ref(object, reinterpret_cast<GWeakNotify>(
                                 GObjectEventListener::gobjectDestroyedCallback),
                     this);
