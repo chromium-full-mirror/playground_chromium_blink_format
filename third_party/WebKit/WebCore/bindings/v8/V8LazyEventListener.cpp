@@ -45,16 +45,14 @@ V8LazyEventListener::V8LazyEventListener(const String& functionName,
                                          bool isSVGEvent,
                                          const String& code,
                                          const String sourceURL,
-                                         int lineNumber,
-                                         int columnNumber,
+                                         const TextPosition0& position,
                                          const WorldContextHandle& worldContext)
     : V8AbstractEventListener(true, worldContext),
       m_functionName(functionName),
       m_isSVGEvent(isSVGEvent),
       m_code(code),
       m_sourceURL(sourceURL),
-      m_lineNumber(lineNumber),
-      m_columnNumber(columnNumber) {}
+      m_position(position) {}
 
 v8::Local<v8::Value> V8LazyEventListener::callListenerFunction(
     ScriptExecutionContext* context,
@@ -124,7 +122,7 @@ void V8LazyEventListener::prepareListenerObject(
   code.append("\n}).call(this, evt);}}}})");
   v8::Handle<v8::String> codeExternalString = v8ExternalString(code);
   v8::Handle<v8::Script> script =
-      V8Proxy::compileScript(codeExternalString, m_sourceURL, m_lineNumber);
+      V8Proxy::compileScript(codeExternalString, m_sourceURL, m_position);
   if (!script.IsEmpty()) {
     v8::Local<v8::Value> value = proxy->runScript(script, false);
     if (!value.IsEmpty()) {
