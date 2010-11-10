@@ -127,6 +127,8 @@ class WebInputEvent {
     NumLockOn = 1 << 10,
   };
 
+  static const int InputModifiers = ShiftKey | ControlKey | AltKey | MetaKey;
+
   unsigned size;  // The size of this structure, for serialization.
   Type type;
   int modifiers;
