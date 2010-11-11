@@ -27,6 +27,7 @@
 
 #include "Connection.h"
 #include "DownloadProxyMessages.h"
+#include "WebCoreArgumentCoders.h"
 #include "WebProcess.h"
 
 using namespace WebCore;
@@ -52,7 +53,7 @@ CoreIPC::Connection* Download::connection() const {
 }
 
 void Download::didStart() {
-  send(Messages::DownloadProxy::DidStart());
+  send(Messages::DownloadProxy::DidStart(m_request));
 }
 
 void Download::didReceiveData(uint64_t length) {}

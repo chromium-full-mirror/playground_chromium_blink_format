@@ -36,7 +36,6 @@ extern "C" {
 WK_EXPORT WKURLRequestRef
 WKURLRequestCreateWithNSURLRequest(NSURLRequest* urlRequest);
 WK_EXPORT NSURLRequest* WKURLRequestCopyNSURLRequest(
-    CFAllocatorRef alloc,
     WKURLRequestRef urlRequest);
 
 #ifdef __cplusplus

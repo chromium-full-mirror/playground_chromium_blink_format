@@ -27,6 +27,7 @@
 #define DownloadProxy_h
 
 #include "APIObject.h"
+#include <WebCore/ResourceRequest.h>
 #include <wtf/Forward.h>
 #include <wtf/PassRefPtr.h>
 
@@ -48,6 +49,7 @@ class DownloadProxy : public APIObject {
   ~DownloadProxy();
 
   uint64_t downloadID() const { return m_downloadID; }
+  const WebCore::ResourceRequest& request() const { return m_request; }
 
   void invalidate();
 
@@ -61,12 +63,13 @@ class DownloadProxy : public APIObject {
   virtual Type type() const { return APIType; }
 
   // Message handlers.
-  void didStart();
+  void didStart(const WebCore::ResourceRequest&);
   void didCreateDestination(const String& path);
   void didFinish();
 
   WebContext* m_webContext;
   uint64_t m_downloadID;
+  WebCore::ResourceRequest m_request;
 };
 
 }  // namespace WebKit
