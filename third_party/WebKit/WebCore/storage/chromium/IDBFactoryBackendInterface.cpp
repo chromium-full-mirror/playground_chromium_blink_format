@@ -38,6 +38,10 @@ PassRefPtr<IDBFactoryBackendInterface> IDBFactoryBackendInterface::create() {
   return ChromiumBridge::idbFactory();
 }
 
+IDBFactoryBackendInterface::~IDBFactoryBackendInterface() {
+  ChromiumBridge::idbShutdown();
+}
+
 }  // namespace WebCore
 
 #endif  // ENABLE(INDEXED_DATABASE)

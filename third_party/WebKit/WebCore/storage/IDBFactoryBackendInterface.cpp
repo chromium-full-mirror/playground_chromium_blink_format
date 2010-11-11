@@ -43,6 +43,8 @@ PassRefPtr<IDBFactoryBackendInterface> IDBFactoryBackendInterface::create() {
   return IDBFactoryBackendImpl::create();
 }
 
+IDBFactoryBackendInterface::~IDBFactoryBackendInterface() {}
+
 }  // namespace WebCore
 
 #endif  // ENABLE(INDEXED_DATABASE)

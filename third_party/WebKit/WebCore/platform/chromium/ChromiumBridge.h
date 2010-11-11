@@ -198,6 +198,7 @@ class ChromiumBridge {
 
   // IndexedDB ----------------------------------------------------------
   static PassRefPtr<IDBFactoryBackendInterface> idbFactory();
+  static void idbShutdown();
   // Extracts keyPath from values and returns the corresponding keys.
   static void createIDBKeysFromSerializedValuesAndKeyPath(
       const Vector<RefPtr<SerializedScriptValue>>& values,

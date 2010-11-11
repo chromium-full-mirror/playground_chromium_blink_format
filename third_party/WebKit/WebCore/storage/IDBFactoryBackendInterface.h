@@ -52,7 +52,7 @@ class IDBFactoryBackendInterface
     : public ThreadSafeShared<IDBFactoryBackendInterface> {
  public:
   static PassRefPtr<IDBFactoryBackendInterface> create();
-  virtual ~IDBFactoryBackendInterface() {}
+  virtual ~IDBFactoryBackendInterface();
 
   virtual void open(const String& name,
                     const String& description,
