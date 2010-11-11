@@ -55,6 +55,10 @@ PassRefPtr<SharedGraphicsContext3D> SharedGraphicsContext3D::create(
   GraphicsContext3D::Attributes attr;
   attr.canRecoverFromContextLoss =
       false;  // Canvas contexts can not handle lost contexts.
+  attr.depth = false;
+  attr.antialias = false;  // FIXME: we eventually want aa, but it's not well
+                           // tested yet, so leave it off for now.
+
   RefPtr<GraphicsContext3D> context =
       GraphicsContext3D::create(attr, hostWindow);
   if (!context)
