@@ -82,9 +82,9 @@ class ComplexTextController {
                                              const SimpleFontData* fontData,
                                              const UChar* characters,
                                              unsigned stringLocation,
-                                             CFRange runRange) {
+                                             size_t stringLength) {
       return adoptRef(new ComplexTextRun(ctRun, fontData, characters,
-                                         stringLocation, runRange));
+                                         stringLocation, stringLength));
     }
 #endif
 #if USE(ATSUI)
@@ -130,7 +130,7 @@ class ComplexTextController {
                    const SimpleFontData*,
                    const UChar* characters,
                    unsigned stringLocation,
-                   CFRange runRange);
+                   size_t stringLength);
     void createTextRunFromFontDataCoreText(bool ltr);
 #endif
 #if USE(ATSUI)
