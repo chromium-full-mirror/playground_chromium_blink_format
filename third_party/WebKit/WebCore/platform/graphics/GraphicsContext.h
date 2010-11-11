@@ -526,6 +526,7 @@ class GraphicsContext : public Noncopyable {
   void pushTransparencyLayerInternal(const QRect& rect,
                                      qreal opacity,
                                      QPixmap& alphaMask);
+  void takeOwnershipOfPlatformContext();
   static QPainter::CompositionMode toQtCompositionMode(CompositeOperator op);
 #endif
 

@@ -211,8 +211,11 @@ class GraphicsContextPlatformPrivate : public Noncopyable {
 #endif
   }
 
+  void takeOwnershipOfPlatformContext() { platformContextIsOwned = true; }
+
  private:
   QPainter* painter;
+  bool platformContextIsOwned;
 };
 
 GraphicsContextPlatformPrivate::GraphicsContextPlatformPrivate(
@@ -222,7 +225,8 @@ GraphicsContextPlatformPrivate::GraphicsContextPlatformPrivate(
       layerCount(0),
       solidColor(initialSolidColor),
       imageInterpolationQuality(InterpolationDefault),
-      painter(p) {
+      painter(p),
+      platformContextIsOwned(false) {
   if (!painter)
     return;
 
@@ -234,7 +238,15 @@ GraphicsContextPlatformPrivate::GraphicsContextPlatformPrivate(
       QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
 }
 
-GraphicsContextPlatformPrivate::~GraphicsContextPlatformPrivate() {}
+GraphicsContextPlatformPrivate::~GraphicsContextPlatformPrivate() {
+  if (!platformContextIsOwned)
+    return;
+
+  painter->end();
+  QPaintDevice* device = painter->device();
+  delete painter;
+  delete device;
+}
 
 GraphicsContext::GraphicsContext(PlatformGraphicsContext* painter)
     : m_common(createGraphicsContextPrivate()),
@@ -1418,6 +1430,10 @@ void GraphicsContext::setImageInterpolationQuality(
 
 InterpolationQuality GraphicsContext::imageInterpolationQuality() const {
   return m_data->imageInterpolationQuality;
+}
+
+void GraphicsContext::takeOwnershipOfPlatformContext() {
+  m_data->takeOwnershipOfPlatformContext();
 }
 }
 
