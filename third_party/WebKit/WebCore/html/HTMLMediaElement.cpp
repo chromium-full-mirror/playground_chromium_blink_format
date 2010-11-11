@@ -1278,11 +1278,10 @@ void HTMLMediaElement::invalidateCachedTime() {
   // sometimes fluctuates for a short amount of time, so the cached time will be
   // off if we take it
   // too early.
-  static const float minimumTimePlayingBeforeCacheSnapshot = 0.5;
+  static const double minimumTimePlayingBeforeCacheSnapshot = 0.5;
 
   m_minimumWallClockTimeToCacheMediaTime =
-      static_cast<float>(WTF::currentTime()) +
-      minimumTimePlayingBeforeCacheSnapshot;
+      WTF::currentTime() + minimumTimePlayingBeforeCacheSnapshot;
   m_cachedTime = invalidMediaTime;
 }
 
