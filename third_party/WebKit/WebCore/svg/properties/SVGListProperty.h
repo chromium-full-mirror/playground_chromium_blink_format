@@ -324,7 +324,7 @@ class SVGListProperty : public SVGProperty {
     processIncomingListItemWrapper(newItem, &index);
 
     // Detach the existing wrapper.
-    RefPtr<ListItemTearOff>& oldItem = wrappers.at(index);
+    RefPtr<ListItemTearOff> oldItem = wrappers.at(index);
     if (oldItem)
       oldItem->detachWrapper();
 
@@ -375,7 +375,7 @@ class SVGListProperty : public SVGProperty {
     ASSERT(values.size() == wrappers.size());
 
     // Detach the existing wrapper.
-    RefPtr<ListItemTearOff>& oldItem = wrappers.at(index);
+    RefPtr<ListItemTearOff> oldItem = wrappers.at(index);
     if (oldItem)
       oldItem->detachWrapper();
 
