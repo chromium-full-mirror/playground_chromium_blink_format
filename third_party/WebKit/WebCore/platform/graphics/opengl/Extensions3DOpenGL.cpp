@@ -102,8 +102,8 @@ void Extensions3DOpenGL::renderbufferStorageMultisample(
     unsigned long internalformat,
     unsigned long width,
     unsigned long height) {
-  ::glRenderbufferStorageMultisample(target, samples, internalformat, width,
-                                     height);
+  ::glRenderbufferStorageMultisampleEXT(target, samples, internalformat, width,
+                                        height);
 }
 
 }  // namespace WebCore
