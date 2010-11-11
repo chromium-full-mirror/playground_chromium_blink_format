@@ -196,6 +196,10 @@ void ScrollView::setPaintsEntireContents(bool paintsEntireContents) {
 IntRect ScrollView::visibleContentRect(bool includeScrollbars) const {
   if (platformWidget())
     return platformVisibleContentRect(includeScrollbars);
+
+  if (!m_actualVisibleContentRect.isEmpty())
+    return m_actualVisibleContentRect;
+
   return IntRect(
       IntPoint(m_scrollOffset.width(), m_scrollOffset.height()),
       IntSize(max(0, width() - (verticalScrollbar() && !includeScrollbars
