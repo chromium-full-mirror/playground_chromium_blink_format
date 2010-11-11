@@ -72,7 +72,7 @@ class HTMLScriptRunner : public Noncopyable {
 
   void executeParsingBlockingScript();
   void executePendingScriptAndDispatchEvent(PendingScript&);
-  void executeScript(const ScriptSourceCode&) const;
+  void executeScript(Element*, const ScriptSourceCode&) const;
   bool haveParsingBlockingScript() const;
   bool executeParsingBlockingScripts();
 
