@@ -97,6 +97,7 @@ class FontPlatformData {
   bool m_syntheticOblique;
   bool m_useGDI;
 };
-}
+
+}  // namespace WebCore
 
 #endif
