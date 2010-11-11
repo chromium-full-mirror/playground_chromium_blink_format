@@ -518,7 +518,7 @@ void WebPageProxy::setPageAndTextZoomFactors(double pageZoomFactor,
                   m_pageID);
 }
 
-void WebPageProxy::scaleWebView(double scale) {
+void WebPageProxy::scaleWebView(double scale, const IntPoint& origin) {
   if (!isValid())
     return;
 
@@ -526,7 +526,7 @@ void WebPageProxy::scaleWebView(double scale) {
     return;
 
   m_viewScaleFactor = scale;
-  process()->send(Messages::WebPage::ScaleWebView(scale), m_pageID);
+  process()->send(Messages::WebPage::ScaleWebView(scale, origin), m_pageID);
 }
 
 void WebPageProxy::findString(const String& string,

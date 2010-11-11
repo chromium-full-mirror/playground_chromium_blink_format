@@ -981,7 +981,7 @@ void Frame::setPageAndTextZoomFactors(float pageZoomFactor,
   }
 }
 
-void Frame::scalePage(float scale) {
+void Frame::scalePage(float scale, const IntPoint& origin) {
   if (m_pageScaleFactor == scale)
     return;
 
@@ -1000,6 +1000,9 @@ void Frame::scalePage(float scale) {
     if (document->renderer() && document->renderer()->needsLayout() &&
         view->didFirstLayout())
       view->layout();
+    IntPoint scrollPosition = view->scrollPosition();
+    view->setScrollPosition(IntPoint(scrollPosition.x() + origin.x() * scale,
+                                     scrollPosition.y() + origin.y() * scale));
   }
 }
 

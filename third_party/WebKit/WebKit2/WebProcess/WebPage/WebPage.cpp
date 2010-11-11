@@ -461,11 +461,11 @@ void WebPage::setPageAndTextZoomFactors(double pageZoomFactor,
                                           static_cast<float>(textZoomFactor));
 }
 
-void WebPage::scaleWebView(double scale) {
+void WebPage::scaleWebView(double scale, const IntPoint& origin) {
   Frame* frame = m_mainFrame->coreFrame();
   if (!frame)
     return;
-  frame->scalePage(scale);
+  frame->scalePage(scale, origin);
 }
 
 double WebPage::viewScaleFactor() const {

@@ -173,7 +173,7 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
   void setPageZoomFactor(double);
   void setPageAndTextZoomFactors(double pageZoomFactor, double textZoomFactor);
 
-  void scaleWebView(double scale);
+  void scaleWebView(double scale, const WebCore::IntPoint& origin);
   double viewScaleFactor() const;
 
   void stopLoading();
