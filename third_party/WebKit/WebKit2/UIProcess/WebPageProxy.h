@@ -167,6 +167,10 @@ class WebPageProxy : public APIObject {
   void updateWindowFrame(const WebCore::IntRect&);
 #endif
 
+#if ENABLE(TILED_BACKING_STORE)
+  void setActualVisibleContentRect(const WebCore::IntRect& rect);
+#endif
+
   void handleMouseEvent(const WebMouseEvent&);
   void handleWheelEvent(const WebWheelEvent&);
   void handleKeyboardEvent(const NativeWebKeyboardEvent&);

@@ -206,6 +206,7 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
   void pageDidScroll();
 #if ENABLE(TILED_BACKING_STORE)
   void pageDidRequestScroll(const WebCore::IntSize& delta);
+  void setActualVisibleContentRect(const WebCore::IntRect&);
 #endif
 
   WebContextMenu* contextMenu();

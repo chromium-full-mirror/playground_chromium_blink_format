@@ -392,6 +392,10 @@ QWKPage::ViewportAttributes QWKPage::viewportAttributesForSize(
   return result;
 }
 
+void QWKPage::setActualVisibleContentsRect(const QRect& rect) const {
+  d->page->setActualVisibleContentRect(rect);
+}
+
 void QWKPage::timerEvent(QTimerEvent* ev) {
   int timerId = ev->timerId();
   if (timerId == d->tripleClickTimer.timerId())

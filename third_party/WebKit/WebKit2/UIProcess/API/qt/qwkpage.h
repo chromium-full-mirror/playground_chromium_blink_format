@@ -84,6 +84,8 @@ class QWEBKIT_EXPORT QWKPage : public QObject {
   ViewportAttributes viewportAttributesForSize(
       const QSize& availableSize) const;
 
+  void setActualVisibleContentsRect(const QRect& rect) const;
+
   QAction* action(WebAction action) const;
   void triggerAction(WebAction action, bool checked = false);
 
