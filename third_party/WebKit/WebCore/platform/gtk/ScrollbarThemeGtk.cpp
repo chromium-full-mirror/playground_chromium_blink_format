@@ -30,6 +30,7 @@
 #include "RenderThemeGtk.h"
 #include "ScrollView.h"
 #include "Scrollbar.h"
+#include "WidgetRenderingContext.h"
 #include "gtkdrawing.h"
 #include <gtk/gtk.h>
 
@@ -238,8 +239,8 @@ void ScrollbarThemeGtk::paintTrackBackground(GraphicsContext* context,
   GtkThemeWidgetType type = scrollbar->orientation() == VerticalScrollbar
                                 ? MOZ_GTK_SCROLLBAR_TRACK_VERTICAL
                                 : MOZ_GTK_SCROLLBAR_TRACK_HORIZONTAL;
-  static_cast<RenderThemeGtk*>(RenderTheme::defaultTheme().get())
-      ->paintMozillaGtkWidget(type, context, fullScrollbarRect, &state, 0);
+  WidgetRenderingContext widgetContext(context, fullScrollbarRect);
+  widgetContext.paintMozillaWidget(type, &state, 0);
 }
 
 void ScrollbarThemeGtk::paintScrollbarBackground(GraphicsContext* context,
@@ -248,9 +249,8 @@ void ScrollbarThemeGtk::paintScrollbarBackground(GraphicsContext* context,
   GtkWidgetState state;
   IntRect fullScrollbarRect = IntRect(scrollbar->x(), scrollbar->y(),
                                       scrollbar->width(), scrollbar->height());
-  static_cast<RenderThemeGtk*>(RenderTheme::defaultTheme().get())
-      ->paintMozillaGtkWidget(MOZ_GTK_SCROLLED_WINDOW, context,
-                              fullScrollbarRect, &state, 0);
+  WidgetRenderingContext widgetContext(context, fullScrollbarRect);
+  widgetContext.paintMozillaWidget(MOZ_GTK_SCROLLED_WINDOW, &state, 0);
 }
 
 void ScrollbarThemeGtk::paintThumb(GraphicsContext* context,
@@ -269,8 +269,8 @@ void ScrollbarThemeGtk::paintThumb(GraphicsContext* context,
   GtkThemeWidgetType type = scrollbar->orientation() == VerticalScrollbar
                                 ? MOZ_GTK_SCROLLBAR_THUMB_VERTICAL
                                 : MOZ_GTK_SCROLLBAR_THUMB_HORIZONTAL;
-  static_cast<RenderThemeGtk*>(RenderTheme::defaultTheme().get())
-      ->paintMozillaGtkWidget(type, context, rect, &state, 0);
+  WidgetRenderingContext widgetContext(context, rect);
+  widgetContext.paintMozillaWidget(type, &state, 0);
 }
 
 IntRect ScrollbarThemeGtk::thumbRect(Scrollbar* scrollbar,
@@ -292,6 +292,9 @@ IntRect ScrollbarThemeGtk::thumbRect(Scrollbar* scrollbar,
 bool ScrollbarThemeGtk::paint(Scrollbar* scrollbar,
                               GraphicsContext* graphicsContext,
                               const IntRect& damageRect) {
+  if (graphicsContext->paintingDisabled())
+    return false;
+
   // Create the ScrollbarControlPartMask based on the damageRect
   ScrollbarControlPartMask scrollMask = NoPart;
 
@@ -395,9 +398,8 @@ void ScrollbarThemeGtk::paintButton(GraphicsContext* context,
     state.inHover = FALSE;
   }
 
-  static_cast<RenderThemeGtk*>(RenderTheme::defaultTheme().get())
-      ->paintMozillaGtkWidget(MOZ_GTK_SCROLLBAR_BUTTON, context, rect, &state,
-                              flags);
+  WidgetRenderingContext widgetContext(context, rect);
+  widgetContext.paintMozillaWidget(MOZ_GTK_SCROLLBAR_BUTTON, &state, flags);
 }
 
 void ScrollbarThemeGtk::paintScrollCorner(ScrollView* view,
