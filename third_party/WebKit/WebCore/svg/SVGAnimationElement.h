@@ -132,6 +132,7 @@ class SVGAnimationElement : public SVGSMILElement,
                                   String& from,
                                   String& to) const;
   float calculatePercentForSpline(float percent, unsigned splineIndex) const;
+  unsigned calculateKeyTimesIndex(float percent) const;
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGAnimationElement,
