@@ -56,6 +56,8 @@ void LayerBackedDrawingAreaProxy::paint(const IntRect& rect,
                                         PlatformDrawingContext context) {}
 
 void LayerBackedDrawingAreaProxy::setSize(const IntSize& viewSize) {
+  DrawingAreaProxy::setSize(viewSize);
+
   WebPageProxy* page = this->page();
   if (!page->isValid())
     return;
@@ -63,7 +65,6 @@ void LayerBackedDrawingAreaProxy::setSize(const IntSize& viewSize) {
   if (viewSize.isEmpty())
     return;
 
-  m_viewSize = viewSize;
   m_lastSetViewSize = viewSize;
 
   platformSetSize();
