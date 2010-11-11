@@ -26,6 +26,7 @@
 #ifndef WebHistoryClient_h
 #define WebHistoryClient_h
 
+#include "APIClient.h"
 #include "WKContext.h"
 #include <wtf/Forward.h>
 
@@ -33,14 +34,11 @@ namespace WebKit {
 
 class WebContext;
 class WebFrameProxy;
-struct WebNavigationDataStore;
 class WebPageProxy;
+struct WebNavigationDataStore;
 
-class WebHistoryClient {
+class WebHistoryClient : public APIClient<WKContextHistoryClient> {
  public:
-  WebHistoryClient();
-  void initialize(const WKContextHistoryClient*);
-
   void didNavigateWithNavigationData(WebContext*,
                                      WebPageProxy*,
                                      const WebNavigationDataStore&,
@@ -62,12 +60,7 @@ class WebHistoryClient {
                              WebFrameProxy*);
   void populateVisitedLinks(WebContext*);
 
-  bool shouldTrackVisitedLinks() const {
-    return m_contextHistoryClient.populateVisitedLinks;
-  }
-
- private:
-  WKContextHistoryClient m_contextHistoryClient;
+  bool shouldTrackVisitedLinks() const { return m_client.populateVisitedLinks; }
 };
 
 }  // namespace WebKit

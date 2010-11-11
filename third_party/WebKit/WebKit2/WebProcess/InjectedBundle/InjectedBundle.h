@@ -27,6 +27,7 @@
 #define InjectedBundle_h
 
 #include "APIObject.h"
+#include "InjectedBundleClient.h"
 #include "WKBundle.h"
 #include <WebCore/UserContentTypes.h>
 #include <WebCore/UserScriptTypes.h>
@@ -139,7 +140,7 @@ class InjectedBundle : public APIObject {
   String m_sandboxToken;
 #endif
 
-  WKBundleClient m_client;
+  InjectedBundleClient m_client;
 };
 
 }  // namespace WebKit

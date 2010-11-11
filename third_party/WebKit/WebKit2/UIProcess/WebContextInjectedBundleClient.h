@@ -26,6 +26,7 @@
 #ifndef WebContextInjectedBundleClient_h
 #define WebContextInjectedBundleClient_h
 
+#include "APIClient.h"
 #include "WKContext.h"
 #include <wtf/Forward.h>
 
@@ -34,11 +35,9 @@ namespace WebKit {
 class APIObject;
 class WebContext;
 
-class WebContextInjectedBundleClient {
+class WebContextInjectedBundleClient
+    : public APIClient<WKContextInjectedBundleClient> {
  public:
-  WebContextInjectedBundleClient();
-  void initialize(const WKContextInjectedBundleClient*);
-
   void didReceiveMessageFromInjectedBundle(WebContext*,
                                            const String&,
                                            APIObject*);
@@ -47,9 +46,6 @@ class WebContextInjectedBundleClient {
       const String&,
       APIObject*,
       RefPtr<APIObject>& returnData);
-
- private:
-  WKContextInjectedBundleClient m_client;
 };
 
 }  // namespace WebKit
