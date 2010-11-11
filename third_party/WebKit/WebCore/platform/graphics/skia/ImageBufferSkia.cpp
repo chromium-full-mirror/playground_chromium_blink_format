@@ -109,7 +109,7 @@ void ImageBuffer::draw(GraphicsContext* context,
       DrawingBuffer* sourceDrawingBuffer =
           m_data.m_platformContext.gpuCanvas()->drawingBuffer();
       unsigned sourceTexture =
-          static_cast<unsigned>(sourceDrawingBuffer->platformColorBuffer());
+          sourceDrawingBuffer->getRenderingResultsAsTexture();
       FloatRect destRectFlipped(destRect);
       destRectFlipped.setY(destRect.y() + destRect.height());
       destRectFlipped.setHeight(-destRect.height());
