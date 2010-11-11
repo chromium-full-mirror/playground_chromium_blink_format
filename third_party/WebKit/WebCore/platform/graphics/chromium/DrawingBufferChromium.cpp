@@ -82,6 +82,11 @@ DrawingBuffer::DrawingBuffer(GraphicsContext3D* context, const IntSize& size)
     : m_context(context),
       m_size(size),
       m_fbo(0),
+      m_colorBuffer(0),
+      m_depthStencilBuffer(0),
+      m_multisampleFBO(0),
+      m_multisampleColorBuffer(0),
+      m_multisampleDepthStencilBuffer(0),
       m_internal(new DrawingBufferInternal) {
   if (!m_context->getExtensions()->supports(
           "GL_CHROMIUM_copy_texture_to_parent_texture")) {
@@ -90,7 +95,7 @@ DrawingBuffer::DrawingBuffer(GraphicsContext3D* context, const IntSize& size)
   }
   m_fbo = context->createFramebuffer();
   context->bindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_fbo);
-  m_internal->offscreenColorTexture = generateColorTexture(context, size);
+  m_colorBuffer = generateColorTexture(context, size);
 }
 
 DrawingBuffer::~DrawingBuffer() {
@@ -103,7 +108,7 @@ DrawingBuffer::~DrawingBuffer() {
     return;
 
   m_context->bindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_fbo);
-  m_context->deleteTexture(m_internal->offscreenColorTexture);
+  m_context->deleteTexture(m_colorBuffer);
 
   clear();
 }
@@ -128,27 +133,12 @@ void DrawingBuffer::publishToPlatformLayer() {
   // could wait for.
   m_context->makeContextCurrent();
   static_cast<Extensions3DChromium*>(m_context->getExtensions())
-      ->copyTextureToParentTextureCHROMIUM(m_internal->offscreenColorTexture,
-                                           parentTexture);
+      ->copyTextureToParentTextureCHROMIUM(m_colorBuffer, parentTexture);
   m_context->flush();
 }
 #endif
 
-void DrawingBuffer::reset(const IntSize& newSize) {
-  if (!m_context)
-    return;
-
-  if (m_size == newSize)
-    return;
-  m_size = newSize;
-
-  m_context->bindTexture(GraphicsContext3D::TEXTURE_2D,
-                         m_internal->offscreenColorTexture);
-  m_context->texImage2D(GraphicsContext3D::TEXTURE_2D, 0,
-                        GraphicsContext3D::RGBA, m_size.width(),
-                        m_size.height(), 0, GraphicsContext3D::RGBA,
-                        GraphicsContext3D::UNSIGNED_BYTE, 0);
-
+void DrawingBuffer::didReset() {
 #if USE(ACCELERATED_COMPOSITING)
   if (m_internal->platformLayer)
     m_internal->platformLayer->setTextureChanged();
@@ -163,7 +153,7 @@ PlatformLayer* DrawingBuffer::platformLayer() {
 }
 #endif
 
-unsigned DrawingBuffer::getRenderingResultsAsTexture() {
-  return m_internal->offscreenColorTexture;
+Platform3DObject DrawingBuffer::platformColorBuffer() const {
+  return m_colorBuffer;
 }
 }
