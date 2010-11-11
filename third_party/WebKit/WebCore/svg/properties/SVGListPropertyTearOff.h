@@ -117,7 +117,7 @@ class SVGListPropertyTearOff : public SVGListProperty<PropertyType> {
                                              passNewItem, ec);
   }
 
- private:
+ protected:
   SVGListPropertyTearOff(AnimatedListPropertyTearOff* animatedProperty,
                          SVGPropertyRole role)
       : SVGListProperty<PropertyType>(role),
@@ -197,7 +197,6 @@ class SVGListPropertyTearOff : public SVGListProperty<PropertyType> {
     }
   }
 
- private:
   // Back pointer to the animated property that created us
   // For example (text.x.baseVal): m_animatedProperty points to the 'x'
   // SVGAnimatedLengthList object

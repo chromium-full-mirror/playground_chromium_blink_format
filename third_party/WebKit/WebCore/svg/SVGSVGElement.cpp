@@ -428,8 +428,8 @@ FloatPoint SVGSVGElement::createSVGPoint() {
   return FloatPoint();
 }
 
-AffineTransform SVGSVGElement::createSVGMatrix() {
-  return AffineTransform();
+SVGMatrix SVGSVGElement::createSVGMatrix() {
+  return SVGMatrix();
 }
 
 FloatRect SVGSVGElement::createSVGRect() {
@@ -441,8 +441,8 @@ SVGTransform SVGSVGElement::createSVGTransform() {
 }
 
 SVGTransform SVGSVGElement::createSVGTransformFromMatrix(
-    const AffineTransform& matrix) {
-  return SVGTransform(matrix);
+    const SVGMatrix& matrix) {
+  return SVGTransform(static_cast<const AffineTransform&>(matrix));
 }
 
 AffineTransform SVGSVGElement::localCoordinateSpaceTransform(
@@ -555,8 +555,13 @@ AffineTransform SVGSVGElement::viewBoxToViewTransform(float viewWidth,
 
   AffineTransform ctm = SVGFitToViewBox::viewBoxToViewTransform(
       viewBoxRect, preserveAspectRatio(), viewWidth, viewHeight);
-  if (useCurrentView() && currentView())
-    return currentView()->transform()->concatenate().matrix() * ctm;
+  if (useCurrentView() && currentView()) {
+    AffineTransform transform;
+    if (!currentView()->transform().concatenate(transform))
+      return ctm;
+
+    return transform * ctm;
+  }
 
   return ctm;
 }

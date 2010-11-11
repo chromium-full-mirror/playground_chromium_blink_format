@@ -97,7 +97,7 @@ static const int optionalValuesForType[] = {0, 0, 1, 1, 2, 0, 0};
 bool SVGTransformable::parseTransformValue(unsigned type,
                                            const UChar*& ptr,
                                            const UChar* end,
-                                           SVGTransform& t) {
+                                           SVGTransform& transform) {
   if (type == SVGTransform::SVG_TRANSFORM_UNKNOWN)
     return false;
 
@@ -110,34 +110,34 @@ bool SVGTransformable::parseTransformValue(unsigned type,
 
   switch (type) {
     case SVGTransform::SVG_TRANSFORM_SKEWX:
-      t.setSkewX(values[0]);
+      transform.setSkewX(values[0]);
       break;
     case SVGTransform::SVG_TRANSFORM_SKEWY:
-      t.setSkewY(values[0]);
+      transform.setSkewY(values[0]);
       break;
     case SVGTransform::SVG_TRANSFORM_SCALE:
       if (valueCount ==
           1)  // Spec: if only one param given, assume uniform scaling
-        t.setScale(values[0], values[0]);
+        transform.setScale(values[0], values[0]);
       else
-        t.setScale(values[0], values[1]);
+        transform.setScale(values[0], values[1]);
       break;
     case SVGTransform::SVG_TRANSFORM_TRANSLATE:
       if (valueCount ==
           1)  // Spec: if only one param given, assume 2nd param to be 0
-        t.setTranslate(values[0], 0);
+        transform.setTranslate(values[0], 0);
       else
-        t.setTranslate(values[0], values[1]);
+        transform.setTranslate(values[0], values[1]);
       break;
     case SVGTransform::SVG_TRANSFORM_ROTATE:
       if (valueCount == 1)
-        t.setRotate(values[0], 0, 0);
+        transform.setRotate(values[0], 0, 0);
       else
-        t.setRotate(values[0], values[1], values[2]);
+        transform.setRotate(values[0], values[1], values[2]);
       break;
     case SVGTransform::SVG_TRANSFORM_MATRIX:
-      t.setMatrix(AffineTransform(values[0], values[1], values[2], values[3],
-                                  values[4], values[5]));
+      transform.setMatrix(AffineTransform(values[0], values[1], values[2],
+                                          values[3], values[4], values[5]));
       break;
   }
 
@@ -185,21 +185,18 @@ static inline bool parseAndSkipType(const UChar*& currTransform,
   return true;
 }
 
-bool SVGTransformable::parseTransformAttribute(SVGTransformList* list,
+bool SVGTransformable::parseTransformAttribute(SVGTransformList& list,
                                                const AtomicString& transform) {
   const UChar* start = transform.characters();
   return parseTransformAttribute(list, start, start + transform.length());
 }
 
-bool SVGTransformable::parseTransformAttribute(SVGTransformList* list,
+bool SVGTransformable::parseTransformAttribute(SVGTransformList& list,
                                                const UChar*& currTransform,
                                                const UChar* end,
                                                TransformParsingMode mode) {
-  ExceptionCode ec = 0;
-  if (mode == ClearList) {
-    list->clear(ec);
-    ASSERT(!ec);
-  }
+  if (mode == ClearList)
+    list.clear();
 
   bool delimParsed = false;
   while (currTransform < end) {
@@ -210,11 +207,11 @@ bool SVGTransformable::parseTransformAttribute(SVGTransformList* list,
     if (!parseAndSkipType(currTransform, end, type))
       return false;
 
-    SVGTransform t;
-    if (!parseTransformValue(type, currTransform, end, t))
+    SVGTransform transform;
+    if (!parseTransformValue(type, currTransform, end, transform))
       return false;
 
-    list->appendItem(t, ec);
+    list.append(transform);
     skipOptionalSpaces(currTransform, end);
     if (currTransform < end && *currTransform == ',') {
       delimParsed = true;

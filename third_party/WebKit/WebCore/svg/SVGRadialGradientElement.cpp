@@ -143,9 +143,11 @@ void SVGRadialGradientElement::collectGradientAttributes(
           SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
 
     if (!attributes.hasGradientTransform() &&
-        current->hasAttribute(SVGNames::gradientTransformAttr))
-      attributes.setGradientTransform(
-          current->gradientTransform()->consolidate().matrix());
+        current->hasAttribute(SVGNames::gradientTransformAttr)) {
+      AffineTransform transform;
+      current->gradientTransform().concatenate(transform);
+      attributes.setGradientTransform(transform);
+    }
 
     if (!attributes.hasStops()) {
       const Vector<Gradient::ColorStop>& stops(current->buildStops());

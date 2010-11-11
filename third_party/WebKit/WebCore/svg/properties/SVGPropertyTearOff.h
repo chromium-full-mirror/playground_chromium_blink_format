@@ -72,6 +72,9 @@ class SVGPropertyTearOff : public SVGProperty {
   }
 
   void detachWrapper() {
+    if (m_valueIsCopy)
+      return;
+
     // Switch from a live value, to a non-live value.
     // For example: <text x="50"/>
     // var item = text.x.baseVal.getItem(0);
@@ -81,7 +84,6 @@ class SVGPropertyTearOff : public SVGProperty {
     // w/o changing the "new item" (with x=100) in the text element.
     // Whenever the XML DOM modifies the "x" attribute, all existing wrappers
     // are detached, using this function.
-    ASSERT(!m_valueIsCopy);
     m_value = new PropertyType(*m_value);
     m_valueIsCopy = true;
     m_animatedProperty = 0;

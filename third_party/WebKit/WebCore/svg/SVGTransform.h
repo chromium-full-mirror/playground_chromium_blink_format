@@ -22,8 +22,8 @@
 #define SVGTransform_h
 
 #if ENABLE(SVG)
-#include "AffineTransform.h"
 #include "FloatPoint.h"
+#include "SVGMatrix.h"
 
 namespace WebCore {
 
@@ -45,15 +45,16 @@ class SVGTransform {
   SVGTransform(SVGTransformType);
   explicit SVGTransform(const AffineTransform&);
 
-  SVGTransformType type() const;
+  SVGTransformType type() const { return m_type; }
 
-  AffineTransform matrix() const;
+  SVGMatrix& svgMatrix() { return static_cast<SVGMatrix&>(m_matrix); }
+  AffineTransform matrix() const { return m_matrix; }
+  void updateMatrix();
 
-  float angle() const;
-  FloatPoint rotationCenter() const;
+  float angle() const { return m_angle; }
+  FloatPoint rotationCenter() const { return m_center; }
 
-  void setMatrix(AffineTransform);
-
+  void setMatrix(const AffineTransform&);
   void setTranslate(float tx, float ty);
   void setScale(float sx, float sy);
   void setRotate(float angle, float cx, float cy);
@@ -64,9 +65,11 @@ class SVGTransform {
   FloatPoint translate() const;
   FloatSize scale() const;
 
-  bool isValid();
+  bool isValid() const { return m_type != SVG_TRANSFORM_UNKNOWN; }
 
  private:
+  friend bool operator==(const SVGTransform& a, const SVGTransform& b);
+
   SVGTransformType m_type;
   float m_angle;
   FloatPoint m_center;
@@ -74,8 +77,8 @@ class SVGTransform {
 };
 
 inline bool operator==(const SVGTransform& a, const SVGTransform& b) {
-  return a.type() == b.type() && a.angle() == b.angle() &&
-         a.matrix() == b.matrix();
+  return a.m_type == b.m_type && a.m_angle == b.m_angle &&
+         a.m_matrix == b.m_matrix;
 }
 
 inline bool operator!=(const SVGTransform& a, const SVGTransform& b) {

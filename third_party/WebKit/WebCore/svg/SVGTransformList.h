@@ -22,31 +22,23 @@
 #define SVGTransformList_h
 
 #if ENABLE(SVG)
-#include "SVGList.h"
 #include "SVGTransform.h"
-#include <wtf/Forward.h>
-#include <wtf/PassRefPtr.h>
+#include <wtf/Vector.h>
+#include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
-class SVGTransformList : public SVGPODList<SVGTransform> {
+class SVGTransformList : public Vector<SVGTransform> {
  public:
-  static PassRefPtr<SVGTransformList> create(
-      const QualifiedName& attributeName) {
-    return adoptRef(new SVGTransformList(attributeName));
-  }
-  virtual ~SVGTransformList();
+  SVGTransformList() {}
 
-  SVGTransform createSVGTransformFromMatrix(const AffineTransform&) const;
+  SVGTransform createSVGTransformFromMatrix(const SVGMatrix&) const;
   SVGTransform consolidate();
 
   // Internal use only
-  SVGTransform concatenate() const;
+  bool concatenate(AffineTransform& result) const;
 
   String valueAsString() const;
-
- private:
-  SVGTransformList(const QualifiedName&);
 };
 
 }  // namespace WebCore

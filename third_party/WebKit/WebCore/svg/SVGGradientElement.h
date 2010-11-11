@@ -24,6 +24,7 @@
 #if ENABLE(SVG)
 #include "Gradient.h"
 #include "SVGAnimatedPropertyMacros.h"
+#include "SVGAnimatedTransformList.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGStyledElement.h"
 #include "SVGTransformList.h"
@@ -62,11 +63,11 @@ class SVGGradientElement : public SVGStyledElement,
                                        int,
                                        GradientUnits,
                                        gradientUnits)
-  DECLARE_ANIMATED_PROPERTY(SVGGradientElement,
-                            SVGNames::gradientTransformAttr,
-                            SVGTransformList*,
-                            GradientTransform,
-                            gradientTransform)
+  DECLARE_ANIMATED_TRANSFORM_LIST_PROPERTY_NEW(SVGGradientElement,
+                                               SVGNames::gradientTransformAttr,
+                                               SVGTransformList,
+                                               GradientTransform,
+                                               gradientTransform)
 
   // SVGURIReference
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGGradientElement,

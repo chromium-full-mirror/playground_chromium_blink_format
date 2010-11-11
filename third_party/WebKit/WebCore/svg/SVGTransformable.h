@@ -37,9 +37,9 @@ class SVGTransformable : virtual public SVGLocatable {
  public:
   enum TransformParsingMode { ClearList, DoNotClearList };
 
-  static bool parseTransformAttribute(SVGTransformList*,
+  static bool parseTransformAttribute(SVGTransformList&,
                                       const AtomicString& transform);
-  static bool parseTransformAttribute(SVGTransformList*,
+  static bool parseTransformAttribute(SVGTransformList&,
                                       const UChar*& ptr,
                                       const UChar* end,
                                       TransformParsingMode mode = ClearList);

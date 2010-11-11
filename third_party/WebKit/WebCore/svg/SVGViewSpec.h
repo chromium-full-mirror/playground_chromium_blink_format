@@ -42,7 +42,7 @@ class SVGViewSpec : public SVGFitToViewBox,
   bool parseViewSpec(const String&);
 
   void setTransform(const String&);
-  SVGTransformList* transform() const { return m_transform.get(); }
+  SVGTransformList transform() const { return m_transform; }
 
   void setViewBoxString(const String&);
 
@@ -71,7 +71,7 @@ class SVGViewSpec : public SVGFitToViewBox,
                                 PreserveAspectRatio,
                                 preserveAspectRatio)
 
-  mutable RefPtr<SVGTransformList> m_transform;
+  SVGTransformList m_transform;
   String m_viewTargetString;
 };
 
