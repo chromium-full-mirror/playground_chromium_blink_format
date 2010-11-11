@@ -195,6 +195,18 @@
 #define WTF_CPU_SPARC 1
 #endif
 
+/* CPU(S390X) - S390 64-bit */
+#if defined(__s390x__)
+#define WTF_CPU_S390X 1
+#define WTF_CPU_BIG_ENDIAN 1
+#endif
+
+/* CPU(S390) - S390 32-bit */
+#if defined(__s390__)
+#define WTF_CPU_S390 1
+#define WTF_CPU_BIG_ENDIAN 1
+#endif
+
 /* CPU(X86) - i386 / x86 32-bit */
 #if defined(__i386__) || defined(i386) || defined(_M_IX86) || \
     defined(_X86_) || defined(__THW_INTEL)
@@ -912,8 +924,9 @@
 #endif
 
 #if !defined(WTF_USE_JSVALUE64) && !defined(WTF_USE_JSVALUE32_64)
-#if (CPU(X86_64) && (OS(UNIX) || OS(WINDOWS))) || \
-    (CPU(IA64) && !CPU(IA64_32)) || CPU(ALPHA) || CPU(SPARC64) || CPU(PPC64)
+#if (CPU(X86_64) && (OS(UNIX) || OS(WINDOWS))) ||                 \
+    (CPU(IA64) && !CPU(IA64_32)) || CPU(ALPHA) || CPU(SPARC64) || \
+    CPU(S390X) || CPU(PPC64)
 #define WTF_USE_JSVALUE64 1
 #else
 #define WTF_USE_JSVALUE32_64 1
