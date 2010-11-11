@@ -1281,7 +1281,8 @@ void HTMLMediaElement::invalidateCachedTime() {
   static const float minimumTimePlayingBeforeCacheSnapshot = 0.5;
 
   m_minimumWallClockTimeToCacheMediaTime =
-      WTF::currentTime() + minimumTimePlayingBeforeCacheSnapshot;
+      static_cast<float>(WTF::currentTime()) +
+      minimumTimePlayingBeforeCacheSnapshot;
   m_cachedTime = invalidMediaTime;
 }
 
@@ -1324,7 +1325,7 @@ float HTMLMediaElement::currentTime() const {
     // Not too soon, use the cached time only if it hasn't expired.
     if (wallClockDelta < maximumDurationToCacheMediaTime) {
       float adjustedCacheTime =
-          m_cachedTime + (m_playbackRate * wallClockDelta);
+          static_cast<float>(m_cachedTime + (m_playbackRate * wallClockDelta));
 
 #if LOG_CACHED_TIME_WARNINGS
       float delta = adjustedCacheTime - m_player->currentTime();
