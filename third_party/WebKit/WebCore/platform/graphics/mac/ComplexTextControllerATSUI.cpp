@@ -30,13 +30,11 @@
 #include "ShapeArabic.h"
 
 #ifdef __LP64__
+// ATSUTextInserted() is SPI in 64-bit.
 extern "C" {
 OSStatus ATSUTextInserted(ATSUTextLayout iTextLayout,
                           UniCharArrayOffset iInsertionLocation,
                           UniCharCount iInsertionLength);
-OSStatus ATSUTextDeleted(ATSUTextLayout iTextLayout,
-                         UniCharArrayOffset iInsertionLocation,
-                         UniCharCount iInsertionLength);
 }
 #endif
 
@@ -65,11 +63,12 @@ OSStatus ComplexTextController::ComplexTextRun::overrideLayoutOperation(
 
   count--;
   ItemCount j = 0;
-  CFIndex indexOffset = complexTextRun->m_indexOffset;
+  CFIndex indexOffset = 0;
 
   if (complexTextRun->m_directionalOverride) {
     j++;
     count -= 2;
+    indexOffset = -1;
   }
 
   complexTextRun->m_glyphCount = count;
@@ -179,7 +178,6 @@ ComplexTextController::ComplexTextRun::ComplexTextRun(
       m_stringLocation(stringLocation),
       m_stringLength(stringLength),
       m_directionalOverride(directionalOverride),
-      m_indexOffset(0),
       m_isMonotonic(true) {
   OSStatus status;
 
@@ -226,36 +224,6 @@ ComplexTextController::ComplexTextRun::ComplexTextRun(
     ATSUTextMoved(atsuTextLayout, substituteCharacters.data());
   }
 
-  // Remove the leading character if it is one of explicit Unicode bidi control
-  // characters.
-  // Explicit Unicode bidi control character, if present, is always the leading
-  // character in a run. And it could be the leading character in a LTR run.
-  // For example, "a&#x202b;x!&#202c;y", the last run "&#x202c;y" is a LTR run
-  // and begins with an explicit Unicode bidi control character.
-  if (stringLength > 0) {
-    UChar leadingCharacter;
-    if (substituteCharacters.isEmpty())
-      leadingCharacter = characters[0];
-    else
-      leadingCharacter = substituteCharacters[0];
-    if (leadingCharacter == leftToRightEmbed ||
-        leadingCharacter == leftToRightOverride ||
-        leadingCharacter == rightToLeftEmbed ||
-        leadingCharacter == rightToLeftOverride ||
-        leadingCharacter == popDirectionalFormatting) {
-      if (substituteCharacters.isEmpty()) {
-        substituteCharacters.grow(stringLength - 1);
-        memcpy(substituteCharacters.data(), characters + 1,
-               (stringLength - 1) * sizeof(UChar));
-        ATSUTextMoved(atsuTextLayout, substituteCharacters.data());
-      } else {
-        substituteCharacters.remove(0);
-        ATSUTextDeleted(atsuTextLayout, 0, 1);
-      }
-      m_indexOffset++;
-    }
-  }
-
   if (directionalOverride) {
     UChar override = ltr ? leftToRightOverride : rightToLeftOverride;
     if (substituteCharacters.isEmpty()) {
@@ -270,7 +238,6 @@ ComplexTextController::ComplexTextRun::ComplexTextRun(
       substituteCharacters.append(popDirectionalFormatting);
     }
     ATSUTextInserted(atsuTextLayout, 0, 2);
-    m_indexOffset--;
   }
 
   ATSULayoutOperationOverrideSpecifier overrideSpecifier;
@@ -288,7 +255,7 @@ ComplexTextController::ComplexTextRun::ComplexTextRun(
   status = ATSUSetLayoutControls(atsuTextLayout, 3, tags, sizes, values);
 
   ItemCount boundsCount;
-  status = ATSUGetGlyphBounds(atsuTextLayout, 0, 0, 0, kATSUToTextEnd,
+  status = ATSUGetGlyphBounds(atsuTextLayout, 0, 0, 0, m_stringLength,
                               kATSUseFractionalOrigins, 0, 0, &boundsCount);
 
   status = ATSUDisposeTextLayout(atsuTextLayout);
