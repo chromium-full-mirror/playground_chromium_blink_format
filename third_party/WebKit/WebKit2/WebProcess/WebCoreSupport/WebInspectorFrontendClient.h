@@ -38,6 +38,8 @@ class WebInspectorFrontendClient
   WebInspectorFrontendClient(WebPage* page, WebPage* inspectorPage);
 
  private:
+  virtual void frontendLoaded();
+
   virtual String localizedStringsURL();
   virtual String hiddenPanels();
 

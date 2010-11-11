@@ -33,6 +33,7 @@
 namespace WebKit {
 
 class WebPage;
+class WebPageCreationParameters;
 
 class WebInspector {
   WTF_MAKE_NONCOPYABLE(WebInspector);
@@ -41,6 +42,7 @@ class WebInspector {
   explicit WebInspector(WebPage*);
 
   WebPage* page() const { return m_page; }
+  WebPage* inspectorPage() const { return m_inspectorPage; }
 
   // Implemented in generated WebInspectorMessageReceiver.cpp
   void didReceiveWebInspectorMessage(CoreIPC::Connection*,
@@ -48,6 +50,18 @@ class WebInspector {
                                      CoreIPC::ArgumentDecoder*);
 
  private:
+  friend class WebInspectorClient;
+  friend class WebInspectorFrontendClient;
+
+  // Called from WebInspectorClient
+  WebPage* createInspectorPage();
+
+  // Called from WebInspectorFrontendClient
+  void didLoadInspectorPage();
+
+  // Implemented in platform WebInspector file
+  String localizedStringsURL() const;
+
   // Called by WebInspector messages
   void show();
   void close();
@@ -64,6 +78,7 @@ class WebInspector {
   void stopPageProfiling();
 
   WebPage* m_page;
+  WebPage* m_inspectorPage;
 };
 
 }  // namespace WebKit
