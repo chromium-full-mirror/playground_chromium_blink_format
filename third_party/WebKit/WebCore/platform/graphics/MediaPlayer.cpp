@@ -610,6 +610,10 @@ float MediaPlayer::mediaTimeForTimeValue(float timeValue) const {
   return m_private->mediaTimeForTimeValue(timeValue);
 }
 
+double MediaPlayer::maximumDurationToCacheMediaTime() const {
+  return m_private->maximumDurationToCacheMediaTime();
+}
+
 // Client callbacks.
 void MediaPlayer::networkStateChanged() {
   if (m_mediaPlayerClient)

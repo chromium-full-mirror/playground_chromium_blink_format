@@ -81,7 +81,7 @@ namespace WebCore {
 
 #if !LOG_DISABLED
 static String urlForLogging(const String& url) {
-  static unsigned maximumURLLengthForLogging = 128;
+  static const unsigned maximumURLLengthForLogging = 128;
 
   if (url.length() < maximumURLLengthForLogging)
     return url;
@@ -99,6 +99,15 @@ static const char* boolString(bool val) {
 // the logging.
 #define LOG_MEDIA_EVENTS 0
 #endif
+
+#ifndef LOG_CACHED_TIME_WARNINGS
+// Default to not logging warnings about excessive drift in the cached media
+// time because it adds a
+// fair amount of overhead and logging.
+#define LOG_CACHED_TIME_WARNINGS 0
+#endif
+
+static const float invalidMediaTime = -1;
 
 using namespace HTMLNames;
 
@@ -137,6 +146,9 @@ HTMLMediaElement::HTMLMediaElement(const QualifiedName& tagName,
       m_preload(MediaPlayer::Auto),
       m_displayMode(Unknown),
       m_processingMediaPlayerCallback(0),
+      m_cachedTime(invalidMediaTime),
+      m_cachedTimeWallClockUpdateTime(0),
+      m_minimumWallClockTimeToCacheMediaTime(0),
       m_playing(false),
       m_isWaitingUntilMediaCanStart(false),
       m_shouldDelayLoadEvent(false),
@@ -577,6 +589,7 @@ void HTMLMediaElement::prepareForLoad() {
     m_networkState = NETWORK_EMPTY;
     m_readyState = HAVE_NOTHING;
     m_readyStateMaximum = HAVE_NOTHING;
+    refreshCachedTime();
     m_paused = true;
     m_seeking = false;
     scheduleEvent(eventNames().emptiedEvent);
@@ -1134,6 +1147,7 @@ void HTMLMediaElement::seek(float time, ExceptionCode& ec) {
 
   // Get the current time before setting m_seeking, m_lastSeekTime is returned
   // once it is set.
+  refreshCachedTime();
   float now = currentTime();
 
   // 2 - If the element's seeking IDL attribute is true, then another instance
@@ -1251,13 +1265,96 @@ bool HTMLMediaElement::seeking() const {
   return m_seeking;
 }
 
+void HTMLMediaElement::refreshCachedTime() const {
+  m_cachedTime = m_player->currentTime();
+  m_cachedTimeWallClockUpdateTime = WTF::currentTime();
+}
+
+void HTMLMediaElement::invalidateCachedTime() {
+  LOG(Media, "HTMLMediaElement::invalidateCachedTime");
+
+  // Don't try to cache movie time when playback first starts as the time
+  // reported by the engine
+  // sometimes fluctuates for a short amount of time, so the cached time will be
+  // off if we take it
+  // too early.
+  static const float minimumTimePlayingBeforeCacheSnapshot = 0.5;
+
+  m_minimumWallClockTimeToCacheMediaTime =
+      WTF::currentTime() + minimumTimePlayingBeforeCacheSnapshot;
+  m_cachedTime = invalidMediaTime;
+}
+
 // playback state
 float HTMLMediaElement::currentTime() const {
+#if LOG_CACHED_TIME_WARNINGS
+  static const double minCachedDeltaForWarning = 0.01;
+#endif
+
   if (!m_player)
     return 0;
-  if (m_seeking)
+
+  if (m_seeking) {
+    LOG(Media, "HTMLMediaElement::currentTime - seeking, returning %f",
+        m_lastSeekTime);
     return m_lastSeekTime;
-  return m_player->currentTime();
+  }
+
+  if (m_cachedTime != invalidMediaTime && m_paused) {
+#if LOG_CACHED_TIME_WARNINGS
+    float delta = m_cachedTime - m_player->currentTime();
+    if (delta > minCachedDeltaForWarning)
+      LOG(Media,
+          "HTMLMediaElement::currentTime - WARNING, cached time is %f seconds "
+          "off of media time when paused",
+          delta);
+#endif
+    return m_cachedTime;
+  }
+
+  // Is it too soon use a cached time?
+  double now = WTF::currentTime();
+  double maximumDurationToCacheMediaTime =
+      m_player->maximumDurationToCacheMediaTime();
+
+  if (maximumDurationToCacheMediaTime && m_cachedTime != invalidMediaTime &&
+      !m_paused && now > m_minimumWallClockTimeToCacheMediaTime) {
+    double wallClockDelta = now - m_cachedTimeWallClockUpdateTime;
+
+    // Not too soon, use the cached time only if it hasn't expired.
+    if (wallClockDelta < maximumDurationToCacheMediaTime) {
+      float adjustedCacheTime =
+          m_cachedTime + (m_playbackRate * wallClockDelta);
+
+#if LOG_CACHED_TIME_WARNINGS
+      float delta = adjustedCacheTime - m_player->currentTime();
+      if (delta > minCachedDeltaForWarning)
+        LOG(Media,
+            "HTMLMediaElement::currentTime - WARNING, cached time is %f "
+            "seconds off of media time when playing",
+            delta);
+#endif
+      return adjustedCacheTime;
+    }
+  }
+
+#if LOG_CACHED_TIME_WARNINGS
+  if (maximumDurationToCacheMediaTime &&
+      now > m_minimumWallClockTimeToCacheMediaTime &&
+      m_cachedTime != invalidMediaTime) {
+    double wallClockDelta = now - m_cachedTimeWallClockUpdateTime;
+    float delta = m_cachedTime + (m_playbackRate * wallClockDelta) -
+                  m_player->currentTime();
+    LOG(Media,
+        "HTMLMediaElement::currentTime - cached time was %f seconds off of "
+        "media time when it expired",
+        delta);
+  }
+#endif
+
+  refreshCachedTime();
+
+  return m_cachedTime;
 }
 
 void HTMLMediaElement::setCurrentTime(float time, ExceptionCode& ec) {
@@ -1400,6 +1497,7 @@ void HTMLMediaElement::playInternal() {
   setPlaybackRate(defaultPlaybackRate());
 
   if (m_paused) {
+    invalidateCachedTime();
     m_paused = false;
     scheduleEvent(eventNames().playEvent);
 
@@ -1434,6 +1532,7 @@ void HTMLMediaElement::pauseInternal() {
   m_autoplaying = false;
 
   if (!m_paused) {
+    refreshCachedTime();
     m_paused = true;
     scheduleTimeupdateEvent(false);
     scheduleEvent(eventNames().pauseEvent);
@@ -1545,7 +1644,7 @@ void HTMLMediaElement::beginScrubbing() {
 }
 
 void HTMLMediaElement::endScrubbing() {
-  LOG(Media, "HTMLMediaElement::beginScrubbing - m_pausedInternal is %s",
+  LOG(Media, "HTMLMediaElement::endScrubbing - m_pausedInternal is %s",
       boolString(m_pausedInternal));
 
   if (m_pausedInternal)
@@ -1587,7 +1686,7 @@ void HTMLMediaElement::scheduleTimeupdateEvent(bool periodicEvent) {
   // Some media engines make multiple "time changed" callbacks at the same time,
   // but we only want one
   // event at a given time so filter here
-  float movieTime = m_player ? m_player->currentTime() : 0;
+  float movieTime = currentTime();
   if (movieTime != m_lastTimeUpdateEventMovieTime) {
     scheduleEvent(eventNames().timeupdateEvent);
     m_lastTimeUpdateEventWallTime = now;
@@ -1830,17 +1929,19 @@ void HTMLMediaElement::mediaPlayerTimeChanged(MediaPlayer*) {
 
   beginProcessingMediaPlayerCallback();
 
+  invalidateCachedTime();
+
+  // 4.8.10.9 step 14 & 15.  Needed if no ReadyState change is associated with
+  // the seek.
+  if (m_seeking && m_readyState >= HAVE_CURRENT_DATA)
+    finishSeek();
+
   // Always call scheduleTimeupdateEvent when the media engine reports a time
   // discontinuity,
   // it will only queue a 'timeupdate' event if we haven't already posted one at
   // the current
   // movie time.
   scheduleTimeupdateEvent(false);
-
-  // 4.8.10.9 step 14 & 15.  Needed if no ReadyState change is associated with
-  // the seek.
-  if (m_seeking && m_readyState >= HAVE_CURRENT_DATA)
-    finishSeek();
 
   float now = currentTime();
   float dur = duration();
@@ -1895,6 +1996,9 @@ void HTMLMediaElement::mediaPlayerRateChanged(MediaPlayer*) {
   LOG(Media, "HTMLMediaElement::mediaPlayerRateChanged");
 
   beginProcessingMediaPlayerCallback();
+
+  invalidateCachedTime();
+
   // Stash the rate in case the one we tried to set isn't what the engine is
   // using (eg. it can't handle the rate we set)
   m_playbackRate = m_player->rate();
@@ -2081,6 +2185,7 @@ void HTMLMediaElement::updatePlayState() {
     return;
 
   if (m_pausedInternal) {
+    refreshCachedTime();
     if (!m_player->paused())
       m_player->pause();
     m_playbackProgressTimer.stop();
@@ -2097,6 +2202,7 @@ void HTMLMediaElement::updatePlayState() {
 
   if (shouldBePlaying) {
     setDisplayMode(Video);
+    invalidateCachedTime();
 
     if (playerPaused) {
       // Set rate before calling play in case the rate was set before the media
@@ -2111,6 +2217,7 @@ void HTMLMediaElement::updatePlayState() {
     m_playing = true;
 
   } else {  // Should not be playing right now
+    refreshCachedTime();
     if (!playerPaused)
       m_player->pause();
 

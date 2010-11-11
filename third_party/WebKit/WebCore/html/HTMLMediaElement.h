@@ -322,6 +322,9 @@ class HTMLMediaElement : public HTMLElement,
 
   void setShouldDelayLoadEvent(bool);
 
+  void invalidateCachedTime();
+  void refreshCachedTime() const;
+
   // Restrictions to change default behaviors. This is effectively a compile
   // time choice at the moment
   // because there are no accessor functions.
@@ -386,6 +389,10 @@ class HTMLMediaElement : public HTMLElement,
   // we can avoid
   // calling the media engine recursively.
   int m_processingMediaPlayerCallback;
+
+  mutable float m_cachedTime;
+  mutable double m_cachedTimeWallClockUpdateTime;
+  mutable double m_minimumWallClockTimeToCacheMediaTime;
 
   bool m_playing : 1;
   bool m_isWaitingUntilMediaCanStart : 1;

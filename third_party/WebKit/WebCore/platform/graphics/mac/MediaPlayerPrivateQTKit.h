@@ -185,6 +185,8 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
 
   virtual float mediaTimeForTimeValue(float) const;
 
+  virtual double maximumDurationToCacheMediaTime() const { return 5; }
+
   MediaPlayer* m_player;
   RetainPtr<QTMovie> m_qtMovie;
   RetainPtr<QTMovieView> m_qtMovieView;

@@ -294,6 +294,8 @@ class MediaPlayer : public Noncopyable {
 
   float mediaTimeForTimeValue(float) const;
 
+  double maximumDurationToCacheMediaTime() const;
+
  private:
   MediaPlayer(MediaPlayerClient*);
 
