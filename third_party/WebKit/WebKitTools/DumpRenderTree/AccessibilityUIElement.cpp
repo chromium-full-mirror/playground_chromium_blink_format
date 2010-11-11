@@ -1197,6 +1197,12 @@ AccessibilityUIElement AccessibilityUIElement::selectedChildAtIndex(
 }
 #endif
 
+#if !PLATFORM(WIN)
+bool AccessibilityUIElement::isEqual(AccessibilityUIElement* otherElement) {
+  return platformUIElement() == otherElement->platformUIElement();
+}
+#endif
+
 #if !SUPPORTS_AX_TEXTMARKERS
 
 AccessibilityTextMarkerRange AccessibilityUIElement::textMarkerRangeForElement(
