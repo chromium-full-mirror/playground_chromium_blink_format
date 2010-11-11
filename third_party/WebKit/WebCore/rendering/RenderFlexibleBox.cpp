@@ -217,7 +217,8 @@ void RenderFlexibleBox::layoutBlock(bool relayoutChildren,
 
   LayoutRepainter repainter(*this, checkForRepaintDuringLayout());
   LayoutStateMaintainer statePusher(view(), this, IntSize(x(), y()),
-                                    hasTransform() || hasReflection());
+                                    hasTransform() || hasReflection() ||
+                                        style()->isFlippedBlocksWritingMode());
 
   int previousWidth = width();
   int previousHeight = height();

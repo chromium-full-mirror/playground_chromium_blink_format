@@ -1310,10 +1310,11 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
       colInfo->clearForcedBreaks();
   }
 
-  LayoutStateMaintainer statePusher(
-      view(), this, IntSize(x(), y()),
-      hasColumns() || hasTransform() || hasReflection(), pageHeight,
-      pageHeightChanged, colInfo);
+  LayoutStateMaintainer statePusher(view(), this, IntSize(x(), y()),
+                                    hasColumns() || hasTransform() ||
+                                        hasReflection() ||
+                                        style()->isFlippedBlocksWritingMode(),
+                                    pageHeight, pageHeightChanged, colInfo);
 
   // We use four values, maxTopPos, maxTopNeg, maxBottomPos, and maxBottomNeg,
   // to track
@@ -2289,9 +2290,10 @@ bool RenderBlock::layoutOnlyPositionedObjects() {
   if (!posChildNeedsLayout() || normalChildNeedsLayout() || selfNeedsLayout())
     return false;
 
-  LayoutStateMaintainer statePusher(
-      view(), this, IntSize(x(), y()),
-      hasColumns() || hasTransform() || hasReflection());
+  LayoutStateMaintainer statePusher(view(), this, IntSize(x(), y()),
+                                    hasColumns() || hasTransform() ||
+                                        hasReflection() ||
+                                        style()->isFlippedBlocksWritingMode());
 
   if (needsPositionedMovementLayout()) {
     tryLayoutDoingPositionedMovementOnly();
@@ -2964,9 +2966,11 @@ void RenderBlock::paintSelection(PaintInfo& paintInfo, int tx, int ty) {
       if (RenderLayer* layer = enclosingLayer()) {
         gapRectsBounds.move(IntSize(-tx, -ty));
         if (!hasLayer()) {
-          FloatRect localBounds(gapRectsBounds);
-          gapRectsBounds = localToContainerQuad(localBounds, layer->renderer())
-                               .enclosingBoundingBox();
+          IntRect localBounds(gapRectsBounds);
+          flipForWritingMode(localBounds);
+          gapRectsBounds =
+              localToContainerQuad(FloatRect(localBounds), layer->renderer())
+                  .enclosingBoundingBox();
           gapRectsBounds.move(layer->scrolledContentOffset());
         }
         layer->addBlockSelectionGapsBounds(gapRectsBounds);

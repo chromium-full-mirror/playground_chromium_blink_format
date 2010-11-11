@@ -266,7 +266,8 @@ void RenderTable::layout() {
   recalcSectionsIfNeeded();
 
   LayoutRepainter repainter(*this, checkForRepaintDuringLayout());
-  LayoutStateMaintainer statePusher(view(), this, IntSize(x(), y()));
+  LayoutStateMaintainer statePusher(view(), this, IntSize(x(), y()),
+                                    style()->isFlippedBlocksWritingMode());
 
   setLogicalHeight(0);
   m_overflow.clear();
