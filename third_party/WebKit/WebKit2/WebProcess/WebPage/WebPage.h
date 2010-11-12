@@ -197,7 +197,7 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
 #endif
 
   void installPageOverlay(PassRefPtr<PageOverlay>);
-  void uninstallPageOverlay();
+  void uninstallPageOverlay(PageOverlay*);
 
   static const WebEvent* currentEvent();
 
