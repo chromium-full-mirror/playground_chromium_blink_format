@@ -41,13 +41,13 @@ class ShadowElement : public BaseElement {
       : BaseElement(name, shadowParent->document()),
         m_shadowParent(shadowParent) {}
 
-  HTMLElement* shadowParent() const { return m_shadowParent; }
+  HTMLElement* shadowParent() const { return m_shadowParent.get(); }
 
  private:
   virtual bool isShadowNode() const { return true; }
-  virtual ContainerNode* shadowParentNode() { return m_shadowParent; }
+  virtual ContainerNode* shadowParentNode() { return m_shadowParent.get(); }
 
-  HTMLElement* m_shadowParent;
+  RefPtr<HTMLElement> m_shadowParent;
 };
 
 class ShadowBlockElement : public ShadowElement<HTMLDivElement> {
