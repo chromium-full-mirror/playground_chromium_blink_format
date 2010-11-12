@@ -20,6 +20,8 @@
 #ifndef DumpRenderTreeSupportGtk_h
 #define DumpRenderTreeSupportGtk_h
 
+#include "JSStringRef.h"
+
 class DumpRenderTreeSupportGtk {
  public:
   DumpRenderTreeSupportGtk();
@@ -30,6 +32,15 @@ class DumpRenderTreeSupportGtk {
 
   static void setLinksIncludedInFocusChain(bool);
   static bool linksIncludedInFocusChain();
+  static JSValueRef nodesFromRect(JSContextRef context,
+                                  JSValueRef value,
+                                  int x,
+                                  int y,
+                                  unsigned top,
+                                  unsigned right,
+                                  unsigned bottom,
+                                  unsigned left,
+                                  bool ignoreClipping);
 
  private:
   static bool s_drtRun;
