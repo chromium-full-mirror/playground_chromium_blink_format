@@ -29,13 +29,12 @@
 
 #if ENABLE(CLIENT_BASED_GEOLOCATION)
 
-#include "GeolocationControllerClient.h"
+#include "GeolocationClient.h"
 
 namespace WebCore {
 
-GeolocationController::GeolocationController(
-    Page* page,
-    GeolocationControllerClient* client)
+GeolocationController::GeolocationController(Page* page,
+                                             GeolocationClient* client)
     : m_page(page), m_client(client) {}
 
 GeolocationController::~GeolocationController() {

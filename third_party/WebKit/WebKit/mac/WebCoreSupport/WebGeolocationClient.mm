@@ -23,34 +23,34 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "WebGeolocationControllerClient.h"
+#import "WebGeolocationClient.h"
 
 #import "WebGeolocationPositionInternal.h"
 #import "WebViewInternal.h"
 
 using namespace WebCore;
 
-WebGeolocationControllerClient::WebGeolocationControllerClient(WebView *webView)
+WebGeolocationClient::WebGeolocationClient(WebView *webView)
     : m_webView(webView)
 {
 }
 
-void WebGeolocationControllerClient::geolocationDestroyed()
+void WebGeolocationClient::geolocationDestroyed()
 {
     delete this;
 }
 
-void WebGeolocationControllerClient::startUpdating()
+void WebGeolocationClient::startUpdating()
 {
     [[m_webView _geolocationProvider] registerWebView:m_webView];
 }
 
-void WebGeolocationControllerClient::stopUpdating()
+void WebGeolocationClient::stopUpdating()
 {
     [[m_webView _geolocationProvider] unregisterWebView:m_webView];
 }
 
-GeolocationPosition* WebGeolocationControllerClient::lastPosition()
+GeolocationPosition* WebGeolocationClient::lastPosition()
 {
 #if ENABLE(CLIENT_BASED_GEOLOCATION)
     return core([[m_webView _geolocationProvider] lastPosition]);

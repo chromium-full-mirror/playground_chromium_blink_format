@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,30 +23,30 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GeolocationControllerClient_h
-#define GeolocationControllerClient_h
+#ifndef WebGeolocationClient_h
+#define WebGeolocationClient_h
+
+#include "COMPtr.h"
+#include <WebCore/GeolocationClient.h>
 
 namespace WebCore {
-
 class GeolocationPosition;
+}
 
-class GeolocationControllerClient {
+class WebView;
+
+class WebGeolocationClient : public WebCore::GeolocationClient {
  public:
-  virtual void geolocationDestroyed() = 0;
+  WebGeolocationClient(WebView*);
 
-  virtual void startUpdating() = 0;
-  virtual void stopUpdating() = 0;
-  // FIXME: The V2 Geolocation specification proposes that this property is
-  // renamed. See http://www.w3.org/2008/geolocation/track/issues/6
-  // We should update WebKit to reflect this if and when the V2 specification
-  // is published.
-  virtual void setEnableHighAccuracy(bool) = 0;
-  virtual GeolocationPosition* lastPosition() = 0;
+  virtual void geolocationDestroyed();
+  virtual void startUpdating();
+  virtual void stopUpdating();
+  virtual void setEnableHighAccuracy(bool) {}
+  virtual WebCore::GeolocationPosition* lastPosition();
 
- protected:
-  virtual ~GeolocationControllerClient() {}
+ private:
+  COMPtr<WebView> m_webView;
 };
 
-}  // namespace WebCore
-
-#endif  // GeolocationControllerClient_h
+#endif  // WebGeolocationClient_h

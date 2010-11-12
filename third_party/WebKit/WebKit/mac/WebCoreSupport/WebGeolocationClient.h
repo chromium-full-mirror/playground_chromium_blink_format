@@ -23,7 +23,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <WebCore/GeolocationControllerClient.h>
+#import <WebCore/GeolocationClient.h>
 
 namespace WebCore {
 class GeolocationPosition;
@@ -31,10 +31,9 @@ class GeolocationPosition;
 
 @class WebView;
 
-class WebGeolocationControllerClient
-    : public WebCore::GeolocationControllerClient {
+class WebGeolocationClient : public WebCore::GeolocationClient {
  public:
-  WebGeolocationControllerClient(WebView*);
+  WebGeolocationClient(WebView*);
   WebView* webView() { return m_webView; }
 
   void geolocationDestroyed();

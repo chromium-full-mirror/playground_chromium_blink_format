@@ -55,8 +55,8 @@ class DragController;
 class EditorClient;
 class FocusController;
 class Frame;
+class GeolocationClient;
 class GeolocationController;
-class GeolocationControllerClient;
 class HaltablePlugin;
 class HistoryItem;
 class InspectorClient;
@@ -106,7 +106,7 @@ class Page : public Noncopyable {
     DragClient* dragClient;
     InspectorClient* inspectorClient;
     PluginHalterClient* pluginHalterClient;
-    GeolocationControllerClient* geolocationControllerClient;
+    GeolocationClient* geolocationClient;
     DeviceMotionClient* deviceMotionClient;
     DeviceOrientationClient* deviceOrientationClient;
     RefPtr<BackForwardList> backForwardClient;

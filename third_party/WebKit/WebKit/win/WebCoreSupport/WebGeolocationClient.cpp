@@ -23,31 +23,46 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebGeolocationControllerClient_h
-#define WebGeolocationControllerClient_h
+#include "config.h"
+#include "WebKitDLL.h"
+#include "WebGeolocationClient.h"
 
-#include "COMPtr.h"
-#include <WebCore/GeolocationControllerClient.h>
+#include "WebGeolocationPosition.h"
+#include "WebView.h"
 
-namespace WebCore {
-class GeolocationPosition;
+using namespace WebCore;
+
+WebGeolocationClient::WebGeolocationClient(WebView* webView)
+    : m_webView(webView) {}
+
+void WebGeolocationClient::geolocationDestroyed() {
+  delete this;
 }
 
-class WebView;
+void WebGeolocationClient::startUpdating() {
+  COMPtr<IWebGeolocationProvider> provider;
+  if (FAILED(m_webView->geolocationProvider(&provider)))
+    return;
+  provider->registerWebView(m_webView.get());
+}
 
-class WebGeolocationControllerClient
-    : public WebCore::GeolocationControllerClient {
- public:
-  WebGeolocationControllerClient(WebView*);
+void WebGeolocationClient::stopUpdating() {
+  COMPtr<IWebGeolocationProvider> provider;
+  if (FAILED(m_webView->geolocationProvider(&provider)))
+    return;
+  provider->unregisterWebView(m_webView.get());
+}
 
-  virtual void geolocationDestroyed();
-  virtual void startUpdating();
-  virtual void stopUpdating();
-  virtual void setEnableHighAccuracy(bool) {}
-  virtual WebCore::GeolocationPosition* lastPosition();
-
- private:
-  COMPtr<WebView> m_webView;
-};
-
-#endif  // WebGeolocationControllerClient_h
+GeolocationPosition* WebGeolocationClient::lastPosition() {
+#if ENABLE(CLIENT_BASED_GEOLOCATION)
+  COMPtr<IWebGeolocationProvider> provider;
+  if (FAILED(m_webView->geolocationProvider(&provider)))
+    return 0;
+  COMPtr<IWebGeolocationPosition> position;
+  if (FAILED(provider->lastPosition(&position)))
+    return 0;
+  return core(position.get());
+#else
+  return 0;
+#endif
+}

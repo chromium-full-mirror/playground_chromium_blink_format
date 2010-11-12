@@ -157,8 +157,7 @@ Page::Page(const PageClients& pageClients)
 #if ENABLE(CLIENT_BASED_GEOLOCATION)
       ,
       m_geolocationController(adoptPtr(
-          new GeolocationController(this,
-                                    pageClients.geolocationControllerClient)))
+          new GeolocationController(this, pageClients.geolocationClient)))
 #endif
 #if ENABLE(DEVICE_ORIENTATION)
       ,
@@ -932,7 +931,7 @@ Page::PageClients::PageClients()
       dragClient(0),
       inspectorClient(0),
       pluginHalterClient(0),
-      geolocationControllerClient(0),
+      geolocationClient(0),
       deviceMotionClient(0),
       deviceOrientationClient(0),
       speechInputClient(0) {}

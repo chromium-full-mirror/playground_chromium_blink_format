@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Apple Inc. All rights reserved.
+ * Copyright (C) 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,46 +23,30 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "WebKitDLL.h"
-#include "WebGeolocationControllerClient.h"
+#ifndef GeolocationClient_h
+#define GeolocationClient_h
 
-#include "WebGeolocationPosition.h"
-#include "WebView.h"
+namespace WebCore {
 
-using namespace WebCore;
+class GeolocationPosition;
 
-WebGeolocationControllerClient::WebGeolocationControllerClient(WebView* webView)
-    : m_webView(webView) {}
+class GeolocationClient {
+ public:
+  virtual void geolocationDestroyed() = 0;
 
-void WebGeolocationControllerClient::geolocationDestroyed() {
-  delete this;
-}
+  virtual void startUpdating() = 0;
+  virtual void stopUpdating() = 0;
+  // FIXME: The V2 Geolocation specification proposes that this property is
+  // renamed. See http://www.w3.org/2008/geolocation/track/issues/6
+  // We should update WebKit to reflect this if and when the V2 specification
+  // is published.
+  virtual void setEnableHighAccuracy(bool) = 0;
+  virtual GeolocationPosition* lastPosition() = 0;
 
-void WebGeolocationControllerClient::startUpdating() {
-  COMPtr<IWebGeolocationProvider> provider;
-  if (FAILED(m_webView->geolocationProvider(&provider)))
-    return;
-  provider->registerWebView(m_webView.get());
-}
+ protected:
+  virtual ~GeolocationClient() {}
+};
 
-void WebGeolocationControllerClient::stopUpdating() {
-  COMPtr<IWebGeolocationProvider> provider;
-  if (FAILED(m_webView->geolocationProvider(&provider)))
-    return;
-  provider->unregisterWebView(m_webView.get());
-}
+}  // namespace WebCore
 
-GeolocationPosition* WebGeolocationControllerClient::lastPosition() {
-#if ENABLE(CLIENT_BASED_GEOLOCATION)
-  COMPtr<IWebGeolocationProvider> provider;
-  if (FAILED(m_webView->geolocationProvider(&provider)))
-    return 0;
-  COMPtr<IWebGeolocationPosition> position;
-  if (FAILED(provider->lastPosition(&position)))
-    return 0;
-  return core(position.get());
-#else
-  return 0;
-#endif
-}
+#endif  // GeolocationClient_h
