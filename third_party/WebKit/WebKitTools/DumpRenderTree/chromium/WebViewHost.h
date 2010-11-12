@@ -96,6 +96,7 @@ class WebViewHost : public WebKit::WebViewClient,
 
   void addClearHeader(const WTF::String& header) { m_clearHeaders.add(header); }
   const HashSet<WTF::String>& clearHeaders() const { return m_clearHeaders; }
+  void closeWidget();
 
   WebKit::WebContextMenuData* lastContextMenuData() const;
   void clearContextMenuData();
