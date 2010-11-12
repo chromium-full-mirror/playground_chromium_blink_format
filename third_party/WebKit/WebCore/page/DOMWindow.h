@@ -93,7 +93,6 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   virtual DOMWindow* toDOMWindow() { return this; }
   virtual ScriptExecutionContext* scriptExecutionContext() const;
 
-  bool printDeferred() const { return m_printDeferred; }
   Frame* frame() const { return m_frame; }
   void disconnectFrame();
 
@@ -415,6 +414,8 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   void captureEvents();
   void releaseEvents();
 
+  void finishedLoading();
+
   // These methods are used for GC marking. See
   // JSDOMWindow::markChildren(MarkStack&) in
   // JSDOMWindowCustom.cpp.
@@ -462,7 +463,7 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   RefPtr<SecurityOrigin> m_securityOrigin;
   KURL m_url;
 
-  bool m_printDeferred;
+  bool m_shouldPrintWhenFinishedLoading;
   Frame* m_frame;
   mutable RefPtr<Screen> m_screen;
   mutable RefPtr<DOMSelection> m_selection;
