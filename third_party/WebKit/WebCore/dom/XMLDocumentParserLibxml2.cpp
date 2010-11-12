@@ -921,7 +921,7 @@ void XMLDocumentParser::endElementNs() {
       } else
         m_scriptElement = 0;
     } else
-      m_view->frame()->script()->executeScript(
+      scriptElement->executeScript(
           ScriptSourceCode(scriptElement->scriptContent(), document()->url(),
                            m_scriptStartPosition));
 

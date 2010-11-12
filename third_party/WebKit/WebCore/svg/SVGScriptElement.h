@@ -43,7 +43,10 @@ class SVGScriptElement : public SVGElement,
   void setType(const String&);
 
  private:
-  SVGScriptElement(const QualifiedName&, Document*, bool createdByParser);
+  SVGScriptElement(const QualifiedName&,
+                   Document*,
+                   bool createdByParser,
+                   bool isEvaluated);
 
   virtual String scriptContent() const;
 
@@ -79,6 +82,9 @@ class SVGScriptElement : public SVGElement,
 
   virtual void dispatchLoadEvent();
   virtual void dispatchErrorEvent();
+
+  PassRefPtr<Element> cloneElementWithoutAttributesAndChildren() const;
+  void executeScript(const ScriptSourceCode& sourceCode);
 
   // SVGURIReference
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGScriptElement,

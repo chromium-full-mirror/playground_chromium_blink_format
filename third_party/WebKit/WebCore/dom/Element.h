@@ -417,6 +417,7 @@ class Element : public ContainerNode {
   // cloneElementWithoutChildren
   // are used instead.
   virtual PassRefPtr<Node> cloneNode(bool deep);
+  virtual PassRefPtr<Element> cloneElementWithoutAttributesAndChildren() const;
 
   QualifiedName m_tagName;
   virtual NodeRareData* createRareData();

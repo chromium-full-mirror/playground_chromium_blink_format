@@ -33,8 +33,9 @@ namespace WebCore {
 
 inline SVGScriptElement::SVGScriptElement(const QualifiedName& tagName,
                                           Document* document,
-                                          bool createdByParser)
-    : SVGElement(tagName, document), m_data(this, this) {
+                                          bool createdByParser,
+                                          bool isEvaluated)
+    : SVGElement(tagName, document), m_data(this, this, isEvaluated) {
   m_data.setCreatedByParser(createdByParser);
 }
 
@@ -42,7 +43,8 @@ PassRefPtr<SVGScriptElement> SVGScriptElement::create(
     const QualifiedName& tagName,
     Document* document,
     bool createdByParser) {
-  return adoptRef(new SVGScriptElement(tagName, document, createdByParser));
+  return adoptRef(
+      new SVGScriptElement(tagName, document, createdByParser, false));
 }
 
 String SVGScriptElement::scriptContent() const {
@@ -236,6 +238,16 @@ void SVGScriptElement::dispatchErrorEvent() {
 
 bool SVGScriptElement::shouldExecuteAsJavaScript() const {
   return m_data.shouldExecuteAsJavaScript();
+}
+
+PassRefPtr<Element> SVGScriptElement::cloneElementWithoutAttributesAndChildren()
+    const {
+  return adoptRef(new SVGScriptElement(tagQName(), document(), false,
+                                       m_data.isEvaluated()));
+}
+
+void SVGScriptElement::executeScript(const ScriptSourceCode& sourceCode) {
+  m_data.executeScript(sourceCode);
 }
 }
 

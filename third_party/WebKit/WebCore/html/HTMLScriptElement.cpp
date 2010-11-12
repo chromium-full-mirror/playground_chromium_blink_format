@@ -38,8 +38,9 @@ using namespace HTMLNames;
 
 inline HTMLScriptElement::HTMLScriptElement(const QualifiedName& tagName,
                                             Document* document,
-                                            bool createdByParser)
-    : HTMLElement(tagName, document), m_data(this, this) {
+                                            bool createdByParser,
+                                            bool isEvaluated)
+    : HTMLElement(tagName, document), m_data(this, this, isEvaluated) {
   ASSERT(hasTagName(scriptTag));
   m_data.setCreatedByParser(createdByParser);
 }
@@ -48,7 +49,8 @@ PassRefPtr<HTMLScriptElement> HTMLScriptElement::create(
     const QualifiedName& tagName,
     Document* document,
     bool createdByParser) {
-  return adoptRef(new HTMLScriptElement(tagName, document, createdByParser));
+  return adoptRef(
+      new HTMLScriptElement(tagName, document, createdByParser, false));
 }
 
 bool HTMLScriptElement::isURLAttribute(Attribute* attr) const {
@@ -180,5 +182,15 @@ void HTMLScriptElement::dispatchLoadEvent() {
 
 void HTMLScriptElement::dispatchErrorEvent() {
   dispatchEvent(Event::create(eventNames().errorEvent, true, false));
+}
+
+PassRefPtr<Element>
+HTMLScriptElement::cloneElementWithoutAttributesAndChildren() const {
+  return adoptRef(new HTMLScriptElement(tagQName(), document(), false,
+                                        m_data.isEvaluated()));
+}
+
+void HTMLScriptElement::executeScript(const ScriptSourceCode& sourceCode) {
+  return m_data.executeScript(sourceCode);
 }
 }

@@ -48,7 +48,10 @@ class HTMLScriptElement : public HTMLElement, public ScriptElement {
   bool haveFiredLoadEvent() const { return m_data.haveFiredLoadEvent(); }
 
  private:
-  HTMLScriptElement(const QualifiedName&, Document*, bool createdByParser);
+  HTMLScriptElement(const QualifiedName&,
+                    Document*,
+                    bool createdByParser,
+                    bool isEvaluated);
 
   virtual String scriptContent() const;
 
@@ -76,6 +79,9 @@ class HTMLScriptElement : public HTMLElement, public ScriptElement {
 
   virtual void dispatchLoadEvent();
   virtual void dispatchErrorEvent();
+
+  PassRefPtr<Element> cloneElementWithoutAttributesAndChildren() const;
+  void executeScript(const ScriptSourceCode&);
 
   ScriptElementData m_data;
 };

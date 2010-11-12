@@ -135,13 +135,14 @@ static bool isSupportedJavaScriptLanguage(const String& language) {
 
 // ScriptElementData
 ScriptElementData::ScriptElementData(ScriptElement* scriptElement,
-                                     Element* element)
+                                     Element* element,
+                                     bool isEvaluated)
     : m_scriptElement(scriptElement),
       m_element(element),
       m_cachedScript(0),
       m_createdByParser(false),
       m_requested(false),
-      m_evaluated(false),
+      m_isEvaluated(isEvaluated),
       m_firedLoad(false) {
   ASSERT(m_scriptElement);
   ASSERT(m_element);
@@ -184,7 +185,7 @@ void ScriptElementData::requestScript(const String& sourceUrl) {
 }
 
 void ScriptElementData::evaluateScript(const ScriptSourceCode& sourceCode) {
-  if (m_evaluated || sourceCode.isEmpty() || !shouldExecuteAsJavaScript())
+  if (m_isEvaluated || sourceCode.isEmpty() || !shouldExecuteAsJavaScript())
     return;
 
   RefPtr<Document> document = m_element->document();
@@ -193,7 +194,7 @@ void ScriptElementData::evaluateScript(const ScriptSourceCode& sourceCode) {
     if (!frame->script()->canExecuteScripts(AboutToExecuteScript))
       return;
 
-    m_evaluated = true;
+    m_isEvaluated = true;
 
     // http://www.whatwg.org/specs/web-apps/current-work/#script
 
@@ -209,6 +210,20 @@ void ScriptElementData::evaluateScript(const ScriptSourceCode& sourceCode) {
 
     Document::updateStyleForAllDocuments();
   }
+}
+
+void ScriptElementData::executeScript(const ScriptSourceCode& sourceCode) {
+  if (m_isEvaluated || sourceCode.isEmpty())
+    return;
+  RefPtr<Document> document = m_element->document();
+  ASSERT(document);
+  Frame* frame = document->frame();
+  if (!frame)
+    return;
+
+  m_isEvaluated = true;
+
+  frame->script()->executeScript(sourceCode);
 }
 
 void ScriptElementData::stopLoadRequest() {
@@ -237,7 +252,7 @@ void ScriptElementData::notifyFinished(CachedResource* o) {
 }
 
 bool ScriptElementData::ignoresLoadRequest() const {
-  return m_evaluated || m_requested || m_createdByParser ||
+  return m_isEvaluated || m_requested || m_createdByParser ||
          !m_element->inDocument();
 }
 

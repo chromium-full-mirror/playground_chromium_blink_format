@@ -55,6 +55,7 @@ class ScriptElement {
   virtual String scriptCharset() const = 0;
 
   virtual bool shouldExecuteAsJavaScript() const = 0;
+  virtual void executeScript(const ScriptSourceCode&) = 0;
 
  protected:
   // Helper functions used by our parent classes.
@@ -71,7 +72,7 @@ class ScriptElement {
 // and pass it to the static helper functions in ScriptElement
 class ScriptElementData : private CachedResourceClient {
  public:
-  ScriptElementData(ScriptElement*, Element*);
+  ScriptElementData(ScriptElement*, Element*, bool isEvaluated);
   virtual ~ScriptElementData();
 
   bool ignoresLoadRequest() const;
@@ -81,6 +82,7 @@ class ScriptElementData : private CachedResourceClient {
   String scriptCharset() const;
   bool isAsynchronous() const;
   bool isDeferred() const;
+  bool isEvaluated() const { return m_isEvaluated; }
 
   Element* element() const { return m_element; }
   bool createdByParser() const { return m_createdByParser; }
@@ -90,6 +92,7 @@ class ScriptElementData : private CachedResourceClient {
 
   void requestScript(const String& sourceUrl);
   void evaluateScript(const ScriptSourceCode&);
+  void executeScript(const ScriptSourceCode&);
   void stopLoadRequest();
 
   void execute(CachedScript*);
@@ -103,7 +106,7 @@ class ScriptElementData : private CachedResourceClient {
   CachedResourceHandle<CachedScript> m_cachedScript;
   bool m_createdByParser;  // HTML5: "parser-inserted"
   bool m_requested;
-  bool m_evaluated;  // HTML5: "already started"
+  bool m_isEvaluated;  // HTML5: "already started"
   bool m_firedLoad;
 };
 
