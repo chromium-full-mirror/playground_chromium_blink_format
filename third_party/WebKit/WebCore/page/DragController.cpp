@@ -309,6 +309,11 @@ bool DragController::tryDocumentDrag(DragData* dragData,
   if (!m_documentUnderMouse)
     return false;
 
+  if (m_dragInitiator &&
+      !m_documentUnderMouse->securityOrigin()->canReceiveDragData(
+          m_dragInitiator->securityOrigin()))
+    return false;
+
   m_isHandlingDrag = false;
   if (actionMask & DragDestinationActionDHTML) {
     m_isHandlingDrag = tryDHTMLDrag(dragData, operation);
