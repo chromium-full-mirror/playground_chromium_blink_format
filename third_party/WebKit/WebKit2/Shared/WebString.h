@@ -84,7 +84,8 @@ class WebString : public APIObject {
   }
 
  private:
-  WebString(const String& string) : m_string(string) {}
+  WebString(const String& string)
+      : m_string(!string.impl() ? String(StringImpl::empty()) : string) {}
 
   virtual Type type() const { return APIType; }
 
