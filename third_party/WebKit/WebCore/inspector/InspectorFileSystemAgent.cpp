@@ -42,6 +42,7 @@
 #include "InspectorController.h"
 #include "InspectorFrontend.h"
 #include "LocalFileSystem.h"
+#include "NotImplemented.h"
 #include "Page.h"
 #include "RuntimeEnabledFeatures.h"
 
@@ -60,7 +61,7 @@ class InspectorFileSystemAgentCallbacks : public AsyncFileSystemCallbacks {
   // are irrelevant and will not be called.
   void didSucceed() { ASSERT_NOT_REACHED(); }
 
-  void didOpenFileSystem(const String& name,
+  void didOpenFileSystem(const String&,
                          PassOwnPtr<AsyncFileSystem> fileSystem) {
     // Agent will be alive even if InspectorController is destroyed until
     // callback is run.
@@ -69,18 +70,15 @@ class InspectorFileSystemAgentCallbacks : public AsyncFileSystemCallbacks {
 
   void didReadMetadata(const FileMetadata&) { ASSERT_NOT_REACHED(); }
 
-  void didReadDirectoryEntry(const String& name, bool isDirectory) {
+  void didReadDirectoryEntry(const String&, bool) { ASSERT_NOT_REACHED(); }
+
+  void didReadDirectoryEntries(bool) { ASSERT_NOT_REACHED(); }
+
+  void didCreateFileWriter(PassOwnPtr<AsyncFileWriter>, long long) {
     ASSERT_NOT_REACHED();
   }
 
-  void didReadDirectoryEntries(bool hasMore) { ASSERT_NOT_REACHED(); }
-
-  void didCreateFileWriter(PassOwnPtr<AsyncFileWriter> writer,
-                           long long length) {
-    ASSERT_NOT_REACHED();
-  }
-
-  void didFail(int code) {
+  void didFail(int) {
     // FIXME: Is it useful to give back the code to Inspector UI?
     m_agent->didGetFileSystemError(m_type, m_origin);
   }
@@ -102,9 +100,17 @@ void InspectorFileSystemAgent::stop() {
   m_inspectorController = 0;
 }
 
+#if PLATFORM(CHROMIUM)
 void InspectorFileSystemAgent::revealFolderInOS(const String& path) {
+  // FIXME: Remove guard when revealFolderInOS is implemented for non-chromium
+  // platforms.
   WebCore::revealFolderInOS(path);
 }
+#else
+void InspectorFileSystemAgent::revealFolderInOS(const String&) {
+  notImplemented();
+}
+#endif
 
 void InspectorFileSystemAgent::getFileSystemPathAsync(unsigned int type,
                                                       const String& origin) {
