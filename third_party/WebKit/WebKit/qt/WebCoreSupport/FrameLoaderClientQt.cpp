@@ -837,6 +837,7 @@ enum {
   WebKitErrorCannotFindPlugIn = 200,
   WebKitErrorCannotLoadPlugIn = 201,
   WebKitErrorJavaUnavailable = 202,
+  WebKitErrorPluginWillHandleLoad = 203
 };
 
 WebCore::ResourceError FrameLoaderClientQt::blockedError(
@@ -884,9 +885,12 @@ WebCore::ResourceError FrameLoaderClientQt::fileDoesNotExistError(
 }
 
 WebCore::ResourceError FrameLoaderClientQt::pluginWillHandleLoadError(
-    const WebCore::ResourceResponse&) {
-  notImplemented();
-  return ResourceError();
+    const WebCore::ResourceResponse& response) {
+  return ResourceError(
+      "WebKit", WebKitErrorPluginWillHandleLoad, response.url().string(),
+      QCoreApplication::translate("QWebFrame",
+                                  "Loading is handled by the media engine", 0,
+                                  QCoreApplication::UnicodeUTF8));
 }
 
 bool FrameLoaderClientQt::shouldFallBack(const WebCore::ResourceError&) {
