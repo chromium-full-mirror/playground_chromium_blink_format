@@ -1060,7 +1060,6 @@ class JIT : private JSInterfaceJIT {
   void emit_op_neq(Instruction*);
   void emit_op_neq_null(Instruction*);
   void emit_op_new_array(Instruction*);
-  void emit_op_new_error(Instruction*);
   void emit_op_new_func(Instruction*);
   void emit_op_new_func_exp(Instruction*);
   void emit_op_new_object(Instruction*);
@@ -1105,6 +1104,8 @@ class JIT : private JSInterfaceJIT {
   void emit_op_tear_off_activation(Instruction*);
   void emit_op_tear_off_arguments(Instruction*);
   void emit_op_throw(Instruction*);
+  void emit_op_throw_reference_error(Instruction*);
+  void emit_op_throw_syntax_error(Instruction*);
   void emit_op_to_jsnumber(Instruction*);
   void emit_op_to_primitive(Instruction*);
   void emit_op_unexpected_load(Instruction*);
