@@ -31,6 +31,9 @@ using std::min;
 namespace WTF {
 
 CString::CString(const char* str) {
+  if (!str)
+    return;
+
   init(str, strlen(str));
 }
 
