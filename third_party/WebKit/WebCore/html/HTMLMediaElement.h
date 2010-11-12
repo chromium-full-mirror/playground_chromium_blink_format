@@ -219,9 +219,6 @@ class HTMLMediaElement : public HTMLElement,
 
   virtual void defaultEventHandler(Event*);
 
-  float getTimeOffsetAttribute(const QualifiedName&, float valueOnError) const;
-  void setTimeOffsetAttribute(const QualifiedName&, float value);
-
   // ActiveDOMObject functions.
   virtual bool canSuspend() const;
   virtual void suspend(ReasonForSuspension);
