@@ -861,6 +861,7 @@ void EventSender::addTouchPoint(const CppArgumentList& arguments,
   touchPoint.state = WebTouchPoint::StatePressed;
   touchPoint.position =
       WebPoint(arguments[0].toInt32(), arguments[1].toInt32());
+  touchPoint.screenPosition = touchPoint.position;
   touchPoint.id = touchPoints.size();
   touchPoints.append(touchPoint);
 }
@@ -913,6 +914,7 @@ void EventSender::updateTouchPoint(const CppArgumentList& arguments,
   WebTouchPoint* touchPoint = &touchPoints[index];
   touchPoint->state = WebTouchPoint::StateMoved;
   touchPoint->position = position;
+  touchPoint->screenPosition = position;
 }
 
 void EventSender::cancelTouchPoint(const CppArgumentList& arguments,
@@ -929,6 +931,8 @@ void EventSender::cancelTouchPoint(const CppArgumentList& arguments,
 void EventSender::sendCurrentTouchEvent(const WebInputEvent::Type type) {
   ASSERT(static_cast<unsigned>(WebTouchEvent::touchPointsLengthCap) >
          touchPoints.size());
+  webview()->layout();
+
   WebTouchEvent touchEvent;
   touchEvent.type = type;
   touchEvent.modifiers = touchModifiers;
