@@ -28,58 +28,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "Navigation.h"
+module window {
 
-#if ENABLE(WEB_TIMING)
+    // See: http://dev.w3.org/2006/webapi/WebTiming/
+    interface [Conditional=WEB_TIMING, OmitConstructor] PerformanceNavigation {
+        const unsigned short NAVIGATE = 0;
+        const unsigned short RELOAD = 1;
+        const unsigned short BACK_FORWARD = 2;
+        readonly attribute unsigned short type;
 
-#include "DocumentLoader.h"
-#include "Frame.h"
-#include "FrameLoaderTypes.h"
+        readonly attribute unsigned short redirectCount;
+    };
 
-namespace WebCore {
-
-Navigation::Navigation(Frame* frame) : m_frame(frame) {}
-
-Frame* Navigation::frame() const {
-  return m_frame;
 }
-
-void Navigation::disconnectFrame() {
-  m_frame = 0;
-}
-
-unsigned short Navigation::type() const {
-  if (!m_frame)
-    return NAVIGATE;
-
-  DocumentLoader* documentLoader = m_frame->loader()->documentLoader();
-  if (!documentLoader)
-    return NAVIGATE;
-
-  WebCore::NavigationType navigationType =
-      documentLoader->triggeringAction().type();
-  switch (navigationType) {
-    case NavigationTypeReload:
-      return RELOAD;
-    case NavigationTypeBackForward:
-      return BACK_FORWARD;
-    default:
-      return NAVIGATE;
-  }
-}
-
-unsigned short Navigation::redirectCount() const {
-  if (!m_frame)
-    return 0;
-
-  DocumentLoader* loader = m_frame->loader()->documentLoader();
-  if (!loader)
-    return 0;
-
-  return loader->timing()->redirectCount;
-}
-
-}  // namespace WebCore
-
-#endif  // ENABLE(WEB_TIMING)

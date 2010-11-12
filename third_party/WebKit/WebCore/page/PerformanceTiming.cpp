@@ -29,7 +29,7 @@
  */
 
 #include "config.h"
-#include "Timing.h"
+#include "PerformanceTiming.h"
 
 #if ENABLE(WEB_TIMING)
 
@@ -69,17 +69,17 @@ static double getPossiblySkewedTimeInKnownRange(double skewedTime,
   return skewedTime;
 }
 
-Timing::Timing(Frame* frame) : m_frame(frame) {}
+PerformanceTiming::PerformanceTiming(Frame* frame) : m_frame(frame) {}
 
-Frame* Timing::frame() const {
+Frame* PerformanceTiming::frame() const {
   return m_frame;
 }
 
-void Timing::disconnectFrame() {
+void PerformanceTiming::disconnectFrame() {
   m_frame = 0;
 }
 
-unsigned long long Timing::navigationStart() const {
+unsigned long long PerformanceTiming::navigationStart() const {
   DocumentLoadTiming* timing = documentLoadTiming();
   if (!timing)
     return 0;
@@ -87,7 +87,7 @@ unsigned long long Timing::navigationStart() const {
   return toIntegerMilliseconds(timing->navigationStart);
 }
 
-unsigned long long Timing::unloadEventEnd() const {
+unsigned long long PerformanceTiming::unloadEventEnd() const {
   DocumentLoadTiming* timing = documentLoadTiming();
   if (!timing)
     return 0;
@@ -95,7 +95,7 @@ unsigned long long Timing::unloadEventEnd() const {
   return toIntegerMilliseconds(timing->unloadEventEnd);
 }
 
-unsigned long long Timing::redirectStart() const {
+unsigned long long PerformanceTiming::redirectStart() const {
   DocumentLoadTiming* timing = documentLoadTiming();
   if (!timing)
     return 0;
@@ -103,7 +103,7 @@ unsigned long long Timing::redirectStart() const {
   return toIntegerMilliseconds(timing->redirectStart);
 }
 
-unsigned long long Timing::redirectEnd() const {
+unsigned long long PerformanceTiming::redirectEnd() const {
   DocumentLoadTiming* timing = documentLoadTiming();
   if (!timing)
     return 0;
@@ -111,7 +111,7 @@ unsigned long long Timing::redirectEnd() const {
   return toIntegerMilliseconds(timing->redirectEnd);
 }
 
-unsigned long long Timing::fetchStart() const {
+unsigned long long PerformanceTiming::fetchStart() const {
   DocumentLoadTiming* timing = documentLoadTiming();
   if (!timing)
     return 0;
@@ -119,7 +119,7 @@ unsigned long long Timing::fetchStart() const {
   return toIntegerMilliseconds(timing->fetchStart);
 }
 
-unsigned long long Timing::domainLookupStart() const {
+unsigned long long PerformanceTiming::domainLookupStart() const {
   ResourceLoadTiming* timing = resourceLoadTiming();
   if (!timing)
     return 0;
@@ -134,7 +134,7 @@ unsigned long long Timing::domainLookupStart() const {
   return resourceLoadTimeRelativeToAbsolute(dnsStart);
 }
 
-unsigned long long Timing::domainLookupEnd() const {
+unsigned long long PerformanceTiming::domainLookupEnd() const {
   ResourceLoadTiming* timing = resourceLoadTiming();
   if (!timing)
     return 0;
@@ -149,7 +149,7 @@ unsigned long long Timing::domainLookupEnd() const {
   return resourceLoadTimeRelativeToAbsolute(dnsEnd);
 }
 
-unsigned long long Timing::connectStart() const {
+unsigned long long PerformanceTiming::connectStart() const {
   DocumentLoader* loader = documentLoader();
   if (!loader)
     return 0;
@@ -174,7 +174,7 @@ unsigned long long Timing::connectStart() const {
   return resourceLoadTimeRelativeToAbsolute(connectStart);
 }
 
-unsigned long long Timing::connectEnd() const {
+unsigned long long PerformanceTiming::connectEnd() const {
   DocumentLoader* loader = documentLoader();
   if (!loader)
     return 0;
@@ -199,7 +199,7 @@ unsigned long long Timing::connectEnd() const {
   return resourceLoadTimeRelativeToAbsolute(connectEnd);
 }
 
-unsigned long long Timing::requestStart() const {
+unsigned long long PerformanceTiming::requestStart() const {
   ResourceLoadTiming* timing = resourceLoadTiming();
   if (!timing)
     return 0;
@@ -208,7 +208,7 @@ unsigned long long Timing::requestStart() const {
   return resourceLoadTimeRelativeToAbsolute(timing->sendStart);
 }
 
-unsigned long long Timing::responseStart() const {
+unsigned long long PerformanceTiming::responseStart() const {
   ResourceLoadTiming* timing = resourceLoadTiming();
   if (!timing)
     return 0;
@@ -223,7 +223,7 @@ unsigned long long Timing::responseStart() const {
   return resourceLoadTimeRelativeToAbsolute(timing->receiveHeadersEnd);
 }
 
-unsigned long long Timing::responseEnd() const {
+unsigned long long PerformanceTiming::responseEnd() const {
   DocumentLoadTiming* timing = documentLoadTiming();
   if (!timing)
     return 0;
@@ -231,7 +231,7 @@ unsigned long long Timing::responseEnd() const {
   return toIntegerMilliseconds(timing->responseEnd);
 }
 
-unsigned long long Timing::domLoading() const {
+unsigned long long PerformanceTiming::domLoading() const {
   const DocumentTiming* timing = documentTiming();
   if (!timing)
     return 0;
@@ -239,7 +239,7 @@ unsigned long long Timing::domLoading() const {
   return toIntegerMilliseconds(timing->domLoading);
 }
 
-unsigned long long Timing::domInteractive() const {
+unsigned long long PerformanceTiming::domInteractive() const {
   const DocumentTiming* timing = documentTiming();
   if (!timing)
     return 0;
@@ -247,7 +247,7 @@ unsigned long long Timing::domInteractive() const {
   return toIntegerMilliseconds(timing->domInteractive);
 }
 
-unsigned long long Timing::domContentLoadedStart() const {
+unsigned long long PerformanceTiming::domContentLoadedStart() const {
   const DocumentTiming* timing = documentTiming();
   if (!timing)
     return 0;
@@ -255,7 +255,7 @@ unsigned long long Timing::domContentLoadedStart() const {
   return toIntegerMilliseconds(timing->domContentLoadedStart);
 }
 
-unsigned long long Timing::domContentLoadedEnd() const {
+unsigned long long PerformanceTiming::domContentLoadedEnd() const {
   const DocumentTiming* timing = documentTiming();
   if (!timing)
     return 0;
@@ -263,7 +263,7 @@ unsigned long long Timing::domContentLoadedEnd() const {
   return toIntegerMilliseconds(timing->domContentLoadedEnd);
 }
 
-unsigned long long Timing::domComplete() const {
+unsigned long long PerformanceTiming::domComplete() const {
   const DocumentTiming* timing = documentTiming();
   if (!timing)
     return 0;
@@ -271,7 +271,7 @@ unsigned long long Timing::domComplete() const {
   return toIntegerMilliseconds(timing->domComplete);
 }
 
-unsigned long long Timing::loadEventStart() const {
+unsigned long long PerformanceTiming::loadEventStart() const {
   DocumentLoadTiming* timing = documentLoadTiming();
   if (!timing)
     return 0;
@@ -279,7 +279,7 @@ unsigned long long Timing::loadEventStart() const {
   return toIntegerMilliseconds(timing->loadEventStart);
 }
 
-unsigned long long Timing::loadEventEnd() const {
+unsigned long long PerformanceTiming::loadEventEnd() const {
   DocumentLoadTiming* timing = documentLoadTiming();
   if (!timing)
     return 0;
@@ -287,14 +287,14 @@ unsigned long long Timing::loadEventEnd() const {
   return toIntegerMilliseconds(timing->loadEventEnd);
 }
 
-DocumentLoader* Timing::documentLoader() const {
+DocumentLoader* PerformanceTiming::documentLoader() const {
   if (!m_frame)
     return 0;
 
   return m_frame->loader()->documentLoader();
 }
 
-const DocumentTiming* Timing::documentTiming() const {
+const DocumentTiming* PerformanceTiming::documentTiming() const {
   if (!m_frame)
     return 0;
 
@@ -305,7 +305,7 @@ const DocumentTiming* Timing::documentTiming() const {
   return document->timing();
 }
 
-DocumentLoadTiming* Timing::documentLoadTiming() const {
+DocumentLoadTiming* PerformanceTiming::documentLoadTiming() const {
   DocumentLoader* loader = documentLoader();
   if (!loader)
     return 0;
@@ -313,7 +313,7 @@ DocumentLoadTiming* Timing::documentLoadTiming() const {
   return loader->timing();
 }
 
-ResourceLoadTiming* Timing::resourceLoadTiming() const {
+ResourceLoadTiming* PerformanceTiming::resourceLoadTiming() const {
   DocumentLoader* loader = documentLoader();
   if (!loader)
     return 0;
@@ -321,7 +321,7 @@ ResourceLoadTiming* Timing::resourceLoadTiming() const {
   return loader->response().resourceLoadTiming();
 }
 
-unsigned long long Timing::resourceLoadTimeRelativeToAbsolute(
+unsigned long long PerformanceTiming::resourceLoadTimeRelativeToAbsolute(
     int relativeSeconds) const {
   ASSERT(relativeSeconds >= 0);
   ResourceLoadTiming* resourceTiming = resourceLoadTiming();

@@ -28,8 +28,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Navigation_h
-#define Navigation_h
+#ifndef PerformanceTiming_h
+#define PerformanceTiming_h
 
 #if ENABLE(WEB_TIMING)
 
@@ -38,28 +38,53 @@
 
 namespace WebCore {
 
+struct DocumentLoadTiming;
+class DocumentLoader;
+struct DocumentTiming;
 class Frame;
+class ResourceLoadTiming;
 
-class Navigation : public RefCounted<Navigation> {
+class PerformanceTiming : public RefCounted<PerformanceTiming> {
  public:
-  static PassRefPtr<Navigation> create(Frame* frame) {
-    return adoptRef(new Navigation(frame));
+  static PassRefPtr<PerformanceTiming> create(Frame* frame) {
+    return adoptRef(new PerformanceTiming(frame));
   }
 
   Frame* frame() const;
   void disconnectFrame();
 
-  enum NavigationType { NAVIGATE, RELOAD, BACK_FORWARD };
-
-  unsigned short type() const;
-  unsigned short redirectCount() const;
+  unsigned long long navigationStart() const;
+  unsigned long long unloadEventEnd() const;
+  unsigned long long redirectStart() const;
+  unsigned long long redirectEnd() const;
+  unsigned long long fetchStart() const;
+  unsigned long long domainLookupStart() const;
+  unsigned long long domainLookupEnd() const;
+  unsigned long long connectStart() const;
+  unsigned long long connectEnd() const;
+  unsigned long long requestStart() const;
+  unsigned long long responseStart() const;
+  unsigned long long responseEnd() const;
+  unsigned long long domLoading() const;
+  unsigned long long domInteractive() const;
+  unsigned long long domContentLoadedStart() const;
+  unsigned long long domContentLoadedEnd() const;
+  unsigned long long domComplete() const;
+  unsigned long long loadEventStart() const;
+  unsigned long long loadEventEnd() const;
 
  private:
-  Navigation(Frame*);
+  PerformanceTiming(Frame*);
+
+  const DocumentTiming* documentTiming() const;
+  DocumentLoader* documentLoader() const;
+  DocumentLoadTiming* documentLoadTiming() const;
+  ResourceLoadTiming* resourceLoadTiming() const;
+  unsigned long long resourceLoadTimeRelativeToAbsolute(int) const;
 
   Frame* m_frame;
 };
 }
 
 #endif  // !ENABLE(WEB_TIMING)
-#endif  // !defined(Navigation_h)
+#endif  // !defined(PerformanceTiming_h)
