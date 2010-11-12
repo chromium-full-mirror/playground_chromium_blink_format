@@ -68,10 +68,6 @@ class ResourceLoadScheduler : public Noncopyable {
   void suspendPendingRequests();
   void resumePendingRequests();
 
-#ifndef NDEBUG
-  void assertLoaderBeingCounted(ResourceLoader*);
-#endif
-
  private:
   ResourceLoadScheduler();
   ~ResourceLoadScheduler();
@@ -93,10 +89,6 @@ class ResourceLoadScheduler : public Noncopyable {
     bool limitRequests() const {
       return m_requestsLoading.size() >= m_maxRequestsInFlight;
     }
-
-#ifndef NDEBUG
-    void assertLoaderBeingCounted(ResourceLoader*);
-#endif
 
     typedef Deque<RefPtr<ResourceLoader>> RequestQueue;
     RequestQueue& requestsPending(Priority priority) {

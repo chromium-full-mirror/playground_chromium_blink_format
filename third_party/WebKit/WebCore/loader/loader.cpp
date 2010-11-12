@@ -139,10 +139,9 @@ void Loader::load(CachedResourceLoader* cachedResourceLoader,
           cachedResourceLoader->document()->frame(), this, resourceRequest,
           determinePriority(resource), request->shouldDoSecurityCheck(),
           request->sendResourceLoadCallbacks());
-  if (loader) {
+  if (loader && !loader->reachedTerminalState())
     m_requestsLoading.add(loader.release(), request);
-    request->cachedResource()->setRequestedFromNetworkingLayer();
-  } else {
+  else {
     // FIXME: What if resources in other frames were waiting for this
     // revalidation?
     LOG(ResourceLoading, "Cannot start loading '%s'",
@@ -172,6 +171,17 @@ void Loader::cancelRequests(CachedResourceLoader* cachedResourceLoader) {
     SubresourceLoader* loader = loadersToCancel[i];
     didFail(loader, true);
   }
+}
+
+void Loader::willSendRequest(SubresourceLoader* loader,
+                             ResourceRequest&,
+                             const ResourceResponse&) {
+  RequestMap::iterator i = m_requestsLoading.find(loader);
+  if (i == m_requestsLoading.end())
+    return;
+
+  Request* request = i->second;
+  request->cachedResource()->setRequestedFromNetworkingLayer();
 }
 
 void Loader::didFinishLoading(SubresourceLoader* loader) {

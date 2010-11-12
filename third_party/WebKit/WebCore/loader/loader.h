@@ -47,6 +47,9 @@ class Loader : public Noncopyable, private SubresourceLoaderClient {
   void cancelRequests(CachedResourceLoader*);
 
  private:
+  virtual void willSendRequest(SubresourceLoader*,
+                               ResourceRequest&,
+                               const ResourceResponse&);
   virtual void didReceiveResponse(SubresourceLoader*, const ResourceResponse&);
   virtual void didReceiveData(SubresourceLoader*, const char*, int);
   virtual void didReceiveCachedMetadata(SubresourceLoader*, const char*, int);
