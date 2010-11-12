@@ -83,6 +83,19 @@ void Connection::invalidate() {
       WorkItem::create(this, &Connection::platformInvalidate));
 }
 
+PassOwnPtr<ArgumentEncoder> Connection::createSyncMessageArgumentEncoder(
+    uint64_t destinationID,
+    uint64_t& syncRequestID) {
+  OwnPtr<ArgumentEncoder> argumentEncoder =
+      ArgumentEncoder::create(destinationID);
+
+  // Encode the sync request ID.
+  syncRequestID = ++m_syncRequestID;
+  argumentEncoder->encode(syncRequestID);
+
+  return argumentEncoder.release();
+}
+
 bool Connection::sendMessage(MessageID messageID,
                              PassOwnPtr<ArgumentEncoder> arguments) {
   if (!isValid())
@@ -405,7 +418,8 @@ void Connection::dispatchSyncMessage(MessageID messageID,
   }
 
   // Create our reply encoder.
-  ArgumentEncoder* replyEncoder = new ArgumentEncoder(syncRequestID);
+  ArgumentEncoder* replyEncoder =
+      ArgumentEncoder::create(syncRequestID).leakPtr();
 
   // Hand off both the decoder and encoder to the client..
   SyncReplyMode syncReplyMode =

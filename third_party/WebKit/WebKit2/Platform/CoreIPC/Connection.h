@@ -118,8 +118,8 @@ class Connection : public ThreadSafeShared<Connection> {
   bool send(const T& message, uint64_t destinationID);
 
   static const unsigned long long NoTimeout = 10000000000ULL;
-  // FIXME: This variant of send is deprecated, all clients should move to the
-  // overload that takes a message.
+  // FIXME: This variant of sendSync is deprecated, all clients should move to
+  // the overload that takes a message.
   template <typename E, typename T, typename U>
   bool sendSync(E messageID,
                 uint64_t destinationID,
@@ -138,8 +138,10 @@ class Connection : public ThreadSafeShared<Connection> {
                                       uint64_t destinationID,
                                       double timeout);
 
+  PassOwnPtr<ArgumentEncoder> createSyncMessageArgumentEncoder(
+      uint64_t destinationID,
+      uint64_t& syncRequestID);
   bool sendMessage(MessageID, PassOwnPtr<ArgumentEncoder>);
-
   bool sendSyncReply(PassOwnPtr<ArgumentEncoder>);
 
  private:
@@ -285,7 +287,8 @@ class Connection : public ThreadSafeShared<Connection> {
 
 template <typename E, typename T>
 bool Connection::send(E messageID, uint64_t destinationID, const T& arguments) {
-  OwnPtr<ArgumentEncoder> argumentEncoder(new ArgumentEncoder(destinationID));
+  OwnPtr<ArgumentEncoder> argumentEncoder =
+      ArgumentEncoder::create(destinationID);
   argumentEncoder->encode(arguments);
 
   return sendMessage(MessageID(messageID), argumentEncoder.release());
@@ -293,7 +296,8 @@ bool Connection::send(E messageID, uint64_t destinationID, const T& arguments) {
 
 template <typename T>
 bool Connection::send(const T& message, uint64_t destinationID) {
-  OwnPtr<ArgumentEncoder> argumentEncoder(new ArgumentEncoder(destinationID));
+  OwnPtr<ArgumentEncoder> argumentEncoder =
+      ArgumentEncoder::create(destinationID);
   argumentEncoder->encode(message);
 
   return sendMessage(MessageID(T::messageID), argumentEncoder.release());
@@ -305,14 +309,11 @@ inline bool Connection::sendSync(E messageID,
                                  const T& arguments,
                                  const U& reply,
                                  double timeout) {
-  OwnPtr<ArgumentEncoder> argumentEncoder(new ArgumentEncoder(destinationID));
+  uint64_t syncRequestID = 0;
+  OwnPtr<ArgumentEncoder> argumentEncoder =
+      createSyncMessageArgumentEncoder(destinationID, syncRequestID);
 
-  uint64_t syncRequestID = ++m_syncRequestID;
-
-  // Encode the sync request ID.
-  argumentEncoder->encode(syncRequestID);
-
-  // Encode the rest of the input arguments.
+  // Encode the input arguments.
   argumentEncoder->encode(arguments);
 
   // Now send the message and wait for a reply.
@@ -331,12 +332,9 @@ bool Connection::sendSync(const T& message,
                           const typename T::Reply& reply,
                           uint64_t destinationID,
                           double timeout) {
-  OwnPtr<ArgumentEncoder> argumentEncoder(new ArgumentEncoder(destinationID));
-
-  uint64_t syncRequestID = ++m_syncRequestID;
-
-  // Encode the sync request ID.
-  argumentEncoder->encode(syncRequestID);
+  uint64_t syncRequestID = 0;
+  OwnPtr<ArgumentEncoder> argumentEncoder =
+      createSyncMessageArgumentEncoder(destinationID, syncRequestID);
 
   // Encode the rest of the input arguments.
   argumentEncoder->encode(message);
