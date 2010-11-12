@@ -32,6 +32,7 @@
 #define WebBindings_h
 
 #include "WebCommon.h"
+#include "WebString.h"
 #include "WebVector.h"
 #include <bindings/npruntime.h>
 
@@ -193,6 +194,7 @@ class WebBindings {
   WEBKIT_API static bool getElement(NPObject* element, WebElement*);
 
   WEBKIT_API static NPObject* makeIntArray(const WebVector<int>&);
+  WEBKIT_API static NPObject* makeStringArray(const WebVector<WebString>&);
 
   // Exceptions -------------------------------------------------------------
 

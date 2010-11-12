@@ -341,6 +341,18 @@ static NPObject* makeIntArrayImpl(const WebVector<int>& data) {
   return npCreateV8ScriptObject(0, result, window);
 }
 
+static NPObject* makeStringArrayImpl(const WebVector<WebString>& data) {
+  v8::HandleScope handleScope;
+  v8::Handle<v8::Array> result = v8::Array::New(data.size());
+  for (size_t i = 0; i < data.size(); ++i)
+    result->Set(i, data[i].data() ? v8::String::New(data[i].data())
+                                  : v8::String::New(""));
+
+  WebCore::DOMWindow* window =
+      WebCore::V8Proxy::retrieveWindow(WebCore::V8Proxy::currentContext());
+  return npCreateV8ScriptObject(0, result, window);
+}
+
 #endif
 
 bool WebBindings::getDragData(NPObject* event,
@@ -380,6 +392,15 @@ bool WebBindings::getElement(NPObject* element, WebElement* webElement) {
 NPObject* WebBindings::makeIntArray(const WebVector<int>& data) {
 #if USE(V8)
   return makeIntArrayImpl(data);
+#else
+  // Not supported on other ports (JSC, etc.).
+  return 0;
+#endif
+}
+
+NPObject* WebBindings::makeStringArray(const WebVector<WebString>& data) {
+#if USE(V8)
+  return makeStringArrayImpl(data);
 #else
   // Not supported on other ports (JSC, etc.).
   return 0;

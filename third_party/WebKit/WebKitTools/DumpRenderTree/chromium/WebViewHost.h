@@ -97,6 +97,9 @@ class WebViewHost : public WebKit::WebViewClient,
   void addClearHeader(const WTF::String& header) { m_clearHeaders.add(header); }
   const HashSet<WTF::String>& clearHeaders() const { return m_clearHeaders; }
 
+  WebKit::WebContextMenuData* lastContextMenuData() const;
+  void clearContextMenuData();
+
   // NavigationHost
   virtual bool navigate(const TestNavigationEntry&, bool reload);
 
@@ -360,6 +363,8 @@ class WebViewHost : public WebKit::WebViewClient,
   OwnPtr<skia::PlatformCanvas> m_canvas;
   WebKit::WebRect m_paintRect;
   bool m_isPainting;
+
+  OwnPtr<WebKit::WebContextMenuData> m_lastContextMenuData;
 
 #if !ENABLE(CLIENT_BASED_GEOLOCATION)
   // Geolocation
