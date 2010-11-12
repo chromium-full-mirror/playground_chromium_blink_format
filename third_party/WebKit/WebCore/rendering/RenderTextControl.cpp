@@ -31,6 +31,7 @@
 #include "Frame.h"
 #include "HTMLBRElement.h"
 #include "HTMLFormControlElement.h"
+#include "HTMLInputElement.h"
 #include "HTMLNames.h"
 #include "HitTestResult.h"
 #include "RenderLayer.h"
@@ -270,6 +271,23 @@ void setSelectionRange(Node* node, int start, int end) {
     frame->selection()->setSelection(newSelection);
 }
 
+bool RenderTextControl::isSelectableElement(Node* node) const {
+  if (!node || !m_innerText)
+    return false;
+
+  if (node->rootEditableElement() == m_innerText)
+    return true;
+
+  if (!m_innerText->contains(node))
+    return false;
+
+  Node* shadowAncestor = node->shadowAncestorNode();
+  return shadowAncestor &&
+         (shadowAncestor->hasTagName(textareaTag) ||
+          (shadowAncestor->hasTagName(inputTag) &&
+           static_cast<HTMLInputElement*>(shadowAncestor)->isTextField()));
+}
+
 PassRefPtr<Range> RenderTextControl::selection(int start, int end) const {
   if (!m_innerText)
     return 0;
@@ -296,8 +314,7 @@ VisiblePosition RenderTextControl::visiblePositionForIndex(int index) const {
 int RenderTextControl::indexForVisiblePosition(
     const VisiblePosition& pos) const {
   Position indexPosition = pos.deepEquivalent();
-  if (!indexPosition.node() ||
-      indexPosition.node()->rootEditableElement() != m_innerText)
+  if (!isSelectableElement(indexPosition.node()))
     return 0;
   ExceptionCode ec = 0;
   RefPtr<Range> range = Range::create(document());

@@ -114,6 +114,7 @@ class RenderTextControl : public RenderBlock {
 
   bool hasVisibleTextArea() const;
   friend void setSelectionRange(Node*, int start, int end);
+  bool isSelectableElement(Node*) const;
 
   bool m_wasChangedSinceLastChangeEvent;
   bool m_lastChangeWasUserEdit;
