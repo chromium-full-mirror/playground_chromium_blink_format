@@ -127,6 +127,8 @@ class SimpleFontData : public FontData {
   virtual bool isLoading() const { return m_isLoading; }
   virtual bool isSegmented() const;
 
+  bool isBrokenIdeographFont() const { return m_isBrokenIdeographFont; }
+
   const GlyphData& missingGlyphData() const { return m_missingGlyphData; }
 
 #ifndef NDEBUG

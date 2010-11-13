@@ -43,7 +43,8 @@ bool GlyphPage::fill(unsigned offset,
   bool haveGlyphs = false;
 
 #ifndef BUILDING_ON_TIGER
-  if (fontData->platformData().orientation() == Horizontal) {
+  if (fontData->orientation() == Horizontal ||
+      fontData->isBrokenIdeographFont()) {
     Vector<CGGlyph, 512> glyphs(bufferLength);
     wkGetGlyphsForCharacters(fontData->platformData().cgFont(), buffer,
                              glyphs.data(), bufferLength);
