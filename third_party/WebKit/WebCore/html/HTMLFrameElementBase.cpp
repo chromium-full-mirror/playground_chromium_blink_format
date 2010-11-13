@@ -157,14 +157,10 @@ void HTMLFrameElementBase::parseMappedAttribute(Attribute* attr) {
     HTMLFrameOwnerElement::parseMappedAttribute(attr);
 }
 
-void HTMLFrameElementBase::setName() {
+void HTMLFrameElementBase::setNameAndOpenURL() {
   m_frameName = getAttribute(nameAttr);
   if (m_frameName.isNull())
     m_frameName = getIdAttribute();
-}
-
-void HTMLFrameElementBase::setNameAndOpenURL() {
-  setName();
   openURL();
 }
 

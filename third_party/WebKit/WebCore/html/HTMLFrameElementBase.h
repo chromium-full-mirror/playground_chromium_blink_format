@@ -59,8 +59,6 @@ class HTMLFrameElementBase : public HTMLFrameOwnerElement {
 
   virtual bool isURLAttribute(Attribute*) const;
 
-  virtual void setName();
-
   virtual void willRemove();
   void checkInDocumentTimerFired(Timer<HTMLFrameElementBase>*);
   void updateOnReparenting();
