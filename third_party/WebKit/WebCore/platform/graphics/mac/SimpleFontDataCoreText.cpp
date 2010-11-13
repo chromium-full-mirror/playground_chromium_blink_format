@@ -69,8 +69,7 @@ CFDictionaryRef SimpleFontData::getCFStringAttributes(
     const void* valuesWithKerningDisabled[] = {
         platformData().ctFont(), kerningAdjustment,
         allowLigatures ? ligaturesAllowed : ligaturesNotAllowed,
-        platformData().orientation() == Vertical ? kCFBooleanTrue
-                                                 : kCFBooleanFalse};
+        orientation() == Vertical ? kCFBooleanTrue : kCFBooleanFalse};
     attributesDictionary.adoptCF(CFDictionaryCreate(
         0, keysWithKerningDisabled, valuesWithKerningDisabled,
         sizeof(keysWithKerningDisabled) / sizeof(*keysWithKerningDisabled),
@@ -85,8 +84,7 @@ CFDictionaryRef SimpleFontData::getCFStringAttributes(
     const void* valuesWithKerningEnabled[] = {
         platformData().ctFont(),
         allowLigatures ? ligaturesAllowed : ligaturesNotAllowed,
-        platformData().orientation() == Vertical ? kCFBooleanTrue
-                                                 : kCFBooleanFalse};
+        orientation() == Vertical ? kCFBooleanTrue : kCFBooleanFalse};
     attributesDictionary.adoptCF(CFDictionaryCreate(
         0, keysWithKerningEnabled, valuesWithKerningEnabled,
         sizeof(keysWithKerningEnabled) / sizeof(*keysWithKerningEnabled),
