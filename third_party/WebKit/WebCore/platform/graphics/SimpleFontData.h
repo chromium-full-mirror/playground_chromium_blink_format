@@ -82,6 +82,8 @@ class SimpleFontData : public FontData {
   SimpleFontData* smallCapsFontData(
       const FontDescription& fontDescription) const;
 
+  SimpleFontData* brokenIdeographFontData() const;
+
   // vertical metrics
   int ascent() const { return m_ascent; }
   int descent() const { return m_descent; }
@@ -168,6 +170,8 @@ class SimpleFontData : public FontData {
   wxFont* getWxFont() const { return m_platformData.font(); }
 #endif
 
+  FontOrientation orientation() const { return m_orientation; }
+
  private:
   void platformInit();
   void platformGlyphInit();
@@ -194,6 +198,12 @@ class SimpleFontData : public FontData {
   float m_xHeight;
   unsigned m_unitsPerEm;
 
+  FontOrientation m_orientation;  // This is our supported orientation according
+                                  // to the tables in the font.
+                                  // FontPlatformData will just always have the
+                                  // desired orientation.
+  // This value represents what we actually support.
+
   FontPlatformData m_platformData;
 
   mutable OwnPtr<GlyphMetricsMap<FloatRect>> m_glyphToBoundsMap;
@@ -209,6 +219,7 @@ class SimpleFontData : public FontData {
                         // @font-face
   bool m_isLoading;  // Whether or not this custom font is still in the act of
                      // loading.
+  bool m_isBrokenIdeographFont;
 
   Glyph m_spaceGlyph;
   float m_spaceWidth;
@@ -219,6 +230,8 @@ class SimpleFontData : public FontData {
   GlyphData m_missingGlyphData;
 
   mutable SimpleFontData* m_smallCapsFontData;
+
+  mutable SimpleFontData* m_brokenIdeographFontData;
 
 #if PLATFORM(CG) || PLATFORM(CAIRO) || PLATFORM(WX)
   float m_syntheticBoldOffset;

@@ -27,6 +27,7 @@
 
 #include <wtf/Forward.h>
 #include "FontDescription.h"
+#include "FontOrientation.h"
 #include <QFont>
 #include <QHash>
 
@@ -138,6 +139,11 @@ class FontPlatformData : public FastAllocBase {
       return m_data->font.pixelSize();
     return 0;
   }
+
+  FontOrientation orientation() const {
+    return Horizontal;
+  }  // FIXME: Implement.
+
   unsigned hash() const;
 
 #ifndef NDEBUG

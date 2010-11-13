@@ -117,7 +117,8 @@ SimpleFontData* CSSFontFaceSource::getFontData(
   }
 
   // See if we have a mapping in our FontData cache.
-  unsigned hashKey = fontDescription.computedPixelSize() << 2 |
+  unsigned hashKey = fontDescription.computedPixelSize() << 3 |
+                     (fontDescription.orientation() == Vertical ? 4 : 0) |
                      (syntheticBold ? 2 : 0) | (syntheticItalic ? 1 : 0);
   if (SimpleFontData* cachedData = m_fontDataTable.get(hashKey))
     return cachedData;

@@ -30,6 +30,7 @@
 #define FontPlatformData_h
 
 #include "FontDescription.h"
+#include "FontOrientation.h"
 #include "StringImpl.h"
 #include <wtf/Forward.h>
 #include <wtf/RefPtr.h>
@@ -145,6 +146,10 @@ class FontPlatformData {
   bool roundsGlyphAdvances() const { return false; }
 
   bool allowsLigatures() const { return false; }
+
+  FontOrientation orientation() const {
+    return Horizontal;
+  }  // FIXME: Implement.
 
 #if OS(WINDOWS)
   bool useGDI() const;

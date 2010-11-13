@@ -34,6 +34,7 @@
 
 #include "config.h"
 
+#include "FontOrientation.h"
 #include <wtf/Forward.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -70,6 +71,10 @@ class FontPlatformData {
 
   HFONT hfont() const { return m_font ? m_font->hfont() : 0; }
   float size() const { return m_size; }
+
+  FontOrientation orientation() const {
+    return Horizontal;
+  }  // FIXME: Implement.
 
   unsigned hash() const { return m_font ? m_font->hash() : NULL; }
 

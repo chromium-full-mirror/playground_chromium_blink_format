@@ -169,6 +169,8 @@ class Font {
   // Used for complex text, and does not utilize the glyph map cache.
   const FontData* fontDataForCharacters(const UChar*, int length) const;
 
+  static bool isCJKIdeograph(UChar32);
+
 #if PLATFORM(QT)
   QFont font() const;
 #endif

@@ -53,11 +53,14 @@ SimpleFontData::SimpleFontData(const FontPlatformData& platformData,
     : m_maxCharWidth(-1),
       m_avgCharWidth(-1),
       m_unitsPerEm(defaultUnitsPerEm),
+      m_orientation(platformData.orientation()),
       m_platformData(platformData),
       m_treatAsFixedPitch(false),
       m_isCustomFont(isCustomFont),
       m_isLoading(isLoading),
-      m_smallCapsFontData(0) {
+      m_isBrokenIdeographFont(false),
+      m_smallCapsFontData(0),
+      m_brokenIdeographFontData(0) {
   platformInit();
   platformGlyphInit();
   platformCharWidthInit();
@@ -68,12 +71,15 @@ SimpleFontData::SimpleFontData(PassOwnPtr<SVGFontData> svgFontData,
                                int size,
                                bool syntheticBold,
                                bool syntheticItalic)
-    : m_platformData(FontPlatformData(size, syntheticBold, syntheticItalic)),
+    : m_orientation(Horizontal),
+      m_platformData(FontPlatformData(size, syntheticBold, syntheticItalic)),
       m_treatAsFixedPitch(false),
       m_svgFontData(svgFontData),
       m_isCustomFont(true),
       m_isLoading(false),
-      m_smallCapsFontData(0) {
+      m_isBrokenIdeographFont(false),
+      m_smallCapsFontData(0),
+      m_brokenIdeographFontData(0) {
   SVGFontFaceElement* svgFontFaceElement = m_svgFontData->svgFontFaceElement();
   m_unitsPerEm = svgFontFaceElement->unitsPerEm();
 
@@ -204,6 +210,8 @@ SimpleFontData::~SimpleFontData() {
       fontCache()->releaseFontData(m_smallCapsFontData);
     GlyphPageTreeNode::pruneTreeFontData(this);
   }
+
+  delete m_brokenIdeographFontData;
 }
 
 const SimpleFontData* SimpleFontData::fontDataForCharacter(UChar32) const {
@@ -212,6 +220,16 @@ const SimpleFontData* SimpleFontData::fontDataForCharacter(UChar32) const {
 
 bool SimpleFontData::isSegmented() const {
   return false;
+}
+
+SimpleFontData* SimpleFontData::brokenIdeographFontData() const {
+  if (!m_brokenIdeographFontData) {
+    m_brokenIdeographFontData =
+        new SimpleFontData(m_platformData, isCustomFont(), false);
+    m_brokenIdeographFontData->m_orientation = Vertical;
+    m_brokenIdeographFontData->m_isBrokenIdeographFont = true;
+  }
+  return m_brokenIdeographFontData;
 }
 
 #ifndef NDEBUG
