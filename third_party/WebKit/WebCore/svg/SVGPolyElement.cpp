@@ -64,6 +64,10 @@ void SVGPolyElement::parseMappedAttribute(Attribute* attr) {
 void SVGPolyElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
+  if (SVGTests::handleAttributeChange(const_cast<SVGPolyElement*>(this),
+                                      attrName))
+    return;
+
   RenderSVGPath* renderer = static_cast<RenderSVGPath*>(this->renderer());
   if (!renderer)
     return;
@@ -80,8 +84,7 @@ void SVGPolyElement::svgAttributeChanged(const QualifiedName& attrName) {
     return;
   }
 
-  if (SVGTests::isKnownAttribute(attrName) ||
-      SVGLangSpace::isKnownAttribute(attrName) ||
+  if (SVGLangSpace::isKnownAttribute(attrName) ||
       SVGExternalResourcesRequired::isKnownAttribute(attrName))
     RenderSVGResource::markForLayoutAndParentResourceInvalidation(renderer);
 }

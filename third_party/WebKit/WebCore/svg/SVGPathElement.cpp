@@ -238,6 +238,10 @@ void SVGPathElement::parseMappedAttribute(Attribute* attr) {
 void SVGPathElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
+  if (SVGTests::handleAttributeChange(const_cast<SVGPathElement*>(this),
+                                      attrName))
+    return;
+
   RenderSVGPath* renderer = static_cast<RenderSVGPath*>(this->renderer());
   if (!renderer)
     return;
@@ -255,7 +259,6 @@ void SVGPathElement::svgAttributeChanged(const QualifiedName& attrName) {
   }
 
   if (attrName == SVGNames::pathLengthAttr ||
-      SVGTests::isKnownAttribute(attrName) ||
       SVGLangSpace::isKnownAttribute(attrName) ||
       SVGExternalResourcesRequired::isKnownAttribute(attrName))
     RenderSVGResource::markForLayoutAndParentResourceInvalidation(renderer);

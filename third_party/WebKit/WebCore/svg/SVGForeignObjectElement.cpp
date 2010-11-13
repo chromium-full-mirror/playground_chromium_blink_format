@@ -79,6 +79,10 @@ void SVGForeignObjectElement::svgAttributeChanged(
   if (isLengthAttribute)
     updateRelativeLengthsInformation();
 
+  if (SVGTests::handleAttributeChange(
+          const_cast<SVGForeignObjectElement*>(this), attrName))
+    return;
+
   RenderObject* renderer = this->renderer();
   if (!renderer)
     return;
@@ -89,8 +93,7 @@ void SVGForeignObjectElement::svgAttributeChanged(
     return;
   }
 
-  if (isLengthAttribute || SVGTests::isKnownAttribute(attrName) ||
-      SVGLangSpace::isKnownAttribute(attrName) ||
+  if (isLengthAttribute || SVGLangSpace::isKnownAttribute(attrName) ||
       SVGExternalResourcesRequired::isKnownAttribute(attrName))
     RenderSVGResource::markForLayoutAndParentResourceInvalidation(renderer);
 }
