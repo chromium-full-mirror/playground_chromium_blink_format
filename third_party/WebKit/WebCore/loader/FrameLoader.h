@@ -197,7 +197,7 @@ class FrameLoader : public Noncopyable {
   ResourceError fileDoesNotExistError(const ResourceResponse&) const;
   ResourceError blockedError(const ResourceRequest&) const;
   ResourceError cannotShowURLError(const ResourceRequest&) const;
-  ResourceError interruptionForPolicyChangeError(const ResourceRequest&);
+  ResourceError interruptionForPolicyChangeError(const ResourceRequest&) const;
 
   bool isHostedByObjectElement() const;
   bool isLoadingMainFrame() const;
@@ -388,12 +388,6 @@ class FrameLoader : public Noncopyable {
   NetworkingContext* networkingContext() const;
 
  private:
-  bool canCachePageContainingThisFrame();
-#ifndef NDEBUG
-  void logCanCachePageDecision();
-  bool logCanCacheFrameDecision(int indentLevel);
-#endif
-
   void checkTimerFired(Timer<FrameLoader>*);
 
   void navigateWithinDocument(HistoryItem*);
@@ -420,8 +414,6 @@ class FrameLoader : public Noncopyable {
   void frameLoadCompleted();
 
   void mainReceivedError(const ResourceError&, bool isComplete);
-
-  void setLoadType(FrameLoadType);
 
   static void callContinueLoadAfterNavigationPolicy(void*,
                                                     const ResourceRequest&,
@@ -462,8 +454,6 @@ class FrameLoader : public Noncopyable {
 
   void closeOldDataSources();
   void prepareForCachedPageRestore();
-
-  void updateHistoryAfterClientRedirect();
 
   bool shouldReloadToHandleUnreachableURL(DocumentLoader*);
 
@@ -526,8 +516,6 @@ class FrameLoader : public Noncopyable {
                           bool isNewNavigation);
 
   void provisionalLoadStarted();
-
-  bool canCachePage();
 
   bool didOpenURL(const KURL&);
 
@@ -606,10 +594,6 @@ class FrameLoader : public Noncopyable {
 
   SandboxFlags m_sandboxFlags;
   SandboxFlags m_forcedSandboxFlags;
-
-#ifndef NDEBUG
-  bool m_didDispatchDidCommitLoad;
-#endif
 
   RefPtr<FrameNetworkingContext> m_networkingContext;
 };
