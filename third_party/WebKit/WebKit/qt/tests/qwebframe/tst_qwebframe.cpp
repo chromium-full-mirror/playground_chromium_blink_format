@@ -2471,7 +2471,11 @@ void tst_QWebFrame::javaScriptWindowObjectCleared_data() {
   QTest::addColumn<QString>("html");
   QTest::addColumn<int>("signalCount");
   QTest::newRow("with <script>")
-      << "<html><body><script></script><p>hello world</p></body></html>" << 1;
+      << "<html><body><script>i=0</script><p>hello world</p></body></html>"
+      << 1;
+  // NOTE: Empty scripts no longer cause this signal to be emitted.
+  QTest::newRow("with empty <script>")
+      << "<html><body><script></script><p>hello world</p></body></html>" << 0;
   QTest::newRow("without <script>")
       << "<html><body><p>hello world</p></body></html>" << 0;
 }
