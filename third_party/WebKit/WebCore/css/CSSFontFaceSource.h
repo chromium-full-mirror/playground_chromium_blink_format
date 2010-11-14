@@ -71,6 +71,7 @@ class CSSFontFaceSource : public CachedResourceClient {
   void setSVGFontFaceElement(SVGFontFaceElement* element) {
     m_svgFontFaceElement = element;
   }
+  bool isSVGFontFaceSource() const;
 #endif
 
  private:
