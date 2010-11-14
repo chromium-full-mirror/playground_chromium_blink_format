@@ -341,7 +341,6 @@ static NPError webkit_test_plugin_get_value(NPP instance,
       err = NPERR_GENERIC_ERROR;
       break;
     default:
-      fprintf(stderr, "Unhandled variable\n");
       err = NPERR_GENERIC_ERROR;
       break;
   }
