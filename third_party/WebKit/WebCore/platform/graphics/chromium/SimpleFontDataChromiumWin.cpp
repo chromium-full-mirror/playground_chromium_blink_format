@@ -96,11 +96,7 @@ void SimpleFontData::platformCharWidthInit() {
   // charwidths are set in platformInit.
 }
 
-void SimpleFontData::platformDestroy() {
-  // We don't hash this on Win32, so it's effectively owned by us.
-  delete m_smallCapsFontData;
-  m_smallCapsFontData = 0;
-}
+void SimpleFontData::platformDestroy() {}
 
 SimpleFontData* SimpleFontData::smallCapsFontData(
     const FontDescription& fontDescription) const {
@@ -112,8 +108,8 @@ SimpleFontData* SimpleFontData::smallCapsFontData(
     // to be some kind of artifact of their CG backend, or something.
     winFont.lfHeight = -lroundf(smallCapsSize);
     HFONT hfont = CreateFontIndirect(&winFont);
-    m_smallCapsFontData =
-        new SimpleFontData(FontPlatformData(hfont, smallCapsSize));
+    m_smallCapsFontData = new SimpleFontData(
+        FontPlatformData(hfont, smallCapsSize), isCustomFont(), false);
   }
   return m_smallCapsFontData;
 }

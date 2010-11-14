@@ -75,9 +75,6 @@ void SimpleFontData::platformCharWidthInit() {
 }
 
 void SimpleFontData::platformDestroy() {
-  delete m_smallCapsFontData;
-  m_smallCapsFontData = 0;
-
 #if OS(WINDOWS)
   if (m_scriptFontProperties) {
     delete m_scriptFontProperties;
@@ -95,7 +92,8 @@ SimpleFontData* SimpleFontData::smallCapsFontData(
     FontDescription desc = FontDescription(fontDescription);
     desc.setSpecifiedSize(0.70f * fontDescription.computedSize());
     FontPlatformData platformData(desc, desc.family().family());
-    m_smallCapsFontData = new SimpleFontData(platformData);
+    m_smallCapsFontData =
+        new SimpleFontData(platformData, isCustomFont(), false);
   }
   return m_smallCapsFontData;
 }

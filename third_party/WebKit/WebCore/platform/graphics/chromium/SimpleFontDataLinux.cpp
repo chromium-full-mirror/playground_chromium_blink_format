@@ -124,18 +124,15 @@ void SimpleFontData::platformCharWidthInit() {
   // charwidths are set in platformInit.
 }
 
-void SimpleFontData::platformDestroy() {
-  delete m_smallCapsFontData;
-  m_smallCapsFontData = 0;
-}
+void SimpleFontData::platformDestroy() {}
 
 SimpleFontData* SimpleFontData::smallCapsFontData(
     const FontDescription& fontDescription) const {
   if (!m_smallCapsFontData) {
     const float smallCapsSize =
         lroundf(fontDescription.computedSize() * smallCapsFraction);
-    m_smallCapsFontData =
-        new SimpleFontData(FontPlatformData(m_platformData, smallCapsSize));
+    m_smallCapsFontData = new SimpleFontData(
+        FontPlatformData(m_platformData, smallCapsSize), isCustomFont(), false);
   }
 
   return m_smallCapsFontData;

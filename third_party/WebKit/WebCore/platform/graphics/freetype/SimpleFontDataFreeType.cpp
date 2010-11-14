@@ -75,19 +75,18 @@ void SimpleFontData::platformCharWidthInit() {
   initCharWidths();
 }
 
-void SimpleFontData::platformDestroy() {
-  delete m_smallCapsFontData;
-  m_smallCapsFontData = 0;
-}
+void SimpleFontData::platformDestroy() {}
 
 SimpleFontData* SimpleFontData::smallCapsFontData(
     const FontDescription& fontDescription) const {
   // FIXME: I think we want to ask FontConfig for the right font again.
   if (!m_smallCapsFontData)
-    m_smallCapsFontData = new SimpleFontData(FontPlatformData(
-        cairo_scaled_font_get_font_face(m_platformData.scaledFont()),
-        0.70f * fontDescription.computedSize(), m_platformData.syntheticBold(),
-        m_platformData.syntheticOblique()));
+    m_smallCapsFontData = new SimpleFontData(
+        FontPlatformData(
+            cairo_scaled_font_get_font_face(m_platformData.scaledFont()),
+            0.70f * fontDescription.computedSize(),
+            m_platformData.syntheticBold(), m_platformData.syntheticOblique()),
+        isCustomFont(), false);
 
   return m_smallCapsFontData;
 }

@@ -312,7 +312,8 @@ static void disableLigatures(const SimpleFontData* fontData,
   // Pro is an example.
   // See bugzilla 5166.
   if ((typesettingFeatures & Ligatures) ||
-      fontData->platformData().allowsLigatures())
+      (fontData->orientation() == Horizontal &&
+       fontData->platformData().allowsLigatures()))
     return;
 
   ATSUFontFeatureType featureTypes[] = {kLigaturesType};

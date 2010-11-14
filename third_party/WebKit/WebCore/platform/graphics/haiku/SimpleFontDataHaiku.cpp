@@ -59,10 +59,7 @@ void SimpleFontData::platformCharWidthInit() {
   initCharWidths();
 }
 
-void SimpleFontData::platformDestroy() {
-  delete m_smallCapsFontData;
-  m_smallCapsFontData = 0;
-}
+void SimpleFontData::platformDestroy() {}
 
 SimpleFontData* SimpleFontData::smallCapsFontData(
     const FontDescription& fontDescription) const {
@@ -70,7 +67,8 @@ SimpleFontData* SimpleFontData::smallCapsFontData(
     FontDescription desc = FontDescription(fontDescription);
     desc.setSpecifiedSize(0.70f * fontDescription.computedSize());
     FontPlatformData fontPlatformData(desc, desc.family().family());
-    m_smallCapsFontData = new SimpleFontData(fontPlatformData);
+    m_smallCapsFontData =
+        new SimpleFontData(fontPlatformData, isCustomFont(), false);
   }
   return m_smallCapsFontData;
 }
