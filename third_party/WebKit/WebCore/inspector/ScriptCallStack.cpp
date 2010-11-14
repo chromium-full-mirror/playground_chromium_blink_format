@@ -66,11 +66,13 @@ bool ScriptCallStack::isEqual(ScriptCallStack* o) const {
   return true;
 }
 
+#if ENABLE(INSPECTOR)
 PassRefPtr<InspectorArray> ScriptCallStack::buildInspectorObject() const {
   RefPtr<InspectorArray> frames = InspectorArray::create();
   for (size_t i = 0; i < m_frames.size(); i++)
     frames->pushObject(m_frames.at(i).buildInspectorObject());
   return frames;
 }
+#endif
 
 }  // namespace WebCore
