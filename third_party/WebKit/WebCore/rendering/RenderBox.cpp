@@ -1509,11 +1509,10 @@ void RenderBox::computeRectForRepaint(RenderBoxModelObject* repaintContainer,
   if (!o)
     return;
 
-  IntPoint topLeft = rect.location();
   if (isWritingModeRoot() && !isPositioned())
-    topLeft.move(locationOffsetIncludingFlipping());
-  else
-    topLeft.move(x(), y());
+    flipForWritingMode(rect);
+  IntPoint topLeft = rect.location();
+  topLeft.move(x(), y());
 
   EPosition position = style()->position();
 
@@ -1524,10 +1523,7 @@ void RenderBox::computeRectForRepaint(RenderBoxModelObject* repaintContainer,
     fixed = position == FixedPosition;
     rect = layer()->transform()->mapRect(rect);
     topLeft = rect.location();
-    if (isWritingModeRoot() && !isPositioned())
-      topLeft.move(locationOffsetIncludingFlipping());
-    else
-      topLeft.move(x(), y());
+    topLeft.move(x(), y());
   } else if (position == FixedPosition)
     fixed = true;
 
