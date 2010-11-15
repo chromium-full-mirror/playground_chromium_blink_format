@@ -42,6 +42,7 @@
 #include "HiddenInputType.h"
 #include "ImageInputType.h"
 #include "IsIndexInputType.h"
+#include "LocalizedStrings.h"
 #include "MonthInputType.h"
 #include "NumberInputType.h"
 #include "PasswordInputType.h"
@@ -242,6 +243,10 @@ bool InputType::scaledStepValeuShouldBeInteger() const {
 
 double InputType::acceptableError(double) const {
   return 0;
+}
+
+String InputType::typeMismatchText() const {
+  return validationMessageTypeMismatchText();
 }
 
 RenderObject* InputType::createRenderer(RenderArena*,

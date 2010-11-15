@@ -212,6 +212,9 @@ class HTMLTextFormControlElement : public HTMLFormControlElementWithState {
   void setSelectionRange(int start, int end);
   PassRefPtr<Range> selection() const;
 
+  virtual int maxLength() const = 0;
+  virtual String value() const = 0;
+
  protected:
   HTMLTextFormControlElement(const QualifiedName&, Document*, HTMLFormElement*);
 

@@ -44,6 +44,7 @@ class EmailInputType : public BaseTextInputType {
   virtual const AtomicString& formControlType() const;
   virtual bool typeMismatchFor(const String&) const;
   virtual bool typeMismatch() const;
+  virtual String typeMismatchText() const;
 };
 
 }  // namespace WebCore

@@ -167,11 +167,15 @@ String localizedMediaTimeDescription(float);
 
 String validationMessageValueMissingText();
 String validationMessageTypeMismatchText();
+String validationMessageTypeMismatchForEmailText();
+String validationMessageTypeMismatchForMultipleEmailText();
+String validationMessageTypeMismatchForURLText();
 String validationMessagePatternMismatchText();
-String validationMessageTooLongText();
-String validationMessageRangeUnderflowText();
-String validationMessageRangeOverflowText();
-String validationMessageStepMismatchText();
+String validationMessageTooLongText(int valueLength, int maxLength);
+String validationMessageRangeUnderflowText(const String& minimum);
+String validationMessageRangeOverflowText(const String& maximum);
+String validationMessageStepMismatchText(const String& base,
+                                         const String& step);
 }
 
 #endif
