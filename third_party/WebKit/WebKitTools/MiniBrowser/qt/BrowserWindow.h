@@ -44,6 +44,7 @@ class BrowserWindow : public QMainWindow {
 
  public slots:
   BrowserWindow* newWindow(const QString& url = "about:blank");
+  void openLocation();
 
  protected slots:
   void changeLocation();
