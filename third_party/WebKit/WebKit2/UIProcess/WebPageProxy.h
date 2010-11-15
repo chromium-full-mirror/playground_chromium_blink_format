@@ -32,6 +32,7 @@
 #include "GenericCallback.h"
 #include "SharedMemory.h"
 #include "WKBase.h"
+#include "WebPageContextMenuClient.h"
 #include "WebContextMenuItemData.h"
 #include "WebEvent.h"
 #include "WebFindClient.h"
@@ -120,11 +121,12 @@ class WebPageProxy : public APIObject {
   WebInspectorProxy* inspector();
 
   void setPageClient(PageClient*);
+  void initializeContextMenuClient(const WKPageContextMenuClient*);
+  void initializeFindClient(const WKPageFindClient*);
+  void initializeFormClient(const WKPageFormClient*);
   void initializeLoaderClient(const WKPageLoaderClient*);
   void initializePolicyClient(const WKPagePolicyClient*);
-  void initializeFormClient(const WKPageFormClient*);
   void initializeUIClient(const WKPageUIClient*);
-  void initializeFindClient(const WKPageFindClient*);
   void relaunch();
 
   void initializeWebPage(const WebCore::IntSize&);
@@ -420,7 +422,8 @@ class WebPageProxy : public APIObject {
 
   // Context Menu.
   void showContextMenu(const WebCore::IntPoint&,
-                       const Vector<WebContextMenuItemData>& items);
+                       const Vector<WebContextMenuItemData>&,
+                       CoreIPC::ArgumentDecoder*);
 
   void takeFocus(bool direction);
   void setToolTip(const String&);
@@ -449,6 +452,7 @@ class WebPageProxy : public APIObject {
   WebFormClient m_formClient;
   WebUIClient m_uiClient;
   WebFindClient m_findClient;
+  WebPageContextMenuClient m_contextMenuClient;
 
   OwnPtr<DrawingAreaProxy> m_drawingArea;
   RefPtr<WebPageNamespace> m_pageNamespace;

@@ -153,6 +153,11 @@ void WebPageProxy::initializeFindClient(const WKPageFindClient* client) {
   m_findClient.initialize(client);
 }
 
+void WebPageProxy::initializeContextMenuClient(
+    const WKPageContextMenuClient* client) {
+  m_contextMenuClient.initialize(client);
+}
+
 void WebPageProxy::relaunch() {
   m_isValid = true;
   m_pageNamespace->context()->relaunchProcessIfNecessary();
@@ -1239,13 +1244,30 @@ void WebPageProxy::hidePopupMenu() {
 
 void WebPageProxy::showContextMenu(
     const WebCore::IntPoint& menuLocation,
-    const Vector<WebContextMenuItemData>& items) {
+    const Vector<WebContextMenuItemData>& proposedItems,
+    CoreIPC::ArgumentDecoder* arguments) {
+  RefPtr<APIObject> userData;
+  WebContextUserMessageDecoder messageDecoder(userData,
+                                              pageNamespace()->context());
+  if (!arguments->decode(messageDecoder))
+    return;
+
   if (m_activeContextMenu)
     m_activeContextMenu->hideContextMenu();
   else
     m_activeContextMenu = m_pageClient->createContextMenuProxy(this);
 
-  m_activeContextMenu->showContextMenu(menuLocation, items);
+  // Give the PageContextMenuClient one last swipe at changing the menu.
+  Vector<WebContextMenuItemData> items;
+
+  if (!m_contextMenuClient.getContextMenuFromProposedMenu(
+          this, proposedItems, items, userData.get())) {
+    m_activeContextMenu->showContextMenu(menuLocation, proposedItems);
+    return;
+  }
+
+  if (items.size())
+    m_activeContextMenu->showContextMenu(menuLocation, items);
 }
 
 void WebPageProxy::contextMenuItemSelected(const WebContextMenuItemData& item) {
