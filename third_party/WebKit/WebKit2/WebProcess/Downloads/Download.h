@@ -65,6 +65,7 @@ class Download : public CoreIPC::MessageSender<Download> {
   void didStart();
   void didReceiveResponse(const WebCore::ResourceResponse&);
   void didReceiveData(uint64_t length);
+  String decideDestinationWithSuggestedFilename(const String& filename);
   void didCreateDestination(const String& path);
   void didFinish();
 

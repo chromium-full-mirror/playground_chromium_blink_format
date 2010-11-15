@@ -116,6 +116,12 @@ typedef void (*WKContextDownloadDidReceiveDataCallback)(WKContextRef context,
                                                         WKDownloadRef download,
                                                         uint64_t length,
                                                         const void* clientInfo);
+typedef WKStringRef (
+    *WKContextDownloadDecideDestinationWithSuggestedFilenameCallback)(
+    WKContextRef context,
+    WKDownloadRef download,
+    WKStringRef filename,
+    const void* clientInfo);
 typedef void (*WKContextDownloadDidCreateDestinationCallback)(
     WKContextRef context,
     WKDownloadRef download,
@@ -131,6 +137,8 @@ struct WKContextDownloadClient {
   WKContextDownloadDidStartCallback didStart;
   WKContextDownloadDidReceiveResponseCallback didReceiveResponse;
   WKContextDownloadDidReceiveDataCallback didReceiveData;
+  WKContextDownloadDecideDestinationWithSuggestedFilenameCallback
+      decideDestinationWithSuggestedFilename;
   WKContextDownloadDidCreateDestinationCallback didCreateDestination;
   WKContextDownloadDidFinishCallback didFinish;
 };

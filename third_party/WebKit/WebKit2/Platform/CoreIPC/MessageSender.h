@@ -56,6 +56,25 @@ class MessageSender {
 
     return connection->sendMessage(messageID, argumentEncoder);
   }
+
+  template <typename U>
+  bool sendSync(const U& message,
+                const typename U::Reply& reply,
+                double timeout = Connection::NoTimeout) {
+    return sendSync(message, reply, static_cast<T*>(this)->destinationID(),
+                    timeout);
+  }
+
+  template <typename U>
+  bool sendSync(const U& message,
+                const typename U::Reply& reply,
+                uint64_t destinationID,
+                double timeout = Connection::NoTimeout) {
+    Connection* connection = static_cast<T*>(this)->connection();
+    ASSERT(connection);
+
+    return connection->sendSync(message, reply, destinationID, timeout);
+  }
 };
 
 }  // namespace CoreIPC
