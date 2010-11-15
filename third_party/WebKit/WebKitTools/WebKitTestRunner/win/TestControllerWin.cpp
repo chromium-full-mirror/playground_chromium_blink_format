@@ -94,6 +94,8 @@ static LONG WINAPI exceptionFilter(EXCEPTION_POINTERS*) {
   return EXCEPTION_CONTINUE_SEARCH;
 }
 
+void TestController::notifyDone() {}
+
 void TestController::platformInitialize() {
   ::SetUnhandledExceptionFilter(exceptionFilter);
 

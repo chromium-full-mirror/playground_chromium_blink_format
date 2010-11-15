@@ -30,11 +30,6 @@
 
 #include <cstdlib>
 #include <QCoreApplication>
-#if (QT_VERSION >= 0x040700)
-#include <QElapsedTimer>
-#else
-#include <QTime>
-#endif
 #include <QEventLoop>
 #include <QFileInfo>
 #include <QLibrary>
@@ -45,54 +40,45 @@
 
 namespace WTR {
 
-// With a bigger interval we would waste to much time
-// after the test had been finished.
-static const unsigned kTimerIntervalMS = 1;
-
-class RunUntilConditionLoop : public QObject {
+class TestControllerRunLoop : public QObject {
   Q_OBJECT
-
  public:
-  static void start(bool& done, int timeout) {
-    static RunUntilConditionLoop* instance = new RunUntilConditionLoop;
-    instance->run(done, timeout);
+  static TestControllerRunLoop* instance() {
+    static TestControllerRunLoop* result = new TestControllerRunLoop;
+    return result;
   }
 
- private:
-  RunUntilConditionLoop() {}
-
-  void run(bool& done, int timeout) {
-    m_condition = &done;
-    m_timeout = timeout;
-    m_elapsedTime.start();
-    m_timerID = startTimer(kTimerIntervalMS);
+  void start(int msec) {
+    m_timerID = startTimer(msec);
     ASSERT(m_timerID);
     m_eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
   }
 
-  virtual void timerEvent(QTimerEvent*) {
-    if (!*m_condition && m_elapsedTime.elapsed() < m_timeout)
-      return;
-
+  void stop() {
     killTimer(m_timerID);
-    m_eventLoop.exit();
+    m_eventLoop.quit();
+  }
+
+ private:
+  TestControllerRunLoop() {}
+
+  void timerEvent(QTimerEvent*) {
+    fprintf(stderr, "FAIL: TestControllerRunLoop timed out.\n");
+    stop();
   }
 
   QEventLoop m_eventLoop;
-  bool* m_condition;
   int m_timerID;
-  int m_timeout;
-#if (QT_VERSION >= 0x040700)
-  QElapsedTimer m_elapsedTime;
-#else
-  QTime m_elapsedTime;
-#endif
 };
+
+void TestController::notifyDone() {
+  TestControllerRunLoop::instance()->stop();
+}
 
 void TestController::platformInitialize() {}
 
-void TestController::platformRunUntil(bool& done, double timeout) {
-  RunUntilConditionLoop::start(done, static_cast<int>(timeout * 1000));
+void TestController::platformRunUntil(bool&, double timeout) {
+  TestControllerRunLoop::instance()->start(static_cast<int>(timeout * 1000));
 }
 
 static bool isExistingLibrary(const QString& path) {

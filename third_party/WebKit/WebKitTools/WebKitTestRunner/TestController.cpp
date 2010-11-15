@@ -409,6 +409,7 @@ void TestController::didFinishLoadForFrame(WKPageRef page, WKFrameRef frame) {
     return;
 
   m_doneResetting = true;
+  shared().notifyDone();
 }
 
 }  // namespace WTR

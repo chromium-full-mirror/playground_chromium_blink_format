@@ -56,6 +56,7 @@ class TestController {
   // Runs the run loop until `done` is true or the timeout elapses.
   enum TimeoutDuration { ShortTimeout, LongTimeout };
   void runUntil(bool& done, TimeoutDuration);
+  void notifyDone();
 
  private:
   void initialize(int argc, const char* argv[]);
