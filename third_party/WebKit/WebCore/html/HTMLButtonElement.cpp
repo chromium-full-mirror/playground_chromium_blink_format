@@ -168,6 +168,10 @@ void HTMLButtonElement::accessKeyAction(bool sendToAnyElement) {
   dispatchSimulatedClick(0, sendToAnyElement);
 }
 
+bool HTMLButtonElement::isURLAttribute(Attribute* attr) const {
+  return attr->name() == formactionAttr;
+}
+
 String HTMLButtonElement::value() const {
   return getAttribute(valueAttr);
 }

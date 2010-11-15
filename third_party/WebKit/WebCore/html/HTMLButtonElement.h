@@ -56,6 +56,7 @@ class HTMLButtonElement : public HTMLFormControlElement {
   virtual void setActivatedSubmit(bool flag);
 
   virtual void accessKeyAction(bool sendToAnyElement);
+  virtual bool isURLAttribute(Attribute*) const;
 
   virtual bool canStartSelection() const { return false; }
 
