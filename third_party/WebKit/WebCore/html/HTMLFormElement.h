@@ -138,6 +138,7 @@ class HTMLFormElement : public HTMLElement {
               bool processingUserGesture,
               FormSubmissionTrigger);
 
+  unsigned formElementIndexWithFormAttribute(HTMLFormControlElement*);
   unsigned formElementIndex(HTMLFormControlElement*);
   // Returns true if the submission should be proceeded.
   bool validateInteractively(Event*);
@@ -156,6 +157,8 @@ class HTMLFormElement : public HTMLElement {
 
   CheckedRadioButtons m_checkedRadioButtons;
 
+  unsigned m_associatedElementsBeforeIndex;
+  unsigned m_associatedElementsAfterIndex;
   Vector<HTMLFormControlElement*> m_associatedElements;
   Vector<HTMLImageElement*> m_imageElements;
 

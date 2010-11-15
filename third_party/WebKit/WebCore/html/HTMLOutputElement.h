@@ -45,7 +45,6 @@ class HTMLOutputElement : public HTMLFormControlElement {
 
   virtual bool willValidate() const { return false; }
 
-  void setForm(const String&);
   String value() const;
   void setValue(const String&);
   String defaultValue() const;
