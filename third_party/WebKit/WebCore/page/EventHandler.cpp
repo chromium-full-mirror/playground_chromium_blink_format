@@ -2575,7 +2575,7 @@ void EventHandler::handleKeyboardSelectionMovement(KeyboardEvent* event) {
   if (!event)
     return;
 
-  String key = event->keyIdentifier();
+  const String& key = event->keyIdentifier();
   bool isShifted = event->getModifierState("Shift");
   bool isOptioned = event->getModifierState("Alt");
   bool isCommanded = event->getModifierState("Meta");

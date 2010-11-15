@@ -93,7 +93,7 @@ class KeyboardEvent : public UIEventWithKeyState {
                          bool metaKey,
                          bool altGraphKey = false);
 
-  String keyIdentifier() const { return m_keyIdentifier; }
+  const String& keyIdentifier() const { return m_keyIdentifier; }
   unsigned keyLocation() const { return m_keyLocation; }
 
   bool getModifierState(const String& keyIdentifier) const;

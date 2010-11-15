@@ -585,7 +585,8 @@ void SelectElement::menuListDefaultEventHandler(SelectElementData& data,
     if (!element->renderer() || !event->isKeyboardEvent())
       return;
 
-    String keyIdentifier = static_cast<KeyboardEvent*>(event)->keyIdentifier();
+    const String& keyIdentifier =
+        static_cast<KeyboardEvent*>(event)->keyIdentifier();
     bool handled = false;
 
 #if ARROW_KEYS_POP_MENU
@@ -837,15 +838,16 @@ void SelectElement::listBoxDefaultEventHandler(SelectElementData& data,
              element->document()
                      ->frame()
                      ->eventHandler()
-                     ->autoscrollRenderer() != element->renderer())
+                     ->autoscrollRenderer() != element->renderer()) {
     // This makes sure we fire dispatchFormControlChangeEvent for a single
     // click.  For drag selection, onChange will fire when the autoscroll timer
     // stops.
     listBoxOnChange(data, element);
-  else if (event->type() == eventNames().keydownEvent) {
+  } else if (event->type() == eventNames().keydownEvent) {
     if (!event->isKeyboardEvent())
       return;
-    String keyIdentifier = static_cast<KeyboardEvent*>(event)->keyIdentifier();
+    const String& keyIdentifier =
+        static_cast<KeyboardEvent*>(event)->keyIdentifier();
 
     int endIndex = 0;
     if (data.activeSelectionEndIndex() < 0) {
