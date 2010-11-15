@@ -75,6 +75,9 @@ class TiledDrawingAreaProxy : public DrawingAreaProxy {
 
   void waitUntilUpdatesComplete();
 
+  void takeSnapshot(const WebCore::IntSize& size,
+                    const WebCore::IntRect& contentsRect);
+
 #if USE(ACCELERATED_COMPOSITING)
   virtual void attachCompositingContext(uint32_t /* contextID */) {}
   virtual void detachCompositingContext() {}
@@ -110,6 +113,8 @@ class TiledDrawingAreaProxy : public DrawingAreaProxy {
   WebPageProxy* page();
   WebCore::IntRect webViewVisibleRect();
   void updateWebView(const Vector<WebCore::IntRect>& paintedArea);
+
+  void snapshotTaken(UpdateChunk&);
 
   // DrawingAreaProxy
   virtual void didReceiveMessage(CoreIPC::Connection*,

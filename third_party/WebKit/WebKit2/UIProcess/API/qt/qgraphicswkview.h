@@ -47,6 +47,8 @@ class QWEBKIT_EXPORT QGraphicsWKView : public QGraphicsWidget {
   virtual QSizeF sizeHint(Qt::SizeHint, const QSizeF&) const;
   virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const;
 
+  void takeSnapshot(const QSize& size, const QRect& documentRect);
+
   // FIXME: should not be public
   virtual QRectF visibleRect() const;
 
@@ -60,6 +62,7 @@ class QWEBKIT_EXPORT QGraphicsWKView : public QGraphicsWidget {
   Q_SIGNAL void loadProgress(int progress);
   Q_SIGNAL void initialLayoutCompleted();
   Q_SIGNAL void urlChanged(const QUrl&);
+  Q_SIGNAL void snapshotTaken(const QImage&);
 
  public Q_SLOTS:
   void back();

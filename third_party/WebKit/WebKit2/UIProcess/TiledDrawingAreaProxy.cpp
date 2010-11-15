@@ -161,6 +161,13 @@ void TiledDrawingAreaProxy::didReceiveMessage(
       tileBufferUpdateComplete();
       break;
     }
+    case DrawingAreaProxyMessage::SnapshotTaken: {
+      UpdateChunk chunk;
+      if (!arguments->decode(CoreIPC::Out(chunk)))
+        return;
+      snapshotTaken(chunk);
+      break;
+    }
     default:
       ASSERT_NOT_REACHED();
   }
@@ -230,6 +237,13 @@ void TiledDrawingAreaProxy::setKeepAndCoverAreaMultipliers(
   m_keepAreaMultiplier = keepMultiplier;
   m_coverAreaMultiplier = coverMultiplier;
   startTileCreationTimer();
+}
+
+void TiledDrawingAreaProxy::takeSnapshot(const IntSize& size,
+                                         const IntRect& contentsRect) {
+  WebPageProxy* page = this->page();
+  page->process()->send(DrawingAreaMessage::TakeSnapshot, page->pageID(),
+                        CoreIPC::Out(size, contentsRect));
 }
 
 void TiledDrawingAreaProxy::invalidate(const IntRect& contentsDirtyRect) {
