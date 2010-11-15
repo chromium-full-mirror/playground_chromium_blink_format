@@ -46,9 +46,13 @@ class WebDownloadClient : public APIClient<WKContextDownloadClient> {
                           DownloadProxy*,
                           const WebCore::ResourceResponse&);
   void didReceiveData(WebContext*, DownloadProxy*, uint64_t length);
+  bool shouldDecodeSourceDataOfMIMEType(WebContext*,
+                                        DownloadProxy*,
+                                        const String& mimeType);
   String decideDestinationWithSuggestedFilename(WebContext*,
                                                 DownloadProxy*,
-                                                const String& filename);
+                                                const String& filename,
+                                                bool& allowOverwrite);
   void didCreateDestination(WebContext*, DownloadProxy*, const String& path);
   void didFinish(WebContext*, DownloadProxy*);
 };

@@ -77,15 +77,25 @@ void DownloadProxy::didReceiveData(uint64_t length) {
   m_webContext->downloadClient().didReceiveData(m_webContext, this, length);
 }
 
+void DownloadProxy::shouldDecodeSourceDataOfMIMEType(const String& mimeType,
+                                                     bool& result) {
+  if (!m_webContext)
+    return;
+
+  result = m_webContext->downloadClient().shouldDecodeSourceDataOfMIMEType(
+      m_webContext, this, mimeType);
+}
+
 void DownloadProxy::decideDestinationWithSuggestedFilename(
     const String& filename,
-    String& destination) {
+    String& destination,
+    bool& allowOverwrite) {
   if (!m_webContext)
     return;
 
   destination =
       m_webContext->downloadClient().decideDestinationWithSuggestedFilename(
-          m_webContext, this, filename);
+          m_webContext, this, filename, allowOverwrite);
 }
 
 void DownloadProxy::didCreateDestination(const String& path) {
