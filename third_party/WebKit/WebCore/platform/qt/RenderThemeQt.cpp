@@ -231,8 +231,31 @@ bool RenderThemeQt::supportsHover(const RenderStyle*) const {
   return true;
 }
 
-bool RenderThemeQt::supportsFocusRing(const RenderStyle*) const {
-  return true;  // Qt provides this through the style
+bool RenderThemeQt::supportsFocusRing(const RenderStyle* style) const {
+  switch (style->appearance()) {
+    case CheckboxPart:
+    case RadioPart:
+    case PushButtonPart:
+    case SquareButtonPart:
+    case ButtonPart:
+    case ButtonBevelPart:
+    case ListboxPart:
+    case ListItemPart:
+    case MenulistPart:
+    case MenulistButtonPart:
+    case SliderHorizontalPart:
+    case SliderVerticalPart:
+    case SliderThumbHorizontalPart:
+    case SliderThumbVerticalPart:
+    case SearchFieldPart:
+    case SearchFieldResultsButtonPart:
+    case SearchFieldCancelButtonPart:
+    case TextFieldPart:
+    case TextAreaPart:
+      return true;
+    default:
+      return false;
+  }
 }
 
 int RenderThemeQt::baselinePosition(const RenderObject* o) const {
