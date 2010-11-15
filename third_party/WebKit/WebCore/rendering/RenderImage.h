@@ -57,6 +57,8 @@ class RenderImage : public RenderReplaced {
   void highQualityRepaintTimerFired(Timer<RenderImage>*);
 
  protected:
+  virtual void styleDidChange(StyleDifference, const RenderStyle*);
+
   virtual void imageChanged(WrappedImagePtr, const IntRect* = 0);
 
   virtual void paintIntoRect(GraphicsContext*, const IntRect&);
@@ -93,13 +95,16 @@ class RenderImage : public RenderReplaced {
   virtual int computeReplacedLogicalWidth(bool includeMaxWidth = true) const;
   virtual int computeReplacedLogicalHeight() const;
 
+  IntSize imageSizeForError(CachedImage*) const;
+  void imageDimensionsChanged(bool imageSizeChanged, const IntRect* = 0);
+
   int calcAspectRatioLogicalWidth() const;
   int calcAspectRatioLogicalHeight() const;
 
- private:
   // Text to display as long as the image isn't available.
   String m_altText;
   OwnPtr<RenderImageResource> m_imageResource;
+  bool m_needsToSetSizeForAltText;
 
   friend class RenderImageScaleObserver;
 };
