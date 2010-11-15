@@ -401,6 +401,9 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
   bool m_initialized;
   bool m_renderDirectlyToWebView;
   bool m_isGLES2;
+  bool m_haveEXTFramebufferObject;
+  bool m_haveEXTFramebufferMultisample;
+  bool m_haveANGLEFramebufferMultisample;
 
   unsigned int m_texture;
   unsigned int m_fbo;
