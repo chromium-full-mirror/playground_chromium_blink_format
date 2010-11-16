@@ -2253,7 +2253,7 @@ void QWebPage::setUserPermission(QWebFrame* frame,
 #if ENABLE(NOTIFICATIONS)
       if (policy == PermissionGranted)
         NotificationPresenterClientQt::notificationPresenter()
-            ->allowNotificationForFrame(frame);
+            ->allowNotificationForFrame(frame->d->frame);
 #endif
       break;
     case GeolocationPermissionDomain:

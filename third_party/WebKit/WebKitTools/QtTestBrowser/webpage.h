@@ -67,9 +67,6 @@ class WebPage : public QWebPage {
   bool shouldInterruptJavaScript();
   void authenticationRequired(QNetworkReply*, QAuthenticator*);
   void requestPermission(QWebFrame* frame, QWebPage::PermissionDomain domain);
-  void checkPermission(QWebFrame* frame,
-                       QWebPage::PermissionDomain domain,
-                       QWebPage::PermissionPolicy& policy);
   void cancelRequestsForPermission(QWebFrame* frame,
                                    QWebPage::PermissionDomain domain);
 

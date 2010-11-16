@@ -399,9 +399,6 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
   void requestPermissionFromUser(QWebFrame* frame,
                                  QWebPage::PermissionDomain domain);
-  void checkPermissionFromUser(QWebFrame* frame,
-                               QWebPage::PermissionDomain domain,
-                               QWebPage::PermissionPolicy& policy);
   void cancelRequestsForPermission(QWebFrame* frame,
                                    QWebPage::PermissionDomain domain);
 

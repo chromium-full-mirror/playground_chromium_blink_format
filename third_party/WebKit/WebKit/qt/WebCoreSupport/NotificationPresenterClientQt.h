@@ -48,6 +48,7 @@ class QWebPage;
 namespace WebCore {
 
 class Document;
+class Frame;
 class ScriptExecutionContext;
 
 class NotificationWrapper : public QObject, public QWebNotificationData {
@@ -97,7 +98,7 @@ class NotificationPresenterClientQt : public NotificationPresenter {
 
   void cancel(NotificationWrapper*);
 
-  void allowNotificationForFrame(QWebFrame*);
+  void allowNotificationForFrame(Frame*);
 
   static bool dumpNotification;
 
@@ -125,6 +126,8 @@ class NotificationPresenterClientQt : public NotificationPresenter {
     QList<RefPtr<VoidCallback>> m_callbacks;
   };
   QHash<ScriptExecutionContext*, CallbacksInfo> m_pendingPermissionRequests;
+  QHash<ScriptExecutionContext*, NotificationPresenter::Permission>
+      m_cachedPermissions;
 
   NotificationsQueue m_notifications;
   QtPlatformPlugin m_platformPlugin;
