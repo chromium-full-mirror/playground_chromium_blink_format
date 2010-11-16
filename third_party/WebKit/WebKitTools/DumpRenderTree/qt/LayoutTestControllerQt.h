@@ -73,6 +73,7 @@ class LayoutTestController : public QObject {
   bool shouldDumpTitleChanges() const { return m_dumpTitleChanges; }
   bool waitForPolicy() const { return m_waitForPolicy; }
   bool ignoreReqestForPermission() const { return m_ignoreDesktopNotification; }
+  bool isPrinting() { return m_isPrinting; }
 
   void reset();
 
@@ -99,6 +100,7 @@ class LayoutTestController : public QObject {
   void dumpDatabaseCallbacks() { m_dumpDatabaseCallbacks = true; }
   void dumpStatusCallbacks() { m_dumpStatusCallbacks = true; }
   void setCanOpenWindows() { m_canOpenWindows = true; }
+  void setPrinting() { m_isPrinting = true; }
   void waitUntilDone();
   QString counterValueForElementById(const QString& id);
   int webHistoryItemCount();
@@ -314,6 +316,7 @@ class LayoutTestController : public QObject {
   bool m_globalFlag;
   bool m_userStyleSheetEnabled;
   bool m_isGeolocationPermissionSet;
+  bool m_isPrinting;
   bool m_geolocationPermission;
 
   QUrl m_userStyleSheetLocation;
