@@ -259,6 +259,12 @@ static void PopupMenuPositionFunc(GtkMenu* menu,
   *pushIn = FALSE;
 }
 
+static Node* getFocusedNode(Frame* frame) {
+  if (Document* doc = frame->document())
+    return doc->focusedNode();
+  return 0;
+}
+
 static gboolean webkit_web_view_forward_context_menu_event(
     WebKitWebView* webView,
     const PlatformMouseEvent& event) {
@@ -357,11 +363,19 @@ static gboolean webkit_web_view_popup_menu_handler(GtkWidget* widget) {
 
   if (!start.node() || !end.node() ||
       (frame->selection()->selection().isCaret() &&
-       !frame->selection()->selection().isContentEditable()))
-    location = IntPoint(rightAligned ? view->contentsWidth() - contextMenuMargin
-                                     : contextMenuMargin,
-                        contextMenuMargin);
-  else {
+       !frame->selection()->selection().isContentEditable())) {
+    // If there's a focused elment, use its location.
+    if (Node* focusedNode = getFocusedNode(frame)) {
+      IntRect focusedNodeRect = focusedNode->getRect();
+      location =
+          IntPoint(rightAligned ? focusedNodeRect.right() : focusedNodeRect.x(),
+                   focusedNodeRect.bottom());
+    } else
+      location =
+          IntPoint(rightAligned ? view->contentsWidth() - contextMenuMargin
+                                : contextMenuMargin,
+                   contextMenuMargin);
+  } else {
     RenderObject* renderer = start.node()->renderer();
     if (!renderer)
       return FALSE;
