@@ -96,14 +96,6 @@ struct LineInfo {
   int32_t lineNumber;
 };
 
-// Both op_construct and op_instanceof require a use of op_get_by_id to get
-// the prototype property from an object. The exception messages for exceptions
-// thrown by these instances op_get_by_id need to reflect this.
-struct GetByIdExceptionInfo {
-  unsigned bytecodeOffset : 31;
-  bool isOpCreateThis : 1;
-};
-
 #if ENABLE(JIT)
 struct CallLinkInfo {
   CallLinkInfo() : callee(0), position(0), hasSeenShouldRepatch(0) {}
@@ -247,7 +239,6 @@ inline ArrayType* binaryChop(ArrayType* array, size_t size, KeyType key) {
 struct ExceptionInfo : FastAllocBase {
   Vector<ExpressionRangeInfo> m_expressionInfo;
   Vector<LineInfo> m_lineInfo;
-  Vector<GetByIdExceptionInfo> m_getByIdExceptionInfo;
 
 #if ENABLE(JIT)
   Vector<CallReturnOffsetToBytecodeOffset> m_callReturnIndexVector;
@@ -309,9 +300,6 @@ class CodeBlock : public FastAllocBase {
                                         int& divot,
                                         int& startOffset,
                                         int& endOffset);
-  bool getByIdExceptionInfoForBytecodeOffset(CallFrame*,
-                                             unsigned bytecodeOffset,
-                                             OpcodeID&);
 
 #if ENABLE(JIT)
   void addCaller(CallLinkInfo* caller) {
@@ -503,10 +491,6 @@ class CodeBlock : public FastAllocBase {
   void addExpressionInfo(const ExpressionRangeInfo& expressionInfo) {
     ASSERT(m_exceptionInfo);
     m_exceptionInfo->m_expressionInfo.append(expressionInfo);
-  }
-  void addGetByIdExceptionInfo(const GetByIdExceptionInfo& info) {
-    ASSERT(m_exceptionInfo);
-    m_exceptionInfo->m_getByIdExceptionInfo.append(info);
   }
 
   size_t numberOfLineInfos() const {

@@ -494,7 +494,6 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
     emitOpcode(op_get_callee);
     instructions().append(func->index());
     // Load prototype.
-    emitGetByIdExceptionInfo(op_create_this);
     emitGetById(funcProto.get(), func.get(),
                 globalData()->propertyNames->prototype);
 
@@ -1218,6 +1217,11 @@ bool BytecodeGenerator::findScopedProperty(const Identifier& property,
   if (++iter == end)
     globalObject = scope;
   return true;
+}
+
+void BytecodeGenerator::emitCheckHasInstance(RegisterID* base) {
+  emitOpcode(op_check_has_instance);
+  instructions().append(base->index());
 }
 
 RegisterID* BytecodeGenerator::emitInstanceOf(RegisterID* dst,

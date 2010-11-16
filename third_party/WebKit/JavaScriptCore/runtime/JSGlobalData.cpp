@@ -133,8 +133,6 @@ JSGlobalData::JSGlobalData(GlobalDataType globalDataType,
       strictEvalActivationStructure(
           StrictEvalActivation::createStructure(jsNull())),
       stringStructure(JSString::createStructure(jsNull())),
-      notAnObjectErrorStubStructure(
-          JSNotAnObjectErrorStub::createStructure(jsNull())),
       notAnObjectStructure(JSNotAnObject::createStructure(jsNull())),
       propertyNameIteratorStructure(
           JSPropertyNameIterator::createStructure(jsNull())),
