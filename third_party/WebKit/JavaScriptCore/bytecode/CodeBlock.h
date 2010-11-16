@@ -304,11 +304,11 @@ class CodeBlock : public FastAllocBase {
 
   HandlerInfo* handlerForBytecodeOffset(unsigned bytecodeOffset);
   int lineNumberForBytecodeOffset(CallFrame*, unsigned bytecodeOffset);
-  int expressionRangeForBytecodeOffset(CallFrame*,
-                                       unsigned bytecodeOffset,
-                                       int& divot,
-                                       int& startOffset,
-                                       int& endOffset);
+  void expressionRangeForBytecodeOffset(CallFrame*,
+                                        unsigned bytecodeOffset,
+                                        int& divot,
+                                        int& startOffset,
+                                        int& endOffset);
   bool getByIdExceptionInfoForBytecodeOffset(CallFrame*,
                                              unsigned bytecodeOffset,
                                              OpcodeID&);

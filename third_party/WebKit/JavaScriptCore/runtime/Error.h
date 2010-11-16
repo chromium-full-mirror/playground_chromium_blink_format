@@ -60,27 +60,11 @@ JSObject* addErrorInfo(JSGlobalData*,
                        JSObject* error,
                        int line,
                        const SourceCode&);
-JSObject* addErrorInfo(JSGlobalData*,
-                       JSObject* error,
-                       int line,
-                       const SourceCode&,
-                       int divotPoint,
-                       int startOffset,
-                       int endOffset,
-                       bool withCaret = true);
 // ExecState wrappers.
 JSObject* addErrorInfo(ExecState*,
                        JSObject* error,
                        int line,
                        const SourceCode&);
-JSObject* addErrorInfo(ExecState*,
-                       JSObject* error,
-                       int line,
-                       const SourceCode&,
-                       int divotPoint,
-                       int startOffset,
-                       int endOffset,
-                       bool withCaret = true);
 
 // Methods to throw Errors.
 JSValue throwError(ExecState*, JSValue);

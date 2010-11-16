@@ -45,10 +45,7 @@ using namespace Unicode;
 namespace JSC {
 #if ENABLE(JIT)
 EncodedJSValue JSC_HOST_CALL callHostFunctionAsConstructor(ExecState* exec) {
-  CodeBlock* codeBlock = exec->callerFrame()->codeBlock();
-  unsigned vPCIndex = codeBlock->bytecodeOffset(exec, exec->returnPC());
-  return throwVMError(exec, createNotAConstructorError(exec, exec->callee(),
-                                                       vPCIndex, codeBlock));
+  return throwVMError(exec, createNotAConstructorError(exec, exec->callee()));
 }
 #endif
 
