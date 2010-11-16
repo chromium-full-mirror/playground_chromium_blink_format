@@ -99,18 +99,6 @@ class CSSPrimitiveValue : public CSSValue {
     CSS_REMS = 109
   };
 
-  // This enum follows the CSSParser::Units enum augmented with UNIT_FREQUENCY
-  // for frequencies.
-  enum UnitCategory {
-    UNumber,
-    UPercent,
-    ULength,
-    UAngle,
-    UTime,
-    UFrequency,
-    UOther
-  };
-
   static bool isUnitTypeLength(int type) {
     return (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
             type < CSSPrimitiveValue::CSS_DEG) ||
@@ -177,25 +165,25 @@ class CSSPrimitiveValue : public CSSValue {
   // use with care!!!
   void setPrimitiveType(unsigned short type) { m_type = type; }
 
-  double getDoubleValue(unsigned short unitType, ExceptionCode&) const;
-  double getDoubleValue(unsigned short unitType) const;
+  double getDoubleValue(unsigned short unitType, ExceptionCode&);
+  double getDoubleValue(unsigned short unitType);
   double getDoubleValue() const { return m_value.num; }
 
   void setFloatValue(unsigned short unitType,
                      double floatValue,
                      ExceptionCode&);
-  float getFloatValue(unsigned short unitType, ExceptionCode& ec) const {
+  float getFloatValue(unsigned short unitType, ExceptionCode& ec) {
     return static_cast<float>(getDoubleValue(unitType, ec));
   }
-  float getFloatValue(unsigned short unitType) const {
+  float getFloatValue(unsigned short unitType) {
     return static_cast<float>(getDoubleValue(unitType));
   }
   float getFloatValue() const { return static_cast<float>(m_value.num); }
 
-  int getIntValue(unsigned short unitType, ExceptionCode& ec) const {
+  int getIntValue(unsigned short unitType, ExceptionCode& ec) {
     return static_cast<int>(getDoubleValue(unitType, ec));
   }
-  int getIntValue(unsigned short unitType) const {
+  int getIntValue(unsigned short unitType) {
     return static_cast<int>(getDoubleValue(unitType));
   }
   int getIntValue() const { return static_cast<int>(m_value.num); }
@@ -226,7 +214,7 @@ class CSSPrimitiveValue : public CSSValue {
     return m_type != CSS_DASHBOARD_REGION ? 0 : m_value.region;
   }
 
-  int getIdent() const;
+  int getIdent();
   template <typename T>
   inline operator T() const;  // Defined in CSSPrimitiveValueMappings.h
 
@@ -273,14 +261,11 @@ class CSSPrimitiveValue : public CSSValue {
   static PassRefPtr<CSSPrimitiveValue> createUncached(double value,
                                                       UnitTypes type);
 
-  static UnitTypes canonicalUnitTypeForCategory(UnitCategory category);
-
   void init(PassRefPtr<Counter>);
   void init(PassRefPtr<Rect>);
   void init(PassRefPtr<Pair>);
   void init(PassRefPtr<DashboardRegion>);  // FIXME: Dashboard region should not
                                            // be a primitive value.
-  bool getDoubleValueInternal(UnitTypes targetUnitType, double* result) const;
 
   virtual bool isPrimitiveValue() const { return true; }
 
