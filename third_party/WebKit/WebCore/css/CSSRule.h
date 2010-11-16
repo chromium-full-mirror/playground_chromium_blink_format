@@ -43,8 +43,8 @@ class CSSRule : public StyleBase {
     MEDIA_RULE,
     FONT_FACE_RULE,
     PAGE_RULE,
-    VARIABLES_RULE,
-    WEBKIT_KEYFRAMES_RULE,
+    // 7 used to be VARIABLES_RULE
+    WEBKIT_KEYFRAMES_RULE = 8,
     WEBKIT_KEYFRAME_RULE
   };
 

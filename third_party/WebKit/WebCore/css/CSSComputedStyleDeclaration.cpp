@@ -1755,7 +1755,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyWebkitTransformOriginY:
     case CSSPropertyWebkitTransformOriginZ:
     case CSSPropertyWebkitTransition:
-    case CSSPropertyWebkitVariableDeclarationBlock:
       break;
 #if ENABLE(SVG)
     case CSSPropertyClipPath:

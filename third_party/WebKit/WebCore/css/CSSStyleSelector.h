@@ -51,8 +51,6 @@ class CSSSelector;
 class CSSStyleRule;
 class CSSStyleSheet;
 class CSSValue;
-class CSSVariableDependentValue;
-class CSSVariablesRule;
 class ContainerNode;
 class DataGridColumn;
 class Document;
@@ -210,12 +208,6 @@ class CSSStyleSelector : public Noncopyable {
   void visitedStateChanged(LinkHash visitedHash) {
     m_checker.visitedStateChanged(visitedHash);
   }
-
-  void addVariables(CSSVariablesRule* variables);
-  CSSValue* resolveVariableDependentValue(CSSVariableDependentValue*);
-  void resolveVariablesForDeclaration(CSSMutableStyleDeclaration* decl,
-                                      CSSMutableStyleDeclaration* newDecl,
-                                      HashSet<String>& usedBlockVariables);
 
   void addKeyframeStyle(PassRefPtr<WebKitCSSKeyframesRule> rule);
   void addPageStyle(PassRefPtr<CSSPageRule>);
@@ -411,10 +403,6 @@ class CSSStyleSelector : public Noncopyable {
   HashSet<AtomicStringImpl*> m_selectorAttrs;
   Vector<CSSMutableStyleDeclaration*> m_additionalAttributeStyleDecls;
   Vector<MediaQueryResult*> m_viewportDependentMediaQueryResults;
-
-  HashMap<String, CSSVariablesRule*> m_variablesMap;
-  HashMap<CSSMutableStyleDeclaration*, RefPtr<CSSMutableStyleDeclaration>>
-      m_resolvedVariablesDeclarations;
 };
 
 class CSSRuleData : public Noncopyable {

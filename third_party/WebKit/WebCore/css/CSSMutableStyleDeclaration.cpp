@@ -40,7 +40,6 @@ namespace WebCore {
 
 CSSMutableStyleDeclaration::CSSMutableStyleDeclaration()
     : m_node(0),
-      m_variableDependentValueCount(0),
       m_strictParsing(false)
 #ifndef NDEBUG
       ,
@@ -52,7 +51,6 @@ CSSMutableStyleDeclaration::CSSMutableStyleDeclaration()
 CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(CSSRule* parent)
     : CSSStyleDeclaration(parent),
       m_node(0),
-      m_variableDependentValueCount(0),
       m_strictParsing(!parent || parent->useStrictParsing())
 #ifndef NDEBUG
       ,
@@ -63,12 +61,10 @@ CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(CSSRule* parent)
 
 CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(
     CSSRule* parent,
-    const Vector<CSSProperty>& properties,
-    unsigned variableDependentValueCount)
+    const Vector<CSSProperty>& properties)
     : CSSStyleDeclaration(parent),
       m_properties(properties),
       m_node(0),
-      m_variableDependentValueCount(variableDependentValueCount),
       m_strictParsing(!parent || parent->useStrictParsing())
 #ifndef NDEBUG
       ,
@@ -85,7 +81,6 @@ CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(
     int numProperties)
     : CSSStyleDeclaration(parent),
       m_node(0),
-      m_variableDependentValueCount(0),
       m_strictParsing(!parent || parent->useStrictParsing())
 #ifndef NDEBUG
       ,
@@ -97,9 +92,7 @@ CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(
   for (int i = 0; i < numProperties; ++i) {
     const CSSProperty* property = properties[i];
     ASSERT(property);
-    if (property->value()->isVariableDependentValue())
-      m_variableDependentValueCount++;
-    else if (candidates.contains(property->id()))
+    if (candidates.contains(property->id()))
       removeProperty(properties[i]->id(), false);
     m_properties.append(*property);
     if (!getPropertyPriority(property->id()) && !property->isImportant())
@@ -489,9 +482,6 @@ String CSSMutableStyleDeclaration::removeProperty(int propertyID,
 
   String value = returnText ? foundProperty->value()->cssText() : String();
 
-  if (foundProperty->value()->isVariableDependentValue())
-    m_variableDependentValueCount--;
-
   // A more efficient removal strategy would involve marking entries as empty
   // and sweeping them when the vector grows too big.
   m_properties.remove(foundProperty - m_properties.data());
@@ -660,8 +650,6 @@ void CSSMutableStyleDeclaration::addParsedProperties(
       removeProperty(properties[i]->id(), false);
       ASSERT(properties[i]);
       m_properties.append(*properties[i]);
-      if (properties[i]->value()->isVariableDependentValue())
-        m_variableDependentValueCount++;
     }
   }
   // FIXME: This probably should have a call to setNeedsStyleRecalc() if
@@ -891,8 +879,7 @@ CSSMutableStyleDeclaration::makeMutable() {
 
 PassRefPtr<CSSMutableStyleDeclaration> CSSMutableStyleDeclaration::copy()
     const {
-  return adoptRef(new CSSMutableStyleDeclaration(
-      0, m_properties, m_variableDependentValueCount));
+  return adoptRef(new CSSMutableStyleDeclaration(0, m_properties));
 }
 
 const CSSProperty* CSSMutableStyleDeclaration::findPropertyWithId(
