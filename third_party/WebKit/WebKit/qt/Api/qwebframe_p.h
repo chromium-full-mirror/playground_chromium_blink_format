@@ -82,8 +82,7 @@ class QWebFramePrivate {
         ,
         rootGraphicsLayer(0)
 #endif
-        ,
-        zoomTextOnly(false) {
+  {
   }
   void init(QWebFrame* qframe, QWebFrameData* frameData);
   void setPage(QWebPage*);
@@ -124,7 +123,6 @@ class QWebFramePrivate {
   WebCore::TextureMapperContentLayer* rootGraphicsLayer;
   OwnPtr<WebCore::TextureMapper> textureMapper;
 #endif
-  bool zoomTextOnly;
 };
 
 class QWebHitTestResultPrivate {

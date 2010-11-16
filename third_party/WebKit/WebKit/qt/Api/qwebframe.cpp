@@ -1211,8 +1211,9 @@ void QWebFrame::setTextSizeMultiplier(qreal factor) {
     Returns the value of the multiplier used to scale the text in a Web frame.
 */
 qreal QWebFrame::textSizeMultiplier() const {
-  return d->zoomTextOnly ? d->frame->textZoomFactor()
-                         : d->frame->pageZoomFactor();
+  return page()->settings()->testAttribute(QWebSettings::ZoomTextOnly)
+             ? d->frame->textZoomFactor()
+             : d->frame->pageZoomFactor();
 }
 
 /*!
@@ -1222,15 +1223,16 @@ qreal QWebFrame::textSizeMultiplier() const {
 */
 
 void QWebFrame::setZoomFactor(qreal factor) {
-  if (d->zoomTextOnly)
+  if (page()->settings()->testAttribute(QWebSettings::ZoomTextOnly))
     d->frame->setTextZoomFactor(factor);
   else
     d->frame->setPageZoomFactor(factor);
 }
 
 qreal QWebFrame::zoomFactor() const {
-  return d->zoomTextOnly ? d->frame->textZoomFactor()
-                         : d->frame->pageZoomFactor();
+  return page()->settings()->testAttribute(QWebSettings::ZoomTextOnly)
+             ? d->frame->textZoomFactor()
+             : d->frame->pageZoomFactor();
 }
 
 /*!
