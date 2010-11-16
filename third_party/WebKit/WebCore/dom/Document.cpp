@@ -1551,6 +1551,10 @@ void Document::unscheduleStyleRecalc() {
   m_pendingStyleRecalcShouldForce = false;
 }
 
+bool Document::isPendingStyleRecalc() const {
+  return m_styleRecalcTimer.isActive() && !m_inStyleRecalc;
+}
+
 void Document::styleRecalcTimerFired(Timer<Document>*) {
   updateStyleIfNeeded();
 }
