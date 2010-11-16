@@ -49,8 +49,6 @@
 #include <wtf/OwnPtr.h>
 
 namespace WebKit {
-class WebDeviceOrientationClient;
-class WebDeviceOrientationClientMock;
 class WebSpeechInputController;
 class WebSpeechInputControllerMock;
 class WebSpeechInputListener;
@@ -345,7 +343,6 @@ class LayoutTestController : public CppBoundClass {
 
   WebKit::WebSpeechInputController* speechInputController(
       WebKit::WebSpeechInputListener*);
-  WebKit::WebDeviceOrientationClient* deviceOrientationClient();
   bool shouldDumpAsText() { return m_dumpAsText; }
   bool shouldDumpEditingCallbacks() { return m_dumpEditingCallbacks; }
   bool shouldDumpFrameLoadCallbacks() { return m_dumpFrameLoadCallbacks; }
@@ -569,8 +566,6 @@ class LayoutTestController : public CppBoundClass {
   WebKit::WebURL m_userStyleSheetLocation;
 
   OwnPtr<WebKit::WebSpeechInputControllerMock> m_speechInputControllerMock;
-
-  OwnPtr<WebKit::WebDeviceOrientationClientMock> m_deviceOrientationClientMock;
 };
 
 #endif  // LayoutTestController_h

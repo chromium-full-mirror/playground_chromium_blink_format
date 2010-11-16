@@ -1646,9 +1646,13 @@ void LayoutTestController::setMockDeviceOrientation(
       arguments[0].toBoolean(), arguments[1].toDouble(),
       arguments[2].toBoolean(), arguments[3].toDouble(),
       arguments[4].toBoolean(), arguments[5].toDouble());
-
-  ASSERT(m_deviceOrientationClientMock);
-  m_deviceOrientationClientMock->setOrientation(orientation);
+  // Note that we only call setOrientation on the main page's mock since this is
+  // all that the
+  // tests require. If necessary, we could get a list of WebViewHosts from the
+  // TestShell and
+  // call setOrientation on each DeviceOrientationClientMock.
+  m_shell->webViewHost()->deviceOrientationClientMock()->setOrientation(
+      orientation);
 }
 
 void LayoutTestController::setGeolocationPermission(
@@ -1722,12 +1726,6 @@ void LayoutTestController::markerTextForListItem(const CppArgumentList& args,
   else
     result->set(
         element.document().frame()->markerTextForListItem(element).utf8());
-}
-
-WebDeviceOrientationClient* LayoutTestController::deviceOrientationClient() {
-  if (!m_deviceOrientationClientMock.get())
-    m_deviceOrientationClientMock.set(WebDeviceOrientationClientMock::create());
-  return m_deviceOrientationClientMock.get();
 }
 
 void LayoutTestController::hasSpellingMarker(const CppArgumentList& arguments,
