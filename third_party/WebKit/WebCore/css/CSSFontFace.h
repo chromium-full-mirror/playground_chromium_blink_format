@@ -42,8 +42,9 @@ class SimpleFontData;
 
 class CSSFontFace : public RefCounted<CSSFontFace> {
  public:
-  static PassRefPtr<CSSFontFace> create(FontTraitsMask traitsMask) {
-    return adoptRef(new CSSFontFace(traitsMask));
+  static PassRefPtr<CSSFontFace> create(FontTraitsMask traitsMask,
+                                        bool isLocalFallback = false) {
+    return adoptRef(new CSSFontFace(traitsMask, isLocalFallback));
   }
   ~CSSFontFace();
 
@@ -61,6 +62,8 @@ class CSSFontFace : public RefCounted<CSSFontFace> {
 
   bool isLoaded() const;
   bool isValid() const;
+
+  bool isLocalFallback() const { return m_isLocalFallback; }
 
   void addSource(CSSFontFaceSource*);
 
@@ -86,14 +89,17 @@ class CSSFontFace : public RefCounted<CSSFontFace> {
 #endif
 
  private:
-  CSSFontFace(FontTraitsMask traitsMask)
-      : m_traitsMask(traitsMask), m_activeSource(0) {}
+  CSSFontFace(FontTraitsMask traitsMask, bool isLocalFallback)
+      : m_traitsMask(traitsMask),
+        m_activeSource(0),
+        m_isLocalFallback(isLocalFallback) {}
 
   FontTraitsMask m_traitsMask;
   Vector<UnicodeRange> m_ranges;
   HashSet<CSSSegmentedFontFace*> m_segmentedFontFaces;
   Vector<CSSFontFaceSource*> m_sources;
   CSSFontFaceSource* m_activeSource;
+  bool m_isLocalFallback;
 };
 }
 
