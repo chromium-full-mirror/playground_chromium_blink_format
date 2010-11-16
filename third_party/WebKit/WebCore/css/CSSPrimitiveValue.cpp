@@ -48,7 +48,7 @@ using namespace WTF;
 
 namespace WebCore {
 
-CSSPrimitiveValue::UnitCategory unitCategory(
+static CSSPrimitiveValue::UnitCategory unitCategory(
     CSSPrimitiveValue::UnitTypes type) {
   // Here we violate the spec
   // (http://www.w3.org/TR/DOM-Level-2-Style/css.html#CSS-CSSPrimitiveValue) and
