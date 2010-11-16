@@ -79,6 +79,7 @@ class FontPlatformData {
   }
 
   FontPlatformData(NSFont* nsFont,
+                   float size,
                    bool syntheticBold = false,
                    bool syntheticOblique = false,
                    FontOrientation = Horizontal);

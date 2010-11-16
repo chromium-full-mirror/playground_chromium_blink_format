@@ -204,7 +204,7 @@ void WebPreferences::initializeDefaultSettings() {
   CFDictionaryAddValue(defaults, CFSTR(WebKitFantasyFontPreferenceKey),
                        CFSTR("Comic Sans MS"));
   CFDictionaryAddValue(defaults, CFSTR(WebKitMinimumFontSizePreferenceKey),
-                       CFSTR("1"));
+                       CFSTR("0"));
   CFDictionaryAddValue(
       defaults, CFSTR(WebKitMinimumLogicalFontSizePreferenceKey), CFSTR("9"));
   CFDictionaryAddValue(defaults, CFSTR(WebKitDefaultFontSizePreferenceKey),

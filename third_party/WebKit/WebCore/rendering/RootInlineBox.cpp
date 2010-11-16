@@ -256,12 +256,15 @@ int RootInlineBox::alignBoxesInBlockDirection(
   int maxPositionBottom = 0;
   int maxAscent = 0;
   int maxDescent = 0;
+  bool setMaxAscent = false;
+  bool setMaxDescent = false;
 
   // Figure out if we're in no-quirks mode.
   bool noQuirksMode = renderer()->document()->inNoQuirksMode();
 
   computeLogicalBoxHeights(maxPositionTop, maxPositionBottom, maxAscent,
-                           maxDescent, noQuirksMode, textBoxDataMap);
+                           maxDescent, setMaxAscent, setMaxDescent,
+                           noQuirksMode, textBoxDataMap);
 
   if (maxAscent + maxDescent < max(maxPositionTop, maxPositionBottom))
     adjustMaxAscentAndDescent(maxAscent, maxDescent, maxPositionTop,

@@ -200,6 +200,8 @@ class InlineFlowBox : public InlineBox {
                                 int& maxPositionBottom,
                                 int& maxAscent,
                                 int& maxDescent,
+                                bool& setMaxAscent,
+                                bool& setMaxDescent,
                                 bool strictMode,
                                 GlyphOverflowAndFallbackFontsMap&);
   void adjustMaxAscentAndDescent(int& maxAscent,
