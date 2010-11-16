@@ -207,6 +207,16 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
 #if ENABLE(TILED_BACKING_STORE)
   void pageDidRequestScroll(const WebCore::IntSize& delta);
   void setActualVisibleContentRect(const WebCore::IntRect&);
+
+  bool resizesToContentsEnabled() const {
+    return !m_resizesToContentsLayoutSize.isEmpty();
+  }
+  WebCore::IntSize resizesToContentsLayoutSize() const {
+    return m_resizesToContentsLayoutSize;
+  }
+  void setResizesToContentsUsingLayoutSize(
+      const WebCore::IntSize& targetLayoutSize);
+  void resizeToContentsIfNeeded();
 #endif
 
   WebContextMenu* contextMenu();
@@ -333,6 +343,10 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
   InjectedBundlePageFormClient m_formClient;
   InjectedBundlePageLoaderClient m_loaderClient;
   InjectedBundlePageUIClient m_uiClient;
+
+#if ENABLE(TILED_BACKING_STORE)
+  WebCore::IntSize m_resizesToContentsLayoutSize;
+#endif
 
   FindController m_findController;
   RefPtr<PageOverlay> m_pageOverlay;
