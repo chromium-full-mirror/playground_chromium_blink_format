@@ -83,6 +83,8 @@ ViewportAttributes computeViewportAttributes(ViewportArguments args,
 
   // Resolve non-'auto' width and height to pixel values.
   if (deviceDPI != 1.0) {
+    availableWidth /= result.devicePixelRatio;
+    availableHeight /= result.devicePixelRatio;
     deviceWidth /= result.devicePixelRatio;
     deviceHeight /= result.devicePixelRatio;
 
