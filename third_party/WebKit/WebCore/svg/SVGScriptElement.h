@@ -48,8 +48,6 @@ class SVGScriptElement : public SVGElement,
                    bool createdByParser,
                    bool isEvaluated);
 
-  virtual String scriptContent() const;
-
   virtual void parseMappedAttribute(Attribute*);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
@@ -63,11 +61,7 @@ class SVGScriptElement : public SVGElement,
   virtual bool isURLAttribute(Attribute*) const;
   virtual void finishParsingChildren();
 
-  virtual String scriptCharset() const;
-
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
-
-  virtual bool shouldExecuteAsJavaScript() const;
 
   virtual bool haveLoadedRequiredResources();
 
@@ -84,7 +78,6 @@ class SVGScriptElement : public SVGElement,
   virtual void dispatchErrorEvent();
 
   PassRefPtr<Element> cloneElementWithoutAttributesAndChildren() const;
-  void executeScript(const ScriptSourceCode& sourceCode);
 
   // SVGURIReference
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGScriptElement,
@@ -100,7 +93,6 @@ class SVGScriptElement : public SVGElement,
                                        ExternalResourcesRequired,
                                        externalResourcesRequired)
 
-  ScriptElementData m_data;
   String m_type;
 };
 

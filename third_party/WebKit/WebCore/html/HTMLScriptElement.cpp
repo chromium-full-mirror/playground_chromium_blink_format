@@ -40,9 +40,9 @@ inline HTMLScriptElement::HTMLScriptElement(const QualifiedName& tagName,
                                             Document* document,
                                             bool createdByParser,
                                             bool isEvaluated)
-    : HTMLElement(tagName, document), m_data(this, this, isEvaluated) {
+    : HTMLElement(tagName, document),
+      ScriptElement(this, createdByParser, isEvaluated) {
   ASSERT(hasTagName(scriptTag));
-  m_data.setCreatedByParser(createdByParser);
 }
 
 PassRefPtr<HTMLScriptElement> HTMLScriptElement::create(
@@ -57,15 +57,11 @@ bool HTMLScriptElement::isURLAttribute(Attribute* attr) const {
   return attr->name() == srcAttr;
 }
 
-bool HTMLScriptElement::shouldExecuteAsJavaScript() const {
-  return m_data.shouldExecuteAsJavaScript();
-}
-
 void HTMLScriptElement::childrenChanged(bool changedByParser,
                                         Node* beforeChange,
                                         Node* afterChange,
                                         int childCountDelta) {
-  ScriptElement::childrenChanged(m_data);
+  ScriptElement::childrenChanged();
   HTMLElement::childrenChanged(changedByParser, beforeChange, afterChange,
                                childCountDelta);
 }
@@ -74,7 +70,7 @@ void HTMLScriptElement::parseMappedAttribute(Attribute* attr) {
   const QualifiedName& attrName = attr->name();
 
   if (attrName == srcAttr)
-    handleSourceAttribute(m_data, attr->value());
+    handleSourceAttribute(attr->value());
   else if (attrName == onloadAttr)
     setAttributeEventListener(eventNames().loadEvent,
                               createAttributeEventListener(this, attr));
@@ -89,18 +85,18 @@ void HTMLScriptElement::parseMappedAttribute(Attribute* attr) {
 }
 
 void HTMLScriptElement::finishParsingChildren() {
-  ScriptElement::finishParsingChildren(m_data, sourceAttributeValue());
+  ScriptElement::finishParsingChildren(sourceAttributeValue());
   HTMLElement::finishParsingChildren();
 }
 
 void HTMLScriptElement::insertedIntoDocument() {
   HTMLElement::insertedIntoDocument();
-  ScriptElement::insertedIntoDocument(m_data, sourceAttributeValue());
+  ScriptElement::insertedIntoDocument(sourceAttributeValue());
 }
 
 void HTMLScriptElement::removedFromDocument() {
   HTMLElement::removedFromDocument();
-  ScriptElement::removedFromDocument(m_data);
+  ScriptElement::removedFromDocument();
 }
 
 String HTMLScriptElement::text() const {
@@ -124,14 +120,6 @@ void HTMLScriptElement::setText(const String& value) {
 
 KURL HTMLScriptElement::src() const {
   return document()->completeURL(sourceAttributeValue());
-}
-
-String HTMLScriptElement::scriptCharset() const {
-  return m_data.scriptCharset();
-}
-
-String HTMLScriptElement::scriptContent() const {
-  return m_data.scriptContent();
 }
 
 void HTMLScriptElement::addSubresourceAttributeURLs(
@@ -188,9 +176,5 @@ PassRefPtr<Element>
 HTMLScriptElement::cloneElementWithoutAttributesAndChildren() const {
   return adoptRef(new HTMLScriptElement(tagQName(), document(), false,
                                         m_data.isEvaluated()));
-}
-
-void HTMLScriptElement::executeScript(const ScriptSourceCode& sourceCode) {
-  return m_data.executeScript(sourceCode);
 }
 }

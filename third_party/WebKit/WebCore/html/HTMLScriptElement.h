@@ -36,14 +36,10 @@ class HTMLScriptElement : public HTMLElement, public ScriptElement {
                                               Document*,
                                               bool createdByParser);
 
-  virtual bool shouldExecuteAsJavaScript() const;
-
   String text() const;
   void setText(const String&);
 
   KURL src() const;
-
-  virtual String scriptCharset() const;
 
   bool haveFiredLoadEvent() const { return m_data.haveFiredLoadEvent(); }
 
@@ -52,8 +48,6 @@ class HTMLScriptElement : public HTMLElement, public ScriptElement {
                     Document*,
                     bool createdByParser,
                     bool isEvaluated);
-
-  virtual String scriptContent() const;
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void insertedIntoDocument();
@@ -81,9 +75,6 @@ class HTMLScriptElement : public HTMLElement, public ScriptElement {
   virtual void dispatchErrorEvent();
 
   PassRefPtr<Element> cloneElementWithoutAttributesAndChildren() const;
-  void executeScript(const ScriptSourceCode&);
-
-  ScriptElementData m_data;
 };
 
 }  // namespace

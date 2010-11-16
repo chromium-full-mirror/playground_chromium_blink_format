@@ -35,9 +35,8 @@ inline SVGScriptElement::SVGScriptElement(const QualifiedName& tagName,
                                           Document* document,
                                           bool createdByParser,
                                           bool isEvaluated)
-    : SVGElement(tagName, document), m_data(this, this, isEvaluated) {
-  m_data.setCreatedByParser(createdByParser);
-}
+    : SVGElement(tagName, document),
+      ScriptElement(this, createdByParser, isEvaluated) {}
 
 PassRefPtr<SVGScriptElement> SVGScriptElement::create(
     const QualifiedName& tagName,
@@ -45,10 +44,6 @@ PassRefPtr<SVGScriptElement> SVGScriptElement::create(
     bool createdByParser) {
   return adoptRef(
       new SVGScriptElement(tagName, document, createdByParser, false));
-}
-
-String SVGScriptElement::scriptContent() const {
-  return m_data.scriptContent();
 }
 
 void SVGScriptElement::parseMappedAttribute(Attribute* attr) {
@@ -70,7 +65,7 @@ void SVGScriptElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGElement::svgAttributeChanged(attrName);
 
   if (SVGURIReference::isKnownAttribute(attrName))
-    handleSourceAttribute(m_data, href());
+    handleSourceAttribute(href());
   else if (SVGExternalResourcesRequired::isKnownAttribute(attrName)) {
     // Handle dynamic updates of the 'externalResourcesRequired' attribute. Only
     // possible case: changing from 'true' to 'false'
@@ -104,7 +99,7 @@ void SVGScriptElement::synchronizeProperty(const QualifiedName& attrName) {
 
 void SVGScriptElement::insertedIntoDocument() {
   SVGElement::insertedIntoDocument();
-  ScriptElement::insertedIntoDocument(m_data, sourceAttributeValue());
+  ScriptElement::insertedIntoDocument(sourceAttributeValue());
 
   if (m_data.createdByParser())
     return;
@@ -119,14 +114,14 @@ void SVGScriptElement::insertedIntoDocument() {
 
 void SVGScriptElement::removedFromDocument() {
   SVGElement::removedFromDocument();
-  ScriptElement::removedFromDocument(m_data);
+  ScriptElement::removedFromDocument();
 }
 
 void SVGScriptElement::childrenChanged(bool changedByParser,
                                        Node* beforeChange,
                                        Node* afterChange,
                                        int childCountDelta) {
-  ScriptElement::childrenChanged(m_data);
+  ScriptElement::childrenChanged();
   SVGElement::childrenChanged(changedByParser, beforeChange, afterChange,
                               childCountDelta);
 }
@@ -136,7 +131,7 @@ bool SVGScriptElement::isURLAttribute(Attribute* attr) const {
 }
 
 void SVGScriptElement::finishParsingChildren() {
-  ScriptElement::finishParsingChildren(m_data, sourceAttributeValue());
+  ScriptElement::finishParsingChildren(sourceAttributeValue());
   SVGElement::finishParsingChildren();
 
   // A SVGLoad event has been fired by SVGElement::finishParsingChildren.
@@ -150,10 +145,6 @@ String SVGScriptElement::type() const {
 
 void SVGScriptElement::setType(const String& type) {
   m_type = type;
-}
-
-String SVGScriptElement::scriptCharset() const {
-  return m_data.scriptCharset();
 }
 
 void SVGScriptElement::addSubresourceAttributeURLs(
@@ -236,18 +227,10 @@ void SVGScriptElement::dispatchErrorEvent() {
   dispatchEvent(Event::create(eventNames().errorEvent, true, false));
 }
 
-bool SVGScriptElement::shouldExecuteAsJavaScript() const {
-  return m_data.shouldExecuteAsJavaScript();
-}
-
 PassRefPtr<Element> SVGScriptElement::cloneElementWithoutAttributesAndChildren()
     const {
   return adoptRef(new SVGScriptElement(tagQName(), document(), false,
                                        m_data.isEvaluated()));
-}
-
-void SVGScriptElement::executeScript(const ScriptSourceCode& sourceCode) {
-  m_data.executeScript(sourceCode);
 }
 }
 
