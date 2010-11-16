@@ -27,30 +27,41 @@
  */
 
 #include "BrowserWindow.h"
+#include <QLatin1String>
+#include <QRegExp>
+#include <qgraphicswkview.h>
 #include <QtGui>
 
 int main(int argc, char** argv) {
   QApplication app(argc, argv);
 
   QStringList args = QApplication::arguments();
-  QStringList urls = args;
-  urls.removeAt(0);
+  args.removeAt(0);
 
-  if (urls.isEmpty()) {
+  QGraphicsWKView::BackingStoreType backingStoreTypeToUse =
+      QGraphicsWKView::Simple;
+  int indexOfTiledOption;
+  if ((indexOfTiledOption = args.indexOf(QRegExp(QLatin1String("-tiled")))) !=
+      -1) {
+    backingStoreTypeToUse = QGraphicsWKView::Tiled;
+    args.removeAt(indexOfTiledOption);
+  }
+
+  if (args.isEmpty()) {
     QString defaultUrl = QString("file://%1/%2")
                              .arg(QDir::homePath())
                              .arg(QLatin1String("index.html"));
     if (QDir(defaultUrl).exists())
-      urls.append(defaultUrl);
+      args.append(defaultUrl);
     else
-      urls.append("http://www.google.com");
+      args.append("http://www.google.com");
   }
 
-  BrowserWindow* window = new BrowserWindow();
-  window->load(urls[0]);
+  BrowserWindow* window = new BrowserWindow(backingStoreTypeToUse);
+  window->load(args[0]);
 
-  for (int i = 1; i < urls.size(); ++i)
-    window->newWindow(urls[i]);
+  for (int i = 1; i < args.size(); ++i)
+    window->newWindow(args[i]);
 
   app.exec();
 
