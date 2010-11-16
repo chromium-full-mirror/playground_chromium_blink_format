@@ -83,6 +83,11 @@
 #include "JSIDBRequest.h"
 #endif
 
+#if ENABLE(WEB_AUDIO)
+#include "JSJavaScriptAudioNode.h"
+#include "JavaScriptAudioNode.h"
+#endif
+
 #if ENABLE(WEB_SOCKETS)
 #include "JSWebSocket.h"
 #include "WebSocket.h"
@@ -160,6 +165,11 @@ JSValue toJS(ExecState* exec,
 #if ENABLE(INDEXED_DATABASE)
   if (IDBRequest* idbRequest = target->toIDBRequest())
     return toJS(exec, idbRequest);
+#endif
+
+#if ENABLE(WEB_AUDIO)
+  if (JavaScriptAudioNode* jsAudioNode = target->toJavaScriptAudioNode())
+    return toJS(exec, globalObject, jsAudioNode);
 #endif
 
 #if ENABLE(WEB_SOCKETS)

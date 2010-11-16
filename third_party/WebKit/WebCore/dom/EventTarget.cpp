@@ -103,6 +103,12 @@ SVGElementInstance* EventTarget::toSVGElementInstance() {
 }
 #endif
 
+#if ENABLE(WEB_AUDIO)
+JavaScriptAudioNode* EventTarget::toJavaScriptAudioNode() {
+  return 0;
+}
+#endif
+
 #if ENABLE(WEB_SOCKETS)
 WebSocket* EventTarget::toWebSocket() {
   return 0;

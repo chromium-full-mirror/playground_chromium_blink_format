@@ -51,6 +51,7 @@ class FileReader;
 class FileWriter;
 class IDBRequest;
 class IDBTransaction;
+class JavaScriptAudioNode;
 class MessagePort;
 class Node;
 class Notification;
@@ -113,6 +114,11 @@ class EventTarget {
   virtual SharedWorker* toSharedWorker();
   virtual SharedWorkerContext* toSharedWorkerContext();
 #endif
+
+#if ENABLE(WEB_AUDIO)
+  virtual JavaScriptAudioNode* toJavaScriptAudioNode();
+#endif
+
 #if ENABLE(WEB_SOCKETS)
   virtual WebSocket* toWebSocket();
 #endif

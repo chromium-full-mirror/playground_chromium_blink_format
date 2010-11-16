@@ -130,6 +130,9 @@ class Event : public RefCounted<Event> {
   virtual bool isIDBErrorEvent() const;
   virtual bool isIDBSuccessEvent() const;
 #endif
+#if ENABLE(WEB_AUDIO)
+  virtual bool isAudioProcessingEvent() const;
+#endif
 #if ENABLE(WORKERS)
   virtual bool isErrorEvent() const;
 #endif
