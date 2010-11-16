@@ -65,11 +65,7 @@ bool RenderTextControlMultiLine::nodeAtPoint(const HitTestRequest& request,
                                       hitTestAction))
     return false;
 
-  bool resultIsTextValueOrPlaceholder =
-      (!m_placeholderVisible && result.innerNode() == innerTextElement()) ||
-      (m_placeholderVisible &&
-       result.innerNode()->isDescendantOf(innerTextElement()));
-  if (result.innerNode() == node() || resultIsTextValueOrPlaceholder)
+  if (result.innerNode() == node() || result.innerNode() == innerTextElement())
     hitInnerTextElement(result, x, y, tx, ty);
 
   return true;
@@ -112,11 +108,7 @@ void RenderTextControlMultiLine::updateFromElement() {
   createSubtreeIfNeeded(0);
   RenderTextControl::updateFromElement();
 
-  HTMLTextAreaElement* textArea = static_cast<HTMLTextAreaElement*>(node());
-  if (m_placeholderVisible)
-    setInnerTextValue(textArea->strippedPlaceholder());
-  else
-    setInnerTextValue(textArea->value());
+  setInnerTextValue(static_cast<HTMLTextAreaElement*>(node())->value());
 }
 
 void RenderTextControlMultiLine::cacheSelection(int start, int end) {
@@ -125,16 +117,8 @@ void RenderTextControlMultiLine::cacheSelection(int start, int end) {
 
 PassRefPtr<RenderStyle> RenderTextControlMultiLine::createInnerTextStyle(
     const RenderStyle* startStyle) const {
-  RefPtr<RenderStyle> textBlockStyle;
-  if (m_placeholderVisible) {
-    if (RenderStyle* pseudoStyle = getCachedPseudoStyle(INPUT_PLACEHOLDER))
-      textBlockStyle = RenderStyle::clone(pseudoStyle);
-  }
-  if (!textBlockStyle) {
-    textBlockStyle = RenderStyle::create();
-    textBlockStyle->inheritFrom(startStyle);
-  }
-
+  RefPtr<RenderStyle> textBlockStyle = RenderStyle::create();
+  textBlockStyle->inheritFrom(startStyle);
   adjustInnerTextStyle(startStyle, textBlockStyle.get());
   textBlockStyle->setDisplay(BLOCK);
 
@@ -143,5 +127,23 @@ PassRefPtr<RenderStyle> RenderTextControlMultiLine::createInnerTextStyle(
 
 RenderStyle* RenderTextControlMultiLine::textBaseStyle() const {
   return style();
+}
+
+int RenderTextControlMultiLine::textBlockInsetLeft() const {
+  int inset = borderLeft() + paddingLeft();
+  if (HTMLElement* innerText = innerTextElement()) {
+    if (RenderBox* innerTextRenderer = innerText->renderBox())
+      inset += innerTextRenderer->paddingLeft();
+  }
+  return inset;
+}
+
+int RenderTextControlMultiLine::textBlockInsetRight() const {
+  int inset = borderRight() + paddingRight();
+  if (HTMLElement* innerText = innerTextElement()) {
+    if (RenderBox* innerTextRenderer = innerText->renderBox())
+      inset += innerTextRenderer->paddingRight();
+  }
+  return inset;
 }
 }

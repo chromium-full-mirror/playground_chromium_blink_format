@@ -61,6 +61,8 @@ class RenderTextControlMultiLine : public RenderTextControl {
   virtual RenderStyle* textBaseStyle() const;
   virtual PassRefPtr<RenderStyle> createInnerTextStyle(
       const RenderStyle* startStyle) const;
+  virtual int textBlockInsetLeft() const;
+  virtual int textBlockInsetRight() const;
 };
 
 inline RenderTextControlMultiLine* toRenderTextControlMultiLine(
