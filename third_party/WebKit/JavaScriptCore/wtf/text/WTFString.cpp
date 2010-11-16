@@ -1,6 +1,7 @@
 /*
  * (C) 1999 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010 Apple Inc. All rights
+ * reserved.
  * Copyright (C) 2007-2009 Torch Mobile, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -22,7 +23,6 @@
 #include "config.h"
 #include "WTFString.h"
 
-#include <limits>
 #include <stdarg.h>
 #include <wtf/ASCIICType.h>
 #include <wtf/text/CString.h>
@@ -31,6 +31,8 @@
 #include <wtf/dtoa.h>
 #include <wtf/unicode/UTF8.h>
 #include <wtf/unicode/Unicode.h>
+
+using namespace std;
 
 namespace WTF {
 
@@ -49,7 +51,7 @@ String::String(const UChar* str) {
   while (str[len] != UChar(0))
     len++;
 
-  if (len > std::numeric_limits<unsigned>::max())
+  if (len > numeric_limits<unsigned>::max())
     CRASH();
 
   m_impl = StringImpl::create(str, len);
@@ -77,6 +79,8 @@ void String::append(const String& str) {
   if (str.m_impl) {
     if (m_impl) {
       UChar* data;
+      if (str.length() > numeric_limits<unsigned>::max() - m_impl->length())
+        CRASH();
       RefPtr<StringImpl> newImpl = StringImpl::createUninitialized(
           m_impl->length() + str.length(), data);
       memcpy(data, m_impl->characters(), m_impl->length() * sizeof(UChar));
@@ -98,6 +102,8 @@ void String::append(char c) {
   // call to fastMalloc every single time.
   if (m_impl) {
     UChar* data;
+    if (m_impl->length() >= numeric_limits<unsigned>::max())
+      CRASH();
     RefPtr<StringImpl> newImpl =
         StringImpl::createUninitialized(m_impl->length() + 1, data);
     memcpy(data, m_impl->characters(), m_impl->length() * sizeof(UChar));
@@ -117,6 +123,8 @@ void String::append(UChar c) {
   // call to fastMalloc every single time.
   if (m_impl) {
     UChar* data;
+    if (m_impl->length() >= numeric_limits<unsigned>::max())
+      CRASH();
     RefPtr<StringImpl> newImpl =
         StringImpl::createUninitialized(m_impl->length() + 1, data);
     memcpy(data, m_impl->characters(), m_impl->length() * sizeof(UChar));
@@ -172,7 +180,7 @@ void String::append(const UChar* charactersToAppend, unsigned lengthToAppend) {
 
   ASSERT(charactersToAppend);
   UChar* data;
-  if (lengthToAppend > std::numeric_limits<unsigned>::max() - length())
+  if (lengthToAppend > numeric_limits<unsigned>::max() - length())
     CRASH();
   RefPtr<StringImpl> newImpl =
       StringImpl::createUninitialized(length() + lengthToAppend, data);
@@ -196,7 +204,7 @@ void String::insert(const UChar* charactersToInsert,
 
   ASSERT(charactersToInsert);
   UChar* data;
-  if (lengthToInsert > std::numeric_limits<unsigned>::max() - length())
+  if (lengthToInsert > numeric_limits<unsigned>::max() - length())
     CRASH();
   RefPtr<StringImpl> newImpl =
       StringImpl::createUninitialized(length() + lengthToInsert, data);
@@ -685,7 +693,7 @@ CString String::utf8(bool strict) const {
 }
 
 String String::fromUTF8(const char* stringStart, size_t length) {
-  if (length > std::numeric_limits<unsigned>::max())
+  if (length > numeric_limits<unsigned>::max())
     CRASH();
 
   if (!stringStart)
@@ -751,9 +759,8 @@ static inline IntegralType toIntegralType(const UChar* data,
                                           size_t length,
                                           bool* ok,
                                           int base) {
-  static const IntegralType integralMax =
-      std::numeric_limits<IntegralType>::max();
-  static const bool isSigned = std::numeric_limits<IntegralType>::is_signed;
+  static const IntegralType integralMax = numeric_limits<IntegralType>::max();
+  static const bool isSigned = numeric_limits<IntegralType>::is_signed;
   const IntegralType maxMultiplier = integralMax / base;
 
   IntegralType value = 0;
