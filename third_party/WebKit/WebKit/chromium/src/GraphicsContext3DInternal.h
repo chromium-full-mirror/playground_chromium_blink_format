@@ -78,8 +78,6 @@ class GraphicsContext3DInternal {
   WebGLLayerChromium* platformLayer() const;
 #endif
   bool isGLES2Compliant() const;
-  bool isGLES2NPOTStrict() const;
-  bool isErrorGeneratedOnOutOfBoundsAccesses() const;
 
   //----------------------------------------------------------------------
   // Entry points for WebGL.
