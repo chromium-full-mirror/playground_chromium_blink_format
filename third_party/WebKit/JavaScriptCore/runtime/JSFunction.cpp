@@ -317,6 +317,10 @@ void JSFunction::getOwnPropertyNames(ExecState* exec,
                                      PropertyNameArray& propertyNames,
                                      EnumerationMode mode) {
   if (!isHostFunction() && (mode == IncludeDontEnumProperties)) {
+    // Make sure prototype has been reified.
+    PropertySlot slot;
+    getOwnPropertySlot(exec, exec->propertyNames().prototype, slot);
+
     propertyNames.add(exec->propertyNames().arguments);
     propertyNames.add(exec->propertyNames().callee);
     propertyNames.add(exec->propertyNames().caller);
@@ -332,6 +336,13 @@ void JSFunction::put(ExecState* exec,
   if (isHostFunction()) {
     Base::put(exec, propertyName, value, slot);
     return;
+  }
+  if (propertyName == exec->propertyNames().prototype) {
+    // Make sure prototype has been reified, such that it can only be
+    // overwritten
+    // following the rules set out in ECMA-262 8.12.9.
+    PropertySlot slot;
+    getOwnPropertySlot(exec, propertyName, slot);
   }
   if (jsExecutable()->isStrictMode()) {
     if (propertyName == exec->propertyNames().arguments) {
