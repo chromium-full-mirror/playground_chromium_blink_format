@@ -348,7 +348,10 @@ class WebPageProxy : public APIObject {
   void decidePolicyForMIMEType(uint64_t frameID,
                                const String& MIMEType,
                                const String& url,
-                               uint64_t listenerID);
+                               uint64_t listenerID,
+                               bool& receivedPolicyAction,
+                               uint64_t& policyAction,
+                               uint64_t& downloadID);
 
   void willSubmitForm(uint64_t frameID,
                       uint64_t sourceFrameID,
@@ -509,6 +512,11 @@ class WebPageProxy : public APIObject {
 
   // Whether WebPageProxy::close() has been called on this page.
   bool m_isClosed;
+
+  bool m_inDecidePolicyForMIMEType;
+  bool m_syncMimeTypePolicyActionIsValid;
+  WebCore::PolicyAction m_syncMimeTypePolicyAction;
+  uint64_t m_syncMimeTypePolicyDownloadID;
 
   uint64_t m_pageID;
 

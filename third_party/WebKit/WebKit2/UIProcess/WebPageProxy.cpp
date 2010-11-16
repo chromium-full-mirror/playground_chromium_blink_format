@@ -96,6 +96,10 @@ WebPageProxy::WebPageProxy(WebPageNamespace* pageNamespace, uint64_t pageID)
       m_viewScaleFactor(1),
       m_isValid(true),
       m_isClosed(false),
+      m_inDecidePolicyForMIMEType(false),
+      m_syncMimeTypePolicyActionIsValid(false),
+      m_syncMimeTypePolicyAction(PolicyUse),
+      m_syncMimeTypePolicyDownloadID(0),
       m_pageID(pageID) {
 #ifndef NDEBUG
   webPageProxyCounter.increment();
@@ -455,6 +459,16 @@ void WebPageProxy::receivedPolicyDecision(PolicyAction action,
   if (action == PolicyDownload) {
     // Create a download proxy.
     downloadID = pageNamespace()->context()->createDownloadProxy();
+  }
+
+  // If we received a policy decision while in decidePolicyForMIMEType the
+  // decision will
+  // be sent back to the web process by decidePolicyForMIMEType.
+  if (m_inDecidePolicyForMIMEType) {
+    m_syncMimeTypePolicyActionIsValid = true;
+    m_syncMimeTypePolicyAction = action;
+    m_syncMimeTypePolicyDownloadID = downloadID;
+    return;
   }
 
   process()->send(Messages::WebPage::DidReceivePolicyDecision(
@@ -972,13 +986,32 @@ void WebPageProxy::decidePolicyForNewWindowAction(uint64_t frameID,
 void WebPageProxy::decidePolicyForMIMEType(uint64_t frameID,
                                            const String& MIMEType,
                                            const String& url,
-                                           uint64_t listenerID) {
+                                           uint64_t listenerID,
+                                           bool& receivedPolicyAction,
+                                           uint64_t& policyAction,
+                                           uint64_t& downloadID) {
   WebFrameProxy* frame = process()->webFrame(frameID);
   RefPtr<WebFramePolicyListenerProxy> listener =
       frame->setUpPolicyListenerProxy(listenerID);
+
+  ASSERT(!m_inDecidePolicyForMIMEType);
+
+  m_inDecidePolicyForMIMEType = true;
+  m_syncMimeTypePolicyActionIsValid = false;
+
   if (!m_policyClient.decidePolicyForMIMEType(this, MIMEType, url, frame,
                                               listener.get()))
     listener->use();
+
+  m_inDecidePolicyForMIMEType = false;
+
+  // Check if we received a policy decision already. If we did, we can just pass
+  // it back.
+  if (m_syncMimeTypePolicyActionIsValid) {
+    receivedPolicyAction = true;
+    policyAction = m_syncMimeTypePolicyAction;
+    downloadID = m_syncMimeTypePolicyDownloadID;
+  }
 }
 
 // FormClient
