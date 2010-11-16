@@ -48,6 +48,8 @@ class ResourceResponse;
 
 namespace WebKit {
 
+class WebPage;
+
 class Download : public CoreIPC::MessageSender<Download> {
   WTF_MAKE_NONCOPYABLE(Download);
 
@@ -60,7 +62,7 @@ class Download : public CoreIPC::MessageSender<Download> {
   CoreIPC::Connection* connection() const;
   uint64_t destinationID() const { return m_downloadID; }
 
-  void start();
+  void start(WebPage* initiatingWebPage);
 
   void didStart();
   void didReceiveResponse(const WebCore::ResourceResponse&);
