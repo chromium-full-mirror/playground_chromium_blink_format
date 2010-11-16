@@ -25,8 +25,6 @@
 
 #include "WebInspectorFrontendClient.h"
 
-#if ENABLE(INSPECTOR)
-
 #include "WebInspector.h"
 #include "WebPage.h"
 #include <WebCore/Page.h>
@@ -93,5 +91,3 @@ void WebInspectorFrontendClient::sendMessageToBackend(const String&) {
 }
 
 }  // namespace WebKit
-
-#endif
