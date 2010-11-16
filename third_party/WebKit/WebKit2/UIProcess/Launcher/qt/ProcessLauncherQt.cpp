@@ -83,7 +83,7 @@ class QtWebProcess : public QProcess {
 
 void QtWebProcess::setupChildProcess() {
 #if defined Q_OS_UNIX
-  prctl(PR_SET_PDEATHSIG, SIGKILL);
+  prctl(PR_SET_PDEATHSIG, SIGINT);
 #endif
 }
 
