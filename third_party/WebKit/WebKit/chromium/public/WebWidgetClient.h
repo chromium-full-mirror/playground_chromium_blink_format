@@ -50,6 +50,9 @@ class WebWidgetClient {
   // scrolled by the specified dx and dy amounts.
   virtual void didScrollRect(int dx, int dy, const WebRect& clipRect) {}
 
+  // Called when the compositor enables or disables.
+  virtual void didActivateAcceleratedCompositing(bool active) {}
+
   // Called when a call to WebWidget::composite is required
   virtual void scheduleComposite() {}
 
