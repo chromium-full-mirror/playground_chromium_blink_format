@@ -40,7 +40,7 @@ class PNGImageDecoder;
 // This class decodes the ICO and CUR image formats.
 class ICOImageDecoder : public ImageDecoder {
  public:
-  ICOImageDecoder(bool premultiplyAlpha);
+  ICOImageDecoder(bool premultiplyAlpha, bool ignoreGammaAndColorProfile);
   virtual ~ICOImageDecoder();
 
   // ImageDecoder

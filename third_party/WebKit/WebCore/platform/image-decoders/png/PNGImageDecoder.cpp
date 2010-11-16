@@ -173,8 +173,10 @@ class PNGImageReader {
   unsigned m_currentBufferSize;
 };
 
-PNGImageDecoder::PNGImageDecoder(bool premultiplyAlpha)
-    : ImageDecoder(premultiplyAlpha), m_doNothingOnFailure(false) {}
+PNGImageDecoder::PNGImageDecoder(bool premultiplyAlpha,
+                                 bool ignoreGammaAndColorProfile)
+    : ImageDecoder(premultiplyAlpha, ignoreGammaAndColorProfile),
+      m_doNothingOnFailure(false) {}
 
 PNGImageDecoder::~PNGImageDecoder() {}
 
@@ -299,7 +301,7 @@ void PNGImageDecoder::headerAvailable() {
 
   // Deal with gamma and keep it under our control.
   double gamma;
-  if (png_get_gAMA(png, info, &gamma)) {
+  if (!m_ignoreGammaAndColorProfile && png_get_gAMA(png, info, &gamma)) {
     if ((gamma <= 0.0) || (gamma > cMaxGamma)) {
       gamma = cInverseGamma;
       png_set_gAMA(png, info, gamma);

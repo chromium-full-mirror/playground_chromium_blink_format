@@ -40,8 +40,10 @@ namespace WebCore {
 // don't pack).
 static const size_t sizeOfFileHeader = 14;
 
-BMPImageDecoder::BMPImageDecoder(bool premultiplyAlpha)
-    : ImageDecoder(premultiplyAlpha), m_decodedOffset(0) {}
+BMPImageDecoder::BMPImageDecoder(bool premultiplyAlpha,
+                                 bool ignoreGammaAndColorProfile)
+    : ImageDecoder(premultiplyAlpha, ignoreGammaAndColorProfile),
+      m_decodedOffset(0) {}
 
 void BMPImageDecoder::setData(SharedBuffer* data, bool allDataReceived) {
   if (failed())

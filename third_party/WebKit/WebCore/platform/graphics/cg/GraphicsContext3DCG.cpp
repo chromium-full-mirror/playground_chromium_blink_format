@@ -123,13 +123,14 @@ bool GraphicsContext3D::getImageData(Image* image,
                                      unsigned int format,
                                      unsigned int type,
                                      bool premultiplyAlpha,
+                                     bool ignoreGammaAndColorProfile,
                                      Vector<uint8_t>& outputVector) {
   if (!image)
     return false;
   CGImageRef cgImage;
   RetainPtr<CGImageRef> decodedImage;
   if (image->data()) {
-    ImageSource decoder(false);
+    ImageSource decoder(false, ignoreGammaAndColorProfile);
     decoder.setData(image->data(), true);
     if (!decoder.frameCount())
       return false;

@@ -381,8 +381,9 @@ void term_source(j_decompress_ptr jd) {
   src->decoder->decoder()->jpegComplete();
 }
 
-JPEGImageDecoder::JPEGImageDecoder(bool premultiplyAlpha)
-    : ImageDecoder(premultiplyAlpha) {}
+JPEGImageDecoder::JPEGImageDecoder(bool premultiplyAlpha,
+                                   bool ignoreGammaAndColorProfile)
+    : ImageDecoder(premultiplyAlpha, ignoreGammaAndColorProfile) {}
 
 JPEGImageDecoder::~JPEGImageDecoder() {}
 

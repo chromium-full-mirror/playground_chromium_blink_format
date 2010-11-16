@@ -2617,8 +2617,9 @@ void WebGLRenderingContext::texImage2DImpl(unsigned target,
                                            ExceptionCode& ec) {
   ec = 0;
   Vector<uint8_t> data;
-  if (!m_context->extractImageData(image, format, type, flipY, premultiplyAlpha,
-                                   data)) {
+  if (!m_context->extractImageData(
+          image, format, type, flipY, premultiplyAlpha,
+          m_unpackColorspaceConversion == GraphicsContext3D::NONE, data)) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
@@ -2854,8 +2855,9 @@ void WebGLRenderingContext::texSubImage2DImpl(unsigned target,
   if (isContextLost())
     return;
   Vector<uint8_t> data;
-  if (!m_context->extractImageData(image, format, type, flipY, premultiplyAlpha,
-                                   data)) {
+  if (!m_context->extractImageData(
+          image, format, type, flipY, premultiplyAlpha,
+          m_unpackColorspaceConversion == GraphicsContext3D::NONE, data)) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
