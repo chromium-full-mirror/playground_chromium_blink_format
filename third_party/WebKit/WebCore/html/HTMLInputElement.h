@@ -228,10 +228,6 @@ class HTMLInputElement : public HTMLTextFormControlElement,
     return document()->checkedRadioButtons();
   }
 
-  // FIXME: We should move m_xPos and m_yPos to ImageInputType class.
-  int xPosition() const { return m_xPos; }
-  int yPosition() const { return m_yPos; }
-
  protected:
   HTMLInputElement(const QualifiedName&, Document*, HTMLFormElement* = 0);
 
@@ -387,7 +383,6 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   void updateCheckedRadioButtons();
 
   void handleBeforeTextInsertedEvent(Event*);
-  void handleKeyEventForRange(KeyboardEvent*);
   PassRefPtr<HTMLFormElement> createTemporaryFormForIsIndex();
   // Helper for stepUp()/stepDown().  Adds step value * count to the current
   // value.
@@ -402,8 +397,6 @@ class HTMLInputElement : public HTMLTextFormControlElement,
 #endif
 
   InputElementData m_data;
-  int m_xPos;
-  int m_yPos;
   short m_maxResults;
   OwnPtr<HTMLImageLoader> m_imageLoader;
   RefPtr<FileList> m_fileList;

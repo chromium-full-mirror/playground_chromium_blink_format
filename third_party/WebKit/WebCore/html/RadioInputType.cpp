@@ -32,6 +32,7 @@
 #include "RadioInputType.h"
 
 #include "HTMLInputElement.h"
+#include "MouseEvent.h"
 #include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
@@ -47,6 +48,11 @@ const AtomicString& RadioInputType::formControlType() const {
 bool RadioInputType::valueMissing(const String&) const {
   return !element()->checkedRadioButtons().checkedButtonForGroup(
       element()->name());
+}
+
+bool RadioInputType::handleClickEvent(MouseEvent* event) {
+  event->setDefaultHandled();
+  return true;
 }
 
 }  // namespace WebCore

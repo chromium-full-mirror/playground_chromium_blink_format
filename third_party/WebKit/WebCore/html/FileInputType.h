@@ -44,6 +44,7 @@ class FileInputType : public BaseButtonInputType {
   virtual const AtomicString& formControlType() const;
   virtual bool appendFormData(FormDataList&, bool) const;
   virtual bool valueMissing(const String&) const;
+  virtual bool handleDOMActivateEvent(Event*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*) const;
 };
 

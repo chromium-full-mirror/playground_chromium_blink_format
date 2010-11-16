@@ -43,6 +43,7 @@ class ResetInputType : public BaseButtonInputType {
   ResetInputType(HTMLInputElement* element) : BaseButtonInputType(element) {}
   virtual const AtomicString& formControlType() const;
   virtual bool supportsValidation() const;
+  virtual bool handleDOMActivateEvent(Event*);
 };
 
 }  // namespace WebCore
