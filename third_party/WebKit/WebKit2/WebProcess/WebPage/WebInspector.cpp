@@ -25,6 +25,8 @@
 
 #include "WebInspector.h"
 
+#if ENABLE(INSPECTOR)
+
 #include "WebInspectorProxyMessages.h"
 #include "WebPage.h"
 #include "WebPageCreationParameters.h"
@@ -114,3 +116,5 @@ void WebInspector::stopPageProfiling() {
 }
 
 }  // namespace WebKit
+
+#endif
