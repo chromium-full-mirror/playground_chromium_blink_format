@@ -161,17 +161,8 @@ static v8::Handle<v8::Value> getObjectParameter(const v8::Arguments& args,
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
       V8WebGLRenderingContext::toNative(args.Holder());
-  bool ok;
-  unsigned target = toInt32(args[0], ok);
-  if (!ok) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
-    return notHandledByInterceptor();
-  }
-  unsigned pname = toInt32(args[1], ok);
-  if (!ok) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
-    return notHandledByInterceptor();
-  }
+  unsigned target = toInt32(args[0]);
+  unsigned pname = toInt32(args[1]);
   WebGLGetInfo info;
   switch (objectType) {
     case kBuffer:
@@ -265,22 +256,9 @@ V8WebGLRenderingContext::getFramebufferAttachmentParameterCallback(
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
       V8WebGLRenderingContext::toNative(args.Holder());
-  bool ok;
-  unsigned target = toInt32(args[0], ok);
-  if (!ok) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
-    return notHandledByInterceptor();
-  }
-  unsigned attachment = toInt32(args[1], ok);
-  if (!ok) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
-    return notHandledByInterceptor();
-  }
-  unsigned pname = toInt32(args[2], ok);
-  if (!ok) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
-    return notHandledByInterceptor();
-  }
+  unsigned target = toInt32(args[0]);
+  unsigned attachment = toInt32(args[1]);
+  unsigned pname = toInt32(args[2]);
   WebGLGetInfo info =
       context->getFramebufferAttachmentParameter(target, attachment, pname, ec);
   if (ec) {
@@ -302,12 +280,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getParameterCallback(
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
       V8WebGLRenderingContext::toNative(args.Holder());
-  bool ok;
-  unsigned pname = toInt32(args[0], ok);
-  if (!ok) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
-    return notHandledByInterceptor();
-  }
+  unsigned pname = toInt32(args[0]);
   WebGLGetInfo info = context->getParameter(pname, ec);
   if (ec) {
     V8Proxy::setDOMException(ec);
@@ -337,12 +310,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getProgramParameterCallback(
       V8WebGLProgram::HasInstance(args[0])
           ? V8WebGLProgram::toNative(v8::Handle<v8::Object>::Cast(args[0]))
           : 0;
-  bool ok;
-  unsigned pname = toInt32(args[1], ok);
-  if (!ok) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
-    return notHandledByInterceptor();
-  }
+  unsigned pname = toInt32(args[1]);
   WebGLGetInfo info = context->getProgramParameter(program, pname, ec);
   if (ec) {
     V8Proxy::setDOMException(ec);
@@ -378,12 +346,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getShaderParameterCallback(
       V8WebGLShader::HasInstance(args[0])
           ? V8WebGLShader::toNative(v8::Handle<v8::Object>::Cast(args[0]))
           : 0;
-  bool ok;
-  unsigned pname = toInt32(args[1], ok);
-  if (!ok) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
-    return notHandledByInterceptor();
-  }
+  unsigned pname = toInt32(args[1]);
   WebGLGetInfo info = context->getShaderParameter(shader, pname, ec);
   if (ec) {
     V8Proxy::setDOMException(ec);
@@ -497,7 +460,7 @@ static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
   WebGLUniformLocation* location = 0;
 
   if (isFunctionToCallForAttribute(functionToCall))
-    index = toInt32(args[0], ok);
+    index = toInt32(args[0]);
   else {
     if (args.Length() > 0 && !isUndefinedOrNull(args[0]) &&
         !V8WebGLUniformLocation::HasInstance(args[0])) {
