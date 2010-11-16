@@ -1140,6 +1140,17 @@ void WebPageProxy::pageDidScroll() {
 void WebPageProxy::didChangeContentsSize(const WebCore::IntSize& size) {
   m_pageClient->didChangeContentsSize(size);
 }
+
+void WebPageProxy::didFindZoomableArea(const WebCore::IntRect& area) {
+  m_pageClient->didFindZoomableArea(area);
+}
+
+void WebPageProxy::findZoomableAreaForPoint(const WebCore::IntPoint& point) {
+  if (!isValid())
+    return;
+
+  process()->send(Messages::WebPage::FindZoomableAreaForPoint(point), m_pageID);
+}
 #endif
 
 void WebPageProxy::didDraw() {
