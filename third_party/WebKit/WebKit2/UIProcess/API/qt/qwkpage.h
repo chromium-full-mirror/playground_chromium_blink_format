@@ -114,6 +114,7 @@ class QWEBKIT_EXPORT QWKPage : public QObject {
   Q_SIGNAL void scrollRequested(int dx, int dy);
   Q_SIGNAL void cursorChanged(const QCursor&);
   Q_SIGNAL void viewportChangeRequested();
+  Q_SIGNAL void windowCloseRequested();
 
  protected:
   void timerEvent(QTimerEvent*);
