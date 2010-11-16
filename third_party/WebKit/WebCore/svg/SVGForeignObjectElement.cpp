@@ -79,8 +79,7 @@ void SVGForeignObjectElement::svgAttributeChanged(
   if (isLengthAttribute)
     updateRelativeLengthsInformation();
 
-  if (SVGTests::handleAttributeChange(
-          const_cast<SVGForeignObjectElement*>(this), attrName))
+  if (SVGTests::handleAttributeChange(this, attrName))
     return;
 
   RenderObject* renderer = this->renderer();

@@ -325,8 +325,7 @@ void SVGSVGElement::svgAttributeChanged(const QualifiedName& attrName) {
     updateRelativeLengthsInformation();
   }
 
-  if (SVGTests::handleAttributeChange(const_cast<SVGSVGElement*>(this),
-                                      attrName))
+  if (SVGTests::handleAttributeChange(this, attrName))
     return;
 
   if (!renderer())

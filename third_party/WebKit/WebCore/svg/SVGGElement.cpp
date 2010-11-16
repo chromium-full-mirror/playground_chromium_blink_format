@@ -51,7 +51,7 @@ void SVGGElement::parseMappedAttribute(Attribute* attr) {
 void SVGGElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
-  if (SVGTests::handleAttributeChange(const_cast<SVGGElement*>(this), attrName))
+  if (SVGTests::handleAttributeChange(this, attrName))
     return;
 
   RenderObject* renderer = this->renderer();
