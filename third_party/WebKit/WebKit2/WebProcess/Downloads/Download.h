@@ -43,6 +43,7 @@ class WKDownloadAsDelegate;
 #endif
 
 namespace WebCore {
+class ResourceHandle;
 class ResourceResponse;
 }
 
@@ -63,6 +64,10 @@ class Download : public CoreIPC::MessageSender<Download> {
   uint64_t destinationID() const { return m_downloadID; }
 
   void start(WebPage* initiatingWebPage);
+  void startWithHandle(WebPage* initiatingPage,
+                       WebCore::ResourceHandle*,
+                       const WebCore::ResourceRequest& initialRequest,
+                       const WebCore::ResourceResponse&);
 
   void didStart();
   void didReceiveResponse(const WebCore::ResourceResponse&);

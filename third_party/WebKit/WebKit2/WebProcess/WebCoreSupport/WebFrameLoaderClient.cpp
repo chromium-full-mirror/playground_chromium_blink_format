@@ -1033,11 +1033,11 @@ bool WebFrameLoaderClient::canCachePage() const {
   return false;
 }
 
-void WebFrameLoaderClient::download(ResourceHandle*,
-                                    const ResourceRequest&,
-                                    const ResourceRequest&,
-                                    const ResourceResponse&) {
-  notImplemented();
+void WebFrameLoaderClient::download(ResourceHandle* handle,
+                                    const ResourceRequest& request,
+                                    const ResourceRequest& initialRequest,
+                                    const ResourceResponse& response) {
+  m_frame->convertHandleToDownload(handle, request, initialRequest, response);
 }
 
 PassRefPtr<Frame> WebFrameLoaderClient::createFrame(

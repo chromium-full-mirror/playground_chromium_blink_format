@@ -214,6 +214,17 @@ void WebFrame::startDownload(const WebCore::ResourceRequest& request) {
   m_policyDownloadID = 0;
 }
 
+void WebFrame::convertHandleToDownload(ResourceHandle* handle,
+                                       const ResourceRequest& request,
+                                       const ResourceRequest& initialRequest,
+                                       const ResourceResponse& response) {
+  ASSERT(m_policyDownloadID);
+
+  DownloadManager::shared().convertHandleToDownload(
+      m_policyDownloadID, page(), handle, request, initialRequest, response);
+  m_policyDownloadID = 0;
+}
+
 String WebFrame::source() const {
   if (!m_coreFrame)
     return String();

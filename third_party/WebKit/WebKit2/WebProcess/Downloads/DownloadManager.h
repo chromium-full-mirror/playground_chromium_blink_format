@@ -30,7 +30,9 @@
 #include <wtf/Noncopyable.h>
 
 namespace WebCore {
+class ResourceHandle;
 class ResourceRequest;
+class ResourceResponse;
 }
 
 namespace WebKit {
@@ -47,6 +49,12 @@ class DownloadManager {
   void startDownload(uint64_t downloadID,
                      WebPage* initiatingPage,
                      const WebCore::ResourceRequest&);
+  void convertHandleToDownload(uint64_t downloadID,
+                               WebPage* initiatingPage,
+                               WebCore::ResourceHandle*,
+                               const WebCore::ResourceRequest&,
+                               const WebCore::ResourceRequest& initialRequest,
+                               const WebCore::ResourceResponse&);
 
  private:
   DownloadManager();

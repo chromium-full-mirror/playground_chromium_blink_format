@@ -35,6 +35,13 @@ void Download::start(WebPage* initiatingWebPage) {
   notImplemented();
 }
 
+void Download::startWithHandle(WebPage* initiatingPage,
+                               ResourceHandle*,
+                               const ResourceRequest& initialRequest,
+                               const ResourceResponse&) {
+  notImplemented();
+}
+
 void Download::platformInvalidate() {
   notImplemented();
 }
