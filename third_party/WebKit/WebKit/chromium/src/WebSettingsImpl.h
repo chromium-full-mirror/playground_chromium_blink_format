@@ -77,6 +77,7 @@ class WebSettingsImpl : public WebSettings {
   virtual void setXSSAuditorEnabled(bool);
   virtual void setLocalStorageEnabled(bool);
   virtual void setEditableLinkBehaviorNeverLive();
+  virtual void setFrameFlatteningEnabled(bool);
   virtual void setFontRenderingModeNormal();
   virtual void setShouldPaintCustomScrollbars(bool);
   virtual void setAllowUniversalAccessFromFileURLs(bool);
