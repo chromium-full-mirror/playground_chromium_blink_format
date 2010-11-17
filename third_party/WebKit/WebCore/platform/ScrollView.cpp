@@ -325,6 +325,8 @@ void ScrollView::setScrollPosition(const IntPoint& scrollPoint) {
   if (delegatesScrolling()) {
     hostWindow()->delegatedScrollRequested(
         IntSize(scrollPoint.x(), scrollPoint.y()));
+    if (!m_actualVisibleContentRect.isEmpty())
+      m_actualVisibleContentRect.setLocation(scrollPoint);
     return;
   }
 #endif
