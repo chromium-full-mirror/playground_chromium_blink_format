@@ -1701,16 +1701,8 @@ void LayoutTestController::setMockSpeechInputResult(
       !arguments[1].isString())
     return;
 
-  m_speechInputControllerMock->setMockRecognitionResult(
+  m_shell->webViewHost()->speechInputControllerMock()->setMockRecognitionResult(
       cppVariantToWebString(arguments[0]), cppVariantToWebString(arguments[1]));
-}
-
-WebKit::WebSpeechInputController* LayoutTestController::speechInputController(
-    WebKit::WebSpeechInputListener* listener) {
-  if (!m_speechInputControllerMock.get())
-    m_speechInputControllerMock.set(
-        WebSpeechInputControllerMock::create(listener));
-  return m_speechInputControllerMock.get();
 }
 
 void LayoutTestController::layerTreeAsText(const CppArgumentList& args,

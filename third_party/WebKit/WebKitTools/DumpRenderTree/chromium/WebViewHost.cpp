@@ -50,6 +50,7 @@
 #include "WebRect.h"
 #include "WebScreenInfo.h"
 #include "WebSize.h"
+#include "WebSpeechInputControllerMock.h"
 #include "WebStorageNamespace.h"
 #include "WebURLRequest.h"
 #include "WebURLResponse.h"
@@ -571,7 +572,10 @@ WebKit::WebGeolocationService* WebViewHost::geolocationService() {
 
 WebSpeechInputController* WebViewHost::speechInputController(
     WebKit::WebSpeechInputListener* listener) {
-  return m_shell->layoutTestController()->speechInputController(listener);
+  if (!m_speechInputControllerMock)
+    m_speechInputControllerMock.set(
+        WebSpeechInputControllerMock::create(listener));
+  return m_speechInputControllerMock.get();
 }
 
 WebDeviceOrientationClientMock* WebViewHost::deviceOrientationClientMock() {
@@ -1132,6 +1136,9 @@ void WebViewHost::reset() {
 #if !ENABLE(CLIENT_BASED_GEOLOCATION)
   m_geolocationServiceMock.clear();
 #endif
+
+  if (m_speechInputControllerMock.get())
+    m_speechInputControllerMock->clearResults();
 
   m_currentCursor = WebCursorInfo();
   m_windowRect = WebRect();

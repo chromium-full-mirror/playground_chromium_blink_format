@@ -50,6 +50,7 @@ class WebDeviceOrientationClient;
 class WebDeviceOrientationClientMock;
 class WebGeolocationServiceMock;
 class WebSpeechInputController;
+class WebSpeechInputControllerMock;
 class WebSpeechInputListener;
 class WebURL;
 struct WebRect;
@@ -101,6 +102,10 @@ class WebViewHost : public WebKit::WebViewClient,
 
   WebKit::WebContextMenuData* lastContextMenuData() const;
   void clearContextMenuData();
+
+  WebKit::WebSpeechInputControllerMock* speechInputControllerMock() {
+    return m_speechInputControllerMock.get();
+  }
 
   // NavigationHost
   virtual bool navigate(const TestNavigationEntry&, bool reload);
@@ -377,6 +382,7 @@ class WebViewHost : public WebKit::WebViewClient,
 #endif
 
   OwnPtr<WebKit::WebDeviceOrientationClientMock> m_deviceOrientationClientMock;
+  OwnPtr<WebKit::WebSpeechInputControllerMock> m_speechInputControllerMock;
 
   OwnPtr<TestNavigationController*> m_navigationController;
 };

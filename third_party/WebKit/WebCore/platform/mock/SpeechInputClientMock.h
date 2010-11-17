@@ -49,6 +49,7 @@ class SpeechInputClientMock : public SpeechInputClient {
   SpeechInputClientMock();
 
   void setRecognitionResult(const String& result, const AtomicString& language);
+  void clearResults();
 
   // SpeechInputClient methods.
   void setListener(SpeechInputListener*);

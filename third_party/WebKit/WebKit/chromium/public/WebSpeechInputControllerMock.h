@@ -46,6 +46,8 @@ class WebSpeechInputControllerMock : public WebSpeechInputController {
 
   virtual void setMockRecognitionResult(const WebString& result,
                                         const WebString& language) = 0;
+
+  virtual void clearResults() = 0;
 };
 
 }  // namespace WebKit
