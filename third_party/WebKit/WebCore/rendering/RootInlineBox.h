@@ -176,6 +176,8 @@ class RootInlineBox : public InlineFlowBox {
   virtual void attachLineBoxToRenderObject();
   virtual void removeLineBoxFromRenderObject();
 
+  FontBaseline baselineType() const { return m_baselineType; }
+
  private:
   bool hasEllipsisBox() const { return m_hasEllipsisBoxOrHyphen; }
   void setHasEllipsisBox(bool hasEllipsisBox) {
@@ -202,6 +204,10 @@ class RootInlineBox : public InlineFlowBox {
   // The logical height of the block at the end of this line.  This is where the
   // next line starts.
   int m_blockLogicalHeight;
+
+  // Whether or not this line uses alphabetic or ideographic baselines by
+  // default.
+  FontBaseline m_baselineType;
 
   WTF::Unicode::Direction m_lineBreakBidiStatusEor : 5;
   WTF::Unicode::Direction m_lineBreakBidiStatusLastStrong : 5;

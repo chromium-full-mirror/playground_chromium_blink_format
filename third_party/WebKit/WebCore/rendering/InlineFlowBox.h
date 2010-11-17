@@ -220,6 +220,8 @@ class InlineFlowBox : public InlineBox {
                                      int lineBottom,
                                      bool strictMode,
                                      GlyphOverflowAndFallbackFontsMap&);
+  bool requiresIdeographicBaseline(
+      const GlyphOverflowAndFallbackFontsMap&) const;
 
   void removeChild(InlineBox* child);
 
