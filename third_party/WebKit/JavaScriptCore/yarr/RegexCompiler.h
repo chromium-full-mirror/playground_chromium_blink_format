@@ -26,8 +26,6 @@
 #ifndef RegexCompiler_h
 #define RegexCompiler_h
 
-#if ENABLE(YARR)
-
 #include "RegexParser.h"
 #include "RegexPattern.h"
 #include <wtf/unicode/Unicode.h>
@@ -38,7 +36,5 @@ namespace Yarr {
 const char* compileRegex(const UString& patternString, RegexPattern& pattern);
 }
 }  // namespace JSC::Yarr
-
-#endif
 
 #endif  // RegexCompiler_h

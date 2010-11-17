@@ -35,8 +35,6 @@
 #include <stdio.h>
 #endif
 
-#if ENABLE(YARR)
-
 using namespace WTF;
 
 namespace JSC {
@@ -1929,6 +1927,11 @@ PassOwnPtr<BytecodePattern> byteCompileRegex(const UString& patternString,
   return ByteCompiler(pattern).compile(allocator);
 }
 
+PassOwnPtr<BytecodePattern> byteCompileRegex(RegexPattern& pattern,
+                                             BumpPointerAllocator* allocator) {
+  return ByteCompiler(pattern).compile(allocator);
+}
+
 int interpretRegex(BytecodePattern* regex,
                    const UChar* input,
                    unsigned start,
@@ -1967,5 +1970,3 @@ COMPILE_ASSERT(sizeof(Interpreter::BackTrackInfoParentheses) ==
                CheckRegexStackSpaceForBackTrackInfoParentheses);
 }
 }
-
-#endif

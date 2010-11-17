@@ -26,8 +26,6 @@
 #ifndef RegexParser_h
 #define RegexParser_h
 
-#if ENABLE(YARR)
-
 #include "UString.h"
 #include <limits.h>
 #include <wtf/ASCIICType.h>
@@ -833,7 +831,5 @@ const char* parse(Delegate& delegate,
 }
 }
 }  // namespace JSC::Yarr
-
-#endif
 
 #endif  // RegexParser_h
