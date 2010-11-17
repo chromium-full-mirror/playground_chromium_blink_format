@@ -519,7 +519,7 @@ static double conversionToCanonicalUnitsScaleFactor(unsigned short unitType) {
 
 double CSSPrimitiveValue::getDoubleValue(unsigned short unitType,
                                          ExceptionCode& ec) const {
-  double result;
+  double result = 0;
   bool success =
       getDoubleValueInternal(static_cast<UnitTypes>(unitType), &result);
   if (!success) {
@@ -532,7 +532,7 @@ double CSSPrimitiveValue::getDoubleValue(unsigned short unitType,
 }
 
 double CSSPrimitiveValue::getDoubleValue(unsigned short unitType) const {
-  double result;
+  double result = 0;
   getDoubleValueInternal(static_cast<UnitTypes>(unitType), &result);
   return result;
 }
