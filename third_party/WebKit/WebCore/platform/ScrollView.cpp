@@ -321,9 +321,6 @@ void ScrollView::setScrollPosition(const IntPoint& scrollPoint) {
     return;
   }
 
-  IntPoint newScrollPosition = scrollPoint.shrunkTo(maximumScrollPosition());
-  newScrollPosition.clampNegativeToZero();
-
 #if ENABLE(TILED_BACKING_STORE)
   if (delegatesScrolling()) {
     hostWindow()->delegatedScrollRequested(
@@ -331,6 +328,9 @@ void ScrollView::setScrollPosition(const IntPoint& scrollPoint) {
     return;
   }
 #endif
+
+  IntPoint newScrollPosition = scrollPoint.shrunkTo(maximumScrollPosition());
+  newScrollPosition.clampNegativeToZero();
 
   if (newScrollPosition == scrollPosition())
     return;
