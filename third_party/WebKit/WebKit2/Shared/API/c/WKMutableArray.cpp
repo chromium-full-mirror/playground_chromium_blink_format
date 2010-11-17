@@ -42,3 +42,7 @@ bool WKArrayIsMutable(WKArrayRef arrayRef) {
 void WKArrayAppendItem(WKMutableArrayRef arrayRef, WKTypeRef itemRef) {
   toImpl(arrayRef)->append(toImpl(itemRef));
 }
+
+void WKArrayRemoveItemAtIndex(WKMutableArrayRef arrayRef, size_t index) {
+  toImpl(arrayRef)->removeItemAtIndex(index);
+}
