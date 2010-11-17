@@ -176,18 +176,19 @@ bool InspectorStyle::setPropertyText(unsigned index,
         return false;
     } else {
       unsigned textLength = propertyText.length();
+      unsigned disabledIndex =
+          disabledIndexByOrdinal(index, false, allProperties);
       if (!textLength) {
         // Delete disabled property.
-        m_disabledProperties.remove(
-            disabledIndexByOrdinal(index, false, allProperties));
-        return true;
+        m_disabledProperties.remove(disabledIndex);
+      } else {
+        // Patch disabled property text.
+        m_disabledProperties.at(disabledIndex).rawText = propertyText;
       }
 
-      // Patch disabled property text and range.
-      property.rawText = propertyText;
-      if (property.sourceData.range.end)
-        property.sourceData.range.end =
-            property.sourceData.range.start + textLength;
+      // We should not shift subsequent disabled properties when altering a
+      // disabled property.
+      return true;
     }
   } else {
     // Insert at index.
@@ -215,7 +216,7 @@ bool InspectorStyle::setPropertyText(unsigned index,
     if (insertLast) {
       propertyStart = sourceData->styleSourceData->styleBodyRange.end -
                       sourceData->styleSourceData->styleBodyRange.start;
-      if (propertyStart > 0 && propertyText.length()) {
+      if (propertyStart && propertyText.length()) {
         const UChar* characters = text.characters();
 
         unsigned curPos = propertyStart - 1;  // The last position of style
@@ -240,7 +241,8 @@ bool InspectorStyle::setPropertyText(unsigned index,
     m_parentStyleSheet->setStyleText(m_style, text);
   }
 
-  // Recompute subsequent disabled property ranges.
+  // Recompute subsequent disabled property ranges if acting on a non-disabled
+  // property.
   shiftDisabledProperties(disabledIndexByOrdinal(index, true, allProperties),
                           propertyLengthDelta);
 
