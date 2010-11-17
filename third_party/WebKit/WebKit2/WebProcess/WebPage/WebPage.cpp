@@ -434,10 +434,12 @@ void WebPage::setResizesToContentsUsingLayoutSize(
   if (m_resizesToContentsLayoutSize.isEmpty()) {
     m_page->settings()->setShouldDelegateScrolling(false);
     frame->view()->setUseFixedLayout(false);
+    frame->view()->setPaintsEntireContents(false);
   } else {
     m_page->settings()->setShouldDelegateScrolling(true);
     frame->view()->setUseFixedLayout(true);
     frame->view()->setFixedLayoutSize(m_resizesToContentsLayoutSize);
+    frame->view()->setPaintsEntireContents(true);
   }
   frame->view()->forceLayout();
 }
