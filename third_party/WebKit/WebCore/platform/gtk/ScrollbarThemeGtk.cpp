@@ -382,6 +382,7 @@ void ScrollbarThemeGtk::paintButton(GraphicsContext* context,
   state.focused = TRUE;
   state.isDefault = TRUE;
   state.canDefault = TRUE;
+  state.depressed = FALSE;
 
   if ((BackButtonStartPart == part && scrollbar->currentPos()) ||
       (BackButtonEndPart == part && scrollbar->currentPos()) ||
