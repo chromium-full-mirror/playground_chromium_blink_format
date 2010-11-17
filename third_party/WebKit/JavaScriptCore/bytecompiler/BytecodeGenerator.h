@@ -62,11 +62,9 @@ class CallArguments {
            RegisterFile::CallFrameHeaderSize;
   }
   unsigned count() { return m_argv.size(); }
-  RegisterID* profileHookRegister() { return m_profileHookRegister.get(); }
   ArgumentsNode* argumentsNode() { return m_argumentsNode; }
 
  private:
-  RefPtr<RegisterID> m_profileHookRegister;
   ArgumentsNode* m_argumentsNode;
   Vector<RefPtr<RegisterID>, 16> m_argv;
 };

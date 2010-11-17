@@ -52,13 +52,16 @@ class ProfileGenerator : public RefCounted<ProfileGenerator> {
   unsigned profileGroup() const { return m_profileGroup; }
 
   // Collecting
-  void willExecute(const CallIdentifier&);
-  void didExecute(const CallIdentifier&);
+  void willExecute(ExecState* exec, const CallIdentifier&);
+  void didExecute(ExecState* exec, const CallIdentifier&);
+
+  void exceptionUnwind(ExecState* exec, const CallIdentifier&);
 
   // Stopping Profiling
   void stopProfiling();
 
   typedef void (ProfileGenerator::*ProfileFunction)(
+      ExecState* exec,
       const CallIdentifier& callIdentifier);
 
  private:
