@@ -62,6 +62,9 @@ class MockSpellCheck {
                       int* misspelledOffset,
                       int* misspelledLength);
 
+  void fillSuggestionList(const WebKit::WebString& word,
+                          Vector<WebKit::WebString>* suggestions);
+
  private:
   // Initialize the internal resources if we need to initialize it.
   // Initializing this object may take long time. To prevent from hurting

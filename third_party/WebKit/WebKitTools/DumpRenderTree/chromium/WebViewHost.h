@@ -267,6 +267,7 @@ class WebViewHost : public WebKit::WebViewClient,
                               WebKit::WebFileSystemCallbacks*);
 
   WebKit::WebDeviceOrientationClientMock* deviceOrientationClientMock();
+  MockSpellCheck* mockSpellCheck();
 
  private:
   LayoutTestController* layoutTestController() const;

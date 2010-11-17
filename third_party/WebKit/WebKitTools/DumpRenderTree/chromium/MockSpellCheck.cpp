@@ -94,6 +94,12 @@ bool MockSpellCheck::spellCheckWord(const WebString& text,
   return false;
 }
 
+void MockSpellCheck::fillSuggestionList(const WebString& word,
+                                        Vector<WebString>* suggestions) {
+  if (word == WebString::fromUTF8("wellcome"))
+    suggestions->append(WebString::fromUTF8("welcome"));
+}
+
 bool MockSpellCheck::initializeIfNeeded() {
   // Exit if we have already initialized this object.
   if (m_initialized)
@@ -112,8 +118,7 @@ bool MockSpellCheck::initializeIfNeeded() {
       "Textx", "blockquoted", "asd", "Lorem", "Nunc", "Curabitur", "eu", "adlj",
       "adaasj", "sdklj", "jlkds", "jsaada", "jlda", "zz", "contentEditable",
       // The following words are used by unit tests.
-      "ifmmp", "qwertyuiopasd", "qwertyuiopasdf",
-  };
+      "ifmmp", "qwertyuiopasd", "qwertyuiopasdf", "wellcome"};
 
   m_misspelledWords.clear();
   for (size_t i = 0; i < arraysize(misspelledWords); ++i)

@@ -580,6 +580,10 @@ WebDeviceOrientationClientMock* WebViewHost::deviceOrientationClientMock() {
   return m_deviceOrientationClientMock.get();
 }
 
+MockSpellCheck* WebViewHost::mockSpellCheck() {
+  return &m_spellcheck;
+}
+
 WebDeviceOrientationClient* WebViewHost::deviceOrientationClient() {
   return deviceOrientationClientMock();
 }
