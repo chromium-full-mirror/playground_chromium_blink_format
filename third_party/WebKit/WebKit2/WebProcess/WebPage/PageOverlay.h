@@ -61,6 +61,7 @@ class PageOverlay : public APIObject {
   virtual ~PageOverlay();
 
   void setPage(WebPage*);
+  void setNeedsDisplay(const WebCore::IntRect& dirtyRect);
   void setNeedsDisplay();
 
   void drawRect(WebCore::GraphicsContext&, const WebCore::IntRect& dirtyRect);
