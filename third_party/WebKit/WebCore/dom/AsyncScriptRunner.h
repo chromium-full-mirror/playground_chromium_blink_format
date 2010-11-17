@@ -36,7 +36,7 @@ namespace WebCore {
 
 class CachedScript;
 class Document;
-class ScriptElementData;
+class ScriptElement;
 
 class AsyncScriptRunner : public Noncopyable {
  public:
@@ -45,8 +45,7 @@ class AsyncScriptRunner : public Noncopyable {
   }
   ~AsyncScriptRunner();
 
-  void executeScriptSoon(ScriptElementData*,
-                         CachedResourceHandle<CachedScript>);
+  void executeScriptSoon(ScriptElement*, CachedResourceHandle<CachedScript>);
   bool hasPendingScripts() const { return !m_scriptsToExecuteSoon.isEmpty(); }
   void suspend();
   void resume();
@@ -57,7 +56,7 @@ class AsyncScriptRunner : public Noncopyable {
   void timerFired(Timer<AsyncScriptRunner>*);
 
   Document* m_document;
-  Vector<std::pair<ScriptElementData*, CachedResourceHandle<CachedScript>>>
+  Vector<std::pair<ScriptElement*, CachedResourceHandle<CachedScript>>>
       m_scriptsToExecuteSoon;
   Timer<AsyncScriptRunner> m_timer;
 };
