@@ -1010,9 +1010,6 @@ void WebFrameLoaderClient::transitionToCommittedForNewPage() {
       m_frame->page()->size(), Color::white, false,
       webPage->resizesToContentsLayoutSize(),
       isMainFrame && webPage->resizesToContentsEnabled());
-
-  if (isMainFrame && webPage->resizesToContentsEnabled())
-    m_frame->coreFrame()->view()->setProhibitsScrolling(true);
 #else
   m_frame->coreFrame()->createView(m_frame->page()->size(), Color::white, false,
                                    IntSize(), false);
