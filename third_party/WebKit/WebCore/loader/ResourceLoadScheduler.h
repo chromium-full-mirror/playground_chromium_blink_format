@@ -47,7 +47,14 @@ class ResourceLoadScheduler : public Noncopyable {
  public:
   friend ResourceLoadScheduler* resourceLoadScheduler();
 
-  enum Priority { VeryLow, Low, Medium, High };
+  enum Priority {
+    VeryLow,
+    Low,
+    Medium,
+    High,
+    LowestPriority = VeryLow,
+    HighestPriority = High
+  };
   PassRefPtr<SubresourceLoader> scheduleSubresourceLoad(
       Frame*,
       SubresourceLoaderClient*,
@@ -96,7 +103,7 @@ class ResourceLoadScheduler : public Noncopyable {
     }
 
    private:
-    RequestQueue m_requestsPending[High + 1];
+    RequestQueue m_requestsPending[HighestPriority + 1];
     typedef HashSet<RefPtr<ResourceLoader>> RequestMap;
     RequestMap m_requestsLoading;
     const String m_name;
