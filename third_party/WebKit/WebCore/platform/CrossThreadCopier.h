@@ -74,7 +74,9 @@ struct CrossThreadCopierBase<false, false, ThreadableLoaderOptions>
 // Custom copy methods.
 template <typename T>
 struct CrossThreadCopierBase<false, true, T> {
-  typedef typename WTF::RemoveTemplate<T, RefPtr>::Type RefCountedType;
+  typedef typename WTF::RemoveTemplate<T, RefPtr>::Type TypeWithoutRefPtr;
+  typedef typename WTF::RemoveTemplate<TypeWithoutRefPtr, PassRefPtr>::Type
+      RefCountedType;
   typedef PassRefPtr<RefCountedType> Type;
   static Type copy(const T& refPtr) { return refPtr.get(); }
 };
@@ -121,7 +123,10 @@ struct CrossThreadCopier
           WTF::IsConvertibleToInteger<T>::value,
           WTF::IsSubclassOfTemplate<
               typename WTF::RemoveTemplate<T, RefPtr>::Type,
-              ThreadSafeShared>::value,
+              ThreadSafeShared>::value ||
+              WTF::IsSubclassOfTemplate<
+                  typename WTF::RemoveTemplate<T, PassRefPtr>::Type,
+                  ThreadSafeShared>::value,
           T> {};
 
 }  // namespace WebCore
