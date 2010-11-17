@@ -1058,13 +1058,6 @@ void WebPage::didReceiveMessage(CoreIPC::Connection* connection,
     return;
   }
 
-  if (messageID.is<CoreIPC::MessageClassWebInspector>()) {
-    if (WebInspector* inspector = this->inspector())
-      inspector->didReceiveWebInspectorMessage(connection, messageID,
-                                               arguments);
-    return;
-  }
-
   didReceiveWebPageMessage(connection, messageID, arguments);
 }
 
