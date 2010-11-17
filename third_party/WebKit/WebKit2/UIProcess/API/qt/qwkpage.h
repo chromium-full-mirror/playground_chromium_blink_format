@@ -95,6 +95,7 @@ class QWEBKIT_EXPORT QWKPage : public QObject {
   void setCreateNewPageFunction(CreateNewPageFn function);
 
   void setCustomUserAgent(const QString&);
+  QString customUserAgent() const;
 
   qreal textZoomFactor() const;
   qreal pageZoomFactor() const;
