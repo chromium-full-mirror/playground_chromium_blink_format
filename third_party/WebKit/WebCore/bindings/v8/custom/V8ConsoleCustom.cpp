@@ -85,6 +85,7 @@ v8::Handle<v8::Value> V8Console::assertCallback(const v8::Arguments& args) {
   return v8::Handle<v8::Value>();
 }
 
+#if ENABLE(JAVASCRIPT_DEBUGGER)
 v8::Handle<v8::Value> V8Console::profileCallback(const v8::Arguments& args) {
   INC_STATS("DOM.Console.profile");
   Console* imp = V8Console::toNative(args.Holder());
@@ -108,5 +109,6 @@ v8::Handle<v8::Value> V8Console::profileEndCallback(const v8::Arguments& args) {
   imp->profileEnd(title, ScriptState::current(), callStack.release());
   return v8::Handle<v8::Value>();
 }
+#endif
 
 }  // namespace WebCore
