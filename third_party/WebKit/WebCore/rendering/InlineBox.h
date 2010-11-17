@@ -276,9 +276,10 @@ class InlineBox {
   // for horizontal text and width for vertical text.
   int logicalHeight() const;
 
-  virtual int baselinePosition() const {
+  virtual int baselinePosition(FontBaseline baselineType) const {
     return boxModelObject()->baselinePosition(
-        m_firstLine, isHorizontal() ? HorizontalLine : VerticalLine,
+        baselineType, m_firstLine,
+        isHorizontal() ? HorizontalLine : VerticalLine,
         PositionOnContainingLine);
   }
   virtual int lineHeight() const {

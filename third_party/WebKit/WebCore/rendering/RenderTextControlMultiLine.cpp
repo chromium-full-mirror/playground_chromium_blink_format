@@ -98,10 +98,12 @@ void RenderTextControlMultiLine::adjustControlHeightBasedOnLineHeight(
 }
 
 int RenderTextControlMultiLine::baselinePosition(
+    FontBaseline baselineType,
     bool firstLine,
     LineDirectionMode direction,
     LinePositionMode linePositionMode) const {
-  return RenderBox::baselinePosition(firstLine, direction, linePositionMode);
+  return RenderBox::baselinePosition(baselineType, firstLine, direction,
+                                     linePositionMode);
 }
 
 void RenderTextControlMultiLine::updateFromElement() {

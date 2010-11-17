@@ -64,7 +64,8 @@ class RootInlineBox : public InlineFlowBox {
   }
 
   int alignBoxesInBlockDirection(int heightOfBlock,
-                                 GlyphOverflowAndFallbackFontsMap&);
+                                 GlyphOverflowAndFallbackFontsMap&,
+                                 VerticalPositionCache&);
   void setLineTopBottomPositions(int top, int bottom);
 
   virtual RenderLineBoxList* rendererLineBoxes() const;
@@ -113,9 +114,10 @@ class RootInlineBox : public InlineFlowBox {
 
   virtual void clearTruncation();
 
-  virtual int baselinePosition() const {
+  virtual int baselinePosition(FontBaseline baselineType) const {
     return boxModelObject()->baselinePosition(
-        m_firstLine, isHorizontal() ? HorizontalLine : VerticalLine,
+        baselineType, m_firstLine,
+        isHorizontal() ? HorizontalLine : VerticalLine,
         PositionOfInteriorLineBoxes);
   }
   virtual int lineHeight() const {

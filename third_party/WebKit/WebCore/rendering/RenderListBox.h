@@ -80,6 +80,7 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
 
   virtual void computePreferredLogicalWidths();
   virtual int baselinePosition(
+      FontBaseline,
       bool firstLine,
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;

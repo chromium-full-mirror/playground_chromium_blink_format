@@ -242,10 +242,11 @@ void RenderListBox::computeLogicalHeight() {
   }
 }
 
-int RenderListBox::baselinePosition(bool firstLine,
+int RenderListBox::baselinePosition(FontBaseline baselineType,
+                                    bool firstLine,
                                     LineDirectionMode lineDirection,
                                     LinePositionMode linePositionMode) const {
-  return RenderBox::baselinePosition(firstLine, lineDirection,
+  return RenderBox::baselinePosition(baselineType, firstLine, lineDirection,
                                      linePositionMode) -
          baselineAdjustment;
 }

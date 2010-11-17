@@ -80,9 +80,6 @@ class RenderInline : public RenderBoxModelObject {
   virtual void addFocusRingRects(Vector<IntRect>&, int tx, int ty);
   void paintOutline(GraphicsContext*, int tx, int ty);
 
-  int verticalPositionFromCache(bool firstLine) const;
-  void invalidateVerticalPosition() { m_verticalPosition = PositionUndefined; }
-
  protected:
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
@@ -168,6 +165,7 @@ class RenderInline : public RenderBoxModelObject {
                          LineDirectionMode,
                          LinePositionMode = PositionOnContainingLine) const;
   virtual int baselinePosition(
+      FontBaseline,
       bool firstLine,
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;
@@ -206,7 +204,6 @@ class RenderInline : public RenderBoxModelObject {
                                          // its continuation but the
   // <b> will just have an inline as its continuation.
   mutable int m_lineHeight;
-  mutable int m_verticalPosition;
 };
 
 inline RenderInline* toRenderInline(RenderObject* object) {

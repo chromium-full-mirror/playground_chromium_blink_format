@@ -63,6 +63,7 @@ class RenderListMarker : public RenderBox {
                          LineDirectionMode,
                          LinePositionMode = PositionOnContainingLine) const;
   virtual int baselinePosition(
+      FontBaseline,
       bool firstLine,
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;

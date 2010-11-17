@@ -38,6 +38,7 @@ class RenderMathMLRow : public RenderMathMLBlock {
   virtual bool isRenderMathMLRow() const { return true; }
   virtual int nonOperatorHeight() const;
   virtual int baselinePosition(
+      FontBaseline,
       bool firstLine,
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;

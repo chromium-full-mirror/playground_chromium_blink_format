@@ -169,6 +169,7 @@ void RenderMathMLSubSup::layout() {
 }
 
 int RenderMathMLSubSup::baselinePosition(
+    FontBaseline,
     bool firstLine,
     LineDirectionMode direction,
     LinePositionMode linePositionMode) const {
@@ -194,14 +195,16 @@ int RenderMathMLSubSup::baselinePosition(
         // adjusted space for zoom
         float zoomFactor = style()->effectiveZoom();
         return topAdjust +
-               box->baselinePosition(firstLine, direction, linePositionMode) +
+               box->baselinePosition(AlphabeticBaseline, firstLine, direction,
+                                     linePositionMode) +
                static_cast<int>((zoomFactor > 1.25 ? 2 : 3) * zoomFactor);
       }
       break;
     case Sup:
     case Sub:
       RenderBoxModelObject* box = toRenderBoxModelObject(base);
-      baseline = box->baselinePosition(firstLine, direction, linePositionMode);
+      baseline = box->baselinePosition(AlphabeticBaseline, firstLine, direction,
+                                       linePositionMode);
       break;
   }
 

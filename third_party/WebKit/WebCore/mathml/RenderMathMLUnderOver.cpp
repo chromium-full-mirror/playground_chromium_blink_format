@@ -159,11 +159,11 @@ void RenderMathMLUnderOver::layout() {
         if (!over->firstChild()->isBoxModelObject())
           break;
 
-        int overSpacing =
-            static_cast<int>(gOverSpacingAdjustment *
-                             (getOffsetHeight(over) -
-                              toRenderBoxModelObject(over->firstChild())
-                                  ->baselinePosition(true, HorizontalLine)));
+        int overSpacing = static_cast<int>(
+            gOverSpacingAdjustment *
+            (getOffsetHeight(over) -
+             toRenderBoxModelObject(over->firstChild())
+                 ->baselinePosition(AlphabeticBaseline, true, HorizontalLine)));
 
         // base row wrapper
         base = over->nextSibling();
@@ -197,7 +197,7 @@ void RenderMathMLUnderOver::layout() {
         //        the line boxes and the baseline and squeeze them together
         int underSpacing = baseHeight -
                            toRenderBoxModelObject(base)->baselinePosition(
-                               true, HorizontalLine);
+                               AlphabeticBaseline, true, HorizontalLine);
 
         // adjust the base's intrusion into the under
         RenderObject* under = lastChild();
@@ -223,11 +223,11 @@ void RenderMathMLUnderOver::layout() {
         // over
         if (!over->firstChild()->isBoxModelObject())
           break;
-        int overSpacing =
-            static_cast<int>(gOverSpacingAdjustment *
-                             (getOffsetHeight(over) -
-                              toRenderBoxModelObject(over->firstChild())
-                                  ->baselinePosition(true, HorizontalLine)));
+        int overSpacing = static_cast<int>(
+            gOverSpacingAdjustment *
+            (getOffsetHeight(over) -
+             toRenderBoxModelObject(over->firstChild())
+                 ->baselinePosition(AlphabeticBaseline, true, HorizontalLine)));
 
         // base row wrapper
         base = over->nextSibling();
@@ -251,7 +251,7 @@ void RenderMathMLUnderOver::layout() {
           //        the line boxes and the baseline and squeeze them together
           int underSpacing = baseHeight -
                              toRenderBoxModelObject(base)->baselinePosition(
-                                 true, HorizontalLine);
+                                 AlphabeticBaseline, true, HorizontalLine);
 
           RenderObject* under = lastChild();
           if (under && under->firstChild()->isRenderInline() &&
@@ -266,13 +266,14 @@ void RenderMathMLUnderOver::layout() {
 }
 
 int RenderMathMLUnderOver::baselinePosition(
+    FontBaseline,
     bool firstLine,
     LineDirectionMode direction,
     LinePositionMode linePositionMode) const {
   RenderObject* current = firstChild();
   if (!current)
-    return RenderBlock::baselinePosition(firstLine, direction,
-                                         linePositionMode);
+    return RenderBlock::baselinePosition(AlphabeticBaseline, firstLine,
+                                         direction, linePositionMode);
 
   int baseline = 0;
   switch (m_kind) {
@@ -286,7 +287,7 @@ int RenderMathMLUnderOver::baselinePosition(
         if (!base || !base->isBoxModelObject())
           break;
         baseline += toRenderBoxModelObject(base)->baselinePosition(
-            firstLine, HorizontalLine, linePositionMode);
+            AlphabeticBaseline, firstLine, HorizontalLine, linePositionMode);
         // added the negative top margin
         baseline += current->style()->marginTop().value();
       }
@@ -295,7 +296,7 @@ int RenderMathMLUnderOver::baselinePosition(
       RenderObject* base = current->firstChild();
       if (base && base->isBoxModelObject())
         baseline += toRenderBoxModelObject(base)->baselinePosition(
-            true, HorizontalLine);
+            AlphabeticBaseline, true, HorizontalLine);
   }
 
   // FIXME: Where is the extra 2-3px adjusted for zoom coming from?

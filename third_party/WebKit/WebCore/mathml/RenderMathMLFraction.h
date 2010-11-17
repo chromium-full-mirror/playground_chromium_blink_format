@@ -39,6 +39,7 @@ class RenderMathMLFraction : public RenderMathMLBlock {
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
   virtual void updateFromElement();
   virtual int baselinePosition(
+      FontBaseline,
       bool firstLine,
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;

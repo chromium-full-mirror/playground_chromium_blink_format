@@ -40,6 +40,7 @@ class RenderMathMLUnderOver : public RenderMathMLBlock {
   virtual bool hasBase() const { return true; }
   virtual int nonOperatorHeight() const;
   virtual int baselinePosition(
+      FontBaseline,
       bool firstLine,
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;

@@ -36,6 +36,7 @@
 #include "RenderView.h"
 #include "Settings.h"
 #include "TrailingFloatsRootInlineBox.h"
+#include "VerticalPositionCache.h"
 #include "break_lines.h"
 #include <wtf/AlwaysInline.h>
 #include <wtf/RefCountedLeakCounter.h>
@@ -551,9 +552,10 @@ void RenderBlock::computeInlineDirectionPositionsForLine(
 void RenderBlock::computeBlockDirectionPositionsForLine(
     RootInlineBox* lineBox,
     BidiRun* firstRun,
-    GlyphOverflowAndFallbackFontsMap& textBoxDataMap) {
-  setLogicalHeight(
-      lineBox->alignBoxesInBlockDirection(logicalHeight(), textBoxDataMap));
+    GlyphOverflowAndFallbackFontsMap& textBoxDataMap,
+    VerticalPositionCache& verticalPositionCache) {
+  setLogicalHeight(lineBox->alignBoxesInBlockDirection(
+      logicalHeight(), textBoxDataMap, verticalPositionCache));
   lineBox->setBlockLogicalHeight(logicalHeight());
 
   // Now make sure we place replaced render objects correctly.
@@ -654,12 +656,6 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         if (fullLayout || o->selfNeedsLayout())
           dirtyLineBoxesForRenderer(o, fullLayout);
         o->setNeedsLayout(false);
-        if (!o->isText())
-          toRenderInline(o)->invalidateVerticalPosition();  // FIXME: Should do
-                                                            // better here and
-                                                            // not always
-                                                            // invalidate
-                                                            // everything.
       }
       o = bidiNext(this, o, 0, false, &endOfInline);
     }
@@ -754,6 +750,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
     bool isLineEmpty = true;
     bool paginated =
         view()->layoutState() && view()->layoutState()->isPaginated();
+
+    VerticalPositionCache verticalPositionCache;
 
     while (!end.atEnd()) {
       // FIXME: Is this check necessary before the first iteration or can it be
@@ -876,7 +874,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
 
             // Now position our text runs vertically.
             computeBlockDirectionPositionsForLine(lineBox, resolver.firstRun(),
-                                                  textBoxDataMap);
+                                                  textBoxDataMap,
+                                                  verticalPositionCache);
 
 #if ENABLE(SVG)
             // SVG text layout code computes vertical & horizontal positions on
@@ -1038,8 +1037,9 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         m_lineBoxes.appendLineBox(trailingFloatsLineBox);
         trailingFloatsLineBox->setConstructed();
         GlyphOverflowAndFallbackFontsMap textBoxDataMap;
-        trailingFloatsLineBox->alignBoxesInBlockDirection(logicalHeight(),
-                                                          textBoxDataMap);
+        VerticalPositionCache verticalPositionCache;
+        trailingFloatsLineBox->alignBoxesInBlockDirection(
+            logicalHeight(), textBoxDataMap, verticalPositionCache);
         trailingFloatsLineBox->setBlockDirectionOverflowPositions(
             logicalHeight(), bottomLayoutOverflow, logicalHeight(),
             bottomVisualOverflow);

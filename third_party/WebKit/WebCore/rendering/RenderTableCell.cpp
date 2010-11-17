@@ -298,14 +298,7 @@ void RenderTableCell::computeRectForRepaint(
   RenderBlock::computeRectForRepaint(repaintContainer, r, fixed);
 }
 
-int RenderTableCell::baselinePosition(bool firstLine,
-                                      LineDirectionMode lineDirection,
-                                      LinePositionMode linePositionMode) const {
-  // FIXME: This function still needs to be patched for writing-mode.
-  if (linePositionMode == PositionOfInteriorLineBoxes)
-    return RenderBlock::baselinePosition(firstLine, lineDirection,
-                                         linePositionMode);
-
+int RenderTableCell::baselinePosition() const {
   // <http://www.w3.org/TR/2007/CR-CSS21-20070719/tables.html#height-layout>:
   // The baseline of a cell is the baseline of
   // the first in-flow line box in the cell, or the first in-flow table-row in
@@ -315,7 +308,7 @@ int RenderTableCell::baselinePosition(bool firstLine,
   int firstLineBaseline = firstLineBoxBaseline();
   if (firstLineBaseline != -1)
     return firstLineBaseline;
-  return paddingTop() + borderTop() + contentHeight();
+  return paddingBefore() + borderBefore() + contentLogicalHeight();
 }
 
 void RenderTableCell::styleWillChange(StyleDifference diff,

@@ -348,6 +348,7 @@ RenderBlock* RenderMathMLOperator::createGlyph(UChar glyph,
 }
 
 int RenderMathMLOperator::baselinePosition(
+    FontBaseline,
     bool firstLine,
     LineDirectionMode lineDirection,
     LinePositionMode linePositionMode) const {
@@ -356,8 +357,8 @@ int RenderMathMLOperator::baselinePosition(
            (m_stretchHeight -
             static_cast<int>(m_stretchHeight / gOperatorExpansion)) /
                2;
-  return RenderBlock::baselinePosition(firstLine, lineDirection,
-                                       linePositionMode);
+  return RenderBlock::baselinePosition(AlphabeticBaseline, firstLine,
+                                       lineDirection, linePositionMode);
 }
 }
 

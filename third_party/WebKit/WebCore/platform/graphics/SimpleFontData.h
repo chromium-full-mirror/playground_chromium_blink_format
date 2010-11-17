@@ -85,7 +85,11 @@ class SimpleFontData : public FontData {
 
   SimpleFontData* brokenIdeographFontData() const;
 
-  // vertical metrics
+  // FIXME: Use the actual metrics for fonts with vertical tables instead of
+  // just hard-coding.  If the font is horizontally oriented or
+  // a broken ideographic font, then just hard-code to split ascent/descent down
+  // the middle.  Otherwise we should actually use the metrics
+  // from the font itself.
   int ascent(FontBaseline baselineType = AlphabeticBaseline) const {
     return baselineType == AlphabeticBaseline ? m_ascent
                                               : height() - height() / 2;

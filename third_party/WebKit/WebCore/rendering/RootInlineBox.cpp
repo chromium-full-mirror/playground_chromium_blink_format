@@ -246,7 +246,8 @@ void RootInlineBox::childRemoved(InlineBox* box) {
 
 int RootInlineBox::alignBoxesInBlockDirection(
     int heightOfBlock,
-    GlyphOverflowAndFallbackFontsMap& textBoxDataMap) {
+    GlyphOverflowAndFallbackFontsMap& textBoxDataMap,
+    VerticalPositionCache& verticalPositionCache) {
 #if ENABLE(SVG)
   // SVG will handle vertical alignment on its own.
   if (isSVGRootInlineBox())
@@ -269,7 +270,8 @@ int RootInlineBox::alignBoxesInBlockDirection(
 
   computeLogicalBoxHeights(maxPositionTop, maxPositionBottom, maxAscent,
                            maxDescent, setMaxAscent, setMaxDescent,
-                           noQuirksMode, textBoxDataMap);
+                           noQuirksMode, textBoxDataMap, m_baselineType,
+                           verticalPositionCache);
 
   if (maxAscent + maxDescent < max(maxPositionTop, maxPositionBottom))
     adjustMaxAscentAndDescent(maxAscent, maxDescent, maxPositionTop,
@@ -280,7 +282,7 @@ int RootInlineBox::alignBoxesInBlockDirection(
   int lineBottom = heightOfBlock;
   bool setLineTop = false;
   placeBoxesInBlockDirection(heightOfBlock, maxHeight, maxAscent, noQuirksMode,
-                             lineTop, lineBottom, setLineTop);
+                             lineTop, lineBottom, setLineTop, m_baselineType);
   computeBlockDirectionOverflow(lineTop, lineBottom, noQuirksMode,
                                 textBoxDataMap);
   setLineTopBottomPositions(lineTop, lineBottom);

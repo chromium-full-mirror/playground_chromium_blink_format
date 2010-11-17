@@ -148,9 +148,11 @@ RenderSlider::~RenderSlider() {
     m_thumb->detach();
 }
 
-int RenderSlider::baselinePosition(bool /*firstLine*/,
+int RenderSlider::baselinePosition(FontBaseline,
+                                   bool /*firstLine*/,
                                    LineDirectionMode,
                                    LinePositionMode) const {
+  // FIXME: Patch this function for writing-mode.
   return height() + marginTop();
 }
 

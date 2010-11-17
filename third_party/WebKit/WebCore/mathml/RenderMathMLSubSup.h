@@ -41,6 +41,7 @@ class RenderMathMLSubSup : public RenderMathMLBlock {
   virtual int nonOperatorHeight() const;
   virtual void stretchToHeight(int pixelHeight);
   virtual int baselinePosition(
+      FontBaseline,
       bool firstLine,
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;

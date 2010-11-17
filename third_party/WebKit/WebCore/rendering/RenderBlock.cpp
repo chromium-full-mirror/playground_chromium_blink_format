@@ -6199,7 +6199,8 @@ int RenderBlock::lineHeight(bool firstLine,
   return m_lineHeight;
 }
 
-int RenderBlock::baselinePosition(bool firstLine,
+int RenderBlock::baselinePosition(FontBaseline baselineType,
+                                  bool firstLine,
                                   LineDirectionMode direction,
                                   LinePositionMode linePositionMode) const {
   // Inline blocks are replaced elements. Otherwise, just pass off to
@@ -6246,11 +6247,12 @@ int RenderBlock::baselinePosition(bool firstLine,
       return direction == HorizontalLine ? marginTop() + baselinePos
                                          : marginRight() + baselinePos;
 
-    return RenderBox::baselinePosition(firstLine, direction, linePositionMode);
+    return RenderBox::baselinePosition(baselineType, firstLine, direction,
+                                       linePositionMode);
   }
 
   const Font& f = style(firstLine)->font();
-  return f.ascent() +
+  return f.ascent(baselineType) +
          (lineHeight(firstLine, direction, linePositionMode) - f.height()) / 2;
 }
 
@@ -6260,7 +6262,8 @@ int RenderBlock::firstLineBoxBaseline() const {
 
   if (childrenInline()) {
     if (firstLineBox())
-      return firstLineBox()->logicalTop() + style(true)->font().ascent();
+      return firstLineBox()->logicalTop() +
+             style(true)->font().ascent(firstRootBox()->baselineType());
     else
       return -1;
   } else {
@@ -6297,7 +6300,9 @@ int RenderBlock::lastLineBoxBaseline() const {
     }
     if (lastLineBox())
       return lastLineBox()->logicalTop() +
-             style(lastLineBox() == firstLineBox())->font().ascent();
+             style(lastLineBox() == firstLineBox())
+                 ->font()
+                 .ascent(lastRootBox()->baselineType());
     return -1;
   } else {
     bool haveNormalFlowChild = false;

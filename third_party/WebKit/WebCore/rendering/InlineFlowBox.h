@@ -30,6 +30,7 @@ class HitTestRequest;
 class HitTestResult;
 class InlineTextBox;
 class RenderLineBoxList;
+class VerticalPositionCache;
 
 typedef HashMap<const InlineTextBox*,
                 pair<Vector<const SimpleFontData*>, GlyphOverflow>>
@@ -203,7 +204,9 @@ class InlineFlowBox : public InlineBox {
                                 bool& setMaxAscent,
                                 bool& setMaxDescent,
                                 bool strictMode,
-                                GlyphOverflowAndFallbackFontsMap&);
+                                GlyphOverflowAndFallbackFontsMap&,
+                                FontBaseline,
+                                VerticalPositionCache&);
   void adjustMaxAscentAndDescent(int& maxAscent,
                                  int& maxDescent,
                                  int maxPositionTop,
@@ -214,7 +217,8 @@ class InlineFlowBox : public InlineBox {
                                   bool strictMode,
                                   int& lineTop,
                                   int& lineBottom,
-                                  bool& setLineTop);
+                                  bool& setLineTop,
+                                  FontBaseline);
   void flipLinesInBlockDirection(int lineTop, int lineBottom);
   void computeBlockDirectionOverflow(int lineTop,
                                      int lineBottom,

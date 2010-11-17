@@ -166,6 +166,7 @@ void RenderMathMLFraction::paint(PaintInfo& info, int tx, int ty) {
 }
 
 int RenderMathMLFraction::baselinePosition(
+    FontBaseline,
     bool firstLine,
     LineDirectionMode lineDirection,
     LinePositionMode linePositionMode) const {
@@ -177,8 +178,8 @@ int RenderMathMLFraction::baselinePosition(
     // a good guess.
     return numerator->offsetHeight() + style()->fontSize() / 3;
   }
-  return RenderBlock::baselinePosition(firstLine, lineDirection,
-                                       linePositionMode);
+  return RenderBlock::baselinePosition(AlphabeticBaseline, firstLine,
+                                       lineDirection, linePositionMode);
 }
 }
 

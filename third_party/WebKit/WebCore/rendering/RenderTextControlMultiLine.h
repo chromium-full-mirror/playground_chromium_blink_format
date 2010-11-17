@@ -51,6 +51,7 @@ class RenderTextControlMultiLine : public RenderTextControl {
   virtual int preferredContentWidth(float charWidth) const;
   virtual void adjustControlHeightBasedOnLineHeight(int lineHeight);
   virtual int baselinePosition(
+      FontBaseline,
       bool firstLine,
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;

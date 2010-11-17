@@ -28,11 +28,6 @@
 
 namespace WebCore {
 
-// Values for vertical alignment.
-const int PositionTop = -0x7fffffff;
-const int PositionBottom = 0x7fffffff;
-const int PositionUndefined = 0x80000000;
-
 // Modes for some of the line-related functions.
 enum LinePositionMode { PositionOnContainingLine, PositionOfInteriorLineBoxes };
 enum LineDirectionMode { HorizontalLine, VerticalLine };
@@ -167,15 +162,12 @@ class RenderBoxModelObject : public RenderObject {
                               CompositeOperator = CompositeSourceOver,
                               RenderObject* backgroundObject = 0);
 
-  // The difference between this inline's baseline position and the line's
-  // baseline position.
-  int verticalPosition(bool firstLine) const;
-
   // Overridden by subclasses to determine line height and baseline position.
   virtual int lineHeight(bool firstLine,
                          LineDirectionMode,
                          LinePositionMode = PositionOnContainingLine) const = 0;
   virtual int baselinePosition(
+      FontBaseline,
       bool firstLine,
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const = 0;

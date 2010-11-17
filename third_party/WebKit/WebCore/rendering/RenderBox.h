@@ -543,6 +543,7 @@ class RenderBox : public RenderBoxModelObject {
                          LineDirectionMode,
                          LinePositionMode = PositionOnContainingLine) const;
   virtual int baselinePosition(
+      FontBaseline,
       bool firstLine,
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;

@@ -64,6 +64,7 @@ class RenderBlock : public RenderBox {
                          LineDirectionMode,
                          LinePositionMode = PositionOnContainingLine) const;
   virtual int baselinePosition(
+      FontBaseline,
       bool firstLine,
       LineDirectionMode,
       LinePositionMode = PositionOnContainingLine) const;
@@ -656,7 +657,8 @@ class RenderBlock : public RenderBox {
       GlyphOverflowAndFallbackFontsMap&);
   void computeBlockDirectionPositionsForLine(RootInlineBox*,
                                              BidiRun*,
-                                             GlyphOverflowAndFallbackFontsMap&);
+                                             GlyphOverflowAndFallbackFontsMap&,
+                                             VerticalPositionCache&);
   void deleteEllipsisLineBoxes();
   void checkLinesForTextOverflow();
   void addOverflowFromInlineChildren();
