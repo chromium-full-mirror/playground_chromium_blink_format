@@ -41,11 +41,12 @@ WebPreferencesStore::WebPreferencesStore()
       localStorageEnabled(true),
       xssAuditorEnabled(true),
       frameFlatteningEnabled(false),
+      developerExtrasEnabled(false),
+      privateBrowsingEnabled(false),
+      needsSiteSpecificQuirks(false),
       acceleratedCompositingEnabled(true),
       compositingBordersVisible(false),
       compositingRepaintCountersVisible(false),
-      privateBrowsingEnabled(false),
-      developerExtrasEnabled(false),
       fontSmoothingLevel(FontSmoothingLevelMedium),
       minimumFontSize(0),
       minimumLogicalFontSize(9),
@@ -96,6 +97,7 @@ void WebPreferencesStore::encode(CoreIPC::ArgumentEncoder* encoder) const {
   encoder->encode(acceleratedCompositingEnabled);
   encoder->encode(compositingBordersVisible);
   encoder->encode(compositingRepaintCountersVisible);
+  encoder->encode(needsSiteSpecificQuirks);
 }
 
 bool WebPreferencesStore::decode(CoreIPC::ArgumentDecoder* decoder,
@@ -147,6 +149,8 @@ bool WebPreferencesStore::decode(CoreIPC::ArgumentDecoder* decoder,
   if (!decoder->decode(s.compositingBordersVisible))
     return false;
   if (!decoder->decode(s.compositingRepaintCountersVisible))
+    return false;
+  if (!decoder->decode(s.needsSiteSpecificQuirks))
     return false;
 
   if (hasXSSAuditorEnabledTestRunnerOverride)
