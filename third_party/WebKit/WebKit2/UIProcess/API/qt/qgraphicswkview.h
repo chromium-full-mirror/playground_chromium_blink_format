@@ -83,7 +83,9 @@ class QWEBKIT_EXPORT QGraphicsWKView : public QGraphicsWidget {
   virtual void hoverMoveEvent(QGraphicsSceneHoverEvent*);
 
   Q_SLOT void updateCursor(const QCursor&);
+  Q_SLOT void focusNextPrevChildCallback(bool next);
 
+  virtual bool focusNextPrevChild(bool next);
   virtual void focusInEvent(QFocusEvent*);
   virtual void focusOutEvent(QFocusEvent*);
 
