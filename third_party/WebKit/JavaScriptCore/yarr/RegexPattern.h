@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2010 Peter Varga (pvarga@inf.u-szeged.hu), University of Szeged
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -237,11 +238,28 @@ CharacterClass* nondigitsCreate();
 CharacterClass* nonspacesCreate();
 CharacterClass* nonwordcharCreate();
 
+struct TermChain {
+  TermChain(PatternTerm term) : term(term) {}
+
+  PatternTerm term;
+  Vector<TermChain> hotTerms;
+};
+
+struct BeginChar {
+  BeginChar() : value(0), mask(0) {}
+
+  BeginChar(unsigned value, unsigned mask) : value(value), mask(mask) {}
+
+  unsigned value;
+  unsigned mask;
+};
+
 struct RegexPattern {
   RegexPattern(bool ignoreCase, bool multiline)
       : m_ignoreCase(ignoreCase),
         m_multiline(multiline),
         m_containsBackreferences(false),
+        m_containsBeginChars(false),
         m_containsBOL(false),
         m_numSubpatterns(0),
         m_maxBackReference(0),
@@ -263,6 +281,7 @@ struct RegexPattern {
     m_maxBackReference = 0;
 
     m_containsBackreferences = false;
+    m_containsBeginChars = false;
     m_containsBOL = false;
 
     newlineCached = 0;
@@ -277,6 +296,7 @@ struct RegexPattern {
     m_disjunctions.clear();
     deleteAllValues(m_userCharacterClasses);
     m_userCharacterClasses.clear();
+    m_beginChars.clear();
   }
 
   bool containsIllegalBackReference() {
@@ -322,12 +342,14 @@ struct RegexPattern {
   bool m_ignoreCase : 1;
   bool m_multiline : 1;
   bool m_containsBackreferences : 1;
+  bool m_containsBeginChars : 1;
   bool m_containsBOL : 1;
   unsigned m_numSubpatterns;
   unsigned m_maxBackReference;
   PatternDisjunction* m_body;
   Vector<PatternDisjunction*, 4> m_disjunctions;
   Vector<CharacterClass*> m_userCharacterClasses;
+  Vector<BeginChar> m_beginChars;
 
  private:
   CharacterClass* newlineCached;
