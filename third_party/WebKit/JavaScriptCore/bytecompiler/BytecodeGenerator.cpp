@@ -362,9 +362,6 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
 
   codeBlock->setGlobalData(m_globalData);
 
-  if (m_shouldEmitProfileHooks)
-    emitOpcode(op_profile_has_called);
-
   emitOpcode(op_enter);
   if (m_codeBlock->needsFullScopeChain()) {
     m_activationRegister = addVar();
@@ -1753,6 +1750,9 @@ RegisterID* BytecodeGenerator::emitCall(OpcodeID opcodeID,
   ASSERT(opcodeID == op_call || opcodeID == op_call_eval);
   ASSERT(func->refCount());
 
+  if (m_shouldEmitProfileHooks)
+    emitMove(callArguments.profileHookRegister(), func);
+
   // Generate code for arguments.
   unsigned argumentIndex = 0;
   for (ArgumentListNode* n = callArguments.argumentsNode()->m_listNode; n;
@@ -1763,6 +1763,16 @@ RegisterID* BytecodeGenerator::emitCall(OpcodeID opcodeID,
   Vector<RefPtr<RegisterID>, RegisterFile::CallFrameHeaderSize> callFrame;
   for (int i = 0; i < RegisterFile::CallFrameHeaderSize; ++i)
     callFrame.append(newTemporary());
+
+  if (m_shouldEmitProfileHooks) {
+    emitOpcode(op_profile_will_call);
+    instructions().append(callArguments.profileHookRegister()->index());
+
+#if ENABLE(JIT)
+    m_codeBlock->addFunctionRegisterInfo(
+        instructions().size(), callArguments.profileHookRegister()->index());
+#endif
+  }
 
   emitExpressionInfo(divot, startOffset, endOffset);
 
@@ -1778,6 +1788,11 @@ RegisterID* BytecodeGenerator::emitCall(OpcodeID opcodeID,
   if (dst != ignoredResult()) {
     emitOpcode(op_call_put_result);
     instructions().append(dst->index());  // dst
+  }
+
+  if (m_shouldEmitProfileHooks) {
+    emitOpcode(op_profile_did_call);
+    instructions().append(callArguments.profileHookRegister()->index());
   }
 
   return dst;
@@ -1806,6 +1821,14 @@ RegisterID* BytecodeGenerator::emitCallVarargs(RegisterID* dst,
   ASSERT(func->refCount());
   ASSERT(thisRegister->refCount());
   ASSERT(dst != func);
+  if (m_shouldEmitProfileHooks) {
+    emitOpcode(op_profile_will_call);
+    instructions().append(func->index());
+
+#if ENABLE(JIT)
+    m_codeBlock->addFunctionRegisterInfo(instructions().size(), func->index());
+#endif
+  }
 
   emitExpressionInfo(divot, startOffset, endOffset);
 
@@ -1819,6 +1842,10 @@ RegisterID* BytecodeGenerator::emitCallVarargs(RegisterID* dst,
   if (dst != ignoredResult()) {
     emitOpcode(op_call_put_result);
     instructions().append(dst->index());  // dst
+  }
+  if (m_shouldEmitProfileHooks) {
+    emitOpcode(op_profile_did_call);
+    instructions().append(func->index());
   }
   return dst;
 }
@@ -1838,9 +1865,6 @@ RegisterID* BytecodeGenerator::emitReturn(RegisterID* src) {
     emitOpcode(op_tear_off_arguments);
     instructions().append(m_codeBlock->argumentsRegister());
   }
-
-  if (m_shouldEmitProfileHooks)
-    emitOpcode(op_profile_will_return);
 
   // Constructors use op_ret_object_or_this to check the result is an
   // object, unless we can trivially determine the check is not
@@ -1869,11 +1893,19 @@ RegisterID* BytecodeGenerator::emitConstruct(RegisterID* dst,
                                              unsigned endOffset) {
   ASSERT(func->refCount());
 
+  if (m_shouldEmitProfileHooks)
+    emitMove(callArguments.profileHookRegister(), func);
+
   // Generate code for arguments.
   unsigned argumentIndex = 0;
   if (ArgumentsNode* argumentsNode = callArguments.argumentsNode()) {
     for (ArgumentListNode* n = argumentsNode->m_listNode; n; n = n->m_next)
       emitNode(callArguments.argumentRegister(argumentIndex++), n);
+  }
+
+  if (m_shouldEmitProfileHooks) {
+    emitOpcode(op_profile_will_call);
+    instructions().append(callArguments.profileHookRegister()->index());
   }
 
   // Reserve space for call frame.
@@ -1894,6 +1926,11 @@ RegisterID* BytecodeGenerator::emitConstruct(RegisterID* dst,
   if (dst != ignoredResult()) {
     emitOpcode(op_call_put_result);
     instructions().append(dst->index());  // dst
+  }
+
+  if (m_shouldEmitProfileHooks) {
+    emitOpcode(op_profile_did_call);
+    instructions().append(callArguments.profileHookRegister()->index());
   }
 
   return dst;

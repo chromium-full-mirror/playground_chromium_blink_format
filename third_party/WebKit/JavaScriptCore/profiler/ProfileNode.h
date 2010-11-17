@@ -37,7 +37,6 @@
 
 namespace JSC {
 
-class ExecState;
 class ProfileNode;
 
 typedef Vector<RefPtr<ProfileNode>>::const_iterator StackIterator;
@@ -45,30 +44,26 @@ typedef HashCountedSet<StringImpl*> FunctionCallHashCount;
 
 class ProfileNode : public RefCounted<ProfileNode> {
  public:
-  static PassRefPtr<ProfileNode> create(ExecState* exec,
-                                        const CallIdentifier& callIdentifier,
+  static PassRefPtr<ProfileNode> create(const CallIdentifier& callIdentifier,
                                         ProfileNode* headNode,
                                         ProfileNode* parentNode) {
-    return adoptRef(
-        new ProfileNode(exec, callIdentifier, headNode, parentNode));
+    return adoptRef(new ProfileNode(callIdentifier, headNode, parentNode));
   }
-  static PassRefPtr<ProfileNode> create(ExecState* exec,
-                                        ProfileNode* headNode,
+  static PassRefPtr<ProfileNode> create(ProfileNode* headNode,
                                         ProfileNode* node) {
-    return adoptRef(new ProfileNode(exec, headNode, node));
+    return adoptRef(new ProfileNode(headNode, node));
   }
 
   bool operator==(ProfileNode* node) {
-    return m_exec == node->m_exec && m_callIdentifier == node->callIdentifier();
+    return m_callIdentifier == node->callIdentifier();
   }
 
-  ProfileNode* willExecute(ExecState* exec, const CallIdentifier&);
+  ProfileNode* willExecute(const CallIdentifier&);
   ProfileNode* didExecute();
 
   void stopProfiling();
 
   // CallIdentifier members
-  const ExecState* exec() const { return m_exec; }
   const CallIdentifier& callIdentifier() const { return m_callIdentifier; }
   const UString& functionName() const { return m_callIdentifier.m_name; }
   const UString& url() const { return m_callIdentifier.m_url; }
@@ -153,11 +148,10 @@ class ProfileNode : public RefCounted<ProfileNode> {
 #endif
 
  private:
-  ProfileNode(ExecState* exec,
-              const CallIdentifier&,
+  ProfileNode(const CallIdentifier&,
               ProfileNode* headNode,
               ProfileNode* parentNode);
-  ProfileNode(ExecState* exec, ProfileNode* headNode, ProfileNode* nodeToCopy);
+  ProfileNode(ProfileNode* headNode, ProfileNode* nodeToCopy);
 
   void startTimer();
   void resetChildrensSiblings();
@@ -204,7 +198,6 @@ class ProfileNode : public RefCounted<ProfileNode> {
     return a->functionName() < b->functionName();
   }
 
-  ExecState* m_exec;
   CallIdentifier m_callIdentifier;
   ProfileNode* m_head;
   ProfileNode* m_parent;

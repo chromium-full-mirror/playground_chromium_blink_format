@@ -1425,12 +1425,16 @@ void CodeBlock::dump(ExecState* exec,
              debugHookName(debugHookID), firstLine, lastLine);
       break;
     }
-    case op_profile_has_called: {
-      printf("[%4d] op_profile_has_called\n", location);
+    case op_profile_will_call: {
+      int function = (++it)->u.operand;
+      printf("[%4d] profile_will_call %s\n", location,
+             registerName(exec, function).data());
       break;
     }
-    case op_profile_will_return: {
-      printf("[%4d] op_profile_will_return\n", location);
+    case op_profile_did_call: {
+      int function = (++it)->u.operand;
+      printf("[%4d] profile_did_call\t %s\n", location,
+             registerName(exec, function).data());
       break;
     }
     case op_end: {
@@ -1917,6 +1921,36 @@ void CodeBlock::expressionRangeForBytecodeOffset(CallFrame* callFrame,
   return;
 }
 
+#if ENABLE(JIT)
+bool CodeBlock::functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
+                                                  int& functionRegisterIndex) {
+  ASSERT(bytecodeOffset < m_instructionCount);
+
+  if (!m_rareData || !m_rareData->m_functionRegisterInfos.size())
+    return false;
+
+  int low = 0;
+  int high = m_rareData->m_functionRegisterInfos.size();
+  while (low < high) {
+    int mid = low + (high - low) / 2;
+    if (m_rareData->m_functionRegisterInfos[mid].bytecodeOffset <=
+        bytecodeOffset)
+      low = mid + 1;
+    else
+      high = mid;
+  }
+
+  if (!low ||
+      m_rareData->m_functionRegisterInfos[low - 1].bytecodeOffset !=
+          bytecodeOffset)
+    return false;
+
+  functionRegisterIndex =
+      m_rareData->m_functionRegisterInfos[low - 1].functionRegisterIndex;
+  return true;
+}
+#endif
+
 #if ENABLE(INTERPRETER)
 bool CodeBlock::hasGlobalResolveInstructionAtBytecodeOffset(
     unsigned bytecodeOffset) {
@@ -1989,6 +2023,9 @@ void CodeBlock::shrinkToFit() {
     m_rareData->m_immediateSwitchJumpTables.shrinkToFit();
     m_rareData->m_characterSwitchJumpTables.shrinkToFit();
     m_rareData->m_stringSwitchJumpTables.shrinkToFit();
+#if ENABLE(JIT)
+    m_rareData->m_functionRegisterInfos.shrinkToFit();
+#endif
   }
 }
 

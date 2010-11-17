@@ -71,11 +71,11 @@ void ProfileGenerator::addParentForConsoleStart(ExecState* exec) {
 
   exec->interpreter()->retrieveLastCaller(exec, lineNumber, sourceID, sourceURL,
                                           function);
-  m_currentNode = ProfileNode::create(
-      exec, Profiler::createCallIdentifier(
-                exec, function ? function.toThisObject(exec) : 0, sourceURL,
-                lineNumber),
-      m_head.get(), m_head.get());
+  m_currentNode =
+      ProfileNode::create(Profiler::createCallIdentifier(
+                              exec, function ? function.toThisObject(exec) : 0,
+                              sourceURL, lineNumber),
+                          m_head.get(), m_head.get());
   m_head->insertNode(m_currentNode.get());
 }
 
@@ -83,8 +83,7 @@ const UString& ProfileGenerator::title() const {
   return m_profile->title();
 }
 
-void ProfileGenerator::willExecute(ExecState* exec,
-                                   const CallIdentifier& callIdentifier) {
+void ProfileGenerator::willExecute(const CallIdentifier& callIdentifier) {
   if (JAVASCRIPTCORE_PROFILE_WILL_EXECUTE_ENABLED()) {
     CString name = callIdentifier.m_name.utf8();
     CString url = callIdentifier.m_url.utf8();
@@ -96,12 +95,11 @@ void ProfileGenerator::willExecute(ExecState* exec,
   if (!m_originatingGlobalExec)
     return;
 
-  ASSERT(m_currentNode);
-  m_currentNode = m_currentNode->willExecute(exec, callIdentifier);
+  ASSERT_ARG(m_currentNode, m_currentNode);
+  m_currentNode = m_currentNode->willExecute(callIdentifier);
 }
 
-void ProfileGenerator::didExecute(ExecState* exec,
-                                  const CallIdentifier& callIdentifier) {
+void ProfileGenerator::didExecute(const CallIdentifier& callIdentifier) {
   if (JAVASCRIPTCORE_PROFILE_DID_EXECUTE_ENABLED()) {
     CString name = callIdentifier.m_name.utf8();
     CString url = callIdentifier.m_url.utf8();
@@ -113,10 +111,10 @@ void ProfileGenerator::didExecute(ExecState* exec,
   if (!m_originatingGlobalExec)
     return;
 
-  ASSERT(m_currentNode);
+  ASSERT_ARG(m_currentNode, m_currentNode);
   if (m_currentNode->callIdentifier() != callIdentifier) {
-    RefPtr<ProfileNode> returningNode = ProfileNode::create(
-        exec, callIdentifier, m_head.get(), m_currentNode.get());
+    RefPtr<ProfileNode> returningNode =
+        ProfileNode::create(callIdentifier, m_head.get(), m_currentNode.get());
     returningNode->setStartTime(m_currentNode->startTime());
     returningNode->didExecute();
     m_currentNode->insertNode(returningNode.release());
@@ -126,21 +124,13 @@ void ProfileGenerator::didExecute(ExecState* exec,
   m_currentNode = m_currentNode->didExecute();
 }
 
-void ProfileGenerator::exceptionUnwind(ExecState* exec, const CallIdentifier&) {
-  ASSERT(m_currentNode);
-  while (m_currentNode->exec() > exec) {
-    didExecute(exec, m_currentNode->callIdentifier());
-    ASSERT(m_currentNode);
-  }
-}
-
 void ProfileGenerator::stopProfiling() {
   m_profile->forEach(&ProfileNode::stopProfiling);
 
   removeProfileStart();
   removeProfileEnd();
 
-  ASSERT(m_currentNode);
+  ASSERT_ARG(m_currentNode, m_currentNode);
 
   // Set the current node to the parent, because we are in a call that
   // will not get didExecute call.
@@ -148,7 +138,7 @@ void ProfileGenerator::stopProfiling() {
 
   if (double headSelfTime = m_head->selfTime()) {
     RefPtr<ProfileNode> idleNode =
-        ProfileNode::create(0, CallIdentifier(NonJSExecution, UString(), 0),
+        ProfileNode::create(CallIdentifier(NonJSExecution, UString(), 0),
                             m_head.get(), m_head.get());
 
     idleNode->setTotalTime(headSelfTime);
