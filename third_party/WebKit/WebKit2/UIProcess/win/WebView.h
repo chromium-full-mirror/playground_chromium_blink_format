@@ -39,14 +39,20 @@ namespace WebKit {
 class DrawingAreaProxy;
 class WebPageNamespace;
 
+enum InjectedBundleVisibility {
+  HiddenFromInjectedBundle,
+  VisibleToInjectedBundle
+};
+
 class WebView : public APIObject,
                 public PageClient,
                 WebCore::WindowMessageListener {
  public:
   static PassRefPtr<WebView> create(RECT rect,
                                     WebPageNamespace* pageNamespace,
-                                    HWND parentWindow) {
-    return adoptRef(new WebView(rect, pageNamespace, parentWindow));
+                                    HWND parentWindow,
+                                    InjectedBundleVisibility visibility) {
+    return adoptRef(new WebView(rect, pageNamespace, parentWindow, visibility));
   }
   ~WebView();
 
@@ -60,7 +66,7 @@ class WebView : public APIObject,
   WebPageProxy* page() const { return m_page.get(); }
 
  private:
-  WebView(RECT, WebPageNamespace*, HWND parentWindow);
+  WebView(RECT, WebPageNamespace*, HWND parentWindow, InjectedBundleVisibility);
 
   virtual Type type() const { return TypeView; }
 

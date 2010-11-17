@@ -116,6 +116,11 @@ class WebPageProxy : public APIObject {
   DrawingAreaProxy* drawingArea() { return m_drawingArea.get(); }
   void setDrawingArea(PassOwnPtr<DrawingAreaProxy>);
 
+  bool visibleToInjectedBundle() const { return m_visibleToInjectedBundle; }
+  void setVisibleToInjectedBundle(bool visible) {
+    m_visibleToInjectedBundle = visible;
+  }
+
   WebBackForwardList* backForwardList() { return m_backForwardList.get(); }
 
   WebInspectorProxy* inspector();
@@ -508,6 +513,8 @@ class WebPageProxy : public APIObject {
   double m_textZoomFactor;
   double m_pageZoomFactor;
   double m_viewScaleFactor;
+
+  bool m_visibleToInjectedBundle;
 
   // If the process backing the web page is alive and kicking.
   bool m_isValid;

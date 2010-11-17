@@ -95,6 +95,7 @@ WebPageProxy::WebPageProxy(WebPageNamespace* pageNamespace, uint64_t pageID)
       m_textZoomFactor(1),
       m_pageZoomFactor(1),
       m_viewScaleFactor(1),
+      m_visibleToInjectedBundle(true),
       m_isValid(true),
       m_isClosed(false),
       m_inDecidePolicyForMIMEType(false),
@@ -1538,6 +1539,7 @@ WebPageCreationParameters WebPageProxy::creationParameters(
   parameters.viewSize = size;
   parameters.store = pageNamespace()->context()->preferences()->store();
   parameters.drawingAreaInfo = m_drawingArea->info();
+  parameters.visibleToInjectedBundle = m_visibleToInjectedBundle;
 
 #if PLATFORM(WIN)
   parameters.nativeWindow = m_pageClient->nativeWindow();

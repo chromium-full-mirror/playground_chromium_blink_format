@@ -187,7 +187,10 @@ bool WebView::registerWebViewWindowClass() {
   return !!::RegisterClassEx(&wcex);
 }
 
-WebView::WebView(RECT rect, WebPageNamespace* pageNamespace, HWND parentWindow)
+WebView::WebView(RECT rect,
+                 WebPageNamespace* pageNamespace,
+                 HWND parentWindow,
+                 InjectedBundleVisibility injectedBundleVisibility)
     : m_rect(rect),
       m_topLevelParentWindow(0),
       m_toolTipWindow(0),
@@ -201,6 +204,8 @@ WebView::WebView(RECT rect, WebPageNamespace* pageNamespace, HWND parentWindow)
   m_page = pageNamespace->createWebPage();
   m_page->setPageClient(this);
   m_page->setDrawingArea(ChunkedUpdateDrawingAreaProxy::create(this));
+  m_page->setVisibleToInjectedBundle(injectedBundleVisibility ==
+                                     VisibleToInjectedBundle);
 
   m_window = ::CreateWindowEx(
       0, kWebKit2WebViewWindowClassName, 0,
