@@ -270,7 +270,7 @@ void CachedImage::data(PassRefPtr<SharedBuffer> data, bool allDataReceived) {
     if (m_image->isNull() ||
         (maxDecodedImageSize > 0 &&
          estimatedDecodedImageSize > maxDecodedImageSize)) {
-      error();
+      error(errorOccurred() ? status() : DecodeError);
       if (inCache())
         cache()->remove(this);
       return;
@@ -291,9 +291,10 @@ void CachedImage::data(PassRefPtr<SharedBuffer> data, bool allDataReceived) {
   }
 }
 
-void CachedImage::error() {
+void CachedImage::error(CachedResource::Status status) {
   clear();
-  setErrorOccurred(true);
+  setStatus(status);
+  ASSERT(errorOccurred() || httpStatusCodeErrorOccurred());
   m_data.clear();
   notifyObservers();
   setLoading(false);

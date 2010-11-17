@@ -118,9 +118,10 @@ void CachedCSSStyleSheet::checkNotify() {
                         this);
 }
 
-void CachedCSSStyleSheet::error() {
+void CachedCSSStyleSheet::error(CachedResource::Status status) {
+  setStatus(status);
+  ASSERT(errorOccurred());
   setLoading(false);
-  setErrorOccurred(true);
   checkNotify();
 }
 

@@ -93,9 +93,10 @@ void CachedScript::checkNotify() {
     c->notifyFinished(this);
 }
 
-void CachedScript::error() {
+void CachedScript::error(CachedResource::Status status) {
+  setStatus(status);
+  ASSERT(errorOccurred());
   setLoading(false);
-  setErrorOccurred(true);
   checkNotify();
 }
 

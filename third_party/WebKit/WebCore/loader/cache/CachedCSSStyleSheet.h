@@ -51,7 +51,7 @@ class CachedCSSStyleSheet : public CachedResource {
   virtual void setEncoding(const String&);
   virtual String encoding() const;
   virtual void data(PassRefPtr<SharedBuffer> data, bool allDataReceived);
-  virtual void error();
+  virtual void error(CachedResource::Status);
 
   void checkNotify();
 

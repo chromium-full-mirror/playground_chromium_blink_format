@@ -108,7 +108,7 @@ bool CachedFont::ensureCustomFontData() {
   if (!m_fontData && !errorOccurred() && !isLoading() && m_data) {
     m_fontData = createFontCustomPlatformData(m_data.get());
     if (!m_fontData)
-      setErrorOccurred(true);
+      setStatus(DecodeError);
   }
 #endif
   return m_fontData;
@@ -206,9 +206,10 @@ void CachedFont::checkNotify() {
     c->fontLoaded(this);
 }
 
-void CachedFont::error() {
+void CachedFont::error(CachedResource::Status status) {
+  setStatus(status);
+  ASSERT(errorOccurred());
   setLoading(false);
-  setErrorOccurred(true);
   checkNotify();
 }
 }

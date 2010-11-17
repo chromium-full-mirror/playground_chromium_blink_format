@@ -86,9 +86,10 @@ void CachedXSLStyleSheet::checkNotify() {
     c->setXSLStyleSheet(m_url, m_response.url(), m_sheet);
 }
 
-void CachedXSLStyleSheet::error() {
+void CachedXSLStyleSheet::error(CachedResource::Status status) {
+  setStatus(status);
+  ASSERT(errorOccurred());
   setLoading(false);
-  setErrorOccurred(true);
   checkNotify();
 }
 
