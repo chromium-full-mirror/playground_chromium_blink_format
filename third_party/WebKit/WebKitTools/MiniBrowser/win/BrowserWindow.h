@@ -30,38 +30,41 @@
 #include <string>
 
 class BrowserWindow {
- public:
-  static BrowserWindow* create() { return new BrowserWindow; }
+public:
+    static BrowserWindow* create()
+    {
+        return new BrowserWindow;
+    }
 
-  void createWindow(int x, int y, int width, int height);
-  void showWindow();
+    void createWindow(int x, int y, int width, int height);
+    void showWindow();
 
-  void goToURL(const std::wstring& url);
+    void goToURL(const std::wstring& url);
 
-  bool handleMessage(const MSG*);
+    bool handleMessage(const MSG*);
 
-  const BrowserView& view() const { return m_browserView; }
-  HWND window() const { return m_window; }
+    const BrowserView& view() const { return m_browserView; }
+    HWND window() const { return m_window; }
 
- private:
-  BrowserWindow();
+private:
+    BrowserWindow();
 
-  static LRESULT CALLBACK BrowserWindowWndProc(HWND, UINT, WPARAM, LPARAM);
+    static LRESULT CALLBACK BrowserWindowWndProc(HWND, UINT, WPARAM, LPARAM);
 
-  // Message handlers.
-  LRESULT wndProc(HWND, UINT, WPARAM, LPARAM);
-  void onCreate(LPCREATESTRUCT);
-  void onDestroy();
-  void onNCDestroy();
+    // Message handlers.
+    LRESULT wndProc(HWND, UINT, WPARAM, LPARAM);
+    void onCreate(LPCREATESTRUCT);
+    void onDestroy();
+    void onNCDestroy();
 
-  void onSize(int width, int height);
-  LRESULT onCommand(int commandID, bool& handled);
+    void onSize(int width, int height);
+    LRESULT onCommand(int commandID, bool& handled);
 
-  HWND m_window;
+    HWND m_window;
 
-  HWND m_rebarWindow;
-  HWND m_comboBoxWindow;
-  BrowserView m_browserView;
+    HWND m_rebarWindow;
+    HWND m_comboBoxWindow;
+    BrowserView m_browserView;
 };
 
-#endif  // BrowserWindow_h
+#endif // BrowserWindow_h

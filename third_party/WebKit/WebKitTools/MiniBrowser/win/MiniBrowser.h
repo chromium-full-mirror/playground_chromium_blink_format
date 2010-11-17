@@ -31,25 +31,25 @@
 class BrowserWindow;
 
 class MiniBrowser {
- public:
-  static MiniBrowser& shared();
+public:
+    static MiniBrowser& shared();
 
-  void initialize(HINSTANCE);
+    void initialize(HINSTANCE);
 
-  void createNewWindow();
+    void createNewWindow();
 
-  void registerWindow(BrowserWindow*);
-  void unregisterWindow(BrowserWindow*);
+    void registerWindow(BrowserWindow*);
+    void unregisterWindow(BrowserWindow*);
 
-  bool handleMessage(const MSG*);
+    bool handleMessage(const MSG*);
 
-  HINSTANCE instance() const { return m_instance; }
+    HINSTANCE instance() const { return m_instance; }
 
- private:
-  MiniBrowser();
+private:
+    MiniBrowser();
 
-  HINSTANCE m_instance;
-  std::set<BrowserWindow*> m_browserWindows;
+    HINSTANCE m_instance;
+    std::set<BrowserWindow*> m_browserWindows;
 };
 
-#endif  // MiniBrowser_h
+#endif // MiniBrowser_h
