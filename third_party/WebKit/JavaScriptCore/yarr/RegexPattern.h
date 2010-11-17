@@ -27,6 +27,8 @@
 #ifndef RegexPattern_h
 #define RegexPattern_h
 
+#if ENABLE(YARR)
+
 #include <wtf/Vector.h>
 #include <wtf/unicode/Unicode.h>
 
@@ -360,5 +362,7 @@ struct RegexPattern {
 };
 }
 }  // namespace JSC::Yarr
+
+#endif
 
 #endif  // RegexPattern_h
