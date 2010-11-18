@@ -33,6 +33,7 @@
 #include <wtf/PassRefPtr.h>
 
 namespace WebCore {
+class ResourceError;
 class ResourceResponse;
 }
 
@@ -76,6 +77,7 @@ class DownloadProxy : public APIObject {
                                               bool& allowOverwrite);
   void didCreateDestination(const String& path);
   void didFinish();
+  void didFail(const WebCore::ResourceError&);
 
   WebContext* m_webContext;
   uint64_t m_downloadID;

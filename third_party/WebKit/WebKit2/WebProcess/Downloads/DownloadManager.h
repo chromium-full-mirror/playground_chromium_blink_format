@@ -56,6 +56,9 @@ class DownloadManager {
                                const WebCore::ResourceRequest& initialRequest,
                                const WebCore::ResourceResponse&);
 
+  void downloadFinished(Download*);
+  bool isDownloading() const { return !m_downloads.isEmpty(); }
+
  private:
   DownloadManager();
 
