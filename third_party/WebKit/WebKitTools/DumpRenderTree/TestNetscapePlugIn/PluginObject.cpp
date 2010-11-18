@@ -156,6 +156,7 @@ enum {
   ID_PROPERTY_THROW_EXCEPTION_PROPERTY,
   ID_LAST_SET_WINDOW_ARGUMENTS,
   ID_PROPERTY_WINDOWED_PLUGIN,
+  ID_PROPERTY_TEST_OBJECT_COUNT,
   NUM_PROPERTY_IDENTIFIERS
 };
 
@@ -172,7 +173,9 @@ static const NPUTF8* pluginPropertyIdentifierNames[NUM_PROPERTY_IDENTIFIERS] = {
     "cachedPrivateBrowsingEnabled",
     "testThrowExceptionProperty",
     "lastSetWindowArguments",
-    "windowedPlugin"};
+    "windowedPlugin",
+    "testObjectCount",
+};
 
 enum {
   ID_TEST_CALLBACK_METHOD = 0,
@@ -198,6 +201,7 @@ enum {
   ID_TEST_FAIL_METHOD,
   ID_TEST_CLONE_OBJECT,
   ID_TEST_SCRIPT_OBJECT_INVOKE,
+  ID_TEST_CREATE_TEST_OBJECT,
   ID_DESTROY_NULL_STREAM,
   ID_TEST_RELOAD_PLUGINS_NO_PAGES,
   ID_TEST_RELOAD_PLUGINS_AND_PAGES,
@@ -238,6 +242,7 @@ static const NPUTF8* pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
     "testFail",
     "testCloneObject",
     "testScriptObjectInvoke",
+    "testCreateTestObject",
     "destroyNullStream",
     "reloadPluginsNoPages",
     "reloadPluginsAndPages",
@@ -351,6 +356,10 @@ static bool pluginGetProperty(NPObject* obj,
         plugin->lastWindow.clipRect.bottom - plugin->lastWindow.clipRect.top);
 
     STRINGZ_TO_NPVARIANT(buf, *result);
+    return true;
+  }
+  if (name == pluginPropertyIdentifiers[ID_PROPERTY_TEST_OBJECT_COUNT]) {
+    INT32_TO_NPVARIANT(getTestObjectCount(), *result);
     return true;
   }
 
@@ -943,6 +952,9 @@ static bool testScriptObjectInvoke(PluginObject* obj,
     browser->releasevariantvalue(&object_method_result);
     VOID_TO_NPVARIANT(*result);
   }
+
+  browser->releaseobject(object_arg);
+
   return true;
 }
 
@@ -1158,6 +1170,12 @@ static bool pluginInvoke(NPObject* header,
     NPObject* new_object = browser->createobject(plugin->npp, &pluginClass);
     assert(new_object->referenceCount == 1);
     OBJECT_TO_NPVARIANT(new_object, *result);
+    return true;
+  }
+  if (name == pluginMethodIdentifiers[ID_TEST_CREATE_TEST_OBJECT]) {
+    NPObject* testObject = browser->createobject(plugin->npp, getTestClass());
+    assert(testObject->referenceCount == 1);
+    OBJECT_TO_NPVARIANT(testObject, *result);
     return true;
   }
   if (name == pluginMethodIdentifiers[ID_DESTROY_NULL_STREAM])

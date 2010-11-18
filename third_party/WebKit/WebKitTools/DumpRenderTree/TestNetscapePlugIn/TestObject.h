@@ -27,3 +27,4 @@
 #include <WebKit/npruntime.h>
 
 NPClass* getTestClass(void);
+int getTestObjectCount();

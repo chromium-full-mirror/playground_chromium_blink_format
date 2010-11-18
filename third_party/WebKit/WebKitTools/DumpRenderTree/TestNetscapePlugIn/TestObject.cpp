@@ -65,6 +65,12 @@ NPClass* getTestClass(void) {
   return &testClass;
 }
 
+static int testObjectCount = 0;
+
+int getTestObjectCount() {
+  return testObjectCount;
+}
+
 typedef struct {
   NPObject header;
   NPObject* testObject;
@@ -79,12 +85,13 @@ enum {
   ID_PROPERTY_BAR,
   ID_PROPERTY_OBJECT_POINTER,
   ID_PROPERTY_TEST_OBJECT,
+  ID_PROPERTY_REF_COUNT,
   NUM_TEST_IDENTIFIERS,
 };
 
 static NPIdentifier testIdentifiers[NUM_TEST_IDENTIFIERS];
 static const NPUTF8* testIdentifierNames[NUM_TEST_IDENTIFIERS] = {
-    "foo", "bar", "objectPointer", "testObject",
+    "foo", "bar", "objectPointer", "testObject", "refCount",
 };
 
 #define ID_THROW_EXCEPTION_METHOD 0
@@ -106,6 +113,7 @@ static NPObject* testAllocate(NPP /*npp*/, NPClass* /*theClass*/) {
   TestObject* newInstance =
       static_cast<TestObject*>(malloc(sizeof(TestObject)));
   newInstance->testObject = 0;
+  ++testObjectCount;
 
   if (!identifiersInitialized) {
     identifiersInitialized = true;
@@ -119,6 +127,8 @@ static void testDeallocate(NPObject* obj) {
   TestObject* testObject = reinterpret_cast<TestObject*>(obj);
   if (testObject->testObject)
     browser->releaseobject(testObject->testObject);
+
+  --testObjectCount;
   free(obj);
 }
 
@@ -173,6 +183,10 @@ static bool testGetProperty(NPObject* npobj,
       testObject->testObject = browser->createobject(0, &testClass);
     browser->retainobject(testObject->testObject);
     OBJECT_TO_NPVARIANT(testObject->testObject, *result);
+    return true;
+  }
+  if (name == testIdentifiers[ID_PROPERTY_REF_COUNT]) {
+    INT32_TO_NPVARIANT(npobj->referenceCount, *result);
     return true;
   }
 
