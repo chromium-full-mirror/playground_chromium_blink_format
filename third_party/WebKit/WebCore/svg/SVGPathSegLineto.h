@@ -22,33 +22,45 @@
 #define SVGPathSegLineto_h
 
 #if ENABLE(SVG)
-
-#include "PlatformString.h"
-#include "SVGPathSeg.h"
+#include "SVGPathSegWithContext.h"
 
 namespace WebCore {
 
-class SVGPathSegLinetoAbs : public SVGPathSegSingleCoord {
+class SVGPathSegLinetoAbs : public SVGPathSegSingleCoordinate {
  public:
-  static PassRefPtr<SVGPathSegLinetoAbs> create(float x, float y) {
-    return adoptRef(new SVGPathSegLinetoAbs(x, y));
+  static PassRefPtr<SVGPathSegLinetoAbs> create(SVGPathElement* element,
+                                                SVGPathSegRole role,
+                                                float x,
+                                                float y) {
+    return adoptRef(new SVGPathSegLinetoAbs(element, role, x, y));
   }
 
  private:
-  SVGPathSegLinetoAbs(float x, float y);
+  SVGPathSegLinetoAbs(SVGPathElement* element,
+                      SVGPathSegRole role,
+                      float x,
+                      float y)
+      : SVGPathSegSingleCoordinate(element, role, x, y) {}
 
   virtual unsigned short pathSegType() const { return PATHSEG_LINETO_ABS; }
   virtual String pathSegTypeAsLetter() const { return "L"; }
 };
 
-class SVGPathSegLinetoRel : public SVGPathSegSingleCoord {
+class SVGPathSegLinetoRel : public SVGPathSegSingleCoordinate {
  public:
-  static PassRefPtr<SVGPathSegLinetoRel> create(float x, float y) {
-    return adoptRef(new SVGPathSegLinetoRel(x, y));
+  static PassRefPtr<SVGPathSegLinetoRel> create(SVGPathElement* element,
+                                                SVGPathSegRole role,
+                                                float x,
+                                                float y) {
+    return adoptRef(new SVGPathSegLinetoRel(element, role, x, y));
   }
 
  private:
-  SVGPathSegLinetoRel(float x, float y);
+  SVGPathSegLinetoRel(SVGPathElement* element,
+                      SVGPathSegRole role,
+                      float x,
+                      float y)
+      : SVGPathSegSingleCoordinate(element, role, x, y) {}
 
   virtual unsigned short pathSegType() const { return PATHSEG_LINETO_REL; }
   virtual String pathSegTypeAsLetter() const { return "l"; }
@@ -58,5 +70,3 @@ class SVGPathSegLinetoRel : public SVGPathSegSingleCoord {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

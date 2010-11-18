@@ -26,7 +26,6 @@
 #include "Attribute.h"
 #include "RenderSVGPath.h"
 #include "RenderSVGResource.h"
-#include "SVGNames.h"
 #include "SVGPathParserFactory.h"
 #include "SVGPathSegArc.h"
 #include "SVGPathSegClosePath.h"
@@ -38,6 +37,7 @@
 #include "SVGPathSegLinetoHorizontal.h"
 #include "SVGPathSegLinetoVertical.h"
 #include "SVGPathSegList.h"
+#include "SVGPathSegListPropertyTearOff.h"
 #include "SVGPathSegListBuilder.h"
 #include "SVGPathSegMoveto.h"
 #include "SVGSVGElement.h"
@@ -46,7 +46,9 @@ namespace WebCore {
 
 inline SVGPathElement::SVGPathElement(const QualifiedName& tagName,
                                       Document* document)
-    : SVGStyledTransformableElement(tagName, document) {}
+    : SVGStyledTransformableElement(tagName, document),
+      m_pathByteStream(SVGPathByteStream::create()),
+      m_pathSegList(PathSegUnalteredRole) {}
 
 PassRefPtr<SVGPathElement> SVGPathElement::create(const QualifiedName& tagName,
                                                   Document* document) {
@@ -73,37 +75,42 @@ FloatPoint SVGPathElement::getPointAtLength(float length) {
 unsigned long SVGPathElement::getPathSegAtLength(float length) {
   SVGPathParserFactory* factory = SVGPathParserFactory::self();
   unsigned long pathSeg = 0;
-  factory->getSVGPathSegAtLengthFromSVGPathSegList(pathSegList(), length,
-                                                   pathSeg);
+  factory->getSVGPathSegAtLengthFromSVGPathByteStream(m_pathByteStream.get(),
+                                                      length, pathSeg);
   return pathSeg;
 }
 
-PassRefPtr<SVGPathSegClosePath> SVGPathElement::createSVGPathSegClosePath() {
-  return SVGPathSegClosePath::create();
+PassRefPtr<SVGPathSegClosePath> SVGPathElement::createSVGPathSegClosePath(
+    SVGPathSegRole role) {
+  return SVGPathSegClosePath::create(this, role);
 }
 
 PassRefPtr<SVGPathSegMovetoAbs> SVGPathElement::createSVGPathSegMovetoAbs(
     float x,
-    float y) {
-  return SVGPathSegMovetoAbs::create(x, y);
+    float y,
+    SVGPathSegRole role) {
+  return SVGPathSegMovetoAbs::create(this, role, x, y);
 }
 
 PassRefPtr<SVGPathSegMovetoRel> SVGPathElement::createSVGPathSegMovetoRel(
     float x,
-    float y) {
-  return SVGPathSegMovetoRel::create(x, y);
+    float y,
+    SVGPathSegRole role) {
+  return SVGPathSegMovetoRel::create(this, role, x, y);
 }
 
 PassRefPtr<SVGPathSegLinetoAbs> SVGPathElement::createSVGPathSegLinetoAbs(
     float x,
-    float y) {
-  return SVGPathSegLinetoAbs::create(x, y);
+    float y,
+    SVGPathSegRole role) {
+  return SVGPathSegLinetoAbs::create(this, role, x, y);
 }
 
 PassRefPtr<SVGPathSegLinetoRel> SVGPathElement::createSVGPathSegLinetoRel(
     float x,
-    float y) {
-  return SVGPathSegLinetoRel::create(x, y);
+    float y,
+    SVGPathSegRole role) {
+  return SVGPathSegLinetoRel::create(this, role, x, y);
 }
 
 PassRefPtr<SVGPathSegCurvetoCubicAbs>
@@ -112,8 +119,9 @@ SVGPathElement::createSVGPathSegCurvetoCubicAbs(float x,
                                                 float x1,
                                                 float y1,
                                                 float x2,
-                                                float y2) {
-  return SVGPathSegCurvetoCubicAbs::create(x, y, x1, y1, x2, y2);
+                                                float y2,
+                                                SVGPathSegRole role) {
+  return SVGPathSegCurvetoCubicAbs::create(this, role, x, y, x1, y1, x2, y2);
 }
 
 PassRefPtr<SVGPathSegCurvetoCubicRel>
@@ -122,24 +130,27 @@ SVGPathElement::createSVGPathSegCurvetoCubicRel(float x,
                                                 float x1,
                                                 float y1,
                                                 float x2,
-                                                float y2) {
-  return SVGPathSegCurvetoCubicRel::create(x, y, x1, y1, x2, y2);
+                                                float y2,
+                                                SVGPathSegRole role) {
+  return SVGPathSegCurvetoCubicRel::create(this, role, x, y, x1, y1, x2, y2);
 }
 
 PassRefPtr<SVGPathSegCurvetoQuadraticAbs>
 SVGPathElement::createSVGPathSegCurvetoQuadraticAbs(float x,
                                                     float y,
                                                     float x1,
-                                                    float y1) {
-  return SVGPathSegCurvetoQuadraticAbs::create(x, y, x1, y1);
+                                                    float y1,
+                                                    SVGPathSegRole role) {
+  return SVGPathSegCurvetoQuadraticAbs::create(this, role, x, y, x1, y1);
 }
 
 PassRefPtr<SVGPathSegCurvetoQuadraticRel>
 SVGPathElement::createSVGPathSegCurvetoQuadraticRel(float x,
                                                     float y,
                                                     float x1,
-                                                    float y1) {
-  return SVGPathSegCurvetoQuadraticRel::create(x, y, x1, y1);
+                                                    float y1,
+                                                    SVGPathSegRole role) {
+  return SVGPathSegCurvetoQuadraticRel::create(this, role, x, y, x1, y1);
 }
 
 PassRefPtr<SVGPathSegArcAbs> SVGPathElement::createSVGPathSegArcAbs(
@@ -149,8 +160,10 @@ PassRefPtr<SVGPathSegArcAbs> SVGPathElement::createSVGPathSegArcAbs(
     float r2,
     float angle,
     bool largeArcFlag,
-    bool sweepFlag) {
-  return SVGPathSegArcAbs::create(x, y, r1, r2, angle, largeArcFlag, sweepFlag);
+    bool sweepFlag,
+    SVGPathSegRole role) {
+  return SVGPathSegArcAbs::create(this, role, x, y, r1, r2, angle, largeArcFlag,
+                                  sweepFlag);
 }
 
 PassRefPtr<SVGPathSegArcRel> SVGPathElement::createSVGPathSegArcRel(
@@ -160,63 +173,73 @@ PassRefPtr<SVGPathSegArcRel> SVGPathElement::createSVGPathSegArcRel(
     float r2,
     float angle,
     bool largeArcFlag,
-    bool sweepFlag) {
-  return SVGPathSegArcRel::create(x, y, r1, r2, angle, largeArcFlag, sweepFlag);
+    bool sweepFlag,
+    SVGPathSegRole role) {
+  return SVGPathSegArcRel::create(this, role, x, y, r1, r2, angle, largeArcFlag,
+                                  sweepFlag);
 }
 
 PassRefPtr<SVGPathSegLinetoHorizontalAbs>
-SVGPathElement::createSVGPathSegLinetoHorizontalAbs(float x) {
-  return SVGPathSegLinetoHorizontalAbs::create(x);
+SVGPathElement::createSVGPathSegLinetoHorizontalAbs(float x,
+                                                    SVGPathSegRole role) {
+  return SVGPathSegLinetoHorizontalAbs::create(this, role, x);
 }
 
 PassRefPtr<SVGPathSegLinetoHorizontalRel>
-SVGPathElement::createSVGPathSegLinetoHorizontalRel(float x) {
-  return SVGPathSegLinetoHorizontalRel::create(x);
+SVGPathElement::createSVGPathSegLinetoHorizontalRel(float x,
+                                                    SVGPathSegRole role) {
+  return SVGPathSegLinetoHorizontalRel::create(this, role, x);
 }
 
 PassRefPtr<SVGPathSegLinetoVerticalAbs>
-SVGPathElement::createSVGPathSegLinetoVerticalAbs(float y) {
-  return SVGPathSegLinetoVerticalAbs::create(y);
+SVGPathElement::createSVGPathSegLinetoVerticalAbs(float y,
+                                                  SVGPathSegRole role) {
+  return SVGPathSegLinetoVerticalAbs::create(this, role, y);
 }
 
 PassRefPtr<SVGPathSegLinetoVerticalRel>
-SVGPathElement::createSVGPathSegLinetoVerticalRel(float y) {
-  return SVGPathSegLinetoVerticalRel::create(y);
+SVGPathElement::createSVGPathSegLinetoVerticalRel(float y,
+                                                  SVGPathSegRole role) {
+  return SVGPathSegLinetoVerticalRel::create(this, role, y);
 }
 
 PassRefPtr<SVGPathSegCurvetoCubicSmoothAbs>
 SVGPathElement::createSVGPathSegCurvetoCubicSmoothAbs(float x,
                                                       float y,
                                                       float x2,
-                                                      float y2) {
-  return SVGPathSegCurvetoCubicSmoothAbs::create(x, y, x2, y2);
+                                                      float y2,
+                                                      SVGPathSegRole role) {
+  return SVGPathSegCurvetoCubicSmoothAbs::create(this, role, x, y, x2, y2);
 }
 
 PassRefPtr<SVGPathSegCurvetoCubicSmoothRel>
 SVGPathElement::createSVGPathSegCurvetoCubicSmoothRel(float x,
                                                       float y,
                                                       float x2,
-                                                      float y2) {
-  return SVGPathSegCurvetoCubicSmoothRel::create(x, y, x2, y2);
+                                                      float y2,
+                                                      SVGPathSegRole role) {
+  return SVGPathSegCurvetoCubicSmoothRel::create(this, role, x, y, x2, y2);
 }
 
 PassRefPtr<SVGPathSegCurvetoQuadraticSmoothAbs>
-SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothAbs(float x, float y) {
-  return SVGPathSegCurvetoQuadraticSmoothAbs::create(x, y);
+SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothAbs(float x,
+                                                          float y,
+                                                          SVGPathSegRole role) {
+  return SVGPathSegCurvetoQuadraticSmoothAbs::create(this, role, x, y);
 }
 
 PassRefPtr<SVGPathSegCurvetoQuadraticSmoothRel>
-SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothRel(float x, float y) {
-  return SVGPathSegCurvetoQuadraticSmoothRel::create(x, y);
+SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothRel(float x,
+                                                          float y,
+                                                          SVGPathSegRole role) {
+  return SVGPathSegCurvetoQuadraticSmoothRel::create(this, role, x, y);
 }
 
 void SVGPathElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::dAttr) {
-    ExceptionCode ec;
-    pathSegList()->clear(ec);
     SVGPathParserFactory* factory = SVGPathParserFactory::self();
-    if (!factory->buildSVGPathSegListFromString(attr->value(), pathSegList(),
-                                                NormalizedParsing))
+    if (!factory->buildSVGPathByteStreamFromString(
+            attr->value(), m_pathByteStream, UnalteredParsing))
       document()->accessSVGExtensions()->reportError("Problem parsing d=\"" +
                                                      attr->value() + "\"");
   } else if (attr->name() == SVGNames::pathLengthAttr) {
@@ -242,14 +265,26 @@ void SVGPathElement::svgAttributeChanged(const QualifiedName& attrName) {
     return;
 
   RenderSVGPath* renderer = static_cast<RenderSVGPath*>(this->renderer());
-  if (!renderer)
-    return;
 
   if (attrName == SVGNames::dAttr) {
+    if (m_animatablePathSegList) {
+      SVGPathSegList newList(PathSegUnalteredRole);
+      SVGPathParserFactory* factory = SVGPathParserFactory::self();
+      factory->buildSVGPathSegListFromByteStream(m_pathByteStream.get(), this,
+                                                 newList, UnalteredParsing);
+      m_pathSegList.value = newList;
+    }
+
+    if (!renderer)
+      return;
+
     renderer->setNeedsPathUpdate();
     RenderSVGResource::markForLayoutAndParentResourceInvalidation(renderer);
     return;
   }
+
+  if (!renderer)
+    return;
 
   if (SVGStyledTransformableElement::isKnownAttribute(attrName)) {
     renderer->setNeedsTransformUpdate();
@@ -267,36 +302,73 @@ void SVGPathElement::synchronizeProperty(const QualifiedName& attrName) {
   SVGStyledTransformableElement::synchronizeProperty(attrName);
 
   if (attrName == anyQName()) {
+    synchronizeD();
     synchronizePathLength();
     synchronizeExternalResourcesRequired();
     return;
   }
 
-  if (attrName == SVGNames::pathLengthAttr)
+  if (attrName == SVGNames::dAttr)
+    synchronizeD();
+  else if (attrName == SVGNames::pathLengthAttr)
     synchronizePathLength();
   else if (SVGExternalResourcesRequired::isKnownAttribute(attrName))
     synchronizeExternalResourcesRequired();
 }
 
-SVGPathSegList* SVGPathElement::pathSegList() const {
-  if (!m_pathSegList)
-    m_pathSegList = SVGPathSegList::create(SVGNames::dAttr);
+void SVGPathElement::synchronizeD() {
+  if (!m_pathSegList.shouldSynchronize)
+    return;
 
-  return m_pathSegList.get();
+  SVGAnimatedPropertySynchronizer<true>::synchronize(
+      this, SVGNames::dAttr, m_pathSegList.value.valueAsString());
 }
 
-SVGPathSegList* SVGPathElement::normalizedPathSegList() const {
-  // TODO
+SVGPathSegListPropertyTearOff* SVGPathElement::pathSegList() {
+  if (!m_animatablePathSegList) {
+    m_pathSegList.shouldSynchronize = true;
+
+    SVGPathParserFactory* factory = SVGPathParserFactory::self();
+    factory->buildSVGPathSegListFromByteStream(
+        m_pathByteStream.get(), this, m_pathSegList.value, UnalteredParsing);
+
+    m_animatablePathSegList = SVGAnimatedProperty::lookupOrCreateWrapper<
+        SVGAnimatedPathSegListPropertyTearOff, SVGPathSegList>(
+        this, SVGNames::dAttr, SVGNames::dAttr.localName(),
+        m_pathSegList.value);
+  }
+
+  return static_cast<SVGPathSegListPropertyTearOff*>(
+      m_animatablePathSegList->baseVal(PathSegUnalteredRole));
+}
+
+SVGPathSegListPropertyTearOff* SVGPathElement::normalizedPathSegList() {
+  // FIXME: https://bugs.webkit.org/show_bug.cgi?id=15412 - Implement normalized
+  // path segment lists!
   return 0;
 }
 
-SVGPathSegList* SVGPathElement::animatedPathSegList() const {
-  // TODO
-  return 0;
+SVGPathSegListPropertyTearOff* SVGPathElement::animatedPathSegList() {
+  if (!m_animatablePathSegList) {
+    m_pathSegList.shouldSynchronize = true;
+
+    SVGPathParserFactory* factory = SVGPathParserFactory::self();
+    factory->buildSVGPathSegListFromByteStream(
+        m_pathByteStream.get(), this, m_pathSegList.value, UnalteredParsing);
+
+    m_animatablePathSegList = SVGAnimatedProperty::lookupOrCreateWrapper<
+        SVGAnimatedPathSegListPropertyTearOff, SVGPathSegList>(
+        this, SVGNames::dAttr, SVGNames::dAttr.localName(),
+        m_pathSegList.value);
+  }
+
+  return static_cast<SVGPathSegListPropertyTearOff*>(
+      m_animatablePathSegList->animVal(PathSegUnalteredRole));
 }
 
-SVGPathSegList* SVGPathElement::animatedNormalizedPathSegList() const {
-  // TODO
+SVGPathSegListPropertyTearOff* SVGPathElement::animatedNormalizedPathSegList() {
+  // FIXME: https://bugs.webkit.org/show_bug.cgi?id=15412 - Implement normalized
+  // path segment lists!
   return 0;
 }
 
@@ -304,7 +376,34 @@ void SVGPathElement::toPathData(Path& path) const {
   ASSERT(path.isEmpty());
 
   SVGPathParserFactory* factory = SVGPathParserFactory::self();
-  factory->buildPathFromSVGPathSegList(pathSegList(), path);
+  factory->buildPathFromByteStream(m_pathByteStream.get(), path);
+}
+
+void SVGPathElement::pathSegListChanged(SVGPathSegRole role) {
+  SVGPathParserFactory* factory = SVGPathParserFactory::self();
+
+  switch (role) {
+    case PathSegNormalizedRole:
+      // FIXME: https://bugs.webkit.org/show_bug.cgi?id=15412 - Implement
+      // normalized path segment lists!
+      break;
+    case PathSegUnalteredRole:
+      m_pathByteStream->clear();
+      factory->buildSVGPathByteStreamFromSVGPathSegList(
+          m_pathSegList.value, m_pathByteStream, UnalteredParsing);
+      break;
+    case PathSegUndefinedRole:
+      return;
+  }
+
+  invalidateSVGAttributes();
+
+  RenderSVGPath* renderer = static_cast<RenderSVGPath*>(this->renderer());
+  if (!renderer)
+    return;
+
+  renderer->setNeedsPathUpdate();
+  RenderSVGResource::markForLayoutAndParentResourceInvalidation(renderer);
 }
 }
 
