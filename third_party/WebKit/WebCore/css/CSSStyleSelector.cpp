@@ -413,6 +413,9 @@ static CSSStyleSheet* simpleDefaultStyleSheet;
 RenderStyle* CSSStyleSelector::s_styleNotYetAvailable;
 
 static void loadFullDefaultStyle();
+#if ENABLE(FULLSCREEN_API)
+static void loadFullScreenRulesIfNeeded(Document*);
+#endif
 static void loadSimpleDefaultStyle();
 // FIXME: It would be nice to use some mechanism that guarantees this is in sync
 // with the real UA stylesheet.
@@ -459,8 +462,12 @@ CSSStyleSelector::CSSStyleSelector(
   if (!defaultStyle) {
     if (!root || elementCanUseSimpleDefaultStyle(root))
       loadSimpleDefaultStyle();
-    else
+    else {
       loadFullDefaultStyle();
+#if ENABLE(FULLSCREEN_API)
+      loadFullScreenRulesIfNeeded(document);
+#endif
+    }
   }
 
   // construct document root element default style. this is needed
@@ -574,8 +581,12 @@ static void loadFullDefaultStyle() {
       RenderTheme::defaultTheme()->extraQuirksStyleSheet();
   CSSStyleSheet* quirksSheet = parseUASheet(quirksRules);
   defaultQuirksStyle->addRulesFromSheet(quirksSheet, screenEval());
+}
 
 #if ENABLE(FULLSCREEN_API)
+static void loadFullScreenRulesIfNeeded(Document* document) {
+  if (!document->webkitFullScreen())
+    return;
   // Full-screen rules.
   String fullscreenRules =
       String(fullscreenUserAgentStyleSheet,
@@ -584,8 +595,8 @@ static void loadFullDefaultStyle() {
   CSSStyleSheet* fullscreenSheet = parseUASheet(fullscreenRules);
   defaultStyle->addRulesFromSheet(fullscreenSheet, screenEval());
   defaultQuirksStyle->addRulesFromSheet(fullscreenSheet, screenEval());
-#endif
 }
+#endif
 
 static void loadSimpleDefaultStyle() {
   ASSERT(!defaultStyle);
@@ -1241,8 +1252,12 @@ PassRefPtr<RenderStyle> CSSStyleSelector::styleForElement(
     m_style->setInsideLink(m_elementLinkState);
   }
 
-  if (simpleDefaultStyleSheet && !elementCanUseSimpleDefaultStyle(e))
+  if (simpleDefaultStyleSheet && !elementCanUseSimpleDefaultStyle(e)) {
     loadFullDefaultStyle();
+#if ENABLE(FULLSCREEN_API)
+    loadFullScreenRulesIfNeeded(e->document());
+#endif
+  }
 
 #if ENABLE(SVG)
   static bool loadedSVGUserAgentSheet;
