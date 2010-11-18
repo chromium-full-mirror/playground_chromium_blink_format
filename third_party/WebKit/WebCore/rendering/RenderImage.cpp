@@ -394,8 +394,8 @@ void RenderImage::paintIntoRect(GraphicsContext* context, const IntRect& rect) {
                                    : 0;
   CompositeOperator compositeOperator =
       imageElt ? imageElt->compositeOperator() : CompositeSourceOver;
-  bool useLowQualityScaling =
-      shouldPaintAtLowQuality(context, m_imageResource->image(), rect.size());
+  bool useLowQualityScaling = shouldPaintAtLowQuality(
+      context, m_imageResource->image(), 0, rect.size());
   context->drawImage(m_imageResource->image(rect.width(), rect.height()),
                      style()->colorSpace(), rect, compositeOperator,
                      useLowQualityScaling);

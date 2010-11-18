@@ -50,7 +50,8 @@ bool RenderBoxModelObject::s_layerWasSelfPainting = false;
 static const double cInterpolationCutoff = 800. * 800.;
 static const double cLowQualityTimeThreshold = 0.500;  // 500 ms
 
-typedef HashMap<RenderBoxModelObject*, IntSize> LastPaintSizeMap;
+typedef pair<RenderBoxModelObject*, const void*> LastPaintSizeMapKey;
+typedef HashMap<LastPaintSizeMapKey, IntSize> LastPaintSizeMap;
 
 class ImageQualityController : public Noncopyable {
  public:
@@ -58,7 +59,9 @@ class ImageQualityController : public Noncopyable {
   bool shouldPaintAtLowQuality(GraphicsContext*,
                                RenderBoxModelObject*,
                                Image*,
+                               const void* layer,
                                const IntSize&);
+  void keyDestroyed(LastPaintSizeMapKey key);
   void objectDestroyed(RenderBoxModelObject*);
 
  private:
@@ -74,12 +77,23 @@ ImageQualityController::ImageQualityController()
     : m_timer(this, &ImageQualityController::highQualityRepaintTimerFired),
       m_animatedResizeIsActive(false) {}
 
-void ImageQualityController::objectDestroyed(RenderBoxModelObject* object) {
-  m_lastPaintSizeMap.remove(object);
+void ImageQualityController::keyDestroyed(LastPaintSizeMapKey key) {
+  m_lastPaintSizeMap.remove(key);
   if (m_lastPaintSizeMap.isEmpty()) {
     m_animatedResizeIsActive = false;
     m_timer.stop();
   }
+}
+
+void ImageQualityController::objectDestroyed(RenderBoxModelObject* object) {
+  Vector<LastPaintSizeMapKey> keysToDie;
+  for (LastPaintSizeMap::iterator it = m_lastPaintSizeMap.begin();
+       it != m_lastPaintSizeMap.end(); ++it)
+    if (it->first.first == object)
+      keysToDie.append(it->first);
+  for (Vector<LastPaintSizeMapKey>::iterator it = keysToDie.begin();
+       it != keysToDie.end(); ++it)
+    keyDestroyed(*it);
 }
 
 void ImageQualityController::highQualityRepaintTimerFired(
@@ -88,7 +102,7 @@ void ImageQualityController::highQualityRepaintTimerFired(
     m_animatedResizeIsActive = false;
     for (LastPaintSizeMap::iterator it = m_lastPaintSizeMap.begin();
          it != m_lastPaintSizeMap.end(); ++it)
-      it->first->repaint();
+      it->first.first->repaint();
   }
 }
 
@@ -100,6 +114,7 @@ bool ImageQualityController::shouldPaintAtLowQuality(
     GraphicsContext* context,
     RenderBoxModelObject* object,
     Image* image,
+    const void* layer,
     const IntSize& size) {
   // If the image is not a bitmap image, then none of this is relevant and we
   // just paint at high
@@ -113,7 +128,8 @@ bool ImageQualityController::shouldPaintAtLowQuality(
   IntSize imageSize(image->width(), image->height());
 
   // Look ourselves up in the hashtable.
-  LastPaintSizeMap::iterator i = m_lastPaintSizeMap.find(object);
+  LastPaintSizeMapKey key(object, layer);
+  LastPaintSizeMap::iterator i = m_lastPaintSizeMap.find(key);
 
   const AffineTransform& currentTransform = context->getCTM();
   bool contextIsScaled = !currentTransform.isIdentityOrTranslationOrFlipped();
@@ -121,7 +137,7 @@ bool ImageQualityController::shouldPaintAtLowQuality(
     // There is no scale in effect. If we had a scale in effect before, we can
     // just remove this object from the list.
     if (i != m_lastPaintSizeMap.end())
-      m_lastPaintSizeMap.remove(object);
+      m_lastPaintSizeMap.remove(key);
 
     return false;
   }
@@ -137,7 +153,7 @@ bool ImageQualityController::shouldPaintAtLowQuality(
   // If an animated resize is active, paint in low quality and kick the timer
   // ahead.
   if (m_animatedResizeIsActive) {
-    m_lastPaintSizeMap.set(object, size);
+    m_lastPaintSizeMap.set(key, size);
     restartTimer();
     return true;
   }
@@ -146,19 +162,19 @@ bool ImageQualityController::shouldPaintAtLowQuality(
   // size and set the timer.
   if (i == m_lastPaintSizeMap.end() || size == i->second) {
     restartTimer();
-    m_lastPaintSizeMap.set(object, size);
+    m_lastPaintSizeMap.set(key, size);
     return false;
   }
   // If the timer is no longer active, draw at high quality and don't
   // set the timer.
   if (!m_timer.isActive()) {
-    objectDestroyed(object);
+    keyDestroyed(key);
     return false;
   }
   // This object has been resized to two different sizes while the timer
   // is active, so draw at low quality, set the flag for animated resizes and
   // the object to the list for high quality redraw.
-  m_lastPaintSizeMap.set(object, size);
+  m_lastPaintSizeMap.set(key, size);
   m_animatedResizeIsActive = true;
   restartTimer();
   return true;
@@ -192,9 +208,10 @@ void RenderBoxModelObject::setSelectionState(SelectionState s) {
 
 bool RenderBoxModelObject::shouldPaintAtLowQuality(GraphicsContext* context,
                                                    Image* image,
+                                                   const void* layer,
                                                    const IntSize& size) {
   return imageQualityController()->shouldPaintAtLowQuality(context, this, image,
-                                                           size);
+                                                           layer, size);
 }
 
 RenderBoxModelObject::RenderBoxModelObject(Node* node)
@@ -724,7 +741,7 @@ void RenderBoxModelObject::paintFillLayerExtended(
           backgroundObject ? backgroundObject : this;
       Image* image = bg->image(clientForBackgroundImage, tileSize);
       bool useLowQualityScaling =
-          shouldPaintAtLowQuality(context, image, tileSize);
+          shouldPaintAtLowQuality(context, image, bgLayer, tileSize);
       context->drawTiledImage(image, style()->colorSpace(), destRect, phase,
                               tileSize, compositeOp, useLowQualityScaling);
     }
