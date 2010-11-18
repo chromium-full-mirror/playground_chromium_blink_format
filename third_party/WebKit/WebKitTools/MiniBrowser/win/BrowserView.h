@@ -31,19 +31,19 @@
 
 class BrowserWindow;
 
-class BrowserView  {
-public:
-    BrowserView();
+class BrowserView {
+ public:
+  BrowserView();
 
-    void goToURL(const std::wstring& url);
+  void goToURL(const std::wstring& url);
 
-    void create(RECT, BrowserWindow* parentWindow);
-    void setFrame(RECT);
+  void create(RECT, BrowserWindow* parentWindow);
+  void setFrame(RECT);
 
-    WKViewRef webView() const { return m_webView; }
+  WKViewRef webView() const { return m_webView; }
 
-private:
-    WKViewRef m_webView;
+ private:
+  WKViewRef m_webView;
 };
 
-#endif // BrowserView_h
+#endif  // BrowserView_h

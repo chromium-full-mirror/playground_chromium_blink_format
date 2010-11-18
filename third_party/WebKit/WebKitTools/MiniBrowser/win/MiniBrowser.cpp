@@ -29,56 +29,49 @@
 #include "MiniBrowser.h"
 #include <assert.h>
 
-MiniBrowser::MiniBrowser()
-    : m_instance(0)
-{
+MiniBrowser::MiniBrowser() : m_instance(0) {}
+
+MiniBrowser& MiniBrowser::shared() {
+  static MiniBrowser miniBrowser;
+
+  return miniBrowser;
 }
 
-MiniBrowser& MiniBrowser::shared()
-{
-    static MiniBrowser miniBrowser;
+void MiniBrowser::initialize(HINSTANCE instance) {
+  assert(!m_instance);
 
-    return miniBrowser;
+  m_instance = instance;
 }
 
-void MiniBrowser::initialize(HINSTANCE instance)
-{
-    assert(!m_instance);
+void MiniBrowser::createNewWindow() {
+  static const wchar_t* kDefaultURLString = L"http://webkit.org/";
 
-    m_instance = instance;
+  BrowserWindow* browserWindow = BrowserWindow::create();
+  browserWindow->createWindow(0, 0, 800, 600);
+  browserWindow->showWindow();
+  browserWindow->goToURL(kDefaultURLString);
 }
 
-void MiniBrowser::createNewWindow()
-{
-    static const wchar_t* kDefaultURLString = L"http://webkit.org/";
-
-    BrowserWindow* browserWindow = BrowserWindow::create();
-    browserWindow->createWindow(0, 0, 800, 600);
-    browserWindow->showWindow();
-    browserWindow->goToURL(kDefaultURLString);
+void MiniBrowser::registerWindow(BrowserWindow* window) {
+  m_browserWindows.insert(window);
 }
 
-void MiniBrowser::registerWindow(BrowserWindow* window)
-{
-    m_browserWindows.insert(window);
+void MiniBrowser::unregisterWindow(BrowserWindow* window) {
+  m_browserWindows.erase(window);
+
+  if (m_browserWindows.empty())
+    ::PostQuitMessage(0);
 }
 
-void MiniBrowser::unregisterWindow(BrowserWindow* window)
-{
-    m_browserWindows.erase(window);
+bool MiniBrowser::handleMessage(const MSG* message) {
+  for (std::set<BrowserWindow *>::const_iterator it = m_browserWindows.begin(),
+                                                 end = m_browserWindows.end();
+       it != end; ++it) {
+    BrowserWindow* browserWindow = *it;
 
-    if (m_browserWindows.empty())
-        ::PostQuitMessage(0);
-}
+    if (browserWindow->handleMessage(message))
+      return true;
+  }
 
-bool MiniBrowser::handleMessage(const MSG* message)
-{
-    for (std::set<BrowserWindow*>::const_iterator it = m_browserWindows.begin(), end = m_browserWindows.end(); it != end; ++it) {
-        BrowserWindow* browserWindow = *it;
-
-        if (browserWindow->handleMessage(message))
-            return true;
-    }
-
-    return false;
+  return false;
 }

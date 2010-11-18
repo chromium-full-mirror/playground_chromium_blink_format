@@ -32,114 +32,118 @@
 
 static const unsigned short HIGH_BIT_MASK_SHORT = 0x8000;
 
-BrowserView::BrowserView()
-    : m_webView(0)
-{
-}
+BrowserView::BrowserView() : m_webView(0) {}
 
 // UI Client Callbacks
 
-static WKPageRef createNewPage(WKPageRef page, WKDictionaryRef features, WKEventModifiers modifiers, WKEventMouseButton mouseButton, const void* clientInfo)
-{
-    BrowserWindow* browserWindow = BrowserWindow::create();
-    browserWindow->createWindow(0, 0, 800, 600);
+static WKPageRef createNewPage(WKPageRef page,
+                               WKDictionaryRef features,
+                               WKEventModifiers modifiers,
+                               WKEventMouseButton mouseButton,
+                               const void* clientInfo) {
+  BrowserWindow* browserWindow = BrowserWindow::create();
+  browserWindow->createWindow(0, 0, 800, 600);
 
-    return WKViewGetPage(browserWindow->view().webView());
+  return WKViewGetPage(browserWindow->view().webView());
 }
 
-static void showPage(WKPageRef page, const void *clientInfo)
-{
-    static_cast<BrowserWindow*>(const_cast<void*>(clientInfo))->showWindow();
+static void showPage(WKPageRef page, const void* clientInfo) {
+  static_cast<BrowserWindow*>(const_cast<void*>(clientInfo))->showWindow();
 }
 
-static void closePage(WKPageRef page, const void *clientInfo)
-{
+static void closePage(WKPageRef page, const void* clientInfo) {}
+
+static void runJavaScriptAlert(WKPageRef page,
+                               WKStringRef alertText,
+                               WKFrameRef frame,
+                               const void* clientInfo) {}
+
+static bool runJavaScriptConfirm(WKPageRef page,
+                                 WKStringRef message,
+                                 WKFrameRef frame,
+                                 const void* clientInfo) {
+  return false;
 }
 
-static void runJavaScriptAlert(WKPageRef page, WKStringRef alertText, WKFrameRef frame, const void* clientInfo)
-{
+static WKStringRef runJavaScriptPrompt(WKPageRef page,
+                                       WKStringRef message,
+                                       WKStringRef defaultValue,
+                                       WKFrameRef frame,
+                                       const void* clientInfo) {
+  return 0;
 }
 
-static bool runJavaScriptConfirm(WKPageRef page, WKStringRef message, WKFrameRef frame, const void* clientInfo)
-{
-    return false;
+static void setStatusText(WKPageRef page,
+                          WKStringRef text,
+                          const void* clientInfo) {}
+
+static void mouseDidMoveOverElement(WKPageRef page,
+                                    WKEventModifiers modifiers,
+                                    WKTypeRef userData,
+                                    const void* clientInfo) {}
+
+void BrowserView::create(RECT webViewRect, BrowserWindow* parentWindow) {
+  assert(!m_webView);
+
+  bool isShiftKeyDown = ::GetKeyState(VK_SHIFT) & HIGH_BIT_MASK_SHORT;
+
+  WKContextRef context;
+  if (isShiftKeyDown)
+    context = WKContextGetSharedThreadContext();
+  else
+    context = WKContextGetSharedProcessContext();
+
+  WKPageNamespaceRef pageNamespace = WKPageNamespaceCreate(context);
+
+  m_webView = WKViewCreate(webViewRect, pageNamespace, parentWindow->window());
+
+  WKPageUIClient uiClient = {
+      0,            /* version */
+      parentWindow, /* clientInfo */
+      createNewPage,
+      showPage,
+      closePage,
+      runJavaScriptAlert,
+      runJavaScriptConfirm,
+      runJavaScriptPrompt,
+      setStatusText,
+      mouseDidMoveOverElement,
+      0, /* didNotHandleKeyEvent */
+      0, /* toolbarsAreVisible */
+      0, /* setToolbarsAreVisible */
+      0, /* menuBarIsVisible */
+      0, /* setMenuBarIsVisible */
+      0, /* statusBarIsVisible */
+      0, /* setStatusBarIsVisible */
+      0, /* isResizable */
+      0, /* setIsResizable */
+      0, /* getWindowFrame */
+      0, /* setWindowFrame */
+      0, /* runBeforeUnloadConfirmPanel */
+      0, /* didDraw */
+      0  /* pageDidScroll */
+  };
+
+  WKPageSetPageUIClient(WKViewGetPage(m_webView), &uiClient);
 }
 
-static WKStringRef runJavaScriptPrompt(WKPageRef page, WKStringRef message, WKStringRef defaultValue, WKFrameRef frame, const void* clientInfo)
-{
-    return 0;
+void BrowserView::setFrame(RECT rect) {
+  HWND webViewWindow = WKViewGetWindow(m_webView);
+  ::SetWindowPos(webViewWindow, 0, rect.left, rect.top, rect.right - rect.left,
+                 rect.bottom - rect.top,
+                 SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
 }
 
-static void setStatusText(WKPageRef page, WKStringRef text, const void* clientInfo)
-{
-}
+void BrowserView::goToURL(const std::wstring& urlString) {
+  CFStringRef string = CFStringCreateWithCharacters(
+      0, (const UniChar*)urlString.data(), urlString.size());
+  CFURLRef cfURL = CFURLCreateWithString(0, string, 0);
+  CFRelease(string);
 
-static void mouseDidMoveOverElement(WKPageRef page, WKEventModifiers modifiers, WKTypeRef userData, const void *clientInfo)
-{
-}
+  WKURLRef url = WKURLCreateWithCFURL(cfURL);
+  CFRelease(cfURL);
 
-void BrowserView::create(RECT webViewRect, BrowserWindow* parentWindow)
-{
-    assert(!m_webView);
-
-    bool isShiftKeyDown = ::GetKeyState(VK_SHIFT) & HIGH_BIT_MASK_SHORT;
-
-    WKContextRef context;
-    if (isShiftKeyDown)
-        context = WKContextGetSharedThreadContext();
-    else
-        context = WKContextGetSharedProcessContext();
-
-    WKPageNamespaceRef pageNamespace = WKPageNamespaceCreate(context);
-
-    m_webView = WKViewCreate(webViewRect, pageNamespace, parentWindow->window());
-
-    WKPageUIClient uiClient = {
-        0,              /* version */
-        parentWindow,   /* clientInfo */
-        createNewPage,
-        showPage,
-        closePage,
-        runJavaScriptAlert,
-        runJavaScriptConfirm,
-        runJavaScriptPrompt,
-        setStatusText,
-        mouseDidMoveOverElement,
-        0,          /* didNotHandleKeyEvent */
-        0,          /* toolbarsAreVisible */
-        0,          /* setToolbarsAreVisible */
-        0,          /* menuBarIsVisible */
-        0,          /* setMenuBarIsVisible */
-        0,          /* statusBarIsVisible */
-        0,          /* setStatusBarIsVisible */
-        0,          /* isResizable */
-        0,          /* setIsResizable */
-        0,          /* getWindowFrame */
-        0,          /* setWindowFrame */
-        0,          /* runBeforeUnloadConfirmPanel */
-        0,          /* didDraw */
-        0           /* pageDidScroll */
-    };
-
-    WKPageSetPageUIClient(WKViewGetPage(m_webView), &uiClient);
-}
-
-void BrowserView::setFrame(RECT rect)
-{
-    HWND webViewWindow = WKViewGetWindow(m_webView);
-    ::SetWindowPos(webViewWindow, 0, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
-}
-
-void BrowserView::goToURL(const std::wstring& urlString)
-{
-    CFStringRef string = CFStringCreateWithCharacters(0, (const UniChar*)urlString.data(), urlString.size());
-    CFURLRef cfURL = CFURLCreateWithString(0, string, 0);
-    CFRelease(string);
-
-    WKURLRef url = WKURLCreateWithCFURL(cfURL);
-    CFRelease(cfURL); 
-
-    WKPageRef page = WKViewGetPage(m_webView);
-    WKPageLoadURL(page, url);
-    WKRelease(url);
+  WKPageRef page = WKViewGetPage(m_webView);
+  WKPageLoadURL(page, url);
+  WKRelease(url);
 }
