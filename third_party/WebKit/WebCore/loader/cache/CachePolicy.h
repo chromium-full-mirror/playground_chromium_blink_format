@@ -33,7 +33,7 @@ enum CachePolicy {
   CachePolicyVerify,
   CachePolicyRevalidate,
   CachePolicyReload,
-  CachePolicyAllowStale
+  CachePolicyHistoryBuffer
 };
 }
 

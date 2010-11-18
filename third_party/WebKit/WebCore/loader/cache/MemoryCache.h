@@ -133,7 +133,8 @@ class MemoryCache : public Noncopyable {
                                   CachedResource::Type,
                                   const KURL& url,
                                   const String& charset,
-                                  bool isPreload = false);
+                                  bool isPreload = false,
+                                  bool forHistory = false);
 
   CachedCSSStyleSheet* requestUserCSSStyleSheet(CachedResourceLoader*,
                                                 const String& url,
