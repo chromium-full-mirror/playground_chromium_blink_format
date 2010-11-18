@@ -20,27 +20,10 @@
 #include "config.h"
 #include "StyleSheet.h"
 
-#include "HTMLNames.h"
 #include "MediaList.h"
 #include "Node.h"
-#include "SVGNames.h"
 
 namespace WebCore {
-
-#if !ASSERT_DISABLED
-static bool isAcceptableStyleSheetParent(Node* parentNode) {
-  // Only these nodes can be parents of StyleSheets, and they need to call
-  // clearOwnerNode() when moved out of document.
-  return !parentNode || parentNode->isDocumentNode() ||
-         parentNode->hasTagName(HTMLNames::linkTag) ||
-         parentNode->hasTagName(HTMLNames::styleTag) ||
-         parentNode->nodeType() == Node::PROCESSING_INSTRUCTION_NODE
-#if ENABLE(SVG)
-         || parentNode->hasTagName(SVGNames::styleTag)
-#endif
-      ;
-}
-#endif
 
 StyleSheet::StyleSheet(StyleSheet* parentSheet,
                        const String& originalURL,
@@ -58,9 +41,7 @@ StyleSheet::StyleSheet(Node* parentNode,
       m_parentNode(parentNode),
       m_originalURL(originalURL),
       m_finalURL(finalURL),
-      m_disabled(false) {
-  ASSERT(isAcceptableStyleSheetParent(parentNode));
-}
+      m_disabled(false) {}
 
 StyleSheet::StyleSheet(StyleBase* owner,
                        const String& originalURL,
