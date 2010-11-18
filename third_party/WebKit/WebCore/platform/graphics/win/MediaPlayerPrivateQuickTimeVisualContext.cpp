@@ -302,7 +302,9 @@ void MediaPlayerPrivateQuickTimeVisualContext::setUpCookiesForQuickTime(
   // will
   // use WinINet to download the movie, so we need to copy any cookies needed to
   // download the movie into WinInet before asking QuickTime to open it.
-  Frame* frame = m_player->frameView() ? m_player->frameView()->frame() : 0;
+  Document* document =
+      m_player->mediaPlayerClient()->mediaPlayerOwningDocument();
+  Frame* frame = document ? document->frame() : 0;
   if (!frame || !frame->page() || !frame->page()->cookieEnabled())
     return;
 
