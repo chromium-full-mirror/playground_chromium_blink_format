@@ -263,8 +263,12 @@ void QWKPagePrivate::_q_webActionTriggered(bool checked) {
 #endif  // QT_NO_ACTION
 
 void QWKPagePrivate::touchEvent(QTouchEvent* event) {
+#if ENABLE(TOUCH_EVENTS)
   WebTouchEvent touchEvent = WebEventFactory::createWebTouchEvent(event);
   page->handleTouchEvent(touchEvent);
+#else
+  event->ignore();
+#endif
 }
 
 QWKPage::QWKPage(WKPageNamespaceRef namespaceRef)

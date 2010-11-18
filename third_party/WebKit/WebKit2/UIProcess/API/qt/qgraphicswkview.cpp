@@ -291,11 +291,9 @@ void QGraphicsWKView::wheelEvent(QGraphicsSceneWheelEvent* ev) {
     QGraphicsItem::wheelEvent(ev);
 }
 
-#if ENABLE(TOUCH_EVENTS)
 void QGraphicsWKView::touchEvent(QTouchEvent* ev) {
   page()->d->touchEvent(ev);
 }
-#endif
 
 void QGraphicsWKView::focusInEvent(QFocusEvent*) {
   page()->d->page->setActive(true);
