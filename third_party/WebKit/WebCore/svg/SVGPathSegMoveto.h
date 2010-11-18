@@ -22,45 +22,32 @@
 #define SVGPathSegMoveto_h
 
 #if ENABLE(SVG)
-#include "SVGPathSegWithContext.h"
+
+#include "PlatformString.h"
+#include "SVGPathSeg.h"
 
 namespace WebCore {
-
-class SVGPathSegMovetoAbs : public SVGPathSegSingleCoordinate {
+class SVGPathSegMovetoAbs : public SVGPathSegSingleCoord {
  public:
-  static PassRefPtr<SVGPathSegMovetoAbs> create(SVGPathElement* element,
-                                                SVGPathSegRole role,
-                                                float x,
-                                                float y) {
-    return adoptRef(new SVGPathSegMovetoAbs(element, role, x, y));
+  static PassRefPtr<SVGPathSegMovetoAbs> create(float x, float y) {
+    return adoptRef(new SVGPathSegMovetoAbs(x, y));
   }
 
  private:
-  SVGPathSegMovetoAbs(SVGPathElement* element,
-                      SVGPathSegRole role,
-                      float x,
-                      float y)
-      : SVGPathSegSingleCoordinate(element, role, x, y) {}
+  SVGPathSegMovetoAbs(float x, float y);
 
   virtual unsigned short pathSegType() const { return PATHSEG_MOVETO_ABS; }
   virtual String pathSegTypeAsLetter() const { return "M"; }
 };
 
-class SVGPathSegMovetoRel : public SVGPathSegSingleCoordinate {
+class SVGPathSegMovetoRel : public SVGPathSegSingleCoord {
  public:
-  static PassRefPtr<SVGPathSegMovetoRel> create(SVGPathElement* element,
-                                                SVGPathSegRole role,
-                                                float x,
-                                                float y) {
-    return adoptRef(new SVGPathSegMovetoRel(element, role, x, y));
+  static PassRefPtr<SVGPathSegMovetoRel> create(float x, float y) {
+    return adoptRef(new SVGPathSegMovetoRel(x, y));
   }
 
  private:
-  SVGPathSegMovetoRel(SVGPathElement* element,
-                      SVGPathSegRole role,
-                      float x,
-                      float y)
-      : SVGPathSegSingleCoordinate(element, role, x, y) {}
+  SVGPathSegMovetoRel(float x, float y);
 
   virtual unsigned short pathSegType() const { return PATHSEG_MOVETO_REL; }
   virtual String pathSegTypeAsLetter() const { return "m"; }
@@ -70,3 +57,5 @@ class SVGPathSegMovetoRel : public SVGPathSegSingleCoordinate {
 
 #endif  // ENABLE(SVG)
 #endif
+
+// vim:ts=4:noet

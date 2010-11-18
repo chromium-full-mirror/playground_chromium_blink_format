@@ -649,7 +649,8 @@ void setDOMException(ExecState* exec, ExceptionCode ec) {
 #if ENABLE(SVG)
     case SVGExceptionType:
       errorObject =
-          toJS(exec, globalObject, SVGException::create(description).get());
+          toJS(exec, globalObject, SVGException::create(description).get(),
+               0 /* no context on purpose */);
       break;
 #endif
 #if ENABLE(XPATH)
