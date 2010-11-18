@@ -262,8 +262,9 @@ void PNGImageDecoder::headerAvailable() {
   png_get_IHDR(png, info, &width, &height, &bitDepth, &colorType,
                &interlaceType, &compressionType, &filterType);
 
-  if (colorType == PNG_COLOR_TYPE_RGB ||
-      colorType == PNG_COLOR_TYPE_RGB_ALPHA) {
+  if ((colorType == PNG_COLOR_TYPE_RGB ||
+       colorType == PNG_COLOR_TYPE_RGB_ALPHA) &&
+      !m_ignoreGammaAndColorProfile) {
     // We currently support color profiles only for RGB and RGBA PNGs.
     // Supporting
     // color profiles for gray-scale images is slightly tricky, at least using
