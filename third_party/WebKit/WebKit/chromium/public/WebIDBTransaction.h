@@ -61,6 +61,9 @@ class WebIDBTransaction {
   getIDBTransactionBackendInterface() const {
     return 0;
   }
+
+ protected:
+  WebIDBTransaction() {}
 };
 
 }  // namespace WebKit

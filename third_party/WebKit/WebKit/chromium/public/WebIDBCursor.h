@@ -67,6 +67,9 @@ class WebIDBCursor {
   virtual void remove(WebIDBCallbacks*, WebExceptionCode&) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
+
+ protected:
+  WebIDBCursor() {}
 };
 
 }  // namespace WebKit

@@ -101,6 +101,9 @@ class WebIDBObjectStore {
                           WebExceptionCode&) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
+
+ protected:
+  WebIDBObjectStore() {}
 };
 
 }  // namespace WebKit
