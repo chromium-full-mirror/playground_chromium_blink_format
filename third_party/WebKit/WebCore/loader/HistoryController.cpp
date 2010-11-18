@@ -65,8 +65,7 @@ static inline void addVisitedLink(Page* page, const KURL& url) {
 #endif
 }
 
-HistoryController::HistoryController(Frame* frame)
-    : m_frame(frame), m_frameLoadComplete(true) {}
+HistoryController::HistoryController(Frame* frame) : m_frame(frame) {}
 
 HistoryController::~HistoryController() {}
 
@@ -152,12 +151,12 @@ void HistoryController::saveDocumentState() {
 
   // Because of previousItem's "masking" of currentItem for this purpose, it's
   // important
-  // that we keep track of the end of a page transition with
-  // m_frameLoadComplete.  We
-  // leverage the checkLoadComplete recursion to achieve this goal.
+  // that previousItem be cleared at the end of a page transition.  We leverage
+  // the
+  // checkLoadComplete recursion to achieve this goal.
 
   HistoryItem* item =
-      m_frameLoadComplete ? m_currentItem.get() : m_previousItem.get();
+      m_previousItem ? m_previousItem.get() : m_currentItem.get();
   if (!item)
     return;
 
@@ -274,8 +273,7 @@ void HistoryController::updateForBackForwardNavigation() {
 #endif
 
   // Must grab the current scroll position before disturbing it
-  if (!m_frameLoadComplete)
-    saveScrollPositionAndViewStateToItem(m_previousItem.get());
+  saveScrollPositionAndViewStateToItem(m_previousItem.get());
 }
 
 void HistoryController::updateForReload() {
@@ -440,7 +438,6 @@ void HistoryController::updateForCommit() {
     // the provisional item for restoring state.
     // Note previousItem must be set before we close the URL, which will
     // happen when the data source is made non-provisional below
-    m_frameLoadComplete = false;
     m_previousItem = m_currentItem;
     ASSERT(m_provisionalItem);
     m_currentItem = m_provisionalItem;
@@ -465,14 +462,12 @@ void HistoryController::updateForSameDocumentNavigation() {
 
 void HistoryController::updateForFrameLoadCompleted() {
   // Even if already complete, we might have set a previous item on a frame that
-  // didn't do any data loading on the past transaction. Make sure to track that
-  // the load is complete so that we use the current item instead.
-  m_frameLoadComplete = true;
+  // didn't do any data loading on the past transaction. Make sure to clear
+  // these out.
+  m_previousItem = 0;
 }
 
 void HistoryController::setCurrentItem(HistoryItem* item) {
-  m_frameLoadComplete = false;
-  m_previousItem = m_currentItem;
   m_currentItem = item;
 }
 
@@ -548,7 +543,6 @@ PassRefPtr<HistoryItem> HistoryController::createItem(bool useOriginal) {
   }
 
   // Set the item for which we will save document state
-  m_frameLoadComplete = false;
   m_previousItem = m_currentItem;
   m_currentItem = item;
 
@@ -559,7 +553,7 @@ PassRefPtr<HistoryItem> HistoryController::createItemTree(Frame* targetFrame,
                                                           bool clipAtTarget) {
   RefPtr<HistoryItem> bfItem =
       createItem(m_frame->tree()->parent() ? true : false);
-  if (!m_frameLoadComplete)
+  if (m_previousItem)
     saveScrollPositionAndViewStateToItem(m_previousItem.get());
 
   if (!clipAtTarget || m_frame != targetFrame) {
@@ -623,9 +617,8 @@ void HistoryController::recursiveGoToItem(HistoryItem* item,
       currentFramesMatchItem(item) && fromItem->hasSameFrames(item)) {
     // This content is good, so leave it alone and look for children that need
     // reloading
-    // Save form state (works from currentItem, since m_frameLoadComplete is
-    // true)
-    ASSERT(m_frameLoadComplete);
+    // Save form state (works from currentItem, since prevItem is nil)
+    ASSERT(!m_previousItem);
     saveDocumentState();
     saveScrollPositionAndViewStateToItem(m_currentItem.get());
 
