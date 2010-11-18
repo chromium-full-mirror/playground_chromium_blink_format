@@ -202,7 +202,7 @@ PassRefPtr<HTMLElement> HTMLTableElement::insertRow(int index,
 
   ContainerNode* parent;
   if (lastRow)
-    parent = row ? row->parent() : lastRow->parent();
+    parent = row ? row->parentNode() : lastRow->parentNode();
   else {
     parent = lastBody();
     if (!parent) {

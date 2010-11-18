@@ -378,7 +378,7 @@ bool DeleteSelectionCommand::handleSpecialCaseBRDelete() {
 static void updatePositionForNodeRemoval(Node* node, Position& position) {
   if (position.isNull())
     return;
-  if (node->parent() == position.node() &&
+  if (node->parentNode() == position.node() &&
       node->nodeIndex() < (unsigned)position.deprecatedEditingOffset())
     position =
         Position(position.node(), position.deprecatedEditingOffset() - 1);

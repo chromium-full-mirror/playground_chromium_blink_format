@@ -417,7 +417,7 @@ Node* StyledMarkupAccumulator::serializeNodes(Node* startNode, Node* pastEnd) {
       if (next != pastEnd && n != nextParent) {
         Node* lastAncestorClosedOrSelf =
             n->isDescendantOf(lastClosed) ? lastClosed : n;
-        for (ContainerNode* parent = lastAncestorClosedOrSelf->parent();
+        for (ContainerNode* parent = lastAncestorClosedOrSelf->parentNode();
              parent && parent != nextParent; parent = parent->parentNode()) {
           // All ancestors that aren't in the ancestorsToClose list should
           // either be a) unrendered:

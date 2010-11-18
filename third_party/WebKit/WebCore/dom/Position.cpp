@@ -786,7 +786,7 @@ bool Position::isCandidate() const {
     return false;
 
   if (renderer->isBR())
-    return m_offset == 0 && !nodeIsUserSelectNone(node()->parent());
+    return !m_offset && !nodeIsUserSelectNone(node()->parentNode());
 
   if (renderer->isText())
     return !nodeIsUserSelectNone(node()) && inRenderedText();
@@ -794,7 +794,7 @@ bool Position::isCandidate() const {
   if (isTableElement(node()) || editingIgnoresContent(node()))
     return (atFirstEditingPositionForNode() ||
             atLastEditingPositionForNode()) &&
-           !nodeIsUserSelectNone(node()->parent());
+           !nodeIsUserSelectNone(node()->parentNode());
 
   if (m_anchorNode->hasTagName(htmlTag))
     return false;

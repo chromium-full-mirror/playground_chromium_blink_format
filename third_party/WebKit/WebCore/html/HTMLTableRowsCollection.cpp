@@ -38,18 +38,18 @@ namespace WebCore {
 using namespace HTMLNames;
 
 static bool isInHead(Element* row) {
-  return row->parent() &&
-         static_cast<Element*>(row->parent())->hasLocalName(theadTag);
+  return row->parentNode() &&
+         static_cast<Element*>(row->parentNode())->hasLocalName(theadTag);
 }
 
 static bool isInBody(Element* row) {
-  return row->parent() &&
-         static_cast<Element*>(row->parent())->hasLocalName(tbodyTag);
+  return row->parentNode() &&
+         static_cast<Element*>(row->parentNode())->hasLocalName(tbodyTag);
 }
 
 static bool isInFoot(Element* row) {
-  return row->parent() &&
-         static_cast<Element*>(row->parent())->hasLocalName(tfootTag);
+  return row->parentNode() &&
+         static_cast<Element*>(row->parentNode())->hasLocalName(tfootTag);
 }
 
 HTMLTableRowElement* HTMLTableRowsCollection::rowAfter(
@@ -59,7 +59,7 @@ HTMLTableRowElement* HTMLTableRowsCollection::rowAfter(
 
   // Start by looking for the next row in this section.
   // Continue only if there is none.
-  if (previous && previous->parent() != table) {
+  if (previous && previous->parentNode() != table) {
     for (child = previous->nextSibling(); child; child = child->nextSibling()) {
       if (child->hasTagName(trTag))
         return static_cast<HTMLTableRowElement*>(child);
@@ -71,7 +71,7 @@ HTMLTableRowElement* HTMLTableRowsCollection::rowAfter(
   if (!previous)
     child = table->firstChild();
   else if (isInHead(previous))
-    child = previous->parent()->nextSibling();
+    child = previous->parentNode()->nextSibling();
   for (; child; child = child->nextSibling()) {
     if (child->hasTagName(theadTag)) {
       for (Node* grandchild = child->firstChild(); grandchild;
@@ -86,10 +86,10 @@ HTMLTableRowElement* HTMLTableRowsCollection::rowAfter(
   // the first in the next body section.
   if (!previous || isInHead(previous))
     child = table->firstChild();
-  else if (previous->parent() == table)
+  else if (previous->parentNode() == table)
     child = previous->nextSibling();
   else if (isInBody(previous))
-    child = previous->parent()->nextSibling();
+    child = previous->parentNode()->nextSibling();
   for (; child; child = child->nextSibling()) {
     if (child->hasTagName(trTag))
       return static_cast<HTMLTableRowElement*>(child);
@@ -106,7 +106,7 @@ HTMLTableRowElement* HTMLTableRowsCollection::rowAfter(
   if (!previous || !isInFoot(previous))
     child = table->firstChild();
   else
-    child = previous->parent()->nextSibling();
+    child = previous->parentNode()->nextSibling();
   for (; child; child = child->nextSibling()) {
     if (child->hasTagName(tfootTag)) {
       for (Node* grandchild = child->firstChild(); grandchild;

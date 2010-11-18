@@ -396,7 +396,7 @@ void HTMLElement::setInnerHTML(const String& html, ExceptionCode& ec) {
 }
 
 void HTMLElement::setOuterHTML(const String& html, ExceptionCode& ec) {
-  Node* p = parent();
+  Node* p = parentNode();
   if (!p || !p->isHTMLElement()) {
     ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
@@ -556,7 +556,7 @@ Node* HTMLElement::insertAdjacent(const String& where,
   // Opera also appears to disallow such usage.
 
   if (equalIgnoringCase(where, "beforeBegin")) {
-    ContainerNode* parent = this->parent();
+    ContainerNode* parent = this->parentNode();
     return (parent && parent->insertBefore(newChild, this, ec)) ? newChild : 0;
   }
 
@@ -567,7 +567,7 @@ Node* HTMLElement::insertAdjacent(const String& where,
     return appendChild(newChild, ec) ? newChild : 0;
 
   if (equalIgnoringCase(where, "afterEnd")) {
-    ContainerNode* parent = this->parent();
+    ContainerNode* parent = this->parentNode();
     return (parent && parent->insertBefore(newChild, nextSibling(), ec))
                ? newChild
                : 0;
@@ -683,8 +683,8 @@ void HTMLElement::addHTMLAlignmentToStyledElement(StyledElement* element,
 }
 
 bool HTMLElement::supportsFocus() const {
-  return Element::supportsFocus() ||
-         (isContentEditable() && parent() && !parent()->isContentEditable());
+  return Element::supportsFocus() || (isContentEditable() && parentNode() &&
+                                      !parentNode()->isContentEditable());
 }
 
 bool HTMLElement::isContentEditable() const {

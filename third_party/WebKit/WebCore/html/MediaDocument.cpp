@@ -210,7 +210,7 @@ void MediaDocument::replaceMediaElementTimerFired(Timer<MediaDocument>*) {
                                frame()->loader()->writer()->mimeType());
 
     ExceptionCode ec;
-    videoElement->parent()->replaceChild(embedElement, videoElement, ec);
+    videoElement->parentNode()->replaceChild(embedElement, videoElement, ec);
   }
 }
 }

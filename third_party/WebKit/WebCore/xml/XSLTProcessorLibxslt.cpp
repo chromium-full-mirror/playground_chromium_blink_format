@@ -274,8 +274,8 @@ static xsltStylesheetPtr xsltStylesheetPointer(
     Node* stylesheetRootNode) {
   if (!cachedStylesheet && stylesheetRootNode) {
     cachedStylesheet = XSLStyleSheet::create(
-        stylesheetRootNode->parent() ? stylesheetRootNode->parent()
-                                     : stylesheetRootNode,
+        stylesheetRootNode->parentNode() ? stylesheetRootNode->parentNode()
+                                         : stylesheetRootNode,
         stylesheetRootNode->document()->url().string(),
         stylesheetRootNode->document()
             ->url());  // FIXME: Should we use baseURL here?

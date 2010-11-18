@@ -36,7 +36,7 @@ AppendNodeCommand::AppendNodeCommand(PassRefPtr<Element> parent,
     : SimpleEditCommand(parent->document()), m_parent(parent), m_node(node) {
   ASSERT(m_parent);
   ASSERT(m_node);
-  ASSERT(!m_node->parent());
+  ASSERT(!m_node->parentNode());
 
   ASSERT(m_parent->isContentEditable() || !m_parent->attached());
 }

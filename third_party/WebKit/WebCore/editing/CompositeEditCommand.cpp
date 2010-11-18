@@ -1350,18 +1350,20 @@ PassRefPtr<Node> CompositeEditCommand::splitTreeToNode(Node* start,
   ASSERT(start != end);
 
   RefPtr<Node> node;
-  for (node = start; node && node->parent() != end; node = node->parent()) {
-    if (!node->parent()->isElementNode())
+  for (node = start; node && node->parentNode() != end;
+       node = node->parentNode()) {
+    if (!node->parentNode()->isElementNode())
       break;
-    VisiblePosition positionInParent(Position(node->parent(), 0), DOWNSTREAM);
+    VisiblePosition positionInParent(Position(node->parentNode(), 0),
+                                     DOWNSTREAM);
     VisiblePosition positionInNode(Position(node, 0), DOWNSTREAM);
     if (positionInParent != positionInNode)
       applyCommandToComposite(SplitElementCommand::create(
-          static_cast<Element*>(node->parent()), node));
+          static_cast<Element*>(node->parentNode()), node));
   }
   if (splitAncestor) {
     splitElement(static_cast<Element*>(end), node);
-    return node->parent();
+    return node->parentNode();
   }
   return node.release();
 }

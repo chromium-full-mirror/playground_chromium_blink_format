@@ -151,7 +151,7 @@ bool PositionIterator::isCandidate() const {
 
   if (renderer->isBR())
     return !m_offsetInAnchor &&
-           !Position::nodeIsUserSelectNone(m_anchorNode->parent());
+           !Position::nodeIsUserSelectNone(m_anchorNode->parentNode());
 
   if (renderer->isText())
     return !Position::nodeIsUserSelectNone(m_anchorNode) &&
@@ -159,7 +159,7 @@ bool PositionIterator::isCandidate() const {
 
   if (isTableElement(m_anchorNode) || editingIgnoresContent(m_anchorNode))
     return (atStartOfNode() || atEndOfNode()) &&
-           !Position::nodeIsUserSelectNone(m_anchorNode->parent());
+           !Position::nodeIsUserSelectNone(m_anchorNode->parentNode());
 
   if (!m_anchorNode->hasTagName(htmlTag) && renderer->isBlockFlow()) {
     if (toRenderBlock(renderer)->height() ||

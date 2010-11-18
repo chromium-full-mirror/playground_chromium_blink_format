@@ -679,7 +679,7 @@ WritingDirection Editor::textDirectionForSelection(
   Node* block = enclosingBlock(node);
   WritingDirection foundDirection = NaturalWritingDirection;
 
-  for (; node != block; node = node->parent()) {
+  for (; node != block; node = node->parentNode()) {
     if (!node->isStyledElement())
       continue;
 

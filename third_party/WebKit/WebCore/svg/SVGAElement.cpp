@@ -117,7 +117,7 @@ void SVGAElement::synchronizeProperty(const QualifiedName& attrName) {
 }
 
 RenderObject* SVGAElement::createRenderer(RenderArena* arena, RenderStyle*) {
-  if (static_cast<SVGElement*>(parent())->isTextContent())
+  if (static_cast<SVGElement*>(parentNode())->isTextContent())
     return new (arena) RenderSVGInline(this);
 
   return new (arena) RenderSVGTransformableContainer(this);
@@ -200,8 +200,8 @@ bool SVGAElement::childShouldCreateRenderer(Node* child) const {
   // itself.
   if (child->hasTagName(SVGNames::aTag))
     return false;
-  if (parent() && parent()->isSVGElement())
-    return parent()->childShouldCreateRenderer(child);
+  if (parentNode() && parentNode()->isSVGElement())
+    return parentNode()->childShouldCreateRenderer(child);
 
   return SVGElement::childShouldCreateRenderer(child);
 }
