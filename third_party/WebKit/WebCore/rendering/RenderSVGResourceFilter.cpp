@@ -252,8 +252,12 @@ bool RenderSVGResourceFilter::applyResource(RenderObject* object,
   OwnPtr<ImageBuffer> sourceGraphic;
   if (!SVGImageBufferTools::createImageBuffer(
           absoluteDrawingRegion, absoluteDrawingRegion, sourceGraphic,
-          ColorSpaceLinearRGB))
+          ColorSpaceLinearRGB)) {
+    ASSERT(!m_filter.contains(object));
+    filterData->savedContext = context;
+    m_filter.set(object, filterData.leakPtr());
     return false;
+  }
 
   GraphicsContext* sourceGraphicContext = sourceGraphic->context();
   ASSERT(sourceGraphicContext);
