@@ -320,6 +320,10 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   bool dispatchEvent(PassRefPtr<Event> prpEvent,
                      PassRefPtr<EventTarget> prpTarget);
   void dispatchLoadEvent();
+  void dispatchTimedEvent(PassRefPtr<Event> event,
+                          Document* target,
+                          double* startTime,
+                          double* endTime);
 
   DEFINE_ATTRIBUTE_EVENT_LISTENER(abort);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(beforeunload);

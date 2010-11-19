@@ -87,6 +87,14 @@ unsigned long long PerformanceTiming::navigationStart() const {
   return toIntegerMilliseconds(timing->navigationStart);
 }
 
+unsigned long long PerformanceTiming::unloadEventStart() const {
+  DocumentLoadTiming* timing = documentLoadTiming();
+  if (!timing)
+    return 0;
+
+  return toIntegerMilliseconds(timing->unloadEventStart);
+}
+
 unsigned long long PerformanceTiming::unloadEventEnd() const {
   DocumentLoadTiming* timing = documentLoadTiming();
   if (!timing)

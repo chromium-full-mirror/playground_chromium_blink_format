@@ -31,6 +31,7 @@ namespace WebCore {
 struct DocumentLoadTiming {
   DocumentLoadTiming()
       : navigationStart(0.0),
+        unloadEventStart(0.0),
         unloadEventEnd(0.0),
         redirectStart(0.0),
         redirectEnd(0.0),
@@ -41,6 +42,7 @@ struct DocumentLoadTiming {
         loadEventEnd(0.0) {}
 
   double navigationStart;
+  double unloadEventStart;
   double unloadEventEnd;
   double redirectStart;
   double redirectEnd;

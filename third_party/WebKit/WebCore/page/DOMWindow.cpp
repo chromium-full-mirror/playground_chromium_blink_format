@@ -1498,14 +1498,14 @@ bool DOMWindow::removeEventListener(const AtomicString& eventType,
 }
 
 void DOMWindow::dispatchLoadEvent() {
+  RefPtr<Event> loadEvent(Event::create(eventNames().loadEvent, false, false));
   if (DocumentLoader* documentLoader =
-          m_frame ? m_frame->loader()->documentLoader() : 0)
-    documentLoader->timing()->loadEventStart = currentTime();
-  dispatchEvent(Event::create(eventNames().loadEvent, false, false),
-                document());
-  if (DocumentLoader* documentLoader =
-          m_frame ? m_frame->loader()->documentLoader() : 0)
-    documentLoader->timing()->loadEventEnd = currentTime();
+          m_frame ? m_frame->loader()->documentLoader() : 0) {
+    DocumentLoadTiming* timing = documentLoader->timing();
+    dispatchTimedEvent(loadEvent, document(), &timing->loadEventStart,
+                       &timing->loadEventEnd);
+  } else
+    dispatchEvent(loadEvent, document());
 
   // For load events, send a separate load event to the enclosing frame only.
   // This is a DOM extension and is independent of bubbling/capturing rules of
@@ -1546,6 +1546,18 @@ bool DOMWindow::dispatchEvent(PassRefPtr<Event> prpEvent,
   InspectorInstrumentation::didDispatchEventOnWindow(cookie);
 
   return result;
+}
+
+void DOMWindow::dispatchTimedEvent(PassRefPtr<Event> event,
+                                   Document* target,
+                                   double* startTime,
+                                   double* endTime) {
+  ASSERT(startTime);
+  ASSERT(endTime);
+  *startTime = currentTime();
+  dispatchEvent(event, target);
+  *endTime = currentTime();
+  ASSERT(*endTime >= *startTime);
 }
 
 void DOMWindow::removeAllEventListeners() {
