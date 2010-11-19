@@ -218,6 +218,9 @@ class InlineFlowBox : public InlineBox {
                                   int& lineTop,
                                   int& lineBottom,
                                   bool& setLineTop,
+                                  int& lineTopIncludingMargins,
+                                  int& lineBottomIncludingMargins,
+                                  bool& containsRuby,
                                   FontBaseline);
   void flipLinesInBlockDirection(int lineTop, int lineBottom);
   void computeBlockDirectionOverflow(int lineTop,
@@ -226,6 +229,7 @@ class InlineFlowBox : public InlineBox {
                                      GlyphOverflowAndFallbackFontsMap&);
   bool requiresIdeographicBaseline(
       const GlyphOverflowAndFallbackFontsMap&) const;
+  int computeBlockDirectionRubyAdjustment(int allowedPosition) const;
 
   void removeChild(InlineBox* child);
 

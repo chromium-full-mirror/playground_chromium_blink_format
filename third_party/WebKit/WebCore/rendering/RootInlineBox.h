@@ -180,11 +180,15 @@ class RootInlineBox : public InlineFlowBox {
 
   FontBaseline baselineType() const { return m_baselineType; }
 
+  bool containsRuby() const { return m_containsRuby; }
+
  private:
   bool hasEllipsisBox() const { return m_hasEllipsisBoxOrHyphen; }
   void setHasEllipsisBox(bool hasEllipsisBox) {
     m_hasEllipsisBoxOrHyphen = hasEllipsisBox;
   }
+
+  int blockDirectionRubyAdjustment() const;
 
   // Where this line ended.  The exact object and the position within that
   // object are stored so that
@@ -210,6 +214,9 @@ class RootInlineBox : public InlineFlowBox {
   // Whether or not this line uses alphabetic or ideographic baselines by
   // default.
   FontBaseline m_baselineType;
+
+  // If the line contains any ruby runs, then this will be true.
+  bool m_containsRuby : 1;
 
   WTF::Unicode::Direction m_lineBreakBidiStatusEor : 5;
   WTF::Unicode::Direction m_lineBreakBidiStatusLastStrong : 5;

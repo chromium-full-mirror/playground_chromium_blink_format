@@ -418,6 +418,8 @@ class RenderBlock : public RenderBox {
   }
 #endif
 
+  void addOverflowFromBlockChildren();
+
  private:
   virtual RenderObjectChildList* virtualChildren() { return children(); }
   virtual const RenderObjectChildList* virtualChildren() const {
@@ -476,8 +478,10 @@ class RenderBlock : public RenderBox {
 
   virtual RootInlineBox* createRootInlineBox();  // Subclassed by SVG and Ruby.
 
-  // Called to lay out the legend for a fieldset.
-  virtual RenderObject* layoutLegend(bool /*relayoutChildren*/) { return 0; }
+  // Called to lay out the legend for a fieldset or the ruby text of a ruby run.
+  virtual RenderObject* layoutSpecialExcludedChild(bool /*relayoutChildren*/) {
+    return 0;
+  }
 
   struct FloatWithRect {
     FloatWithRect(RenderBox* f)
@@ -668,7 +672,6 @@ class RenderBlock : public RenderBox {
   int afterSideLayoutOverflowForLine(RootInlineBox*) const;
   // End of functions defined in RenderBlockLineLayout.cpp.
 
-  void addOverflowFromBlockChildren();
   void addOverflowFromFloats();
 
   void paintFloats(PaintInfo&, int tx, int ty, bool preservePhase = false);

@@ -60,7 +60,8 @@ void RenderFieldset::computePreferredLogicalWidths() {
   }
 }
 
-RenderObject* RenderFieldset::layoutLegend(bool relayoutChildren) {
+RenderObject* RenderFieldset::layoutSpecialExcludedChild(
+    bool relayoutChildren) {
   RenderBox* legend = findLegend();
   if (legend) {
     if (relayoutChildren)
