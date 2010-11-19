@@ -358,7 +358,8 @@ template AtomicString v8StringToWebCoreString<AtomicString>(
     v8::Handle<v8::String>,
     ExternalMode);
 
-String int32ToWebCoreString(int value) {
+// Fast but non thread-safe version.
+String int32ToWebCoreStringFast(int value) {
   // Caching of small strings below is not thread safe: newly constructed
   // AtomicString
   // are not safely published.
@@ -379,6 +380,14 @@ String int32ToWebCoreString(int value) {
   } else
     webCoreString = String::number(value);
   return webCoreString;
+}
+
+String int32ToWebCoreString(int value) {
+  // If we are on the main thread (this should always true for non-workers),
+  // call the faster one.
+  if (WTF::isMainThread())
+    return int32ToWebCoreStringFast(value);
+  return String::number(value);
 }
 
 String v8NonStringValueToWebCoreString(v8::Handle<v8::Value> object) {
