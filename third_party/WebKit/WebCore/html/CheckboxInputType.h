@@ -44,6 +44,7 @@ class CheckboxInputType : public BaseCheckableInputType {
       : BaseCheckableInputType(element) {}
   virtual const AtomicString& formControlType() const;
   virtual bool valueMissing(const String&) const;
+  virtual String valueMissingText() const;
 };
 
 }  // namespace WebCore

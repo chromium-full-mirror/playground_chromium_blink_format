@@ -84,6 +84,7 @@ String searchMenuNoRecentSearchesText() {
 String searchMenuRecentSearchesText() {
   return query(WebLocalizedString::SearchMenuRecentSearchesText);
 }
+
 String searchMenuClearRecentSearchesText() {
   return query(WebLocalizedString::SearchMenuClearRecentSearchesText);
 }
@@ -358,6 +359,26 @@ String localizedMediaTimeDescription(float /*time*/) {
 
 String validationMessageValueMissingText() {
   return query(WebLocalizedString::ValidationValueMissing);
+}
+
+String validationMessageValueMissingForCheckboxText() {
+  return query(WebLocalizedString::ValidationValueMissingForCheckbox);
+}
+
+String validationMessageValueMissingForFileText() {
+  return query(WebLocalizedString::ValidationValueMissingForFile);
+}
+
+String validationMessageValueMissingForMultipleFileText() {
+  return query(WebLocalizedString::ValidationValueMissingForMultipleFile);
+}
+
+String validationMessageValueMissingForRadioText() {
+  return query(WebLocalizedString::ValidationValueMissingForRadio);
+}
+
+String validationMessageValueMissingForSelectText() {
+  return query(WebLocalizedString::ValidationValueMissingForSelect);
 }
 
 String validationMessageTypeMismatchText() {

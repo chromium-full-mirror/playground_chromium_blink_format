@@ -266,6 +266,10 @@ String HTMLInputElement::typeMismatchText() const {
   return m_inputType->typeMismatchText();
 }
 
+String HTMLInputElement::valueMissingText() const {
+  return m_inputType->valueMissingText();
+}
+
 bool HTMLInputElement::getAllowedValueStep(double* step) const {
   return getAllowedValueStepWithDecimalPlaces(step, 0);
 }

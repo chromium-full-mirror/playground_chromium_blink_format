@@ -43,6 +43,7 @@ class RadioInputType : public BaseCheckableInputType {
   RadioInputType(HTMLInputElement* element) : BaseCheckableInputType(element) {}
   virtual const AtomicString& formControlType() const;
   virtual bool valueMissing(const String&) const;
+  virtual String valueMissingText() const;
   virtual bool handleClickEvent(MouseEvent*);
 };
 
