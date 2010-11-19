@@ -218,7 +218,7 @@ static PassRefPtr<InspectorObject> buildObjectForResourceResponse(
     loadInfoObject->setObject(
         "responseHeaders",
         buildObjectForHeaders(response.resourceLoadInfo()->responseHeaders));
-    loadInfoObject->setObject("loadInfo", loadInfoObject);
+    responseObject->setObject("loadInfo", loadInfoObject);
   }
   return responseObject;
 }
