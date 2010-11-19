@@ -349,9 +349,6 @@ class CodeBlock : public FastAllocBase {
                getJITCode().offsetOf(returnAddress.value()))
         ->bytecodeOffset;
   }
-
-  bool functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
-                                         int& functionRegisterIndex);
 #endif
 #if ENABLE(INTERPRETER)
   unsigned bytecodeOffset(CallFrame*, Instruction* returnAddress) {
@@ -461,12 +458,6 @@ class CodeBlock : public FastAllocBase {
   void addMethodCallLinkInfos(unsigned n) { m_methodCallLinkInfos.grow(n); }
   MethodCallLinkInfo& methodCallLinkInfo(int index) {
     return m_methodCallLinkInfos[index];
-  }
-
-  void addFunctionRegisterInfo(unsigned bytecodeOffset, int functionIndex) {
-    createRareDataIfNecessary();
-    m_rareData->m_functionRegisterInfos.append(
-        FunctionRegisterInfo(bytecodeOffset, functionIndex));
   }
 #endif
 
@@ -723,10 +714,6 @@ class CodeBlock : public FastAllocBase {
     Vector<StringJumpTable> m_stringSwitchJumpTables;
 
     EvalCodeCache m_evalCodeCache;
-
-#if ENABLE(JIT)
-    Vector<FunctionRegisterInfo> m_functionRegisterInfos;
-#endif
   };
   OwnPtr<RareData> m_rareData;
 };

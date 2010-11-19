@@ -59,12 +59,16 @@ class Profiler : public FastAllocBase {
   void startProfiling(ExecState*, const UString& title);
   PassRefPtr<Profile> stopProfiling(ExecState*, const UString& title);
 
-  void willExecute(ExecState*, JSValue function);
-  void willExecute(ExecState*,
+  void willExecute(ExecState* callerCallFrame, JSValue function);
+  void willExecute(ExecState* callerCallFrame,
                    const UString& sourceURL,
                    int startingLineNumber);
-  void didExecute(ExecState*, JSValue function);
-  void didExecute(ExecState*, const UString& sourceURL, int startingLineNumber);
+  void didExecute(ExecState* callerCallFrame, JSValue function);
+  void didExecute(ExecState* callerCallFrame,
+                  const UString& sourceURL,
+                  int startingLineNumber);
+
+  void exceptionUnwind(ExecState* handlerCallFrame);
 
   const Vector<RefPtr<ProfileGenerator>>& currentProfiles() {
     return m_currentProfiles;

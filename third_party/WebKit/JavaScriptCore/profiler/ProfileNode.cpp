@@ -55,10 +55,12 @@ static double getCount() {
 #endif
 }
 
-ProfileNode::ProfileNode(const CallIdentifier& callIdentifier,
+ProfileNode::ProfileNode(ExecState* callerCallFrame,
+                         const CallIdentifier& callIdentifier,
                          ProfileNode* headNode,
                          ProfileNode* parentNode)
-    : m_callIdentifier(callIdentifier),
+    : m_callerCallFrame(callerCallFrame),
+      m_callIdentifier(callIdentifier),
       m_head(headNode),
       m_parent(parentNode),
       m_nextSibling(0),
@@ -72,8 +74,11 @@ ProfileNode::ProfileNode(const CallIdentifier& callIdentifier,
   startTimer();
 }
 
-ProfileNode::ProfileNode(ProfileNode* headNode, ProfileNode* nodeToCopy)
-    : m_callIdentifier(nodeToCopy->callIdentifier()),
+ProfileNode::ProfileNode(ExecState* callerCallFrame,
+                         ProfileNode* headNode,
+                         ProfileNode* nodeToCopy)
+    : m_callerCallFrame(callerCallFrame),
+      m_callIdentifier(nodeToCopy->callIdentifier()),
       m_head(headNode),
       m_parent(nodeToCopy->parent()),
       m_nextSibling(0),
@@ -85,7 +90,8 @@ ProfileNode::ProfileNode(ProfileNode* headNode, ProfileNode* nodeToCopy)
       m_numberOfCalls(nodeToCopy->numberOfCalls()),
       m_visible(nodeToCopy->visible()) {}
 
-ProfileNode* ProfileNode::willExecute(const CallIdentifier& callIdentifier) {
+ProfileNode* ProfileNode::willExecute(ExecState* callerCallFrame,
+                                      const CallIdentifier& callIdentifier) {
   for (StackIterator currentChild = m_children.begin();
        currentChild != m_children.end(); ++currentChild) {
     if ((*currentChild)->callIdentifier() == callIdentifier) {
@@ -95,7 +101,7 @@ ProfileNode* ProfileNode::willExecute(const CallIdentifier& callIdentifier) {
   }
 
   RefPtr<ProfileNode> newChild = ProfileNode::create(
-      callIdentifier, m_head ? m_head : this,
+      callerCallFrame, callIdentifier, m_head ? m_head : this,
       this);  // If this ProfileNode has no head it is the head.
   if (m_children.size())
     m_children.last()->setNextSibling(newChild.get());
