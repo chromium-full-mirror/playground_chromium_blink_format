@@ -111,8 +111,5 @@ class SVGElement : public StyledElement {
 };
 }
 
-// This file needs to be included after the SVGElement declaration
-#include "DeprecatedSVGAnimatedProperty.h"  // NOLINT
-
 #endif
 #endif
