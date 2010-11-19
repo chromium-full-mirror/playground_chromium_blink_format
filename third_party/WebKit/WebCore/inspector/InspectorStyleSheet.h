@@ -216,7 +216,7 @@ class InspectorStyleSheet : public RefCounted<InspectorStyleSheet> {
 
  private:
   bool ensureText() const;
-  bool ensureSourceData(Node* ownerNode);
+  bool ensureSourceData();
   bool styleSheetTextWithChangedStyle(CSSStyleDeclaration*,
                                       const String& newStyleText,
                                       String* result);
