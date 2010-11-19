@@ -1629,7 +1629,7 @@ void LayoutTestController::setEditingBehavior(const CppArgumentList& arguments,
     m_shell->applyPreferences();
   } else
     logErrorToConsole(
-        "Passed invalid editing behavior. Should be 'mac' or 'win'.");
+        "Passed invalid editing behavior. Should be 'mac', 'win', or 'unix'.");
 }
 
 void LayoutTestController::setMockDeviceOrientation(

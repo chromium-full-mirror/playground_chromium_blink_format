@@ -2651,9 +2651,10 @@ static JSValueRef setEditingBehaviorCallback(JSContextRef context,
   char* behaviorBuffer = new char[maxLength + 1];
   JSStringGetUTF8CString(editingBehavior.get(), behaviorBuffer, maxLength);
 
-  if (strcmp(behaviorBuffer, "mac") && strcmp(behaviorBuffer, "win")) {
+  if (strcmp(behaviorBuffer, "mac") && strcmp(behaviorBuffer, "win") &&
+      strcmp(behaviorBuffer, "unix")) {
     JSRetainPtr<JSStringRef> invalidArgument(JSStringCreateWithUTF8CString(
-        "Passed invalid editing behavior. Must be 'mac' or 'win'."));
+        "Passed invalid editing behavior. Must be 'mac', 'win', or 'unix'."));
     *exception = JSValueMakeString(context, invalidArgument.get());
     return JSValueMakeUndefined(context);
   }

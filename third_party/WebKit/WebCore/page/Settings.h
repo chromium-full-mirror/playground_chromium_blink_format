@@ -449,6 +449,7 @@ class Settings : public Noncopyable {
   unsigned m_sessionStorageQuota;
 #endif
   unsigned m_pluginAllowedRunTime;
+  unsigned m_editingBehaviorType;
   bool m_isSpatialNavigationEnabled : 1;
   bool m_isJavaEnabled : 1;
   bool m_loadsImagesAutomatically : 1;
@@ -493,7 +494,6 @@ class Settings : public Noncopyable {
   bool m_enforceCSSMIMETypeInNoQuirksMode : 1;
   bool m_usesEncodingDetector : 1;
   bool m_allowScriptsToCloseWindows : 1;
-  unsigned m_editingBehaviorType : 1;
   bool m_downloadableBinaryFontsEnabled : 1;
   bool m_xssAuditorEnabled : 1;
   bool m_acceleratedCompositingEnabled : 1;
