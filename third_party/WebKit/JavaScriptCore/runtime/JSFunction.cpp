@@ -234,7 +234,8 @@ bool JSFunction::getOwnPropertySlot(ExecState* exec,
       JSObject* prototype =
           new (exec) JSObject(scope().globalObject()->emptyObjectStructure());
       prototype->putDirect(exec->propertyNames().constructor, this, DontEnum);
-      putDirect(exec->propertyNames().prototype, prototype, DontDelete);
+      putDirect(exec->propertyNames().prototype, prototype,
+                DontDelete | DontEnum);
       location = getDirectLocation(propertyName);
     }
 
