@@ -206,15 +206,19 @@ static PassRefPtr<InspectorObject> buildObjectForResourceResponse(
   if (response.resourceLoadTiming())
     responseObject->setObject(
         "timing", buildObjectForTiming(*response.resourceLoadTiming()));
-  if (response.resourceRawHeaders()) {
-    RefPtr<InspectorObject> rawHeadersObject = InspectorObject::create();
-    rawHeadersObject->setObject(
+  if (response.resourceLoadInfo()) {
+    RefPtr<InspectorObject> loadInfoObject = InspectorObject::create();
+    loadInfoObject->setNumber("httpStatusCode",
+                              response.resourceLoadInfo()->httpStatusCode);
+    loadInfoObject->setString("httpStatusText",
+                              response.resourceLoadInfo()->httpStatusText);
+    loadInfoObject->setObject(
         "requestHeaders",
-        buildObjectForHeaders(response.resourceRawHeaders()->requestHeaders));
-    rawHeadersObject->setObject(
+        buildObjectForHeaders(response.resourceLoadInfo()->requestHeaders));
+    loadInfoObject->setObject(
         "responseHeaders",
-        buildObjectForHeaders(response.resourceRawHeaders()->responseHeaders));
-    responseObject->setObject("rawHeaders", rawHeadersObject);
+        buildObjectForHeaders(response.resourceLoadInfo()->responseHeaders));
+    loadInfoObject->setObject("loadInfo", loadInfoObject);
   }
   return responseObject;
 }

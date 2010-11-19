@@ -29,8 +29,8 @@
 
 #include "HTTPHeaderMap.h"
 #include "KURL.h"
+#include "ResourceLoadInfo.h"
 #include "ResourceLoadTiming.h"
-#include "ResourceRawHeaders.h"
 
 #include <wtf/PassOwnPtr.h>
 #include <wtf/RefPtr.h>
@@ -112,8 +112,8 @@ class ResourceResponseBase : public FastAllocBase {
   ResourceLoadTiming* resourceLoadTiming() const;
   void setResourceLoadTiming(PassRefPtr<ResourceLoadTiming>);
 
-  PassRefPtr<ResourceRawHeaders> resourceRawHeaders() const;
-  void setResourceRawHeaders(PassRefPtr<ResourceRawHeaders>);
+  PassRefPtr<ResourceLoadInfo> resourceLoadInfo() const;
+  void setResourceLoadInfo(PassRefPtr<ResourceLoadInfo>);
 
   // The ResourceResponse subclass may "shadow" this method to provide
   // platform-specific memory usage information
@@ -158,7 +158,7 @@ class ResourceResponseBase : public FastAllocBase {
   unsigned m_connectionID;
   bool m_connectionReused : 1;
   RefPtr<ResourceLoadTiming> m_resourceLoadTiming;
-  RefPtr<ResourceRawHeaders> m_resourceRawHeaders;
+  RefPtr<ResourceLoadInfo> m_resourceLoadInfo;
 
   bool m_isNull : 1;
 
