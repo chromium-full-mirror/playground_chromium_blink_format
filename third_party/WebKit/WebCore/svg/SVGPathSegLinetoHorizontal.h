@@ -22,18 +22,22 @@
 #define SVGPathSegLinetoHorizontal_h
 
 #if ENABLE(SVG)
-
-#include "PlatformString.h"
-#include "SVGPathSeg.h"
+#include "SVGPathSegWithContext.h"
 
 namespace WebCore {
 
-class SVGPathSegLinetoHorizontal : public SVGPathSeg {
+class SVGPathSegLinetoHorizontal : public SVGPathSegWithContext {
  public:
-  SVGPathSegLinetoHorizontal(float x) : SVGPathSeg(), m_x(x) {}
+  SVGPathSegLinetoHorizontal(SVGPathElement* element,
+                             SVGPathSegRole role,
+                             float x)
+      : SVGPathSegWithContext(element, role), m_x(x) {}
 
-  void setX(float x) { m_x = x; }
   float x() const { return m_x; }
+  void setX(float x) {
+    m_x = x;
+    commitChange();
+  }
 
  private:
   float m_x;
@@ -41,12 +45,16 @@ class SVGPathSegLinetoHorizontal : public SVGPathSeg {
 
 class SVGPathSegLinetoHorizontalAbs : public SVGPathSegLinetoHorizontal {
  public:
-  static PassRefPtr<SVGPathSegLinetoHorizontalAbs> create(float x) {
-    return adoptRef(new SVGPathSegLinetoHorizontalAbs(x));
+  static PassRefPtr<SVGPathSegLinetoHorizontalAbs>
+  create(SVGPathElement* element, SVGPathSegRole role, float x) {
+    return adoptRef(new SVGPathSegLinetoHorizontalAbs(element, role, x));
   }
 
  private:
-  SVGPathSegLinetoHorizontalAbs(float x);
+  SVGPathSegLinetoHorizontalAbs(SVGPathElement* element,
+                                SVGPathSegRole role,
+                                float x)
+      : SVGPathSegLinetoHorizontal(element, role, x) {}
 
   virtual unsigned short pathSegType() const {
     return PATHSEG_LINETO_HORIZONTAL_ABS;
@@ -56,12 +64,16 @@ class SVGPathSegLinetoHorizontalAbs : public SVGPathSegLinetoHorizontal {
 
 class SVGPathSegLinetoHorizontalRel : public SVGPathSegLinetoHorizontal {
  public:
-  static PassRefPtr<SVGPathSegLinetoHorizontalRel> create(float x) {
-    return adoptRef(new SVGPathSegLinetoHorizontalRel(x));
+  static PassRefPtr<SVGPathSegLinetoHorizontalRel>
+  create(SVGPathElement* element, SVGPathSegRole role, float x) {
+    return adoptRef(new SVGPathSegLinetoHorizontalRel(element, role, x));
   }
 
  private:
-  SVGPathSegLinetoHorizontalRel(float x);
+  SVGPathSegLinetoHorizontalRel(SVGPathElement* element,
+                                SVGPathSegRole role,
+                                float x)
+      : SVGPathSegLinetoHorizontal(element, role, x) {}
 
   virtual unsigned short pathSegType() const {
     return PATHSEG_LINETO_HORIZONTAL_REL;
@@ -73,5 +85,3 @@ class SVGPathSegLinetoHorizontalRel : public SVGPathSegLinetoHorizontal {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

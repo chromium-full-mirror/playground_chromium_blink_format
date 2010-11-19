@@ -22,39 +22,63 @@
 #define SVGPathSegCurvetoCubic_h
 
 #if ENABLE(SVG)
-
-#include "PlatformString.h"
-#include "SVGPathSeg.h"
+#include "SVGPathSegWithContext.h"
 
 namespace WebCore {
 
-class SVGPathSegCurvetoCubic : public SVGPathSeg {
+class SVGPathSegCurvetoCubic : public SVGPathSegWithContext {
  public:
-  SVGPathSegCurvetoCubic(float x,
+  SVGPathSegCurvetoCubic(SVGPathElement* element,
+                         SVGPathSegRole role,
+                         float x,
                          float y,
                          float x1,
                          float y1,
                          float x2,
                          float y2)
-      : m_x(x), m_y(y), m_x1(x1), m_y1(y1), m_x2(x2), m_y2(y2) {}
+      : SVGPathSegWithContext(element, role),
+        m_x(x),
+        m_y(y),
+        m_x1(x1),
+        m_y1(y1),
+        m_x2(x2),
+        m_y2(y2) {}
 
-  void setX(float x) { m_x = x; }
   float x() const { return m_x; }
+  void setX(float x) {
+    m_x = x;
+    commitChange();
+  }
 
-  void setY(float y) { m_y = y; }
   float y() const { return m_y; }
+  void setY(float y) {
+    m_y = y;
+    commitChange();
+  }
 
-  void setX1(float x1) { m_x1 = x1; }
   float x1() const { return m_x1; }
+  void setX1(float x1) {
+    m_x1 = x1;
+    commitChange();
+  }
 
-  void setY1(float y1) { m_y1 = y1; }
   float y1() const { return m_y1; }
+  void setY1(float y1) {
+    m_y1 = y1;
+    commitChange();
+  }
 
-  void setX2(float x2) { m_x2 = x2; }
   float x2() const { return m_x2; }
+  void setX2(float x2) {
+    m_x2 = x2;
+    commitChange();
+  }
 
-  void setY2(float y2) { m_y2 = y2; }
   float y2() const { return m_y2; }
+  void setY2(float y2) {
+    m_y2 = y2;
+    commitChange();
+  }
 
  private:
   float m_x;
@@ -67,22 +91,28 @@ class SVGPathSegCurvetoCubic : public SVGPathSeg {
 
 class SVGPathSegCurvetoCubicAbs : public SVGPathSegCurvetoCubic {
  public:
-  static PassRefPtr<SVGPathSegCurvetoCubicAbs> create(float x,
+  static PassRefPtr<SVGPathSegCurvetoCubicAbs> create(SVGPathElement* element,
+                                                      SVGPathSegRole role,
+                                                      float x,
                                                       float y,
                                                       float x1,
                                                       float y1,
                                                       float x2,
                                                       float y2) {
-    return adoptRef(new SVGPathSegCurvetoCubicAbs(x, y, x1, y1, x2, y2));
+    return adoptRef(
+        new SVGPathSegCurvetoCubicAbs(element, role, x, y, x1, y1, x2, y2));
   }
 
  private:
-  SVGPathSegCurvetoCubicAbs(float x,
+  SVGPathSegCurvetoCubicAbs(SVGPathElement* element,
+                            SVGPathSegRole role,
+                            float x,
                             float y,
                             float x1,
                             float y1,
                             float x2,
-                            float y2);
+                            float y2)
+      : SVGPathSegCurvetoCubic(element, role, x, y, x1, y1, x2, y2) {}
 
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_CUBIC_ABS;
@@ -92,22 +122,28 @@ class SVGPathSegCurvetoCubicAbs : public SVGPathSegCurvetoCubic {
 
 class SVGPathSegCurvetoCubicRel : public SVGPathSegCurvetoCubic {
  public:
-  static PassRefPtr<SVGPathSegCurvetoCubicRel> create(float x,
+  static PassRefPtr<SVGPathSegCurvetoCubicRel> create(SVGPathElement* element,
+                                                      SVGPathSegRole role,
+                                                      float x,
                                                       float y,
                                                       float x1,
                                                       float y1,
                                                       float x2,
                                                       float y2) {
-    return adoptRef(new SVGPathSegCurvetoCubicRel(x, y, x1, y1, x2, y2));
+    return adoptRef(
+        new SVGPathSegCurvetoCubicRel(element, role, x, y, x1, y1, x2, y2));
   }
 
  private:
-  SVGPathSegCurvetoCubicRel(float x,
+  SVGPathSegCurvetoCubicRel(SVGPathElement* element,
+                            SVGPathSegRole role,
+                            float x,
                             float y,
                             float x1,
                             float y1,
                             float x2,
-                            float y2);
+                            float y2)
+      : SVGPathSegCurvetoCubic(element, role, x, y, x1, y1, x2, y2) {}
 
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_CUBIC_REL;
@@ -119,5 +155,3 @@ class SVGPathSegCurvetoCubicRel : public SVGPathSegCurvetoCubic {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

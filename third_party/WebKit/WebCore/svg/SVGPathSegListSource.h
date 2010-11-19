@@ -32,12 +32,13 @@ namespace WebCore {
 
 class SVGPathSegListSource : public SVGPathSource {
  public:
-  static PassOwnPtr<SVGPathSegListSource> create(SVGPathSegList* pathSegList) {
+  static PassOwnPtr<SVGPathSegListSource> create(
+      const SVGPathSegList& pathSegList) {
     return adoptPtr(new SVGPathSegListSource(pathSegList));
   }
 
  private:
-  SVGPathSegListSource(SVGPathSegList*);
+  SVGPathSegListSource(const SVGPathSegList&);
 
   virtual bool hasMoreData() const;
   virtual bool moveToNextToken() { return true; }
@@ -59,7 +60,7 @@ class SVGPathSegListSource : public SVGPathSource {
                                  bool&,
                                  FloatPoint&);
 
-  SVGPathSegList* m_pathSegList;
+  const SVGPathSegList& m_pathSegList;
   RefPtr<SVGPathSeg> m_segment;
   int m_itemCurrent;
   int m_itemEnd;

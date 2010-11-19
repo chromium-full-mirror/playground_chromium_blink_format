@@ -22,28 +22,47 @@
 #define SVGPathSegCurvetoQuadratic_h
 
 #if ENABLE(SVG)
-
-#include "PlatformString.h"
-#include "SVGPathSeg.h"
+#include "SVGPathSegWithContext.h"
 
 namespace WebCore {
 
-class SVGPathSegCurvetoQuadratic : public SVGPathSeg {
+class SVGPathSegCurvetoQuadratic : public SVGPathSegWithContext {
  public:
-  SVGPathSegCurvetoQuadratic(float x, float y, float x1, float y1)
-      : m_x(x), m_y(y), m_x1(x1), m_y1(y1) {}
+  SVGPathSegCurvetoQuadratic(SVGPathElement* element,
+                             SVGPathSegRole role,
+                             float x,
+                             float y,
+                             float x1,
+                             float y1)
+      : SVGPathSegWithContext(element, role),
+        m_x(x),
+        m_y(y),
+        m_x1(x1),
+        m_y1(y1) {}
 
-  void setX(float x) { m_x = x; }
   float x() const { return m_x; }
+  void setX(float x) {
+    m_x = x;
+    commitChange();
+  }
 
-  void setY(float y) { m_y = y; }
   float y() const { return m_y; }
+  void setY(float y) {
+    m_y = y;
+    commitChange();
+  }
 
-  void setX1(float x1) { m_x1 = x1; }
   float x1() const { return m_x1; }
+  void setX1(float x1) {
+    m_x1 = x1;
+    commitChange();
+  }
 
-  void setY1(float y1) { m_y1 = y1; }
   float y1() const { return m_y1; }
+  void setY1(float y1) {
+    m_y1 = y1;
+    commitChange();
+  }
 
  private:
   float m_x;
@@ -54,15 +73,25 @@ class SVGPathSegCurvetoQuadratic : public SVGPathSeg {
 
 class SVGPathSegCurvetoQuadraticAbs : public SVGPathSegCurvetoQuadratic {
  public:
-  static PassRefPtr<SVGPathSegCurvetoQuadraticAbs> create(float x,
-                                                          float y,
-                                                          float x1,
-                                                          float y1) {
-    return adoptRef(new SVGPathSegCurvetoQuadraticAbs(x, y, x1, y1));
+  static PassRefPtr<SVGPathSegCurvetoQuadraticAbs> create(
+      SVGPathElement* element,
+      SVGPathSegRole role,
+      float x,
+      float y,
+      float x1,
+      float y1) {
+    return adoptRef(
+        new SVGPathSegCurvetoQuadraticAbs(element, role, x, y, x1, y1));
   }
 
  private:
-  SVGPathSegCurvetoQuadraticAbs(float x, float y, float x1, float y1);
+  SVGPathSegCurvetoQuadraticAbs(SVGPathElement* element,
+                                SVGPathSegRole role,
+                                float x,
+                                float y,
+                                float x1,
+                                float y1)
+      : SVGPathSegCurvetoQuadratic(element, role, x, y, x1, y1) {}
 
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_QUADRATIC_ABS;
@@ -72,15 +101,25 @@ class SVGPathSegCurvetoQuadraticAbs : public SVGPathSegCurvetoQuadratic {
 
 class SVGPathSegCurvetoQuadraticRel : public SVGPathSegCurvetoQuadratic {
  public:
-  static PassRefPtr<SVGPathSegCurvetoQuadraticRel> create(float x,
-                                                          float y,
-                                                          float x1,
-                                                          float y1) {
-    return adoptRef(new SVGPathSegCurvetoQuadraticRel(x, y, x1, y1));
+  static PassRefPtr<SVGPathSegCurvetoQuadraticRel> create(
+      SVGPathElement* element,
+      SVGPathSegRole role,
+      float x,
+      float y,
+      float x1,
+      float y1) {
+    return adoptRef(
+        new SVGPathSegCurvetoQuadraticRel(element, role, x, y, x1, y1));
   }
 
  private:
-  SVGPathSegCurvetoQuadraticRel(float x, float y, float x1, float y1);
+  SVGPathSegCurvetoQuadraticRel(SVGPathElement* element,
+                                SVGPathSegRole role,
+                                float x,
+                                float y,
+                                float x1,
+                                float y1)
+      : SVGPathSegCurvetoQuadratic(element, role, x, y, x1, y1) {}
 
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_QUADRATIC_REL;
@@ -92,5 +131,3 @@ class SVGPathSegCurvetoQuadraticRel : public SVGPathSegCurvetoQuadratic {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

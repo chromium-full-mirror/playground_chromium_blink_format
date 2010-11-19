@@ -121,7 +121,6 @@
 #include "JSSVGElementInstanceCustom.cpp"
 #include "JSSVGLengthCustom.cpp"
 #include "JSSVGPathSegCustom.cpp"
-#include "JSSVGPathSegListCustom.cpp"
 #include "JSScriptProfileNodeCustom.cpp"
 #include "JSSharedWorkerCustom.cpp"
 #include "JSStorageCustom.cpp"
