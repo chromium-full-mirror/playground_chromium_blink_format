@@ -76,11 +76,6 @@ DOMWrapperMap<SVGElementInstance>& getDOMSVGElementInstanceMap() {
   return getDOMDataStore().domSvgElementInstanceMap();
 }
 
-// Map of SVG objects with contexts to V8 objects
-DOMWrapperMap<void>& getDOMSVGObjectWithContextMap() {
-  return getDOMDataStore().domSvgObjectWithContextMap();
-}
-
 #endif  // ENABLE(SVG)
 
 void removeAllDOMObjectsInCurrentThread() {
@@ -95,9 +90,6 @@ void removeAllDOMObjectsInCurrentThread() {
     // Remove all SVG element instances in the wrapper map.
     DOMData::removeObjectsFromWrapperMap<SVGElementInstance>(
         getDOMSVGElementInstanceMap());
-
-    // Remove all SVG objects with context in the wrapper map.
-    DOMData::removeObjectsFromWrapperMap<void>(getDOMSVGObjectWithContextMap());
 #endif
   }
 
@@ -165,20 +157,6 @@ void visitDOMSVGElementInstancesInCurrentThread(
       continue;
 
     store->domSvgElementInstanceMap().visit(visitor);
-  }
-}
-
-void visitSVGObjectsInCurrentThread(DOMWrapperMap<void>::Visitor* visitor) {
-  v8::HandleScope scope;
-
-  WTF::MutexLocker locker(DOMDataStore::allStoresMutex());
-  DOMDataList& list = DOMDataStore::allStores();
-  for (size_t i = 0; i < list.size(); ++i) {
-    DOMDataStore* store = list[i];
-    if (!store->domData()->owningThread() == WTF::currentThread())
-      continue;
-
-    store->domSvgObjectWithContextMap().visit(visitor);
   }
 }
 

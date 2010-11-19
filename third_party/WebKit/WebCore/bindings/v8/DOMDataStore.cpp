@@ -87,8 +87,7 @@ DOMDataStore::DOMDataStore(DOMData* domData)
       m_activeDomObjectMap(0)
 #if ENABLE(SVG)
       ,
-      m_domSvgElementInstanceMap(0),
-      m_domSvgObjectWithContextMap(0)
+      m_domSvgElementInstanceMap(0)
 #endif
       ,
       m_domData(domData) {
@@ -122,8 +121,6 @@ void* DOMDataStore::getDOMWrapperMap(DOMWrapperMapType type) {
 #if ENABLE(SVG)
     case DOMSVGElementInstanceMap:
       return m_domSvgElementInstanceMap;
-    case DOMSVGObjectWithContextMap:
-      return m_domSvgObjectWithContextMap;
 #endif
   }
 
@@ -202,16 +199,6 @@ void DOMDataStore::weakSVGElementInstanceCallback(
   DOMData::handleWeakObject(DOMDataStore::DOMSVGElementInstanceMap,
                             v8::Persistent<v8::Object>::Cast(v8Object),
                             static_cast<SVGElementInstance*>(domObject));
-}
-
-void DOMDataStore::weakSVGObjectWithContextCallback(
-    v8::Persistent<v8::Value> v8Object,
-    void* domObject) {
-  v8::HandleScope scope;
-  ASSERT(v8Object->IsObject());
-  DOMData::handleWeakObject(DOMDataStore::DOMSVGObjectWithContextMap,
-                            v8::Persistent<v8::Object>::Cast(v8Object),
-                            domObject);
 }
 
 #endif  // ENABLE(SVG)
