@@ -27,8 +27,10 @@
 
 namespace WebKit {
 
-void WebProcess::platformSetCacheModel(CacheModel cacheModel) {
+void WebProcess::platformSetCacheModel(CacheModel) {
   // FIXME: Implement.
 }
+
+void WebProcess::platformClearResourceCaches() {}
 
 }  // namespace WebKit

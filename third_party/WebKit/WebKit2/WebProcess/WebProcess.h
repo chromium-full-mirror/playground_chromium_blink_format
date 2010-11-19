@@ -118,6 +118,9 @@ class WebProcess : ChildProcess {
                                   unsigned& pageCacheCapacity,
                                   unsigned long& urlCacheMemoryCapacity,
                                   unsigned long& urlCacheDiskCapacity);
+  void clearResourceCaches();
+  void platformClearResourceCaches();
+  void clearApplicationCache();
 
   // CoreIPC::Connection::Client
   void didReceiveMessage(CoreIPC::Connection*,

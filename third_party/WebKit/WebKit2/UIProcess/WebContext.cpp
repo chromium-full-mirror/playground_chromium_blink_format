@@ -534,4 +534,12 @@ CoreIPC::SyncReplyMode WebContext::didReceiveSyncMessage(
   return CoreIPC::AutomaticReply;
 }
 
+void WebContext::clearResourceCaches() {
+  m_process->send(Messages::WebProcess::ClearResourceCaches(), 0);
+}
+
+void WebContext::clearApplicationCache() {
+  m_process->send(Messages::WebProcess::ClearApplicationCache(), 0);
+}
+
 }  // namespace WebKit
