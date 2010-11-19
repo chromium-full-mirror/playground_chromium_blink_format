@@ -153,6 +153,10 @@ class Geolocation : public RefCounted<Geolocation>
   void sendError(GeoNotifierVector&, PositionError*);
   void sendPosition(GeoNotifierVector&, Geoposition*);
 
+  static void extractNotifiersWithCachedPosition(GeoNotifierVector& notifiers,
+                                                 GeoNotifierVector* cached);
+  static void copyToSet(const GeoNotifierVector&, GeoNotifierSet&);
+
   static void stopTimer(GeoNotifierVector&);
   void stopTimersForOneShots();
   void stopTimersForWatchers();
