@@ -36,6 +36,7 @@
 #include "InjectedBundlePageUIClient.h"
 #include "MessageSender.h"
 #include "Plugin.h"
+#include "SandboxExtension.h"
 #include "WebEditCommand.h"
 #include <WebCore/FrameLoaderTypes.h>
 #include <WebCore/IntRect.h>
@@ -221,6 +222,27 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
 
   WebContextMenu* contextMenu();
 
+  class SandboxExtensionTracker {
+   public:
+    ~SandboxExtensionTracker();
+
+    void invalidate();
+
+    void beginLoad(WebFrame*, const SandboxExtension::Handle& handle);
+    void didStartProvisionalLoad(WebFrame*);
+    void didCommitProvisionalLoad(WebFrame*);
+    void didFailProvisionalLoad(WebFrame*);
+
+   private:
+    RefPtr<SandboxExtension> m_pendingProvisionalSandboxExtension;
+    RefPtr<SandboxExtension> m_provisionalSandboxExtension;
+    RefPtr<SandboxExtension> m_committedSandboxExtension;
+  };
+
+  SandboxExtensionTracker& sandboxExtensionTracker() {
+    return m_sandboxExtensionTracker;
+  }
+
  private:
   WebPage(uint64_t pageID, const WebPageCreationParameters&);
 
@@ -245,8 +267,10 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
 
   // Actions
   void tryClose();
-  void loadURL(const String&);
-  void loadURLRequest(const WebCore::ResourceRequest&);
+  void loadURL(const String&,
+               const SandboxExtension::Handle& sandboxExtensionHandle);
+  void loadURLRequest(const WebCore::ResourceRequest&,
+                      const SandboxExtension::Handle& sandboxExtensionHandle);
   void loadHTMLString(const String& htmlString, const String& baseURL);
   void loadAlternateHTMLString(const String& htmlString,
                                const String& baseURL,
@@ -357,11 +381,10 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
   RefPtr<PageOverlay> m_pageOverlay;
 
   OwnPtr<WebInspector> m_inspector;
-
   RefPtr<WebPopupMenu> m_activePopupMenu;
-
   RefPtr<WebContextMenu> m_contextMenu;
 
+  SandboxExtensionTracker m_sandboxExtensionTracker;
   uint64_t m_pageID;
 };
 
