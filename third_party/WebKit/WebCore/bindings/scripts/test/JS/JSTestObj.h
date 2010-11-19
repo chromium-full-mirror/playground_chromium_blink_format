@@ -193,6 +193,16 @@ JSC::JSValue jsTestObjReadOnlyStringAttr(JSC::ExecState*,
 JSC::JSValue jsTestObjReadOnlyTestObjAttr(JSC::ExecState*,
                                           JSC::JSValue,
                                           const JSC::Identifier&);
+JSC::JSValue jsTestObjShortAttr(JSC::ExecState*,
+                                JSC::JSValue,
+                                const JSC::Identifier&);
+void setJSTestObjShortAttr(JSC::ExecState*, JSC::JSObject*, JSC::JSValue);
+JSC::JSValue jsTestObjUnsignedShortAttr(JSC::ExecState*,
+                                        JSC::JSValue,
+                                        const JSC::Identifier&);
+void setJSTestObjUnsignedShortAttr(JSC::ExecState*,
+                                   JSC::JSObject*,
+                                   JSC::JSValue);
 JSC::JSValue jsTestObjIntAttr(JSC::ExecState*,
                               JSC::JSValue,
                               const JSC::Identifier&);
