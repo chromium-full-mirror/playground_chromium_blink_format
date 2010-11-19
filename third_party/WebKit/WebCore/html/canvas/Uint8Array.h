@@ -46,6 +46,9 @@ class Uint8Array : public IntegralTypedArrayBase<unsigned char> {
   using IntegralTypedArrayBase<unsigned char>::set;
 #endif
 
+  PassRefPtr<Uint8Array> slice(int start) const;
+  PassRefPtr<Uint8Array> slice(int start, int end) const;
+
  private:
   Uint8Array(PassRefPtr<ArrayBuffer> buffer,
              unsigned byteOffset,
@@ -55,7 +58,6 @@ class Uint8Array : public IntegralTypedArrayBase<unsigned char> {
 
   // Overridden from ArrayBufferView.
   virtual bool isUnsignedByteArray() const { return true; }
-  virtual PassRefPtr<ArrayBufferView> slice(int start, int end) const;
 };
 
 }  // namespace WebCore

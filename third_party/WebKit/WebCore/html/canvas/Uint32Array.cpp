@@ -53,7 +53,11 @@ Uint32Array::Uint32Array(PassRefPtr<ArrayBuffer> buffer,
                          unsigned length)
     : IntegralTypedArrayBase<unsigned int>(buffer, byteOffset, length) {}
 
-PassRefPtr<ArrayBufferView> Uint32Array::slice(int start, int end) const {
+PassRefPtr<Uint32Array> Uint32Array::slice(int start) const {
+  return slice(start, length());
+}
+
+PassRefPtr<Uint32Array> Uint32Array::slice(int start, int end) const {
   return sliceImpl<Uint32Array>(start, end);
 }
 }

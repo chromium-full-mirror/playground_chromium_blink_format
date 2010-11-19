@@ -52,7 +52,11 @@ Int8Array::Int8Array(PassRefPtr<ArrayBuffer> buffer,
                      unsigned length)
     : IntegralTypedArrayBase<signed char>(buffer, byteOffset, length) {}
 
-PassRefPtr<ArrayBufferView> Int8Array::slice(int start, int end) const {
+PassRefPtr<Int8Array> Int8Array::slice(int start) const {
+  return slice(start, length());
+}
+
+PassRefPtr<Int8Array> Int8Array::slice(int start, int end) const {
   return sliceImpl<Int8Array>(start, end);
 }
 }

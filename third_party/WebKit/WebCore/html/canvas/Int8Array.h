@@ -44,6 +44,9 @@ class Int8Array : public IntegralTypedArrayBase<signed char> {
   using TypedArrayBase<signed char>::set;
   using IntegralTypedArrayBase<signed char>::set;
 
+  PassRefPtr<Int8Array> slice(int start) const;
+  PassRefPtr<Int8Array> slice(int start, int end) const;
+
  private:
   Int8Array(PassRefPtr<ArrayBuffer> buffer,
             unsigned byteOffset,
@@ -53,7 +56,6 @@ class Int8Array : public IntegralTypedArrayBase<signed char> {
 
   // Overridden from ArrayBufferView.
   virtual bool isByteArray() const { return true; }
-  virtual PassRefPtr<ArrayBufferView> slice(int start, int end) const;
 };
 
 }  // namespace WebCore

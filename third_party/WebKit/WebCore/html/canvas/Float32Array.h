@@ -62,6 +62,9 @@ class Float32Array : public TypedArrayBase<float> {
     return result;
   }
 
+  PassRefPtr<Float32Array> slice(int start) const;
+  PassRefPtr<Float32Array> slice(int start, int end) const;
+
  private:
   Float32Array(PassRefPtr<ArrayBuffer> buffer,
                unsigned byteOffset,
@@ -71,7 +74,6 @@ class Float32Array : public TypedArrayBase<float> {
 
   // Overridden from ArrayBufferView.
   virtual bool isFloatArray() const { return true; }
-  virtual PassRefPtr<ArrayBufferView> slice(int start, int end) const;
 };
 
 }  // namespace WebCore

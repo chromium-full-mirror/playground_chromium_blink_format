@@ -53,9 +53,7 @@ class ArrayBufferView : public RefCounted<ArrayBufferView> {
 
   unsigned byteOffset() const { return m_byteOffset; }
 
-  virtual unsigned length() const = 0;
   virtual unsigned byteLength() const = 0;
-  virtual PassRefPtr<ArrayBufferView> slice(int start, int end) const = 0;
 
   virtual ~ArrayBufferView();
 

@@ -44,6 +44,9 @@ class Int32Array : public IntegralTypedArrayBase<int> {
   using IntegralTypedArrayBase<int>::set;
 #endif
 
+  PassRefPtr<Int32Array> slice(int start) const;
+  PassRefPtr<Int32Array> slice(int start, int end) const;
+
  private:
   Int32Array(PassRefPtr<ArrayBuffer> buffer,
              unsigned byteOffset,
@@ -53,7 +56,6 @@ class Int32Array : public IntegralTypedArrayBase<int> {
 
   // Overridden from ArrayBufferView.
   virtual bool isIntArray() const { return true; }
-  virtual PassRefPtr<ArrayBufferView> slice(int start, int end) const;
 };
 
 }  // namespace WebCore

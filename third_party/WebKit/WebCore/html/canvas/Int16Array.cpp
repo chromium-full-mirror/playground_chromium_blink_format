@@ -50,7 +50,11 @@ Int16Array::Int16Array(PassRefPtr<ArrayBuffer> buffer,
                        unsigned length)
     : IntegralTypedArrayBase<short>(buffer, byteOffset, length) {}
 
-PassRefPtr<ArrayBufferView> Int16Array::slice(int start, int end) const {
+PassRefPtr<Int16Array> Int16Array::slice(int start) const {
+  return slice(start, length());
+}
+
+PassRefPtr<Int16Array> Int16Array::slice(int start, int end) const {
   return sliceImpl<Int16Array>(start, end);
 }
 }

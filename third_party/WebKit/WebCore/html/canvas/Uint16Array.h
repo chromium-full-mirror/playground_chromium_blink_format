@@ -44,6 +44,9 @@ class Uint16Array : public IntegralTypedArrayBase<unsigned short> {
   using TypedArrayBase<unsigned short>::set;
   using IntegralTypedArrayBase<unsigned short>::set;
 
+  PassRefPtr<Uint16Array> slice(int start) const;
+  PassRefPtr<Uint16Array> slice(int start, int end) const;
+
  private:
   Uint16Array(PassRefPtr<ArrayBuffer> buffer,
               unsigned byteOffset,
@@ -53,7 +56,6 @@ class Uint16Array : public IntegralTypedArrayBase<unsigned short> {
 
   // Overridden from ArrayBufferView.
   virtual bool isUnsignedShortArray() const { return true; }
-  virtual PassRefPtr<ArrayBufferView> slice(int start, int end) const;
 };
 
 }  // namespace WebCore
