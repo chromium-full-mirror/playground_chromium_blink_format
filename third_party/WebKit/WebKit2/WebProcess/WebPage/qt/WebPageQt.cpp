@@ -269,4 +269,14 @@ bool WebPage::performDefaultBehaviorForKeyEvent(
   return true;
 }
 
+bool WebPage::hasLocalDataForURL(const WebCore::KURL&) {
+  // FIXME: Implement
+  return false;
+}
+
+bool WebPage::canHandleRequest(const WebCore::ResourceRequest&) {
+  // FIXME: Implement
+  return true;
+}
+
 }  // namespace WebKit

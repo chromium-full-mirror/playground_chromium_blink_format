@@ -222,6 +222,10 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
 
   WebContextMenu* contextMenu();
 
+  bool hasLocalDataForURL(const WebCore::KURL&);
+
+  static bool canHandleRequest(const WebCore::ResourceRequest&);
+
   class SandboxExtensionTracker {
    public:
     ~SandboxExtensionTracker();

@@ -51,7 +51,14 @@ class InjectedBundleHitTestResult : public APIObject {
   PassRefPtr<InjectedBundleNodeHandle> nodeHandle() const;
   WebFrame* frame() const;
   WebFrame* targetFrame() const;
+
+  String absoluteImageURL() const;
   String absoluteLinkURL() const;
+  String absoluteMediaURL() const;
+
+  WebCore::IntRect imageRect() const;
+
+  bool isSelected() const;
 
  private:
   explicit InjectedBundleHitTestResult(
