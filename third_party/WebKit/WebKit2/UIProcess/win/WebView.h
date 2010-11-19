@@ -61,6 +61,7 @@ class WebView : public APIObject,
   HWND window() const { return m_window; }
   void setParentWindow(HWND);
   void windowAncestryDidChange();
+  void setIsInWindow(bool);
   void setOverrideCursor(HCURSOR overrideCursor);
 
   WebPageProxy* page() const { return m_page.get(); }
