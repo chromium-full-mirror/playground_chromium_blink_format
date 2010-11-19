@@ -44,7 +44,8 @@ WebGLRenderbuffer::WebGLRenderbuffer(WebGLRenderingContext* ctx)
       m_initialized(false),
       m_width(0),
       m_height(0),
-      m_isValid(true) {
+      m_isValid(true),
+      m_hasEverBeenBound(false) {
   setObject(context()->graphicsContext3D()->createRenderbuffer());
 }
 

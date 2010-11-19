@@ -58,6 +58,10 @@ class WebGLRenderbuffer : public WebGLObject {
   bool isInitialized() const { return m_initialized; }
   void setInitialized() { m_initialized = true; }
 
+  bool hasEverBeenBound() const { return object() && m_hasEverBeenBound; }
+
+  void setHasEverBeenBound() { m_hasEverBeenBound = true; }
+
  protected:
   WebGLRenderbuffer(WebGLRenderingContext*);
 
@@ -71,6 +75,8 @@ class WebGLRenderbuffer : public WebGLObject {
   unsigned long m_width, m_height;
   bool m_isValid;  // This is only false if internalFormat is DEPTH_STENCIL and
                    // packed_depth_stencil is not supported.
+
+  bool m_hasEverBeenBound;
 };
 
 }  // namespace WebCore

@@ -67,6 +67,8 @@ class WebGLTexture : public WebGLObject {
   // 2.0 Sec 3.8.2).
   bool needToUseBlackTexture() const;
 
+  bool hasEverBeenBound() const { return object() && m_target; }
+
   static int computeLevelCount(int width, int height);
 
  protected:

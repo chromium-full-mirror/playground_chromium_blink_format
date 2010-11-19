@@ -318,6 +318,8 @@ void WebGLRenderingContext::bindFramebuffer(unsigned long target,
   }
   m_framebufferBinding = buffer;
   m_context->bindFramebuffer(target, objectOrZero(buffer));
+  if (buffer)
+    buffer->setHasEverBeenBound();
   cleanupAfterGraphicsCall(false);
 }
 
@@ -337,6 +339,8 @@ void WebGLRenderingContext::bindRenderbuffer(unsigned long target,
   }
   m_renderbufferBinding = renderBuffer;
   m_context->bindRenderbuffer(target, objectOrZero(renderBuffer));
+  if (renderBuffer)
+    renderBuffer->setHasEverBeenBound();
   cleanupAfterGraphicsCall(false);
 }
 
@@ -2215,6 +2219,9 @@ bool WebGLRenderingContext::isBuffer(WebGLBuffer* buffer) {
   if (!buffer || isContextLost())
     return false;
 
+  if (!buffer->hasEverBeenBound())
+    return false;
+
   return m_context->isBuffer(buffer->object());
 }
 
@@ -2232,6 +2239,9 @@ bool WebGLRenderingContext::isFramebuffer(WebGLFramebuffer* framebuffer) {
   if (!framebuffer || isContextLost())
     return false;
 
+  if (!framebuffer->hasEverBeenBound())
+    return false;
+
   return m_context->isFramebuffer(framebuffer->object());
 }
 
@@ -2246,6 +2256,9 @@ bool WebGLRenderingContext::isRenderbuffer(WebGLRenderbuffer* renderbuffer) {
   if (!renderbuffer || isContextLost())
     return false;
 
+  if (!renderbuffer->hasEverBeenBound())
+    return false;
+
   return m_context->isRenderbuffer(renderbuffer->object());
 }
 
@@ -2258,6 +2271,9 @@ bool WebGLRenderingContext::isShader(WebGLShader* shader) {
 
 bool WebGLRenderingContext::isTexture(WebGLTexture* texture) {
   if (!texture || isContextLost())
+    return false;
+
+  if (!texture->hasEverBeenBound())
     return false;
 
   return m_context->isTexture(texture->object());

@@ -61,6 +61,8 @@ class WebGLBuffer : public WebGLObject {
   unsigned long getTarget() const { return m_target; }
   void setTarget(unsigned long);
 
+  bool hasEverBeenBound() const { return object() && m_target; }
+
  protected:
   WebGLBuffer(WebGLRenderingContext*);
 
