@@ -1207,6 +1207,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   const DocumentTiming* timing() const { return &m_documentTiming; }
 
+  bool mayCauseFlashOfUnstyledContent() const;
+
  protected:
   Document(Frame*,
            const KURL& url,

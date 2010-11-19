@@ -2562,7 +2562,7 @@ void RenderBlock::paintContents(PaintInfo& paintInfo, int tx, int ty) {
   // It's ok not to draw, because later on, when all the stylesheets do load,
   // updateStyleSelector on the Document
   // will do a full repaint().
-  if (document()->didLayoutWithPendingStylesheets() && !isRenderView())
+  if (document()->mayCauseFlashOfUnstyledContent() && !isRenderView())
     return;
 
   if (childrenInline())
