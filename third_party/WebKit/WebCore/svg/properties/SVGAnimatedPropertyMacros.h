@@ -100,10 +100,6 @@ struct SVGSynchronizableAnimatedProperty {
                                                                               \
   void set##UpperProperty##BaseValue(const PropertyType& type) {              \
     m_##LowerProperty.value = type;                                           \
-    SVGElement* contextElement = GetOwnerElementForType<                      \
-        OwnerType,                                                            \
-        IsDerivedFromSVGElement<OwnerType>::value>::ownerElement(this);       \
-    contextElement->invalidateSVGAttributes();                                \
   }                                                                           \
                                                                               \
   void synchronize##UpperProperty() {                                         \

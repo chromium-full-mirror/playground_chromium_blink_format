@@ -51,7 +51,7 @@ void SVGTextElement::parseMappedAttribute(Attribute* attr) {
       newList.clear();
 
     detachAnimatedTransformListWrappers(newList.size());
-    transformBaseValue() = newList;
+    setTransformBaseValue(newList);
   } else
     SVGTextPositioningElement::parseMappedAttribute(attr);
 }
