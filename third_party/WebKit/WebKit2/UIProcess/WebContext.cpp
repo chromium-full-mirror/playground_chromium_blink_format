@@ -44,10 +44,6 @@
 #include <wtf/OwnArrayPtr.h>
 #include <wtf/PassOwnArrayPtr.h>
 
-#if ENABLE(WEB_PROCESS_SANDBOX)
-#include <sandbox.h>
-#endif
-
 #ifndef NDEBUG
 #include <wtf/RefCountedLeakCounter.h>
 #endif
@@ -162,17 +158,9 @@ void WebContext::ensureWebProcess() {
   if (!injectedBundlePath().isEmpty()) {
     parameters.injectedBundlePath = injectedBundlePath();
 
-#if ENABLE(WEB_PROCESS_SANDBOX)
-    char* sandboxBundleTokenUTF8 = 0;
-    CString injectedBundlePathUTF8 = injectedBundlePath().utf8();
-    sandbox_issue_extension(injectedBundlePathUTF8.data(),
-                            &sandboxBundleTokenUTF8);
-    String sandboxBundleToken = String::fromUTF8(sandboxBundleTokenUTF8);
-    if (sandboxBundleTokenUTF8)
-      free(sandboxBundleTokenUTF8);
-
-    parameters.injectedBundlePathToken = sandboxBundleToken;
-#endif
+    SandboxExtension::createHandle(
+        parameters.injectedBundlePath, SandboxExtension::ReadOnly,
+        parameters.injectedBundlePathExtensionHandle);
   }
 
   parameters.shouldTrackVisitedLinks =

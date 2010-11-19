@@ -31,29 +31,22 @@
 #include <wtf/text/CString.h>
 #include <wtf/text/WTFString.h>
 
-#if ENABLE(WEB_PROCESS_SANDBOX)
-#include <sandbox.h>
-#endif
-
 using namespace WebCore;
 
 namespace WebKit {
 
 bool InjectedBundle::load(APIObject* initializationUserData) {
-#if ENABLE(WEB_PROCESS_SANDBOX)
-  if (!m_sandboxToken.isEmpty()) {
-    CString bundlePath = m_path.utf8();
-    CString sandboxToken = m_sandboxToken.utf8();
-    int rv = sandbox_consume_extension(bundlePath.data(), sandboxToken.data());
-    if (rv) {
+  if (m_sandboxExtension) {
+    if (!m_sandboxExtension->consume()) {
       fprintf(stderr,
-              "InjectedBundle::load failed - Could not consume (%d) bundle "
-              "sandbox extension [%s] for [%s].\n",
-              rv, sandboxToken.data(), bundlePath.data());
+              "InjectedBundle::load failed - Could not consume bundle sandbox "
+              "extension for [%s].\n",
+              m_path.utf8().data());
       return false;
     }
+
+    m_sandboxExtension = 0;
   }
-#endif
 
   RetainPtr<CFStringRef> injectedBundlePathStr(
       AdoptCF, CFStringCreateWithCharacters(
