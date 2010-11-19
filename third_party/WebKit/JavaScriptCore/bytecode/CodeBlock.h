@@ -334,7 +334,7 @@ class CodeBlock : public FastAllocBase {
   }
 #endif
 #if ENABLE(INTERPRETER)
-  unsigned bytecodeOffset(CallFrame*, Instruction* returnAddress) {
+  unsigned bytecodeOffset(Instruction* returnAddress) {
     return static_cast<Instruction*>(returnAddress) - instructions().begin();
   }
 #endif
