@@ -668,17 +668,13 @@ NEVER_INLINE bool Interpreter::unwindCallFrame(CallFrame*& callFrame,
   codeBlock = callerFrame->codeBlock();
 #if ENABLE(JIT) && ENABLE(INTERPRETER)
   if (callerFrame->globalData().canUseJIT())
-    bytecodeOffset =
-        codeBlock->bytecodeOffset(callerFrame, callFrame->returnPC());
+    bytecodeOffset = codeBlock->bytecodeOffset(callFrame->returnPC());
   else
-    bytecodeOffset =
-        codeBlock->bytecodeOffset(callerFrame, callFrame->returnVPC());
+    bytecodeOffset = codeBlock->bytecodeOffset(callFrame->returnVPC());
 #elif ENABLE(JIT)
-  bytecodeOffset =
-      codeBlock->bytecodeOffset(callerFrame, callFrame->returnPC());
+  bytecodeOffset = codeBlock->bytecodeOffset(callFrame->returnPC());
 #else
-  bytecodeOffset =
-      codeBlock->bytecodeOffset(callerFrame, callFrame->returnVPC());
+  bytecodeOffset = codeBlock->bytecodeOffset(callFrame->returnVPC());
 #endif
 
   callFrame = callerFrame;
@@ -690,13 +686,16 @@ static void appendSourceToError(CallFrame* callFrame,
                                 unsigned bytecodeOffset) {
   exception->clearAppendSourceToMessage();
 
+  if (!callFrame->codeBlock()->hasExpressionInfo())
+    return;
+
   int startOffset = 0;
   int endOffset = 0;
   int divotPoint = 0;
 
   CodeBlock* codeBlock = callFrame->codeBlock();
-  codeBlock->expressionRangeForBytecodeOffset(
-      callFrame, bytecodeOffset, divotPoint, startOffset, endOffset);
+  codeBlock->expressionRangeForBytecodeOffset(bytecodeOffset, divotPoint,
+                                              startOffset, endOffset);
 
   int expressionStart = divotPoint - startOffset;
   int expressionStop = divotPoint + endOffset;
@@ -744,26 +743,31 @@ static void appendSourceToError(CallFrame* callFrame,
 
 NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
                                                       JSValue& exceptionValue,
-                                                      unsigned bytecodeOffset,
-                                                      bool explicitThrow) {
+                                                      unsigned bytecodeOffset) {
   CodeBlock* codeBlock = callFrame->codeBlock();
   bool isInterrupt = false;
 
   // Set up the exception object
   if (exceptionValue.isObject()) {
     JSObject* exception = asObject(exceptionValue);
-    if (!explicitThrow && exception->isErrorInstance() &&
+
+    if (exception->isErrorInstance() &&
         static_cast<ErrorInstance*>(exception)->appendSourceToMessage())
       appendSourceToError(callFrame, static_cast<ErrorInstance*>(exception),
                           bytecodeOffset);
 
-    // FIXME: should only really be adding these properties to VM generated
-    // exceptions,
-    // but the inspector currently requires these for all thrown objects.
-    if (!hasErrorInfo(callFrame, exception))
-      addErrorInfo(callFrame, exception, codeBlock->lineNumberForBytecodeOffset(
-                                             callFrame, bytecodeOffset),
+    // Using hasExpressionInfo to imply we are interested in rich exception
+    // info.
+    if (codeBlock->hasExpressionInfo() && !hasErrorInfo(callFrame, exception)) {
+      ASSERT(codeBlock->hasLineInfo());
+
+      // FIXME: should only really be adding these properties to VM generated
+      // exceptions,
+      // but the inspector currently requires these for all thrown objects.
+      addErrorInfo(callFrame, exception,
+                   codeBlock->lineNumberForBytecodeOffset(bytecodeOffset),
                    codeBlock->ownerExecutable()->source());
+    }
 
     ComplType exceptionType = exception->exceptionType();
     isInterrupt = exceptionType == Interrupted || exceptionType == Terminated;
@@ -774,8 +778,7 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
     bool hasHandler = codeBlock->handlerForBytecodeOffset(bytecodeOffset);
     debugger->exception(
         debuggerCallFrame, codeBlock->ownerExecutable()->sourceID(),
-        codeBlock->lineNumberForBytecodeOffset(callFrame, bytecodeOffset),
-        hasHandler);
+        codeBlock->lineNumberForBytecodeOffset(bytecodeOffset), hasHandler);
   }
 
   // Calculate an exception handler vPC, unwinding call frames as necessary.
@@ -5040,7 +5043,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       exceptionValue = callFrame->r(ex).jsValue();
 
       handler = throwException(callFrame, exceptionValue,
-                               vPC - codeBlock->instructions().begin(), true);
+                               vPC - codeBlock->instructions().begin());
       if (!handler)
         return throwError(callFrame, exceptionValue);
 
@@ -5220,7 +5223,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       exceptionValue = createInterruptedExecutionException(globalData);
     }
     handler = throwException(callFrame, exceptionValue,
-                             vPC - codeBlock->instructions().begin(), false);
+                             vPC - codeBlock->instructions().begin());
     if (!handler)
       return throwError(callFrame, exceptionValue);
 
@@ -5299,19 +5302,15 @@ void Interpreter::retrieveLastCaller(CallFrame* callFrame,
   unsigned bytecodeOffset = 0;
 #if ENABLE(INTERPRETER)
   if (!callerFrame->globalData().canUseJIT())
-    bytecodeOffset =
-        callerCodeBlock->bytecodeOffset(callerFrame, callFrame->returnVPC());
+    bytecodeOffset = callerCodeBlock->bytecodeOffset(callFrame->returnVPC());
 #if ENABLE(JIT)
   else
-    bytecodeOffset =
-        callerCodeBlock->bytecodeOffset(callerFrame, callFrame->returnPC());
+    bytecodeOffset = callerCodeBlock->bytecodeOffset(callFrame->returnPC());
 #endif
 #else
-  bytecodeOffset =
-      callerCodeBlock->bytecodeOffset(callerFrame, callFrame->returnPC());
+  bytecodeOffset = callerCodeBlock->bytecodeOffset(callFrame->returnPC());
 #endif
-  lineNumber = callerCodeBlock->lineNumberForBytecodeOffset(callerFrame,
-                                                            bytecodeOffset - 1);
+  lineNumber = callerCodeBlock->lineNumberForBytecodeOffset(bytecodeOffset - 1);
   sourceID = callerCodeBlock->ownerExecutable()->sourceID();
   sourceURL = callerCodeBlock->ownerExecutable()->sourceURL();
   function = callerFrame->callee();

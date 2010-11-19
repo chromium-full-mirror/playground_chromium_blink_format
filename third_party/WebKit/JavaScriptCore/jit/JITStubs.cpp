@@ -1155,16 +1155,14 @@ struct ExceptionHandler {
 static ExceptionHandler jitThrow(JSGlobalData* globalData,
                                  CallFrame* callFrame,
                                  JSValue exceptionValue,
-                                 ReturnAddressPtr faultLocation,
-                                 bool explicitThrow) {
+                                 ReturnAddressPtr faultLocation) {
   ASSERT(exceptionValue);
 
-  unsigned vPCIndex =
-      callFrame->codeBlock()->bytecodeOffset(callFrame, faultLocation);
+  unsigned vPCIndex = callFrame->codeBlock()->bytecodeOffset(faultLocation);
   globalData->exception = JSValue();
   HandlerInfo* handler = globalData->interpreter->throwException(
-      callFrame, exceptionValue, vPCIndex,
-      explicitThrow);  // This may update callFrame & exceptionValue!
+      callFrame, exceptionValue,
+      vPCIndex);  // This may update callFrame & exceptionValue!
   globalData->exception = exceptionValue;
 
   void* catchRoutine = handler ? handler->nativeCode.executableAddress()
@@ -1482,7 +1480,7 @@ DEFINE_STUB_FUNCTION(void*, register_file_check) {
     ExceptionHandler handler =
         jitThrow(stackFrame.globalData, oldCallFrame,
                  createStackOverflowError(oldCallFrame),
-                 ReturnAddressPtr(oldCallFrame->returnPC()), false);
+                 ReturnAddressPtr(oldCallFrame->returnPC()));
     STUB_SET_RETURN_ADDRESS(handler.catchRoutine);
     callFrame = handler.callFrame;
   }
@@ -2168,7 +2166,7 @@ DEFINE_STUB_FUNCTION(void*, op_call_arityCheck) {
       // moved the call frame forward.
       ExceptionHandler handler =
           jitThrow(stackFrame.globalData, oldCallFrame,
-                   createStackOverflowError(oldCallFrame), pc, false);
+                   createStackOverflowError(oldCallFrame), pc);
       STUB_SET_RETURN_ADDRESS(handler.catchRoutine);
       return handler.callFrame;
     }
@@ -2187,7 +2185,7 @@ DEFINE_STUB_FUNCTION(void*, op_call_arityCheck) {
       // moved the call frame forward.
       ExceptionHandler handler =
           jitThrow(stackFrame.globalData, oldCallFrame,
-                   createStackOverflowError(oldCallFrame), pc, false);
+                   createStackOverflowError(oldCallFrame), pc);
       STUB_SET_RETURN_ADDRESS(handler.catchRoutine);
       return handler.callFrame;
     }
@@ -2234,7 +2232,7 @@ DEFINE_STUB_FUNCTION(void*, op_construct_arityCheck) {
       // moved the call frame forward.
       ExceptionHandler handler =
           jitThrow(stackFrame.globalData, oldCallFrame,
-                   createStackOverflowError(oldCallFrame), pc, false);
+                   createStackOverflowError(oldCallFrame), pc);
       STUB_SET_RETURN_ADDRESS(handler.catchRoutine);
       return handler.callFrame;
     }
@@ -2253,7 +2251,7 @@ DEFINE_STUB_FUNCTION(void*, op_construct_arityCheck) {
       // moved the call frame forward.
       ExceptionHandler handler =
           jitThrow(stackFrame.globalData, oldCallFrame,
-                   createStackOverflowError(oldCallFrame), pc, false);
+                   createStackOverflowError(oldCallFrame), pc);
       STUB_SET_RETURN_ADDRESS(handler.catchRoutine);
       return handler.callFrame;
     }
@@ -3489,7 +3487,7 @@ DEFINE_STUB_FUNCTION(void*, op_throw) {
   STUB_INIT_STACK_FRAME(stackFrame);
   ExceptionHandler handler =
       jitThrow(stackFrame.globalData, stackFrame.callFrame,
-               stackFrame.args[0].jsValue(), STUB_RETURN_ADDRESS, true);
+               stackFrame.args[0].jsValue(), STUB_RETURN_ADDRESS);
   STUB_SET_RETURN_ADDRESS(handler.catchRoutine);
   return handler.callFrame;
 }
@@ -3855,7 +3853,7 @@ DEFINE_STUB_FUNCTION(void*, vm_throw) {
   JSGlobalData* globalData = stackFrame.globalData;
   ExceptionHandler handler =
       jitThrow(globalData, stackFrame.callFrame, globalData->exception,
-               globalData->exceptionLocation, false);
+               globalData->exceptionLocation);
   STUB_SET_RETURN_ADDRESS(handler.catchRoutine);
   return handler.callFrame;
 }

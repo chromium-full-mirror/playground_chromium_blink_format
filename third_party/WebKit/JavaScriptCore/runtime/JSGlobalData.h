@@ -109,6 +109,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   };
 
   bool isSharedInstance() { return globalDataType == APIShared; }
+  bool usingAPI() { return globalDataType != Default; }
   static bool sharedInstanceExists();
   static JSGlobalData& sharedInstance();
 
@@ -202,7 +203,6 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   HashSet<JSObject*> arrayVisitedElements;
 
-  CodeBlock* functionCodeBlockBeingReparsed;
   Stringifier* firstStringifierToMark;
 
   MarkStack markStack;

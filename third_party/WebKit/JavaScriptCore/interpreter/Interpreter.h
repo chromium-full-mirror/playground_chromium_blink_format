@@ -136,8 +136,7 @@ class Interpreter : public FastAllocBase {
                                 int registerOffset);
   NEVER_INLINE HandlerInfo* throwException(CallFrame*&,
                                            JSValue&,
-                                           unsigned bytecodeOffset,
-                                           bool);
+                                           unsigned bytecodeOffset);
   NEVER_INLINE void debug(CallFrame*, DebugHookID, int firstLine, int lastLine);
 
   void dumpSampleData(ExecState* exec);

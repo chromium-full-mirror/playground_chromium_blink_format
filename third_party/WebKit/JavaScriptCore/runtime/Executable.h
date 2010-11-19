@@ -186,9 +186,6 @@ class ScriptExecutable : public ExecutableBase {
   }
   bool isStrictMode() const { return m_features & StrictModeFeature; }
 
-  virtual PassOwnPtr<ExceptionInfo> reparseExceptionInfo(ScopeChainNode*,
-                                                         CodeBlock*) = 0;
-
  protected:
   void recordParse(CodeFeatures features,
                    bool hasCapturedVariables,
@@ -239,9 +236,6 @@ class EvalExecutable : public ScriptExecutable {
 
   JSObject* compileInternal(ExecState*, ScopeChainNode*);
 
-  virtual PassOwnPtr<ExceptionInfo> reparseExceptionInfo(ScopeChainNode*,
-                                                         CodeBlock*);
-
   OwnPtr<EvalCodeBlock> m_evalCodeBlock;
 };
 
@@ -277,9 +271,6 @@ class ProgramExecutable : public ScriptExecutable {
   ProgramExecutable(ExecState*, const SourceCode&);
 
   JSObject* compileInternal(ExecState*, ScopeChainNode*);
-
-  virtual PassOwnPtr<ExceptionInfo> reparseExceptionInfo(ScopeChainNode*,
-                                                         CodeBlock*);
 
   OwnPtr<ProgramCodeBlock> m_programCodeBlock;
 };
@@ -395,9 +386,6 @@ class FunctionExecutable : public ScriptExecutable {
 
   JSObject* compileForCallInternal(ExecState*, ScopeChainNode*);
   JSObject* compileForConstructInternal(ExecState*, ScopeChainNode*);
-
-  virtual PassOwnPtr<ExceptionInfo> reparseExceptionInfo(ScopeChainNode*,
-                                                         CodeBlock*);
 
   unsigned m_numCapturedVariables : 31;
   bool m_forceUsesArguments : 1;

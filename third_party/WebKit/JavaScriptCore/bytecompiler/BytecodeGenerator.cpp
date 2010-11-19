@@ -160,12 +160,6 @@ void BytecodeGenerator::generate() {
       m_codeType == EvalCode)
     symbolTable().clear();
 
-#if !ENABLE(OPCODE_SAMPLING)
-  if (!m_regeneratingForExceptionInfo && !m_usesExceptions &&
-      (m_codeType == FunctionCode || m_codeType == EvalCode))
-    m_codeBlock->clearExceptionInfo();
-#endif
-
   m_codeBlock->shrinkToFit();
 }
 
@@ -211,12 +205,13 @@ void BytecodeGenerator::preserveLastVar() {
 }
 
 BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
-                                     const Debugger* debugger,
                                      const ScopeChain& scopeChain,
                                      SymbolTable* symbolTable,
                                      ProgramCodeBlock* codeBlock)
-    : m_shouldEmitDebugHooks(!!debugger),
+    : m_shouldEmitDebugHooks(scopeChain.globalObject()->debugger()),
       m_shouldEmitProfileHooks(scopeChain.globalObject()->supportsProfiling()),
+      m_shouldEmitRichSourceInfo(
+          scopeChain.globalObject()->supportsRichSourceInfo()),
       m_scopeChain(&scopeChain),
       m_symbolTable(symbolTable),
       m_scopeNode(programNode),
@@ -232,7 +227,7 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
       m_hasCreatedActivation(true),
       m_firstLazyFunction(0),
       m_lastLazyFunction(0),
-      m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
+      m_globalData(&scopeChain.globalObject()->globalData()),
       m_lastOpcodeID(op_end)
 #ifndef NDEBUG
       ,
@@ -326,12 +321,13 @@ BytecodeGenerator::BytecodeGenerator(ProgramNode* programNode,
 }
 
 BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
-                                     const Debugger* debugger,
                                      const ScopeChain& scopeChain,
                                      SymbolTable* symbolTable,
                                      CodeBlock* codeBlock)
-    : m_shouldEmitDebugHooks(!!debugger),
+    : m_shouldEmitDebugHooks(scopeChain.globalObject()->debugger()),
       m_shouldEmitProfileHooks(scopeChain.globalObject()->supportsProfiling()),
+      m_shouldEmitRichSourceInfo(
+          scopeChain.globalObject()->supportsRichSourceInfo()),
       m_scopeChain(&scopeChain),
       m_symbolTable(symbolTable),
       m_scopeNode(functionBody),
@@ -346,7 +342,7 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
       m_hasCreatedActivation(false),
       m_firstLazyFunction(0),
       m_lastLazyFunction(0),
-      m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
+      m_globalData(&scopeChain.globalObject()->globalData()),
       m_lastOpcodeID(op_end)
 #ifndef NDEBUG
       ,
@@ -436,7 +432,8 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
     }
   }
   bool canLazilyCreateFunctions =
-      !functionBody->needsActivationForMoreThanVariables() && !debugger;
+      !functionBody->needsActivationForMoreThanVariables() &&
+      !m_shouldEmitDebugHooks;
   if (!canLazilyCreateFunctions && !m_hasCreatedActivation) {
     m_hasCreatedActivation = true;
     emitOpcode(op_create_activation);
@@ -469,7 +466,7 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
       addVar(ident, varStack[i].second & DeclarationStacks::IsConstant);
   }
 
-  if (debugger)
+  if (m_shouldEmitDebugHooks)
     codeBlock->m_numCapturedVars = codeBlock->m_numVars;
 
   FunctionParameters& parameters = *functionBody->parameters();
@@ -510,12 +507,13 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
 }
 
 BytecodeGenerator::BytecodeGenerator(EvalNode* evalNode,
-                                     const Debugger* debugger,
                                      const ScopeChain& scopeChain,
                                      SymbolTable* symbolTable,
                                      EvalCodeBlock* codeBlock)
-    : m_shouldEmitDebugHooks(!!debugger),
+    : m_shouldEmitDebugHooks(scopeChain.globalObject()->debugger()),
       m_shouldEmitProfileHooks(scopeChain.globalObject()->supportsProfiling()),
+      m_shouldEmitRichSourceInfo(
+          scopeChain.globalObject()->supportsRichSourceInfo()),
       m_scopeChain(&scopeChain),
       m_symbolTable(symbolTable),
       m_scopeNode(evalNode),
@@ -530,7 +528,7 @@ BytecodeGenerator::BytecodeGenerator(EvalNode* evalNode,
       m_hasCreatedActivation(true),
       m_firstLazyFunction(0),
       m_lastLazyFunction(0),
-      m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
+      m_globalData(&scopeChain.globalObject()->globalData()),
       m_lastOpcodeID(op_end)
 #ifndef NDEBUG
       ,

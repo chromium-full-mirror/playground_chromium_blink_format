@@ -100,7 +100,6 @@ struct LineInfo {
 struct CallLinkInfo {
   CallLinkInfo() : callee(0), position(0), hasSeenShouldRepatch(0) {}
 
-  unsigned bytecodeOffset;
   CodeLocationNearCall callReturnLocation;
   CodeLocationDataLabelPtr hotPathBegin;
   CodeLocationNearCall hotPathOther;
@@ -141,15 +140,6 @@ struct MethodCallLinkInfo {
   CodeLocationDataLabelPtr structureLabel;
   Structure* cachedStructure;
   Structure* cachedPrototypeStructure;
-};
-
-struct FunctionRegisterInfo {
-  FunctionRegisterInfo(unsigned bytecodeOffset, int functionRegisterIndex)
-      : bytecodeOffset(bytecodeOffset),
-        functionRegisterIndex(functionRegisterIndex) {}
-
-  unsigned bytecodeOffset;
-  int functionRegisterIndex;
 };
 
 struct GlobalResolveInfo {
@@ -236,15 +226,6 @@ inline ArrayType* binaryChop(ArrayType* array, size_t size, KeyType key) {
 }
 #endif
 
-struct ExceptionInfo : FastAllocBase {
-  Vector<ExpressionRangeInfo> m_expressionInfo;
-  Vector<LineInfo> m_lineInfo;
-
-#if ENABLE(JIT)
-  Vector<CallReturnOffsetToBytecodeOffset> m_callReturnIndexVector;
-#endif
-};
-
 class CodeBlock : public FastAllocBase {
   friend class JIT;
 
@@ -294,9 +275,8 @@ class CodeBlock : public FastAllocBase {
   }
 
   HandlerInfo* handlerForBytecodeOffset(unsigned bytecodeOffset);
-  int lineNumberForBytecodeOffset(CallFrame*, unsigned bytecodeOffset);
-  void expressionRangeForBytecodeOffset(CallFrame*,
-                                        unsigned bytecodeOffset,
+  int lineNumberForBytecodeOffset(unsigned bytecodeOffset);
+  void expressionRangeForBytecodeOffset(unsigned bytecodeOffset,
                                         int& divot,
                                         int& startOffset,
                                         int& endOffset);
@@ -339,13 +319,16 @@ class CodeBlock : public FastAllocBase {
         returnAddress.value()));
   }
 
-  unsigned bytecodeOffset(CallFrame* callFrame,
-                          ReturnAddressPtr returnAddress) {
-    if (!reparseForExceptionInfoIfNecessary(callFrame))
+  unsigned bytecodeOffset(ReturnAddressPtr returnAddress) {
+    if (!m_rareData)
+      return 1;
+    Vector<CallReturnOffsetToBytecodeOffset>& callIndices =
+        m_rareData->m_callReturnIndexVector;
+    if (!callIndices.size())
       return 1;
     return binaryChop<CallReturnOffsetToBytecodeOffset, unsigned,
                       getCallReturnOffset>(
-               callReturnIndexVector().begin(), callReturnIndexVector().size(),
+               callIndices.begin(), callIndices.size(),
                getJITCode().offsetOf(returnAddress.value()))
         ->bytecodeOffset;
   }
@@ -475,32 +458,34 @@ class CodeBlock : public FastAllocBase {
     return m_rareData->m_exceptionHandlers[index];
   }
 
-  bool hasExceptionInfo() const { return m_exceptionInfo; }
-  void clearExceptionInfo() { m_exceptionInfo.clear(); }
-  PassOwnPtr<ExceptionInfo> extractExceptionInfo();
-
   void addExpressionInfo(const ExpressionRangeInfo& expressionInfo) {
-    ASSERT(m_exceptionInfo);
-    m_exceptionInfo->m_expressionInfo.append(expressionInfo);
+    createRareDataIfNecessary();
+    m_rareData->m_expressionInfo.append(expressionInfo);
   }
 
-  size_t numberOfLineInfos() const {
-    ASSERT(m_exceptionInfo);
-    return m_exceptionInfo->m_lineInfo.size();
+  void addLineInfo(unsigned bytecodeOffset, int lineNo) {
+    createRareDataIfNecessary();
+    Vector<LineInfo>& lineInfo = m_rareData->m_lineInfo;
+    if (!lineInfo.size() || lineInfo.last().lineNumber != lineNo) {
+      LineInfo info = {bytecodeOffset, lineNo};
+      lineInfo.append(info);
+    }
   }
-  void addLineInfo(const LineInfo& lineInfo) {
-    ASSERT(m_exceptionInfo);
-    m_exceptionInfo->m_lineInfo.append(lineInfo);
+
+  bool hasExpressionInfo() {
+    return m_rareData && m_rareData->m_expressionInfo.size();
   }
-  LineInfo& lastLineInfo() {
-    ASSERT(m_exceptionInfo);
-    return m_exceptionInfo->m_lineInfo.last();
+  bool hasLineInfo() { return m_rareData && m_rareData->m_lineInfo.size(); }
+  bool needsCallReturnIndices() {
+    return m_rareData && (m_rareData->m_expressionInfo.size() ||
+                          m_rareData->m_lineInfo.size() ||
+                          m_rareData->m_exceptionHandlers.size());
   }
 
 #if ENABLE(JIT)
   Vector<CallReturnOffsetToBytecodeOffset>& callReturnIndexVector() {
-    ASSERT(m_exceptionInfo);
-    return m_exceptionInfo->m_callReturnIndexVector;
+    createRareDataIfNecessary();
+    return m_rareData->m_callReturnIndexVector;
   }
 #endif
 
@@ -649,8 +634,6 @@ class CodeBlock : public FastAllocBase {
                       const char* op) const;
 #endif
 
-  bool reparseForExceptionInfoIfNecessary(CallFrame*) WARN_UNUSED_RETURN;
-
   void createRareDataIfNecessary() {
     if (!m_rareData)
       m_rareData = adoptPtr(new RareData);
@@ -700,8 +683,6 @@ class CodeBlock : public FastAllocBase {
 
   SymbolTable* m_symbolTable;
 
-  OwnPtr<ExceptionInfo> m_exceptionInfo;
-
   struct RareData : FastAllocBase {
     Vector<HandlerInfo> m_exceptionHandlers;
 
@@ -714,6 +695,14 @@ class CodeBlock : public FastAllocBase {
     Vector<StringJumpTable> m_stringSwitchJumpTables;
 
     EvalCodeCache m_evalCodeCache;
+
+    // Expression info - present if debugging.
+    Vector<ExpressionRangeInfo> m_expressionInfo;
+    // Line info - present if profiling or debugging.
+    Vector<LineInfo> m_lineInfo;
+#if ENABLE(JIT)
+    Vector<CallReturnOffsetToBytecodeOffset> m_callReturnIndexVector;
+#endif
   };
   OwnPtr<RareData> m_rareData;
 };
@@ -813,11 +802,6 @@ class FunctionCodeBlock : public CodeBlock {
                   isConstructor) {}
   ~FunctionCodeBlock() { sharedSymbolTable()->deref(); }
 };
-
-inline PassOwnPtr<ExceptionInfo> CodeBlock::extractExceptionInfo() {
-  ASSERT(m_exceptionInfo);
-  return m_exceptionInfo.release();
-}
 
 inline Register& ExecState::r(int index) {
   CodeBlock* codeBlock = this->codeBlock();

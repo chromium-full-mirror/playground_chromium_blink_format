@@ -97,20 +97,14 @@ class BytecodeGenerator : public FastAllocBase {
   static bool dumpsGeneratedCode();
 
   BytecodeGenerator(ProgramNode*,
-                    const Debugger*,
                     const ScopeChain&,
                     SymbolTable*,
                     ProgramCodeBlock*);
   BytecodeGenerator(FunctionBodyNode*,
-                    const Debugger*,
                     const ScopeChain&,
                     SymbolTable*,
                     CodeBlock*);
-  BytecodeGenerator(EvalNode*,
-                    const Debugger*,
-                    const ScopeChain&,
-                    SymbolTable*,
-                    EvalCodeBlock*);
+  BytecodeGenerator(EvalNode*, const ScopeChain&, SymbolTable*, EvalCodeBlock*);
 
   JSGlobalData* globalData() const { return m_globalData; }
   const CommonIdentifiers& propertyNames() const {
@@ -233,11 +227,8 @@ class BytecodeGenerator : public FastAllocBase {
     // referenced temporary.
     ASSERT(!dst || dst == ignoredResult() || !dst->isTemporary() ||
            dst->refCount());
-    if (!m_codeBlock->numberOfLineInfos() ||
-        m_codeBlock->lastLineInfo().lineNumber != n->lineNo()) {
-      LineInfo info = {instructions().size(), n->lineNo()};
-      m_codeBlock->addLineInfo(info);
-    }
+    addLineInfo(n->lineNo());
+
     if (m_emitNodeDepth >= s_maxEmitNodeDepth)
       return emitThrowExpressionTooDeepException();
     ++m_emitNodeDepth;
@@ -252,11 +243,7 @@ class BytecodeGenerator : public FastAllocBase {
                                   Label* trueTarget,
                                   Label* falseTarget,
                                   bool fallThroughMeansTrue) {
-    if (!m_codeBlock->numberOfLineInfos() ||
-        m_codeBlock->lastLineInfo().lineNumber != n->lineNo()) {
-      LineInfo info = {instructions().size(), n->lineNo()};
-      m_codeBlock->addLineInfo(info);
-    }
+    addLineInfo(n->lineNo());
     if (m_emitNodeDepth >= s_maxEmitNodeDepth) {
       emitThrowExpressionTooDeepException();
       return;
@@ -270,6 +257,9 @@ class BytecodeGenerator : public FastAllocBase {
   void emitExpressionInfo(unsigned divot,
                           unsigned startOffset,
                           unsigned endOffset) {
+    if (!m_shouldEmitRichSourceInfo)
+      return;
+
     divot -= m_codeBlock->sourceOffset();
     if (divot > ExpressionRangeInfo::MaxDivot) {
       // Overflow has occurred, we can only give line number info for errors for
@@ -650,6 +640,13 @@ class BytecodeGenerator : public FastAllocBase {
                                       body->lastLine());
   }
 
+  void addLineInfo(unsigned lineNo) {
+#if !ENABLE(OPCODE_SAMPLING)
+    if (m_shouldEmitRichSourceInfo)
+#endif
+      m_codeBlock->addLineInfo(instructions().size(), lineNo);
+  }
+
   RegisterID* emitInitLazyRegister(RegisterID*);
 
   Vector<Instruction>& instructions() { return m_codeBlock->instructions(); }
@@ -671,6 +668,7 @@ class BytecodeGenerator : public FastAllocBase {
 
   bool m_shouldEmitDebugHooks;
   bool m_shouldEmitProfileHooks;
+  bool m_shouldEmitRichSourceInfo;
 
   const ScopeChain* m_scopeChain;
   SymbolTable* m_symbolTable;
