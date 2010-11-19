@@ -2089,11 +2089,12 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_mul) {
 DEFINE_STUB_FUNCTION(JSObject*, op_new_func) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
-  ASSERT(stackFrame.callFrame->codeBlock()->codeType() != FunctionCode ||
-         !stackFrame.callFrame->codeBlock()->needsFullScopeChain() ||
-         stackFrame.callFrame
-             ->r(stackFrame.callFrame->codeBlock()->activationRegister())
-             .jsValue());
+  ASSERT(
+      stackFrame.callFrame->codeBlock()->codeType() != FunctionCode ||
+      !stackFrame.callFrame->codeBlock()->needsFullScopeChain() ||
+      stackFrame.callFrame
+          ->uncheckedR(stackFrame.callFrame->codeBlock()->activationRegister())
+          .jsValue());
   return stackFrame.args[0].function()->make(
       stackFrame.callFrame, stackFrame.callFrame->scopeChain());
 }
@@ -2978,7 +2979,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_resolve_skip) {
       codeBlock->codeType() == FunctionCode && codeBlock->needsFullScopeChain();
   ASSERT(skip || !checkTopLevel);
   if (checkTopLevel && skip--) {
-    if (callFrame->r(codeBlock->activationRegister()).jsValue())
+    if (callFrame->uncheckedR(codeBlock->activationRegister()).jsValue())
       ++iter;
   }
   while (skip--) {
@@ -3346,7 +3347,8 @@ DEFINE_STUB_FUNCTION(JSObject*, op_new_func_exp) {
   JSFunction* func = function->make(callFrame, callFrame->scopeChain());
   ASSERT(callFrame->codeBlock()->codeType() != FunctionCode ||
          !callFrame->codeBlock()->needsFullScopeChain() ||
-         callFrame->r(callFrame->codeBlock()->activationRegister()).jsValue());
+         callFrame->uncheckedR(callFrame->codeBlock()->activationRegister())
+             .jsValue());
 
   /*
       The Identifier in a FunctionExpression can be referenced from inside
@@ -3453,11 +3455,12 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_bitor) {
 
 DEFINE_STUB_FUNCTION(EncodedJSValue, op_call_eval) {
   STUB_INIT_STACK_FRAME(stackFrame);
-  ASSERT(stackFrame.callFrame->codeBlock()->codeType() != FunctionCode ||
-         !stackFrame.callFrame->codeBlock()->needsFullScopeChain() ||
-         stackFrame.callFrame
-             ->r(stackFrame.callFrame->codeBlock()->activationRegister())
-             .jsValue());
+  ASSERT(
+      stackFrame.callFrame->codeBlock()->codeType() != FunctionCode ||
+      !stackFrame.callFrame->codeBlock()->needsFullScopeChain() ||
+      stackFrame.callFrame
+          ->uncheckedR(stackFrame.callFrame->codeBlock()->activationRegister())
+          .jsValue());
 
   CallFrame* callFrame = stackFrame.callFrame;
   RegisterFile* registerFile = stackFrame.registerFile;

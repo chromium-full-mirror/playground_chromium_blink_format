@@ -168,6 +168,8 @@ class ExecState : private Register {
 
   // Read a register from the codeframe (or constant from the CodeBlock).
   inline Register& r(int);
+  // Read a register for a non-constant
+  inline Register& uncheckedR(int);
 
   // Access to arguments.
   int hostThisRegister() {
