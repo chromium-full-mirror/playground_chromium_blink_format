@@ -139,8 +139,8 @@ class ScrollView : public Widget, public ScrollbarClient {
            verticalScrollbarMode() != ScrollbarAlwaysOff;
   }
 
-  virtual bool delegatesScrolling() { return false; }
-  virtual bool avoidScrollbarCreation() { return false; }
+  virtual bool delegatesScrolling() const { return false; }
+  virtual bool avoidScrollbarCreation() const { return false; }
 
   // By default you only receive paint events for the area that is visible. In
   // the case of using a
