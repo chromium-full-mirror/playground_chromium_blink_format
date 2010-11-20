@@ -31,6 +31,7 @@
 #include <wtf/Forward.h>
 
 namespace WebCore {
+class ResourceError;
 class ResourceResponse;
 }
 
@@ -55,6 +56,7 @@ class WebDownloadClient : public APIClient<WKContextDownloadClient> {
                                                 bool& allowOverwrite);
   void didCreateDestination(WebContext*, DownloadProxy*, const String& path);
   void didFinish(WebContext*, DownloadProxy*);
+  void didFail(WebContext*, DownloadProxy*, const WebCore::ResourceError&);
 };
 
 }  // namespace WebKit
