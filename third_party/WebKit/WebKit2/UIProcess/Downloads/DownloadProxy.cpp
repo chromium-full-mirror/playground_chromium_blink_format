@@ -89,13 +89,18 @@ void DownloadProxy::shouldDecodeSourceDataOfMIMEType(const String& mimeType,
 void DownloadProxy::decideDestinationWithSuggestedFilename(
     const String& filename,
     String& destination,
-    bool& allowOverwrite) {
+    bool& allowOverwrite,
+    SandboxExtension::Handle& sandboxExtensionHandle) {
   if (!m_webContext)
     return;
 
   destination =
       m_webContext->downloadClient().decideDestinationWithSuggestedFilename(
           m_webContext, this, filename, allowOverwrite);
+
+  if (!destination.isNull())
+    SandboxExtension::createHandle(destination, SandboxExtension::WriteOnly,
+                                   sandboxExtensionHandle);
 }
 
 void DownloadProxy::didCreateDestination(const String& path) {

@@ -28,6 +28,7 @@
 #include "Connection.h"
 #include "DownloadProxyMessages.h"
 #include "DownloadManager.h"
+#include "SandboxExtension.h"
 #include "WebCoreArgumentCoders.h"
 #include "WebProcess.h"
 
@@ -79,12 +80,17 @@ bool Download::shouldDecodeSourceDataOfMIMEType(const String& mimeType) {
 String Download::decideDestinationWithSuggestedFilename(const String& filename,
                                                         bool& allowOverwrite) {
   String destination;
+  SandboxExtension::Handle sandboxExtensionHandle;
   if (!sendSync(
           Messages::DownloadProxy::DecideDestinationWithSuggestedFilename(
               filename),
           Messages::DownloadProxy::DecideDestinationWithSuggestedFilename::
-              Reply(destination, allowOverwrite)))
+              Reply(destination, allowOverwrite, sandboxExtensionHandle)))
     return String();
+
+  m_sandboxExtension = SandboxExtension::create(sandboxExtensionHandle);
+  if (m_sandboxExtension)
+    m_sandboxExtension->consume();
 
   return destination;
 }
@@ -96,12 +102,16 @@ void Download::didCreateDestination(const String& path) {
 void Download::didFinish() {
   send(Messages::DownloadProxy::DidFinish());
 
+  if (m_sandboxExtension)
+    m_sandboxExtension->invalidate();
   DownloadManager::shared().downloadFinished(this);
 }
 
 void Download::didFail(const WebCore::ResourceError& error) {
   send(Messages::DownloadProxy::DidFail(error));
 
+  if (m_sandboxExtension)
+    m_sandboxExtension->invalidate();
   DownloadManager::shared().downloadFinished(this);
 }
 
