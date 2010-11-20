@@ -97,8 +97,11 @@ class PageClientQWidget : public QWebPageClient {
   void syncLayers(Timer<PageClientQWidget>*);
 #endif
 
-  // QGraphicsWebView can render composited layers
+#if USE(ACCELERATED_COMPOSITING) && USE(TEXTURE_MAPPER)
   virtual bool allowsAcceleratedCompositing() const { return true; }
+#else
+  virtual bool allowsAcceleratedCompositing() const { return false; }
+#endif
 
 #if USE(ACCELERATED_COMPOSITING) && USE(TEXTURE_MAPPER)
   Timer<PageClientQWidget> syncTimer;
