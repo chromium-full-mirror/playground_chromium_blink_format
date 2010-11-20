@@ -84,6 +84,17 @@ namespace WebCore {
 using namespace std;
 using namespace HTMLNames;
 
+static inline bool isAmbiguousBoundaryCharacter(UChar character) {
+  // These are characters that can behave as word boundaries, but can appear
+  // within words.
+  // If they are just typed, i.e. if they are immediately followed by a caret,
+  // we want to delay text checking until the next character has been typed.
+  // FIXME: this is required until 6853027 is fixed and text checking can do
+  // this for us.
+  return character == '\'' || character == rightSingleQuotationMark ||
+         character == hebrewPunctuationGershayim;
+}
+
 // When an event handler has moved the selection outside of a text control
 // we should use the target control's selection for this editing operation.
 VisibleSelection Editor::selectionForCommand(Event* event) {
@@ -2146,15 +2157,30 @@ void Editor::markMisspellingsAndBadGrammar(
     markBadGrammar(movingSelection);
 }
 
-void Editor::markMisspellingsAfterTypingToPosition(const VisiblePosition& p) {
+void Editor::markMisspellingsAfterTypingToWord(
+    const VisiblePosition& wordStart,
+    const VisibleSelection& selectionAfterTyping) {
 #if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
     !defined(BUILDING_ON_LEOPARD)
 #if SUPPORT_AUTOCORRECTION_PANEL
   // Apply pending autocorrection before next round of spell checking.
-  applyCorrectionPanelInfo(true);
+  bool doApplyCorrection = true;
+  VisiblePosition startOfSelection = selectionAfterTyping.visibleStart();
+  VisibleSelection currentWord =
+      VisibleSelection(startOfWord(startOfSelection, LeftWordIfOnBoundary),
+                       endOfWord(startOfSelection, RightWordIfOnBoundary));
+  if (currentWord.visibleEnd() == startOfSelection) {
+    String wordText = plainText(currentWord.toNormalizedRange().get());
+    if (wordText.length() > 0 &&
+        isAmbiguousBoundaryCharacter(wordText[wordText.length() - 1]))
+      doApplyCorrection = false;
+  }
+  if (doApplyCorrection)
+    applyCorrectionPanelInfo(true);
   m_correctionPanelInfo.m_rangeToBeReplaced.clear();
+#else
+  UNUSED_PARAM(selectionAfterTyping);
 #endif
-
   TextCheckingOptions textCheckingOptions = 0;
   if (isContinuousSpellCheckingEnabled())
     textCheckingOptions |= MarkSpelling;
@@ -2174,11 +2200,11 @@ void Editor::markMisspellingsAfterTypingToPosition(const VisiblePosition& p) {
     textCheckingOptions |= MarkGrammar;
 
   VisibleSelection adjacentWords =
-      VisibleSelection(startOfWord(p, LeftWordIfOnBoundary),
-                       endOfWord(p, RightWordIfOnBoundary));
+      VisibleSelection(startOfWord(wordStart, LeftWordIfOnBoundary),
+                       endOfWord(wordStart, RightWordIfOnBoundary));
   if (textCheckingOptions & MarkGrammar) {
     VisibleSelection selectedSentence =
-        VisibleSelection(startOfSentence(p), endOfSentence(p));
+        VisibleSelection(startOfSentence(wordStart), endOfSentence(wordStart));
     markAllMisspellingsAndBadGrammarInRanges(
         textCheckingOptions, adjacentWords.toNormalizedRange().get(),
         selectedSentence.toNormalizedRange().get());
@@ -2188,14 +2214,16 @@ void Editor::markMisspellingsAfterTypingToPosition(const VisiblePosition& p) {
         adjacentWords.toNormalizedRange().get());
   }
 #else
+  UNUSED_PARAM(selectionAfterTyping);
   if (!isContinuousSpellCheckingEnabled())
     return;
 
   // Check spelling of one word
   RefPtr<Range> misspellingRange;
-  markMisspellings(VisibleSelection(startOfWord(p, LeftWordIfOnBoundary),
-                                    endOfWord(p, RightWordIfOnBoundary)),
-                   misspellingRange);
+  markMisspellings(
+      VisibleSelection(startOfWord(wordStart, LeftWordIfOnBoundary),
+                       endOfWord(wordStart, RightWordIfOnBoundary)),
+      misspellingRange);
 
   // Autocorrect the misspelled word.
   if (!misspellingRange)
@@ -2234,7 +2262,8 @@ void Editor::markMisspellingsAfterTypingToPosition(const VisiblePosition& p) {
     return;
 
   // Check grammar of entire sentence
-  markBadGrammar(VisibleSelection(startOfSentence(p), endOfSentence(p)));
+  markBadGrammar(
+      VisibleSelection(startOfSentence(wordStart), endOfSentence(wordStart)));
 #endif
 }
 
@@ -2311,18 +2340,6 @@ void Editor::markBadGrammar(const VisibleSelection& selection) {
 
 #if PLATFORM(MAC) && !defined(BUILDING_ON_TIGER) && \
     !defined(BUILDING_ON_LEOPARD)
-
-static inline bool isAmbiguousBoundaryCharacter(UChar character) {
-  // These are characters that can behave as word boundaries, but can appear
-  // within words.
-  // If they are just typed, i.e. if they are immediately followed by a caret,
-  // we want to delay text checking until the next character has been typed.
-  // FIXME: this is required until 6853027 is fixed and text checking can do
-  // this for us.
-  return character == '\'' || character == rightSingleQuotationMark ||
-         character == hebrewPunctuationGershayim;
-}
-
 void Editor::markAllMisspellingsAndBadGrammarInRanges(
     TextCheckingOptions textCheckingOptions,
     Range* spellingRange,
@@ -2424,9 +2441,21 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
     const TextCheckingResult* result = &results[i];
     int resultLocation = result->location + offsetDueToReplacement;
     int resultLength = result->length;
+    bool resultEndsAtAmbiguousBoundary =
+        ambiguousBoundaryOffset >= 0 &&
+        resultLocation + resultLength == ambiguousBoundaryOffset;
+
+    // Only mark misspelling if:
+    // 1. Current text checking isn't done for autocorrection, in which case
+    // shouldMarkSpelling is false.
+    // 2. Result falls within spellingRange.
+    // 3. The word in question doesn't end at an ambiguous boundary. For
+    // instance, we would not mark
+    //    "wouldn'" as misspelled right after apostrophe is typed.
     if (shouldMarkSpelling && result->type == TextCheckingTypeSpelling &&
         resultLocation >= spellingParagraph.checkingStart() &&
-        resultLocation + resultLength <= spellingRangeEndOffset) {
+        resultLocation + resultLength <= spellingRangeEndOffset &&
+        !resultEndsAtAmbiguousBoundary) {
       ASSERT(resultLength > 0 && resultLocation >= 0);
       RefPtr<Range> misspellingRange =
           spellingParagraph.subrange(resultLocation, resultLength);
@@ -2466,18 +2495,17 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
         continue;
 
       int replacementLength = result->replacement.length();
-      bool doReplacement = (replacementLength > 0);
+
+      // Apply replacement if:
+      // 1. The replacement length is non-zero.
+      // 2. The result doesn't end at an ambiguous boundary.
+      //    (FIXME: this is required until 6853027 is fixed and text checking
+      //    can do this for us
+      bool doReplacement =
+          replacementLength > 0 && !resultEndsAtAmbiguousBoundary;
       RefPtr<Range> rangeToReplace =
           paragraph.subrange(resultLocation, resultLength);
       VisibleSelection selectionToReplace(rangeToReplace.get(), DOWNSTREAM);
-
-      // avoid correcting text after an ambiguous boundary character has been
-      // typed
-      // FIXME: this is required until 6853027 is fixed and text checking can do
-      // this for us
-      if (ambiguousBoundaryOffset >= 0 &&
-          resultLocation + resultLength == ambiguousBoundaryOffset)
-        doReplacement = false;
 
       // adding links should be done only immediately after they are typed
       if (result->type == TextCheckingTypeLink &&
@@ -2553,8 +2581,12 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(
           if (doReplacement) {
             replaceSelectionWithText(result->replacement, false, false);
             offsetDueToReplacement += replacementLength - resultLength;
-            if (resultLocation < selectionOffset)
+            if (resultLocation < selectionOffset) {
               selectionOffset += replacementLength - resultLength;
+              if (ambiguousBoundaryOffset >= 0)
+                ambiguousBoundaryOffset = selectionOffset - 1;
+            }
+
             if (result->type == TextCheckingTypeCorrection) {
               // Add a marker so that corrections can easily be undone and won't
               // be re-corrected.

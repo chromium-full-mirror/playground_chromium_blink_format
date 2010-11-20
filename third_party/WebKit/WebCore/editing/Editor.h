@@ -233,7 +233,9 @@ class Editor {
       bool& ungrammatical);
   bool isSpellCheckingEnabledInFocusedNode() const;
   bool isSpellCheckingEnabledFor(Node*) const;
-  void markMisspellingsAfterTypingToPosition(const VisiblePosition&);
+  void markMisspellingsAfterTypingToWord(
+      const VisiblePosition& wordStart,
+      const VisibleSelection& selectionAfterTyping);
   void markMisspellings(const VisibleSelection&,
                         RefPtr<Range>& firstMisspellingRange);
   void markBadGrammar(const VisibleSelection&);
