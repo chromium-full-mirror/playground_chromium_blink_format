@@ -40,6 +40,7 @@
 namespace WebCore {
 class Frame;
 class HTMLFrameOwnerElement;
+class KURL;
 }
 
 namespace WebKit {
@@ -110,6 +111,8 @@ class WebFrame : public APIObject {
   String layerTreeAsText() const;
 
   unsigned pendingUnloadCount() const;
+
+  bool allowsFollowingLink(const WebCore::KURL&) const;
 
   // Simple listener class used by plug-ins to know when frames finish or fail
   // loading.
