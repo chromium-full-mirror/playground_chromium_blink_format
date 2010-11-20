@@ -234,6 +234,10 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
     }
   }
 
+  void countLeadingZeros32(RegisterID src, RegisterID dest) {
+    m_assembler.clz(dest, src);
+  }
+
   void lshift32(RegisterID shift_amount, RegisterID dest) {
     // Clamp the shift to the range 0..31
     ARMThumbImmediate armImm = ARMThumbImmediate::makeEncodedImm(0x1f);
@@ -1012,6 +1016,20 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
       m_assembler.sub_S(dest, dest, dataTempRegister);
     }
     return Jump(makeBranch(cond));
+  }
+
+  void relativeTableJump(RegisterID index, int scale) {
+    ASSERT(scale >= 0 && scale <= 31);
+
+    // dataTempRegister will point after the jump if index register contains
+    // zero
+    move(ARMRegisters::pc, dataTempRegister);
+    m_assembler.add(dataTempRegister, dataTempRegister,
+                    ARMThumbImmediate::makeEncodedImm(9));
+
+    ShiftTypeAndAmount shift(SRType_LSL, scale);
+    m_assembler.add(dataTempRegister, dataTempRegister, index, shift);
+    jump(dataTempRegister);
   }
 
   // Miscellaneous operations:
