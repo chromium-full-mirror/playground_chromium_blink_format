@@ -30,12 +30,15 @@
 
 namespace WebCore {
 
-FEFlood::FEFlood(const Color& floodColor, float floodOpacity)
-    : FilterEffect(), m_floodColor(floodColor), m_floodOpacity(floodOpacity) {}
+FEFlood::FEFlood(Filter* filter, const Color& floodColor, float floodOpacity)
+    : FilterEffect(filter),
+      m_floodColor(floodColor),
+      m_floodOpacity(floodOpacity) {}
 
-PassRefPtr<FEFlood> FEFlood::create(const Color& floodColor,
+PassRefPtr<FEFlood> FEFlood::create(Filter* filter,
+                                    const Color& floodColor,
                                     float floodOpacity) {
-  return adoptRef(new FEFlood(floodColor, floodOpacity));
+  return adoptRef(new FEFlood(filter, floodColor, floodOpacity));
 }
 
 Color FEFlood::floodColor() const {
@@ -54,8 +57,8 @@ void FEFlood::setFloodOpacity(float floodOpacity) {
   m_floodOpacity = floodOpacity;
 }
 
-void FEFlood::apply(Filter* filter) {
-  GraphicsContext* filterContext = effectContext(filter);
+void FEFlood::apply() {
+  GraphicsContext* filterContext = effectContext();
   if (!filterContext)
     return;
 

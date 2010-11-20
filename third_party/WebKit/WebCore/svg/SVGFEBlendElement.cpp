@@ -86,7 +86,8 @@ void SVGFEBlendElement::synchronizeProperty(const QualifiedName& attrName) {
 }
 
 PassRefPtr<FilterEffect> SVGFEBlendElement::build(
-    SVGFilterBuilder* filterBuilder) {
+    SVGFilterBuilder* filterBuilder,
+    Filter* filter) {
   FilterEffect* input1 = filterBuilder->getEffectById(in1());
   FilterEffect* input2 = filterBuilder->getEffectById(in2());
 
@@ -94,7 +95,7 @@ PassRefPtr<FilterEffect> SVGFEBlendElement::build(
     return 0;
 
   RefPtr<FilterEffect> effect =
-      FEBlend::create(static_cast<BlendModeType>(mode()));
+      FEBlend::create(filter, static_cast<BlendModeType>(mode()));
   FilterEffectVector& inputEffects = effect->inputEffects();
   inputEffects.reserveCapacity(2);
   inputEffects.append(input1);

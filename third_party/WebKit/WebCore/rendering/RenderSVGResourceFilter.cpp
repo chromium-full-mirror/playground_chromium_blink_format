@@ -90,13 +90,14 @@ void RenderSVGResourceFilter::removeClientFromCache(RenderObject* client,
                                         : ParentOnlyInvalidation);
 }
 
-PassRefPtr<SVGFilterBuilder> RenderSVGResourceFilter::buildPrimitives() {
+PassRefPtr<SVGFilterBuilder> RenderSVGResourceFilter::buildPrimitives(
+    Filter* filter) {
   SVGFilterElement* filterElement = static_cast<SVGFilterElement*>(node());
   bool primitiveBoundingBoxMode = filterElement->primitiveUnits() ==
                                   SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
 
   // Add effects to the builder
-  RefPtr<SVGFilterBuilder> builder = SVGFilterBuilder::create();
+  RefPtr<SVGFilterBuilder> builder = SVGFilterBuilder::create(filter);
   for (Node* node = filterElement->firstChild(); node;
        node = node->nextSibling()) {
     if (!node->isSVGElement())
@@ -108,7 +109,7 @@ PassRefPtr<SVGFilterBuilder> RenderSVGResourceFilter::buildPrimitives() {
 
     SVGFilterPrimitiveStandardAttributes* effectElement =
         static_cast<SVGFilterPrimitiveStandardAttributes*>(element);
-    RefPtr<FilterEffect> effect = effectElement->build(builder.get());
+    RefPtr<FilterEffect> effect = effectElement->build(builder.get(), filter);
     if (!effect) {
       builder->clearEffects();
       return 0;
@@ -196,7 +197,7 @@ bool RenderSVGResourceFilter::applyResource(RenderObject* object,
       targetBoundingBox, filterData->boundaries, primitiveBoundingBoxMode);
 
   // Create all relevant filter primitives.
-  filterData->builder = buildPrimitives();
+  filterData->builder = buildPrimitives(filterData->filter.get());
   if (!filterData->builder)
     return false;
 
@@ -322,7 +323,7 @@ void RenderSVGResourceFilter::postApplyResource(RenderObject* object,
     if (!filterData->builded) {
       filterData->filter->setSourceImage(
           filterData->sourceGraphicBuffer.release());
-      lastEffect->apply(filterData->filter.get());
+      lastEffect->apply();
 #if !PLATFORM(CG)
       ImageBuffer* resultImage = lastEffect->resultImage();
       if (resultImage)

@@ -32,19 +32,26 @@
 
 namespace WebCore {
 
-FEComposite::FEComposite(const CompositeOperationType& type,
+FEComposite::FEComposite(Filter* filter,
+                         const CompositeOperationType& type,
                          float k1,
                          float k2,
                          float k3,
                          float k4)
-    : FilterEffect(), m_type(type), m_k1(k1), m_k2(k2), m_k3(k3), m_k4(k4) {}
+    : FilterEffect(filter),
+      m_type(type),
+      m_k1(k1),
+      m_k2(k2),
+      m_k3(k3),
+      m_k4(k4) {}
 
-PassRefPtr<FEComposite> FEComposite::create(const CompositeOperationType& type,
+PassRefPtr<FEComposite> FEComposite::create(Filter* filter,
+                                            const CompositeOperationType& type,
                                             float k1,
                                             float k2,
                                             float k3,
                                             float k4) {
-  return adoptRef(new FEComposite(type, k1, k2, k3, k4));
+  return adoptRef(new FEComposite(filter, type, k1, k2, k3, k4));
 }
 
 CompositeOperationType FEComposite::operation() const {
@@ -108,7 +115,7 @@ inline void arithmetic(const ByteArray* srcPixelArrayA,
   }
 }
 
-void FEComposite::determineAbsolutePaintRect(Filter* filter) {
+void FEComposite::determineAbsolutePaintRect() {
   switch (m_type) {
     case FECOMPOSITE_OPERATOR_IN:
     case FECOMPOSITE_OPERATOR_ATOP:
@@ -125,20 +132,20 @@ void FEComposite::determineAbsolutePaintRect(Filter* filter) {
       return;
     default:
       // Take the union of both input effects.
-      FilterEffect::determineAbsolutePaintRect(filter);
+      FilterEffect::determineAbsolutePaintRect();
       return;
   }
 }
 
-void FEComposite::apply(Filter* filter) {
+void FEComposite::apply() {
   FilterEffect* in = inputEffect(0);
   FilterEffect* in2 = inputEffect(1);
-  in->apply(filter);
-  in2->apply(filter);
+  in->apply();
+  in2->apply();
   if (!in->resultImage() || !in2->resultImage())
     return;
 
-  GraphicsContext* filterContext = effectContext(filter);
+  GraphicsContext* filterContext = effectContext();
   if (!filterContext)
     return;
 

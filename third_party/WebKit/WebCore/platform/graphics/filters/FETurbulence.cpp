@@ -47,13 +47,14 @@ static const int s_randAmplitude = 16807;      // 7**5; primitive root of m
 static const int s_randQ = 127773;             // m / a
 static const int s_randR = 2836;               // m % a
 
-FETurbulence::FETurbulence(TurbulanceType type,
+FETurbulence::FETurbulence(Filter* filter,
+                           TurbulanceType type,
                            float baseFrequencyX,
                            float baseFrequencyY,
                            int numOctaves,
                            float seed,
                            bool stitchTiles)
-    : FilterEffect(),
+    : FilterEffect(filter),
       m_type(type),
       m_baseFrequencyX(baseFrequencyX),
       m_baseFrequencyY(baseFrequencyY),
@@ -61,13 +62,14 @@ FETurbulence::FETurbulence(TurbulanceType type,
       m_seed(seed),
       m_stitchTiles(stitchTiles) {}
 
-PassRefPtr<FETurbulence> FETurbulence::create(TurbulanceType type,
+PassRefPtr<FETurbulence> FETurbulence::create(Filter* filter,
+                                              TurbulanceType type,
                                               float baseFrequencyX,
                                               float baseFrequencyY,
                                               int numOctaves,
                                               float seed,
                                               bool stitchTiles) {
-  return adoptRef(new FETurbulence(type, baseFrequencyX, baseFrequencyY,
+  return adoptRef(new FETurbulence(filter, type, baseFrequencyX, baseFrequencyY,
                                    numOctaves, seed, stitchTiles));
 }
 
@@ -341,8 +343,8 @@ unsigned char FETurbulence::calculateTurbulenceValueForPoint(
   return static_cast<unsigned char>(turbulenceFunctionResult * 255);
 }
 
-void FETurbulence::apply(Filter* filter) {
-  if (!effectContext(filter))
+void FETurbulence::apply() {
+  if (!effectContext())
     return;
 
   IntRect imageRect(IntPoint(), resultImage()->size());
@@ -370,7 +372,7 @@ void FETurbulence::apply(Filter* filter) {
         pixelArray->set(
             indexOfPixelChannel,
             calculateTurbulenceValueForPoint(
-                paintingData, filter->mapAbsolutePointToLocalPoint(point)));
+                paintingData, filter()->mapAbsolutePointToLocalPoint(point)));
     }
   }
   resultImage()->putUnmultipliedImageData(imageData.get(), imageRect,

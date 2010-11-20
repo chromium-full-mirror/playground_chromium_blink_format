@@ -30,14 +30,14 @@ namespace WebCore {
 
 class SourceAlpha : public FilterEffect {
  public:
-  static PassRefPtr<SourceAlpha> create();
+  static PassRefPtr<SourceAlpha> create(Filter*);
 
   static const AtomicString& effectName();
 
-  virtual void apply(Filter*);
+  virtual void apply();
   virtual void dump();
 
-  virtual void determineAbsolutePaintRect(Filter*);
+  virtual void determineAbsolutePaintRect();
 
   virtual FilterEffectType filterEffectType() const {
     return FilterEffectTypeSourceInput;
@@ -46,7 +46,7 @@ class SourceAlpha : public FilterEffect {
   virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
-  SourceAlpha() {}
+  SourceAlpha(Filter* filter) : FilterEffect(filter) {}
 };
 
 }  // namespace WebCore

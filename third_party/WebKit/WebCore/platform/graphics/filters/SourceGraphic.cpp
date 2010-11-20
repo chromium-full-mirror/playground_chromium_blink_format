@@ -30,8 +30,8 @@
 
 namespace WebCore {
 
-PassRefPtr<SourceGraphic> SourceGraphic::create() {
-  return adoptRef(new SourceGraphic);
+PassRefPtr<SourceGraphic> SourceGraphic::create(Filter* filter) {
+  return adoptRef(new SourceGraphic(filter));
 }
 
 const AtomicString& SourceGraphic::effectName() {
@@ -39,15 +39,17 @@ const AtomicString& SourceGraphic::effectName() {
   return s_effectName;
 }
 
-void SourceGraphic::determineAbsolutePaintRect(Filter* filter) {
+void SourceGraphic::determineAbsolutePaintRect() {
+  Filter* filter = this->filter();
   FloatRect paintRect = filter->sourceImageRect();
   paintRect.scale(filter->filterResolution().width(),
                   filter->filterResolution().height());
   setAbsolutePaintRect(enclosingIntRect(paintRect));
 }
 
-void SourceGraphic::apply(Filter* filter) {
-  GraphicsContext* filterContext = effectContext(filter);
+void SourceGraphic::apply() {
+  GraphicsContext* filterContext = effectContext();
+  Filter* filter = this->filter();
   if (!filterContext || !filter->sourceImage())
     return;
 

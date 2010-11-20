@@ -28,14 +28,16 @@
 
 namespace WebCore {
 
-FESpecularLighting::FESpecularLighting(const Color& lightingColor,
+FESpecularLighting::FESpecularLighting(Filter* filter,
+                                       const Color& lightingColor,
                                        float surfaceScale,
                                        float specularConstant,
                                        float specularExponent,
                                        float kernelUnitLengthX,
                                        float kernelUnitLengthY,
                                        PassRefPtr<LightSource> lightSource)
-    : FELighting(SpecularLighting,
+    : FELighting(filter,
+                 SpecularLighting,
                  lightingColor,
                  surfaceScale,
                  0,
@@ -46,6 +48,7 @@ FESpecularLighting::FESpecularLighting(const Color& lightingColor,
                  lightSource) {}
 
 PassRefPtr<FESpecularLighting> FESpecularLighting::create(
+    Filter* filter,
     const Color& lightingColor,
     float surfaceScale,
     float specularConstant,
@@ -54,7 +57,7 @@ PassRefPtr<FESpecularLighting> FESpecularLighting::create(
     float kernelUnitLengthY,
     PassRefPtr<LightSource> lightSource) {
   return adoptRef(new FESpecularLighting(
-      lightingColor, surfaceScale, specularConstant, specularExponent,
+      filter, lightingColor, surfaceScale, specularConstant, specularExponent,
       kernelUnitLengthX, kernelUnitLengthY, lightSource));
 }
 

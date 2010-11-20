@@ -139,7 +139,8 @@ void SVGFEConvolveMatrixElement::svgAttributeChanged(
 }
 
 PassRefPtr<FilterEffect> SVGFEConvolveMatrixElement::build(
-    SVGFilterBuilder* filterBuilder) {
+    SVGFilterBuilder* filterBuilder,
+    Filter* filter) {
   FilterEffect* input1 = filterBuilder->getEffectById(in1());
 
   if (!input1)
@@ -183,7 +184,7 @@ PassRefPtr<FilterEffect> SVGFEConvolveMatrixElement::build(
   }
 
   RefPtr<FilterEffect> effect = FEConvolveMatrix::create(
-      IntSize(orderXValue, orderYValue), divisorValue, bias(),
+      filter, IntSize(orderXValue, orderYValue), divisorValue, bias(),
       IntPoint(targetXValue, targetYValue),
       static_cast<EdgeModeType>(edgeMode()),
       FloatPoint(kernelUnitLengthX(), kernelUnitLengthX()), preserveAlpha(),

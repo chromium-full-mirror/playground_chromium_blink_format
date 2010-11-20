@@ -62,6 +62,7 @@ struct ComponentTransferFunction {
 class FEComponentTransfer : public FilterEffect {
  public:
   static PassRefPtr<FEComponentTransfer> create(
+      Filter*,
       const ComponentTransferFunction& redFunc,
       const ComponentTransferFunction& greenFunc,
       const ComponentTransferFunction& blueFunc,
@@ -79,13 +80,14 @@ class FEComponentTransfer : public FilterEffect {
   ComponentTransferFunction alphaFunction() const;
   void setAlphaFunction(const ComponentTransferFunction&);
 
-  virtual void apply(Filter*);
+  virtual void apply();
   virtual void dump();
 
   virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
-  FEComponentTransfer(const ComponentTransferFunction& redFunc,
+  FEComponentTransfer(Filter*,
+                      const ComponentTransferFunction& redFunc,
                       const ComponentTransferFunction& greenFunc,
                       const ComponentTransferFunction& blueFunc,
                       const ComponentTransferFunction& alphaFunc);

@@ -33,12 +33,15 @@
 
 namespace WebCore {
 
-FEColorMatrix::FEColorMatrix(ColorMatrixType type, const Vector<float>& values)
-    : FilterEffect(), m_type(type), m_values(values) {}
+FEColorMatrix::FEColorMatrix(Filter* filter,
+                             ColorMatrixType type,
+                             const Vector<float>& values)
+    : FilterEffect(filter), m_type(type), m_values(values) {}
 
-PassRefPtr<FEColorMatrix> FEColorMatrix::create(ColorMatrixType type,
+PassRefPtr<FEColorMatrix> FEColorMatrix::create(Filter* filter,
+                                                ColorMatrixType type,
                                                 const Vector<float>& values) {
-  return adoptRef(new FEColorMatrix(type, values));
+  return adoptRef(new FEColorMatrix(filter, type, values));
 }
 
 ColorMatrixType FEColorMatrix::type() const {
@@ -150,13 +153,13 @@ void effectType(ByteArray* pixelArray, const Vector<float>& values) {
   }
 }
 
-void FEColorMatrix::apply(Filter* filter) {
+void FEColorMatrix::apply() {
   FilterEffect* in = inputEffect(0);
-  in->apply(filter);
+  in->apply();
   if (!in->resultImage())
     return;
 
-  GraphicsContext* filterContext = effectContext(filter);
+  GraphicsContext* filterContext = effectContext();
   if (!filterContext)
     return;
 

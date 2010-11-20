@@ -44,7 +44,8 @@ class CanvasPixelArray;
 
 class FEConvolveMatrix : public FilterEffect {
  public:
-  static PassRefPtr<FEConvolveMatrix> create(const IntSize&,
+  static PassRefPtr<FEConvolveMatrix> create(Filter*,
+                                             const IntSize&,
                                              float,
                                              float,
                                              const IntPoint&,
@@ -77,17 +78,18 @@ class FEConvolveMatrix : public FilterEffect {
   bool preserveAlpha() const;
   void setPreserveAlpha(bool);
 
-  virtual void apply(Filter*);
+  virtual void apply();
   virtual void dump();
 
-  virtual void determineAbsolutePaintRect(Filter*) {
+  virtual void determineAbsolutePaintRect() {
     setAbsolutePaintRect(maxEffectRect());
   }
 
   virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
-  FEConvolveMatrix(const IntSize&,
+  FEConvolveMatrix(Filter*,
+                   const IntSize&,
                    float,
                    float,
                    const IntPoint&,

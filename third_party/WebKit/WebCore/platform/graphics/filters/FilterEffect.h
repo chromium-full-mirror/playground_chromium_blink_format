@@ -60,7 +60,7 @@ class FilterEffect : public RefCounted<FilterEffect> {
   // Creates the ImageBuffer for the current filter primitive result in the size
   // of the
   // repaintRect. Gives back the GraphicsContext of the own ImageBuffer.
-  GraphicsContext* effectContext(Filter*);
+  GraphicsContext* effectContext();
 
   FilterEffectVector& inputEffects() { return m_inputEffects; }
   FilterEffect* inputEffect(unsigned) const;
@@ -83,10 +83,10 @@ class FilterEffect : public RefCounted<FilterEffect> {
     m_maxEffectRect = maxEffectRect;
   }
 
-  virtual void apply(Filter*) = 0;
+  virtual void apply() = 0;
   virtual void dump() = 0;
 
-  virtual void determineAbsolutePaintRect(Filter*);
+  virtual void determineAbsolutePaintRect();
 
   virtual FilterEffectType filterEffectType() const {
     return FilterEffectTypeUnknown;
@@ -123,8 +123,10 @@ class FilterEffect : public RefCounted<FilterEffect> {
     m_effectBoundaries = effectBoundaries;
   }
 
+  Filter* filter() { return m_filter; }
+
  protected:
-  FilterEffect();
+  FilterEffect(Filter*);
 
  private:
   OwnPtr<ImageBuffer> m_effectBuffer;
@@ -138,6 +140,7 @@ class FilterEffect : public RefCounted<FilterEffect> {
   // subregion in absolute coordinate space.
   // The absolute paint rect should never be bigger than m_maxEffectRect.
   IntRect m_maxEffectRect;
+  Filter* m_filter;
 
  private:
   // The following member variables are SVG specific and will move to

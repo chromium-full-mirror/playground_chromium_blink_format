@@ -40,9 +40,9 @@ namespace WebCore {
 
 class FELighting : public FilterEffect {
  public:
-  virtual void apply(Filter*);
+  virtual void apply();
 
-  virtual void determineAbsolutePaintRect(Filter*) {
+  virtual void determineAbsolutePaintRect() {
     setAbsolutePaintRect(maxEffectRect());
   }
 
@@ -68,7 +68,8 @@ class FELighting : public FilterEffect {
     inline void bottomRight(int offset, IntPoint& normalVector);
   };
 
-  FELighting(LightingType,
+  FELighting(Filter*,
+             LightingType,
              const Color&,
              float,
              float,

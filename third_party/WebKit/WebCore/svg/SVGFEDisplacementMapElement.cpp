@@ -106,7 +106,8 @@ void SVGFEDisplacementMapElement::synchronizeProperty(
 }
 
 PassRefPtr<FilterEffect> SVGFEDisplacementMapElement::build(
-    SVGFilterBuilder* filterBuilder) {
+    SVGFilterBuilder* filterBuilder,
+    Filter* filter) {
   FilterEffect* input1 = filterBuilder->getEffectById(in1());
   FilterEffect* input2 = filterBuilder->getEffectById(in2());
 
@@ -114,7 +115,7 @@ PassRefPtr<FilterEffect> SVGFEDisplacementMapElement::build(
     return 0;
 
   RefPtr<FilterEffect> effect = FEDisplacementMap::create(
-      static_cast<ChannelSelectorType>(xChannelSelector()),
+      filter, static_cast<ChannelSelectorType>(xChannelSelector()),
       static_cast<ChannelSelectorType>(yChannelSelector()), scale());
   FilterEffectVector& inputEffects = effect->inputEffects();
   inputEffects.reserveCapacity(2);

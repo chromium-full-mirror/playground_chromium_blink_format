@@ -112,7 +112,8 @@ void SVGFECompositeElement::synchronizeProperty(const QualifiedName& attrName) {
 }
 
 PassRefPtr<FilterEffect> SVGFECompositeElement::build(
-    SVGFilterBuilder* filterBuilder) {
+    SVGFilterBuilder* filterBuilder,
+    Filter* filter) {
   FilterEffect* input1 = filterBuilder->getEffectById(in1());
   FilterEffect* input2 = filterBuilder->getEffectById(in2());
 
@@ -120,7 +121,8 @@ PassRefPtr<FilterEffect> SVGFECompositeElement::build(
     return 0;
 
   RefPtr<FilterEffect> effect = FEComposite::create(
-      static_cast<CompositeOperationType>(_operator()), k1(), k2(), k3(), k4());
+      filter, static_cast<CompositeOperationType>(_operator()), k1(), k2(),
+      k3(), k4());
   FilterEffectVector& inputEffects = effect->inputEffects();
   inputEffects.reserveCapacity(2);
   inputEffects.append(input1);

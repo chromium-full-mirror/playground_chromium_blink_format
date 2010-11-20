@@ -40,7 +40,7 @@ class SVGFEDisplacementMapElement
   virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
-  virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
+  virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*, Filter*);
 
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEDisplacementMapElement,
                                        SVGNames::inAttr,

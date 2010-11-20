@@ -61,7 +61,8 @@ void SVGFEComponentTransferElement::synchronizeProperty(
 }
 
 PassRefPtr<FilterEffect> SVGFEComponentTransferElement::build(
-    SVGFilterBuilder* filterBuilder) {
+    SVGFilterBuilder* filterBuilder,
+    Filter* filter) {
   FilterEffect* input1 = filterBuilder->getEffectById(in1());
 
   if (!input1)
@@ -84,7 +85,7 @@ PassRefPtr<FilterEffect> SVGFEComponentTransferElement::build(
   }
 
   RefPtr<FilterEffect> effect =
-      FEComponentTransfer::create(red, green, blue, alpha);
+      FEComponentTransfer::create(filter, red, green, blue, alpha);
   effect->inputEffects().append(input1);
   return effect.release();
 }

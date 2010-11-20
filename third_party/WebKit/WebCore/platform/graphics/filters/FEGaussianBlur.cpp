@@ -40,11 +40,13 @@ static const unsigned gMaxKernelSize = 1000;
 
 namespace WebCore {
 
-FEGaussianBlur::FEGaussianBlur(float x, float y)
-    : FilterEffect(), m_stdX(x), m_stdY(y) {}
+FEGaussianBlur::FEGaussianBlur(Filter* filter, float x, float y)
+    : FilterEffect(filter), m_stdX(x), m_stdY(y) {}
 
-PassRefPtr<FEGaussianBlur> FEGaussianBlur::create(float x, float y) {
-  return adoptRef(new FEGaussianBlur(x, y));
+PassRefPtr<FEGaussianBlur> FEGaussianBlur::create(Filter* filter,
+                                                  float x,
+                                                  float y) {
+  return adoptRef(new FEGaussianBlur(filter, x, y));
 }
 
 float FEGaussianBlur::stdDeviationX() const {
@@ -157,13 +159,13 @@ inline void calculateKernelSize(Filter* filter,
     kernelSizeY = gMaxKernelSize;
 }
 
-void FEGaussianBlur::determineAbsolutePaintRect(Filter* filter) {
+void FEGaussianBlur::determineAbsolutePaintRect() {
   FloatRect absolutePaintRect = inputEffect(0)->absolutePaintRect();
   absolutePaintRect.intersect(maxEffectRect());
 
   unsigned kernelSizeX = 0;
   unsigned kernelSizeY = 0;
-  calculateKernelSize(filter, kernelSizeX, kernelSizeY, m_stdX, m_stdY);
+  calculateKernelSize(filter(), kernelSizeX, kernelSizeY, m_stdX, m_stdY);
 
   // We take the half kernel size and multiply it with three, because we run box
   // blur three times.
@@ -172,13 +174,13 @@ void FEGaussianBlur::determineAbsolutePaintRect(Filter* filter) {
   setAbsolutePaintRect(enclosingIntRect(absolutePaintRect));
 }
 
-void FEGaussianBlur::apply(Filter* filter) {
+void FEGaussianBlur::apply() {
   FilterEffect* in = inputEffect(0);
-  in->apply(filter);
+  in->apply();
   if (!in->resultImage())
     return;
 
-  if (!effectContext(filter))
+  if (!effectContext())
     return;
 
   setIsAlphaImage(in->isAlphaImage());
@@ -197,7 +199,7 @@ void FEGaussianBlur::apply(Filter* filter) {
 
   unsigned kernelSizeX = 0;
   unsigned kernelSizeY = 0;
-  calculateKernelSize(filter, kernelSizeX, kernelSizeY, m_stdX, m_stdY);
+  calculateKernelSize(filter(), kernelSizeX, kernelSizeY, m_stdX, m_stdY);
 
   ByteArray* srcPixelArray = srcImageData->data()->data();
   RefPtr<ImageData> tmpImageData =

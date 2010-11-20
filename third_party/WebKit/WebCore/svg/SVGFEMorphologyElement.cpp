@@ -107,7 +107,8 @@ void SVGFEMorphologyElement::synchronizeProperty(
 }
 
 PassRefPtr<FilterEffect> SVGFEMorphologyElement::build(
-    SVGFilterBuilder* filterBuilder) {
+    SVGFilterBuilder* filterBuilder,
+    Filter* filter) {
   FilterEffect* input1 = filterBuilder->getEffectById(in1());
   float xRadius = radiusX();
   float yRadius = radiusY();
@@ -119,7 +120,8 @@ PassRefPtr<FilterEffect> SVGFEMorphologyElement::build(
     return 0;
 
   RefPtr<FilterEffect> effect = FEMorphology::create(
-      static_cast<MorphologyOperatorType>(_operator()), xRadius, yRadius);
+      filter, static_cast<MorphologyOperatorType>(_operator()), xRadius,
+      yRadius);
   effect->inputEffects().append(input1);
   return effect.release();
 }

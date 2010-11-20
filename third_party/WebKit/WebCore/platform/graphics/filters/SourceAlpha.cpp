@@ -31,8 +31,8 @@
 
 namespace WebCore {
 
-PassRefPtr<SourceAlpha> SourceAlpha::create() {
-  return adoptRef(new SourceAlpha);
+PassRefPtr<SourceAlpha> SourceAlpha::create(Filter* filter) {
+  return adoptRef(new SourceAlpha(filter));
 }
 
 const AtomicString& SourceAlpha::effectName() {
@@ -40,15 +40,17 @@ const AtomicString& SourceAlpha::effectName() {
   return s_effectName;
 }
 
-void SourceAlpha::determineAbsolutePaintRect(Filter* filter) {
+void SourceAlpha::determineAbsolutePaintRect() {
+  Filter* filter = this->filter();
   FloatRect paintRect = filter->sourceImageRect();
   paintRect.scale(filter->filterResolution().width(),
                   filter->filterResolution().height());
   setAbsolutePaintRect(enclosingIntRect(paintRect));
 }
 
-void SourceAlpha::apply(Filter* filter) {
-  GraphicsContext* filterContext = effectContext(filter);
+void SourceAlpha::apply() {
+  GraphicsContext* filterContext = effectContext();
+  Filter* filter = this->filter();
   if (!filterContext || !filter->sourceImage())
     return;
 

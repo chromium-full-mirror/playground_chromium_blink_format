@@ -31,22 +31,22 @@
 
 namespace WebCore {
 
-FETile::FETile() : FilterEffect() {}
+FETile::FETile(Filter* filter) : FilterEffect(filter) {}
 
-PassRefPtr<FETile> FETile::create() {
-  return adoptRef(new FETile);
+PassRefPtr<FETile> FETile::create(Filter* filter) {
+  return adoptRef(new FETile(filter));
 }
 
-void FETile::apply(Filter* filter) {
+void FETile::apply() {
 // FIXME: See bug 47315. This is a hack to work around a compile failure, but is
 // incorrect behavior otherwise.
 #if ENABLE(SVG)
   FilterEffect* in = inputEffect(0);
-  in->apply(filter);
+  in->apply();
   if (!in->resultImage())
     return;
 
-  GraphicsContext* filterContext = effectContext(filter);
+  GraphicsContext* filterContext = effectContext();
   if (!filterContext)
     return;
 
@@ -60,6 +60,7 @@ void FETile::apply(Filter* filter) {
   FloatPoint inMaxEffectLocation = tileRect.location();
   FloatPoint maxEffectLocation = maxEffectRect().location();
   if (in->filterEffectType() == FilterEffectTypeSourceInput) {
+    Filter* filter = this->filter();
     tileRect = filter->filterRegion();
     tileRect.scale(filter->filterResolution().width(),
                    filter->filterResolution().height());

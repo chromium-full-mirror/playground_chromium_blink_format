@@ -28,13 +28,15 @@
 
 namespace WebCore {
 
-FEDiffuseLighting::FEDiffuseLighting(const Color& lightingColor,
+FEDiffuseLighting::FEDiffuseLighting(Filter* filter,
+                                     const Color& lightingColor,
                                      float surfaceScale,
                                      float diffuseConstant,
                                      float kernelUnitLengthX,
                                      float kernelUnitLengthY,
                                      PassRefPtr<LightSource> lightSource)
-    : FELighting(DiffuseLighting,
+    : FELighting(filter,
+                 DiffuseLighting,
                  lightingColor,
                  surfaceScale,
                  diffuseConstant,
@@ -45,13 +47,14 @@ FEDiffuseLighting::FEDiffuseLighting(const Color& lightingColor,
                  lightSource) {}
 
 PassRefPtr<FEDiffuseLighting> FEDiffuseLighting::create(
+    Filter* filter,
     const Color& lightingColor,
     float surfaceScale,
     float diffuseConstant,
     float kernelUnitLengthX,
     float kernelUnitLengthY,
     PassRefPtr<LightSource> lightSource) {
-  return adoptRef(new FEDiffuseLighting(lightingColor, surfaceScale,
+  return adoptRef(new FEDiffuseLighting(filter, lightingColor, surfaceScale,
                                         diffuseConstant, kernelUnitLengthX,
                                         kernelUnitLengthY, lightSource));
 }

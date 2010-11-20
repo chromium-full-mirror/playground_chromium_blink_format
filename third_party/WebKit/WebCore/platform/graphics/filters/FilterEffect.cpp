@@ -26,16 +26,19 @@
 
 namespace WebCore {
 
-FilterEffect::FilterEffect()
+FilterEffect::FilterEffect(Filter* filter)
     : m_alphaImage(false),
+      m_filter(filter),
       m_hasX(false),
       m_hasY(false),
       m_hasWidth(false),
-      m_hasHeight(false) {}
+      m_hasHeight(false) {
+  ASSERT(m_filter);
+}
 
 FilterEffect::~FilterEffect() {}
 
-void FilterEffect::determineAbsolutePaintRect(Filter*) {
+void FilterEffect::determineAbsolutePaintRect() {
   m_absolutePaintRect = IntRect();
   unsigned size = m_inputEffects.size();
   for (unsigned i = 0; i < size; ++i)
@@ -64,8 +67,8 @@ FilterEffect* FilterEffect::inputEffect(unsigned number) const {
   return m_inputEffects.at(number).get();
 }
 
-GraphicsContext* FilterEffect::effectContext(Filter* filter) {
-  determineAbsolutePaintRect(filter);
+GraphicsContext* FilterEffect::effectContext() {
+  determineAbsolutePaintRect();
   if (m_absolutePaintRect.isEmpty())
     return 0;
   m_effectBuffer =

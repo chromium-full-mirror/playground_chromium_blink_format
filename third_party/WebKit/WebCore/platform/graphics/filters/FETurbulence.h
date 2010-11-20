@@ -38,12 +38,8 @@ enum TurbulanceType {
 
 class FETurbulence : public FilterEffect {
  public:
-  static PassRefPtr<FETurbulence> create(TurbulanceType,
-                                         float,
-                                         float,
-                                         int,
-                                         float,
-                                         bool);
+  static PassRefPtr<FETurbulence>
+  create(Filter*, TurbulanceType, float, float, int, float, bool);
 
   TurbulanceType type() const;
   void setType(TurbulanceType);
@@ -63,10 +59,10 @@ class FETurbulence : public FilterEffect {
   bool stitchTiles() const;
   void setStitchTiles(bool);
 
-  virtual void apply(Filter*);
+  virtual void apply();
   virtual void dump();
 
-  virtual void determineAbsolutePaintRect(Filter*) {
+  virtual void determineAbsolutePaintRect() {
     setAbsolutePaintRect(maxEffectRect());
   }
 
@@ -91,7 +87,7 @@ class FETurbulence : public FilterEffect {
     inline long random();
   };
 
-  FETurbulence(TurbulanceType, float, float, int, float, bool);
+  FETurbulence(Filter*, TurbulanceType, float, float, int, float, bool);
 
   inline void initPaint(PaintingData&);
   float noise2D(PaintingData&, const FloatPoint&);

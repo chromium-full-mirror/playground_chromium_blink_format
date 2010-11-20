@@ -53,7 +53,7 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
   virtual void notifyFinished(CachedResource*);
 
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
-  virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
+  virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*, Filter*);
 
   void requestImageResource();
 

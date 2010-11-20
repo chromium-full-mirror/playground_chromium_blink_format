@@ -92,7 +92,8 @@ void SVGFEColorMatrixElement::synchronizeProperty(
 }
 
 PassRefPtr<FilterEffect> SVGFEColorMatrixElement::build(
-    SVGFilterBuilder* filterBuilder) {
+    SVGFilterBuilder* filterBuilder,
+    Filter* filter) {
   FilterEffect* input1 = filterBuilder->getEffectById(in1());
 
   if (!input1)
@@ -128,7 +129,8 @@ PassRefPtr<FilterEffect> SVGFEColorMatrixElement::build(
       return 0;
   }
 
-  RefPtr<FilterEffect> effect = FEColorMatrix::create(filterType, filterValues);
+  RefPtr<FilterEffect> effect =
+      FEColorMatrix::create(filter, filterType, filterValues);
   effect->inputEffects().append(input1);
   return effect.release();
 }

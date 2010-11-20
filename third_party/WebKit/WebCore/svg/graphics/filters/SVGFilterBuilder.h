@@ -37,8 +37,8 @@ class SVGFilterBuilder : public RefCounted<SVGFilterBuilder> {
  public:
   typedef HashSet<FilterEffect*> FilterEffectSet;
 
-  static PassRefPtr<SVGFilterBuilder> create() {
-    return adoptRef(new SVGFilterBuilder);
+  static PassRefPtr<SVGFilterBuilder> create(Filter* filter) {
+    return adoptRef(new SVGFilterBuilder(filter));
   }
 
   void add(const AtomicString& id, RefPtr<FilterEffect> effect);
@@ -57,7 +57,7 @@ class SVGFilterBuilder : public RefCounted<SVGFilterBuilder> {
   void clearEffects();
 
  private:
-  SVGFilterBuilder();
+  SVGFilterBuilder(Filter*);
 
   inline void addBuiltinEffects() {
     HashMap<AtomicString, RefPtr<FilterEffect>>::iterator end =

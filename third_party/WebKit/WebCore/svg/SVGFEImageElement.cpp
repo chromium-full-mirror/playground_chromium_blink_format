@@ -127,7 +127,8 @@ void SVGFEImageElement::notifyFinished(CachedResource*) {
       parent->renderer());
 }
 
-PassRefPtr<FilterEffect> SVGFEImageElement::build(SVGFilterBuilder*) {
+PassRefPtr<FilterEffect> SVGFEImageElement::build(SVGFilterBuilder*,
+                                                  Filter* filter) {
   if (!m_cachedImage && !m_targetImage) {
     Element* hrefElement =
         document()->getElementById(SVGURIReference::getTarget(href()));
@@ -146,9 +147,9 @@ PassRefPtr<FilterEffect> SVGFEImageElement::build(SVGFilterBuilder*) {
         m_targetImage.get(), renderer, contentTransformation);
   }
 
-  return FEImage::create(
-      m_targetImage ? m_targetImage->copyImage() : m_cachedImage->image(),
-      preserveAspectRatio());
+  return FEImage::create(filter, m_targetImage ? m_targetImage->copyImage()
+                                               : m_cachedImage->image(),
+                         preserveAspectRatio());
 }
 
 void SVGFEImageElement::addSubresourceAttributeURLs(

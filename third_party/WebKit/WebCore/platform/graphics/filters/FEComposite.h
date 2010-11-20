@@ -42,7 +42,8 @@ enum CompositeOperationType {
 
 class FEComposite : public FilterEffect {
  public:
-  static PassRefPtr<FEComposite> create(const CompositeOperationType&,
+  static PassRefPtr<FEComposite> create(Filter*,
+                                        const CompositeOperationType&,
                                         float,
                                         float,
                                         float,
@@ -63,15 +64,20 @@ class FEComposite : public FilterEffect {
   float k4() const;
   void setK4(float);
 
-  virtual void apply(Filter*);
+  virtual void apply();
   virtual void dump();
 
-  virtual void determineAbsolutePaintRect(Filter*);
+  virtual void determineAbsolutePaintRect();
 
   virtual TextStream& externalRepresentation(TextStream&, int indention) const;
 
  private:
-  FEComposite(const CompositeOperationType&, float, float, float, float);
+  FEComposite(Filter*,
+              const CompositeOperationType&,
+              float,
+              float,
+              float,
+              float);
 
   CompositeOperationType m_type;
   float m_k1;
