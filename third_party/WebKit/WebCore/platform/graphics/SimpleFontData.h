@@ -118,6 +118,9 @@ class SimpleFontData : public FontData {
 #endif
 
   Glyph spaceGlyph() const { return m_spaceGlyph; }
+  bool isZeroWidthSpaceGlyph(Glyph glyph) const {
+    return glyph == m_zeroWidthSpaceGlyph && glyph;
+  }
 
   virtual const SimpleFontData* fontDataForCharacter(UChar32) const;
   virtual bool containsCharacters(const UChar*, int length) const;
@@ -282,7 +285,7 @@ class SimpleFontData : public FontData {
 
 #if !PLATFORM(QT)
 ALWAYS_INLINE FloatRect SimpleFontData::boundsForGlyph(Glyph glyph) const {
-  if (glyph == m_zeroWidthSpaceGlyph && glyph)
+  if (isZeroWidthSpaceGlyph(glyph))
     return FloatRect();
 
   FloatRect bounds;
@@ -300,7 +303,7 @@ ALWAYS_INLINE FloatRect SimpleFontData::boundsForGlyph(Glyph glyph) const {
 }
 
 ALWAYS_INLINE float SimpleFontData::widthForGlyph(Glyph glyph) const {
-  if (glyph == m_zeroWidthSpaceGlyph && glyph)
+  if (isZeroWidthSpaceGlyph(glyph))
     return 0;
 
   float width = m_glyphToWidthMap.metricsForGlyph(glyph);
