@@ -31,8 +31,7 @@
 #include "LinkBuffer.h"
 #include "MacroAssembler.h"
 #include "RegexCompiler.h"
-
-#include "pcre.h"  // temporary, remove when fallback is removed.
+#include "RegexInterpreter.h"  // temporary, remove when fallback is removed.
 
 #if ENABLE(YARR_JIT)
 
@@ -1661,6 +1660,7 @@ void jitCompileRegex(JSGlobalData* globalData,
                      const UString& patternString,
                      unsigned& numSubpatterns,
                      const char*& error,
+                     BumpPointerAllocator* allocator,
                      bool ignoreCase,
                      bool multiline) {
   RegexPattern pattern(ignoreCase, multiline);
@@ -1675,14 +1675,7 @@ void jitCompileRegex(JSGlobalData* globalData,
       return;
   }
 
-  JSRegExpIgnoreCaseOption ignoreCaseOption =
-      ignoreCase ? JSRegExpIgnoreCase : JSRegExpDoNotIgnoreCase;
-  JSRegExpMultilineOption multilineOption =
-      multiline ? JSRegExpMultiline : JSRegExpSingleLine;
-  jitObject.setFallback(jsRegExpCompile(
-      reinterpret_cast<const UChar*>(patternString.characters()),
-      patternString.length(), ignoreCaseOption, multilineOption,
-      &numSubpatterns, &error));
+  jitObject.setFallback(byteCompileRegex(pattern, allocator));
 }
 }
 }

@@ -31,8 +31,6 @@
 #include "RegexPattern.h"
 #include <wtf/Vector.h>
 
-#if ENABLE(YARR)
-
 using namespace WTF;
 
 namespace JSC {
@@ -1008,5 +1006,3 @@ const char* compileRegex(const UString& patternString, RegexPattern& pattern) {
 };
 }
 }
-
-#endif
