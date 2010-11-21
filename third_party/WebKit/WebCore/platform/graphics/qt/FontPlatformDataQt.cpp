@@ -26,7 +26,7 @@
 
 namespace WebCore {
 
-static inline bool isEmtpyValue(const float size,
+static inline bool isEmptyValue(const float size,
                                 const bool bold,
                                 const bool oblique) {
   // this is the empty value by definition of the trait FontDataCacheKeyTraits
@@ -34,7 +34,7 @@ static inline bool isEmtpyValue(const float size,
 }
 
 FontPlatformData::FontPlatformData(float size, bool bold, bool oblique) {
-  if (isEmtpyValue(size, bold, oblique))
+  if (isEmptyValue(size, bold, oblique))
     m_data = 0;
   else
     m_data = new FontPlatformDataPrivate(size, bold, oblique);
