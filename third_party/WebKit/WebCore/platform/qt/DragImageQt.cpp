@@ -31,15 +31,25 @@
 
 namespace WebCore {
 
-IntSize dragImageSize(DragImageRef) {
-  return IntSize(0, 0);
+IntSize dragImageSize(DragImageRef image) {
+  if (!image)
+    return IntSize();
+
+  return image->size();
 }
 
 void deleteDragImage(DragImageRef image) {
   delete image;
 }
 
-DragImageRef scaleDragImage(DragImageRef image, FloatSize) {
+DragImageRef scaleDragImage(DragImageRef image, FloatSize scale) {
+  if (!image)
+    return 0;
+
+  int scaledWidth = image->width() * scale.width();
+  int scaledHeight = image->height() * scale.height();
+
+  *image = image->scaled(scaledWidth, scaledHeight);
   return image;
 }
 
