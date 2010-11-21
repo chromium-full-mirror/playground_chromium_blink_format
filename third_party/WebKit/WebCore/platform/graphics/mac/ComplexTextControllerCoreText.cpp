@@ -164,12 +164,12 @@ void ComplexTextController::collectComplexTextRunsForCharactersCoreText(
                        &rtlForcedEmbeddingLevelValue)};
     static CFDictionaryRef ltrTypesetterOptions = CFDictionaryCreate(
         kCFAllocatorDefault, optionKeys, ltrOptionValues,
-        sizeof(optionKeys) / sizeof(*optionKeys),
-        &kCFCopyStringDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        WTF_ARRAY_LENGTH(optionKeys), &kCFCopyStringDictionaryKeyCallBacks,
+        &kCFTypeDictionaryValueCallBacks);
     static CFDictionaryRef rtlTypesetterOptions = CFDictionaryCreate(
         kCFAllocatorDefault, optionKeys, rtlOptionValues,
-        sizeof(optionKeys) / sizeof(*optionKeys),
-        &kCFCopyStringDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        WTF_ARRAY_LENGTH(optionKeys), &kCFCopyStringDictionaryKeyCallBacks,
+        &kCFTypeDictionaryValueCallBacks);
 
 #if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD) && \
     !defined(BUILDING_ON_SNOW_LEOPARD)

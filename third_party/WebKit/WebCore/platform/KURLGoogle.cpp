@@ -852,7 +852,7 @@ bool portAllowed(const KURL& url) {
       invalidPortNumber,  // Used to block all invalid port numbers
   };
   const unsigned short* const blockedPortListEnd =
-      blockedPortList + sizeof(blockedPortList) / sizeof(blockedPortList[0]);
+      blockedPortList + WTF_ARRAY_LENGTH(blockedPortList);
 
 #ifndef NDEBUG
   // The port list must be sorted for binary_search to work.

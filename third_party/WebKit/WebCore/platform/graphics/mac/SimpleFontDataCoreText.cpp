@@ -73,7 +73,7 @@ CFDictionaryRef SimpleFontData::getCFStringAttributes(
         orientation() == Vertical ? kCFBooleanTrue : kCFBooleanFalse};
     attributesDictionary.adoptCF(CFDictionaryCreate(
         0, keysWithKerningDisabled, valuesWithKerningDisabled,
-        sizeof(keysWithKerningDisabled) / sizeof(*keysWithKerningDisabled),
+        WTF_ARRAY_LENGTH(keysWithKerningDisabled),
         &kCFCopyStringDictionaryKeyCallBacks,
         &kCFTypeDictionaryValueCallBacks));
   } else {
@@ -86,11 +86,11 @@ CFDictionaryRef SimpleFontData::getCFStringAttributes(
         platformData().ctFont(),
         allowLigatures ? ligaturesAllowed : ligaturesNotAllowed,
         orientation() == Vertical ? kCFBooleanTrue : kCFBooleanFalse};
-    attributesDictionary.adoptCF(CFDictionaryCreate(
-        0, keysWithKerningEnabled, valuesWithKerningEnabled,
-        sizeof(keysWithKerningEnabled) / sizeof(*keysWithKerningEnabled),
-        &kCFCopyStringDictionaryKeyCallBacks,
-        &kCFTypeDictionaryValueCallBacks));
+    attributesDictionary.adoptCF(
+        CFDictionaryCreate(0, keysWithKerningEnabled, valuesWithKerningEnabled,
+                           WTF_ARRAY_LENGTH(keysWithKerningEnabled),
+                           &kCFCopyStringDictionaryKeyCallBacks,
+                           &kCFTypeDictionaryValueCallBacks));
   }
 
   return attributesDictionary.get();

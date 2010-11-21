@@ -382,7 +382,7 @@ void SocketStreamHandle::createStreams() {
       const void* proxyValues[] = {m_proxyHost.get(), m_proxyPort.get()};
       RetainPtr<CFDictionaryRef> connectDictionary(
           AdoptCF, CFDictionaryCreate(0, proxyKeys, proxyValues,
-                                      sizeof(proxyKeys) / sizeof(*proxyKeys),
+                                      WTF_ARRAY_LENGTH(proxyKeys),
                                       &kCFTypeDictionaryKeyCallBacks,
                                       &kCFTypeDictionaryValueCallBacks));
       CFReadStreamSetProperty(m_readStream.get(), kCFStreamPropertySOCKSProxy,
@@ -400,10 +400,9 @@ void SocketStreamHandle::createStreams() {
     const void* values[] = {host.get(),
                             kCFStreamSocketSecurityLevelNegotiatedSSL};
     RetainPtr<CFDictionaryRef> settings(
-        AdoptCF,
-        CFDictionaryCreate(0, keys, values, sizeof(keys) / sizeof(*keys),
-                           &kCFTypeDictionaryKeyCallBacks,
-                           &kCFTypeDictionaryValueCallBacks));
+        AdoptCF, CFDictionaryCreate(0, keys, values, WTF_ARRAY_LENGTH(keys),
+                                    &kCFTypeDictionaryKeyCallBacks,
+                                    &kCFTypeDictionaryValueCallBacks));
     CFReadStreamSetProperty(m_readStream.get(), kCFStreamPropertySSLSettings,
                             settings.get());
     CFWriteStreamSetProperty(m_writeStream.get(), kCFStreamPropertySSLSettings,
