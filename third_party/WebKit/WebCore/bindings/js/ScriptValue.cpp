@@ -81,6 +81,11 @@ bool ScriptValue::isObject() const {
   return m_value.get().isObject();
 }
 
+bool ScriptValue::isFunction() const {
+  CallData callData;
+  return getCallData(m_value, callData) != CallTypeNone;
+}
+
 PassRefPtr<SerializedScriptValue> ScriptValue::serialize(
     ScriptState* scriptState) {
   return SerializedScriptValue::create(scriptState, jsValue());

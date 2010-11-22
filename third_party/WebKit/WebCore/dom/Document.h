@@ -7,6 +7,7 @@
  * reserved.
  * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -96,6 +97,8 @@ class IntPoint;
 class DOMWrapperWorld;
 class JSNode;
 class MediaCanStartListener;
+class MediaQueryList;
+class MediaQueryMatcher;
 class MouseEventWithHitTestResults;
 class NodeFilter;
 class NodeIterator;
@@ -213,6 +216,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
     return adoptRef(new Document(frame, url, true, false));
   }
   virtual ~Document();
+
+  MediaQueryMatcher* mediaQueryMatcher();
 
   using ContainerNode::ref;
   using ContainerNode::deref;
@@ -1558,6 +1563,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_writingModeSetOnDocumentElement;
 
   DocumentTiming m_documentTiming;
+  RefPtr<MediaQueryMatcher> m_mediaQueryMatcher;
 };
 
 inline bool Document::DocumentOrderedMap::contains(AtomicStringImpl* id) const {

@@ -8,6 +8,7 @@
  * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
  * Copyright (C) 2008, 2009 Google Inc. All rights reserved.
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -94,6 +95,8 @@
 #include "InspectorInstrumentation.h"
 #include "KeyboardEvent.h"
 #include "Logging.h"
+#include "MediaQueryList.h"
+#include "MediaQueryMatcher.h"
 #include "MessageEvent.h"
 #include "MouseEvent.h"
 #include "MouseEventWithHitTestResults.h"
@@ -610,6 +613,15 @@ Document::~Document() {
   }
 
   m_weakReference->clear();
+
+  if (m_mediaQueryMatcher)
+    m_mediaQueryMatcher->documentDestroyed();
+}
+
+MediaQueryMatcher* Document::mediaQueryMatcher() {
+  if (!m_mediaQueryMatcher)
+    m_mediaQueryMatcher = MediaQueryMatcher::create(this);
+  return m_mediaQueryMatcher.get();
 }
 
 #if USE(JSC)
@@ -2982,6 +2994,9 @@ void Document::styleSelectorChanged(StyleSelectorUpdateFlag updateFlag) {
     if (view())
       view()->scheduleRelayout();
   }
+
+  if (m_mediaQueryMatcher)
+    m_mediaQueryMatcher->styleSelectorChanged();
 }
 
 void Document::addStyleSheetCandidateNode(Node* node, bool createdByParser) {

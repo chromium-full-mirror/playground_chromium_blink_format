@@ -95,6 +95,8 @@ class ScriptValue {
     return m_value == value.m_value;
   }
 
+  bool isFunction() const { return m_value->IsFunction(); }
+
   bool operator!=(const ScriptValue value) const { return !operator==(value); }
 
   bool isNull() const { return m_value->IsNull(); }
