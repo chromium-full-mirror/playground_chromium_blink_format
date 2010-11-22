@@ -1015,7 +1015,7 @@ void GraphicsContext::clipOut(const IntRect& rect) {
                   trRect.bottom());
 }
 
-void GraphicsContext::drawFocusRing(const Vector<Path>& paths,
+void GraphicsContext::drawFocusRing(const Path& path,
                                     int width,
                                     int offset,
                                     const Color& color) {

@@ -206,7 +206,7 @@ void GraphicsContext::clip(const FloatRect& rect) {
   m_data->m_view->ConstrainClippingRegion(&region);
 }
 
-void GraphicsContext::drawFocusRing(const Vector<Path>& paths,
+void GraphicsContext::drawFocusRing(const Path& path,
                                     int width,
                                     int offset,
                                     const Color& color) {

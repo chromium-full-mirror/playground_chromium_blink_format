@@ -145,7 +145,7 @@ void GraphicsContext::drawWindowsBitmap(WindowsBitmap* image,
                      cgImage.get());
 }
 
-void GraphicsContext::drawFocusRing(const Vector<Path>& paths,
+void GraphicsContext::drawFocusRing(const Path& path,
                                     int width,
                                     int offset,
                                     const Color& color) {

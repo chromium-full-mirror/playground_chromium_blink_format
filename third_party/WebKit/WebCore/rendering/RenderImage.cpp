@@ -333,11 +333,11 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
   RenderReplaced::paint(paintInfo, tx, ty);
 
   if (paintInfo.phase == PaintPhaseOutline)
-    paintFocusRings(paintInfo, style());
+    paintFocusRing(paintInfo, style());
 }
 
-void RenderImage::paintFocusRings(PaintInfo& paintInfo,
-                                  const RenderStyle* style) {
+void RenderImage::paintFocusRing(PaintInfo& paintInfo,
+                                 const RenderStyle* style) {
   // Don't draw focus rings if printing.
   if (document()->printing() || !frame()->selection()->isFocusedAndActive())
     return;
@@ -371,10 +371,9 @@ void RenderImage::paintFocusRings(PaintInfo& paintInfo,
     if (focusedNode != areaElement)
       continue;
 
-    Vector<Path> focusRingPaths;
-    focusRingPaths.append(areaElement->getPath(this));
     paintInfo.context->drawFocusRing(
-        focusRingPaths, style->outlineWidth(), style->outlineOffset(),
+        areaElement->getPath(this), style->outlineWidth(),
+        style->outlineOffset(),
         style->visitedDependentColor(CSSPropertyOutlineColor));
     break;
   }
