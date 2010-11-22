@@ -69,6 +69,7 @@ class tst_QWebElement : public QObject {
   void lastChildPreviousSibling();
   void hasSetFocus();
   void render();
+  void addElementToHead();
 
  private:
   QWebView* m_view;
@@ -1026,6 +1027,15 @@ void tst_QWebElement::render() {
   painter4.end();
 
   QVERIFY(image3 == image4);
+}
+
+void tst_QWebElement::addElementToHead() {
+  m_mainFrame->setHtml("<html><head></head><body></body></html>");
+  QWebElement head = m_mainFrame->findFirstElement("head");
+  QVERIFY(!head.isNull());
+  QString append = "<script type=\"text/javascript\">var t = 0;</script>";
+  head.appendInside(append);
+  QCOMPARE(head.toInnerXml(), append);
 }
 
 QTEST_MAIN(tst_QWebElement)

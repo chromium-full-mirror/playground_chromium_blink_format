@@ -992,7 +992,7 @@ void QWebElement::appendInside(const QString& markup) {
 
   HTMLElement* htmlElement = static_cast<HTMLElement*>(m_element);
   RefPtr<DocumentFragment> fragment =
-      htmlElement->deprecatedCreateContextualFragment(markup);
+      htmlElement->Element::deprecatedCreateContextualFragment(markup);
 
   ExceptionCode exception = 0;
   m_element->appendChild(fragment, exception);
