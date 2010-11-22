@@ -46,7 +46,8 @@ bool CSSFontFaceSrcValue::isSupportedFormat() const {
   // and assume that we shouldn't load it.
   if (m_format.isEmpty()) {
     // Check for .eot.
-    if (m_resource.endsWith("eot", false))
+    if (!m_resource.startsWith("data:", false) &&
+        m_resource.endsWith(".eot", false))
       return false;
     return true;
   }
