@@ -277,6 +277,7 @@ bool TestController::resetStateToConsistentValues() {
   WKPreferencesSetFontSmoothingLevel(
       preferences, kWKFontSmoothingLevelNoSubpixelAntiAliasing);
   WKPreferencesSetXSSAuditorEnabled(preferences, false);
+  WKPreferencesSetDeveloperExtrasEnabled(preferences, true);
 
   static WKStringRef standardFontFamily =
       WKStringCreateWithUTF8CString("Times");
