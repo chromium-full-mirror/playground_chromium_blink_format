@@ -134,6 +134,7 @@ void SVGImageElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizePreserveAspectRatio();
     synchronizeExternalResourcesRequired();
     synchronizeHref();
+    SVGTests::synchronizeProperties(this, attrName);
     return;
   }
 
@@ -151,6 +152,8 @@ void SVGImageElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeExternalResourcesRequired();
   else if (SVGURIReference::isKnownAttribute(attrName))
     synchronizeHref();
+  else if (SVGTests::isKnownAttribute(attrName))
+    SVGTests::synchronizeProperties(this, attrName);
 }
 
 bool SVGImageElement::selfHasRelativeLengths() const {

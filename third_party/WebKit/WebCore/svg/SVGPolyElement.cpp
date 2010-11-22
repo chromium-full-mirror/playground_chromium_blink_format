@@ -94,6 +94,7 @@ void SVGPolyElement::synchronizeProperty(const QualifiedName& attrName) {
   if (attrName == anyQName()) {
     synchronizeExternalResourcesRequired();
     synchronizePoints();
+    SVGTests::synchronizeProperties(this, attrName);
     return;
   }
 
@@ -101,6 +102,8 @@ void SVGPolyElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeExternalResourcesRequired();
   else if (attrName == SVGNames::pointsAttr)
     synchronizePoints();
+  else if (SVGTests::isKnownAttribute(attrName))
+    SVGTests::synchronizeProperties(this, attrName);
 }
 
 void SVGPolyElement::synchronizePoints() {

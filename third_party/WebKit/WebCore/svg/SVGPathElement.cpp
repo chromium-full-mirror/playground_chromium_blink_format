@@ -305,6 +305,7 @@ void SVGPathElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeD();
     synchronizePathLength();
     synchronizeExternalResourcesRequired();
+    SVGTests::synchronizeProperties(this, attrName);
     return;
   }
 
@@ -314,6 +315,8 @@ void SVGPathElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizePathLength();
   else if (SVGExternalResourcesRequired::isKnownAttribute(attrName))
     synchronizeExternalResourcesRequired();
+  else if (SVGTests::isKnownAttribute(attrName))
+    SVGTests::synchronizeProperties(this, attrName);
 }
 
 void SVGPathElement::synchronizeD() {

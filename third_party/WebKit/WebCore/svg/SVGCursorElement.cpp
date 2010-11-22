@@ -98,6 +98,7 @@ void SVGCursorElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeY();
     synchronizeExternalResourcesRequired();
     synchronizeHref();
+    SVGTests::synchronizeProperties(this, attrName);
     return;
   }
 
@@ -109,6 +110,8 @@ void SVGCursorElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeExternalResourcesRequired();
   else if (SVGURIReference::isKnownAttribute(attrName))
     synchronizeHref();
+  else if (SVGTests::isKnownAttribute(attrName))
+    SVGTests::synchronizeProperties(this, attrName);
 }
 
 void SVGCursorElement::addSubresourceAttributeURLs(

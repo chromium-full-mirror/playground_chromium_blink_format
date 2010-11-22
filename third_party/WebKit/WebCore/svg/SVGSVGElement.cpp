@@ -349,6 +349,7 @@ void SVGSVGElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeExternalResourcesRequired();
     synchronizeViewBox();
     synchronizePreserveAspectRatio();
+    SVGTests::synchronizeProperties(this, attrName);
     return;
   }
 
@@ -362,10 +363,12 @@ void SVGSVGElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeHeight();
   else if (SVGExternalResourcesRequired::isKnownAttribute(attrName))
     synchronizeExternalResourcesRequired();
-  else if (SVGFitToViewBox::isKnownAttribute(attrName)) {
+  else if (attrName == SVGNames::viewBoxAttr)
     synchronizeViewBox();
+  else if (attrName == SVGNames::preserveAspectRatioAttr)
     synchronizePreserveAspectRatio();
-  }
+  else if (SVGTests::isKnownAttribute(attrName))
+    SVGTests::synchronizeProperties(this, attrName);
 }
 
 unsigned SVGSVGElement::suspendRedraw(unsigned /* maxWaitMilliseconds */) {

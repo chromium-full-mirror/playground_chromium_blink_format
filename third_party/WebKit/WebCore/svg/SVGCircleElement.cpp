@@ -108,6 +108,7 @@ void SVGCircleElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeCy();
     synchronizeR();
     synchronizeExternalResourcesRequired();
+    SVGTests::synchronizeProperties(this, attrName);
     return;
   }
 
@@ -119,6 +120,8 @@ void SVGCircleElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeR();
   else if (SVGExternalResourcesRequired::isKnownAttribute(attrName))
     synchronizeExternalResourcesRequired();
+  else if (SVGTests::isKnownAttribute(attrName))
+    SVGTests::synchronizeProperties(this, attrName);
 }
 
 void SVGCircleElement::toPathData(Path& path) const {

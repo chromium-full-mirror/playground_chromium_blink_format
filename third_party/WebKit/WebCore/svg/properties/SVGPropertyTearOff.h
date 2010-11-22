@@ -36,10 +36,10 @@ class SVGPropertyTearOff : public SVGProperty {
   // example: SVGAnimatedLength::baseVal()).
   // Also used for list tear offs (for example: text.x.baseVal.getItem(0)).
   static PassRefPtr<Self> create(SVGAnimatedProperty* animatedProperty,
-                                 SVGPropertyRole,
+                                 SVGPropertyRole role,
                                  PropertyType& value) {
     ASSERT(animatedProperty);
-    return adoptRef(new Self(animatedProperty, value));
+    return adoptRef(new Self(animatedProperty, role, value));
   }
 
   // Used for non-animated POD types (for example:
@@ -95,9 +95,14 @@ class SVGPropertyTearOff : public SVGProperty {
     m_animatedProperty->commitChange();
   }
 
+  virtual SVGPropertyRole role() const { return m_role; }
+
  protected:
-  SVGPropertyTearOff(SVGAnimatedProperty* animatedProperty, PropertyType& value)
+  SVGPropertyTearOff(SVGAnimatedProperty* animatedProperty,
+                     SVGPropertyRole role,
+                     PropertyType& value)
       : m_animatedProperty(animatedProperty),
+        m_role(role),
         m_value(&value),
         m_valueIsCopy(false) {
     // Using operator & is completly fine, as SVGAnimatedProperty owns this
@@ -107,6 +112,7 @@ class SVGPropertyTearOff : public SVGProperty {
 
   SVGPropertyTearOff(const PropertyType& initialValue)
       : m_animatedProperty(0),
+        m_role(UndefinedRole),
         m_value(new PropertyType(initialValue)),
         m_valueIsCopy(true) {}
 
@@ -116,6 +122,7 @@ class SVGPropertyTearOff : public SVGProperty {
   }
 
   RefPtr<SVGAnimatedProperty> m_animatedProperty;
+  SVGPropertyRole m_role;
   PropertyType* m_value;
   bool m_valueIsCopy : 1;
 };

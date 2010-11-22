@@ -105,6 +105,7 @@ void SVGAElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeSVGTarget();
     synchronizeHref();
     synchronizeExternalResourcesRequired();
+    SVGTests::synchronizeProperties(this, attrName);
     return;
   }
 
@@ -114,6 +115,8 @@ void SVGAElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeHref();
   else if (SVGExternalResourcesRequired::isKnownAttribute(attrName))
     synchronizeExternalResourcesRequired();
+  else if (SVGTests::isKnownAttribute(attrName))
+    SVGTests::synchronizeProperties(this, attrName);
 }
 
 RenderObject* SVGAElement::createRenderer(RenderArena* arena, RenderStyle*) {

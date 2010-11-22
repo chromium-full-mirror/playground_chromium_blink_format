@@ -77,7 +77,7 @@ class SVGPathSegListPropertyTearOff : public SVGListProperty<SVGPathSegList> {
   PassListItemType initialize(PassListItemType passNewItem, ExceptionCode& ec) {
     // Not specified, but FF/Opera do it this way, and it's just sane.
     if (!passNewItem) {
-      ec = TYPE_MISMATCH_ERR;
+      ec = SVGException::SVG_WRONG_TYPE_ERR;
       return 0;
     }
 
@@ -93,7 +93,7 @@ class SVGPathSegListPropertyTearOff : public SVGListProperty<SVGPathSegList> {
                                     ExceptionCode& ec) {
     // Not specified, but FF/Opera do it this way, and it's just sane.
     if (!passNewItem) {
-      ec = TYPE_MISMATCH_ERR;
+      ec = SVGException::SVG_WRONG_TYPE_ERR;
       return 0;
     }
 
@@ -107,7 +107,7 @@ class SVGPathSegListPropertyTearOff : public SVGListProperty<SVGPathSegList> {
                                ExceptionCode& ec) {
     // Not specified, but FF/Opera do it this way, and it's just sane.
     if (!passNewItem) {
-      ec = TYPE_MISMATCH_ERR;
+      ec = SVGException::SVG_WRONG_TYPE_ERR;
       return 0;
     }
 
@@ -121,7 +121,7 @@ class SVGPathSegListPropertyTearOff : public SVGListProperty<SVGPathSegList> {
   PassListItemType appendItem(PassListItemType passNewItem, ExceptionCode& ec) {
     // Not specified, but FF/Opera do it this way, and it's just sane.
     if (!passNewItem) {
-      ec = TYPE_MISMATCH_ERR;
+      ec = SVGException::SVG_WRONG_TYPE_ERR;
       return 0;
     }
 

@@ -54,7 +54,7 @@ class SVGStaticPropertyTearOff : public SVGPropertyTearOff<PropertyType> {
   SVGStaticPropertyTearOff(ContextElement* contextElement,
                            PropertyType& value,
                            UpdateMethod update)
-      : SVGPropertyTearOff<PropertyType>(0, value),
+      : SVGPropertyTearOff<PropertyType>(0, UndefinedRole, value),
         m_update(update),
         m_contextElement(contextElement) {}
 
