@@ -311,7 +311,9 @@ void InspectorCSSAgent::setStyleSheetText2(const String& styleSheetId,
   if (!inspectorStyleSheet)
     return;
 
-  inspectorStyleSheet->setText(text);
+  bool success = inspectorStyleSheet->setText(text);
+  if (success)
+    inspectorStyleSheet->reparseStyleSheet(text);
 }
 
 void InspectorCSSAgent::setPropertyText2(const String& fullStyleId,
