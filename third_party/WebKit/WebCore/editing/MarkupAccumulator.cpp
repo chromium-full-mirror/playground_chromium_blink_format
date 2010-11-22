@@ -63,9 +63,8 @@ void appendCharactersReplacingEntities(Vector<UChar>& out,
   };
 
   size_t positionAfterLastEntity = 0;
-  for (size_t i = 0; i < length; i++) {
-    for (size_t m = 0; m < sizeof(entityMaps) / sizeof(EntityDescription);
-         m++) {
+  for (size_t i = 0; i < length; ++i) {
+    for (size_t m = 0; m < WTF_ARRAY_LENGTH(entityMaps); ++m) {
       if (content[i] == entityMaps[m].entity &&
           entityMaps[m].mask & entityMask) {
         out.append(content + positionAfterLastEntity,

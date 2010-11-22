@@ -145,8 +145,7 @@ String CSSMutableStyleDeclaration::getPropertyValue(int propertyID) const {
           {CSSPropertyBorderTopColor, CSSPropertyBorderRightColor,
            CSSPropertyBorderBottomColor, CSSPropertyBorderLeftColor}};
       String res;
-      const int nrprops = sizeof(properties) / sizeof(properties[0]);
-      for (int i = 0; i < nrprops; ++i) {
+      for (size_t i = 0; i < WTF_ARRAY_LENGTH(properties); ++i) {
         String value = getCommonValue(properties[i], 4);
         if (!value.isNull()) {
           if (!res.isNull())
@@ -824,8 +823,7 @@ static const int blockProperties[] = {
     CSSPropertyTextIndent,
     CSSPropertyWidows};
 
-const unsigned numBlockProperties =
-    sizeof(blockProperties) / sizeof(blockProperties[0]);
+const unsigned numBlockProperties = WTF_ARRAY_LENGTH(blockProperties);
 
 PassRefPtr<CSSMutableStyleDeclaration>
 CSSMutableStyleDeclaration::copyBlockProperties() const {

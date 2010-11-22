@@ -159,25 +159,24 @@ static inline bool parseAndSkipType(const UChar*& currTransform,
     return false;
 
   if (*currTransform == 's') {
-    if (skipString(currTransform, end, skewXDesc,
-                   sizeof(skewXDesc) / sizeof(UChar)))
+    if (skipString(currTransform, end, skewXDesc, WTF_ARRAY_LENGTH(skewXDesc)))
       type = SVGTransform::SVG_TRANSFORM_SKEWX;
     else if (skipString(currTransform, end, skewYDesc,
-                        sizeof(skewYDesc) / sizeof(UChar)))
+                        WTF_ARRAY_LENGTH(skewYDesc)))
       type = SVGTransform::SVG_TRANSFORM_SKEWY;
     else if (skipString(currTransform, end, scaleDesc,
-                        sizeof(scaleDesc) / sizeof(UChar)))
+                        WTF_ARRAY_LENGTH(scaleDesc)))
       type = SVGTransform::SVG_TRANSFORM_SCALE;
     else
       return false;
   } else if (skipString(currTransform, end, translateDesc,
-                        sizeof(translateDesc) / sizeof(UChar)))
+                        WTF_ARRAY_LENGTH(translateDesc)))
     type = SVGTransform::SVG_TRANSFORM_TRANSLATE;
   else if (skipString(currTransform, end, rotateDesc,
-                      sizeof(rotateDesc) / sizeof(UChar)))
+                      WTF_ARRAY_LENGTH(rotateDesc)))
     type = SVGTransform::SVG_TRANSFORM_ROTATE;
   else if (skipString(currTransform, end, matrixDesc,
-                      sizeof(matrixDesc) / sizeof(UChar)))
+                      WTF_ARRAY_LENGTH(matrixDesc)))
     type = SVGTransform::SVG_TRANSFORM_MATRIX;
   else
     return false;

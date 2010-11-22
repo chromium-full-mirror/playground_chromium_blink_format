@@ -520,9 +520,8 @@ bool RenderTextControl::hasValidAvgCharWidth(AtomicString family) {
   if (!fontFamiliesWithInvalidCharWidthMap) {
     fontFamiliesWithInvalidCharWidthMap = new HashSet<AtomicString>;
 
-    for (unsigned i = 0; i < sizeof(fontFamiliesWithInvalidCharWidth) /
-                                 sizeof(fontFamiliesWithInvalidCharWidth[0]);
-         i++)
+    for (size_t i = 0; i < WTF_ARRAY_LENGTH(fontFamiliesWithInvalidCharWidth);
+         ++i)
       fontFamiliesWithInvalidCharWidthMap->add(
           AtomicString(fontFamiliesWithInvalidCharWidth[i]));
   }

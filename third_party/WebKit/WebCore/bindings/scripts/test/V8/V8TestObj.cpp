@@ -1529,11 +1529,11 @@ COMPILE_ASSERT(0x1abc == TestObj::CONST_VALUE_14,
 
 static v8::Persistent<v8::FunctionTemplate> ConfigureV8TestObjTemplate(
     v8::Persistent<v8::FunctionTemplate> desc) {
-  v8::Local<v8::Signature> defaultSignature = configureTemplate(
-      desc, "TestObj", v8::Persistent<v8::FunctionTemplate>(),
-      V8TestObj::internalFieldCount, TestObjAttrs,
-      sizeof(TestObjAttrs) / sizeof(*TestObjAttrs), TestObjCallbacks,
-      sizeof(TestObjCallbacks) / sizeof(*TestObjCallbacks));
+  v8::Local<v8::Signature> defaultSignature =
+      configureTemplate(desc, "TestObj", v8::Persistent<v8::FunctionTemplate>(),
+                        V8TestObj::internalFieldCount, TestObjAttrs,
+                        WTF_ARRAY_LENGTH(TestObjAttrs), TestObjCallbacks,
+                        WTF_ARRAY_LENGTH(TestObjCallbacks));
   v8::Local<v8::ObjectTemplate> instance = desc->InstanceTemplate();
   v8::Local<v8::ObjectTemplate> proto = desc->PrototypeTemplate();
 
@@ -1663,7 +1663,7 @@ static v8::Persistent<v8::FunctionTemplate> ConfigureV8TestObjTemplate(
                    TestObjInternal::enabledAtRuntimeMethod2Callback,
                    v8::Handle<v8::Value>(), defaultSignature));
   batchConfigureConstants(desc, proto, TestObjConsts,
-                          sizeof(TestObjConsts) / sizeof(*TestObjConsts));
+                          WTF_ARRAY_LENGTH(TestObjConsts));
 
   // Custom toString template
   desc->Set(getToStringName(), getToStringTemplate());

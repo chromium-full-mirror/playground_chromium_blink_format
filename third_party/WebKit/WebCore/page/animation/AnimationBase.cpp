@@ -958,9 +958,7 @@ static void addShorthandProperties() {
       CSSPropertyWebkitBorderRadius,
       CSSPropertyWebkitTransformOrigin};
 
-  for (unsigned i = 0; i < sizeof(animatableShorthandProperties) /
-                               sizeof(animatableShorthandProperties[0]);
-       ++i) {
+  for (size_t i = 0; i < WTF_ARRAY_LENGTH(animatableShorthandProperties); ++i) {
     int propertyID = animatableShorthandProperties[i];
     CSSPropertyLonghand longhand = longhandForProperty(propertyID);
     if (longhand.length() > 0)
@@ -972,9 +970,8 @@ static void addShorthandProperties() {
   static const int animatableFontProperties[] = {CSSPropertyFontSize,
                                                  CSSPropertyFontWeight};
 
-  CSSPropertyLonghand fontLonghand(
-      animatableFontProperties,
-      sizeof(animatableFontProperties) / sizeof(animatableFontProperties[0]));
+  CSSPropertyLonghand fontLonghand(animatableFontProperties,
+                                   WTF_ARRAY_LENGTH(animatableFontProperties));
   addPropertyWrapper(CSSPropertyFont, new ShorthandPropertyWrapper(
                                           CSSPropertyFont, fontLonghand));
 }

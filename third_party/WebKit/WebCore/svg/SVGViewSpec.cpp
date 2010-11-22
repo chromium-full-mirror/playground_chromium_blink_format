@@ -80,7 +80,7 @@ bool SVGViewSpec::parseViewSpec(const String& viewSpec) {
     return false;
 
   if (!skipString(currViewSpec, end, svgViewSpec,
-                  sizeof(svgViewSpec) / sizeof(UChar)))
+                  WTF_ARRAY_LENGTH(svgViewSpec)))
     return false;
 
   if (currViewSpec >= end || *currViewSpec != '(')
@@ -90,7 +90,7 @@ bool SVGViewSpec::parseViewSpec(const String& viewSpec) {
   while (currViewSpec < end && *currViewSpec != ')') {
     if (*currViewSpec == 'v') {
       if (skipString(currViewSpec, end, viewBoxSpec,
-                     sizeof(viewBoxSpec) / sizeof(UChar))) {
+                     WTF_ARRAY_LENGTH(viewBoxSpec))) {
         if (currViewSpec >= end || *currViewSpec != '(')
           return false;
         currViewSpec++;
@@ -103,7 +103,7 @@ bool SVGViewSpec::parseViewSpec(const String& viewSpec) {
           return false;
         currViewSpec++;
       } else if (skipString(currViewSpec, end, viewTargetSpec,
-                            sizeof(viewTargetSpec) / sizeof(UChar))) {
+                            WTF_ARRAY_LENGTH(viewTargetSpec))) {
         if (currViewSpec >= end || *currViewSpec != '(')
           return false;
         const UChar* viewTargetStart = ++currViewSpec;
@@ -118,7 +118,7 @@ bool SVGViewSpec::parseViewSpec(const String& viewSpec) {
         return false;
     } else if (*currViewSpec == 'z') {
       if (!skipString(currViewSpec, end, zoomAndPanSpec,
-                      sizeof(zoomAndPanSpec) / sizeof(UChar)))
+                      WTF_ARRAY_LENGTH(zoomAndPanSpec)))
         return false;
       if (currViewSpec >= end || *currViewSpec != '(')
         return false;
@@ -130,7 +130,7 @@ bool SVGViewSpec::parseViewSpec(const String& viewSpec) {
       currViewSpec++;
     } else if (*currViewSpec == 'p') {
       if (!skipString(currViewSpec, end, preserveAspectRatioSpec,
-                      sizeof(preserveAspectRatioSpec) / sizeof(UChar)))
+                      WTF_ARRAY_LENGTH(preserveAspectRatioSpec)))
         return false;
       if (currViewSpec >= end || *currViewSpec != '(')
         return false;
@@ -146,7 +146,7 @@ bool SVGViewSpec::parseViewSpec(const String& viewSpec) {
       currViewSpec++;
     } else if (*currViewSpec == 't') {
       if (!skipString(currViewSpec, end, transformSpec,
-                      sizeof(transformSpec) / sizeof(UChar)))
+                      WTF_ARRAY_LENGTH(transformSpec)))
         return false;
       if (currViewSpec >= end || *currViewSpec != '(')
         return false;

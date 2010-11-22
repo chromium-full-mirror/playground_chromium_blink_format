@@ -993,9 +993,8 @@ static TriState triStateOfStyle(CSSStyleDeclaration* desiredStyle,
       getPropertiesNotIn(desiredStyle, styleToCompare);
 
   if (ignoreTextOnlyProperties)
-    diff->removePropertiesInSet(
-        textOnlyProperties,
-        sizeof(textOnlyProperties) / sizeof(textOnlyProperties[0]));
+    diff->removePropertiesInSet(textOnlyProperties,
+                                WTF_ARRAY_LENGTH(textOnlyProperties));
 
   if (!diff->length())
     return TrueTriState;

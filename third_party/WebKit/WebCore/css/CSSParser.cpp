@@ -2170,7 +2170,7 @@ bool CSSParser::parseAnimationShorthand(bool important) {
                             CSSPropertyWebkitAnimationIterationCount,
                             CSSPropertyWebkitAnimationDirection,
                             CSSPropertyWebkitAnimationFillMode};
-  const int numProperties = sizeof(properties) / sizeof(properties[0]);
+  const int numProperties = WTF_ARRAY_LENGTH(properties);
 
   ShorthandScope scope(this, CSSPropertyWebkitAnimation);
 
@@ -2228,7 +2228,7 @@ bool CSSParser::parseTransitionShorthand(bool important) {
                             CSSPropertyWebkitTransitionDuration,
                             CSSPropertyWebkitTransitionTimingFunction,
                             CSSPropertyWebkitTransitionDelay};
-  const int numProperties = sizeof(properties) / sizeof(properties[0]);
+  const int numProperties = WTF_ARRAY_LENGTH(properties);
 
   ShorthandScope scope(this, CSSPropertyWebkitTransition);
 
