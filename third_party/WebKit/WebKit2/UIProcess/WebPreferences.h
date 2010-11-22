@@ -120,6 +120,9 @@ class WebPreferences : public APIObject {
   void setDeveloperExtrasEnabled(bool);
   bool developerExtrasEnabled() const;
 
+  void setTextAreasAreResizable(bool);
+  bool textAreasAreResizable() const;
+
   void setNeedsSiteSpecificQuirks(bool);
   bool needsSiteSpecificQuirks() const;
 
