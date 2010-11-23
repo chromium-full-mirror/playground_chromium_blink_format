@@ -2300,7 +2300,6 @@ void WebViewImpl::setIsAcceleratedCompositingActive(bool active) {
   RefPtr<GraphicsContext3D> context =
       m_temporaryOnscreenGraphicsContext3D.release();
   if (!context) {
-    m_client->didActivateAcceleratedCompositing(true);
     context = GraphicsContext3D::create(
         GraphicsContext3D::Attributes(), m_page->chrome(),
         GraphicsContext3D::RenderDirectlyToHostWindow);
@@ -2309,6 +2308,7 @@ void WebViewImpl::setIsAcceleratedCompositingActive(bool active) {
   }
   m_layerRenderer = LayerRendererChromium::create(context.release());
   if (m_layerRenderer) {
+    m_client->didActivateAcceleratedCompositing(true);
     m_isAcceleratedCompositingActive = true;
     m_compositorCreationFailed = false;
   } else {
