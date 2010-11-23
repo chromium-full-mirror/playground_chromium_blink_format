@@ -57,8 +57,7 @@ struct CallIdentifier : public FastAllocBase {
     static unsigned hash(const CallIdentifier& key) {
       unsigned hashCodes[3] = {key.m_name.impl()->hash(),
                                key.m_url.impl()->hash(), key.m_lineNumber};
-      return StringImpl::computeHash(reinterpret_cast<char*>(hashCodes),
-                                     sizeof(hashCodes));
+      return WTF::StringHasher::createBlobHash<sizeof(hashCodes)>(hashCodes);
     }
 
     static bool equal(const CallIdentifier& a, const CallIdentifier& b) {
