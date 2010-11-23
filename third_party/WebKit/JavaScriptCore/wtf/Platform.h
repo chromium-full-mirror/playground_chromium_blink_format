@@ -650,7 +650,7 @@
 #endif
 #endif
 
-#if PLATFORM(WIN)
+#if PLATFORM(WIN) && !OS(WINCE)
 #define WTF_PLATFORM_CF 1
 #define WTF_USE_PTHREADS 0
 #endif
