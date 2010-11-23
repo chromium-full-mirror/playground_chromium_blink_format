@@ -173,7 +173,7 @@ void WebPage::authenticationRequired(QNetworkReply* reply,
 }
 
 void WebPage::requestPermission(QWebFrame* frame, QWebPage::Feature feature) {
-  setUserPermission(frame, feature, PermissionGrantedByUser);
+  setFeaturePermission(frame, feature, PermissionGrantedByUser);
 }
 
 void WebPage::cancelRequestsForPermission(QWebFrame*, QWebPage::Feature) {}

@@ -2238,9 +2238,9 @@ bool QWebPage::shouldInterruptJavaScript() {
 #endif
 }
 
-void QWebPage::setUserPermission(QWebFrame* frame,
-                                 Feature feature,
-                                 PermissionPolicy policy) {
+void QWebPage::setFeaturePermission(QWebFrame* frame,
+                                    Feature feature,
+                                    PermissionPolicy policy) {
   switch (feature) {
     case Notifications:
 #if ENABLE(NOTIFICATIONS)
