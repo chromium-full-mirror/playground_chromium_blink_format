@@ -69,7 +69,7 @@ IntSize ScrollView::platformContentsSize() const {
 void ScrollView::platformSetScrollPosition(const WebCore::IntPoint& pt) {
   if (parent())  // don't attempt to scroll subframes; they're fully visible
     return;
-  android::WebViewCore::getWebViewCore(this)->scrollTo(pt.x(), pt.y());
+  PlatformBridge::setScrollPosition(this, pt.x(), pt.y());
 }
 
 void ScrollView::platformScrollbarModes(ScrollbarMode& h,

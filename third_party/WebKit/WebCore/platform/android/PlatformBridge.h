@@ -80,6 +80,7 @@ class NPObject;
 
 namespace WebCore {
 
+class ScrollView;
 class Widget;
 
 // An interface to the embedding layer, which has the ability to answer
@@ -107,6 +108,9 @@ class PlatformBridge {
   static bool cookiesEnabled();
   // Plugin
   static NPObject* pluginScriptableObject(Widget*);
+
+  static void setScrollPosition(ScrollView*, int x, int y);
+
   // Language
   static String computeDefaultLanguage();
   // Memory details for V8 GC
