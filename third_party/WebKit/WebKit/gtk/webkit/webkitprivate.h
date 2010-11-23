@@ -55,6 +55,7 @@
 #include "HistoryItem.h"
 #include "InspectorClientGtk.h"
 #include "IntPoint.h"
+#include "IntRect.h"
 #include "FrameLoaderClient.h"
 #include "FullscreenVideoController.h"
 #include "Node.h"
@@ -187,6 +188,7 @@ struct _WebKitWebViewPrivate {
   CString mainResourceIdentifier;
   PlatformRefPtr<GHashTable> subResources;
   CString tooltipText;
+  WebCore::IntRect tooltipArea;
 
   int currentClickCount;
   WebCore::IntPoint previousClickPoint;
