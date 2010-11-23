@@ -330,7 +330,7 @@ class LayoutTestController : public CppBoundClass {
   void abortModal(const CppArgumentList&, CppVariant*);
 
   // Speech input related functions.
-  void setMockSpeechInputResult(const CppArgumentList&, CppVariant*);
+  void addMockSpeechInputResult(const CppArgumentList&, CppVariant*);
 
   void layerTreeAsText(const CppArgumentList& args, CppVariant* result);
 

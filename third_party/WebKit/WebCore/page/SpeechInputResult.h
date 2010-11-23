@@ -39,6 +39,7 @@ namespace WebCore {
 // fields, as received from the embedder.
 class SpeechInputResult : public RefCounted<SpeechInputResult> {
  public:
+  static PassRefPtr<SpeechInputResult> create(const SpeechInputResult& source);
   static PassRefPtr<SpeechInputResult> create(const String& utterance,
                                               double confidence);
 
@@ -51,6 +52,8 @@ class SpeechInputResult : public RefCounted<SpeechInputResult> {
   String m_utterance;
   double m_confidence;
 };
+
+typedef Vector<RefPtr<SpeechInputResult>> SpeechInputResultArray;
 
 }  // namespace WebCore
 

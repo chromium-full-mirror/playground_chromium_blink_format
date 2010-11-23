@@ -765,7 +765,8 @@ void LayoutTestController::setMockGeolocationPosition(double latitude,
                                                       accuracy);
 }
 
-void LayoutTestController::setMockSpeechInputResult(const QString& result,
+void LayoutTestController::addMockSpeechInputResult(const QString& result,
+                                                    double confidence,
                                                     const QString& language) {
   // FIXME: Implement for speech input layout tests.
   // See https://bugs.webkit.org/show_bug.cgi?id=39485.

@@ -143,6 +143,9 @@ class Event : public RefCounted<Event> {
   virtual bool isDeviceMotionEvent() const;
   virtual bool isDeviceOrientationEvent() const;
 #endif
+#if ENABLE(INPUT_SPEECH)
+  virtual bool isSpeechInputEvent() const;
+#endif
   bool fromUserGesture();
 
   bool propagationStopped() const {

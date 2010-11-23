@@ -44,7 +44,8 @@ class WebSpeechInputControllerMock : public WebSpeechInputController {
       WebSpeechInputListener* listener);
   virtual ~WebSpeechInputControllerMock() {}
 
-  virtual void setMockRecognitionResult(const WebString& result,
+  virtual void addMockRecognitionResult(const WebString& result,
+                                        double confidence,
                                         const WebString& language) = 0;
 
   virtual void clearResults() = 0;

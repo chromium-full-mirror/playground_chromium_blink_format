@@ -123,7 +123,9 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void setMockGeolocationPosition(double latitude,
                                   double longitude,
                                   double accuracy);
-  void setMockSpeechInputResult(JSStringRef result, JSStringRef language);
+  void addMockSpeechInputResult(JSStringRef result,
+                                double confidence,
+                                JSStringRef language);
   void setPersistentUserStyleSheetLocation(JSStringRef path);
   void setPluginsEnabled(bool flag);
   void setPopupBlockingEnabled(bool flag);

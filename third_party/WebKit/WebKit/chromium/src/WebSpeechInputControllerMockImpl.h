@@ -66,7 +66,8 @@ class WebSpeechInputControllerMockImpl : public WebCore::SpeechInputListener,
   void stopRecording(int requestId);
 
   // WebSpeechInputControllerMock methods.
-  void setMockRecognitionResult(const WebString& result,
+  void addMockRecognitionResult(const WebString& result,
+                                double confidence,
                                 const WebString& language);
   void clearResults();
 

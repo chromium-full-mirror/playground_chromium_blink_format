@@ -33,6 +33,7 @@
 
 #include "PlatformString.h"
 #include "SpeechInputClient.h"
+#include "SpeechInputResult.h"
 #include "Timer.h"
 #include <wtf/HashMap.h>
 #include <wtf/text/StringHash.h>
@@ -48,7 +49,9 @@ class SpeechInputClientMock : public SpeechInputClient {
  public:
   SpeechInputClientMock();
 
-  void setRecognitionResult(const String& result, const AtomicString& language);
+  void addRecognitionResult(const String& result,
+                            double confidence,
+                            const AtomicString& language);
   void clearResults();
 
   // SpeechInputClient methods.
@@ -68,9 +71,9 @@ class SpeechInputClientMock : public SpeechInputClient {
   SpeechInputListener* m_listener;
   int m_requestId;
 
-  HashMap<String, String> m_recognitionResult;
+  HashMap<String, SpeechInputResultArray> m_recognitionResults;
   AtomicString m_language;
-  String m_resultForEmptyLanguage;
+  SpeechInputResultArray m_resultsForEmptyLanguage;
 };
 
 }  // namespace WebCore

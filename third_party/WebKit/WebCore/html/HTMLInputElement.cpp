@@ -1925,11 +1925,6 @@ bool HTMLInputElement::isSpeechEnabled() const {
   return false;
 }
 
-void HTMLInputElement::dispatchWebkitSpeechChangeEvent() {
-  ASSERT(isSpeechEnabled());
-  dispatchEvent(
-      Event::create(eventNames().webkitspeechchangeEvent, true, false));
-}
 #endif
 
 }  // namespace
