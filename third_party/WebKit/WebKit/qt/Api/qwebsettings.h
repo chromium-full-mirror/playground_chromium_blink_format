@@ -75,9 +75,9 @@ class QWEBKIT_EXPORT QWebSettings {
     TiledBackingStoreEnabled,
     FrameFlatteningEnabled,
     SiteSpecificQuirksEnabled,
+    JavascriptCanCloseWindows,
     WebGLEnabled,
-    HyperlinkAuditingEnabled,
-    JavascriptCanCloseWindows
+    HyperlinkAuditingEnabled
   };
   enum WebGraphic {
     MissingImageGraphic,
