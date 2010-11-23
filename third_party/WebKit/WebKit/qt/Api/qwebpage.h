@@ -394,8 +394,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
   void viewportChangeRequested();
 
-  void requestPermissionFromUser(QWebFrame* frame, QWebPage::Feature feature);
-  void cancelRequestsForPermission(QWebFrame* frame, QWebPage::Feature feature);
+  void featurePermissionRequested(QWebFrame* frame, QWebPage::Feature feature);
+  void featurePermissionRequestCanceled(QWebFrame* frame,
+                                        QWebPage::Feature feature);
 
  protected:
   virtual QWebPage* createWindow(WebWindowType type);

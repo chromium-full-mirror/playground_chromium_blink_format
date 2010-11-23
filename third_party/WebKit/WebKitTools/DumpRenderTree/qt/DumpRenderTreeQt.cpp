@@ -164,10 +164,10 @@ WebPage::WebPage(QObject* parent, DumpRenderTree* drt)
   setPluginFactory(new TestPlugin(this));
 
   connect(this,
-          SIGNAL(requestPermissionFromUser(QWebFrame*, QWebPage::Feature)),
+          SIGNAL(featurePermissionRequested(QWebFrame*, QWebPage::Feature)),
           this, SLOT(requestPermission(QWebFrame*, QWebPage::Feature)));
-  connect(this,
-          SIGNAL(cancelRequestsForPermission(QWebFrame*, QWebPage::Feature)),
+  connect(this, SIGNAL(featurePermissionRequestCanceled(QWebFrame*,
+                                                        QWebPage::Feature)),
           this, SLOT(cancelPermission(QWebFrame*, QWebPage::Feature)));
 }
 
