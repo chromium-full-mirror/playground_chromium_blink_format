@@ -86,6 +86,7 @@ class AccessibilityUIElement : public CppBoundClass {
   void parentElementCallback(const CppArgumentList&, CppVariant*);
   void incrementCallback(const CppArgumentList&, CppVariant*);
   void decrementCallback(const CppArgumentList&, CppVariant*);
+  void isEqualCallback(const CppArgumentList&, CppVariant*);
   void fallbackCallback(const CppArgumentList&, CppVariant*);
 
   void childrenCountGetterCallback(CppVariant*);

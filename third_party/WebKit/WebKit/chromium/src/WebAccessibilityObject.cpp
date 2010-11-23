@@ -64,6 +64,11 @@ void WebAccessibilityObject::assign(
   assign(p);
 }
 
+bool WebAccessibilityObject::equals(
+    const WebKit::WebAccessibilityObject& other) const {
+  return (m_private == other.m_private);
+}
+
 WebString WebAccessibilityObject::accessibilityDescription() const {
   if (!m_private)
     return WebString();
@@ -164,7 +169,7 @@ WebAccessibilityObject WebAccessibilityObject::parentObject() const {
     return WebAccessibilityObject();
 
   m_private->updateBackingStore();
-  return WebAccessibilityObject(m_private->parentObject());
+  return WebAccessibilityObject(m_private->parentObjectUnignored());
 }
 
 WebAccessibilityObject WebAccessibilityObject::previousSibling() const {

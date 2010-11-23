@@ -69,6 +69,7 @@ class WebAccessibilityObject {
 
   WEBKIT_API void reset();
   WEBKIT_API void assign(const WebAccessibilityObject&);
+  WEBKIT_API bool equals(const WebAccessibilityObject&) const;
 
   bool isNull() const { return !m_private; }
 
