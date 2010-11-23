@@ -73,11 +73,6 @@ enum EditorCommandSource {
   CommandFromDOM,
   CommandFromDOMWithUserInterface
 };
-enum WritingDirection {
-  NaturalWritingDirection,
-  LeftToRightWritingDirection,
-  RightToLeftWritingDirection
-};
 
 class Editor {
  public:

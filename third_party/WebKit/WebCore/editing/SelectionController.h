@@ -214,7 +214,8 @@ class SelectionController : public Noncopyable {
                       int ty,
                       const IntRect& clipRect) const;
 
-  CSSMutableStyleDeclaration* typingStyle() const;
+  EditingStyle* typingStyle() const;
+  PassRefPtr<CSSMutableStyleDeclaration> copyTypingStyle() const;
   void setTypingStyle(PassRefPtr<EditingStyle>);
   void clearTypingStyle();
 
@@ -291,8 +292,15 @@ class SelectionController : public Noncopyable {
   bool m_caretPaint;
 };
 
-inline CSSMutableStyleDeclaration* SelectionController::typingStyle() const {
-  return m_typingStyle ? m_typingStyle->style() : 0;
+inline EditingStyle* SelectionController::typingStyle() const {
+  return m_typingStyle.get();
+}
+
+inline PassRefPtr<CSSMutableStyleDeclaration>
+SelectionController::copyTypingStyle() const {
+  if (!m_typingStyle || !m_typingStyle->style())
+    return 0;
+  return m_typingStyle->style()->copy();
 }
 
 inline void SelectionController::clearTypingStyle() {

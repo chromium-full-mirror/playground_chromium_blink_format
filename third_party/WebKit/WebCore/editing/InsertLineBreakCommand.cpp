@@ -172,16 +172,16 @@ void InsertLineBreakCommand::doApply() {
 
   // Handle the case where there is a typing style.
 
-  RefPtr<CSSMutableStyleDeclaration> typingStyle =
+  RefPtr<EditingStyle> typingStyle =
       document()->frame()->selection()->typingStyle();
 
-  if (typingStyle && typingStyle->length() > 0) {
+  if (typingStyle && !typingStyle->isEmpty()) {
     // Apply the typing style to the inserted line break, so that if the
     // selection
     // leaves and then comes back, new input will have the right style.
     // FIXME: We shouldn't always apply the typing style to the line break here,
     // see <rdar://problem/5794462>.
-    applyStyle(typingStyle.get(),
+    applyStyle(typingStyle->style(),
                firstDeepEditingPositionForNode(nodeToInsert.get()),
                lastDeepEditingPositionForNode(nodeToInsert.get()));
     // Even though this applyStyle operates on a Range, it still sets an

@@ -40,8 +40,19 @@ namespace WebCore {
 class CSSStyleDeclaration;
 class CSSComputedStyleDeclaration;
 
+enum WritingDirection {
+  NaturalWritingDirection,
+  LeftToRightWritingDirection,
+  RightToLeftWritingDirection
+};
+
 class EditingStyle : public RefCounted<EditingStyle> {
  public:
+  enum ShouldPreserveWritingDirection {
+    PreserveWritingDirection,
+    DoNotPreserveWritingDirection
+  };
+
   static PassRefPtr<EditingStyle> create() {
     return adoptRef(new EditingStyle());
   }
@@ -59,6 +70,7 @@ class EditingStyle : public RefCounted<EditingStyle> {
   }
 
   CSSMutableStyleDeclaration* style() { return m_mutableStyle.get(); }
+  bool textDirection(WritingDirection&) const;
   bool isEmpty() const;
   void setStyle(PassRefPtr<CSSMutableStyleDeclaration>);
   void clear();
@@ -66,7 +78,9 @@ class EditingStyle : public RefCounted<EditingStyle> {
   void removeStyleAddedByNode(Node* node);
   void removeStyleConflictingWithStyleOfNode(Node* node);
   void removeNonEditingProperties();
-  void prepareToApplyAt(const Position&);
+  void prepareToApplyAt(
+      const Position&,
+      ShouldPreserveWritingDirection = DoNotPreserveWritingDirection);
 
  private:
   EditingStyle();
