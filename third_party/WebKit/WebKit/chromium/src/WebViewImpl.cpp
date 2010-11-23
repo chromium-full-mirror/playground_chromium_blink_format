@@ -2246,6 +2246,9 @@ void WebViewImpl::scrollRootLayerRect(const IntSize& scrollDelta,
     }
   }
 
+  // Move the previous damage
+  m_rootLayerScrollDamage.move(scrollDelta.width(), scrollDelta.height());
+  // Union with the new damage rect.
   m_rootLayerScrollDamage.unite(damagedContentsRect);
 
   // Scroll any existing damage that intersects with clip rect
