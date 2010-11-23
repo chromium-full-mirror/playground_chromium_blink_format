@@ -374,7 +374,7 @@ void XMLDocumentParser::notifyFinished(CachedResource* unusedResource) {
   if (errorOccurred)
     scriptElement->dispatchErrorEvent();
   else {
-    m_view->frame()->script()->executeScript(sourceCode);
+    scriptElement->executeScript(sourceCode);
     scriptElement->dispatchLoadEvent();
   }
 
