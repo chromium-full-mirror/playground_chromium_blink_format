@@ -593,9 +593,7 @@ Document::~Document() {
 
   m_decoder = 0;
 
-  unsigned count =
-      sizeof(m_nameCollectionInfo) / sizeof(m_nameCollectionInfo[0]);
-  for (unsigned i = 0; i < count; i++)
+  for (size_t i = 0; i < m_nameCollectionInfo.size(); ++i)
     deleteAllValues(m_nameCollectionInfo[i]);
 
   if (m_styleSheets)

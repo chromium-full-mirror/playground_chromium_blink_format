@@ -29,7 +29,8 @@
 #include <wtf/Assertions.h>
 
 namespace WTF {
-template <typename T, int Size>
+
+template <typename T, size_t Size>
 class FixedArray {
  public:
   T& operator[](size_t i) {
@@ -43,11 +44,14 @@ class FixedArray {
   }
 
   T* data() { return m_data; }
+  size_t size() const { return Size; }
 
  private:
   T m_data[Size];
 };
-}
+
+}  // namespace WTF
+
 using WTF::FixedArray;
 
 #endif  // FixedArray_h
