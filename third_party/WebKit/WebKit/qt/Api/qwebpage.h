@@ -199,9 +199,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   enum WebWindowType { WebBrowserWindow, WebModalDialog };
 
   enum PermissionPolicy {
-    PermissionGranted,
     PermissionUnknown,
-    PermissionDenied
+    PermissionGrantedByUser,
+    PermissionDeniedByUser
   };
 
   enum PermissionDomain {

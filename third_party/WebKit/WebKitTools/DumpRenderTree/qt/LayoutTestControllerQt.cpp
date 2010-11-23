@@ -197,7 +197,7 @@ void LayoutTestController::grantDesktopNotificationPermission(
   QWebFrame* frame = m_drt->webPage()->mainFrame();
   m_drt->webPage()->setUserPermission(frame,
                                       QWebPage::NotificationsPermissionDomain,
-                                      QWebPage::PermissionGranted);
+                                      QWebPage::PermissionGrantedByUser);
   m_desktopNotificationAllowedOrigins.append(origin);
 }
 
