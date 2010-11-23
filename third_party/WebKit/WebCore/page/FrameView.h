@@ -78,7 +78,6 @@ class FrameView : public ScrollView {
 
   virtual PassRefPtr<Scrollbar> createScrollbar(ScrollbarOrientation);
 
-  virtual bool delegatesScrolling() const;
   virtual bool avoidScrollbarCreation() const;
 
   virtual void setContentsSize(const IntSize&);
