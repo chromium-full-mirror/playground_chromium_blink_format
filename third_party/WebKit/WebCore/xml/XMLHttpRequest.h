@@ -35,10 +35,12 @@
 
 namespace WebCore {
 
+class ArrayBuffer;
 class Blob;
 class Document;
 class DOMFormData;
 class ResourceRequest;
+class SharedBuffer;
 class TextResourceDecoder;
 class ThreadableLoader;
 
@@ -61,6 +63,14 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
     DONE = 4
   };
 
+  enum ResponseTypeCode {
+    ResponseTypeDefault,
+    ResponseTypeText,
+    ResponseTypeDocument,
+    ResponseTypeBlob,
+    ResponseTypeArrayBuffer
+  };
+
   virtual XMLHttpRequest* toXMLHttpRequest() { return this; }
 
   virtual void contextDestroyed();
@@ -78,7 +88,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   bool withCredentials() const { return m_includeCredentials; }
   void setWithCredentials(bool, ExceptionCode&);
 #if ENABLE(XHR_RESPONSE_BLOB)
-  bool asBlob() const { return m_asBlob; }
+  bool asBlob() const { return responseTypeCode() == ResponseTypeBlob; }
   void setAsBlob(bool, ExceptionCode&);
 #endif
   void open(const String& method, const KURL&, ExceptionCode&);
@@ -108,9 +118,24 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   String getResponseHeader(const AtomicString& name, ExceptionCode&) const;
   String responseText(ExceptionCode&);
   Document* responseXML(ExceptionCode&);
+  Document* optionalResponseXML() const { return m_responseXML.get(); }
 #if ENABLE(XHR_RESPONSE_BLOB)
   Blob* responseBlob(ExceptionCode&) const;
+  Blob* optionalResponseBlob() const { return m_responseBlob.get(); }
 #endif
+
+  void setResponseType(const String&, ExceptionCode&);
+  String responseType();
+  ResponseTypeCode responseTypeCode() const { return m_responseTypeCode; }
+
+#if ENABLE(3D_CANVAS) || ENABLE(BLOB)
+  // response attribute has custom getter.
+  ArrayBuffer* responseArrayBuffer(ExceptionCode&);
+  ArrayBuffer* optionalResponseArrayBuffer() const {
+    return m_responseArrayBuffer.get();
+  }
+#endif
+
   void setLastSendLineNumber(unsigned lineNumber) {
     m_lastSendLineNumber = lineNumber;
   }
@@ -184,7 +209,6 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   bool m_async;
   bool m_includeCredentials;
 #if ENABLE(XHR_RESPONSE_BLOB)
-  bool m_asBlob;
   RefPtr<Blob> m_responseBlob;
 #endif
 
@@ -199,6 +223,11 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   StringBuilder m_responseBuilder;
   mutable bool m_createdDocument;
   mutable RefPtr<Document> m_responseXML;
+
+#if ENABLE(3D_CANVAS) || ENABLE(BLOB)
+  RefPtr<SharedBuffer> m_binaryResponseBuilder;
+  mutable RefPtr<ArrayBuffer> m_responseArrayBuffer;
+#endif
 
   bool m_error;
 
@@ -217,6 +246,10 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   EventTargetData m_eventTargetData;
 
   XMLHttpRequestProgressEventThrottle m_progressEventThrottle;
+
+  // An enum corresponding to the allowed string values for the responseType
+  // attribute.
+  ResponseTypeCode m_responseTypeCode;
 };
 
 }  // namespace WebCore
