@@ -278,15 +278,6 @@ int InlineFlowBox::placeBoxesInInlineDirection(
   int startLogicalLeft = logicalLeft;
   logicalLeft += borderLogicalLeft() + paddingLogicalLeft();
 
-  int markerWidth = 0;
-  for (InlineBox* curr = firstChild(); curr; curr = curr->nextOnLine()) {
-    if (!curr->renderer()->isListMarker())
-      continue;
-    RenderListMarker* marker = toRenderListMarker(curr->renderer());
-    if (!marker->isInside())
-      markerWidth += marker->width() - marker->marginLeft();
-  }
-
   for (InlineBox* curr = firstChild(); curr; curr = curr->nextOnLine()) {
     if (curr->renderer()->isText()) {
       InlineTextBox* text = static_cast<InlineTextBox*>(curr);
@@ -413,10 +404,6 @@ int InlineFlowBox::placeBoxesInInlineDirection(
                 logicalRightVisualOverflow);
 
         logicalLeft += curr->logicalWidth() + logicalRightMargin;
-      } else {
-        RenderListMarker* marker = toRenderListMarker(curr->renderer());
-        markerWidth -= marker->width() - marker->marginLeft();
-        curr->setLogicalLeft(logicalLeft - markerWidth);
       }
     }
   }
