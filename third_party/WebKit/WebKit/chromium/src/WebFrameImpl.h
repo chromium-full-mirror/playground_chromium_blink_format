@@ -133,6 +133,7 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   virtual bool isViewSourceModeEnabled() const;
   virtual void setReferrerForRequest(WebURLRequest&, const WebURL& referrer);
   virtual void dispatchWillSendRequest(WebURLRequest&);
+  virtual WebURLLoader* createAssociatedURLLoader();
   virtual void commitDocumentData(const char* data, size_t length);
   virtual unsigned unloadListenerCount() const;
   virtual bool isProcessingUserGesture() const;

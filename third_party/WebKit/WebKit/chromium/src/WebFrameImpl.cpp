@@ -71,6 +71,7 @@
 #include "config.h"
 #include "WebFrameImpl.h"
 
+#include "AssociatedURLLoader.h"
 #include "Chrome.h"
 #include "ChromiumBridge.h"
 #include "ClipboardUtilitiesChromium.h"
@@ -959,6 +960,10 @@ void WebFrameImpl::dispatchWillSendRequest(WebURLRequest& request) {
   ResourceResponse response;
   m_frame->loader()->client()->dispatchWillSendRequest(
       0, 0, request.toMutableResourceRequest(), response);
+}
+
+WebURLLoader* WebFrameImpl::createAssociatedURLLoader() {
+  return new AssociatedURLLoader(this);
 }
 
 void WebFrameImpl::commitDocumentData(const char* data, size_t length) {
