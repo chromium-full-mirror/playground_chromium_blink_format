@@ -296,7 +296,6 @@ AccessibilityUIElement::AccessibilityUIElement(
   bindMethod("parentElement", &AccessibilityUIElement::parentElementCallback);
   bindMethod("increment", &AccessibilityUIElement::incrementCallback);
   bindMethod("decrement", &AccessibilityUIElement::decrementCallback);
-  bindMethod("isEqual", &AccessibilityUIElement::isEqualCallback);
 
   bindProperty("role", &AccessibilityUIElement::roleGetterCallback);
   bindProperty("subrole", &m_subrole);
@@ -493,12 +492,7 @@ void AccessibilityUIElement::isActionSupportedCallback(const CppArgumentList&,
 
 void AccessibilityUIElement::parentElementCallback(const CppArgumentList&,
                                                    CppVariant* result) {
-  AccessibilityUIElement* parent =
-      m_factory->create(accessibilityObject().parentObject());
-  if (parent)
-    result->set(*(parent->getAsCppVariant()));
-  else
-    result->setNull();
+  result->setNull();
 }
 
 void AccessibilityUIElement::incrementCallback(const CppArgumentList&,
@@ -509,16 +503,6 @@ void AccessibilityUIElement::incrementCallback(const CppArgumentList&,
 void AccessibilityUIElement::decrementCallback(const CppArgumentList&,
                                                CppVariant* result) {
   result->setNull();
-}
-
-void AccessibilityUIElement::isEqualCallback(const CppArgumentList& arguments,
-                                             CppVariant* result) {
-  bool equal = false;
-  AccessibilityUIElement* element = static_cast<AccessibilityUIElement*>(
-      CppBoundClass::getFromCppVariant(arguments[0]));
-  if (element)
-    equal = accessibilityObject().equals(element->accessibilityObject());
-  result->set(equal);
 }
 
 void AccessibilityUIElement::fallbackCallback(const CppArgumentList&,
