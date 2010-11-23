@@ -139,7 +139,9 @@ void ContextShadow::endShadowLayer(PlatformContext p) {
     blurLayerImage(m_layerImage.bits(),
                    IntSize(m_layerImage.width(), m_layerImage.height()),
                    m_layerImage.bytesPerLine());
+  }
 
+  if (m_type != NoShadow) {
     // "Colorize" with the right shadow color.
     QPainter p(&m_layerImage);
     p.setCompositionMode(QPainter::CompositionMode_SourceIn);
