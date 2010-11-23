@@ -187,6 +187,8 @@ class GraphicsContext3DInternal {
 
   unsigned long getError();
 
+  bool isContextLost();
+
   void getFloatv(unsigned long pname, float* value);
 
   void getFramebufferAttachmentParameteriv(unsigned long target,

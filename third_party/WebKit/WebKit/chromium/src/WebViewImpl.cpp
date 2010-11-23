@@ -2431,6 +2431,7 @@ void WebViewImpl::reallocateRenderer() {
   m_layerRenderer = layerRenderer;
 
   // Enable or disable accelerated compositing and request a refresh.
+  m_isAcceleratedCompositingActive = false;
   setRootGraphicsLayer(m_layerRenderer ? m_layerRenderer->rootLayer() : 0);
 }
 #endif

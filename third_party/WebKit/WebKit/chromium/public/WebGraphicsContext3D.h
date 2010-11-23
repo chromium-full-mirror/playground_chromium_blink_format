@@ -268,6 +268,8 @@ class WebGraphicsContext3D : public WebNonCopyable {
 
   virtual unsigned long getError() = 0;
 
+  virtual bool isContextLost() = 0;
+
   virtual void getFloatv(unsigned long pname, float* value) = 0;
 
   virtual void getFramebufferAttachmentParameteriv(unsigned long target,

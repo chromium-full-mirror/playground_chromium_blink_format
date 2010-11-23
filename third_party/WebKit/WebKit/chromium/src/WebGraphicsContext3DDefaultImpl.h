@@ -204,6 +204,8 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
 
   virtual unsigned long getError();
 
+  virtual bool isContextLost();
+
   virtual void getFloatv(unsigned long pname, float* value);
 
   virtual void getFramebufferAttachmentParameteriv(unsigned long target,
