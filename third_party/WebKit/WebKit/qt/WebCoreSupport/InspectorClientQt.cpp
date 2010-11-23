@@ -122,6 +122,7 @@ InspectorClientQt::InspectorClientQt(QWebPage* page)
 }
 
 void InspectorClientQt::inspectorDestroyed() {
+#if ENABLE(INSPECTOR)
   if (m_frontendClient)
     m_frontendClient->inspectorClientDestroyed();
 
@@ -130,10 +131,12 @@ void InspectorClientQt::inspectorDestroyed() {
     webInspectorServer->unregisterClient(this);
 
   delete this;
+#endif
 }
 
 void InspectorClientQt::openInspectorFrontend(
     WebCore::InspectorController* inspectorController) {
+#if ENABLE(INSPECTOR)
 #if USE(V8)
   ensureDebuggerScriptLoaded();
 #endif
@@ -176,6 +179,7 @@ void InspectorClientQt::openInspectorFrontend(
       ->d->page->inspectorController()
       ->setInspectorFrontendClient(m_frontendClient);
   m_frontendWebPage = inspectorPage;
+#endif
 }
 
 void InspectorClientQt::releaseFrontendPage() {
@@ -256,6 +260,7 @@ void InspectorClientQt::storeSetting(const String& key, const String& setting) {
 }
 
 bool InspectorClientQt::sendMessageToFrontend(const String& message) {
+#if ENABLE(INSPECTOR)
   if (m_inspectedWebPage->d->inspector->d->remoteFrontend) {
     RemoteFrontendChannel* session = qobject_cast<RemoteFrontendChannel*>(
         m_inspectedWebPage->d->inspector->d->remoteFrontend);
@@ -268,6 +273,9 @@ bool InspectorClientQt::sendMessageToFrontend(const String& message) {
 
   Page* frontendPage = QWebPagePrivate::core(m_frontendWebPage);
   return doDispatchMessageOnFrontendPage(frontendPage, message);
+#else
+  return false;
+#endif
 }
 
 static String variantToSetting(const QVariant& qvariant) {
@@ -291,6 +299,7 @@ static QVariant settingToVariant(const String& setting) {
   return retVal;
 }
 
+#if ENABLE(INSPECTOR)
 InspectorFrontendClientQt::InspectorFrontendClientQt(
     QWebPage* inspectedWebPage,
     PassOwnPtr<QWebView> inspectorView,
@@ -390,6 +399,7 @@ void InspectorFrontendClientQt::inspectorClientDestroyed() {
   m_inspectorClient = 0;
   m_inspectedWebPage = 0;
 }
+#endif
 }
 
 #include "InspectorClientQt.moc"
