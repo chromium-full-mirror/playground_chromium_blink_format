@@ -65,19 +65,6 @@ class FocusController : public Noncopyable {
                                    KeyboardEvent*,
                                    bool initialFocus);
 
-  void findFocusableNodeInDirection(
-      Node* outter,
-      Node*,
-      FocusDirection,
-      KeyboardEvent*,
-      FocusCandidate& closestFocusCandidate,
-      const FocusCandidate& parentCandidate = FocusCandidate());
-  void deepFindFocusableNodeInDirection(Node* container,
-                                        Node* focused,
-                                        FocusDirection,
-                                        KeyboardEvent*,
-                                        FocusCandidate&);
-
   bool advanceFocusDirectionallyInContainer(Node* container,
                                             const IntRect& startingRect,
                                             FocusDirection,
