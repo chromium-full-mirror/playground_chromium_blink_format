@@ -48,14 +48,12 @@ WebPage::WebPage(QObject* parent)
   connect(networkAccessManager(),
           SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), this,
           SLOT(authenticationRequired(QNetworkReply*, QAuthenticator*)));
+  connect(this,
+          SIGNAL(requestPermissionFromUser(QWebFrame*, QWebPage::Feature)),
+          this, SLOT(requestPermission(QWebFrame*, QWebPage::Feature)));
   connect(
-      this,
-      SIGNAL(requestPermissionFromUser(QWebFrame*, QWebPage::PermissionDomain)),
-      this, SLOT(requestPermission(QWebFrame*, QWebPage::PermissionDomain)));
-  connect(this, SIGNAL(cancelRequestsForPermission(QWebFrame*,
-                                                   QWebPage::PermissionDomain)),
-          this, SLOT(cancelRequestsForPermission(QWebFrame*,
-                                                 QWebPage::PermissionDomain)));
+      this, SIGNAL(cancelRequestsForPermission(QWebFrame*, QWebPage::Feature)),
+      this, SLOT(cancelRequestsForPermission(QWebFrame*, QWebPage::Feature)));
 }
 
 void WebPage::applyProxy() {
@@ -174,13 +172,11 @@ void WebPage::authenticationRequired(QNetworkReply* reply,
   delete dialog;
 }
 
-void WebPage::requestPermission(QWebFrame* frame,
-                                QWebPage::PermissionDomain domain) {
-  setUserPermission(frame, domain, PermissionGrantedByUser);
+void WebPage::requestPermission(QWebFrame* frame, QWebPage::Feature feature) {
+  setUserPermission(frame, feature, PermissionGrantedByUser);
 }
 
-void WebPage::cancelRequestsForPermission(QWebFrame*,
-                                          QWebPage::PermissionDomain) {}
+void WebPage::cancelRequestsForPermission(QWebFrame*, QWebPage::Feature) {}
 
 QWebPage* WebPage::createWindow(QWebPage::WebWindowType type) {
   LauncherWindow* mw = new LauncherWindow;

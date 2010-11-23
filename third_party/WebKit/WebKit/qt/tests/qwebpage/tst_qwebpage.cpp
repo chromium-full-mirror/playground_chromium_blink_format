@@ -207,11 +207,11 @@ class JSTestPage : public QWebPage {
 
  public slots:
   bool shouldInterruptJavaScript() { return true; }
-  void requestPermission(QWebFrame* frame, QWebPage::PermissionDomain domain) {
+  void requestPermission(QWebFrame* frame, QWebPage::Feature feature) {
     if (m_allowGeolocation)
-      setUserPermission(frame, domain, PermissionGrantedByUser);
+      setUserPermission(frame, feature, PermissionGrantedByUser);
     else
-      setUserPermission(frame, domain, PermissionDeniedByUser);
+      setUserPermission(frame, feature, PermissionDeniedByUser);
   }
 
  public:
@@ -241,10 +241,9 @@ void tst_QWebPage::geolocationRequestJS() {
         SkipSingle);
 
   JSTestPage* newPage = new JSTestPage(m_view);
-  connect(
-      newPage,
-      SIGNAL(requestPermissionFromUser(QWebFrame*, QWebPage::PermissionDomain)),
-      newPage, SLOT(requestPermission(QWebFrame*, QWebPage::PermissionDomain)));
+  connect(newPage,
+          SIGNAL(requestPermissionFromUser(QWebFrame*, QWebPage::Feature)),
+          newPage, SLOT(requestPermission(QWebFrame*, QWebPage::Feature)));
 
   newPage->setGeolocationPermission(false);
   m_view->setPage(newPage);

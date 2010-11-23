@@ -204,10 +204,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
     PermissionDeniedByUser
   };
 
-  enum PermissionDomain {
-    NotificationsPermissionDomain,
-    GeolocationPermissionDomain
-  };
+  enum Feature { Notifications, Geolocation };
 
   class QWEBKIT_EXPORT ViewportAttributes {
    public:
@@ -311,7 +308,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   QMenu* createStandardContextMenu();
 
   void setUserPermission(QWebFrame* frame,
-                         PermissionDomain domain,
+                         Feature feature,
                          PermissionPolicy policy);
 
   QStringList supportedContentTypes() const;
@@ -397,10 +394,8 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
   void viewportChangeRequested();
 
-  void requestPermissionFromUser(QWebFrame* frame,
-                                 QWebPage::PermissionDomain domain);
-  void cancelRequestsForPermission(QWebFrame* frame,
-                                   QWebPage::PermissionDomain domain);
+  void requestPermissionFromUser(QWebFrame* frame, QWebPage::Feature feature);
+  void cancelRequestsForPermission(QWebFrame* frame, QWebPage::Feature feature);
 
  protected:
   virtual QWebPage* createWindow(WebWindowType type);
