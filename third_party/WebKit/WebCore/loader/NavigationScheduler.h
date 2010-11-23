@@ -29,8 +29,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RedirectScheduler_h
-#define RedirectScheduler_h
+#ifndef NavigationScheduler_h
+#define NavigationScheduler_h
 
 #include "Event.h"
 #include "Timer.h"
@@ -83,4 +83,4 @@ class NavigationScheduler : public Noncopyable {
 
 }  // namespace WebCore
 
-#endif  // RedirectScheduler_h
+#endif  // NavigationScheduler_h
