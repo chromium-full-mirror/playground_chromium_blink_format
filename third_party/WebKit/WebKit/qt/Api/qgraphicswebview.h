@@ -149,6 +149,8 @@ class QWEBKIT_EXPORT QGraphicsWebView : public QGraphicsWidget {
 
   virtual bool sceneEvent(QEvent*);
 
+  virtual bool eventFilter(QObject*, QEvent*);
+
  private:
   Q_PRIVATE_SLOT(d, void _q_doLoadFinished(bool success))
 #if !defined(QT_NO_IM) && \
