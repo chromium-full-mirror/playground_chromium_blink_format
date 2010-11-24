@@ -245,6 +245,8 @@ static void gotHeadersCallback(SoupMessage* msg, gpointer data) {
   if (!client)
     return;
 
+  ASSERT(d->m_response.isNull());
+
   fillResponseFromMessage(msg, &d->m_response);
   client->didReceiveResponse(handle.get(), d->m_response);
 }
@@ -277,6 +279,8 @@ static void contentSniffedCallback(SoupMessage* msg,
   if (!client)
     return;
 
+  ASSERT(d->m_response.isNull());
+
   fillResponseFromMessage(msg, &d->m_response);
   client->didReceiveResponse(handle.get(), d->m_response);
 }
@@ -296,6 +300,8 @@ static void gotChunkCallback(SoupMessage* msg,
   ResourceHandleClient* client = handle->client();
   if (!client)
     return;
+
+  ASSERT(!d->m_response.isNull());
 
   client->didReceiveData(handle.get(), chunk->data, chunk->length, false);
 }
@@ -334,14 +340,15 @@ static gboolean parseDataUrl(gpointer callbackData) {
   String mimeType = extractMIMETypeFromMediaType(mediaType);
   String charset = extractCharsetFromMediaType(mediaType);
 
-  ResourceResponse response;
-  response.setURL(handle->firstRequest().url());
-  response.setMimeType(mimeType);
+  ASSERT(d->m_response.isNull());
+
+  d->m_response.setURL(handle->firstRequest().url());
+  d->m_response.setMimeType(mimeType);
 
   // For non base64 encoded data we have to convert to UTF-16 early
   // due to limitations in KURL
-  response.setTextEncodingName(isBase64 ? charset : "UTF-16");
-  client->didReceiveResponse(handle, response);
+  d->m_response.setTextEncodingName(isBase64 ? charset : "UTF-16");
+  client->didReceiveResponse(handle, d->m_response);
 
   // The load may be cancelled, and the client may be destroyed
   // by any of the client reporting calls, so we check, and bail
@@ -519,6 +526,8 @@ static void sendRequestCallback(GObject* source,
 
     if (d->m_soupMessage &&
         statusWillBeHandledBySoup(d->m_soupMessage->status_code)) {
+      ASSERT(d->m_response.isNull());
+
       fillResponseFromMessage(soupMsg, &d->m_response);
       client->didReceiveResponse(handle.get(), d->m_response);
 
@@ -551,20 +560,17 @@ static void sendRequestCallback(GObject* source,
   g_object_set_data(G_OBJECT(d->m_inputStream.get()), "webkit-resource",
                     handle.get());
 
-  // We need to check if it's a file: URL and if it is a regular
-  // file as it could be a directory. In that case Soup properly
-  // returns a stream whose content is a HTML with a list of files
-  // in the directory
-  if (equalIgnoringCase(handle->firstRequest().url().protocol(), "file") &&
-      G_IS_FILE_INPUT_STREAM(in)) {
-    ResourceResponse response;
-
-    response.setURL(handle->firstRequest().url());
-    response.setMimeType(
+  // Ensure a response is sent for any protocols that don't explicitly support
+  // responses
+  // through got-headers signal or content sniffing.
+  // (e.g. file and GIO based protocol).
+  if (!handle->shouldContentSniff() && d->m_response.isNull()) {
+    d->m_response.setURL(handle->firstRequest().url());
+    d->m_response.setMimeType(
         webkit_soup_request_get_content_type(d->m_soupRequest.get()));
-    response.setExpectedContentLength(
+    d->m_response.setExpectedContentLength(
         webkit_soup_request_get_content_length(d->m_soupRequest.get()));
-    client->didReceiveResponse(handle.get(), response);
+    client->didReceiveResponse(handle.get(), d->m_response);
 
     if (d->m_cancelled) {
       cleanupSoupRequestOperation(handle.get());
@@ -862,6 +868,9 @@ static void readCallback(GObject* source,
                                closeCallback, 0);
     return;
   }
+
+  // It's mandatory to have sent a response before sending data
+  ASSERT(!d->m_response.isNull());
 
   d->m_total += bytesRead;
   if (G_LIKELY(!convertToUTF16))
