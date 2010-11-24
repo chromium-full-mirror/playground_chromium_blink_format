@@ -26,6 +26,8 @@
 #ifndef WebInspectorFrontendClient_h
 #define WebInspectorFrontendClient_h
 
+#if ENABLE(INSPECTOR)
+
 #include <WebCore/InspectorFrontendClientLocal.h>
 
 namespace WebKit {
@@ -59,5 +61,7 @@ class WebInspectorFrontendClient
 };
 
 }  // namespace WebKit
+
+#endif  // ENABLE(INSPECTOR)
 
 #endif  // WebInspectorFrontendClient_h

@@ -25,6 +25,8 @@
 
 #include "WebInspectorProxy.h"
 
+#if ENABLE(INSPECTOR)
+
 #include "WebInspectorMessages.h"
 #include "WebPageProxy.h"
 #include "WebPageCreationParameters.h"
@@ -155,3 +157,5 @@ void WebInspectorProxy::didLoadInspectorPage() {
 }
 
 }  // namespace WebKit
+
+#endif  // ENABLE(INSPECTOR)

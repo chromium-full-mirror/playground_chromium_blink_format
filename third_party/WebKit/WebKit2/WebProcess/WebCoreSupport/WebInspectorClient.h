@@ -26,6 +26,8 @@
 #ifndef WebInspectorClient_h
 #define WebInspectorClient_h
 
+#if ENABLE(INSPECTOR)
+
 #include <WebCore/InspectorClient.h>
 
 namespace WebKit {
@@ -53,5 +55,7 @@ class WebInspectorClient : public WebCore::InspectorClient {
 };
 
 }  // namespace WebKit
+
+#endif  // ENABLE(INSPECTOR)
 
 #endif  // WebInspectorClient_h

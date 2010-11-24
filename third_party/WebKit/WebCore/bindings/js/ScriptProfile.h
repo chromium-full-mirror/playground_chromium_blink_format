@@ -51,7 +51,9 @@ class ScriptProfile : public RefCounted<ScriptProfile> {
   unsigned int uid() const;
   ScriptProfileNode* head() const;
 
+#if ENABLE(INSPECTOR)
   PassRefPtr<InspectorObject> buildInspectorObjectForHead() const;
+#endif
 
  private:
   ScriptProfile(PassRefPtr<JSC::Profile> profile);

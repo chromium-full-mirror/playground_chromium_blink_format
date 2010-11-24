@@ -43,9 +43,11 @@ class ScriptHeapSnapshot : public RefCounted<ScriptHeapSnapshot> {
   String title() const { return ""; }
   unsigned int uid() const { return 0; }
 
+#if ENABLE(INSPECTOR)
   PassRefPtr<InspectorObject> buildInspectorObjectForHead() const {
     return InspectorObject::create();
   }
+#endif
 
  private:
   ScriptHeapSnapshot() {}

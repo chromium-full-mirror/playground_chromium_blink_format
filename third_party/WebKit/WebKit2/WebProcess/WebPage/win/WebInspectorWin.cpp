@@ -25,6 +25,8 @@
 
 #include "WebInspector.h"
 
+#if ENABLE(INSPECTOR)
+
 #include <wtf/text/WTFString.h>
 
 #define DISABLE_NOT_IMPLEMENTED_WARNINGS 1
@@ -38,3 +40,5 @@ String WebInspector::localizedStringsURL() const {
 }
 
 }  // namespace WebKit
+
+#endif  // ENABLE(INSPECTOR)

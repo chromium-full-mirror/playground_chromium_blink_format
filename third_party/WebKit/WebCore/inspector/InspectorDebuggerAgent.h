@@ -30,7 +30,7 @@
 #ifndef InspectorDebuggerAgent_h
 #define InspectorDebuggerAgent_h
 
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+#if ENABLE(JAVASCRIPT_DEBUGGER) && ENABLE(INSPECTOR)
 #include "ScriptBreakpoint.h"
 #include "ScriptDebugListener.h"
 #include "ScriptState.h"
@@ -130,6 +130,6 @@ class InspectorDebuggerAgent : public ScriptDebugListener, public Noncopyable {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(JAVASCRIPT_DEBUGGER)
+#endif  // ENABLE(JAVASCRIPT_DEBUGGER) && ENABLE(INSPECTOR)
 
 #endif  // !defined(InspectorDebuggerAgent_h)

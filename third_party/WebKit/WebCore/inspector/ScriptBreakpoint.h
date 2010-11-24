@@ -49,10 +49,12 @@ struct ScriptBreakpoint {
   bool enabled;
   String condition;
 
+#if ENABLE(INSPECTOR)
   static void sourceBreakpointsFromInspectorObject(PassRefPtr<InspectorObject>,
                                                    SourceBreakpoints*);
   static PassRefPtr<InspectorObject> inspectorObjectFromSourceBreakpoints(
       const SourceBreakpoints&);
+#endif
 };
 
 }  // namespace WebCore

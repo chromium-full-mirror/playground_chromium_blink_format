@@ -123,7 +123,9 @@ class WebPageProxy : public APIObject {
 
   WebBackForwardList* backForwardList() { return m_backForwardList.get(); }
 
+#if ENABLE(INSPECTOR)
   WebInspectorProxy* inspector();
+#endif
 
   void setPageClient(PageClient*);
   void initializeContextMenuClient(const WKPageContextMenuClient*);
@@ -481,7 +483,9 @@ class WebPageProxy : public APIObject {
 
   String m_customUserAgent;
 
+#if ENABLE(INSPECTOR)
   RefPtr<WebInspectorProxy> m_inspector;
+#endif
 
   HashMap<uint64_t, RefPtr<ContentsAsStringCallback>>
       m_contentsAsStringCallbacks;

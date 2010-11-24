@@ -30,7 +30,7 @@
 #ifndef InspectorProfilerAgent_h
 #define InspectorProfilerAgent_h
 
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+#if ENABLE(JAVASCRIPT_DEBUGGER) && ENABLE(INSPECTOR)
 
 #include "PlatformString.h"
 #include <wtf/Forward.h>
@@ -104,6 +104,6 @@ class InspectorProfilerAgent : public Noncopyable {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(JAVASCRIPT_DEBUGGER)
+#endif  // ENABLE(JAVASCRIPT_DEBUGGER) && ENABLE(INSPECTOR)
 
 #endif  // !defined(InspectorProfilerAgent_h)

@@ -131,7 +131,9 @@ WebPage::WebPage(uint64_t pageID, const WebPageCreationParameters& parameters)
   pageClients.contextMenuClient = new WebContextMenuClient(this);
   pageClients.editorClient = new WebEditorClient(this);
   pageClients.dragClient = new WebDragClient(this);
+#if ENABLE(INSPECTOR)
   pageClients.inspectorClient = new WebInspectorClient(this);
+#endif
   pageClients.backForwardClient = WebBackForwardListProxy::create(this);
   m_page = adoptPtr(new Page(pageClients));
 
@@ -311,7 +313,9 @@ void WebPage::close() {
   if (m_isVisibleToInjectedBundle && WebProcess::shared().injectedBundle())
     WebProcess::shared().injectedBundle()->willDestroyPage(this);
 
+#if ENABLE(INSPECTOR)
   m_inspector = 0;
+#endif
 
   if (m_activePopupMenu) {
     m_activePopupMenu->disconnectFromPage();
@@ -908,6 +912,7 @@ void WebPage::updatePreferences(const WebPreferencesStore& store) {
   platformPreferencesDidChange(store);
 }
 
+#if ENABLE(INSPECTOR)
 WebInspector* WebPage::inspector() {
   if (m_isClosed)
     return 0;
@@ -915,6 +920,7 @@ WebInspector* WebPage::inspector() {
     m_inspector = adoptPtr(new WebInspector(this));
   return m_inspector.get();
 }
+#endif
 
 #if !PLATFORM(MAC)
 bool WebPage::handleEditingKeyboardEvent(KeyboardEvent* evt) {
@@ -1071,12 +1077,14 @@ void WebPage::didReceiveMessage(CoreIPC::Connection* connection,
     return;
   }
 
+#if ENABLE(INSPECTOR)
   if (messageID.is<CoreIPC::MessageClassWebInspector>()) {
     if (WebInspector* inspector = this->inspector())
       inspector->didReceiveWebInspectorMessage(connection, messageID,
                                                arguments);
     return;
   }
+#endif
 
   didReceiveWebPageMessage(connection, messageID, arguments);
 }
