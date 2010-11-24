@@ -156,8 +156,10 @@ IDBDatabaseBackendImpl::createObjectStore(
     bool autoIncrement,
     IDBTransactionBackendInterface* transactionPtr,
     ExceptionCode& ec) {
+  ASSERT(transactionPtr->mode() == IDBTransaction::VERSION_CHANGE);
+
   if (m_objectStores.contains(name)) {
-    // FIXME: Throw CONSTRAINT_ERR in this case.
+    ec = IDBDatabaseException::CONSTRAINT_ERR;
     return 0;
   }
 
@@ -173,6 +175,7 @@ IDBDatabaseBackendImpl::createObjectStore(
                              database, objectStore, transaction),
           createCallbackTask(&IDBDatabaseBackendImpl::removeObjectStoreFromMap,
                              database, objectStore))) {
+    ec = IDBDatabaseException::NOT_ALLOWED_ERR;
     return 0;
   }
 
