@@ -321,7 +321,8 @@ QGraphicsWKViewPrivate::QGraphicsWKViewPrivate(QGraphicsWKView* view)
     : q(view),
       m_scaleCommitTimer(RunLoop::current(),
                          this,
-                         &QGraphicsWKViewPrivate::commitScale) {}
+                         &QGraphicsWKViewPrivate::commitScale),
+      m_isChangingScale(false) {}
 
 QRectF QGraphicsWKView::visibleRect() const {
   if (!scene())
