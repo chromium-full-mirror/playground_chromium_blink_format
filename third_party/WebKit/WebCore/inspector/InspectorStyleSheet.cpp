@@ -129,7 +129,7 @@ static PassRefPtr<CSSRuleList> asCSSRuleList(StyleBase* styleBase) {
 PassRefPtr<InspectorObject> InspectorStyle::buildObjectForStyle() const {
   RefPtr<InspectorObject> result = InspectorObject::create();
   if (!m_styleId.isEmpty())
-    result->setString("styleId", m_styleId.asString());
+    result->setValue("styleId", m_styleId.asInspectorValue());
 
   RefPtr<InspectorObject> propertiesObject = InspectorObject::create();
   propertiesObject->setString("width", m_style->getPropertyValue("width"));
@@ -624,6 +624,12 @@ InspectorStyleSheet::~InspectorStyleSheet() {
   delete m_parsedStyleSheet;
 }
 
+String InspectorStyleSheet::finalURL() const {
+  if (m_pageStyleSheet && !m_pageStyleSheet->finalURL().isEmpty())
+    return m_pageStyleSheet->finalURL().string();
+  return m_documentURL;
+}
+
 void InspectorStyleSheet::reparseStyleSheet(const String& text) {
   for (unsigned i = 0, size = m_pageStyleSheet->length(); i < size; ++i)
     m_pageStyleSheet->remove(i);
@@ -696,13 +702,8 @@ CSSStyleRule* InspectorStyleSheet::ruleForId(const InspectorCSSId& id) const {
     return 0;
 
   ASSERT(!id.isEmpty());
-  bool ok;
-  unsigned index = id.ordinal().toUInt(&ok);
-  if (!ok)
-    return 0;
-
   ensureFlatRules();
-  return index >= m_flatRules.size() ? 0 : m_flatRules.at(index);
+  return id.ordinal() >= m_flatRules.size() ? 0 : m_flatRules.at(id.ordinal());
 }
 
 PassRefPtr<InspectorObject> InspectorStyleSheet::buildObjectForStyleSheet() {
@@ -712,7 +713,7 @@ PassRefPtr<InspectorObject> InspectorStyleSheet::buildObjectForStyleSheet() {
 
   RefPtr<InspectorObject> result = InspectorObject::create();
   result->setBoolean("disabled", styleSheet->disabled());
-  result->setString("sourceURL", styleSheet->href());
+  result->setString("sourceURL", finalURL());
   result->setString("title", styleSheet->title());
   RefPtr<CSSRuleList> cssRuleList = CSSRuleList::create(styleSheet, true);
   RefPtr<InspectorArray> cssRules = buildArrayForRuleList(cssRuleList.get());
@@ -739,9 +740,7 @@ PassRefPtr<InspectorObject> InspectorStyleSheet::buildObjectForRule(
   // "sourceURL" is present only for regular rules, otherwise "origin" should be
   // used in the frontend.
   if (!m_origin.length())
-    result->setString("sourceURL", !styleSheet->href().isEmpty()
-                                       ? styleSheet->href()
-                                       : m_documentURL);
+    result->setString("sourceURL", finalURL());
   result->setNumber("sourceLine", rule->sourceLine());
   result->setString("origin", m_origin);
 
@@ -749,7 +748,7 @@ PassRefPtr<InspectorObject> InspectorStyleSheet::buildObjectForRule(
   if (canBind()) {
     InspectorCSSId id(ruleId(rule));
     if (!id.isEmpty())
-      result->setString("ruleId", id.asString());
+      result->setValue("ruleId", id.asInspectorValue());
   }
 
   RefPtr<CSSRuleSourceData> sourceData;
@@ -826,6 +825,13 @@ bool InspectorStyleSheet::toggleProperty(const InspectorCSSId& id,
   return success;
 }
 
+bool InspectorStyleSheet::text(String* result) const {
+  if (!ensureText())
+    return false;
+  *result = m_parsedStyleSheet->text();
+  return true;
+}
+
 CSSStyleDeclaration* InspectorStyleSheet::styleForId(
     const InspectorCSSId& id) const {
   CSSStyleRule* rule = ruleForId(id);
@@ -863,7 +869,7 @@ InspectorCSSId InspectorStyleSheet::ruleOrStyleId(
     CSSStyleDeclaration* style) const {
   unsigned index = ruleIndexByStyle(style);
   if (index != UINT_MAX)
-    return InspectorCSSId::createFromParts(id(), String::number(index));
+    return InspectorCSSId(id(), index);
   return InspectorCSSId();
 }
 
@@ -891,13 +897,6 @@ unsigned InspectorStyleSheet::ruleIndexByStyle(
 
 bool InspectorStyleSheet::ensureParsedDataReady() {
   return ensureText() && ensureSourceData();
-}
-
-bool InspectorStyleSheet::text(String* result) const {
-  if (!ensureText())
-    return false;
-  *result = m_parsedStyleSheet->text();
-  return true;
 }
 
 bool InspectorStyleSheet::ensureText() const {
@@ -1154,8 +1153,13 @@ InspectorStyleSheetForInlineStyle::InspectorStyleSheetForInlineStyle(
       m_element(element),
       m_ruleSourceData(0) {
   ASSERT(element);
-  m_inspectorStyle = InspectorStyle::create(
-      InspectorCSSId::createFromParts(id, "0"), inlineStyle(), this);
+  m_inspectorStyle =
+      InspectorStyle::create(InspectorCSSId(id, 0), inlineStyle(), this);
+}
+
+bool InspectorStyleSheetForInlineStyle::text(String* result) const {
+  *result = m_element->getAttribute("style");
+  return true;
 }
 
 bool InspectorStyleSheetForInlineStyle::setStyleText(CSSStyleDeclaration* style,
@@ -1165,11 +1169,6 @@ bool InspectorStyleSheetForInlineStyle::setStyleText(CSSStyleDeclaration* style,
   m_element->setAttribute("style", text, ec);
   m_ruleSourceData.clear();
   return !ec;
-}
-
-bool InspectorStyleSheetForInlineStyle::text(String* result) const {
-  *result = m_element->getAttribute("style");
-  return true;
 }
 
 Document* InspectorStyleSheetForInlineStyle::ownerDocument() const {
@@ -1193,7 +1192,7 @@ bool InspectorStyleSheetForInlineStyle::ensureParsedDataReady() {
 PassRefPtr<InspectorStyle>
 InspectorStyleSheetForInlineStyle::inspectorStyleForId(
     const InspectorCSSId& id) {
-  ASSERT_UNUSED(id, id.ordinal() == "0");
+  ASSERT_UNUSED(id, !id.ordinal());
   return m_inspectorStyle;
 }
 

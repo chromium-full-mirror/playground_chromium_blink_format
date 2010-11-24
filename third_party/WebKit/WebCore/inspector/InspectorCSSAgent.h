@@ -69,17 +69,20 @@ class InspectorCSSAgent : public InspectorDOMAgent::DOMListener {
   void getAllStyles2(RefPtr<InspectorArray>* styles);
   void getStyleSheet2(const String& styleSheetId,
                       RefPtr<InspectorValue>* result);
+  void getStyleSheetText2(const String& styleSheetId,
+                          String* url,
+                          String* result);
   void setStyleSheetText2(const String& styleSheetId, const String& text);
-  void setPropertyText2(const String& styleId,
+  void setPropertyText2(const RefPtr<InspectorObject>& styleId,
                         long propertyIndex,
                         const String& text,
                         bool overwrite,
                         RefPtr<InspectorValue>* result);
-  void toggleProperty2(const String& styleId,
+  void toggleProperty2(const RefPtr<InspectorObject>& styleId,
                        long propertyIndex,
                        bool disable,
                        RefPtr<InspectorValue>* result);
-  void setRuleSelector2(const String& ruleId,
+  void setRuleSelector2(const RefPtr<InspectorObject>& ruleId,
                         const String& selector,
                         RefPtr<InspectorValue>* result);
   void addRule2(const long contextNodeId,
