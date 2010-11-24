@@ -34,8 +34,11 @@
 #if USE(ACCELERATED_COMPOSITING)
 
 #include "LayerChromium.h"
+#include "TextureManager.h"
 
 namespace WebCore {
+
+class LayerTexture;
 
 // A Layer that requires a GraphicsContext to render its contents.
 class ContentLayerChromium : public LayerChromium {
@@ -47,7 +50,7 @@ class ContentLayerChromium : public LayerChromium {
 
   virtual ~ContentLayerChromium();
 
-  virtual void updateContents();
+  virtual void updateContentsIfDirty();
   virtual void draw();
   virtual bool drawsContent() { return m_owner && m_owner->drawsContent(); }
 
@@ -78,16 +81,13 @@ class ContentLayerChromium : public LayerChromium {
   ContentLayerChromium(GraphicsLayerChromium* owner);
 
   void updateTextureRect(void* pixels,
-                         const IntSize& bitmapSize,
                          const IntSize& requiredTextureSize,
-                         const IntRect& updateRect,
-                         unsigned textureId);
+                         const IntRect& updateRect);
 
   virtual void cleanupResources();
   bool requiresClippedUpdateRect() const;
 
-  unsigned m_contentsTexture;
-  IntSize m_allocatedTextureSize;
+  OwnPtr<LayerTexture> m_contentsTexture;
   bool m_skipsDraw;
 
  private:

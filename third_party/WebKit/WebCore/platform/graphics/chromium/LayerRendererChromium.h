@@ -129,6 +129,9 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
   const PluginLayerChromium::SharedValues* pluginLayerSharedValues() const {
     return m_pluginLayerSharedValues.get();
   }
+  const RenderSurfaceChromium::SharedValues* renderSurfaceSharedValues() const {
+    return m_renderSurfaceSharedValues.get();
+  }
 
   void resizeOnscreenContent(const IntSize&);
 
@@ -137,6 +140,10 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
   }
   IntRect rootLayerContentRect() const { return m_rootContentRect; }
   void getFramebufferPixels(void* pixels, const IntRect& rect);
+
+  TextureManager* textureManager() const { return m_textureManager.get(); }
+
+  void setScissorToRect(const IntRect&);
 
  private:
   explicit LayerRendererChromium(
@@ -152,8 +159,6 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
                       const TransformationMatrix&,
                       const IntRect& visibleRect);
 
-  void setScissorToRect(const IntRect&);
-
   void setDrawViewportRect(const IntRect&, bool flipY);
 
   bool useRenderSurface(RenderSurfaceChromium*);
@@ -168,13 +173,6 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
   unsigned m_rootLayerTextureId;
   int m_rootLayerTextureWidth;
   int m_rootLayerTextureHeight;
-
-  // Shader uniform locations used by layers whose contents are the results of a
-  // previous rendering operation.
-  unsigned m_textureLayerShaderProgram;
-  int m_textureLayerShaderSamplerLocation;
-  int m_textureLayerShaderMatrixLocation;
-  int m_textureLayerShaderAlphaLocation;
 
   TransformationMatrix m_projectionMatrix;
 
@@ -215,6 +213,9 @@ class LayerRendererChromium : public RefCounted<LayerRendererChromium> {
   OwnPtr<CanvasLayerChromium::SharedValues> m_canvasLayerSharedValues;
   OwnPtr<VideoLayerChromium::SharedValues> m_videoLayerSharedValues;
   OwnPtr<PluginLayerChromium::SharedValues> m_pluginLayerSharedValues;
+  OwnPtr<RenderSurfaceChromium::SharedValues> m_renderSurfaceSharedValues;
+
+  OwnPtr<TextureManager> m_textureManager;
 
   RefPtr<GraphicsContext3D> m_context;
 

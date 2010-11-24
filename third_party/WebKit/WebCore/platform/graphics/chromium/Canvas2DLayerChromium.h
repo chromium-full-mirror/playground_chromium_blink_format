@@ -46,7 +46,7 @@ class Canvas2DLayerChromium : public CanvasLayerChromium {
                                                   GraphicsLayerChromium* owner);
   virtual ~Canvas2DLayerChromium();
   virtual bool drawsContent() { return true; }
-  virtual void updateContents();
+  virtual void updateContentsIfDirty();
 
   void setTextureChanged();
   unsigned textureId() const;

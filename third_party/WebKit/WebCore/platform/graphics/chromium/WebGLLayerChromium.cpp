@@ -47,7 +47,10 @@ PassRefPtr<WebGLLayerChromium> WebGLLayerChromium::create(
 WebGLLayerChromium::WebGLLayerChromium(GraphicsLayerChromium* owner)
     : CanvasLayerChromium(owner), m_context(0) {}
 
-void WebGLLayerChromium::updateContents() {
+void WebGLLayerChromium::updateContentsIfDirty() {
+  if (!m_contentsDirty)
+    return;
+
   GraphicsContext3D* rendererContext = layerRendererContext();
   ASSERT(m_context);
   if (m_textureChanged) {
