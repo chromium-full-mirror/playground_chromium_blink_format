@@ -108,7 +108,8 @@ NativeImagePtr RGBA32Buffer::asNewNativeImage() const {
 
   return CGImageCreate(width(), height(), 8, 32, width() * sizeof(PixelData),
                        colorSpace.get(), alphaInfo | kCGBitmapByteOrder32Host,
-                       dataProvider.get(), 0, false, kCGRenderingIntentDefault);
+                       dataProvider.get(), 0, /*shouldInterpolate=*/true,
+                       kCGRenderingIntentDefault);
 }
 
 }  // namespace WebCore
