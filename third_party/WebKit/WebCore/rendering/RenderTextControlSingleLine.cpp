@@ -627,7 +627,7 @@ void RenderTextControlSingleLine::adjustControlHeightBasedOnLineHeight(
     int lineHeight) {
   if (RenderBox* resultsRenderer =
           m_resultsButton ? m_resultsButton->renderBox() : 0) {
-    toRenderBlock(resultsRenderer)->computeLogicalHeight();
+    resultsRenderer->computeLogicalHeight();
     setHeight(max(
         height(),
         resultsRenderer->borderTop() + resultsRenderer->borderBottom() +
@@ -635,10 +635,9 @@ void RenderTextControlSingleLine::adjustControlHeightBasedOnLineHeight(
             resultsRenderer->marginTop() + resultsRenderer->marginBottom()));
     lineHeight = max(lineHeight, resultsRenderer->height());
   }
-
   if (RenderBox* cancelRenderer =
           m_cancelButton ? m_cancelButton->renderBox() : 0) {
-    toRenderBlock(cancelRenderer)->computeLogicalHeight();
+    cancelRenderer->computeLogicalHeight();
     setHeight(
         max(height(),
             cancelRenderer->borderTop() + cancelRenderer->borderBottom() +
