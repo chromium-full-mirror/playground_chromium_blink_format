@@ -683,10 +683,11 @@ void dump() {
     COMPtr<IWebURLResponse> response;
     if (SUCCEEDED(dataSource->response(&response)) && response) {
       BSTR mimeType;
-      if (SUCCEEDED(response->MIMEType(&mimeType)))
-        ::gLayoutTestController->setDumpAsText(
-            ::gLayoutTestController->dumpAsText() |
-            !_tcscmp(mimeType, TEXT("text/plain")));
+      if (SUCCEEDED(response->MIMEType(&mimeType)) &&
+          !_tcscmp(mimeType, TEXT("text/plain"))) {
+        ::gLayoutTestController->setDumpAsText(true);
+        ::gLayoutTestController->setGeneratePixelResults(false);
+      }
       SysFreeString(mimeType);
     }
   }
