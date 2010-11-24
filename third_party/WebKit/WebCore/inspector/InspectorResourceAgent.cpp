@@ -388,10 +388,10 @@ void InspectorResourceAgent::didLoadResourceFromMemoryCache(
       currentTime(), buildObjectForCachedResource(loader, *resource));
 }
 
-void InspectorResourceAgent::setOverrideContent(unsigned long identifier,
-                                                const String& sourceString,
-                                                const String& type) {
-  m_frontend->setOverrideContent(identifier, sourceString, type);
+void InspectorResourceAgent::setInitialContent(unsigned long identifier,
+                                               const String& sourceString,
+                                               const String& type) {
+  m_frontend->setInitialContent(identifier, sourceString, type);
 }
 
 static PassRefPtr<InspectorObject> buildObjectForFrame(Frame* frame) {

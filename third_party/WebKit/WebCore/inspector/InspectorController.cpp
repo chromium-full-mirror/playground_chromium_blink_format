@@ -951,7 +951,7 @@ void InspectorController::resourceRetrievedByXMLHttpRequest(
                         sendLineNumber, sendURL);
 
   if (m_resourceAgent)
-    m_resourceAgent->setOverrideContent(identifier, sourceString, "XHR");
+    m_resourceAgent->setInitialContent(identifier, sourceString, "XHR");
 }
 
 void InspectorController::scriptImported(unsigned long identifier,
@@ -960,7 +960,7 @@ void InspectorController::scriptImported(unsigned long identifier,
     return;
 
   if (m_resourceAgent)
-    m_resourceAgent->setOverrideContent(identifier, sourceString, "Script");
+    m_resourceAgent->setInitialContent(identifier, sourceString, "Script");
 }
 
 void InspectorController::ensureSettingsLoaded() {

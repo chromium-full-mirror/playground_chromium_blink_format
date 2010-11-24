@@ -94,9 +94,9 @@ class InspectorResourceAgent : public RefCounted<InspectorResourceAgent> {
   void didFinishLoading(unsigned long identifier, double finishTime);
   void didFailLoading(unsigned long identifier, const ResourceError&);
   void didLoadResourceFromMemoryCache(DocumentLoader*, const CachedResource*);
-  void setOverrideContent(unsigned long identifier,
-                          const String& sourceString,
-                          const String& type);
+  void setInitialContent(unsigned long identifier,
+                         const String& sourceString,
+                         const String& type);
   void didCommitLoad(DocumentLoader*);
   void frameDetachedFromParent(Frame*);
 
