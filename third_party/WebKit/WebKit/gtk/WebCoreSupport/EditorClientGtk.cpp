@@ -285,8 +285,7 @@ void EditorClient::setInputMethodState(bool active) {
 
 bool EditorClient::shouldDeleteRange(Range* range) {
   gboolean accept = TRUE;
-  PlatformRefPtr<WebKitDOMRange> kitRange(
-      adoptPlatformRef(static_cast<WebKitDOMRange*>(kit(range))));
+  PlatformRefPtr<WebKitDOMRange> kitRange(adoptPlatformRef(kit(range)));
   g_signal_emit_by_name(m_webView, "should-delete-range", kitRange.get(),
                         &accept);
   return accept;
@@ -295,7 +294,7 @@ bool EditorClient::shouldDeleteRange(Range* range) {
 bool EditorClient::shouldShowDeleteInterface(HTMLElement* element) {
   gboolean accept = TRUE;
   PlatformRefPtr<WebKitDOMHTMLElement> kitElement(
-      adoptPlatformRef(static_cast<WebKitDOMHTMLElement*>(kit(element))));
+      adoptPlatformRef(kit(element)));
   g_signal_emit_by_name(m_webView, "should-show-delete-interface-for-element",
                         kitElement.get(), &accept);
   return accept;
@@ -324,8 +323,7 @@ bool EditorClient::shouldBeginEditing(WebCore::Range* range) {
   clearPendingComposition();
 
   gboolean accept = TRUE;
-  PlatformRefPtr<WebKitDOMRange> kitRange(
-      adoptPlatformRef(static_cast<WebKitDOMRange*>(kit(range))));
+  PlatformRefPtr<WebKitDOMRange> kitRange(adoptPlatformRef(kit(range)));
   g_signal_emit_by_name(m_webView, "should-begin-editing", kitRange.get(),
                         &accept);
   return accept;
@@ -335,8 +333,7 @@ bool EditorClient::shouldEndEditing(WebCore::Range* range) {
   clearPendingComposition();
 
   gboolean accept = TRUE;
-  PlatformRefPtr<WebKitDOMRange> kitRange(
-      adoptPlatformRef(static_cast<WebKitDOMRange*>(kit(range))));
+  PlatformRefPtr<WebKitDOMRange> kitRange(adoptPlatformRef(kit(range)));
   g_signal_emit_by_name(m_webView, "should-end-editing", kitRange.get(),
                         &accept);
   return accept;
@@ -359,8 +356,7 @@ bool EditorClient::shouldInsertText(const String& string,
                                     Range* range,
                                     EditorInsertAction action) {
   gboolean accept = TRUE;
-  PlatformRefPtr<WebKitDOMRange> kitRange(
-      adoptPlatformRef(static_cast<WebKitDOMRange*>(kit(range))));
+  PlatformRefPtr<WebKitDOMRange> kitRange(adoptPlatformRef(kit(range)));
   g_signal_emit_by_name(m_webView, "should-insert-text", string.utf8().data(),
                         kitRange.get(), kit(action), &accept);
   return accept;
@@ -383,11 +379,9 @@ bool EditorClient::shouldChangeSelectedRange(Range* fromRange,
                                              bool stillSelecting) {
   gboolean accept = TRUE;
   PlatformRefPtr<WebKitDOMRange> kitFromRange(
-      fromRange ? adoptPlatformRef(static_cast<WebKitDOMRange*>(kit(fromRange)))
-                : 0);
+      fromRange ? adoptPlatformRef(kit(fromRange)) : 0);
   PlatformRefPtr<WebKitDOMRange> kitToRange(
-      toRange ? adoptPlatformRef(static_cast<WebKitDOMRange*>(kit(toRange)))
-              : 0);
+      toRange ? adoptPlatformRef(kit(toRange)) : 0);
   g_signal_emit_by_name(m_webView, "should-change-selected-range",
                         kitFromRange.get(), kitToRange.get(), kit(affinity),
                         stillSelecting, &accept);
@@ -397,11 +391,8 @@ bool EditorClient::shouldChangeSelectedRange(Range* fromRange,
 bool EditorClient::shouldApplyStyle(WebCore::CSSStyleDeclaration* declaration,
                                     WebCore::Range* range) {
   gboolean accept = TRUE;
-  PlatformRefPtr<WebKitDOMCSSStyleDeclaration> kitDeclaration(
-      static_cast<WebKitDOMCSSStyleDeclaration*>(
-          static_cast<WebKitDOMCSSStyleDeclaration*>(kit(declaration))));
-  PlatformRefPtr<WebKitDOMRange> kitRange(adoptPlatformRef(
-      static_cast<WebKitDOMRange*>(static_cast<WebKitDOMRange*>(kit(range)))));
+  PlatformRefPtr<WebKitDOMCSSStyleDeclaration> kitDeclaration(kit(declaration));
+  PlatformRefPtr<WebKitDOMRange> kitRange(adoptPlatformRef(kit(range)));
   g_signal_emit_by_name(m_webView, "should-apply-style", kitDeclaration.get(),
                         kitRange.get(), &accept);
   return accept;
@@ -562,10 +553,8 @@ bool EditorClient::shouldInsertNode(Node* node,
                                     Range* range,
                                     EditorInsertAction action) {
   gboolean accept = TRUE;
-  PlatformRefPtr<WebKitDOMRange> kitRange(
-      adoptPlatformRef(static_cast<WebKitDOMRange*>(kit(range))));
-  PlatformRefPtr<WebKitDOMNode> kitNode(
-      adoptPlatformRef(static_cast<WebKitDOMNode*>(kit(node))));
+  PlatformRefPtr<WebKitDOMRange> kitRange(adoptPlatformRef(kit(range)));
+  PlatformRefPtr<WebKitDOMNode> kitNode(adoptPlatformRef(kit(node)));
   g_signal_emit_by_name(m_webView, "should-insert-node", kitNode.get(),
                         kitRange.get(), kit(action), &accept);
   return accept;
