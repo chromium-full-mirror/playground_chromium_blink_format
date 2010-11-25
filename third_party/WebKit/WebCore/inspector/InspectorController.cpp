@@ -1485,15 +1485,14 @@ void InspectorController::setNativeBreakpoint(
   } else if (type == domNativeBreakpointType) {
     if (!m_domAgent)
       return;
-    double nodeIdNumber;
-    if (!condition->getNumber("nodeId", &nodeIdNumber))
+    String path;
+    if (!condition->getString("path", &path))
       return;
-    double domBreakpointTypeNumber;
-    if (!condition->getNumber("type", &domBreakpointTypeNumber))
+    double domBreakpointType;
+    if (!condition->getNumber("type", &domBreakpointType))
       return;
-    long nodeId = (long)nodeIdNumber;
-    long domBreakpointType = (long)domBreakpointTypeNumber;
-    *breakpointId = m_domAgent->setDOMBreakpoint(nodeId, domBreakpointType);
+    *breakpointId = m_domAgent->setDOMBreakpoint(
+        path, static_cast<long>(domBreakpointType));
     if (!breakpointId->isEmpty())
       m_nativeBreakpoints.set(*breakpointId, type);
   }
