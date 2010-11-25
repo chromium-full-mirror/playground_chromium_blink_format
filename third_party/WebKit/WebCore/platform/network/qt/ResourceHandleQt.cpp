@@ -213,7 +213,7 @@ void ResourceHandle::loadResourceSynchronously(
 
   QNetworkReply* reply = d->m_job->reply();
   // When using synchronous calls, we are finished when reaching this point.
-  if (reply && reply->isFinished()) {
+  if (reply->isFinished()) {
     syncLoader.setReplyFinished(true);
     d->m_job->forwardData();
     d->m_job->finish();
