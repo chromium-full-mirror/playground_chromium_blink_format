@@ -45,6 +45,7 @@ WebViewGraphicsBased::WebViewGraphicsBased(QWidget* parent)
       m_machine(0) {
   setScene(new QGraphicsScene(this));
   scene()->addItem(m_item);
+  scene()->setFocusItem(m_item);
 
   setFrameShape(QFrame::NoFrame);
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
