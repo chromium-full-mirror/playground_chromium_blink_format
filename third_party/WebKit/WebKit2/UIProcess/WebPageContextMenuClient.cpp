@@ -71,4 +71,15 @@ bool WebPageContextMenuClient::getContextMenuFromProposedMenu(
   return true;
 }
 
+void WebPageContextMenuClient::customContextMenuItemSelected(
+    WebPageProxy* page,
+    const WebContextMenuItemData& itemData) {
+  if (!m_client.customContextMenuItemSelected)
+    return;
+
+  RefPtr<WebContextMenuItem> item = WebContextMenuItem::create(itemData);
+  m_client.customContextMenuItemSelected(toAPI(page), toAPI(item.get()),
+                                         m_client.clientInfo);
+}
+
 }  // namespace WebKit

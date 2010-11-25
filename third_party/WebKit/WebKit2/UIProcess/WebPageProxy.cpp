@@ -1369,6 +1369,13 @@ void WebPageProxy::showContextMenu(
 }
 
 void WebPageProxy::contextMenuItemSelected(const WebContextMenuItemData& item) {
+  // Application custom items don't need to round-trip through to WebCore in the
+  // WebProcess.
+  if (item.action() >= ContextMenuItemBaseApplicationTag) {
+    m_contextMenuClient.customContextMenuItemSelected(this, item);
+    return;
+  }
+
   process()->send(Messages::WebPage::DidSelectItemFromActiveContextMenu(item),
                   m_pageID);
 }

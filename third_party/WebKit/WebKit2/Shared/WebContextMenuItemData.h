@@ -40,6 +40,8 @@ class ContextMenu;
 
 namespace WebKit {
 
+class APIObject;
+
 class WebContextMenuItemData {
  public:
   WebContextMenuItemData();
@@ -63,6 +65,9 @@ class WebContextMenuItemData {
 
   WebCore::ContextMenuItem core() const;
 
+  APIObject* userData() const;
+  void setUserData(APIObject*);
+
   void encode(CoreIPC::ArgumentEncoder*) const;
   static bool decode(CoreIPC::ArgumentDecoder*, WebContextMenuItemData&);
 
@@ -73,6 +78,7 @@ class WebContextMenuItemData {
   bool m_enabled;
   bool m_checked;
   Vector<WebContextMenuItemData> m_submenu;
+  RefPtr<APIObject> m_userData;
 };
 
 Vector<WebContextMenuItemData> kitItems(Vector<WebCore::ContextMenuItem>&,

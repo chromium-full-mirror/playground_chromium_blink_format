@@ -80,4 +80,12 @@ PassRefPtr<ImmutableArray> WebContextMenuItem::submenuItemsAsImmutableArray()
   return ImmutableArray::adopt(result);
 }
 
+APIObject* WebContextMenuItem::userData() const {
+  return m_webContextMenuItemData.userData();
+}
+
+void WebContextMenuItem::setUserData(APIObject* userData) {
+  m_webContextMenuItemData.setUserData(userData);
+}
+
 }  // namespace WebKit

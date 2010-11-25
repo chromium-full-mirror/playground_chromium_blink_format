@@ -48,6 +48,9 @@ class WebContextMenuItem : public APIObject {
 
   PassRefPtr<ImmutableArray> submenuItemsAsImmutableArray() const;
 
+  APIObject* userData() const;
+  void setUserData(APIObject*);
+
   WebContextMenuItemData* data() { return &m_webContextMenuItemData; }
 
  private:
