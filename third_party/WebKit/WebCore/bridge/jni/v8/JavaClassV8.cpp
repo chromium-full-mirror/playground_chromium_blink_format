@@ -38,12 +38,6 @@ JavaClass::JavaClass(jobject anInstance) {
     return;
   }
 
-  jstring className = static_cast<jstring>(
-      callJNIMethod<jobject>(aClass, "getName", "()Ljava/lang/String;"));
-  const char* classNameC = getCharactersFromJString(className);
-  m_name = strdup(classNameC);
-  releaseCharactersForJString(className, classNameC);
-
   int i;
   JNIEnv* env = getJNIEnv();
 
@@ -86,8 +80,6 @@ JavaClass::JavaClass(jobject anInstance) {
 }
 
 JavaClass::~JavaClass() {
-  free(const_cast<char*>(m_name));
-
   deleteAllValues(m_fields);
   m_fields.clear();
 
