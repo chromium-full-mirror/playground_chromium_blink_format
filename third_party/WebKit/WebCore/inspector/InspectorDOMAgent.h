@@ -183,7 +183,7 @@ class InspectorDOMAgent : public EventListener {
 
   String documentURLString(Document* document) const;
 
-  String setDOMBreakpoint(const String& path, long type);
+  String setDOMBreakpoint(long nodeId, long type);
   void removeDOMBreakpoint(const String& breakpointId);
 
  private:
@@ -205,6 +205,7 @@ class InspectorDOMAgent : public EventListener {
   PassRefPtr<InspectorValue> descriptionForDOMEvent(Node* target,
                                                     long breakpointType,
                                                     bool insertion);
+  String createBreakpointId(long nodeId, long type);
 
   PassRefPtr<InspectorObject> buildObjectForAttributeStyles(Element* element);
   PassRefPtr<InspectorArray> buildArrayForCSSRules(Document* ownerDocument,
@@ -277,10 +278,8 @@ class InspectorDOMAgent : public EventListener {
   HashSet<RefPtr<Node>> m_searchResults;
   Vector<long> m_inspectedNodes;
   HashMap<Node*, uint32_t> m_breakpoints;
-  typedef pair<Node*, long> Breakpoint;
+  typedef pair<long, long> Breakpoint;
   HashMap<String, Breakpoint> m_idToBreakpoint;
-  HashMap<Breakpoint, String> m_breakpointToId;
-  unsigned int m_lastBreakpointId;
 };
 
 #endif
