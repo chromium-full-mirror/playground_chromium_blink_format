@@ -27,10 +27,10 @@
 
 #if ENABLE(3D_CANVAS) || ENABLE(BLOB)
 
-#include "JSArrayBufferViewHelper.h"
 #include "JSFloat32Array.h"
 
 #include "Float32Array.h"
+#include "JSArrayBufferViewHelper.h"
 
 using namespace JSC;
 
@@ -56,8 +56,8 @@ EncodedJSValue JSC_HOST_CALL
 JSFloat32ArrayConstructor::constructJSFloat32Array(ExecState* exec) {
   JSFloat32ArrayConstructor* jsConstructor =
       static_cast<JSFloat32ArrayConstructor*>(exec->callee());
-  RefPtr<Float32Array> array = static_cast<Float32Array*>(
-      constructArrayBufferView<Float32Array, float>(exec).get());
+  RefPtr<Float32Array> array =
+      constructArrayBufferView<Float32Array, float>(exec);
   if (!array.get())
     // Exception has already been thrown.
     return JSValue::encode(JSValue());

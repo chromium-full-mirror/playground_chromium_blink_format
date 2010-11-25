@@ -53,6 +53,7 @@
 
 #if ENABLE(3D_CANVAS) || ENABLE(BLOB)
 #include "JSArrayBuffer.h"
+#include "JSDataView.h"
 #include "JSInt8Array.h"
 #include "JSUint8Array.h"
 #include "JSInt32Array.h"
@@ -669,6 +670,9 @@ JSValue JSDOMWindow::float32Array(ExecState* exec) const {
   return getDOMConstructor<JSFloat32ArrayConstructor>(exec, this);
 }
 
+JSValue JSDOMWindow::dataView(ExecState* exec) const {
+  return getDOMConstructor<JSDataViewConstructor>(exec, this);
+}
 #endif
 
 JSValue JSDOMWindow::xmlHttpRequest(ExecState* exec) const {

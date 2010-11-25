@@ -116,6 +116,7 @@ class RuntimeEnabledFeatures {
   static bool int32ArrayEnabled() { return isWebGLEnabled; }
   static bool uint32ArrayEnabled() { return isWebGLEnabled; }
   static bool float32ArrayEnabled() { return isWebGLEnabled; }
+  static bool dataViewEnabled() { return isWebGLEnabled; }
   static bool webGLRenderingContextEnabled() { return isWebGLEnabled; }
   static bool webGLArrayBufferEnabled() { return isWebGLEnabled; }
   static bool webGLByteArrayEnabled() { return isWebGLEnabled; }
