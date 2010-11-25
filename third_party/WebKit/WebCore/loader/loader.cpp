@@ -339,7 +339,8 @@ void Loader::didReceiveData(SubresourceLoader* loader,
     return;
 
   if (resource->response().httpStatusCode() >= 400) {
-    resource->httpStatusCodeError();
+    if (!resource->shouldIgnoreHTTPStatusCodeErrors())
+      resource->error(CachedResource::LoadError);
     return;
   }
 

@@ -95,10 +95,8 @@ class CachedResource : public Noncopyable {
   virtual String encoding() const { return String(); }
   virtual void data(PassRefPtr<SharedBuffer> data, bool allDataReceived);
   virtual void error(CachedResource::Status) {}
-  virtual void httpStatusCodeError() {
-    error(LoadError);
-  }  // Images keep loading in spite of HTTP errors (for legacy compat with
-     // <img>, etc.).
+
+  virtual bool shouldIgnoreHTTPStatusCodeErrors() const { return false; }
 
   const String& url() const { return m_url; }
   Type type() const { return static_cast<Type>(m_type); }
