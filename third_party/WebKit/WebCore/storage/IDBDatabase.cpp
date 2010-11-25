@@ -68,11 +68,17 @@ PassRefPtr<IDBObjectStore> IDBDatabase::createObjectStore(
   options.getKeyBool("autoIncrement", autoIncrement);
   // FIXME: Look up evictable and pass that on as well.
 
+  if (autoIncrement) {
+    // FIXME: Implement support for auto increment.
+    ec = IDBDatabaseException::UNKNOWN_ERR;
+    return 0;
+  }
+
   RefPtr<IDBObjectStoreBackendInterface> objectStore =
       m_backend->createObjectStore(name, keyPath, autoIncrement,
                                    m_setVersionTransaction.get(), ec);
   if (!objectStore) {
-    // FIXME: ASSERT(ec) once UNKNOWN_ERR is not 0.
+    ASSERT(ec);
     return 0;
   }
   return IDBObjectStore::create(objectStore.release(),
