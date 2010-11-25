@@ -68,6 +68,10 @@ WorkerAsyncFileWriterChromium::~WorkerAsyncFileWriterChromium() {
   m_bridge->postShutdownToMainThread(m_bridge);
 }
 
+bool WorkerAsyncFileWriterChromium::waitForOperationToComplete() {
+  return m_bridge->waitForOperationToComplete();
+}
+
 void WorkerAsyncFileWriterChromium::write(long long position, Blob* data) {
   m_bridge->postWriteToMainThread(position, data->url());
 }

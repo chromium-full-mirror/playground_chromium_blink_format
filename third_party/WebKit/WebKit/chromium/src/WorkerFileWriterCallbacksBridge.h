@@ -117,6 +117,10 @@ class WorkerFileWriterCallbacksBridge
   void didFail(WebFileError);
   void didTruncate();
 
+  // Call this on the context thread to wait for the current operation to
+  // complete.
+  bool waitForOperationToComplete();
+
  private:
   WorkerFileWriterCallbacksBridge(const String& path,
                                   WebCore::WorkerLoaderProxy*,
@@ -188,6 +192,12 @@ class WorkerFileWriterCallbacksBridge
   // Used to indicate that shutdown has started on the main thread, and hence
   // the writer has been deleted.
   bool m_writerDeleted;
+
+  // Used by waitForOperationToComplete.
+  bool m_operationInProgress;
+
+  // Used by postTaskForModeToWorkerContext and runInMode.
+  String m_mode;
 };
 
 }  // namespace WebCore
