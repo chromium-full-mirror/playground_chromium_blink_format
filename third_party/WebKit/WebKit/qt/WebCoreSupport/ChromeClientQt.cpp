@@ -115,8 +115,9 @@ FloatRect ChromeClientQt::pageRect() {
 }
 
 float ChromeClientQt::scaleFactor() {
-  notImplemented();
-  return 1;
+  if (!m_webPage)
+    return 1;
+  return m_webPage->d->pixelRatio;
 }
 
 void ChromeClientQt::focus() {
