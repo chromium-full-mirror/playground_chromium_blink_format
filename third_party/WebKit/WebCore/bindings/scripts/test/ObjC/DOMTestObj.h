@@ -30,6 +30,7 @@
 #if WEBKIT_VERSION_MAX_ALLOWED >= WEBKIT_VERSION_LATEST
 
 @class DOMIDBKey;
+@class DOMOptionsObject;
 @class DOMTestObj;
 @class DOMlog;
 @class NSString;
@@ -139,6 +140,7 @@ enum {
                                            objArg:(DOMTestObj*)objArg;
 - (void)serializedValue:(NSString*)serializedArg;
 - (void)idbKey:(DOMIDBKey*)key;
+- (void)optionsObject:(DOMOptionsObject*)oo ooo:(DOMOptionsObject*)ooo;
 - (void)methodWithException;
 - (void)customMethod;
 - (void)customMethodWithArgs:(int)intArg

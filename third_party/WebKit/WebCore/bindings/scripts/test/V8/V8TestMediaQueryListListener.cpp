@@ -65,8 +65,7 @@ ConfigureV8TestMediaQueryListListenerTemplate(
                         v8::Persistent<v8::FunctionTemplate>(),
                         V8TestMediaQueryListListener::internalFieldCount, 0, 0,
                         TestMediaQueryListListenerCallbacks,
-                        sizeof(TestMediaQueryListListenerCallbacks) /
-                            sizeof(*TestMediaQueryListListenerCallbacks));
+                        WTF_ARRAY_LENGTH(TestMediaQueryListListenerCallbacks));
   v8::Local<v8::ObjectTemplate> instance = desc->InstanceTemplate();
   v8::Local<v8::ObjectTemplate> proto = desc->PrototypeTemplate();
 

@@ -33,6 +33,7 @@ class TestObj;
 
 class WebDOMEventListener;
 class WebDOMIDBKey;
+class WebDOMOptionsObject;
 class WebDOMString;
 class WebDOMTestObj;
 
@@ -145,6 +146,8 @@ class WebDOMTestObj : public WebDOMObject {
                                                    const WebDOMTestObj& objArg);
   void serializedValue(const WebDOMString& serializedArg);
   void idbKey(const WebDOMIDBKey& key);
+  void optionsObject(const WebDOMOptionsObject& oo,
+                     const WebDOMOptionsObject& ooo);
   void methodWithException();
   void customMethod();
   void customMethodWithArgs(int intArg,

@@ -130,6 +130,8 @@ jsTestObjPrototypeFunctionSerializedValue(JSC::ExecState*);
 JSC::EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionIdbKey(JSC::ExecState*);
 JSC::EncodedJSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionOptionsObject(JSC::ExecState*);
+JSC::EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionMethodWithException(JSC::ExecState*);
 JSC::EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionCustomMethod(JSC::ExecState*);

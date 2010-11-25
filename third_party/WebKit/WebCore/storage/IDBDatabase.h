@@ -31,6 +31,7 @@
 #include "IDBDatabaseBackendInterface.h"
 #include "IDBObjectStore.h"
 #include "IDBTransaction.h"
+#include "OptionsObject.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
@@ -63,12 +64,7 @@ class IDBDatabase : public RefCounted<IDBDatabase> {
   // FIXME: Try to modify the code generator so this is unneeded.
   PassRefPtr<IDBObjectStore> createObjectStore(const String& name,
                                                ExceptionCode& ec) {
-    return createObjectStore(name, String(), ec);
-  }
-  PassRefPtr<IDBObjectStore> createObjectStore(const String& name,
-                                               const String& keyPath,
-                                               ExceptionCode& ec) {
-    return createObjectStore(name, keyPath, false, ec);
+    return createObjectStore(name, OptionsObject(), ec);
   }
   PassRefPtr<IDBTransaction> transaction(ScriptExecutionContext* context,
                                          ExceptionCode& ec) {
@@ -87,8 +83,7 @@ class IDBDatabase : public RefCounted<IDBDatabase> {
   }  // FIXME: what should the default timeout be?
 
   PassRefPtr<IDBObjectStore> createObjectStore(const String& name,
-                                               const String& keyPath,
-                                               bool autoIncrement,
+                                               const OptionsObject&,
                                                ExceptionCode&);
   void removeObjectStore(const String& name, ExceptionCode&);
   PassRefPtr<IDBRequest> setVersion(ScriptExecutionContext*,
