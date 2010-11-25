@@ -49,7 +49,11 @@ class IDBKey : public ThreadSafeShared<IDBKey> {
   ~IDBKey();
 
   // In order of the least to the highest precedent in terms of sort order.
-  enum Type { NullType = 0, StringType, NumberType };
+  enum Type {
+    NullType = 0,  // FIXME: Phase out support for null keys.
+    StringType,
+    NumberType
+  };
 
   Type type() const { return m_type; }
 

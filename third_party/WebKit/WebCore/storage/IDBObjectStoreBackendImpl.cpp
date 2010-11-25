@@ -257,6 +257,11 @@ void IDBObjectStoreBackendImpl::putInternal(
                                                 "No key supplied."));
     return;
   }
+  if (key->type() == IDBKey::NullType) {
+    callbacks->onError(IDBDatabaseError::create(IDBDatabaseException::DATA_ERR,
+                                                "NULL key is not allowed."));
+    return;
+  }
 
   Vector<RefPtr<IDBKey>> indexKeys;
   for (IndexMap::iterator it = objectStore->m_indexes.begin();
@@ -267,6 +272,12 @@ void IDBObjectStoreBackendImpl::putInternal(
       callbacks->onError(IDBDatabaseError::create(
           IDBDatabaseException::UNKNOWN_ERR,
           "The key could not be fetched from an index's keyPath."));
+      return;
+    }
+    if (key->type() == IDBKey::NullType) {
+      callbacks->onError(IDBDatabaseError::create(
+          IDBDatabaseException::DATA_ERR,
+          "One of the derived (from a keyPath) keys for an index is NULL."));
       return;
     }
     if (!it->second->addingKeyAllowed(key.get())) {
