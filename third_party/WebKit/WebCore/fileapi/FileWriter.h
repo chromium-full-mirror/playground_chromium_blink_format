@@ -34,22 +34,16 @@
 #if ENABLE(FILE_SYSTEM)
 
 #include "ActiveDOMObject.h"
-#include "AsyncFileWriterClient.h"
 #include "EventTarget.h"
-#include <wtf/OwnPtr.h>
-#include <wtf/PassOwnPtr.h>
+#include "FileWriterBase.h"
 #include <wtf/PassRefPtr.h>
-#include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
 
-class AsyncFileWriter;
-class Blob;
-class FileError;
 class ScriptExecutionContext;
 
-class FileWriter : public RefCounted<FileWriter>,
+class FileWriter : public FileWriterBase,
                    public ActiveDOMObject,
                    public EventTarget,
                    public AsyncFileWriterClient {
@@ -58,19 +52,14 @@ class FileWriter : public RefCounted<FileWriter>,
     return adoptRef(new FileWriter(context));
   }
 
-  void initialize(PassOwnPtr<AsyncFileWriter> writer, long long length);
-
   enum ReadyState { INIT = 0, WRITING = 1, DONE = 2 };
 
-  void write(Blob* data, ExceptionCode& ec);
-  void seek(long long position, ExceptionCode& ec);
-  void truncate(long long length, ExceptionCode& ec);
-  void abort(ExceptionCode& ec);
-
+  void write(Blob*, ExceptionCode&);
+  void seek(long long position, ExceptionCode&);
+  void truncate(long long length, ExceptionCode&);
+  void abort(ExceptionCode&);
   ReadyState readyState() const { return m_readyState; }
   FileError* error() const { return m_error.get(); }
-  long long position() const { return m_position; }
-  long long length() const { return m_length; }
 
   // AsyncFileWriterClient
   void didWrite(long long bytes, bool complete);
@@ -88,8 +77,8 @@ class FileWriter : public RefCounted<FileWriter>,
     return ActiveDOMObject::scriptExecutionContext();
   }
 
-  using RefCounted<FileWriter>::ref;
-  using RefCounted<FileWriter>::deref;
+  using RefCounted<FileWriterBase>::ref;
+  using RefCounted<FileWriterBase>::deref;
 
   DEFINE_ATTRIBUTE_EVENT_LISTENER(writestart);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(progress);
@@ -102,8 +91,6 @@ class FileWriter : public RefCounted<FileWriter>,
   FileWriter(ScriptExecutionContext*);
 
   virtual ~FileWriter();
-
-  friend class WTF::RefCounted<FileWriter>;
 
   // EventTarget
   virtual void refEventTarget() { ref(); }
@@ -119,10 +106,7 @@ class FileWriter : public RefCounted<FileWriter>,
 
   RefPtr<FileError> m_error;
   EventTargetData m_eventTargetData;
-  OwnPtr<AsyncFileWriter> m_writer;
   ReadyState m_readyState;
-  long long m_position;
-  long long m_length;
   bool m_startedWriting;
   long long m_bytesWritten;
   long long m_bytesToWrite;

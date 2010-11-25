@@ -41,6 +41,7 @@
 #include "FileEntry.h"
 #include "FileSystemCallbacks.h"
 #include "FileWriter.h"
+#include "FileWriterBaseCallback.h"
 #include "FileWriterCallback.h"
 #include "MetadataCallback.h"
 #include "ScriptExecutionContext.h"
@@ -71,6 +72,26 @@ void DOMFileSystem::contextDestroyed() {
   ActiveDOMObject::contextDestroyed();
 }
 
+namespace {
+
+class ConvertToFileWriterCallback : public FileWriterBaseCallback {
+ public:
+  static PassRefPtr<ConvertToFileWriterCallback> create(
+      PassRefPtr<FileWriterCallback> callback) {
+    return adoptRef(new ConvertToFileWriterCallback(callback));
+  }
+
+  bool handleEvent(FileWriterBase* fileWriterBase) {
+    return m_callback->handleEvent(static_cast<FileWriter*>(fileWriterBase));
+  }
+
+ private:
+  ConvertToFileWriterCallback(PassRefPtr<FileWriterCallback> callback)
+      : m_callback(callback) {}
+  RefPtr<FileWriterCallback> m_callback;
+};
+}
+
 void DOMFileSystem::createWriter(const FileEntry* fileEntry,
                                  PassRefPtr<FileWriterCallback> successCallback,
                                  PassRefPtr<ErrorCallback> errorCallback) {
@@ -80,8 +101,10 @@ void DOMFileSystem::createWriter(const FileEntry* fileEntry,
       m_asyncFileSystem->virtualToPlatformPath(fileEntry->fullPath());
 
   RefPtr<FileWriter> fileWriter = FileWriter::create(scriptExecutionContext());
-  OwnPtr<FileWriterCallbacks> callbacks =
-      FileWriterCallbacks::create(fileWriter, successCallback, errorCallback);
+  RefPtr<FileWriterBaseCallback> conversionCallback =
+      ConvertToFileWriterCallback::create(successCallback);
+  OwnPtr<FileWriterBaseCallbacks> callbacks = FileWriterBaseCallbacks::create(
+      fileWriter, conversionCallback, errorCallback);
   m_asyncFileSystem->createWriter(fileWriter.get(), platformPath,
                                   callbacks.release());
 }

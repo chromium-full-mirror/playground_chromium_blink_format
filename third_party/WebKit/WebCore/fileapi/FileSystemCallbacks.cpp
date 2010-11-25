@@ -47,8 +47,8 @@
 #include "FileError.h"
 #include "FileMetadata.h"
 #include "FileSystemCallback.h"
-#include "FileWriter.h"
-#include "FileWriterCallback.h"
+#include "FileWriterBase.h"
+#include "FileWriterBaseCallback.h"
 #include "Metadata.h"
 #include "MetadataCallback.h"
 #include "ScriptExecutionContext.h"
@@ -231,26 +231,26 @@ void MetadataCallbacks::didReadMetadata(const FileMetadata& metadata) {
   m_successCallback.clear();
 }
 
-// FileWriterCallbacks
+// FileWriterBaseCallbacks
 // ----------------------------------------------------------
 
-PassOwnPtr<FileWriterCallbacks> FileWriterCallbacks::create(
-    PassRefPtr<FileWriter> fileWriter,
-    PassRefPtr<FileWriterCallback> successCallback,
+PassOwnPtr<FileWriterBaseCallbacks> FileWriterBaseCallbacks::create(
+    PassRefPtr<FileWriterBase> fileWriter,
+    PassRefPtr<FileWriterBaseCallback> successCallback,
     PassRefPtr<ErrorCallback> errorCallback) {
   return adoptPtr(
-      new FileWriterCallbacks(fileWriter, successCallback, errorCallback));
+      new FileWriterBaseCallbacks(fileWriter, successCallback, errorCallback));
 }
 
-FileWriterCallbacks::FileWriterCallbacks(
-    PassRefPtr<FileWriter> fileWriter,
-    PassRefPtr<FileWriterCallback> successCallback,
+FileWriterBaseCallbacks::FileWriterBaseCallbacks(
+    PassRefPtr<FileWriterBase> fileWriter,
+    PassRefPtr<FileWriterBaseCallback> successCallback,
     PassRefPtr<ErrorCallback> errorCallback)
     : FileSystemCallbacksBase(errorCallback),
       m_fileWriter(fileWriter),
       m_successCallback(successCallback) {}
 
-void FileWriterCallbacks::didCreateFileWriter(
+void FileWriterBaseCallbacks::didCreateFileWriter(
     PassOwnPtr<AsyncFileWriter> asyncFileWriter,
     long long length) {
   m_fileWriter->initialize(asyncFileWriter, length);
