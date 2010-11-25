@@ -347,7 +347,8 @@ static NPObject* makeStringArrayImpl(const WebVector<WebString>& data) {
   for (size_t i = 0; i < data.size(); ++i)
     result->Set(i, data[i].data()
                        ? v8::String::New(reinterpret_cast<const uint16_t*>(
-                             (data[i].data())))
+                                             (data[i].data())),
+                                         data[i].length())
                        : v8::String::New(""));
 
   WebCore::DOMWindow* window =
