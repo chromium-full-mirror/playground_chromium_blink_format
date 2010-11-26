@@ -22,6 +22,7 @@
 
 #include <glib-object.h>
 
+#include <webkit/webkitdomdefines.h>
 #include <webkit/webkitdefines.h>
 
 G_BEGIN_DECLS
@@ -66,6 +67,10 @@ WEBKIT_API WebKitWebView* webkit_web_inspector_get_web_view(
 
 WEBKIT_API const gchar* webkit_web_inspector_get_inspected_uri(
     WebKitWebInspector* web_inspector);
+
+WEBKIT_API void webkit_web_inspector_inspect_node(
+    WebKitWebInspector* webInspector,
+    WebKitDOMNode* node);
 
 WEBKIT_API void webkit_web_inspector_inspect_coordinates(
     WebKitWebInspector* web_inspector,
