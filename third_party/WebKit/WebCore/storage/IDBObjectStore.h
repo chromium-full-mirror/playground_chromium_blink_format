@@ -32,6 +32,7 @@
 #include "IDBKeyRange.h"
 #include "IDBObjectStoreBackendInterface.h"
 #include "IDBRequest.h"
+#include "OptionsObject.h"
 #include "PlatformString.h"
 #include "SerializedScriptValue.h"
 #include <wtf/PassRefPtr.h>
@@ -73,16 +74,11 @@ class IDBObjectStore : public RefCounted<IDBObjectStore> {
   PassRefPtr<IDBIndex> createIndex(const String& name,
                                    const String& keyPath,
                                    ExceptionCode& ec) {
-    return createIndex(name, keyPath, false, ec);
+    return createIndex(name, keyPath, OptionsObject(), ec);
   }
   PassRefPtr<IDBRequest> openCursor(ScriptExecutionContext* context,
                                     ExceptionCode& ec) {
-    return openCursor(context, 0, ec);
-  }
-  PassRefPtr<IDBRequest> openCursor(ScriptExecutionContext* context,
-                                    PassRefPtr<IDBKeyRange> keyRange,
-                                    ExceptionCode& ec) {
-    return openCursor(context, keyRange, IDBCursor::NEXT, ec);
+    return openCursor(context, OptionsObject(), ec);
   }
 
   PassRefPtr<IDBRequest> get(ScriptExecutionContext*,
@@ -102,14 +98,13 @@ class IDBObjectStore : public RefCounted<IDBObjectStore> {
 
   PassRefPtr<IDBIndex> createIndex(const String& name,
                                    const String& keyPath,
-                                   bool unique,
+                                   const OptionsObject&,
                                    ExceptionCode&);
   PassRefPtr<IDBIndex> index(const String& name, ExceptionCode&);
   void removeIndex(const String& name, ExceptionCode&);
 
   PassRefPtr<IDBRequest> openCursor(ScriptExecutionContext*,
-                                    PassRefPtr<IDBKeyRange>,
-                                    unsigned short direction,
+                                    const OptionsObject&,
                                     ExceptionCode&);
 
  private:
