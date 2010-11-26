@@ -55,8 +55,8 @@ PassRefPtr<IDBRequest> IDBIndex::openCursor(ScriptExecutionContext* context,
   RefPtr<IDBKeyRange> keyRange = options.getKeyKeyRange("range");
 
   // Converted to an unsigned short.
-  int64_t direction = defaultDirection;
-  options.getKeyInteger("direction", direction);
+  int32_t direction = defaultDirection;
+  options.getKeyInt32("direction", direction);
   if (direction != IDBCursor::NEXT &&
       direction != IDBCursor::NEXT_NO_DUPLICATE &&
       direction != IDBCursor::PREV &&
@@ -81,8 +81,8 @@ PassRefPtr<IDBRequest> IDBIndex::openKeyCursor(ScriptExecutionContext* context,
   RefPtr<IDBKeyRange> keyRange = options.getKeyKeyRange("range");
 
   // Converted to an unsigned short.
-  int64_t direction = defaultDirection;
-  options.getKeyInteger("direction", direction);
+  int32_t direction = defaultDirection;
+  options.getKeyInt32("direction", direction);
   if (direction != IDBCursor::NEXT &&
       direction != IDBCursor::NEXT_NO_DUPLICATE &&
       direction != IDBCursor::PREV &&
