@@ -55,7 +55,7 @@ class IDBDatabaseBackendInterface
 
   virtual String name() const = 0;
   virtual String version() const = 0;
-  virtual PassRefPtr<DOMStringList> objectStores() const = 0;
+  virtual PassRefPtr<DOMStringList> objectStoreNames() const = 0;
 
   virtual PassRefPtr<IDBObjectStoreBackendInterface> createObjectStore(
       const String& name,

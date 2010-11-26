@@ -48,7 +48,7 @@ class IDBDatabaseProxy : public IDBDatabaseBackendInterface {
   virtual String name() const;
   virtual String description() const;
   virtual String version() const;
-  virtual PassRefPtr<DOMStringList> objectStores() const;
+  virtual PassRefPtr<DOMStringList> objectStoreNames() const;
 
   virtual PassRefPtr<IDBObjectStoreBackendInterface> createObjectStore(
       const String& name,

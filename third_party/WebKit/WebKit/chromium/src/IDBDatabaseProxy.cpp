@@ -64,8 +64,8 @@ String IDBDatabaseProxy::version() const {
   return m_webIDBDatabase->version();
 }
 
-PassRefPtr<DOMStringList> IDBDatabaseProxy::objectStores() const {
-  return m_webIDBDatabase->objectStores();
+PassRefPtr<DOMStringList> IDBDatabaseProxy::objectStoreNames() const {
+  return m_webIDBDatabase->objectStoreNames();
 }
 
 PassRefPtr<IDBObjectStoreBackendInterface> IDBDatabaseProxy::createObjectStore(

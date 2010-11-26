@@ -125,7 +125,7 @@ SQLiteDatabase& IDBDatabaseBackendImpl::sqliteDatabase() const {
   return m_sqliteDatabase->db();
 }
 
-PassRefPtr<DOMStringList> IDBDatabaseBackendImpl::objectStores() const {
+PassRefPtr<DOMStringList> IDBDatabaseBackendImpl::objectStoreNames() const {
   RefPtr<DOMStringList> objectStoreNames = DOMStringList::create();
   for (ObjectStoreMap::const_iterator it = m_objectStores.begin();
        it != m_objectStores.end(); ++it)
@@ -253,10 +253,10 @@ void IDBDatabaseBackendImpl::setVersion(const String& version,
                                         ExceptionCode& ec) {
   RefPtr<IDBDatabaseBackendImpl> database = this;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
-  RefPtr<DOMStringList> objectStores = DOMStringList::create();
+  RefPtr<DOMStringList> objectStoreNames = DOMStringList::create();
   RefPtr<IDBTransactionBackendInterface> transaction =
       IDBTransactionBackendImpl::create(
-          objectStores.get(), IDBTransaction::VERSION_CHANGE, 0, this);
+          objectStoreNames.get(), IDBTransaction::VERSION_CHANGE, 0, this);
   if (!transaction->scheduleTask(
           createCallbackTask(&IDBDatabaseBackendImpl::setVersionInternal,
                              database, version, callbacks, transaction),
@@ -288,12 +288,13 @@ void IDBDatabaseBackendImpl::setVersionInternal(
 }
 
 PassRefPtr<IDBTransactionBackendInterface> IDBDatabaseBackendImpl::transaction(
-    DOMStringList* objectStores,
+    DOMStringList* objectStoreNames,
     unsigned short mode,
     unsigned long timeout,
     ExceptionCode&) {
   // FIXME: Return not allowed err if close has been called.
-  return IDBTransactionBackendImpl::create(objectStores, mode, timeout, this);
+  return IDBTransactionBackendImpl::create(objectStoreNames, mode, timeout,
+                                           this);
 }
 
 void IDBDatabaseBackendImpl::close() {

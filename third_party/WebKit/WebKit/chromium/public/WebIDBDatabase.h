@@ -53,10 +53,11 @@ class WebIDBDatabase {
     return WebString();
   }
   virtual WebDOMStringList objectStores() const {
-    WEBKIT_ASSERT_NOT_REACHED();
-    return WebDOMStringList();
-  }
-
+    return objectStoreNames();
+  }  // FIXME: Remove after roll.
+  virtual WebDOMStringList objectStoreNames() const {
+    return objectStores();
+  }  // FIXME: Assert not reached after roll.
   virtual WebIDBObjectStore* createObjectStore(const WebString& name,
                                                const WebString& keyPath,
                                                bool autoIncrement,

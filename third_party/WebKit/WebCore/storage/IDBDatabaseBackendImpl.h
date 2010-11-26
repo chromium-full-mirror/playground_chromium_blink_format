@@ -61,7 +61,7 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
 
   virtual String name() const { return m_name; }
   virtual String version() const { return m_version; }
-  virtual PassRefPtr<DOMStringList> objectStores() const;
+  virtual PassRefPtr<DOMStringList> objectStoreNames() const;
 
   virtual PassRefPtr<IDBObjectStoreBackendInterface> createObjectStore(
       const String& name,
@@ -76,7 +76,7 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
                           PassRefPtr<IDBCallbacks>,
                           ExceptionCode&);
   virtual PassRefPtr<IDBTransactionBackendInterface> transaction(
-      DOMStringList* storeNames,
+      DOMStringList* objectStoreNames,
       unsigned short mode,
       unsigned long timeout,
       ExceptionCode&);
