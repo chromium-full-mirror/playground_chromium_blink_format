@@ -67,7 +67,6 @@ class FontPlatformData {
       : m_syntheticBold(syntheticBold),
         m_syntheticOblique(syntheticOblique),
         m_orientation(orientation),
-        m_atsuFontID(0),
         m_size(size),
         m_font(0)
 #ifdef BUILDING_ON_TIGER
@@ -85,7 +84,6 @@ class FontPlatformData {
                    FontOrientation = Horizontal);
 
   FontPlatformData(CGFontRef cgFont,
-                   ATSUFontID fontID,
                    float size,
                    bool syntheticBold,
                    bool syntheticOblique,
@@ -93,7 +91,6 @@ class FontPlatformData {
       : m_syntheticBold(syntheticBold),
         m_syntheticOblique(syntheticOblique),
         m_orientation(orientation),
-        m_atsuFontID(fontID),
         m_size(size),
         m_font(0),
         m_cgFont(cgFont),
@@ -118,7 +115,6 @@ class FontPlatformData {
   bool m_syntheticOblique;
   FontOrientation m_orientation;
 
-  ATSUFontID m_atsuFontID;
   float m_size;
 
   unsigned hash() const {
@@ -135,7 +131,6 @@ class FontPlatformData {
     return m_font == other.m_font && m_syntheticBold == other.m_syntheticBold &&
            m_syntheticOblique == other.m_syntheticOblique &&
            m_cgFont == other.m_cgFont && m_size == other.m_size &&
-           m_atsuFontID == other.m_atsuFontID &&
            m_orientation == other.m_orientation;
   }
 
@@ -175,12 +170,10 @@ class FontPlatformData {
   // done with it.
   // * cgFont - CGFontRef representing the input font at the specified point
   // size.
-  // * fontID - ID of loaded font.
   void loadFont(NSFont* nsFont,
                 float fontSize,
                 NSFont*& outNSFont,
-                CGFontRef& cgFont,
-                ATSUFontID& fontID);
+                CGFontRef& cgFont);
 
   NSFont* m_font;
 

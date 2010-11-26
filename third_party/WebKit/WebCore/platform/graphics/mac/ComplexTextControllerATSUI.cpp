@@ -334,7 +334,10 @@ static ATSUStyle initializeATSUStyle(const SimpleFontData* fontData,
   if (!addResult.second)
     return atsuStyle;
 
-  ATSUFontID fontID = fontData->platformData().m_atsuFontID;
+  ATSUFontID fontID =
+      fontData->platformData().ctFont()
+          ? CTFontGetPlatformFont(fontData->platformData().ctFont(), 0)
+          : 0;
   if (!fontID) {
     LOG_ERROR("unable to get ATSUFontID for %p",
               fontData->platformData().font());
