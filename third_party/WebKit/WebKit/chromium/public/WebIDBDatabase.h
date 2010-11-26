@@ -66,10 +66,16 @@ class WebIDBDatabase {
     WEBKIT_ASSERT_NOT_REACHED();
     return 0;
   }
+  virtual void deleteObjectStore(const WebString& name,
+                                 const WebIDBTransaction& transaction,
+                                 WebExceptionCode& ec) {
+    removeObjectStore(name, transaction, ec);
+  }
+  // FIXME: remove after roll.
   virtual void removeObjectStore(const WebString& name,
-                                 const WebIDBTransaction&,
-                                 WebExceptionCode&) {
-    WEBKIT_ASSERT_NOT_REACHED();
+                                 const WebIDBTransaction& transaction,
+                                 WebExceptionCode& ec) {
+    deleteObjectStore(name, transaction, ec);
   }
   virtual void setVersion(const WebString& version,
                           WebIDBCallbacks* callbacks,

@@ -70,11 +70,18 @@ class WebIDBObjectStore {
                    WebExceptionCode&) {
     WEBKIT_ASSERT_NOT_REACHED();
   }
-  virtual void remove(const WebIDBKey&,
-                      WebIDBCallbacks*,
-                      const WebIDBTransaction&,
-                      WebExceptionCode&) {
-    WEBKIT_ASSERT_NOT_REACHED();
+  // FIXME: Remove after roll.
+  virtual void remove(const WebIDBKey& key,
+                      WebIDBCallbacks* callbacks,
+                      const WebIDBTransaction& transaction,
+                      WebExceptionCode& ec) {
+    deleteFunction(key, callbacks, transaction, ec);
+  }
+  virtual void deleteFunction(const WebIDBKey& key,
+                              WebIDBCallbacks* callbacks,
+                              const WebIDBTransaction& transaction,
+                              WebExceptionCode& ec) {
+    remove(key, callbacks, transaction, ec);
   }
   virtual WebIDBIndex* createIndex(const WebString& name,
                                    const WebString& keyPath,
@@ -89,7 +96,7 @@ class WebIDBObjectStore {
     WEBKIT_ASSERT_NOT_REACHED();
     return 0;
   }
-  virtual void removeIndex(const WebString& name,
+  virtual void deleteIndex(const WebString& name,
                            const WebIDBTransaction&,
                            WebExceptionCode&) {
     WEBKIT_ASSERT_NOT_REACHED();

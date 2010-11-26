@@ -61,10 +61,10 @@ class IDBObjectStoreBackendInterface
                    PassRefPtr<IDBCallbacks>,
                    IDBTransactionBackendInterface*,
                    ExceptionCode&) = 0;
-  virtual void remove(PassRefPtr<IDBKey>,
-                      PassRefPtr<IDBCallbacks>,
-                      IDBTransactionBackendInterface*,
-                      ExceptionCode&) = 0;
+  virtual void deleteFunction(PassRefPtr<IDBKey>,
+                              PassRefPtr<IDBCallbacks>,
+                              IDBTransactionBackendInterface*,
+                              ExceptionCode&) = 0;
 
   virtual PassRefPtr<IDBIndexBackendInterface> createIndex(
       const String& name,
@@ -74,7 +74,7 @@ class IDBObjectStoreBackendInterface
       ExceptionCode&) = 0;
   virtual PassRefPtr<IDBIndexBackendInterface> index(const String& name,
                                                      ExceptionCode&) = 0;
-  virtual void removeIndex(const String& name,
+  virtual void deleteIndex(const String& name,
                            IDBTransactionBackendInterface*,
                            ExceptionCode&) = 0;
 

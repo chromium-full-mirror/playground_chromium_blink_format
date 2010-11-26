@@ -92,16 +92,16 @@ class IDBObjectStore : public RefCounted<IDBObjectStore> {
                              PassRefPtr<SerializedScriptValue>,
                              PassRefPtr<IDBKey>,
                              ExceptionCode&);
-  PassRefPtr<IDBRequest> remove(ScriptExecutionContext*,
-                                PassRefPtr<IDBKey> key,
-                                ExceptionCode&);
+  PassRefPtr<IDBRequest> deleteFunction(ScriptExecutionContext*,
+                                        PassRefPtr<IDBKey> key,
+                                        ExceptionCode&);
 
   PassRefPtr<IDBIndex> createIndex(const String& name,
                                    const String& keyPath,
                                    const OptionsObject&,
                                    ExceptionCode&);
   PassRefPtr<IDBIndex> index(const String& name, ExceptionCode&);
-  void removeIndex(const String& name, ExceptionCode&);
+  void deleteIndex(const String& name, ExceptionCode&);
 
   PassRefPtr<IDBRequest> openCursor(ScriptExecutionContext*,
                                     const OptionsObject&,

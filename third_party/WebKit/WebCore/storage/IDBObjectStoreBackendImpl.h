@@ -84,10 +84,10 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
                    PassRefPtr<IDBCallbacks>,
                    IDBTransactionBackendInterface*,
                    ExceptionCode&);
-  virtual void remove(PassRefPtr<IDBKey> key,
-                      PassRefPtr<IDBCallbacks>,
-                      IDBTransactionBackendInterface*,
-                      ExceptionCode&);
+  virtual void deleteFunction(PassRefPtr<IDBKey> key,
+                              PassRefPtr<IDBCallbacks>,
+                              IDBTransactionBackendInterface*,
+                              ExceptionCode&);
 
   virtual PassRefPtr<IDBIndexBackendInterface> createIndex(
       const String& name,
@@ -97,7 +97,7 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
       ExceptionCode&);
   virtual PassRefPtr<IDBIndexBackendInterface> index(const String& name,
                                                      ExceptionCode&);
-  virtual void removeIndex(const String& name,
+  virtual void deleteIndex(const String& name,
                            IDBTransactionBackendInterface*,
                            ExceptionCode&);
 
@@ -132,7 +132,7 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
                           bool addOnly,
                           PassRefPtr<IDBCallbacks>,
                           PassRefPtr<IDBTransactionBackendInterface>);
-  static void removeInternal(ScriptExecutionContext*,
+  static void deleteInternal(ScriptExecutionContext*,
                              PassRefPtr<IDBObjectStoreBackendImpl>,
                              PassRefPtr<IDBKey> key,
                              PassRefPtr<IDBCallbacks>);
@@ -140,7 +140,7 @@ class IDBObjectStoreBackendImpl : public IDBObjectStoreBackendInterface {
                                   PassRefPtr<IDBObjectStoreBackendImpl>,
                                   PassRefPtr<IDBIndexBackendImpl>,
                                   PassRefPtr<IDBTransactionBackendInterface>);
-  static void removeIndexInternal(ScriptExecutionContext*,
+  static void deleteIndexInternal(ScriptExecutionContext*,
                                   PassRefPtr<IDBObjectStoreBackendImpl>,
                                   PassRefPtr<IDBIndexBackendImpl>,
                                   PassRefPtr<IDBTransactionBackendInterface>);

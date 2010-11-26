@@ -56,7 +56,7 @@ class IDBDatabaseProxy : public IDBDatabaseBackendInterface {
       bool autoIncrement,
       IDBTransactionBackendInterface*,
       ExceptionCode&);
-  virtual void removeObjectStore(const String& name,
+  virtual void deleteObjectStore(const String& name,
                                  IDBTransactionBackendInterface*,
                                  ExceptionCode&);
   virtual void setVersion(const String& version,

@@ -69,7 +69,7 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
       bool autoIncrement,
       IDBTransactionBackendInterface*,
       ExceptionCode&);
-  virtual void removeObjectStore(const String& name,
+  virtual void deleteObjectStore(const String& name,
                                  IDBTransactionBackendInterface*,
                                  ExceptionCode&);
   virtual void setVersion(const String& version,
@@ -101,7 +101,7 @@ class IDBDatabaseBackendImpl : public IDBDatabaseBackendInterface {
       PassRefPtr<IDBDatabaseBackendImpl>,
       PassRefPtr<IDBObjectStoreBackendImpl>,
       PassRefPtr<IDBTransactionBackendInterface>);
-  static void removeObjectStoreInternal(
+  static void deleteObjectStoreInternal(
       ScriptExecutionContext*,
       PassRefPtr<IDBDatabaseBackendImpl>,
       PassRefPtr<IDBObjectStoreBackendImpl>,

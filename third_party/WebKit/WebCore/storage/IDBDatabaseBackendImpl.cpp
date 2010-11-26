@@ -206,7 +206,7 @@ static void doDelete(SQLiteDatabase& db, const char* sql, int64_t id) {
   ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
 }
 
-void IDBDatabaseBackendImpl::removeObjectStore(
+void IDBDatabaseBackendImpl::deleteObjectStore(
     const String& name,
     IDBTransactionBackendInterface* transactionPtr,
     ExceptionCode& ec) {
@@ -218,7 +218,7 @@ void IDBDatabaseBackendImpl::removeObjectStore(
   RefPtr<IDBDatabaseBackendImpl> database = this;
   RefPtr<IDBTransactionBackendInterface> transaction = transactionPtr;
   if (!transaction->scheduleTask(
-          createCallbackTask(&IDBDatabaseBackendImpl::removeObjectStoreInternal,
+          createCallbackTask(&IDBDatabaseBackendImpl::deleteObjectStoreInternal,
                              database, objectStore, transaction),
           createCallbackTask(&IDBDatabaseBackendImpl::addObjectStoreToMap,
                              database, objectStore))) {
@@ -228,7 +228,7 @@ void IDBDatabaseBackendImpl::removeObjectStore(
   m_objectStores.remove(name);
 }
 
-void IDBDatabaseBackendImpl::removeObjectStoreInternal(
+void IDBDatabaseBackendImpl::deleteObjectStoreInternal(
     ScriptExecutionContext*,
     PassRefPtr<IDBDatabaseBackendImpl> database,
     PassRefPtr<IDBObjectStoreBackendImpl> objectStore,

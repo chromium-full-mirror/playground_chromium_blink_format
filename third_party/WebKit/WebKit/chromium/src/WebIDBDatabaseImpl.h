@@ -56,7 +56,7 @@ class WebIDBDatabaseImpl : public WebIDBDatabase {
                                                bool autoIncrement,
                                                const WebIDBTransaction&,
                                                WebExceptionCode&);
-  virtual void removeObjectStore(const WebString& name,
+  virtual void deleteObjectStore(const WebString& name,
                                  const WebIDBTransaction&,
                                  WebExceptionCode&);
   virtual void setVersion(const WebString& version,

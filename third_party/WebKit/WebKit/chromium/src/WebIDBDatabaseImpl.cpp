@@ -75,10 +75,10 @@ WebIDBObjectStore* WebIDBDatabaseImpl::createObjectStore(
   return new WebIDBObjectStoreImpl(objectStore);
 }
 
-void WebIDBDatabaseImpl::removeObjectStore(const WebString& name,
+void WebIDBDatabaseImpl::deleteObjectStore(const WebString& name,
                                            const WebIDBTransaction& transaction,
                                            WebExceptionCode& ec) {
-  m_databaseBackend->removeObjectStore(
+  m_databaseBackend->deleteObjectStore(
       name, transaction.getIDBTransactionBackendInterface(), ec);
 }
 

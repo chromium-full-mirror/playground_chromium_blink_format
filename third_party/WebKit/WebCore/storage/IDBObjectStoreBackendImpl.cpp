@@ -348,7 +348,7 @@ void IDBObjectStoreBackendImpl::putInternal(
   callbacks->onSuccess(key.get());
 }
 
-void IDBObjectStoreBackendImpl::remove(
+void IDBObjectStoreBackendImpl::deleteFunction(
     PassRefPtr<IDBKey> prpKey,
     PassRefPtr<IDBCallbacks> prpCallbacks,
     IDBTransactionBackendInterface* transaction,
@@ -357,12 +357,12 @@ void IDBObjectStoreBackendImpl::remove(
   RefPtr<IDBKey> key = prpKey;
   RefPtr<IDBCallbacks> callbacks = prpCallbacks;
   if (!transaction->scheduleTask(
-          createCallbackTask(&IDBObjectStoreBackendImpl::removeInternal,
+          createCallbackTask(&IDBObjectStoreBackendImpl::deleteInternal,
                              objectStore, key, callbacks)))
     ec = IDBDatabaseException::NOT_ALLOWED_ERR;
 }
 
-void IDBObjectStoreBackendImpl::removeInternal(
+void IDBObjectStoreBackendImpl::deleteInternal(
     ScriptExecutionContext*,
     PassRefPtr<IDBObjectStoreBackendImpl> objectStore,
     PassRefPtr<IDBKey> key,
@@ -463,7 +463,7 @@ static void doDelete(SQLiteDatabase& db, const char* sql, int64_t id) {
   ASSERT_UNUSED(ok, ok);  // FIXME: Better error handling.
 }
 
-void IDBObjectStoreBackendImpl::removeIndex(
+void IDBObjectStoreBackendImpl::deleteIndex(
     const String& name,
     IDBTransactionBackendInterface* transaction,
     ExceptionCode& ec) {
@@ -476,7 +476,7 @@ void IDBObjectStoreBackendImpl::removeIndex(
   RefPtr<IDBObjectStoreBackendImpl> objectStore = this;
   RefPtr<IDBTransactionBackendInterface> transactionPtr = transaction;
   if (!transaction->scheduleTask(
-          createCallbackTask(&IDBObjectStoreBackendImpl::removeIndexInternal,
+          createCallbackTask(&IDBObjectStoreBackendImpl::deleteIndexInternal,
                              objectStore, index, transactionPtr),
           createCallbackTask(&IDBObjectStoreBackendImpl::addIndexToMap,
                              objectStore, index))) {
@@ -486,7 +486,7 @@ void IDBObjectStoreBackendImpl::removeIndex(
   m_indexes.remove(name);
 }
 
-void IDBObjectStoreBackendImpl::removeIndexInternal(
+void IDBObjectStoreBackendImpl::deleteIndexInternal(
     ScriptExecutionContext*,
     PassRefPtr<IDBObjectStoreBackendImpl> objectStore,
     PassRefPtr<IDBIndexBackendImpl> index,

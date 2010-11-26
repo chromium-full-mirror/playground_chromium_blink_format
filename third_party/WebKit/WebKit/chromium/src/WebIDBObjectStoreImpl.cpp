@@ -78,12 +78,13 @@ void WebIDBObjectStoreImpl::put(const WebSerializedScriptValue& value,
                      transaction.getIDBTransactionBackendInterface(), ec);
 }
 
-void WebIDBObjectStoreImpl::remove(const WebIDBKey& key,
-                                   WebIDBCallbacks* callbacks,
-                                   const WebIDBTransaction& transaction,
-                                   WebExceptionCode& ec) {
-  m_objectStore->remove(key, IDBCallbacksProxy::create(callbacks),
-                        transaction.getIDBTransactionBackendInterface(), ec);
+void WebIDBObjectStoreImpl::deleteFunction(const WebIDBKey& key,
+                                           WebIDBCallbacks* callbacks,
+                                           const WebIDBTransaction& transaction,
+                                           WebExceptionCode& ec) {
+  m_objectStore->deleteFunction(key, IDBCallbacksProxy::create(callbacks),
+                                transaction.getIDBTransactionBackendInterface(),
+                                ec);
 }
 
 WebIDBIndex* WebIDBObjectStoreImpl::createIndex(
@@ -108,10 +109,10 @@ WebIDBIndex* WebIDBObjectStoreImpl::index(const WebString& name,
   return new WebIDBIndexImpl(index);
 }
 
-void WebIDBObjectStoreImpl::removeIndex(const WebString& name,
+void WebIDBObjectStoreImpl::deleteIndex(const WebString& name,
                                         const WebIDBTransaction& transaction,
                                         WebExceptionCode& ec) {
-  m_objectStore->removeIndex(
+  m_objectStore->deleteIndex(
       name, transaction.getIDBTransactionBackendInterface(), ec);
 }
 

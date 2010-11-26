@@ -63,7 +63,7 @@ class IDBDatabaseBackendInterface
       bool autoIncrement,
       IDBTransactionBackendInterface*,
       ExceptionCode&) = 0;
-  virtual void removeObjectStore(const String& name,
+  virtual void deleteObjectStore(const String& name,
                                  IDBTransactionBackendInterface*,
                                  ExceptionCode&) = 0;
   virtual void setVersion(const String& version,

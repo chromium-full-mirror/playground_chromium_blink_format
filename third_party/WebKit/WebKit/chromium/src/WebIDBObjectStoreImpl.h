@@ -60,10 +60,10 @@ class WebIDBObjectStoreImpl : public WebIDBObjectStore {
            WebIDBCallbacks*,
            const WebIDBTransaction&,
            WebExceptionCode&);
-  void remove(const WebIDBKey& key,
-              WebIDBCallbacks*,
-              const WebIDBTransaction&,
-              WebExceptionCode&);
+  void deleteFunction(const WebIDBKey& key,
+                      WebIDBCallbacks*,
+                      const WebIDBTransaction&,
+                      WebExceptionCode&);
 
   WebIDBIndex* createIndex(const WebString& name,
                            const WebString& keyPath,
@@ -71,7 +71,7 @@ class WebIDBObjectStoreImpl : public WebIDBObjectStore {
                            const WebIDBTransaction&,
                            WebExceptionCode&);
   WebIDBIndex* index(const WebString& name, WebExceptionCode&);
-  void removeIndex(const WebString& name,
+  void deleteIndex(const WebString& name,
                    const WebIDBTransaction&,
                    WebExceptionCode&);
 

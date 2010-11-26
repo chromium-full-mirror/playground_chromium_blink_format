@@ -95,17 +95,19 @@ void IDBObjectStoreProxy::put(PassRefPtr<SerializedScriptValue> value,
                            *transactionProxy->getWebIDBTransaction(), ec);
 }
 
-void IDBObjectStoreProxy::remove(PassRefPtr<IDBKey> key,
-                                 PassRefPtr<IDBCallbacks> callbacks,
-                                 IDBTransactionBackendInterface* transaction,
-                                 ExceptionCode& ec) {
+void IDBObjectStoreProxy::deleteFunction(
+    PassRefPtr<IDBKey> key,
+    PassRefPtr<IDBCallbacks> callbacks,
+    IDBTransactionBackendInterface* transaction,
+    ExceptionCode& ec) {
   // The transaction pointer is guaranteed to be a pointer to a proxy object as,
   // in the renderer,
   // all implementations of IDB interfaces are proxy objects.
   IDBTransactionBackendProxy* transactionProxy =
       static_cast<IDBTransactionBackendProxy*>(transaction);
-  m_webIDBObjectStore->remove(key, new WebIDBCallbacksImpl(callbacks),
-                              *transactionProxy->getWebIDBTransaction(), ec);
+  m_webIDBObjectStore->deleteFunction(key, new WebIDBCallbacksImpl(callbacks),
+                                      *transactionProxy->getWebIDBTransaction(),
+                                      ec);
 }
 
 PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreProxy::createIndex(
@@ -135,7 +137,7 @@ PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreProxy::index(
   return IDBIndexBackendProxy::create(index);
 }
 
-void IDBObjectStoreProxy::removeIndex(
+void IDBObjectStoreProxy::deleteIndex(
     const String& name,
     IDBTransactionBackendInterface* transaction,
     ExceptionCode& ec) {
@@ -144,7 +146,7 @@ void IDBObjectStoreProxy::removeIndex(
   // all implementations of IDB interfaces are proxy objects.
   IDBTransactionBackendProxy* transactionProxy =
       static_cast<IDBTransactionBackendProxy*>(transaction);
-  m_webIDBObjectStore->removeIndex(
+  m_webIDBObjectStore->deleteIndex(
       name, *transactionProxy->getWebIDBTransaction(), ec);
 }
 
