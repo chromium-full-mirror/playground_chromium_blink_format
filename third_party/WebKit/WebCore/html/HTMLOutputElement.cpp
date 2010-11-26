@@ -42,7 +42,7 @@ inline HTMLOutputElement::HTMLOutputElement(const QualifiedName& tagName,
     : HTMLFormControlElement(tagName, document, form),
       m_isDefaultValueMode(true),
       m_isSetTextContentInProgress(false),
-      m_defaultValue(),
+      m_defaultValue(""),
       m_tokens(DOMSettableTokenList::create()) {}
 
 PassRefPtr<HTMLOutputElement> HTMLOutputElement::create(
@@ -90,6 +90,8 @@ void HTMLOutputElement::reset() {
   // value mode flag to "default" and then to set the element's textContent
   // attribute to the default value.
   m_isDefaultValueMode = true;
+  if (m_defaultValue == value())
+    return;
   setTextContentInternal(m_defaultValue);
 }
 
@@ -100,6 +102,8 @@ String HTMLOutputElement::value() const {
 void HTMLOutputElement::setValue(const String& value) {
   // The value mode flag set to "value" when the value attribute is set.
   m_isDefaultValueMode = false;
+  if (value == this->value())
+    return;
   setTextContentInternal(value);
 }
 
@@ -108,6 +112,8 @@ String HTMLOutputElement::defaultValue() const {
 }
 
 void HTMLOutputElement::setDefaultValue(const String& value) {
+  if (m_defaultValue == value)
+    return;
   m_defaultValue = value;
   // The spec requires the value attribute set to the default value
   // when the element's value mode flag to "default".
