@@ -32,70 +32,52 @@
 
 namespace WebCore {
 
-IDBKeyRange::IDBKeyRange(PassRefPtr<IDBKey> left,
-                         PassRefPtr<IDBKey> right,
-                         unsigned short flags)
-    : m_left(left), m_right(right), m_flags(flags) {}
+IDBKeyRange::IDBKeyRange(PassRefPtr<IDBKey> lower,
+                         PassRefPtr<IDBKey> upper,
+                         bool lowerOpen,
+                         bool upperOpen)
+    : m_lower(lower),
+      m_upper(upper),
+      m_lowerOpen(lowerOpen),
+      m_upperOpen(upperOpen) {}
 
 PassRefPtr<IDBKeyRange> IDBKeyRange::only(PassRefPtr<IDBKey> prpValue) {
   RefPtr<IDBKey> value = prpValue;
-  return IDBKeyRange::create(value, value, IDBKeyRange::SINGLE);
+  return IDBKeyRange::create(value, value, false, false);
 }
 
-PassRefPtr<IDBKeyRange> IDBKeyRange::leftBound(PassRefPtr<IDBKey> bound,
-                                               bool open) {
-  unsigned short flags = IDBKeyRange::LEFT_BOUND;
-  if (open)
-    flags |= IDBKeyRange::LEFT_OPEN;
-  return IDBKeyRange::create(bound, IDBKey::create(), flags);
-}
-
-PassRefPtr<IDBKeyRange> IDBKeyRange::rightBound(PassRefPtr<IDBKey> bound,
+PassRefPtr<IDBKeyRange> IDBKeyRange::lowerBound(PassRefPtr<IDBKey> bound,
                                                 bool open) {
-  unsigned short flags = IDBKeyRange::RIGHT_BOUND;
-  if (open)
-    flags |= IDBKeyRange::RIGHT_OPEN;
-  return IDBKeyRange::create(IDBKey::create(), bound, flags);
+  return IDBKeyRange::create(bound, 0, open, false);
 }
 
-PassRefPtr<IDBKeyRange> IDBKeyRange::bound(PassRefPtr<IDBKey> left,
-                                           PassRefPtr<IDBKey> right,
-                                           bool openLeft,
-                                           bool openRight) {
-  unsigned short flags = IDBKeyRange::LEFT_BOUND | IDBKeyRange::RIGHT_BOUND;
-  if (openLeft)
-    flags |= IDBKeyRange::LEFT_OPEN;
-  if (openRight)
-    flags |= IDBKeyRange::RIGHT_OPEN;
-  return IDBKeyRange::create(left, right, flags);
+PassRefPtr<IDBKeyRange> IDBKeyRange::upperBound(PassRefPtr<IDBKey> bound,
+                                                bool open) {
+  return IDBKeyRange::create(0, bound, false, open);
 }
 
-String IDBKeyRange::leftWhereClauseComparisonOperator() const {
-  if (m_flags & LEFT_OPEN)
+PassRefPtr<IDBKeyRange> IDBKeyRange::bound(PassRefPtr<IDBKey> lower,
+                                           PassRefPtr<IDBKey> upper,
+                                           const OptionsObject& options) {
+  bool lowerOpen = false;
+  bool upperOpen = false;
+  options.getKeyBool("lowerOpen", lowerOpen);
+  options.getKeyBool("upperOpen", upperOpen);
+  return IDBKeyRange::create(lower, upper, lowerOpen, upperOpen);
+}
+
+String IDBKeyRange::lowerWhereClauseComparisonOperator() const {
+  ASSERT(m_lower);
+  if (m_lowerOpen)
     return "<";
-
-  if (m_flags & LEFT_BOUND)
-    return "<=";
-
-  if (m_flags == SINGLE)
-    return "=";
-
-  ASSERT_NOT_REACHED();
-  return "";
+  return "<=";
 }
 
-String IDBKeyRange::rightWhereClauseComparisonOperator() const {
-  if (m_flags & RIGHT_OPEN)
+String IDBKeyRange::upperWhereClauseComparisonOperator() const {
+  ASSERT(m_upper);
+  if (m_upperOpen)
     return "<";
-
-  if (m_flags & RIGHT_BOUND)
-    return "<=";
-
-  if (m_flags == SINGLE)
-    return "=";
-
-  ASSERT_NOT_REACHED();
-  return "";
+  return "<=";
 }
 
 }  // namespace WebCore
