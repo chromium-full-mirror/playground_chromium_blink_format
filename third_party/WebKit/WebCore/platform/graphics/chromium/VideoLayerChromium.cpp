@@ -209,10 +209,7 @@ void VideoLayerChromium::cleanupResources() {
   }
 }
 
-void VideoLayerChromium::updateContentsIfDirty() {
-  if (!m_contentsDirty)
-    return;
-
+void VideoLayerChromium::updateContents() {
   RenderLayerBacking* backing =
       static_cast<RenderLayerBacking*>(m_owner->client());
   if (!backing || backing->paintingGoesToWindow())

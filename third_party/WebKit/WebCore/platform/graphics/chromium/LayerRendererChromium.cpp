@@ -36,9 +36,7 @@
 #include "Canvas2DLayerChromium.h"
 #include "GraphicsContext3D.h"
 #include "LayerChromium.h"
-#include "LayerTexture.h"
 #include "NotImplemented.h"
-#include "TextureManager.h"
 #include "WebGLLayerChromium.h"
 #if PLATFORM(SKIA)
 #include "NativeImageSkia.h"
@@ -48,9 +46,6 @@
 #endif
 
 namespace WebCore {
-
-// FIXME: Make this limit adjustable and give it a useful value.
-static size_t textureMemoryLimitBytes = 64 * 1024 * 1024;
 
 static TransformationMatrix orthoMatrix(float left,
                                         float right,
@@ -104,6 +99,7 @@ LayerRendererChromium::LayerRendererChromium(
     : m_rootLayerTextureId(0),
       m_rootLayerTextureWidth(0),
       m_rootLayerTextureHeight(0),
+      m_textureLayerShaderProgram(0),
       m_rootLayer(0),
       m_scrollPosition(IntPoint(-1, -1)),
       m_currentShader(0),
@@ -268,14 +264,13 @@ void LayerRendererChromium::prepareToDrawLayers(
         0.5 * visibleRect.height() + scrollDelta.y(), 0);
     scrolledLayerMatrix.scale3d(1, -1, 1);
 
-    const RenderSurfaceChromium::SharedValues* rsv =
-        renderSurfaceSharedValues();
-    useShader(rsv->shaderProgram());
-    GLC(m_context, m_context->uniform1i(rsv->shaderSamplerLocation(), 0));
+    useShader(m_textureLayerShaderProgram);
+    GLC(m_context,
+        m_context->uniform1i(m_textureLayerShaderSamplerLocation, 0));
     LayerChromium::drawTexturedQuad(
         m_context.get(), m_projectionMatrix, scrolledLayerMatrix,
         visibleRect.width(), visibleRect.height(), 1,
-        rsv->shaderMatrixLocation(), rsv->shaderAlphaLocation());
+        m_textureLayerShaderMatrixLocation, m_textureLayerShaderAlphaLocation);
 
     GLC(m_context, m_context->copyTexSubImage2D(
                        GraphicsContext3D::TEXTURE_2D, 0, 0, 0, 0, 0,
@@ -402,21 +397,20 @@ void LayerRendererChromium::drawLayers(const IntRect& visibleRect,
     if (!renderSurfaceLayer->m_renderSurface->m_layerList.size())
       continue;
 
-    if (useRenderSurface(renderSurfaceLayer->m_renderSurface.get())) {
-      if (renderSurfaceLayer != m_rootLayer) {
-        GLC(m_context, m_context->disable(GraphicsContext3D::SCISSOR_TEST));
-        GLC(m_context, m_context->clearColor(0, 0, 0, 0));
-        GLC(m_context, m_context->clear(GraphicsContext3D::COLOR_BUFFER_BIT));
-        GLC(m_context, m_context->enable(GraphicsContext3D::SCISSOR_TEST));
-      }
-
-      Vector<LayerChromium*>& layerList =
-          renderSurfaceLayer->m_renderSurface->m_layerList;
-      ASSERT(layerList.size());
-      for (unsigned layerIndex = 0; layerIndex < layerList.size(); ++layerIndex)
-        drawLayer(layerList[layerIndex],
-                  renderSurfaceLayer->m_renderSurface.get());
+    useRenderSurface(renderSurfaceLayer->m_renderSurface.get());
+    if (renderSurfaceLayer != m_rootLayer) {
+      GLC(m_context, m_context->disable(GraphicsContext3D::SCISSOR_TEST));
+      GLC(m_context, m_context->clearColor(0, 0, 0, 0));
+      GLC(m_context, m_context->clear(GraphicsContext3D::COLOR_BUFFER_BIT));
+      GLC(m_context, m_context->enable(GraphicsContext3D::SCISSOR_TEST));
     }
+
+    Vector<LayerChromium*>& layerList =
+        renderSurfaceLayer->m_renderSurface->m_layerList;
+    ASSERT(layerList.size());
+    for (unsigned layerIndex = 0; layerIndex < layerList.size(); ++layerIndex)
+      drawLayer(layerList[layerIndex],
+                renderSurfaceLayer->m_renderSurface.get());
   }
 
   GLC(m_context, m_context->disable(GraphicsContext3D::SCISSOR_TEST));
@@ -592,7 +586,7 @@ void LayerRendererChromium::updateLayersRecursive(
     // Layer's opacity will be applied when drawing the render surface.
     renderSurface->m_drawOpacity = layer->opacity();
     if (layer->superlayer()->preserves3D())
-      renderSurface->m_drawOpacity *= layer->superlayer()->drawOpacity();
+      renderSurface->m_drawOpacity *= layer->superlayer()->m_drawOpacity;
     layer->m_drawOpacity = 1;
 
     TransformationMatrix layerOriginTransform = combinedTransform;
@@ -690,7 +684,7 @@ void LayerRendererChromium::updateLayersRecursive(
     if (sublayer->m_renderSurface) {
       RenderSurfaceChromium* sublayerRenderSurface =
           sublayer->m_renderSurface.get();
-      const IntRect& contentRect = sublayerRenderSurface->contentRect();
+      const IntRect& contentRect = sublayerRenderSurface->m_contentRect;
       FloatRect sublayerRect(-0.5 * contentRect.width(),
                              -0.5 * contentRect.height(), contentRect.width(),
                              contentRect.height());
@@ -776,10 +770,13 @@ bool LayerRendererChromium::useRenderSurface(
   GLC(m_context, m_context->bindFramebuffer(GraphicsContext3D::FRAMEBUFFER,
                                             m_offscreenFramebufferId));
 
-  if (!renderSurface->prepareContentsTexture())
-    return false;
+  renderSurface->prepareContentsTexture();
 
-  renderSurface->m_contentsTexture->framebufferTexture2D();
+  GLC(m_context,
+      m_context->framebufferTexture2D(GraphicsContext3D::FRAMEBUFFER,
+                                      GraphicsContext3D::COLOR_ATTACHMENT0,
+                                      GraphicsContext3D::TEXTURE_2D,
+                                      renderSurface->m_contentsTextureId, 0));
 
 #if !defined(NDEBUG)
   if (m_context->checkFramebufferStatus(GraphicsContext3D::FRAMEBUFFER) !=
@@ -796,7 +793,19 @@ bool LayerRendererChromium::useRenderSurface(
 void LayerRendererChromium::drawLayer(LayerChromium* layer,
                                       RenderSurfaceChromium* targetSurface) {
   if (layer->m_renderSurface && layer->m_renderSurface != targetSurface) {
-    layer->m_renderSurface->draw();
+    GLC(m_context,
+        m_context->bindTexture(GraphicsContext3D::TEXTURE_2D,
+                               layer->m_renderSurface->m_contentsTextureId));
+    useShader(m_textureLayerShaderProgram);
+
+    setScissorToRect(layer->m_renderSurface->m_scissorRect);
+
+    IntRect contentRect = layer->m_renderSurface->m_contentRect;
+    LayerChromium::drawTexturedQuad(
+        m_context.get(), m_projectionMatrix,
+        layer->m_renderSurface->m_drawTransform, contentRect.width(),
+        contentRect.height(), layer->m_renderSurface->m_drawOpacity,
+        m_textureLayerShaderMatrixLocation, m_textureLayerShaderAlphaLocation);
     return;
   }
 
@@ -819,8 +828,12 @@ void LayerRendererChromium::drawLayer(LayerChromium* layer,
 
   if (layer->drawsContent()) {
     // Update the contents of the layer if necessary.
-    layer->updateContentsIfDirty();
-    m_context->makeContextCurrent();
+    if (layer->contentsDirty()) {
+      // Update the backing texture contents for any dirty portion of the layer.
+      layer->updateContents();
+      m_context->makeContextCurrent();
+    }
+
     layer->draw();
   }
 
@@ -889,6 +902,59 @@ void LayerRendererChromium::resizeOnscreenContent(const IntSize& size) {
 bool LayerRendererChromium::initializeSharedObjects() {
   makeContextCurrent();
 
+  // The following program composites layers whose contents are the results of a
+  // previous
+  // render operation and therefore doesn't perform any color swizzling. It is
+  // used
+  // in scrolling and for compositing offscreen textures.
+  char textureLayerVertexShaderString[] =
+      "attribute vec4 a_position;   \n"
+      "attribute vec2 a_texCoord;   \n"
+      "uniform mat4 matrix;         \n"
+      "varying vec2 v_texCoord;     \n"
+      "void main()                  \n"
+      "{                            \n"
+      "  gl_Position = matrix * a_position; \n"
+      "  v_texCoord = a_texCoord;   \n"
+      "}                            \n";
+  char textureLayerFragmentShaderString[] =
+      "precision mediump float;                            \n"
+      "varying vec2 v_texCoord;                            \n"
+      "uniform sampler2D s_texture;                        \n"
+      "uniform float alpha;                                \n"
+      "void main()                                         \n"
+      "{                                                   \n"
+      "  vec4 texColor = texture2D(s_texture, v_texCoord); \n"
+      "  gl_FragColor = vec4(texColor.x, texColor.y, texColor.z, texColor.w) * "
+      "alpha; \n"
+      "}                                                   \n";
+
+  m_textureLayerShaderProgram = LayerChromium::createShaderProgram(
+      m_context.get(), textureLayerVertexShaderString,
+      textureLayerFragmentShaderString);
+  if (!m_textureLayerShaderProgram) {
+    LOG_ERROR("LayerRendererChromium: Failed to create scroll shader program");
+    cleanupSharedObjects();
+    return false;
+  }
+
+  GLC(m_context,
+      m_textureLayerShaderSamplerLocation = m_context->getUniformLocation(
+          m_textureLayerShaderProgram, "s_texture"));
+  GLC(m_context,
+      m_textureLayerShaderMatrixLocation =
+          m_context->getUniformLocation(m_textureLayerShaderProgram, "matrix"));
+  GLC(m_context,
+      m_textureLayerShaderAlphaLocation =
+          m_context->getUniformLocation(m_textureLayerShaderProgram, "alpha"));
+  if (m_textureLayerShaderSamplerLocation == -1 ||
+      m_textureLayerShaderMatrixLocation == -1 ||
+      m_textureLayerShaderAlphaLocation == -1) {
+    LOG_ERROR("Failed to initialize texture layer shader.");
+    cleanupSharedObjects();
+    return false;
+  }
+
   // Create a texture object to hold the contents of the root layer.
   m_rootLayerTextureId = createLayerTexture();
   if (!m_rootLayerTextureId) {
@@ -924,21 +990,16 @@ bool LayerRendererChromium::initializeSharedObjects() {
       adoptPtr(new VideoLayerChromium::SharedValues(m_context.get()));
   m_pluginLayerSharedValues =
       adoptPtr(new PluginLayerChromium::SharedValues(m_context.get()));
-  m_renderSurfaceSharedValues =
-      adoptPtr(new RenderSurfaceChromium::SharedValues(m_context.get()));
 
   if (!m_layerSharedValues->initialized() ||
       !m_contentLayerSharedValues->initialized() ||
       !m_canvasLayerSharedValues->initialized() ||
       !m_videoLayerSharedValues->initialized() ||
-      !m_pluginLayerSharedValues->initialized() ||
-      !m_renderSurfaceSharedValues->initialized()) {
+      !m_pluginLayerSharedValues->initialized()) {
     cleanupSharedObjects();
     return false;
   }
 
-  m_textureManager = TextureManager::create(
-      m_context.get(), textureMemoryLimitBytes, m_maxTextureSize);
   return true;
 }
 
@@ -950,7 +1011,11 @@ void LayerRendererChromium::cleanupSharedObjects() {
   m_canvasLayerSharedValues.clear();
   m_videoLayerSharedValues.clear();
   m_pluginLayerSharedValues.clear();
-  m_renderSurfaceSharedValues.clear();
+
+  if (m_textureLayerShaderProgram) {
+    GLC(m_context, m_context->deleteProgram(m_textureLayerShaderProgram));
+    m_textureLayerShaderProgram = 0;
+  }
 
   if (m_rootLayerTextureId) {
     deleteLayerTexture(m_rootLayerTextureId);
@@ -959,8 +1024,6 @@ void LayerRendererChromium::cleanupSharedObjects() {
 
   if (m_offscreenFramebufferId)
     GLC(m_context, m_context->deleteFramebuffer(m_offscreenFramebufferId));
-
-  m_textureManager.clear();
 }
 
 }  // namespace WebCore
