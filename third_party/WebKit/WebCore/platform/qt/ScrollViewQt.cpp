@@ -34,10 +34,6 @@
 
 namespace WebCore {
 
-void ScrollView::platformInit() {}
-
-void ScrollView::platformDestroy() {}
-
 void ScrollView::platformAddChild(Widget*) {}
 
 void ScrollView::platformRemoveChild(Widget* child) {
