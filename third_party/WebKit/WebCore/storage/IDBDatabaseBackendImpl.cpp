@@ -65,18 +65,15 @@ static bool extractMetaData(SQLiteDatabase& sqliteDatabase,
 
 static bool setMetaData(SQLiteDatabase& sqliteDatabase,
                         const String& name,
-                        const String& description,
                         const String& version,
                         int64_t& rowId) {
   ASSERT(!name.isNull());
-  ASSERT(!description.isNull());
   ASSERT(!version.isNull());
 
   String sql = rowId != IDBDatabaseBackendImpl::InvalidId
-                   ? "UPDATE Databases SET name = ?, description = ?, version "
-                     "= ? WHERE id = ?"
+                   ? "UPDATE Databases SET name = ?, version = ? WHERE id = ?"
                    : "INSERT INTO Databases (name, description, version) "
-                     "VALUES (?, ?, ?)";
+                     "VALUES (?, '', ?)";
   SQLiteStatement query(sqliteDatabase, sql);
   if (query.prepare() != SQLResultOk) {
     ASSERT_NOT_REACHED();
@@ -84,10 +81,9 @@ static bool setMetaData(SQLiteDatabase& sqliteDatabase,
   }
 
   query.bindText(1, name);
-  query.bindText(2, description);
-  query.bindText(3, version);
+  query.bindText(2, version);
   if (rowId != IDBDatabaseBackendImpl::InvalidId)
-    query.bindInt64(4, rowId);
+    query.bindInt64(3, rowId);
 
   if (query.step() != SQLResultDone)
     return false;
@@ -100,7 +96,6 @@ static bool setMetaData(SQLiteDatabase& sqliteDatabase,
 
 IDBDatabaseBackendImpl::IDBDatabaseBackendImpl(
     const String& name,
-    const String& description,
     IDBSQLiteDatabase* sqliteDatabase,
     IDBTransactionCoordinator* coordinator,
     IDBFactoryBackendImpl* factory,
@@ -108,33 +103,22 @@ IDBDatabaseBackendImpl::IDBDatabaseBackendImpl(
     : m_sqliteDatabase(sqliteDatabase),
       m_id(InvalidId),
       m_name(name),
-      m_description(description),
       m_version(""),
       m_identifier(uniqueIdentifier),
       m_factory(factory),
       m_transactionCoordinator(coordinator) {
   ASSERT(!m_name.isNull());
-  ASSERT(!m_description.isNull());
 
   bool success =
       extractMetaData(m_sqliteDatabase->db(), m_name, m_version, m_id);
   ASSERT_UNUSED(success, success == (m_id != InvalidId));
-  if (!setMetaData(m_sqliteDatabase->db(), m_name, m_description, m_version,
-                   m_id))
+  if (!setMetaData(m_sqliteDatabase->db(), m_name, m_version, m_id))
     ASSERT_NOT_REACHED();  // FIXME: Need better error handling.
   loadObjectStores();
 }
 
 IDBDatabaseBackendImpl::~IDBDatabaseBackendImpl() {
   m_factory->removeIDBDatabaseBackend(m_identifier);
-}
-
-void IDBDatabaseBackendImpl::setDescription(const String& description) {
-  if (description == m_description)
-    return;
-
-  m_description = description;
-  setMetaData(m_sqliteDatabase->db(), m_name, m_description, m_version, m_id);
 }
 
 SQLiteDatabase& IDBDatabaseBackendImpl::sqliteDatabase() const {
@@ -291,7 +275,7 @@ void IDBDatabaseBackendImpl::setVersionInternal(
   int64_t databaseId = database->id();
   database->m_version = version;
   if (!setMetaData(database->m_sqliteDatabase->db(), database->m_name,
-                   database->m_description, database->m_version, databaseId)) {
+                   database->m_version, databaseId)) {
     // FIXME: The Indexed Database specification does not have an error code
     // dedicated to I/O errors.
     callbacks->onError(

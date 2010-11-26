@@ -48,7 +48,6 @@ class WebIDBDatabaseImpl : public WebIDBDatabase {
   virtual ~WebIDBDatabaseImpl();
 
   virtual WebString name() const;
-  virtual WebString description() const;
   virtual WebString version() const;
   virtual WebDOMStringList objectStores() const;
 

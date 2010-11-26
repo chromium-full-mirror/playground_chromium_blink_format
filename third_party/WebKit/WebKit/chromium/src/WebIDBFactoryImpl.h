@@ -45,7 +45,6 @@ class WebIDBFactoryImpl : public WebIDBFactory {
   virtual ~WebIDBFactoryImpl();
 
   virtual void open(const WebString& name,
-                    const WebString& description,
                     WebIDBCallbacks*,
                     const WebSecurityOrigin&,
                     WebFrame*,

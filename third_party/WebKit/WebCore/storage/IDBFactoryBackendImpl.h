@@ -54,7 +54,6 @@ class IDBFactoryBackendImpl : public IDBFactoryBackendInterface {
   void removeSQLiteDatabase(const String& uniqueIdentifier);
 
   virtual void open(const String& name,
-                    const String& description,
                     PassRefPtr<IDBCallbacks>,
                     PassRefPtr<SecurityOrigin>,
                     Frame*,

@@ -54,7 +54,6 @@ class IDBDatabaseBackendInterface
   virtual ~IDBDatabaseBackendInterface() {}
 
   virtual String name() const = 0;
-  virtual String description() const = 0;
   virtual String version() const = 0;
   virtual PassRefPtr<DOMStringList> objectStores() const = 0;
 

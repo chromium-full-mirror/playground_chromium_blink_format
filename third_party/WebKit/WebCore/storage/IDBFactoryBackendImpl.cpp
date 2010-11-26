@@ -144,7 +144,6 @@ static bool createTables(SQLiteDatabase& sqliteDatabase) {
 }
 
 void IDBFactoryBackendImpl::open(const String& name,
-                                 const String& description,
                                  PassRefPtr<IDBCallbacks> callbacks,
                                  PassRefPtr<SecurityOrigin> securityOrigin,
                                  Frame*,
@@ -155,9 +154,6 @@ void IDBFactoryBackendImpl::open(const String& name,
   IDBDatabaseBackendMap::iterator it =
       m_databaseBackendMap.find(uniqueIdentifier);
   if (it != m_databaseBackendMap.end()) {
-    if (!description.isNull())
-      it->second->setDescription(
-          description);  // The description may have changed.
     callbacks->onSuccess(it->second);
     return;
   }
@@ -181,7 +177,7 @@ void IDBFactoryBackendImpl::open(const String& name,
   }
 
   RefPtr<IDBDatabaseBackendImpl> databaseBackend =
-      IDBDatabaseBackendImpl::create(name, description, sqliteDatabase.get(),
+      IDBDatabaseBackendImpl::create(name, sqliteDatabase.get(),
                                      m_transactionCoordinator.get(), this,
                                      uniqueIdentifier);
   callbacks->onSuccess(databaseBackend.get());

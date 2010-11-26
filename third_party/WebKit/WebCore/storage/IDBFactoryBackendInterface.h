@@ -55,7 +55,6 @@ class IDBFactoryBackendInterface
   virtual ~IDBFactoryBackendInterface();
 
   virtual void open(const String& name,
-                    const String& description,
                     PassRefPtr<IDBCallbacks>,
                     PassRefPtr<SecurityOrigin>,
                     Frame*,
