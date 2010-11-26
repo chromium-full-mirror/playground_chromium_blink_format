@@ -68,8 +68,10 @@ WebIDBObjectStore* WebIDBDatabaseImpl::createObjectStore(
       m_databaseBackend->createObjectStore(
           name, keyPath, autoIncrement,
           transaction.getIDBTransactionBackendInterface(), ec);
-  if (!objectStore)
+  if (!objectStore) {
+    ASSERT(ec);
     return 0;
+  }
   return new WebIDBObjectStoreImpl(objectStore);
 }
 
@@ -95,8 +97,10 @@ WebIDBTransaction* WebIDBDatabaseImpl::transaction(
   RefPtr<DOMStringList> nameList = PassRefPtr<DOMStringList>(names);
   RefPtr<IDBTransactionBackendInterface> transaction =
       m_databaseBackend->transaction(nameList.get(), mode, timeout, ec);
-  if (!transaction)
+  if (!transaction) {
+    ASSERT(ec);
     return 0;
+  }
   return new WebIDBTransactionImpl(transaction);
 }
 

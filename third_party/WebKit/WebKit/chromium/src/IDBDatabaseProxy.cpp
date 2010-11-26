@@ -114,6 +114,10 @@ PassRefPtr<IDBTransactionBackendInterface> IDBDatabaseProxy::transaction(
   WebKit::WebDOMStringList names(storeNames);
   WebKit::WebIDBTransaction* transaction =
       m_webIDBDatabase->transaction(names, mode, timeout, ec);
+  if (!transaction) {
+    ASSERT(ec);
+    return 0;
+  }
   return IDBTransactionBackendProxy::create(transaction);
 }
 

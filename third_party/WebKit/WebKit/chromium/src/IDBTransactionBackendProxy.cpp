@@ -51,9 +51,9 @@ IDBTransactionBackendProxy::IDBTransactionBackendProxy(
 IDBTransactionBackendProxy::~IDBTransactionBackendProxy() {}
 
 PassRefPtr<IDBObjectStoreBackendInterface>
-IDBTransactionBackendProxy::objectStore(const String& name) {
+IDBTransactionBackendProxy::objectStore(const String& name, ExceptionCode& ec) {
   WebKit::WebIDBObjectStore* objectStore =
-      m_webIDBTransaction->objectStore(name);
+      m_webIDBTransaction->objectStore(name, ec);
   if (!objectStore)
     return 0;
   return IDBObjectStoreProxy::create(objectStore);

@@ -46,7 +46,8 @@ class IDBTransactionBackendProxy : public IDBTransactionBackendInterface {
   virtual ~IDBTransactionBackendProxy();
 
   virtual PassRefPtr<IDBObjectStoreBackendInterface> objectStore(
-      const String& name);
+      const String& name,
+      ExceptionCode&);
   virtual unsigned short mode() const;
   virtual void abort();
   virtual bool scheduleTask(PassOwnPtr<ScriptExecutionContext::Task>,

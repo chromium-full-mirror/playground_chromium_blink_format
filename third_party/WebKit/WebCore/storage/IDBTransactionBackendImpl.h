@@ -50,7 +50,8 @@ class IDBTransactionBackendImpl : public IDBTransactionBackendInterface {
   virtual ~IDBTransactionBackendImpl();
 
   virtual PassRefPtr<IDBObjectStoreBackendInterface> objectStore(
-      const String& name);
+      const String& name,
+      ExceptionCode&);
   virtual unsigned short mode() const { return m_mode; }
   virtual bool scheduleTask(PassOwnPtr<ScriptExecutionContext::Task> task,
                             PassOwnPtr<ScriptExecutionContext::Task> abortTask);

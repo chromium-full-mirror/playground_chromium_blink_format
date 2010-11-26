@@ -68,19 +68,8 @@ class IDBDatabase : public RefCounted<IDBDatabase> {
   }
   PassRefPtr<IDBTransaction> transaction(ScriptExecutionContext* context,
                                          ExceptionCode& ec) {
-    return transaction(context, 0, ec);
+    return transaction(context, OptionsObject(), ec);
   }
-  PassRefPtr<IDBTransaction> transaction(ScriptExecutionContext* context,
-                                         DOMStringList* storeNames,
-                                         ExceptionCode& ec) {
-    return transaction(context, storeNames, IDBTransaction::READ_ONLY, ec);
-  }
-  PassRefPtr<IDBTransaction> transaction(ScriptExecutionContext* context,
-                                         DOMStringList* storeNames,
-                                         unsigned short mode,
-                                         ExceptionCode& ec) {
-    return transaction(context, storeNames, mode, 0, ec);
-  }  // FIXME: what should the default timeout be?
 
   PassRefPtr<IDBObjectStore> createObjectStore(const String& name,
                                                const OptionsObject&,
@@ -90,9 +79,7 @@ class IDBDatabase : public RefCounted<IDBDatabase> {
                                     const String& version,
                                     ExceptionCode&);
   PassRefPtr<IDBTransaction> transaction(ScriptExecutionContext*,
-                                         DOMStringList*,
-                                         unsigned short mode,
-                                         unsigned long timeout,
+                                         const OptionsObject&,
                                          ExceptionCode&);
   void close();
 

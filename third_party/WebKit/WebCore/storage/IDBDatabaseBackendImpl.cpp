@@ -291,7 +291,14 @@ PassRefPtr<IDBTransactionBackendInterface> IDBDatabaseBackendImpl::transaction(
     DOMStringList* objectStoreNames,
     unsigned short mode,
     unsigned long timeout,
-    ExceptionCode&) {
+    ExceptionCode& ec) {
+  for (size_t i = 0; i < objectStoreNames->length(); ++i) {
+    if (!m_objectStores.contains(objectStoreNames->item(i))) {
+      ec = IDBDatabaseException::NOT_FOUND_ERR;
+      return 0;
+    }
+  }
+
   // FIXME: Return not allowed err if close has been called.
   return IDBTransactionBackendImpl::create(objectStoreNames, mode, timeout,
                                            this);
