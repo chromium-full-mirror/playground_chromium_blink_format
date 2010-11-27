@@ -125,7 +125,7 @@ class CSSParser {
   PassRefPtr<CSSValue> parseAnimationProperty();
   PassRefPtr<CSSValue> parseAnimationTimingFunction();
 
-  void parseTransformOriginShorthand(RefPtr<CSSValue>&,
+  bool parseTransformOriginShorthand(RefPtr<CSSValue>&,
                                      RefPtr<CSSValue>&,
                                      RefPtr<CSSValue>&);
   bool parseCubicBezierTimingFunctionValue(CSSParserValueList*& args,
