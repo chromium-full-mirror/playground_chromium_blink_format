@@ -1409,8 +1409,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
       // to the right).  Seems strange, but we'll match it.
       // However, when using Spatial Navigation, we need to be able to navigate
       // without changing the selection.
-      if (!document()->frame() || !document()->frame()->settings() ||
-          !document()->frame()->settings()->isSpatialNavigationEnabled()) {
+      if (!isSpatialNavigationEnabled(document()->frame())) {
         bool forward = (key == "Down" || key == "Right");
 
         // We can only stay within the form's children if the form hasn't been
