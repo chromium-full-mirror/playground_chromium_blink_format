@@ -32,6 +32,7 @@
 #include "Chrome.h"
 #include "CSSStyleSelector.h"
 #include "DashArray.h"
+#include "EditingBoundary.h"
 #include "FloatQuad.h"
 #include "Frame.h"
 #include "FrameView.h"
@@ -2890,11 +2891,10 @@ VisiblePosition RenderObject::createVisiblePosition(int offset,
       // If it can be found, we prefer a visually equivalent position that is
       // editable.
       Position position(node, offset);
-      Position candidate =
-          position.downstream(Position::CanCrossEditingBoundary);
+      Position candidate = position.downstream(CanCrossEditingBoundary);
       if (candidate.node()->isContentEditable())
         return VisiblePosition(candidate, affinity);
-      candidate = position.upstream(Position::CanCrossEditingBoundary);
+      candidate = position.upstream(CanCrossEditingBoundary);
       if (candidate.node()->isContentEditable())
         return VisiblePosition(candidate, affinity);
     }

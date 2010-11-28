@@ -27,6 +27,7 @@
 #define Position_h
 
 #include "ContainerNode.h"
+#include "EditingBoundary.h"
 #include "TextAffinity.h"
 #include "TextDirection.h"
 #include <wtf/Assertions.h>
@@ -54,11 +55,6 @@ class Position {
     PositionIsOffsetInAnchor,
     PositionIsAfterAnchor,
     PositionIsBeforeAnchor
-  };
-
-  enum EditingBoundaryCrossingRule {
-    CanCrossEditingBoundary,
-    CannotCrossEditingBoundary
   };
 
   Position()

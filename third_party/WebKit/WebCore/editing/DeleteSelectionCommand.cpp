@@ -28,6 +28,7 @@
 
 #include "Document.h"
 #include "DocumentFragment.h"
+#include "EditingBoundary.h"
 #include "Editor.h"
 #include "EditorClient.h"
 #include "Element.h"
@@ -902,9 +903,9 @@ void DeleteSelectionCommand::doApply() {
   Position downstreamEnd = m_selectionToDelete.end().downstream();
   m_needPlaceholder =
       isStartOfParagraph(m_selectionToDelete.visibleStart(),
-                         Position::CanCrossEditingBoundary) &&
+                         CanCrossEditingBoundary) &&
       isEndOfParagraph(m_selectionToDelete.visibleEnd(),
-                       Position::CanCrossEditingBoundary) &&
+                       CanCrossEditingBoundary) &&
       !lineBreakExistsAtVisiblePosition(m_selectionToDelete.visibleEnd());
   if (m_needPlaceholder) {
     // Don't need a placeholder when deleting a selection that starts just

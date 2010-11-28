@@ -1064,7 +1064,7 @@ static Position downstreamIgnoringEditingBoundaries(Position position) {
   Position lastPosition;
   while (position != lastPosition) {
     lastPosition = position;
-    position = position.downstream(Position::CanCrossEditingBoundary);
+    position = position.downstream(CanCrossEditingBoundary);
   }
   return position;
 }
@@ -1073,7 +1073,7 @@ static Position upstreamIgnoringEditingBoundaries(Position position) {
   Position lastPosition;
   while (position != lastPosition) {
     lastPosition = position;
-    position = position.upstream(Position::CanCrossEditingBoundary);
+    position = position.upstream(CanCrossEditingBoundary);
   }
   return position;
 }

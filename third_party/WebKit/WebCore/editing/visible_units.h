@@ -27,6 +27,7 @@
 #define visible_units_h
 
 #include "Document.h"
+#include "EditingBoundary.h"
 #include "Position.h"
 #include "TextAffinity.h"
 
@@ -63,21 +64,20 @@ VisiblePosition logicalStartOfLine(const VisiblePosition&);
 VisiblePosition logicalEndOfLine(const VisiblePosition&);
 
 // paragraphs (perhaps a misnomer, can be divided by line break elements)
-VisiblePosition startOfParagraph(const VisiblePosition&,
-                                 Position::EditingBoundaryCrossingRule =
-                                     Position::CannotCrossEditingBoundary);
-VisiblePosition endOfParagraph(const VisiblePosition&,
-                               Position::EditingBoundaryCrossingRule =
-                                   Position::CannotCrossEditingBoundary);
+VisiblePosition startOfParagraph(
+    const VisiblePosition&,
+    EditingBoundaryCrossingRule = CannotCrossEditingBoundary);
+VisiblePosition endOfParagraph(
+    const VisiblePosition&,
+    EditingBoundaryCrossingRule = CannotCrossEditingBoundary);
 VisiblePosition startOfNextParagraph(const VisiblePosition&);
 VisiblePosition previousParagraphPosition(const VisiblePosition&, int x);
 VisiblePosition nextParagraphPosition(const VisiblePosition&, int x);
-bool isStartOfParagraph(const VisiblePosition&,
-                        Position::EditingBoundaryCrossingRule =
-                            Position::CannotCrossEditingBoundary);
+bool isStartOfParagraph(
+    const VisiblePosition&,
+    EditingBoundaryCrossingRule = CannotCrossEditingBoundary);
 bool isEndOfParagraph(const VisiblePosition&,
-                      Position::EditingBoundaryCrossingRule =
-                          Position::CannotCrossEditingBoundary);
+                      EditingBoundaryCrossingRule = CannotCrossEditingBoundary);
 bool inSameParagraph(const VisiblePosition&, const VisiblePosition&);
 
 // blocks (true paragraphs; line break elements don't break blocks)

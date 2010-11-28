@@ -859,7 +859,7 @@ VisiblePosition nextSentencePosition(const VisiblePosition& c) {
 
 VisiblePosition startOfParagraph(
     const VisiblePosition& c,
-    Position::EditingBoundaryCrossingRule boundaryCrossingRule) {
+    EditingBoundaryCrossingRule boundaryCrossingRule) {
   Position p = c.deepEquivalent();
   Node* startNode = p.node();
 
@@ -876,7 +876,7 @@ VisiblePosition startOfParagraph(
 
   Node* n = startNode;
   while (n) {
-    if (boundaryCrossingRule == Position::CannotCrossEditingBoundary &&
+    if (boundaryCrossingRule == CannotCrossEditingBoundary &&
         n->isContentEditable() != startNode->isContentEditable())
       break;
     RenderObject* r = n->renderer();
@@ -921,7 +921,7 @@ VisiblePosition startOfParagraph(
 
 VisiblePosition endOfParagraph(
     const VisiblePosition& c,
-    Position::EditingBoundaryCrossingRule boundaryCrossingRule) {
+    EditingBoundaryCrossingRule boundaryCrossingRule) {
   if (c.isNull())
     return VisiblePosition();
 
@@ -939,7 +939,7 @@ VisiblePosition endOfParagraph(
 
   Node* n = startNode;
   while (n) {
-    if (boundaryCrossingRule == Position::CannotCrossEditingBoundary &&
+    if (boundaryCrossingRule == CannotCrossEditingBoundary &&
         n->isContentEditable() != startNode->isContentEditable())
       break;
     RenderObject* r = n->renderer();
@@ -995,15 +995,13 @@ bool inSameParagraph(const VisiblePosition& a, const VisiblePosition& b) {
   return a.isNotNull() && startOfParagraph(a) == startOfParagraph(b);
 }
 
-bool isStartOfParagraph(
-    const VisiblePosition& pos,
-    Position::EditingBoundaryCrossingRule boundaryCrossingRule) {
+bool isStartOfParagraph(const VisiblePosition& pos,
+                        EditingBoundaryCrossingRule boundaryCrossingRule) {
   return pos.isNotNull() && pos == startOfParagraph(pos, boundaryCrossingRule);
 }
 
-bool isEndOfParagraph(
-    const VisiblePosition& pos,
-    Position::EditingBoundaryCrossingRule boundaryCrossingRule) {
+bool isEndOfParagraph(const VisiblePosition& pos,
+                      EditingBoundaryCrossingRule boundaryCrossingRule) {
   return pos.isNotNull() && pos == endOfParagraph(pos, boundaryCrossingRule);
 }
 
