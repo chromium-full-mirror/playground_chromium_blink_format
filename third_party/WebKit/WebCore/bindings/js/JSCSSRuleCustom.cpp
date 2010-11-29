@@ -47,6 +47,18 @@ using namespace JSC;
 
 namespace WebCore {
 
+void JSCSSRule::markChildren(MarkStack& markStack) {
+  Base::markChildren(markStack);
+
+  if (CSSStyleSheet* parentStyleSheet = impl()->parentStyleSheet())
+    markDOMObjectWrapper(markStack, *Heap::heap(this)->globalData(),
+                         parentStyleSheet);
+
+  if (CSSRule* parentRule = impl()->parentRule())
+    markDOMObjectWrapper(markStack, *Heap::heap(this)->globalData(),
+                         parentRule);
+}
+
 JSValue toJS(ExecState* exec, JSDOMGlobalObject* globalObject, CSSRule* rule) {
   if (!rule)
     return jsNull();
