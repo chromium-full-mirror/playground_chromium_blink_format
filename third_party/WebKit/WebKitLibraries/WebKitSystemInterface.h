@@ -426,6 +426,31 @@ void WKSyncSurfaceToView(NSView* view);
 CFIndex WKGetHyphenationLocationBeforeIndex(CFStringRef string, CFIndex index);
 #endif
 
+#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD) && \
+    !defined(BUILDING_ON_SNOW_LEOPARD)
+typedef enum {
+  WKSandboxExtensionTypeReadOnly,
+  WKSandboxExtensionTypeWriteOnly,
+  WKSandboxExtensionTypeReadWrite,
+} WKSandboxExtensionType;
+typedef struct __WKSandboxExtension* WKSandboxExtensionRef;
+
+WKSandboxExtensionRef WKSandboxExtensionCreate(const char* path,
+                                               WKSandboxExtensionType type);
+void WKSandboxExtensionDestroy(WKSandboxExtensionRef sandboxExtension);
+
+bool WKSandboxExtensionConsume(WKSandboxExtensionRef sandboxExtension);
+bool WKSandboxExtensionInvalidate(WKSandboxExtensionRef sandboxExtension);
+
+const char* WKSandboxExtensionGetSerializedFormat(
+    WKSandboxExtensionRef sandboxExtension,
+    size_t* length);
+WKSandboxExtensionRef WKSandboxExtensionCreateFromSerializedFormat(
+    const char* serializationFormat,
+    size_t length);
+
+#endif
+
 #ifdef __cplusplus
 }
 #endif
