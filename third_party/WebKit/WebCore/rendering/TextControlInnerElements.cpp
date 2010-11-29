@@ -53,6 +53,7 @@ class RenderTextControlInnerBlock : public RenderBlock {
       : RenderBlock(node), m_multiLine(isMultiLine) {}
 
  private:
+  virtual bool hasLineIfEmpty() const { return true; }
   virtual VisiblePosition positionForPoint(const IntPoint&);
 
   bool m_multiLine;

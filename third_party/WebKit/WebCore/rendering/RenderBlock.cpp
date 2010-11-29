@@ -6171,8 +6171,7 @@ bool RenderBlock::hasLineIfEmpty() const {
     return true;
 
   if (node()->isShadowNode() &&
-      (node()->shadowParentNode()->hasTagName(inputTag) ||
-       node()->shadowParentNode()->hasTagName(textareaTag)))
+      (node()->shadowParentNode()->hasTagName(inputTag)))
     return true;
 
   return false;
