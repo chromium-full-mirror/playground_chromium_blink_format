@@ -65,14 +65,16 @@ static void entryAndExitPointsForDirection(FocusDirection direction,
                                            IntPoint& exitPoint,
                                            IntPoint& entryPoint);
 
-FocusCandidate::FocusCandidate(Node* n)
+FocusCandidate::FocusCandidate(Node* n, FocusDirection direction)
     : node(n),
       enclosingScrollableBox(0),
       distance(maxDistance()),
       parentDistance(maxDistance()),
       alignment(None),
       parentAlignment(None),
-      rect(nodeRectInAbsoluteCoordinates(n, true /* ignore border */)) {}
+      rect(nodeRectInAbsoluteCoordinates(n, true /* ignore border */)),
+      isOffscreen(hasOffscreenRect(n)),
+      isOffscreenAfterScrolling(hasOffscreenRect(n, direction)) {}
 
 bool isSpatialNavigationEnabled(const Frame* frame) {
   return (frame && frame->settings() &&
@@ -686,7 +688,7 @@ void distanceDataForNode(FocusDirection direction,
 
 bool canBeScrolledIntoView(FocusDirection direction,
                            const FocusCandidate& candidate) {
-  ASSERT(candidate.node && hasOffscreenRect(candidate.node));
+  ASSERT(candidate.node && candidate.isOffscreen);
   IntRect candidateRect = candidate.rect;
   for (Node* parentNode = candidate.node->parent(); parentNode;
        parentNode = parentNode->parent()) {
