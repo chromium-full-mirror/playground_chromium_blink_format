@@ -120,4 +120,13 @@ void WebDownloadClient::didFail(WebContext* webContext,
                    m_client.clientInfo);
 }
 
+void WebDownloadClient::processDidCrash(WebContext* webContext,
+                                        DownloadProxy* downloadProxy) {
+  if (!m_client.processDidCrash)
+    return;
+
+  m_client.processDidCrash(toAPI(webContext), toAPI(downloadProxy),
+                           m_client.clientInfo);
+}
+
 }  // namespace WebKit
