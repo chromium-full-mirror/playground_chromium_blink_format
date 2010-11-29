@@ -425,6 +425,8 @@ void RenderTable::layout() {
   // FIXME: Only pass true if width or height changed.
   layoutPositionedObjects(true);
 
+  updateLayerTransform();
+
   // Add overflow from borders.
   int rightBorderOverflow =
       width() + (collapsing ? outerBorderRight() - borderRight() : 0);

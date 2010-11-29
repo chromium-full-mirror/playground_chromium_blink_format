@@ -223,6 +223,8 @@ class RenderBox : public RenderBoxModelObject {
   void addOverflowFromChild(RenderBox* child, const IntSize& delta);
   void clearLayoutOverflow();
 
+  void updateLayerTransform();
+
   void blockDirectionOverflow(bool isLineHorizontal,
                               int& logicalTopLayoutOverflow,
                               int& logicalBottomLayoutOverflow,

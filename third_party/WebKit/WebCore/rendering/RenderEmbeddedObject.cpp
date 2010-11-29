@@ -241,6 +241,8 @@ void RenderEmbeddedObject::layout() {
   m_overflow.clear();
   addShadowOverflow();
 
+  updateLayerTransform();
+
   if (!widget() && frameView())
     frameView()->addWidgetToUpdate(this);
 

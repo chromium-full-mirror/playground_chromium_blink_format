@@ -1432,6 +1432,8 @@ void RenderBlock::layoutBlock(bool relayoutChildren, int pageHeight) {
   if (view()->layoutState()->m_pageHeight)
     setPageY(view()->layoutState()->pageY(y()));
 
+  updateLayerTransform();
+
   // Update our scroll information if we're overflow:auto/scroll/hidden now that
   // we know if
   // we overflow or not.
@@ -2306,6 +2308,8 @@ bool RenderBlock::layoutOnlyPositionedObjects() {
   layoutPositionedObjects(false);
 
   statePusher.pop();
+
+  updateLayerTransform();
 
   updateScrollInfoAfterLayout();
 
