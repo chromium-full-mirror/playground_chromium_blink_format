@@ -41,6 +41,9 @@ class ClientRect : public RefCounted<ClientRect> {
   static PassRefPtr<ClientRect> create(const IntRect& rect) {
     return adoptRef(new ClientRect(rect));
   }
+  static PassRefPtr<ClientRect> create(const FloatRect& rect) {
+    return adoptRef(new ClientRect(rect));
+  }
 
   float top() const { return m_rect.y(); }
   float right() const { return m_rect.right(); }
@@ -52,6 +55,7 @@ class ClientRect : public RefCounted<ClientRect> {
  private:
   ClientRect();
   ClientRect(const IntRect&);
+  ClientRect(const FloatRect&);
 
   FloatRect m_rect;
 };
