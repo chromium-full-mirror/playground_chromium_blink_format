@@ -140,6 +140,9 @@ typedef void (*WKContextDownloadDidFailCallback)(WKContextRef context,
                                                  WKDownloadRef download,
                                                  WKErrorRef error,
                                                  const void* clientInfo);
+typedef void (*WKContextDownloadDidCancel)(WKContextRef context,
+                                           WKDownloadRef download,
+                                           const void* clientInfo);
 typedef void (*WKContextDownloadProcessDidCrashCallback)(
     WKContextRef context,
     WKDownloadRef download,
@@ -158,6 +161,7 @@ struct WKContextDownloadClient {
   WKContextDownloadDidCreateDestinationCallback didCreateDestination;
   WKContextDownloadDidFinishCallback didFinish;
   WKContextDownloadDidFailCallback didFail;
+  WKContextDownloadDidCancel didCancel;
   WKContextDownloadProcessDidCrashCallback processDidCrash;
 };
 typedef struct WKContextDownloadClient WKContextDownloadClient;

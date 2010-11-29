@@ -120,6 +120,15 @@ void WebDownloadClient::didFail(WebContext* webContext,
                    m_client.clientInfo);
 }
 
+void WebDownloadClient::didCancel(WebContext* webContext,
+                                  DownloadProxy* downloadProxy) {
+  if (!m_client.didCancel)
+    return;
+
+  m_client.didCancel(toAPI(webContext), toAPI(downloadProxy),
+                     m_client.clientInfo);
+}
+
 void WebDownloadClient::processDidCrash(WebContext* webContext,
                                         DownloadProxy* downloadProxy) {
   if (!m_client.processDidCrash)

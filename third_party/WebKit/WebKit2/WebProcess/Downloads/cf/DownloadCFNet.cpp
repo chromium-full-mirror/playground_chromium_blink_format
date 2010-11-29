@@ -42,6 +42,10 @@ void Download::startWithHandle(WebPage* initiatingPage,
   notImplemented();
 }
 
+void Download::cancel() {
+  notImplemented();
+}
+
 void Download::platformInvalidate() {
   notImplemented();
 }

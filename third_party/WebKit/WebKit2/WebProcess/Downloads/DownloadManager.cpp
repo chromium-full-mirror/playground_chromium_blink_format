@@ -64,6 +64,14 @@ void DownloadManager::convertHandleToDownload(
   m_downloads.set(downloadID, download.leakPtr());
 }
 
+void DownloadManager::cancelDownload(uint64_t downloadID) {
+  Download* download = m_downloads.get(downloadID);
+  if (!download)
+    return;
+
+  download->cancel();
+}
+
 void DownloadManager::downloadFinished(Download* download) {
   ASSERT(m_downloads.contains(download->downloadID()));
   m_downloads.remove(download->downloadID());
