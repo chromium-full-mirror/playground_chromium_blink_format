@@ -107,6 +107,7 @@ PlatformContext ContextShadow::beginShadowLayer(PlatformContext p,
   else
     clipRect = p->transform().inverted().mapRect(p->window());
 
+  m_unscaledLayerRect = layerArea;
   calculateLayerBoundingRect(
       layerArea,
       IntRect(clipRect.x(), clipRect.y(), clipRect.width(), clipRect.height()));
@@ -149,7 +150,16 @@ void ContextShadow::endShadowLayer(PlatformContext p) {
     p.end();
   }
 
-  p->drawImage(m_layerRect.topLeft(), m_layerImage);
+  const QTransform transform = p->transform();
+  if (transform.isScaling()) {
+    qreal x = m_unscaledLayerRect.x() + m_offset.width() / transform.m11() -
+              m_blurDistance;
+    qreal y = m_unscaledLayerRect.y() + m_offset.height() / transform.m22() -
+              m_blurDistance;
+    p->drawImage(QPointF(x, y), m_layerImage);
+  } else
+    p->drawImage(m_layerRect.topLeft(), m_layerImage);
+
   scratchShadowBuffer()->schedulePurge();
 }
 }
