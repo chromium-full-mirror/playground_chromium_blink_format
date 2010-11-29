@@ -1738,7 +1738,8 @@ PassRefPtr<RenderStyle> Document::styleForElementIgnoringPendingStylesheets(
   bool oldIgnore = m_ignorePendingStylesheets;
   m_ignorePendingStylesheets = true;
   RefPtr<RenderStyle> style = styleSelector()->styleForElement(
-      element, element->parent() ? element->parent()->computedStyle() : 0);
+      element,
+      element->parentNode() ? element->parentNode()->computedStyle() : 0);
   m_ignorePendingStylesheets = oldIgnore;
   return style.release();
 }
@@ -3177,13 +3178,14 @@ void Document::removeFocusedNodeOfSubtree(Node* node, bool amongChildrenOnly) {
 }
 
 void Document::hoveredNodeDetached(Node* node) {
-  if (!m_hoverNode || (node != m_hoverNode && (!m_hoverNode->isTextNode() ||
-                                               node != m_hoverNode->parent())))
+  if (!m_hoverNode ||
+      (node != m_hoverNode &&
+       (!m_hoverNode->isTextNode() || node != m_hoverNode->parentNode())))
     return;
 
-  m_hoverNode = node->parent();
+  m_hoverNode = node->parentNode();
   while (m_hoverNode && !m_hoverNode->renderer())
-    m_hoverNode = m_hoverNode->parent();
+    m_hoverNode = m_hoverNode->parentNode();
   if (frame())
     frame()->eventHandler()->scheduleHoverStateUpdate();
 }
@@ -3191,12 +3193,12 @@ void Document::hoveredNodeDetached(Node* node) {
 void Document::activeChainNodeDetached(Node* node) {
   if (!m_activeNode ||
       (node != m_activeNode &&
-       (!m_activeNode->isTextNode() || node != m_activeNode->parent())))
+       (!m_activeNode->isTextNode() || node != m_activeNode->parentNode())))
     return;
 
-  m_activeNode = node->parent();
+  m_activeNode = node->parentNode();
   while (m_activeNode && !m_activeNode->renderer())
-    m_activeNode = m_activeNode->parent();
+    m_activeNode = m_activeNode->parentNode();
 }
 
 #if ENABLE(DASHBOARD_SUPPORT)

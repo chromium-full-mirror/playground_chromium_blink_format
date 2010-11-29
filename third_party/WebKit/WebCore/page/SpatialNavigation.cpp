@@ -690,8 +690,8 @@ bool canBeScrolledIntoView(FocusDirection direction,
                            const FocusCandidate& candidate) {
   ASSERT(candidate.node && candidate.isOffscreen);
   IntRect candidateRect = candidate.rect;
-  for (Node* parentNode = candidate.node->parent(); parentNode;
-       parentNode = parentNode->parent()) {
+  for (Node* parentNode = candidate.node->parentNode(); parentNode;
+       parentNode = parentNode->parentNode()) {
     IntRect parentRect = nodeRectInAbsoluteCoordinates(parentNode);
     if (!candidateRect.intersects(parentRect)) {
       if (((direction == FocusDirectionLeft ||
