@@ -32,6 +32,7 @@
 #include "FileChooser.h"
 #include "FloatRect.h"
 #include "FrameLoadRequest.h"
+#include "FrameView.h"
 #include "GtkVersioning.h"
 #include "HTMLNames.h"
 #include "IntRect.h"
@@ -511,7 +512,11 @@ void ChromeClient::mouseDidMoveOverElement(const HitTestResult& hit,
   }
 
   Node* node = hit.innerNonSharedNode();
-  m_webView->priv->tooltipArea = node ? node->getRect() : IntRect();
+
+  m_webView->priv->tooltipArea =
+      node
+          ? node->document()->frame()->view()->contentsToWindow(node->getRect())
+          : IntRect();
 }
 
 void ChromeClient::setToolTip(const String& toolTip, TextDirection) {
