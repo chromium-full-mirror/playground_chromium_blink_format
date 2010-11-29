@@ -77,7 +77,7 @@ static PassRefPtr<IDBSQLiteDatabase> openSQLiteDatabase(
     }
 
     path = pathByAppendingComponent(
-        pathBase, IDBFactoryBackendImpl::databaseFileName(securityOrigin));
+        pathBase, securityOrigin->databaseIdentifier() + ".indexeddb");
   }
 
   RefPtr<IDBSQLiteDatabase> sqliteDatabase =
@@ -182,11 +182,6 @@ void IDBFactoryBackendImpl::open(const String& name,
                                      uniqueIdentifier);
   callbacks->onSuccess(databaseBackend.get());
   m_databaseBackendMap.set(uniqueIdentifier, databaseBackend.get());
-}
-
-String IDBFactoryBackendImpl::databaseFileName(SecurityOrigin* securityOrigin) {
-  String databaseIdentifier = securityOrigin->databaseIdentifier();
-  return databaseIdentifier + ".indexeddb";
 }
 
 }  // namespace WebCore

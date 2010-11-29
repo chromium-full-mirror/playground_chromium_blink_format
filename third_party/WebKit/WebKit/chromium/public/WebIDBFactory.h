@@ -73,10 +73,6 @@ class WebIDBFactory {
     // WEBKIT_ASSERT_NOT_REACHED();
     open(name, "", callbacks, origin, webFrame, dataDir, maximumSize);
   }
-
-  // The file name that would be used for persisting a given indexed database on
-  // the file system.
-  WEBKIT_API static WebString databaseFileName(const WebSecurityOrigin&);
 };
 
 }  // namespace WebKit

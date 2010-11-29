@@ -60,8 +60,6 @@ class IDBFactoryBackendImpl : public IDBFactoryBackendInterface {
                     const String& dataDir,
                     int64_t maximumSize);
 
-  static String databaseFileName(SecurityOrigin*);
-
  private:
   IDBFactoryBackendImpl();
 
