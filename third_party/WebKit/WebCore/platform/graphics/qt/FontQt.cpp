@@ -387,7 +387,8 @@ FloatRect Font::selectionRectForSimpleText(const TextRun& run,
   String sanitized =
       Font::normalizeSpaces(String(run.characters(), run.length()));
   QString wholeText = fromRawDataWithoutRef(sanitized);
-  QString selectedText = fromRawDataWithoutRef(sanitized, from, to - from);
+  QString selectedText = fromRawDataWithoutRef(
+      sanitized, from, qMin(to - from, wholeText.length() - from));
 
   int startX =
       QFontMetrics(font()).width(wholeText, from, Qt::TextBypassShaping);
