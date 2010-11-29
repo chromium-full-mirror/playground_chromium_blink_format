@@ -83,6 +83,8 @@ struct ByteTerm {
     TypeParenthesesSubpattern,
     TypeParenthesesSubpatternOnceBegin,
     TypeParenthesesSubpatternOnceEnd,
+    TypeParenthesesSubpatternTerminalBegin,
+    TypeParenthesesSubpatternTerminalEnd,
     TypeParentheticalAssertionBegin,
     TypeParentheticalAssertionEnd,
     TypeCheckInput,
