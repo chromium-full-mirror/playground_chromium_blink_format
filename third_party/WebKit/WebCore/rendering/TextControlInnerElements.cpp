@@ -119,10 +119,6 @@ void TextControlInnerElement::attachInnerElement(Node* parent,
     parent->renderer()->addChild(renderer);
 }
 
-bool TextControlInnerElement::isSpellCheckingEnabled() const {
-  return m_shadowParent && m_shadowParent->isSpellCheckingEnabled();
-}
-
 // ----------------------------
 
 inline TextControlInnerTextElement::TextControlInnerTextElement(
