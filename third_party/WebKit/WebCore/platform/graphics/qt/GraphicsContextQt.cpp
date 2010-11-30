@@ -250,8 +250,8 @@ GraphicsContextPlatformPrivate::~GraphicsContextPlatformPrivate() {
   if (!platformContextIsOwned)
     return;
 
-  painter->end();
   QPaintDevice* device = painter->device();
+  painter->end();
   delete painter;
   delete device;
 }
