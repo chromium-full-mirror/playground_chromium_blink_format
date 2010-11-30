@@ -657,6 +657,29 @@ static JSValueRef execCommandCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef findStringCallback(JSContextRef context,
+                                     JSObjectRef function,
+                                     JSObjectRef thisObject,
+                                     size_t argumentCount,
+                                     const JSValueRef arguments[],
+                                     JSValueRef* exception) {
+  // Has Mac implementation.
+  if (argumentCount < 2)
+    return JSValueMakeUndefined(context);
+
+  JSRetainPtr<JSStringRef> target(
+      Adopt, JSValueToStringCopy(context, arguments[0], exception));
+  ASSERT(!*exception);
+
+  JSObjectRef options = JSValueToObject(context, arguments[1], exception);
+  ASSERT(!*exception);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  return JSValueMakeBoolean(
+      context, controller->findString(context, target.get(), options));
+}
+
 static JSValueRef counterValueForElementByIdCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -2863,6 +2886,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"evaluateScriptInIsolatedWorld", evaluateScriptInIsolatedWorldCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"execCommand", execCommandCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"findString", findStringCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"counterValueForElementById", counterValueForElementByIdCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

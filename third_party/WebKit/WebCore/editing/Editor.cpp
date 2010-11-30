@@ -3164,34 +3164,35 @@ bool Editor::insideVisibleArea(Range* range) const {
 }
 
 PassRefPtr<Range> Editor::firstVisibleRange(const String& target,
-                                            bool caseFlag) {
+                                            FindOptions options) {
   RefPtr<Range> searchRange(rangeOfContents(m_frame->document()));
   RefPtr<Range> resultRange =
-      findPlainText(searchRange.get(), target, true, caseFlag);
+      findPlainText(searchRange.get(), target, options & ~Backwards);
   ExceptionCode ec = 0;
 
   while (!insideVisibleArea(resultRange.get())) {
     searchRange->setStartAfter(resultRange->endContainer(), ec);
     if (searchRange->startContainer() == searchRange->endContainer())
       return Range::create(m_frame->document());
-    resultRange = findPlainText(searchRange.get(), target, true, caseFlag);
+    resultRange =
+        findPlainText(searchRange.get(), target, options & ~Backwards);
   }
 
   return resultRange;
 }
 
 PassRefPtr<Range> Editor::lastVisibleRange(const String& target,
-                                           bool caseFlag) {
+                                           FindOptions options) {
   RefPtr<Range> searchRange(rangeOfContents(m_frame->document()));
   RefPtr<Range> resultRange =
-      findPlainText(searchRange.get(), target, false, caseFlag);
+      findPlainText(searchRange.get(), target, options | Backwards);
   ExceptionCode ec = 0;
 
   while (!insideVisibleArea(resultRange.get())) {
     searchRange->setEndBefore(resultRange->startContainer(), ec);
     if (searchRange->startContainer() == searchRange->endContainer())
       return Range::create(m_frame->document());
-    resultRange = findPlainText(searchRange.get(), target, false, caseFlag);
+    resultRange = findPlainText(searchRange.get(), target, options | Backwards);
   }
 
   return resultRange;
@@ -3199,19 +3200,16 @@ PassRefPtr<Range> Editor::lastVisibleRange(const String& target,
 
 PassRefPtr<Range> Editor::nextVisibleRange(Range* currentRange,
                                            const String& target,
-                                           bool forward,
-                                           bool caseFlag,
-                                           bool wrapFlag) {
+                                           FindOptions options) {
   if (m_frame->excludeFromTextSearch())
     return Range::create(m_frame->document());
 
   RefPtr<Range> resultRange = currentRange;
   RefPtr<Range> searchRange(rangeOfContents(m_frame->document()));
   ExceptionCode ec = 0;
-
+  bool forward = !(options & Backwards);
   for (; !insideVisibleArea(resultRange.get());
-       resultRange =
-           findPlainText(searchRange.get(), target, forward, caseFlag)) {
+       resultRange = findPlainText(searchRange.get(), target, options)) {
     if (resultRange->collapsed(ec)) {
       if (!resultRange->startContainer()->isInShadowTree())
         break;
@@ -3247,13 +3245,13 @@ PassRefPtr<Range> Editor::nextVisibleRange(Range* currentRange,
   if (insideVisibleArea(resultRange.get()))
     return resultRange;
 
-  if (!wrapFlag)
+  if (!(options & WrapAround))
     return Range::create(m_frame->document());
 
-  if (forward)
-    return firstVisibleRange(target, caseFlag);
+  if (options & Backwards)
+    return lastVisibleRange(target, options);
 
-  return lastVisibleRange(target, caseFlag);
+  return firstVisibleRange(target, options);
 }
 
 void Editor::changeSelectionAfterCommand(const VisibleSelection& newSelection,
@@ -3563,6 +3561,13 @@ bool Editor::findString(const String& target,
                         bool caseFlag,
                         bool wrapFlag,
                         bool startInSelection) {
+  FindOptions options =
+      (forward ? 0 : Backwards) | (caseFlag ? 0 : CaseInsensitive) |
+      (wrapFlag ? WrapAround : 0) | (startInSelection ? StartInSelection : 0);
+  return findString(target, options);
+}
+
+bool Editor::findString(const String& target, FindOptions options) {
   if (target.isEmpty())
     return false;
 
@@ -3576,6 +3581,8 @@ bool Editor::findString(const String& target,
   RefPtr<Range> searchRange(rangeOfContents(m_frame->document()));
   VisibleSelection selection = m_frame->selection()->selection();
 
+  bool forward = !(options & Backwards);
+  bool startInSelection = options & StartInSelection;
   if (forward)
     setStart(searchRange.get(), startInSelection ? selection.visibleStart()
                                                  : selection.visibleEnd());
@@ -3593,8 +3600,7 @@ bool Editor::findString(const String& target,
       searchRange->setStart(shadowTreeRoot.get(), 0, ec);
   }
 
-  RefPtr<Range> resultRange(
-      findPlainText(searchRange.get(), target, forward, caseFlag));
+  RefPtr<Range> resultRange(findPlainText(searchRange.get(), target, options));
   // If we started in the selection and the found range exactly matches the
   // existing selection, find again.
   // Build a selection with the found range to remove collapsed whitespace.
@@ -3619,7 +3625,7 @@ bool Editor::findString(const String& target,
         searchRange->setStart(shadowTreeRoot.get(), 0, ec);
     }
 
-    resultRange = findPlainText(searchRange.get(), target, forward, caseFlag);
+    resultRange = findPlainText(searchRange.get(), target, options);
   }
 
   ExceptionCode exception = 0;
@@ -3633,12 +3639,11 @@ bool Editor::findString(const String& target,
     else
       searchRange->setEndBefore(shadowTreeRoot->shadowParentNode(), exception);
 
-    resultRange = findPlainText(searchRange.get(), target, forward, caseFlag);
+    resultRange = findPlainText(searchRange.get(), target, options);
   }
 
   if (!insideVisibleArea(resultRange.get())) {
-    resultRange = nextVisibleRange(resultRange.get(), target, forward, caseFlag,
-                                   wrapFlag);
+    resultRange = nextVisibleRange(resultRange.get(), target, options);
     if (!resultRange)
       return false;
   }
@@ -3646,9 +3651,9 @@ bool Editor::findString(const String& target,
   // If we didn't find anything and we're wrapping, search again in the entire
   // document (this will
   // redundantly re-search the area already searched in some cases).
-  if (resultRange->collapsed(exception) && wrapFlag) {
+  if (resultRange->collapsed(exception) && options & WrapAround) {
     searchRange = rangeOfContents(m_frame->document());
-    resultRange = findPlainText(searchRange.get(), target, forward, caseFlag);
+    resultRange = findPlainText(searchRange.get(), target, options);
     // We used to return false here if we ended up with the same range that we
     // started with
     // (e.g., the selection was already the only instance of this text). But we
@@ -3667,7 +3672,7 @@ bool Editor::findString(const String& target,
 }
 
 unsigned Editor::countMatchesForText(const String& target,
-                                     bool caseFlag,
+                                     FindOptions options,
                                      unsigned limit,
                                      bool markMatches) {
   if (target.isEmpty())
@@ -3679,7 +3684,7 @@ unsigned Editor::countMatchesForText(const String& target,
   unsigned matchCount = 0;
   do {
     RefPtr<Range> resultRange(
-        findPlainText(searchRange.get(), target, true, caseFlag));
+        findPlainText(searchRange.get(), target, options & ~Backwards));
     if (resultRange->collapsed(exception)) {
       if (!resultRange->startContainer()->isInShadowTree())
         break;

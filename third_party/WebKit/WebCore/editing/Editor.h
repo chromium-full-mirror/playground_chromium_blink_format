@@ -33,6 +33,7 @@
 #include "EditingBehavior.h"
 #include "EditorDeleteAction.h"
 #include "EditorInsertAction.h"
+#include "FindOptions.h"
 #include "SelectionController.h"
 
 #if PLATFORM(MAC) && !defined(__OBJC__)
@@ -347,11 +348,6 @@ class Editor {
   // moved over here to Editor
   bool insideVisibleArea(const IntPoint&) const;
   bool insideVisibleArea(Range*) const;
-  PassRefPtr<Range> nextVisibleRange(Range*,
-                                     const String&,
-                                     bool forward,
-                                     bool caseFlag,
-                                     bool wrapFlag);
 
   void addToKillRing(Range*, bool prepend);
 
@@ -375,6 +371,8 @@ class Editor {
   Node* findEventTargetFrom(const VisibleSelection& selection) const;
 
   String selectedText() const;
+  bool findString(const String&, FindOptions);
+  // FIXME: Switch callers over to the FindOptions version and retire this one.
   bool findString(const String&,
                   bool forward,
                   bool caseFlag,
@@ -401,7 +399,7 @@ class Editor {
   RenderStyle* styleForSelectionStart(Node*& nodeToRemove) const;
 
   unsigned countMatchesForText(const String&,
-                               bool caseFlag,
+                               FindOptions,
                                unsigned limit,
                                bool markMatches);
   bool markedTextMatchesAreHighlighted() const;
@@ -466,8 +464,9 @@ class Editor {
   void confirmComposition(const String&, bool preserveSelection);
   void setIgnoreCompositionSelectionChange(bool ignore);
 
-  PassRefPtr<Range> firstVisibleRange(const String&, bool caseFlag);
-  PassRefPtr<Range> lastVisibleRange(const String&, bool caseFlag);
+  PassRefPtr<Range> firstVisibleRange(const String&, FindOptions);
+  PassRefPtr<Range> lastVisibleRange(const String&, FindOptions);
+  PassRefPtr<Range> nextVisibleRange(Range*, const String&, FindOptions);
 
   void changeSelectionAfterCommand(const VisibleSelection& newSelection,
                                    bool closeTyping,

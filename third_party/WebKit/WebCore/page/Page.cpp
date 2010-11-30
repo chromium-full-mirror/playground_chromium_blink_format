@@ -522,22 +522,28 @@ bool Page::findString(const String& target,
                       TextCaseSensitivity caseSensitivity,
                       FindDirection direction,
                       bool shouldWrap) {
+  return findString(
+      target, (caseSensitivity == TextCaseInsensitive ? CaseInsensitive : 0) |
+                  (direction == FindDirectionBackward ? Backwards : 0) |
+                  (shouldWrap ? WrapAround : 0));
+}
+
+bool Page::findString(const String& target, FindOptions options) {
   if (target.isEmpty() || !mainFrame())
     return false;
 
+  bool shouldWrap = options & WrapAround;
   Frame* frame = focusController()->focusedOrMainFrame();
   Frame* startFrame = frame;
   do {
-    if (frame->editor()->findString(target, direction == FindDirectionForward,
-                                    caseSensitivity == TextCaseSensitive, false,
-                                    true)) {
+    if (frame->editor()->findString(
+            target, (options & ~WrapAround) | StartInSelection)) {
       if (frame != startFrame)
         startFrame->selection()->clear();
       focusController()->setFocusedFrame(frame);
       return true;
     }
-    frame =
-        incrementFrame(frame, direction == FindDirectionForward, shouldWrap);
+    frame = incrementFrame(frame, !(options & Backwards), shouldWrap);
   } while (frame && frame != startFrame);
 
   // Search contents of startFrame, on the other side of the selection that we
@@ -545,8 +551,7 @@ bool Page::findString(const String& target,
   // We cheat a bit and just research with wrap on
   if (shouldWrap && !startFrame->selection()->isNone()) {
     bool found = startFrame->editor()->findString(
-        target, direction == FindDirectionForward,
-        caseSensitivity == TextCaseSensitive, true, true);
+        target, options | WrapAround | StartInSelection);
     focusController()->setFocusedFrame(frame);
     return found;
   }
@@ -558,6 +563,15 @@ unsigned int Page::markAllMatchesForText(const String& target,
                                          TextCaseSensitivity caseSensitivity,
                                          bool shouldHighlight,
                                          unsigned limit) {
+  return markAllMatchesForText(
+      target, caseSensitivity == TextCaseInsensitive ? CaseInsensitive : 0,
+      shouldHighlight, limit);
+}
+
+unsigned int Page::markAllMatchesForText(const String& target,
+                                         FindOptions options,
+                                         bool shouldHighlight,
+                                         unsigned limit) {
   if (target.isEmpty() || !mainFrame())
     return 0;
 
@@ -567,8 +581,7 @@ unsigned int Page::markAllMatchesForText(const String& target,
   do {
     frame->editor()->setMarkedTextMatchesAreHighlighted(shouldHighlight);
     matches += frame->editor()->countMatchesForText(
-        target, caseSensitivity == TextCaseSensitive,
-        limit ? (limit - matches) : 0, true);
+        target, options, limit ? (limit - matches) : 0, true);
     frame = incrementFrame(frame, true, false);
   } while (frame);
 

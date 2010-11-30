@@ -995,11 +995,9 @@ void WebPage::setActivePopupMenu(WebPopupMenu* menu) {
 }
 
 void WebPage::findString(const String& string,
-                         uint32_t findDirection,
-                         uint32_t findOptions,
+                         uint32_t options,
                          uint32_t maxMatchCount) {
-  m_findController.findString(string, static_cast<FindDirection>(findDirection),
-                              static_cast<FindOptions>(findOptions),
+  m_findController.findString(string, static_cast<FindOptions>(options),
                               maxMatchCount);
 }
 
@@ -1008,9 +1006,10 @@ void WebPage::hideFindUI() {
 }
 
 void WebPage::countStringMatches(const String& string,
-                                 bool caseInsensitive,
+                                 uint32_t options,
                                  uint32_t maxMatchCount) {
-  m_findController.countStringMatches(string, caseInsensitive, maxMatchCount);
+  m_findController.countStringMatches(string, static_cast<FindOptions>(options),
+                                      maxMatchCount);
 }
 
 void WebPage::didChangeSelectedIndexForActivePopupMenu(int32_t newIndex) {

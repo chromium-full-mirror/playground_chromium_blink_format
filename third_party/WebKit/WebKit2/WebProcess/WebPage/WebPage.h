@@ -324,13 +324,10 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
   void reapplyEditCommand(uint64_t commandID);
   void didRemoveEditCommand(uint64_t commandID);
 
-  void findString(const String&,
-                  uint32_t findDirection,
-                  uint32_t findOptions,
-                  uint32_t maxMatchCount);
+  void findString(const String&, uint32_t findOptions, uint32_t maxMatchCount);
   void hideFindUI();
   void countStringMatches(const String&,
-                          bool caseInsensitive,
+                          uint32_t findOptions,
                           uint32_t maxMatchCount);
 
 #if PLATFORM(QT)

@@ -34,6 +34,9 @@ inline bool requiresContextForWordBoundary(UChar32 ch) {
   return WTF::Unicode::hasLineBreakingPropertyComplexContext(ch);
 }
 
+int endOfFirstWordBoundaryContext(const UChar* characters, int length);
+int startOfLastWordBoundaryContext(const UChar* characters, int length);
+
 void findWordBoundary(const UChar*,
                       int len,
                       int position,
