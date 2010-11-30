@@ -2346,9 +2346,9 @@ void RenderBlock::layoutPositionedObjects(bool relayoutChildren) {
 
       // If relayoutChildren is set and we have percentage padding, we also need
       // to invalidate the child's pref widths.
-      // if (relayoutChildren && (r->style()->paddingLeft().isPercent() ||
-      // r->style()->paddingRight().isPercent()))
-      r->setPreferredLogicalWidthsDirty(true, false);
+      if (relayoutChildren && (r->style()->paddingStart().isPercent() ||
+                               r->style()->paddingEnd().isPercent()))
+        r->setPreferredLogicalWidthsDirty(true, false);
 
       if (!r->needsLayout())
         r->markForPaginationRelayoutIfNeeded();
@@ -5608,13 +5608,24 @@ void RenderBlock::computePreferredLogicalWidths() {
         m_minPreferredLogicalWidth = 0;
     }
 
+    int scrollbarWidth = 0;
+    if (hasOverflowClip() && style()->overflowY() == OSCROLL) {
+      layer()->setHasVerticalScrollbar(true);
+      scrollbarWidth = verticalScrollbarWidth();
+      m_maxPreferredLogicalWidth += scrollbarWidth;
+    }
+
     if (isTableCell()) {
       Length w = toRenderTableCell(this)->styleOrColLogicalWidth();
-      if (w.isFixed() && w.value() > 0)
+      if (w.isFixed() && w.value() > 0) {
         m_maxPreferredLogicalWidth =
             max(m_minPreferredLogicalWidth,
                 computeContentBoxLogicalWidth(w.value()));
+        scrollbarWidth = 0;
+      }
     }
+
+    m_minPreferredLogicalWidth += scrollbarWidth;
   }
 
   if (style()->logicalMinWidth().isFixed() &&
@@ -5637,14 +5648,9 @@ void RenderBlock::computePreferredLogicalWidths() {
             computeContentBoxLogicalWidth(style()->logicalMaxWidth().value()));
   }
 
-  int toAdd = 0;
-  toAdd = borderAndPaddingLogicalWidth();
-
-  if (hasOverflowClip() && style()->overflowY() == OSCROLL)
-    toAdd += verticalScrollbarWidth();
-
-  m_minPreferredLogicalWidth += toAdd;
-  m_maxPreferredLogicalWidth += toAdd;
+  int borderAndPadding = borderAndPaddingLogicalWidth();
+  m_minPreferredLogicalWidth += borderAndPadding;
+  m_maxPreferredLogicalWidth += borderAndPadding;
 
   setPreferredLogicalWidthsDirty(false);
 }

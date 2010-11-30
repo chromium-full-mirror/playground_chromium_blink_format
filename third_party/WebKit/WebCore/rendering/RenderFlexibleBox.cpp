@@ -178,6 +178,13 @@ void RenderFlexibleBox::computePreferredLogicalWidths() {
         max(m_minPreferredLogicalWidth, m_maxPreferredLogicalWidth);
   }
 
+  if (hasOverflowClip() && style()->overflowY() == OSCROLL) {
+    layer()->setHasVerticalScrollbar(true);
+    int scrollbarWidth = verticalScrollbarWidth();
+    m_maxPreferredLogicalWidth += scrollbarWidth;
+    m_minPreferredLogicalWidth += scrollbarWidth;
+  }
+
   if (style()->minWidth().isFixed() && style()->minWidth().value() > 0) {
     m_maxPreferredLogicalWidth =
         max(m_maxPreferredLogicalWidth,
@@ -197,13 +204,9 @@ void RenderFlexibleBox::computePreferredLogicalWidths() {
             computeContentBoxLogicalWidth(style()->maxWidth().value()));
   }
 
-  int toAdd = borderAndPaddingWidth();
-
-  if (hasOverflowClip() && style()->overflowY() == OSCROLL)
-    toAdd += verticalScrollbarWidth();
-
-  m_minPreferredLogicalWidth += toAdd;
-  m_maxPreferredLogicalWidth += toAdd;
+  int borderAndPadding = borderAndPaddingLogicalWidth();
+  m_minPreferredLogicalWidth += borderAndPadding;
+  m_maxPreferredLogicalWidth += borderAndPadding;
 
   setPreferredLogicalWidthsDirty(false);
 }
