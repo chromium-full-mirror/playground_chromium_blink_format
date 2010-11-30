@@ -207,7 +207,8 @@ class RenderView : public RenderBlock {
   bool shouldRepaint(const IntRect& r) const;
 
   int docHeight() const;
-  int docWidth() const;
+  int docLeft() const;
+  int docWidth(int leftOverflow) const;
 
   // These functions may only be accessed by LayoutStateMaintainer.
   bool pushLayoutState(RenderBox* renderer,

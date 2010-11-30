@@ -37,6 +37,8 @@ class Frame;
               vertical:(WebCore::ScrollbarMode*)vMode;
 - (void)setScrollBarsSuppressed:(BOOL)suppressed
             repaintOnUnsuppress:(BOOL)repaint;
+- (void)setScrollOriginX:(int)scrollOriginX;
+- (int)scrollOriginX;
 @end
 
 @protocol WebCoreFrameView
