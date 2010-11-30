@@ -100,35 +100,35 @@ class Console : public RefCounted<Console> {
                   const String& message,
                   unsigned lineNumber,
                   const String& sourceURL,
-                  PassOwnPtr<ScriptCallStack> callStack);
+                  PassRefPtr<ScriptCallStack> callStack);
 
-  void debug(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
-  void error(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
-  void info(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
-  void log(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
-  void warn(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
-  void dir(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
-  void dirxml(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
-  void trace(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+  void debug(PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
+  void error(PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
+  void info(PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
+  void log(PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
+  void warn(PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
+  void dir(PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
+  void dirxml(PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
+  void trace(PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
   void assertCondition(bool condition,
-                       PassOwnPtr<ScriptArguments>,
-                       PassOwnPtr<ScriptCallStack>);
-  void count(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
-  void markTimeline(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+                       PassRefPtr<ScriptArguments>,
+                       PassRefPtr<ScriptCallStack>);
+  void count(PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
+  void markTimeline(PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
 #if ENABLE(WML)
   String lastWMLErrorMessage() const;
 #endif
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   const ProfilesArray& profiles() const { return m_profiles; }
-  void profile(const String&, ScriptState*, PassOwnPtr<ScriptCallStack>);
-  void profileEnd(const String&, ScriptState*, PassOwnPtr<ScriptCallStack>);
+  void profile(const String&, ScriptState*, PassRefPtr<ScriptCallStack>);
+  void profileEnd(const String&, ScriptState*, PassRefPtr<ScriptCallStack>);
 #endif
   void time(const String&);
   void timeEnd(const String&,
-               PassOwnPtr<ScriptArguments>,
-               PassOwnPtr<ScriptCallStack>);
-  void group(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
-  void groupCollapsed(PassOwnPtr<ScriptArguments>, PassOwnPtr<ScriptCallStack>);
+               PassRefPtr<ScriptArguments>,
+               PassRefPtr<ScriptCallStack>);
+  void group(PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
+  void groupCollapsed(PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
   void groupEnd();
 
   bool shouldCaptureFullStackTrace() const;
@@ -142,8 +142,8 @@ class Console : public RefCounted<Console> {
   inline Page* page() const;
   void addMessage(MessageType,
                   MessageLevel,
-                  PassOwnPtr<ScriptArguments>,
-                  PassOwnPtr<ScriptCallStack>,
+                  PassRefPtr<ScriptArguments>,
+                  PassRefPtr<ScriptCallStack>,
                   bool acceptNoArguments = false);
 
   Console(Frame*);

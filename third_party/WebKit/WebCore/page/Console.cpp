@@ -142,7 +142,7 @@ void Console::addMessage(MessageSource source,
                          const String& message,
                          unsigned lineNumber,
                          const String& sourceURL,
-                         PassOwnPtr<ScriptCallStack> callStack) {
+                         PassRefPtr<ScriptCallStack> callStack) {
   Page* page = this->page();
   if (!page)
     return;
@@ -171,8 +171,8 @@ void Console::addMessage(MessageSource source,
 
 void Console::addMessage(MessageType type,
                          MessageLevel level,
-                         PassOwnPtr<ScriptArguments> arguments,
-                         PassOwnPtr<ScriptCallStack> callStack,
+                         PassRefPtr<ScriptArguments> arguments,
+                         PassRefPtr<ScriptCallStack> callStack,
                          bool acceptNoArguments) {
   Page* page = this->page();
   if (!page)
@@ -208,41 +208,41 @@ void Console::addMessage(MessageType type,
 #endif
 }
 
-void Console::debug(PassOwnPtr<ScriptArguments> arguments,
-                    PassOwnPtr<ScriptCallStack> callStack) {
+void Console::debug(PassRefPtr<ScriptArguments> arguments,
+                    PassRefPtr<ScriptCallStack> callStack) {
   // In Firebug, console.debug has the same behavior as console.log. So we'll do
   // the same.
   log(arguments, callStack);
 }
 
-void Console::error(PassOwnPtr<ScriptArguments> arguments,
-                    PassOwnPtr<ScriptCallStack> callStack) {
+void Console::error(PassRefPtr<ScriptArguments> arguments,
+                    PassRefPtr<ScriptCallStack> callStack) {
   addMessage(LogMessageType, ErrorMessageLevel, arguments, callStack);
 }
 
-void Console::info(PassOwnPtr<ScriptArguments> arguments,
-                   PassOwnPtr<ScriptCallStack> callStack) {
+void Console::info(PassRefPtr<ScriptArguments> arguments,
+                   PassRefPtr<ScriptCallStack> callStack) {
   log(arguments, callStack);
 }
 
-void Console::log(PassOwnPtr<ScriptArguments> arguments,
-                  PassOwnPtr<ScriptCallStack> callStack) {
+void Console::log(PassRefPtr<ScriptArguments> arguments,
+                  PassRefPtr<ScriptCallStack> callStack) {
   addMessage(LogMessageType, LogMessageLevel, arguments, callStack);
 }
 
-void Console::dir(PassOwnPtr<ScriptArguments> arguments,
-                  PassOwnPtr<ScriptCallStack> callStack) {
+void Console::dir(PassRefPtr<ScriptArguments> arguments,
+                  PassRefPtr<ScriptCallStack> callStack) {
   addMessage(ObjectMessageType, LogMessageLevel, arguments, callStack);
 }
 
-void Console::dirxml(PassOwnPtr<ScriptArguments> arguments,
-                     PassOwnPtr<ScriptCallStack> callStack) {
+void Console::dirxml(PassRefPtr<ScriptArguments> arguments,
+                     PassRefPtr<ScriptCallStack> callStack) {
   // The standard behavior of our console.log will print the DOM tree for nodes.
   log(arguments, callStack);
 }
 
-void Console::trace(PassOwnPtr<ScriptArguments> arguments,
-                    PassOwnPtr<ScriptCallStack> callStack) {
+void Console::trace(PassRefPtr<ScriptArguments> arguments,
+                    PassRefPtr<ScriptCallStack> callStack) {
   addMessage(TraceMessageType, LogMessageLevel, arguments, callStack, true);
 
   if (!shouldPrintExceptions())
@@ -256,16 +256,16 @@ void Console::trace(PassOwnPtr<ScriptArguments> arguments,
 }
 
 void Console::assertCondition(bool condition,
-                              PassOwnPtr<ScriptArguments> arguments,
-                              PassOwnPtr<ScriptCallStack> callStack) {
+                              PassRefPtr<ScriptArguments> arguments,
+                              PassRefPtr<ScriptCallStack> callStack) {
   if (condition)
     return;
 
   addMessage(AssertMessageType, ErrorMessageLevel, arguments, callStack, true);
 }
 
-void Console::count(PassOwnPtr<ScriptArguments> arguments,
-                    PassOwnPtr<ScriptCallStack> callStack) {
+void Console::count(PassRefPtr<ScriptArguments> arguments,
+                    PassRefPtr<ScriptCallStack> callStack) {
 #if ENABLE(INSPECTOR)
   Page* page = this->page();
   if (!page)
@@ -284,8 +284,8 @@ void Console::count(PassOwnPtr<ScriptArguments> arguments,
 #endif
 }
 
-void Console::markTimeline(PassOwnPtr<ScriptArguments> arguments,
-                           PassOwnPtr<ScriptCallStack>) {
+void Console::markTimeline(PassRefPtr<ScriptArguments> arguments,
+                           PassRefPtr<ScriptCallStack>) {
 #if ENABLE(INSPECTOR)
   Page* page = this->page();
   if (!page)
@@ -332,7 +332,7 @@ String Console::lastWMLErrorMessage() const {
 
 void Console::profile(const String& title,
                       ScriptState* state,
-                      PassOwnPtr<ScriptCallStack> callStack) {
+                      PassRefPtr<ScriptCallStack> callStack) {
   Page* page = this->page();
   if (!page)
     return;
@@ -364,7 +364,7 @@ void Console::profile(const String& title,
 
 void Console::profileEnd(const String& title,
                          ScriptState* state,
-                         PassOwnPtr<ScriptCallStack> callStack) {
+                         PassRefPtr<ScriptCallStack> callStack) {
   Page* page = this->page();
   if (!page)
     return;
@@ -408,8 +408,8 @@ void Console::time(const String& title) {
 }
 
 void Console::timeEnd(const String& title,
-                      PassOwnPtr<ScriptArguments>,
-                      PassOwnPtr<ScriptCallStack> callStack) {
+                      PassRefPtr<ScriptArguments>,
+                      PassRefPtr<ScriptCallStack> callStack) {
 #if ENABLE(INSPECTOR)
   Page* page = this->page();
   if (!page)
@@ -436,8 +436,8 @@ void Console::timeEnd(const String& title,
 #endif
 }
 
-void Console::group(PassOwnPtr<ScriptArguments> arguments,
-                    PassOwnPtr<ScriptCallStack> callStack) {
+void Console::group(PassRefPtr<ScriptArguments> arguments,
+                    PassRefPtr<ScriptCallStack> callStack) {
 #if ENABLE(INSPECTOR)
   Page* page = this->page();
   if (!page)
@@ -450,8 +450,8 @@ void Console::group(PassOwnPtr<ScriptArguments> arguments,
 #endif
 }
 
-void Console::groupCollapsed(PassOwnPtr<ScriptArguments> arguments,
-                             PassOwnPtr<ScriptCallStack> callStack) {
+void Console::groupCollapsed(PassRefPtr<ScriptArguments> arguments,
+                             PassRefPtr<ScriptCallStack> callStack) {
 #if ENABLE(INSPECTOR)
   Page* page = this->page();
   if (!page)
@@ -486,8 +486,8 @@ bool Console::shouldCaptureFullStackTrace() const {
 #endif
 }
 
-void Console::warn(PassOwnPtr<ScriptArguments> arguments,
-                   PassOwnPtr<ScriptCallStack> callStack) {
+void Console::warn(PassRefPtr<ScriptArguments> arguments,
+                   PassRefPtr<ScriptCallStack> callStack) {
   addMessage(LogMessageType, WarningMessageLevel, arguments, callStack);
 }
 

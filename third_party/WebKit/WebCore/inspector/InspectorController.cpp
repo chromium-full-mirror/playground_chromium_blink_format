@@ -325,8 +325,8 @@ void InspectorController::addMessageToConsole(
     MessageType type,
     MessageLevel level,
     const String& message,
-    PassOwnPtr<ScriptArguments> arguments,
-    PassOwnPtr<ScriptCallStack> callStack) {
+    PassRefPtr<ScriptArguments> arguments,
+    PassRefPtr<ScriptCallStack> callStack) {
   if (!enabled())
     return;
 
@@ -385,8 +385,8 @@ void InspectorController::clearConsoleMessages() {
     m_frontend->consoleMessagesCleared();
 }
 
-void InspectorController::startGroup(PassOwnPtr<ScriptArguments> arguments,
-                                     PassOwnPtr<ScriptCallStack> callStack,
+void InspectorController::startGroup(PassRefPtr<ScriptArguments> arguments,
+                                     PassRefPtr<ScriptCallStack> callStack,
                                      bool collapsed) {
   ++m_groupLevel;
 

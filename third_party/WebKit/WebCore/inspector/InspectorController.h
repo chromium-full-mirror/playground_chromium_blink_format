@@ -155,8 +155,8 @@ class InspectorController : public Noncopyable {
                            MessageType,
                            MessageLevel,
                            const String& message,
-                           PassOwnPtr<ScriptArguments> arguments,
-                           PassOwnPtr<ScriptCallStack>);
+                           PassRefPtr<ScriptArguments> arguments,
+                           PassRefPtr<ScriptCallStack>);
   void addMessageToConsole(MessageSource,
                            MessageType,
                            MessageLevel,
@@ -277,8 +277,8 @@ class InspectorController : public Noncopyable {
   void startTiming(const String& title);
   bool stopTiming(const String& title, double& elapsed);
 
-  void startGroup(PassOwnPtr<ScriptArguments>,
-                  PassOwnPtr<ScriptCallStack> callFrame,
+  void startGroup(PassRefPtr<ScriptArguments>,
+                  PassRefPtr<ScriptCallStack> callFrame,
                   bool collapsed = false);
   void endGroup(MessageSource source,
                 unsigned lineNumber,

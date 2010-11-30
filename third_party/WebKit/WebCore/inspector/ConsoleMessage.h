@@ -59,8 +59,8 @@ class ConsoleMessage : public Noncopyable {
                  MessageType,
                  MessageLevel,
                  const String& m,
-                 PassOwnPtr<ScriptArguments>,
-                 PassOwnPtr<ScriptCallStack>,
+                 PassRefPtr<ScriptArguments>,
+                 PassRefPtr<ScriptCallStack>,
                  unsigned g);
 
   void addToFrontend(InspectorFrontend*, InjectedScriptHost*);
@@ -76,8 +76,8 @@ class ConsoleMessage : public Noncopyable {
   MessageType m_type;
   MessageLevel m_level;
   String m_message;
-  OwnPtr<ScriptArguments> m_arguments;
-  OwnPtr<ScriptCallStack> m_callStack;
+  RefPtr<ScriptArguments> m_arguments;
+  RefPtr<ScriptCallStack> m_callStack;
   unsigned m_line;
   String m_url;
   unsigned m_groupLevel;

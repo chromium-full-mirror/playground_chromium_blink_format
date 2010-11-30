@@ -81,7 +81,7 @@ static void toScriptCallFramesVector(v8::Local<v8::Context> context,
   }
 }
 
-PassOwnPtr<ScriptCallStack> createScriptCallStack(
+PassRefPtr<ScriptCallStack> createScriptCallStack(
     v8::Local<v8::Context> context,
     v8::Handle<v8::StackTrace> stackTrace,
     size_t maxStackSize) {
@@ -90,10 +90,10 @@ PassOwnPtr<ScriptCallStack> createScriptCallStack(
 
   Vector<ScriptCallFrame> scriptCallFrames;
   toScriptCallFramesVector(context, stackTrace, scriptCallFrames, maxStackSize);
-  return new ScriptCallStack(scriptCallFrames);
+  return ScriptCallStack::create(scriptCallFrames);
 }
 
-PassOwnPtr<ScriptCallStack> createScriptCallStack(size_t maxStackSize) {
+PassRefPtr<ScriptCallStack> createScriptCallStack(size_t maxStackSize) {
   v8::HandleScope scope;
   v8::Local<v8::Context> context = v8::Context::GetCurrent();
   // TODO(yurys): remove?
@@ -103,7 +103,7 @@ PassOwnPtr<ScriptCallStack> createScriptCallStack(size_t maxStackSize) {
   return createScriptCallStack(context, stackTrace, maxStackSize);
 }
 
-PassOwnPtr<ScriptArguments> createScriptArguments(
+PassRefPtr<ScriptArguments> createScriptArguments(
     const v8::Arguments& v8arguments,
     unsigned skipArgumentCount) {
   v8::HandleScope scope;
@@ -114,7 +114,7 @@ PassOwnPtr<ScriptArguments> createScriptArguments(
   for (int i = skipArgumentCount; i < v8arguments.Length(); ++i)
     arguments.append(ScriptValue(v8arguments[i]));
 
-  return new ScriptArguments(state, arguments);
+  return ScriptArguments::create(state, arguments);
 }
 
 bool ScriptCallStack::stackTrace(int frameLimit,
