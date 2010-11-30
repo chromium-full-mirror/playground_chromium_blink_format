@@ -72,7 +72,9 @@ class InspectorCSSAgent : public InspectorDOMAgent::DOMListener {
   void getStyleSheetText2(const String& styleSheetId,
                           String* url,
                           String* result);
-  void setStyleSheetText2(const String& styleSheetId, const String& text);
+  void setStyleSheetText2(const String& styleSheetId,
+                          const String& text,
+                          bool* success);
   void setPropertyText2(const RefPtr<InspectorObject>& styleId,
                         long propertyIndex,
                         const String& text,
