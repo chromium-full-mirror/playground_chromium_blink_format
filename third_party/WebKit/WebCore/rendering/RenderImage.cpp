@@ -371,10 +371,11 @@ void RenderImage::paintFocusRing(PaintInfo& paintInfo,
     if (focusedNode != areaElement)
       continue;
 
+    RenderStyle* styleToUse = areaElement->computedStyle();
     paintInfo.context->drawFocusRing(
-        areaElement->getPath(this), style->outlineWidth(),
-        style->outlineOffset(),
-        style->visitedDependentColor(CSSPropertyOutlineColor));
+        areaElement->getPath(this), styleToUse->outlineWidth(),
+        styleToUse->outlineOffset(),
+        styleToUse->visitedDependentColor(CSSPropertyOutlineColor));
     break;
   }
 }
