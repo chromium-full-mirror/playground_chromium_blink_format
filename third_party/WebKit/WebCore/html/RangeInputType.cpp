@@ -54,6 +54,10 @@ PassOwnPtr<InputType> RangeInputType::create(HTMLInputElement* element) {
   return adoptPtr(new RangeInputType(element));
 }
 
+bool RangeInputType::isRangeControl() const {
+  return true;
+}
+
 const AtomicString& RangeInputType::formControlType() const {
   return InputTypeNames::range();
 }
@@ -136,6 +140,11 @@ bool RangeInputType::handleKeydownEvent(KeyboardEvent* event) {
     double current =
         parseToDouble(element()->value(), numeric_limits<double>::quiet_NaN());
     ASSERT(isfinite(current));
+    // Stepping-up and -down for step="any" are special cases for type="range"
+    // from renderer for convenient.
+    // No stepping normally for step="any". They cannot be handled by
+    // stepUp()/stepDown()/stepUpFromRenderer().
+    // So calculating values stepped-up or -down here.
     double newValue;
     if (key == "Up" || key == "Right") {
       newValue = current + step;
@@ -152,10 +161,8 @@ bool RangeInputType::handleKeydownEvent(KeyboardEvent* event) {
     }
   } else {
     int stepMagnification = (key == "Up" || key == "Right") ? 1 : -1;
-    String lastStringValue = element()->value();
-    element()->stepUp(stepMagnification, ec);
-    if (lastStringValue != element()->value())
-      element()->dispatchFormControlChangeEvent();
+    // Reasonable stepping-up/-down by stepUpFromRenderer() unless step="any"
+    element()->stepUpFromRenderer(stepMagnification);
   }
   event->setDefaultHandled();
   return true;
