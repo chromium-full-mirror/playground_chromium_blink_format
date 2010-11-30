@@ -34,9 +34,9 @@
 #include "AudioNode.h"
 #include "Cone.h"
 #include "Distance.h"
+#include "FloatPoint3D.h"
 #include "Panner.h"
 #include <wtf/OwnPtr.h>
-#include <wtf/Vector3.h>
 
 namespace WebCore {
 
@@ -83,18 +83,22 @@ class AudioPannerNode : public AudioNode {
   void setPanningModel(unsigned short);
 
   // Position
-  Vector3 position() const { return m_position; }
-  void setPosition(float x, float y, float z) { m_position = Vector3(x, y, z); }
+  FloatPoint3D position() const { return m_position; }
+  void setPosition(float x, float y, float z) {
+    m_position = FloatPoint3D(x, y, z);
+  }
 
   // Orientation
-  Vector3 orientation() const { return m_position; }
+  FloatPoint3D orientation() const { return m_position; }
   void setOrientation(float x, float y, float z) {
-    m_orientation = Vector3(x, y, z);
+    m_orientation = FloatPoint3D(x, y, z);
   }
 
   // Velocity
-  Vector3 velocity() const { return m_velocity; }
-  void setVelocity(float x, float y, float z) { m_velocity = Vector3(x, y, z); }
+  FloatPoint3D velocity() const { return m_velocity; }
+  void setVelocity(float x, float y, float z) {
+    m_velocity = FloatPoint3D(x, y, z);
+  }
 
   // Distance parameters
   unsigned short distanceModel() { return m_distanceEffect.model(); }
@@ -162,10 +166,9 @@ class AudioPannerNode : public AudioNode {
   OwnPtr<Panner> m_panner;
   unsigned m_panningModel;
 
-  // FIXME: upgrade to FloatPoint3D from Vector3.
-  Vector3 m_position;
-  Vector3 m_orientation;
-  Vector3 m_velocity;
+  FloatPoint3D m_position;
+  FloatPoint3D m_orientation;
+  FloatPoint3D m_velocity;
 
   // Gain
   RefPtr<AudioGain> m_distanceGain;
