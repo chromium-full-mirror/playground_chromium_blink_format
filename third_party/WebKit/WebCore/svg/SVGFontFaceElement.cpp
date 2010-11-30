@@ -333,6 +333,7 @@ void SVGFontFaceElement::rebuildFontFace() {
 void SVGFontFaceElement::insertedIntoDocument() {
   SVGElement::insertedIntoDocument();
   document()->mappedElementSheet()->append(m_fontFaceRule);
+  m_fontFaceRule->setParent(document()->mappedElementSheet());
   rebuildFontFace();
 }
 
