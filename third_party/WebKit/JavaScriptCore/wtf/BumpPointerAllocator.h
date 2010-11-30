@@ -133,13 +133,7 @@ class BumpPointerPool {
     }
   }
 
-  void destroy() {
-    // Don't call deallocate on allocation, because allocation is *inside*
-    // allocation,
-    // and it will get deallocated before deallocate has completed!
-    PageAllocation allocation = m_allocation;
-    allocation.deallocate();
-  }
+  void destroy() { m_allocation.deallocate(); }
 
   static BumpPointerPool* ensureCapacityCrossPool(BumpPointerPool* previousPool,
                                                   size_t size) {
