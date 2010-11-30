@@ -292,19 +292,24 @@ bool SecurityOrigin::isAccessWhiteListed(
 }
 
 bool SecurityOrigin::canDisplay(const KURL& url) const {
+  RefPtr<SecurityOrigin> targetOrigin = SecurityOrigin::create(url);
+  if (isAccessWhiteListed(targetOrigin.get()))
+    return true;
+
+  if (SchemeRegistry::shouldTreatURLSchemeAsDisplayIsolated(
+          targetOrigin->protocol()))
+    return targetOrigin->protocol() == m_protocol;
+
 #if ENABLE(BLOB)
-  if (url.protocolIs(BlobURL::blobProtocol()))
+  // FIXME: We should generalize this check.
+  if (targetOrigin->protocol() == BlobURL::blobProtocol())
     return canRequest(url);
 #endif
 
   if (!restrictAccessToLocal())
     return true;
 
-  if (!SchemeRegistry::shouldTreatURLAsLocal(url.string()))
-    return true;
-
-  RefPtr<SecurityOrigin> targetOrigin = SecurityOrigin::create(url);
-  if (isAccessWhiteListed(targetOrigin.get()))
+  if (!SchemeRegistry::shouldTreatURLSchemeAsLocal(targetOrigin->protocol()))
     return true;
 
   return canLoadLocalResources();
@@ -315,10 +320,12 @@ bool SecurityOrigin::deprecatedCanDisplay(const String& referrer,
   if (!restrictAccessToLocal())
     return true;
 
-  if (!SchemeRegistry::shouldTreatURLAsLocal(url.string()))
+  // FIXME: I suspect these checks are incorrect because referrer and url
+  //        have not necessarily been canonicalized.
+  if (!SchemeRegistry::deprecatedShouldTreatURLAsLocal(url.string()))
     return true;
 
-  return SchemeRegistry::shouldTreatURLAsLocal(referrer);
+  return SchemeRegistry::deprecatedShouldTreatURLAsLocal(referrer);
 }
 
 void SecurityOrigin::grantLoadLocalResources() {

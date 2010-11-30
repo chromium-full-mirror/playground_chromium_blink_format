@@ -50,6 +50,11 @@ void WebSecurityPolicy::registerURLSchemeAsNoAccess(const WebString& scheme) {
   SchemeRegistry::registerURLSchemeAsNoAccess(scheme);
 }
 
+void WebSecurityPolicy::registerURLSchemeAsDisplayIsolated(
+    const WebString& scheme) {
+  SchemeRegistry::registerURLSchemeAsDisplayIsolated(scheme);
+}
+
 void WebSecurityPolicy::registerURLSchemeAsSecure(const WebString& scheme) {
   SchemeRegistry::registerURLSchemeAsSecure(scheme);
 }
