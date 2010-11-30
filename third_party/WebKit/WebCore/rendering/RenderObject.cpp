@@ -1005,8 +1005,7 @@ void RenderObject::drawBoxSideFromPath(GraphicsContext* graphicsContext,
       lineDash.append(patWidth);
       lineDash.append(whiteSpaceWidth);
       graphicsContext->setLineDash(lineDash, patWidth);
-      graphicsContext->addPath(borderPath);
-      graphicsContext->strokePath();
+      graphicsContext->strokePath(borderPath);
       return;
     }
     case DOUBLE: {

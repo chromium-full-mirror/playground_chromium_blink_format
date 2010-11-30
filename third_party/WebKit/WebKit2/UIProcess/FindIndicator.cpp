@@ -162,9 +162,8 @@ void FindIndicator::draw(GraphicsContext& graphicsContext,
                     verticalOutsetToCenterOfLightBorder);
     graphicsContext.setShadow(FloatSize(shadowOffsetX, shadowOffsetY),
                               shadowBlurRadius, shadowColor(), ColorSpaceSRGB);
-    graphicsContext.addPath(pathWithRoundedRect(outerPathRect, cornerRadius));
     graphicsContext.setFillColor(lightBorderColor(), ColorSpaceDeviceRGB);
-    graphicsContext.fillPath();
+    graphicsContext.fillPath(pathWithRoundedRect(outerPathRect, cornerRadius));
     graphicsContext.restore();
 
     graphicsContext.save();

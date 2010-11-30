@@ -172,9 +172,7 @@ void RenderMathMLRoot::paint(PaintInfo& info, int tx, int ty) {
   // draw to end
   root.addLineTo(leftEnd);
 
-  info.context->beginPath();
-  info.context->addPath(root);
-  info.context->strokePath();
+  info.context->strokePath(root);
 
   info.context->save();
 
@@ -187,8 +185,6 @@ void RenderMathMLRoot::paint(PaintInfo& info, int tx, int ty) {
   mask.addLineTo(
       FloatPoint(2 * topLeft.x() - leftEnd.x(), 2 * topLeft.y() - leftEnd.y()));
 
-  info.context->beginPath();
-  info.context->addPath(mask);
   info.context->clip(mask);
 
   // Draw the thick part of the root.
@@ -200,9 +196,7 @@ void RenderMathMLRoot::paint(PaintInfo& info, int tx, int ty) {
   line.moveTo(bottomLeft);
   line.addLineTo(topLeft);
 
-  info.context->beginPath();
-  info.context->addPath(line);
-  info.context->strokePath();
+  info.context->strokePath(line);
 
   info.context->restore();
 

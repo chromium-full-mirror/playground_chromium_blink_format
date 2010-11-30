@@ -72,7 +72,8 @@ class RenderSVGResourceFilter : public RenderSVGResourceContainer {
                              unsigned short resourceMode);
   virtual void postApplyResource(RenderObject*,
                                  GraphicsContext*&,
-                                 unsigned short resourceMode);
+                                 unsigned short resourceMode,
+                                 const Path*);
 
   virtual FloatRect resourceBoundingBox(RenderObject*);
 

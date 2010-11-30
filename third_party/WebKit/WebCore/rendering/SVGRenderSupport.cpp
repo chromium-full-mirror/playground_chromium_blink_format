@@ -169,7 +169,8 @@ void SVGRenderSupport::finishRenderSVGContent(RenderObject* object,
       SVGResourcesCache::cachedResourcesForRenderObject(object);
   if (resources) {
     if (RenderSVGResourceFilter* filter = resources->filter()) {
-      filter->postApplyResource(object, paintInfo.context, ApplyToDefaultMode);
+      filter->postApplyResource(object, paintInfo.context, ApplyToDefaultMode,
+                                /* path */ 0);
       paintInfo.context = savedContext;
     }
   }

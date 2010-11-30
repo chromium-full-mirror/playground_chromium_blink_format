@@ -348,14 +348,15 @@ bool SVGInlineTextBox::acquirePaintingResource(GraphicsContext*& context,
   return true;
 }
 
-void SVGInlineTextBox::releasePaintingResource(GraphicsContext*& context) {
+void SVGInlineTextBox::releasePaintingResource(GraphicsContext*& context,
+                                               const Path* path) {
   ASSERT(m_paintingResource);
 
   RenderObject* parentRenderer = parent()->renderer();
   ASSERT(parentRenderer);
 
   m_paintingResource->postApplyResource(parentRenderer, context,
-                                        m_paintingResourceMode);
+                                        m_paintingResourceMode, path);
   m_paintingResource = 0;
 }
 
@@ -379,7 +380,7 @@ bool SVGInlineTextBox::prepareGraphicsContextForTextPainting(
 void SVGInlineTextBox::restoreGraphicsContextAfterTextPainting(
     GraphicsContext*& context,
     TextRun& textRun) {
-  releasePaintingResource(context);
+  releasePaintingResource(context, /* path */ 0);
 
 #if ENABLE(SVG_FONTS)
   textRun.setActivePaintingResource(0);
@@ -551,11 +552,9 @@ void SVGInlineTextBox::paintDecorationWithStyle(
   path.addRect(FloatRect(fragment.x, y, fragment.width, thickness));
 
   context->save();
-  context->beginPath();
-  context->addPath(path);
 
   if (acquirePaintingResource(context, decorationRenderer, decorationStyle))
-    releasePaintingResource(context);
+    releasePaintingResource(context, &path);
 
   context->restore();
 }

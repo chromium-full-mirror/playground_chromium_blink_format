@@ -1354,7 +1354,11 @@ Color gradientAverageColor(const Gradient* gradient) {
       (stop.blue + lastStop.blue) * 0.5f, (stop.alpha + lastStop.alpha) * 0.5f);
 }
 
-void GraphicsContext::fillPath() {
+void GraphicsContext::fillPath(const Path& path) {
+  // FIXME: Be smarter about this.
+  beginPath();
+  addPath(path);
+
   Color c = m_common->state.fillGradient
                 ? gradientAverageColor(m_common->state.fillGradient.get())
                 : fillColor();
@@ -1404,6 +1408,10 @@ void GraphicsContext::strokePath() {
   ScopeDCProvider dcProvider(m_data);
   if (!m_data->m_dc)
     return;
+
+  // FIXME: Be smarter about this.
+  beginPath();
+  addPath(path);
 
   OwnPtr<HPEN> pen = createPen(strokeColor(), strokeThickness(), strokeStyle());
 
@@ -1969,7 +1977,7 @@ void GraphicsContext::setLineDash(const DashArray&, float) {
   notImplemented();
 }
 
-void GraphicsContext::clipPath(WindRule) {
+void GraphicsContext::clipPath(const Path&, WindRule) {
   notImplemented();
 }
 

@@ -827,9 +827,7 @@ void CanvasRenderingContext2D::fill() {
     return;
 
   if (!m_path.isEmpty()) {
-    c->beginPath();
-    c->addPath(m_path);
-    c->fillPath();
+    c->fillPath(m_path);
     didDraw(m_path.boundingRect());
   }
 
@@ -846,9 +844,6 @@ void CanvasRenderingContext2D::stroke() {
     return;
 
   if (!m_path.isEmpty()) {
-    c->beginPath();
-    c->addPath(m_path);
-
 #if PLATFORM(QT)
     // Fast approximation of the stroke's bounding rect.
     // This yields a slightly oversized rect but is very fast
@@ -859,7 +854,7 @@ void CanvasRenderingContext2D::stroke() {
     CanvasStrokeStyleApplier strokeApplier(this);
     FloatRect boundingRect = m_path.strokeBoundingRect(&strokeApplier);
 #endif
-    c->strokePath();
+    c->strokePath(m_path);
     didDraw(boundingRect);
   }
 

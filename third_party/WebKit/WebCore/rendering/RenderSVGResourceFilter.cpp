@@ -284,7 +284,8 @@ bool RenderSVGResourceFilter::applyResource(RenderObject* object,
 
 void RenderSVGResourceFilter::postApplyResource(RenderObject* object,
                                                 GraphicsContext*& context,
-                                                unsigned short resourceMode) {
+                                                unsigned short resourceMode,
+                                                const Path*) {
   ASSERT(object);
   ASSERT(context);
 #ifndef NDEBUG

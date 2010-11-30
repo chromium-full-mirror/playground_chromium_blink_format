@@ -49,6 +49,7 @@ enum RenderSVGResourceMode {
 class Color;
 class FloatRect;
 class GraphicsContext;
+class Path;
 class RenderObject;
 class RenderStyle;
 class RenderSVGResourceSolidColor;
@@ -68,7 +69,8 @@ class RenderSVGResource {
                              unsigned short resourceMode) = 0;
   virtual void postApplyResource(RenderObject*,
                                  GraphicsContext*&,
-                                 unsigned short) {}
+                                 unsigned short,
+                                 const Path*) {}
   virtual FloatRect resourceBoundingBox(RenderObject*) = 0;
 
   virtual RenderSVGResourceType resourceType() const = 0;

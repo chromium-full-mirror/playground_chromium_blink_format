@@ -201,15 +201,16 @@ bool RenderSVGResourcePattern::applyResource(RenderObject* object,
 
 void RenderSVGResourcePattern::postApplyResource(RenderObject*,
                                                  GraphicsContext*& context,
-                                                 unsigned short resourceMode) {
+                                                 unsigned short resourceMode,
+                                                 const Path* path) {
   ASSERT(context);
   ASSERT(resourceMode != ApplyToDefaultMode);
 
-  if (!(resourceMode & ApplyToTextMode)) {
+  if (path && !(resourceMode & ApplyToTextMode)) {
     if (resourceMode & ApplyToFillMode)
-      context->fillPath();
+      context->fillPath(*path);
     else if (resourceMode & ApplyToStrokeMode)
-      context->strokePath();
+      context->strokePath(*path);
   }
 
   context->restore();

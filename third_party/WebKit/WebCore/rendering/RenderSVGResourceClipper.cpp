@@ -169,9 +169,7 @@ bool RenderSVGResourceClipper::pathOnlyClipping(
   // have a child.
   if (clipPath.isEmpty())
     clipPath.addRect(FloatRect());
-  context->beginPath();
-  context->addPath(clipPath);
-  context->clipPath(clipRule);
+  context->clipPath(clipPath, clipRule);
   return true;
 }
 

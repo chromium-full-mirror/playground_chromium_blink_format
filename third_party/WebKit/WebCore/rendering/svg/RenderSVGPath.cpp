@@ -151,23 +151,23 @@ void RenderSVGPath::layout() {
 }
 
 void RenderSVGPath::fillAndStrokePath(GraphicsContext* context) {
-  context->beginPath();
   RenderStyle* style = this->style();
 
   Color fallbackColor;
   if (RenderSVGResource* fillPaintingResource =
           RenderSVGResource::fillPaintingResource(this, style, fallbackColor)) {
-    context->addPath(m_path);
     if (fillPaintingResource->applyResource(this, style, context,
                                             ApplyToFillMode))
-      fillPaintingResource->postApplyResource(this, context, ApplyToFillMode);
+      fillPaintingResource->postApplyResource(this, context, ApplyToFillMode,
+                                              &m_path);
     else if (fallbackColor.isValid()) {
       RenderSVGResourceSolidColor* fallbackResource =
           RenderSVGResource::sharedSolidPaintingResource();
       fallbackResource->setColor(fallbackColor);
       if (fallbackResource->applyResource(this, style, context,
                                           ApplyToFillMode))
-        fallbackResource->postApplyResource(this, context, ApplyToFillMode);
+        fallbackResource->postApplyResource(this, context, ApplyToFillMode,
+                                            &m_path);
     }
   }
 
@@ -177,8 +177,12 @@ void RenderSVGPath::fillAndStrokePath(GraphicsContext* context) {
   if (!strokePaintingResource)
     return;
 
+  Path path;
+
+  bool nonScalingStroke =
+      style->svgStyle()->vectorEffect() == VE_NON_SCALING_STROKE;
   bool restoreContext = false;
-  if (style->svgStyle()->vectorEffect() == VE_NON_SCALING_STROKE) {
+  if (nonScalingStroke) {
     SVGStyledTransformableElement* element =
         static_cast<SVGStyledTransformableElement*>(node());
     AffineTransform nonScalingStrokeTransform =
@@ -186,26 +190,26 @@ void RenderSVGPath::fillAndStrokePath(GraphicsContext* context) {
     if (!nonScalingStrokeTransform.isInvertible())
       return;
 
-    Path transformedPath = m_path;
-    transformedPath.transform(nonScalingStrokeTransform);
+    path = m_path;
+    path.transform(nonScalingStrokeTransform);
 
     context->save();
     context->concatCTM(nonScalingStrokeTransform.inverse());
-    context->addPath(transformedPath);
     restoreContext = true;
-  } else
-    context->addPath(m_path);
+  }
 
   if (strokePaintingResource->applyResource(this, style, context,
                                             ApplyToStrokeMode))
-    strokePaintingResource->postApplyResource(this, context, ApplyToStrokeMode);
+    strokePaintingResource->postApplyResource(
+        this, context, ApplyToStrokeMode, nonScalingStroke ? &path : &m_path);
   else if (fallbackColor.isValid()) {
     RenderSVGResourceSolidColor* fallbackResource =
         RenderSVGResource::sharedSolidPaintingResource();
     fallbackResource->setColor(fallbackColor);
     if (fallbackResource->applyResource(this, style, context,
                                         ApplyToStrokeMode))
-      fallbackResource->postApplyResource(this, context, ApplyToStrokeMode);
+      fallbackResource->postApplyResource(this, context, ApplyToStrokeMode,
+                                          nonScalingStroke ? &path : &m_path);
   }
 
   if (restoreContext)

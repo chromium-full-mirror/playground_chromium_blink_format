@@ -158,8 +158,6 @@ void RenderEmbeddedObject::paintReplaced(PaintInfo& paintInfo, int tx, int ty) {
 
   context->save();
   context->clip(contentRect);
-  context->beginPath();
-  context->addPath(path);
   context->setAlpha(m_missingPluginIndicatorIsPressed
                         ? replacementTextPressedRoundedRectOpacity
                         : replacementTextRoundedRectOpacity);
@@ -167,7 +165,7 @@ void RenderEmbeddedObject::paintReplaced(PaintInfo& paintInfo, int tx, int ty) {
                             ? replacementTextRoundedRectPressedColor()
                             : Color::white,
                         style()->colorSpace());
-  context->fillPath();
+  context->fillPath(path);
 
   float labelX = roundf(replacementTextRect.location().x() +
                         (replacementTextRect.size().width() - textWidth) / 2);

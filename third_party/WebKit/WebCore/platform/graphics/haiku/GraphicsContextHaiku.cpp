@@ -120,7 +120,7 @@ void GraphicsContext::strokeArc(const IntRect& rect,
   m_data->m_view->StrokeArc(rect, startAngle, angleSpan, getHaikuStrokeStyle());
 }
 
-void GraphicsContext::strokePath() {
+void GraphicsContext::strokePath(const Path&) {
   notImplemented();
 }
 
@@ -186,15 +186,7 @@ void GraphicsContext::fillRoundedRect(const IntRect& rect,
   // FillRect and FillArc calls are needed.
 }
 
-void GraphicsContext::fillPath() {
-  notImplemented();
-}
-
-void GraphicsContext::beginPath() {
-  notImplemented();
-}
-
-void GraphicsContext::addPath(const Path& path) {
+void GraphicsContext::fillPath(const Path&) {
   notImplemented();
 }
 

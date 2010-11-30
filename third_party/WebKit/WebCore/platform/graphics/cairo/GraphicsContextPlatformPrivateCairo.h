@@ -27,7 +27,6 @@
 
 #include "GraphicsContext.h"
 
-#include "CairoPath.h"
 #include "ContextShadow.h"
 #include <cairo.h>
 #include <math.h>
@@ -98,7 +97,6 @@ class GraphicsContextPlatformPrivate {
 
   cairo_t* cr;
   Vector<float> layers;
-  CairoPath m_pendingPath;
 
   ContextShadow shadow;
   Vector<ContextShadow> shadowStack;

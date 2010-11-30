@@ -1596,21 +1596,18 @@ static void drawOutlinedQuad(GraphicsContext& context,
   // of outline (because inflating a quad is hard)
   {
     context.save();
-    context.addPath(quadPath);
     context.clipOut(quadPath);
 
-    context.addPath(quadPath);
     context.setStrokeThickness(outlineThickness);
     context.setStrokeColor(outlineColor, ColorSpaceDeviceRGB);
-    context.strokePath();
+    context.strokePath(quadPath);
 
     context.restore();
   }
 
   // Now do the fill
-  context.addPath(quadPath);
   context.setFillColor(fillColor, ColorSpaceDeviceRGB);
-  context.fillPath();
+  context.fillPath(quadPath);
 }
 
 static void drawOutlinedQuadWithClip(GraphicsContext& context,

@@ -127,7 +127,6 @@ class GraphicsContextPlatformPrivate;
 class GraphicsContextPrivate;
 class ImageBuffer;
 class KURL;
-class Path;
 class Pattern;
 class SharedGraphicsContext3D;
 class TextRun;
@@ -191,6 +190,7 @@ class GraphicsContext : public Noncopyable {
 #if PLATFORM(CG)
   void applyStrokePattern();
   void applyFillPattern();
+  void drawPath(const Path&);
 #endif
 
   void save();
@@ -207,9 +207,8 @@ class GraphicsContext : public Noncopyable {
                          const FloatPoint*,
                          bool shouldAntialias = false);
 
-  void drawPath();
-  void fillPath();
-  void strokePath();
+  void fillPath(const Path&);
+  void strokePath(const Path&);
 
   // Arc drawing (used by border-radius in CSS) just supports stroking at the
   // moment.
@@ -315,7 +314,7 @@ class GraphicsContext : public Noncopyable {
                           const IntSize& topRight,
                           const IntSize& bottomLeft,
                           const IntSize& bottomRight);
-  void clipPath(WindRule);
+  void clipPath(const Path&, WindRule);
   void clipConvexPolygon(size_t numPoints,
                          const FloatPoint*,
                          bool antialias = true);
@@ -382,8 +381,10 @@ class GraphicsContext : public Noncopyable {
 
   void setCompositeOperation(CompositeOperator);
 
+#if PLATFORM(SKIA) || PLATFORM(WX) || PLATFORM(OPENVG) || OS(WINCE)
   void beginPath();
   void addPath(const Path&);
+#endif
 
   void clip(const Path&);
 
@@ -522,7 +523,6 @@ class GraphicsContext : public Noncopyable {
 
 #if PLATFORM(QT)
   bool inTransparencyLayer() const;
-  PlatformPath* currentPath();
   void pushTransparencyLayerInternal(const QRect& rect,
                                      qreal opacity,
                                      QPixmap& alphaMask);
