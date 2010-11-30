@@ -61,6 +61,10 @@ class RenderTextControlSingleLine : public RenderTextControl,
   // Decoration width outside of the text field.
   int decorationWidthRight() const;
 
+#if ENABLE(INPUT_SPEECH)
+  void speechAttributeChanged();
+#endif
+
  private:
   int preferredDecorationWidthRight() const;
   virtual bool hasControlClip() const;
