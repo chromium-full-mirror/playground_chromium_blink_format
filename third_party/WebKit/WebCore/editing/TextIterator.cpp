@@ -2274,7 +2274,7 @@ inline bool SearchBuffer::needsMoreContext() const {
   return false;
 }
 
-void prependContext(const UChar*, size_t) {
+void SearchBuffer::prependContext(const UChar*, size_t) {
   ASSERT_NOT_REACHED();
 }
 
