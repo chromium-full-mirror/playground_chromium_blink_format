@@ -2195,8 +2195,8 @@ nextMatch:
 
   // If this match is "bad", move on to the next match.
   if (isBadMatch(m_buffer.data() + matchStart, matchedLength) ||
-      m_options & AtWordStarts &&
-          !isWordStartMatch(matchStart, matchedLength)) {
+      ((m_options & AtWordStarts) &&
+       !isWordStartMatch(matchStart, matchedLength))) {
     matchStart = usearch_next(searcher, &status);
     ASSERT(status == U_ZERO_ERROR);
     goto nextMatch;
