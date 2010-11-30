@@ -997,6 +997,11 @@ void WebPage::setActivePopupMenu(WebPopupMenu* menu) {
   m_activePopupMenu = menu;
 }
 
+bool WebPage::findStringFromInjectedBundle(const String& target,
+                                           FindOptions options) {
+  return m_page->findString(target, options);
+}
+
 void WebPage::findString(const String& string,
                          uint32_t options,
                          uint32_t maxMatchCount) {

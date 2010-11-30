@@ -162,6 +162,8 @@ class WebPage : public APIObject, public CoreIPC::MessageSender<WebPage> {
   }
   InjectedBundlePageUIClient& injectedBundleUIClient() { return m_uiClient; }
 
+  bool findStringFromInjectedBundle(const String&, FindOptions);
+
   WebFrame* mainFrame() const { return m_mainFrame.get(); }
   PassRefPtr<Plugin> createPlugin(const Plugin::Parameters&);
 
