@@ -165,7 +165,7 @@ class ChromeClientQt : public ChromeClient {
   virtual void attachRootGraphicsLayer(Frame*, GraphicsLayer*);
   virtual void setNeedsOneShotDrawingSynchronization();
   virtual void scheduleCompositingLayerSync();
-  virtual bool allowsAcceleratedCompositing() const;
+  virtual CompositingTriggerFlags allowedCompositingTriggers() const;
 #endif
 
 #if ENABLE(TILED_BACKING_STORE)

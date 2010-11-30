@@ -246,6 +246,14 @@ bool RenderLayer::hasAcceleratedCompositing() const {
 #endif
 }
 
+bool RenderLayer::canRender3DTransforms() const {
+#if USE(ACCELERATED_COMPOSITING)
+  return compositor()->canRender3DTransforms();
+#else
+  return false;
+#endif
+}
+
 void RenderLayer::updateLayerPositions(UpdateLayerPositionsFlags flags,
                                        IntPoint* cachedOffset) {
   if (flags & DoFullRepaint) {
@@ -437,7 +445,7 @@ void RenderLayer::updateTransform() {
     m_transform->makeIdentity();
     box->style()->applyTransform(*m_transform, box->borderBoxRect().size(),
                                  RenderStyle::IncludeTransformOrigin);
-    makeMatrixRenderable(*m_transform, hasAcceleratedCompositing());
+    makeMatrixRenderable(*m_transform, canRender3DTransforms());
   }
 
   if (had3DTransform != has3DTransform())
@@ -455,7 +463,7 @@ TransformationMatrix RenderLayer::currentTransform() const {
         renderer()->animation()->getAnimatedStyleForRenderer(renderer());
     style->applyTransform(currTransform, renderBox()->borderBoxRect().size(),
                           RenderStyle::IncludeTransformOrigin);
-    makeMatrixRenderable(currTransform, hasAcceleratedCompositing());
+    makeMatrixRenderable(currTransform, canRender3DTransforms());
     return currTransform;
   }
 #endif

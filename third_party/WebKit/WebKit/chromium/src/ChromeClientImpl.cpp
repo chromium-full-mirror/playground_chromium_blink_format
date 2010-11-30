@@ -764,8 +764,12 @@ void ChromeClientImpl::scheduleCompositingLayerSync() {
   m_webView->setRootLayerNeedsDisplay();
 }
 
-bool ChromeClientImpl::allowsAcceleratedCompositing() const {
-  return m_webView->allowsAcceleratedCompositing();
+ChromeClient::CompositingTriggerFlags
+ChromeClientImpl::allowedCompositingTriggers() const {
+  if (!m_webView->allowsAcceleratedCompositing())
+    return 0;
+
+  return ChromeClient::AllTriggers;
 }
 #endif
 

@@ -580,7 +580,7 @@ static bool transform_3dMediaFeatureEval(CSSValue* value,
   bool threeDEnabled = false;
 #if USE(ACCELERATED_COMPOSITING)
   if (RenderView* view = frame->contentRenderer())
-    threeDEnabled = view->compositor()->hasAcceleratedCompositing();
+    threeDEnabled = view->compositor()->canRender3DTransforms();
 #endif
 
   returnValueIfNoParameter = threeDEnabled;

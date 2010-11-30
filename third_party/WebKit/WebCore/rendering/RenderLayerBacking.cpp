@@ -127,7 +127,7 @@ void RenderLayerBacking::updateLayerTransform(const RenderStyle* style) {
   if (m_owningLayer->hasTransform()) {
     style->applyTransform(t, toRenderBox(renderer())->borderBoxRect().size(),
                           RenderStyle::ExcludeTransformOrigin);
-    makeMatrixRenderable(t, compositor()->hasAcceleratedCompositing());
+    makeMatrixRenderable(t, compositor()->canRender3DTransforms());
   }
 
   m_graphicsLayer->setTransform(t);

@@ -98,6 +98,8 @@ RenderLayerCompositor::RenderLayerCompositor(RenderView* renderView)
           this,
           &RenderLayerCompositor::updateCompositingLayersTimerFired),
       m_hasAcceleratedCompositing(true),
+      m_compositingTriggers(static_cast<ChromeClient::CompositingTriggerFlags>(
+          ChromeClient::AllTriggers)),
       m_showDebugBorders(false),
       m_showRepaintCounter(false),
       m_compositingConsultsOverlap(true),
@@ -144,9 +146,11 @@ void RenderLayerCompositor::cacheAcceleratedCompositingFlags() {
   if (hasAcceleratedCompositing) {
     Frame* frame = m_renderView->frameView()->frame();
     Page* page = frame ? frame->page() : 0;
-    if (page)
-      hasAcceleratedCompositing =
-          page->chrome()->client()->allowsAcceleratedCompositing();
+    if (page) {
+      ChromeClient* chromeClient = page->chrome()->client();
+      m_compositingTriggers = chromeClient->allowedCompositingTriggers();
+      hasAcceleratedCompositing = m_compositingTriggers;
+    }
   }
 
   if (hasAcceleratedCompositing != m_hasAcceleratedCompositing ||
@@ -157,6 +161,11 @@ void RenderLayerCompositor::cacheAcceleratedCompositingFlags() {
   m_hasAcceleratedCompositing = hasAcceleratedCompositing;
   m_showDebugBorders = showDebugBorders;
   m_showRepaintCounter = showRepaintCounter;
+}
+
+bool RenderLayerCompositor::canRender3DTransforms() const {
+  return hasAcceleratedCompositing() &&
+         (m_compositingTriggers & ChromeClient::ThreeDTransformTrigger);
 }
 
 void RenderLayerCompositor::setCompositingLayersNeedRebuild(bool needRebuild) {
@@ -1225,7 +1234,9 @@ bool RenderLayerCompositor::requiresCompositingLayer(
          requiresCompositingForCanvas(renderer) ||
          requiresCompositingForPlugin(renderer) ||
          requiresCompositingForIFrame(renderer) ||
-         renderer->style()->backfaceVisibility() == BackfaceVisibilityHidden ||
+         (canRender3DTransforms() &&
+          renderer->style()->backfaceVisibility() ==
+              BackfaceVisibilityHidden) ||
          clipsCompositingDescendants(layer) ||
          requiresCompositingForAnimation(renderer);
 }
@@ -1287,6 +1298,9 @@ bool RenderLayerCompositor::clipsCompositingDescendants(
 
 bool RenderLayerCompositor::requiresCompositingForTransform(
     RenderObject* renderer) const {
+  if (!(m_compositingTriggers & ChromeClient::ThreeDTransformTrigger))
+    return false;
+
   RenderStyle* style = renderer->style();
   // Note that we ask the renderer if it has a transform, because the style may
   // have transforms,
@@ -1299,6 +1313,8 @@ bool RenderLayerCompositor::requiresCompositingForTransform(
 
 bool RenderLayerCompositor::requiresCompositingForVideo(
     RenderObject* renderer) const {
+  if (!(m_compositingTriggers & ChromeClient::VideoTrigger))
+    return false;
 #if ENABLE(VIDEO)
   if (renderer->isVideo()) {
     RenderVideo* video = toRenderVideo(renderer);
@@ -1328,6 +1344,9 @@ bool RenderLayerCompositor::requiresCompositingForVideo(
 
 bool RenderLayerCompositor::requiresCompositingForCanvas(
     RenderObject* renderer) const {
+  if (!(m_compositingTriggers & ChromeClient::CanvasTrigger))
+    return false;
+
   if (renderer->isCanvas()) {
     HTMLCanvasElement* canvas =
         static_cast<HTMLCanvasElement*>(renderer->node());
@@ -1339,6 +1358,9 @@ bool RenderLayerCompositor::requiresCompositingForCanvas(
 
 bool RenderLayerCompositor::requiresCompositingForPlugin(
     RenderObject* renderer) const {
+  if (!(m_compositingTriggers & ChromeClient::PluginTrigger))
+    return false;
+
   bool composite =
       (renderer->isEmbeddedObject() &&
        toRenderEmbeddedObject(renderer)->allowsAcceleratedCompositing()) ||
@@ -1391,6 +1413,9 @@ bool RenderLayerCompositor::requiresCompositingForIFrame(
 
 bool RenderLayerCompositor::requiresCompositingForAnimation(
     RenderObject* renderer) const {
+  if (!(m_compositingTriggers & ChromeClient::AnimationTrigger))
+    return false;
+
   if (AnimationController* animController = renderer->animation()) {
     return (animController->isRunningAnimationOnRenderer(renderer,
                                                          CSSPropertyOpacity) &&
