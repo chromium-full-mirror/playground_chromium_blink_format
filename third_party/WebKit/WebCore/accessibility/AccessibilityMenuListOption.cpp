@@ -80,7 +80,7 @@ void AccessibilityMenuListOption::setSelected(bool b) {
 }
 
 String AccessibilityMenuListOption::nameForMSAA() const {
-  return static_cast<HTMLOptionElement*>(m_element.get())->text();
+  return stringValue();
 }
 
 bool AccessibilityMenuListOption::canSetSelectedAttribute() const {
@@ -95,6 +95,10 @@ IntRect AccessibilityMenuListOption::elementRect() const {
   ASSERT(grandparent->isMenuList());
 
   return grandparent->elementRect();
+}
+
+String AccessibilityMenuListOption::stringValue() const {
+  return static_cast<HTMLOptionElement*>(m_element.get())->text();
 }
 
 }  // namespace WebCore

@@ -61,6 +61,7 @@ class AccessibilityMenuListOption : public AccessibilityObject {
   virtual void setSelected(bool);
   virtual bool canSetSelectedAttribute() const;
   virtual IntRect elementRect() const;
+  virtual String stringValue() const;
 
   RefPtr<HTMLElement> m_element;
   AccessibilityMenuListPopup* m_popup;
