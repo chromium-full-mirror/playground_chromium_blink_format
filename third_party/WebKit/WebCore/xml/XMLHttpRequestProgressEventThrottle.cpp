@@ -46,8 +46,8 @@ XMLHttpRequestProgressEventThrottle::~XMLHttpRequestProgressEventThrottle() {}
 
 void XMLHttpRequestProgressEventThrottle::dispatchProgressEvent(
     bool lengthComputable,
-    unsigned loaded,
-    unsigned total) {
+    unsigned long long loaded,
+    unsigned long long total) {
   ASSERT(!suspended());
   if (!isActive()) {
     // The timer is not active so the least frequent event for now is every

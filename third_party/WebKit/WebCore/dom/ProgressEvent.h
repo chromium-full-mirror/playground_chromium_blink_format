@@ -37,8 +37,8 @@ class ProgressEvent : public Event {
   }
   static PassRefPtr<ProgressEvent> create(const AtomicString& type,
                                           bool lengthComputable,
-                                          unsigned loaded,
-                                          unsigned total) {
+                                          unsigned long long loaded,
+                                          unsigned long long total) {
     return adoptRef(new ProgressEvent(type, lengthComputable, loaded, total));
   }
 
@@ -46,26 +46,26 @@ class ProgressEvent : public Event {
                          bool canBubbleArg,
                          bool cancelableArg,
                          bool lengthComputableArg,
-                         unsigned loadedArg,
-                         unsigned totalArg);
+                         unsigned long long loadedArg,
+                         unsigned long long totalArg);
 
   bool lengthComputable() const { return m_lengthComputable; }
-  unsigned loaded() const { return m_loaded; }
-  unsigned total() const { return m_total; }
-
-  virtual bool isProgressEvent() const { return true; }
+  unsigned long long loaded() const { return m_loaded; }
+  unsigned long long total() const { return m_total; }
 
  protected:
   ProgressEvent();
   ProgressEvent(const AtomicString& type,
                 bool lengthComputable,
-                unsigned loaded,
-                unsigned total);
+                unsigned long long loaded,
+                unsigned long long total);
 
  private:
+  virtual bool isProgressEvent() const { return true; }
+
   bool m_lengthComputable;
-  unsigned m_loaded;
-  unsigned m_total;
+  unsigned long long m_loaded;
+  unsigned long long m_total;
 };
 }
 

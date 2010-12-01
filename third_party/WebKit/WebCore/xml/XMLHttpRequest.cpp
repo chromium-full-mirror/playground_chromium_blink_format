@@ -1061,8 +1061,7 @@ void XMLHttpRequest::didSendData(unsigned long long bytesSent,
 
   if (m_uploadEventsAllowed)
     m_upload->dispatchEvent(XMLHttpRequestProgressEvent::create(
-        eventNames().progressEvent, true, static_cast<unsigned>(bytesSent),
-        static_cast<unsigned>(totalBytesToBeSent)));
+        eventNames().progressEvent, true, bytesSent, totalBytesToBeSent));
 
   if (bytesSent == totalBytesToBeSent && !m_uploadComplete) {
     m_uploadComplete = true;
@@ -1137,8 +1136,7 @@ void XMLHttpRequest::didReceiveData(const char* data, int len) {
       bool lengthComputable =
           expectedLength && m_receivedLength <= expectedLength;
       m_progressEventThrottle.dispatchProgressEvent(
-          lengthComputable, static_cast<unsigned>(m_receivedLength),
-          static_cast<unsigned>(expectedLength));
+          lengthComputable, m_receivedLength, expectedLength);
     }
 
     if (m_state != LOADING)

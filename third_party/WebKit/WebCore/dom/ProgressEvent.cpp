@@ -33,8 +33,8 @@ ProgressEvent::ProgressEvent()
 
 ProgressEvent::ProgressEvent(const AtomicString& type,
                              bool lengthComputable,
-                             unsigned loaded,
-                             unsigned total)
+                             unsigned long long loaded,
+                             unsigned long long total)
     : Event(type, false, true),
       m_lengthComputable(lengthComputable),
       m_loaded(loaded),
@@ -44,8 +44,8 @@ void ProgressEvent::initProgressEvent(const AtomicString& typeArg,
                                       bool canBubbleArg,
                                       bool cancelableArg,
                                       bool lengthComputableArg,
-                                      unsigned loadedArg,
-                                      unsigned totalArg) {
+                                      unsigned long long loadedArg,
+                                      unsigned long long totalArg) {
   if (dispatched())
     return;
 

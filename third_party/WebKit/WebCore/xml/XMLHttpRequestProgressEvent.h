@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2010 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Julien Chaffraix <jchaffraix@webkit.org>. All rights
  * reserved.
  *
@@ -40,25 +40,24 @@ class XMLHttpRequestProgressEvent : public ProgressEvent {
   static PassRefPtr<XMLHttpRequestProgressEvent> create(
       const AtomicString& type,
       bool lengthComputable = false,
-      unsigned loaded = 0,
-      unsigned total = 0) {
+      unsigned long long loaded = 0,
+      unsigned long long total = 0) {
     return adoptRef(
         new XMLHttpRequestProgressEvent(type, lengthComputable, loaded, total));
   }
 
-  virtual bool isXMLHttpRequestProgressEvent() const { return true; }
-
-  // Those 2 methods are to be compatible with Firefox and are only a wrapper on
-  // top of the real implementation.
-  unsigned position() const { return loaded(); }
-  unsigned totalSize() const { return total(); }
+  // Those 2 synonyms are included for compatibility with Firefox.
+  unsigned long long position() const { return loaded(); }
+  unsigned long long totalSize() const { return total(); }
 
  private:
+  virtual bool isXMLHttpRequestProgressEvent() const { return true; }
+
   XMLHttpRequestProgressEvent() {}
   XMLHttpRequestProgressEvent(const AtomicString& type,
                               bool lengthComputable,
-                              unsigned loaded,
-                              unsigned total)
+                              unsigned long long loaded,
+                              unsigned long long total)
       : ProgressEvent(type, lengthComputable, loaded, total) {}
 };
 
