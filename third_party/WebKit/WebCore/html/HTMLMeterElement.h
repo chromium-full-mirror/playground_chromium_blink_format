@@ -28,7 +28,9 @@ namespace WebCore {
 
 class HTMLMeterElement : public HTMLFormControlElement {
  public:
-  static PassRefPtr<HTMLMeterElement> create(const QualifiedName&, Document*);
+  static PassRefPtr<HTMLMeterElement> create(const QualifiedName&,
+                                             Document*,
+                                             HTMLFormElement*);
 
   enum GaugeRegion {
     GaugeRegionOptimum,
@@ -57,7 +59,7 @@ class HTMLMeterElement : public HTMLFormControlElement {
   GaugeRegion gaugeRegion() const;
 
  private:
-  HTMLMeterElement(const QualifiedName&, Document*);
+  HTMLMeterElement(const QualifiedName&, Document*, HTMLFormElement*);
 
   virtual bool recalcWillValidate() const { return false; }
 

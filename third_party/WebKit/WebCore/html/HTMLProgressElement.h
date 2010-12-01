@@ -30,7 +30,7 @@ class HTMLProgressElement : public HTMLFormControlElement {
  public:
   static PassRefPtr<HTMLProgressElement> create(const QualifiedName&,
                                                 Document*,
-                                                HTMLFormElement* = 0);
+                                                HTMLFormElement*);
 
   double value() const;
   void setValue(double, ExceptionCode&);
