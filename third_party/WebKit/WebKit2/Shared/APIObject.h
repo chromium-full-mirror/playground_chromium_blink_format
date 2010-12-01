@@ -64,6 +64,7 @@ class APIObject : public RefCounted<APIObject> {
     TypeInspector,
     TypeNavigationData,
     TypePage,
+    TypePageGroup,
     TypePageNamespace,
     TypePreferences,
 
@@ -75,6 +76,7 @@ class APIObject : public RefCounted<APIObject> {
     TypeBundleHitTestResult,
     TypeBundleNodeHandle,
     TypeBundlePage,
+    TypeBundlePageGroup,
     TypeBundlePageOverlay,
     TypeBundleRangeHandle,
     TypeBundleScriptWorld,

@@ -60,6 +60,13 @@ void InjectedBundle::willDestroyPage(WKBundleRef bundle,
       ->willDestroyPage(page);
 }
 
+void InjectedBundle::didInitializePageGroup(WKBundleRef bundle,
+                                            WKBundlePageGroupRef pageGroup,
+                                            const void* clientInfo) {
+  static_cast<InjectedBundle*>(const_cast<void*>(clientInfo))
+      ->didInitializePageGroup(pageGroup);
+}
+
 void InjectedBundle::didReceiveMessage(WKBundleRef bundle,
                                        WKStringRef messageName,
                                        WKTypeRef messageBody,
@@ -71,7 +78,11 @@ void InjectedBundle::didReceiveMessage(WKBundleRef bundle,
 void InjectedBundle::initialize(WKBundleRef bundle) {
   m_bundle = bundle;
 
-  WKBundleClient client = {0, this, didCreatePage, willDestroyPage,
+  WKBundleClient client = {0,
+                           this,
+                           didCreatePage,
+                           willDestroyPage,
+                           didInitializePageGroup,
                            didReceiveMessage};
   WKBundleSetClient(m_bundle, &client);
 
@@ -91,6 +102,10 @@ void InjectedBundle::willDestroyPage(WKBundlePageRef page) {
       break;
     }
   }
+}
+
+void InjectedBundle::didInitializePageGroup(WKBundlePageGroupRef pageGroup) {
+  m_pageGroup = pageGroup;
 }
 
 InjectedBundlePage* InjectedBundle::page() const {
@@ -133,7 +148,7 @@ void InjectedBundle::beginTesting() {
   WKBundleSetShouldTrackVisitedLinks(m_bundle, false);
   WKBundleRemoveAllVisitedLinks(m_bundle);
 
-  WKBundleRemoveAllUserContent(m_bundle);
+  WKBundleRemoveAllUserContent(m_bundle, m_pageGroup);
 
   page()->reset();
 }

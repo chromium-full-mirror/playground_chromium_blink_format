@@ -44,6 +44,7 @@ class WKView;
 
 namespace WebKit {
 
+class WebPageGroup;
 class WebPageProxy;
 struct WebPageCreationParameters;
 
@@ -107,6 +108,8 @@ class WebInspectorProxy : public APIObject {
   void createInspectorPage(uint64_t& inspectorPageID,
                            WebPageCreationParameters&);
   void didLoadInspectorPage();
+
+  static WebPageGroup* inspectorPageGroup();
 
   WebPageProxy* m_page;
 

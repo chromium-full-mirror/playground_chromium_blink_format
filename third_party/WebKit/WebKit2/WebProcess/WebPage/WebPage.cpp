@@ -50,12 +50,13 @@
 #include "WebInspector.h"
 #include "WebInspectorClient.h"
 #include "WebPageCreationParameters.h"
+#include "WebPageGroupProxy.h"
 #include "WebPageProxyMessages.h"
 #include "WebPopupMenu.h"
 #include "WebPreferencesStore.h"
 #include "WebProcess.h"
-#include "WebProcessProxyMessages.h"
 #include "WebProcessProxyMessageKinds.h"
+#include "WebProcessProxyMessages.h"
 #include <WebCore/Chrome.h>
 #include <WebCore/ContextMenuController.h>
 #include <WebCore/EventHandler.h>
@@ -102,7 +103,7 @@ PassRefPtr<WebPage> WebPage::create(
     const WebPageCreationParameters& parameters) {
   RefPtr<WebPage> page = adoptRef(new WebPage(pageID, parameters));
 
-  if (parameters.visibleToInjectedBundle &&
+  if (page->pageGroup()->isVisibleToInjectedBundle() &&
       WebProcess::shared().injectedBundle())
     WebProcess::shared().injectedBundle()->didCreatePage(page.get());
 
@@ -112,8 +113,7 @@ PassRefPtr<WebPage> WebPage::create(
 WebPage::WebPage(uint64_t pageID, const WebPageCreationParameters& parameters)
     : m_viewSize(parameters.viewSize),
       m_isInRedo(false),
-      m_isClosed(false),
-      m_isVisibleToInjectedBundle(parameters.visibleToInjectedBundle)
+      m_isClosed(false)
 #if PLATFORM(MAC)
       ,
       m_windowIsVisible(false)
@@ -147,7 +147,8 @@ WebPage::WebPage(uint64_t pageID, const WebPageCreationParameters& parameters)
 
   updatePreferences(parameters.store);
 
-  m_page->setGroupName("WebKit2Group");
+  m_pageGroup = WebProcess::shared().webPageGroup(parameters.pageGroupData);
+  m_page->setGroupName(m_pageGroup->identifier());
 
   platformInitialize();
   Settings::setMinDOMTimerInterval(0.004);
@@ -155,7 +156,6 @@ WebPage::WebPage(uint64_t pageID, const WebPageCreationParameters& parameters)
   m_drawingArea =
       DrawingArea::create(parameters.drawingAreaInfo.type,
                           parameters.drawingAreaInfo.identifier, this);
-
   m_mainFrame = WebFrame::createMainFrame(this);
 
 #ifndef NDEBUG
@@ -311,7 +311,8 @@ void WebPage::close() {
 
   m_isClosed = true;
 
-  if (m_isVisibleToInjectedBundle && WebProcess::shared().injectedBundle())
+  if (pageGroup()->isVisibleToInjectedBundle() &&
+      WebProcess::shared().injectedBundle())
     WebProcess::shared().injectedBundle()->willDestroyPage(this);
 
 #if ENABLE(INSPECTOR)

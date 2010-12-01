@@ -65,7 +65,7 @@ QWKPagePrivate::QWKPagePrivate(QWKPage* qq, WKPageNamespaceRef namespaceRef)
   initializePlatformStrategiesIfNeeded();
   memset(actions, 0, sizeof(actions));
   page =
-      toImpl(namespaceRef)->createWebPage();  // Page gets a ref to namespace.
+      toImpl(namespaceRef)->createWebPage(0);  // Page gets a ref to namespace.
   page->setPageClient(this);
   history = QWKHistoryPrivate::createHistory(page->backForwardList());
 }

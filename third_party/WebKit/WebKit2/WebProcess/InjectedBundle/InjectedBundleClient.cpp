@@ -45,6 +45,16 @@ void InjectedBundleClient::willDestroyPage(InjectedBundle* bundle,
   m_client.willDestroyPage(toAPI(bundle), toAPI(page), m_client.clientInfo);
 }
 
+void InjectedBundleClient::didInitializePageGroup(
+    InjectedBundle* bundle,
+    WebPageGroupProxy* pageGroup) {
+  if (!m_client.didInitializePageGroup)
+    return;
+
+  m_client.didInitializePageGroup(toAPI(bundle), toAPI(pageGroup),
+                                  m_client.clientInfo);
+}
+
 void InjectedBundleClient::didReceiveMessage(InjectedBundle* bundle,
                                              const String& messageName,
                                              APIObject* messageBody) {

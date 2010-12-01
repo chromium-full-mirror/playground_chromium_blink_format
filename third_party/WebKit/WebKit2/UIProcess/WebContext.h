@@ -47,6 +47,7 @@ struct WKContextStatistics;
 namespace WebKit {
 
 class DownloadProxy;
+class WebPageGroup;
 class WebPageNamespace;
 class WebPageProxy;
 class WebPreferences;
@@ -72,7 +73,7 @@ class WebContext : public APIObject {
   void processDidFinishLaunching(WebProcessProxy*);
   void processDidClose(WebProcessProxy*);
 
-  WebPageProxy* createWebPage(WebPageNamespace*);
+  WebPageProxy* createWebPage(WebPageNamespace*, WebPageGroup* = 0);
 
   void relaunchProcessIfNecessary();
 
@@ -190,6 +191,8 @@ class WebContext : public APIObject {
 
   HashSet<WebPageNamespace*> m_pageNamespaces;
   RefPtr<WebPreferences> m_preferences;
+
+  RefPtr<WebPageGroup> m_defaultPageGroup;
 
   RefPtr<APIObject> m_injectedBundleInitializationUserData;
   String m_injectedBundlePath;

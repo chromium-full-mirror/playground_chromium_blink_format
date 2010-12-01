@@ -26,6 +26,8 @@
 #include "UserMessageCoders.h"
 #include "WebContext.h"
 #include "WebFrameProxy.h"
+#include "WebPageGroup.h"
+#include "WebPageGroupData.h"
 #include "WebPageProxy.h"
 
 namespace WebKit {
@@ -33,6 +35,7 @@ namespace WebKit {
 // Adds
 // - Page -> BundlePage
 // - Frame -> BundleFrame
+// - PageGroup -> BundlePageGroup
 
 class WebContextUserMessageEncoder
     : public UserMessageEncoder<WebContextUserMessageEncoder> {
@@ -57,6 +60,11 @@ class WebContextUserMessageEncoder
         encoder->encode(frame->frameID());
         break;
       }
+      case APIObject::TypePageGroup: {
+        WebPageGroup* pageGroup = static_cast<WebPageGroup*>(m_root);
+        encoder->encode(pageGroup->data());
+        break;
+      }
       default:
         ASSERT_NOT_REACHED();
         break;
@@ -67,6 +75,7 @@ class WebContextUserMessageEncoder
 // Adds
 //   - Page -> BundlePage
 //   - Frame -> BundleFrame
+//   - PageGroup -> BundlePageGroup
 
 class WebContextUserMessageDecoder
     : public UserMessageDecoder<WebContextUserMessageDecoder> {
@@ -102,6 +111,13 @@ class WebContextUserMessageDecoder
         if (!decoder->decode(frameID))
           return false;
         coder.m_root = coder.m_context->process()->webFrame(frameID);
+        break;
+      }
+      case APIObject::TypeBundlePageGroup: {
+        uint64_t pageGroupID;
+        if (!decoder->decode(pageGroupID))
+          return false;
+        coder.m_root = WebPageGroup::get(pageGroupID);
         break;
       }
       default:

@@ -45,6 +45,8 @@
 #include "WebFormSubmissionListenerProxy.h"
 #include "WebFramePolicyListenerProxy.h"
 #include "WebPageCreationParameters.h"
+#include "WebPageGroup.h"
+#include "WebPageGroupData.h"
 #include "WebPageMessages.h"
 #include "WebPageNamespace.h"
 #include "WebPopupItem.h"
@@ -81,13 +83,17 @@ void invalidateCallbackMap(HashMap<uint64_t, T>& map) {
 }
 
 PassRefPtr<WebPageProxy> WebPageProxy::create(WebPageNamespace* pageNamespace,
+                                              WebPageGroup* pageGroup,
                                               uint64_t pageID) {
-  return adoptRef(new WebPageProxy(pageNamespace, pageID));
+  return adoptRef(new WebPageProxy(pageNamespace, pageGroup, pageID));
 }
 
-WebPageProxy::WebPageProxy(WebPageNamespace* pageNamespace, uint64_t pageID)
+WebPageProxy::WebPageProxy(WebPageNamespace* pageNamespace,
+                           WebPageGroup* pageGroup,
+                           uint64_t pageID)
     : m_pageClient(0),
       m_pageNamespace(pageNamespace),
+      m_pageGroup(pageGroup),
       m_mainFrame(0),
       m_estimatedProgress(0.0),
       m_isInWindow(false),
@@ -95,7 +101,6 @@ WebPageProxy::WebPageProxy(WebPageNamespace* pageNamespace, uint64_t pageID)
       m_textZoomFactor(1),
       m_pageZoomFactor(1),
       m_viewScaleFactor(1),
-      m_visibleToInjectedBundle(true),
       m_isValid(true),
       m_isClosed(false),
       m_inDecidePolicyForMIMEType(false),
@@ -1572,7 +1577,7 @@ WebPageCreationParameters WebPageProxy::creationParameters(
   parameters.viewSize = size;
   parameters.store = pageNamespace()->context()->preferences()->store();
   parameters.drawingAreaInfo = m_drawingArea->info();
-  parameters.visibleToInjectedBundle = m_visibleToInjectedBundle;
+  parameters.pageGroupData = m_pageGroup->data();
 
 #if PLATFORM(WIN)
   parameters.nativeWindow = m_pageClient->nativeWindow();

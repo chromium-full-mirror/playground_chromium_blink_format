@@ -24,10 +24,12 @@
  */
 
 #include "InjectedBundleTest.h"
-#include <WebKit2/WebKit2.h>
+#include <WebKit2/WKBundlePageGroup.h>
 #include <WebKit2/WKBundlePrivate.h>
 #include <WebKit2/WKBundleScriptWorld.h>
 #include <WebKit2/WKRetainPtr.h>
+#include <WebKit2/WebKit2.h>
+#include <assert.h>
 
 namespace TestWebKitAPI {
 
@@ -36,13 +38,20 @@ class DocumentStartUserScriptAlertCrashTest : public InjectedBundleTest {
   DocumentStartUserScriptAlertCrashTest(const std::string& identifier)
       : InjectedBundleTest(identifier) {}
 
-  virtual void initialize(WKBundleRef bundle) {
+  virtual void initialize(WKBundleRef bundle, WKTypeRef userData) {
+    assert(WKGetTypeID(userData) == WKBundlePageGroupGetTypeID());
+    WKBundlePageGroupRef pageGroup =
+        static_cast<WKBundlePageGroupRef>(userData);
+
     WKRetainPtr<WKStringRef> source(
         AdoptWK, WKStringCreateWithUTF8CString("alert('an alert');"));
-    WKBundleAddUserScript(bundle, WKBundleScriptWorldNormalWorld(),
+    WKBundleAddUserScript(bundle, pageGroup, WKBundleScriptWorldNormalWorld(),
                           source.get(), 0, 0, 0, kWKInjectAtDocumentStart,
                           kWKInjectInAllFrames);
   }
+
+ private:
+  WKBundlePageGroupRef m_pageGroup;
 };
 
 static InjectedBundleTest::Register<DocumentStartUserScriptAlertCrashTest>

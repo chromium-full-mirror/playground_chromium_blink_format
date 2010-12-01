@@ -41,7 +41,9 @@ class InjectedBundleController {
   void initialize(WKBundleRef, WKTypeRef);
 
   void dumpTestNames();
-  void initializeTestNamed(WKBundleRef bundle, const std::string&);
+  void initializeTestNamed(WKBundleRef bundle,
+                           const std::string&,
+                           WKTypeRef userData);
 
   typedef InjectedBundleTest* (*CreateInjectedBundleTestFunction)(
       const std::string&);
@@ -53,13 +55,16 @@ class InjectedBundleController {
   InjectedBundleController();
   ~InjectedBundleController();
 
-  static void didCreatePage(WKBundleRef bundle,
-                            WKBundlePageRef page,
+  static void didCreatePage(WKBundleRef,
+                            WKBundlePageRef,
                             const void* clientInfo);
-  static void willDestroyPage(WKBundleRef bundle,
-                              WKBundlePageRef page,
+  static void willDestroyPage(WKBundleRef,
+                              WKBundlePageRef,
                               const void* clientInfo);
-  static void didReceiveMessage(WKBundleRef bundle,
+  static void didInitializePageGroup(WKBundleRef,
+                                     WKBundlePageGroupRef,
+                                     const void* clientInfo);
+  static void didReceiveMessage(WKBundleRef,
                                 WKStringRef messageName,
                                 WKTypeRef messageBody,
                                 const void* clientInfo);
