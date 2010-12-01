@@ -45,8 +45,8 @@ class DrawingArea : public RefCounted<DrawingArea> {
  public:
   // FIXME: It might make sense to move this create function into a factory
   // style class.
-  static PassRefPtr<DrawingArea> create(DrawingAreaBase::Type,
-                                        DrawingAreaBase::DrawingAreaID,
+  static PassRefPtr<DrawingArea> create(DrawingAreaInfo::Type,
+                                        DrawingAreaInfo::Identifier,
                                         WebPage*);
 
   virtual ~DrawingArea();
@@ -76,12 +76,12 @@ class DrawingArea : public RefCounted<DrawingArea> {
                                  CoreIPC::MessageID,
                                  CoreIPC::ArgumentDecoder*) = 0;
 
-  const DrawingAreaBase::DrawingAreaInfo& info() const { return m_info; }
+  const DrawingAreaInfo& info() const { return m_info; }
 
  protected:
-  DrawingArea(DrawingAreaBase::Type, DrawingAreaBase::DrawingAreaID, WebPage*);
+  DrawingArea(DrawingAreaInfo::Type, DrawingAreaInfo::Identifier, WebPage*);
 
-  DrawingAreaBase::DrawingAreaInfo m_info;
+  DrawingAreaInfo m_info;
   WebPage* m_webPage;
 };
 

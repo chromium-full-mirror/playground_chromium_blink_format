@@ -1507,7 +1507,7 @@ void WebPageProxy::focusedFrameChanged(uint64_t frameID) {
 #if USE(ACCELERATED_COMPOSITING)
 void WebPageProxy::didChangeAcceleratedCompositing(
     bool compositing,
-    DrawingAreaBase::DrawingAreaInfo& drawingAreaInfo) {
+    DrawingAreaInfo& drawingAreaInfo) {
   if (compositing)
     didEnterAcceleratedCompositing();
   else

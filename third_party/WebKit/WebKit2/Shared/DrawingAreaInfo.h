@@ -36,46 +36,35 @@ class IntSize;
 
 namespace WebKit {
 
-class DrawingAreaBase {
- public:
+struct DrawingAreaInfo {
   enum Type {
     None,
-    ChunkedUpdateDrawingAreaType,
+    ChunkedUpdate,
 #if USE(ACCELERATED_COMPOSITING)
-    LayerBackedDrawingAreaType,
+    LayerBacked,
 #endif
 #if ENABLE(TILED_BACKING_STORE)
-    TiledDrawingAreaType,
+    Tiled,
 #endif
   };
 
-  typedef uint64_t DrawingAreaID;
+  typedef uint64_t Identifier;
 
-  struct DrawingAreaInfo {
-    Type type;
-    DrawingAreaID id;
+  DrawingAreaInfo() : type(None), identifier(0) {}
 
-    DrawingAreaInfo(Type type = None, DrawingAreaID identifier = 0)
-        : type(type), id(identifier) {}
-  };
+  DrawingAreaInfo(Type type, Identifier identifier)
+      : type(type), identifier(identifier) {}
 
-  virtual ~DrawingAreaBase() {}
-
-  const DrawingAreaInfo& info() const { return m_info; }
-
- protected:
-  DrawingAreaBase(Type type, DrawingAreaID identifier)
-      : m_info(type, identifier) {}
-
-  DrawingAreaInfo m_info;
+  Type type;
+  Identifier identifier;
 };
 
 }  // namespace WebKit
 
 namespace CoreIPC {
 template <>
-struct ArgumentCoder<WebKit::DrawingAreaBase::DrawingAreaInfo>
-    : SimpleArgumentCoder<WebKit::DrawingAreaBase::DrawingAreaInfo> {};
+struct ArgumentCoder<WebKit::DrawingAreaInfo>
+    : SimpleArgumentCoder<WebKit::DrawingAreaInfo> {};
 }
 
 #endif  // DrawingAreaInfo_h

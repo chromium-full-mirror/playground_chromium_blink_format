@@ -45,7 +45,7 @@ PassOwnPtr<LayerBackedDrawingAreaProxy> LayerBackedDrawingAreaProxy::create(
 
 LayerBackedDrawingAreaProxy::LayerBackedDrawingAreaProxy(
     PlatformWebView* webView)
-    : DrawingAreaProxy(DrawingAreaBase::LayerBackedDrawingAreaType),
+    : DrawingAreaProxy(DrawingAreaInfo::LayerBacked),
       m_isWaitingForDidSetFrameNotification(false),
       m_isVisible(true),
       m_webView(webView) {}
@@ -77,7 +77,7 @@ void LayerBackedDrawingAreaProxy::setSize(const IntSize& viewSize) {
 
   page->process()->responsivenessTimer()->start();
   page->process()->send(DrawingAreaMessage::SetSize, page->pageID(),
-                        CoreIPC::In(info().id, viewSize));
+                        CoreIPC::In(info().identifier, viewSize));
 }
 
 #if !PLATFORM(MAC) && !PLATFORM(WIN)
@@ -97,13 +97,13 @@ void LayerBackedDrawingAreaProxy::setPageIsVisible(bool isVisible) {
   if (!m_isVisible) {
     // Tell the web process that it doesn't need to paint anything for now.
     page->process()->send(DrawingAreaMessage::SuspendPainting, page->pageID(),
-                          CoreIPC::In(info().id));
+                          CoreIPC::In(info().identifier));
     return;
   }
 
   // The page is now visible.
   page->process()->send(DrawingAreaMessage::ResumePainting, page->pageID(),
-                        CoreIPC::In(info().id));
+                        CoreIPC::In(info().identifier));
 
   // FIXME: We should request a full repaint here if needed.
 }
@@ -118,7 +118,7 @@ void LayerBackedDrawingAreaProxy::didSetSize() {
 void LayerBackedDrawingAreaProxy::update() {
   WebPageProxy* page = this->page();
   page->process()->send(DrawingAreaMessage::DidUpdate, page->pageID(),
-                        CoreIPC::In(info().id));
+                        CoreIPC::In(info().identifier));
 }
 
 void LayerBackedDrawingAreaProxy::didReceiveMessage(

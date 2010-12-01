@@ -458,8 +458,7 @@ class WebPageProxy : public APIObject {
   void focusedFrameChanged(uint64_t frameID);
 
 #if USE(ACCELERATED_COMPOSITING)
-  void didChangeAcceleratedCompositing(bool compositing,
-                                       DrawingAreaBase::DrawingAreaInfo&);
+  void didChangeAcceleratedCompositing(bool compositing, DrawingAreaInfo&);
 #endif
 
   PageClient* m_pageClient;
