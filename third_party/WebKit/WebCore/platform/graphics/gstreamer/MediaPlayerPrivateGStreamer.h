@@ -43,6 +43,7 @@ class GraphicsContext;
 class IntSize;
 class IntRect;
 class GStreamerGWorld;
+class MediaPlayerPrivateGStreamer;
 
 gboolean mediaPlayerPrivateMessageCallback(GstBus* bus,
                                            GstMessage* message,
@@ -56,6 +57,10 @@ void mediaPlayerPrivateMuteChangedCallback(GObject* element,
 void mediaPlayerPrivateSourceChangedCallback(GObject* element,
                                              GParamSpec* pspec,
                                              gpointer data);
+gboolean mediaPlayerPrivateVolumeChangeTimeoutCallback(
+    MediaPlayerPrivateGStreamer*);
+gboolean mediaPlayerPrivateMuteChangeTimeoutCallback(
+    MediaPlayerPrivateGStreamer*);
 
 class MediaPlayerPrivateGStreamer : public MediaPlayerPrivateInterface {
   friend gboolean mediaPlayerPrivateMessageCallback(GstBus* bus,
@@ -96,12 +101,12 @@ class MediaPlayerPrivateGStreamer : public MediaPlayerPrivateInterface {
 
   void setVolume(float);
   void volumeChanged();
-  void volumeChangedTimerFired(Timer<MediaPlayerPrivateGStreamer>*);
+  void notifyPlayerOfVolumeChange();
 
   bool supportsMuting() const;
   void setMuted(bool);
   void muteChanged();
-  void muteChangedTimerFired(Timer<MediaPlayerPrivateGStreamer>*);
+  void notifyPlayerOfMute();
 
   void setPreload(MediaPlayer::Preload);
   void fillTimerFired(Timer<MediaPlayerPrivateGStreamer>*);
@@ -192,6 +197,8 @@ class MediaPlayerPrivateGStreamer : public MediaPlayerPrivateInterface {
   bool m_delayingLoad;
   bool m_mediaDurationKnown;
   RefPtr<GStreamerGWorld> m_gstGWorld;
+  guint m_volumeTimerHandler;
+  guint m_muteTimerHandler;
 };
 }
 
