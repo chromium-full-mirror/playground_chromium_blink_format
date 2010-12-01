@@ -113,7 +113,7 @@ class LayoutTestController : public JSWrappable {
   void addUserStyleSheet(JSStringRef source, bool allFrames);
 
   // Text search testing.
-  bool findString(JSContextRef, JSStringRef, JSObjectRef optionsArray);
+  bool findString(JSStringRef, JSValueRef optionsArray);
 
   enum WhatToDump { RenderTree, MainFrameText, AllFramesText };
   WhatToDump whatToDump() const { return m_whatToDump; }
