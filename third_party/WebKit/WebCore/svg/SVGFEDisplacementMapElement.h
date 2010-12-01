@@ -22,6 +22,7 @@
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "FEDisplacementMap.h"
+#include "SVGAnimatedNumber.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
 namespace WebCore {
@@ -42,6 +43,7 @@ class SVGFEDisplacementMapElement
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*, Filter*);
 
+  // Animated property declarations
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEDisplacementMapElement,
                                        SVGNames::inAttr,
                                        String,
@@ -62,11 +64,7 @@ class SVGFEDisplacementMapElement
                                        int,
                                        YChannelSelector,
                                        yChannelSelector)
-  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEDisplacementMapElement,
-                                       SVGNames::scaleAttr,
-                                       float,
-                                       Scale,
-                                       scale)
+  DECLARE_ANIMATED_NUMBER(Scale, scale)
 };
 
 }  // namespace WebCore

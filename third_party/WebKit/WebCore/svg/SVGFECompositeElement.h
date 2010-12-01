@@ -23,6 +23,7 @@
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "FEComposite.h"
+#include "SVGAnimatedNumber.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
 namespace WebCore {
@@ -40,6 +41,7 @@ class SVGFECompositeElement : public SVGFilterPrimitiveStandardAttributes {
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*, Filter*);
 
+  // Animated property declarations
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFECompositeElement,
                                        SVGNames::inAttr,
                                        String,
@@ -55,26 +57,10 @@ class SVGFECompositeElement : public SVGFilterPrimitiveStandardAttributes {
                                        int,
                                        _operator,
                                        _operator)
-  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFECompositeElement,
-                                       SVGNames::k1Attr,
-                                       float,
-                                       K1,
-                                       k1)
-  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFECompositeElement,
-                                       SVGNames::k2Attr,
-                                       float,
-                                       K2,
-                                       k2)
-  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFECompositeElement,
-                                       SVGNames::k3Attr,
-                                       float,
-                                       K3,
-                                       k3)
-  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFECompositeElement,
-                                       SVGNames::k4Attr,
-                                       float,
-                                       K4,
-                                       k4)
+  DECLARE_ANIMATED_NUMBER(K1, k1)
+  DECLARE_ANIMATED_NUMBER(K2, k2)
+  DECLARE_ANIMATED_NUMBER(K3, k3)
+  DECLARE_ANIMATED_NUMBER(K4, k4)
 };
 
 }  // namespace WebCore

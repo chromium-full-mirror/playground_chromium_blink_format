@@ -28,6 +28,19 @@
 
 namespace WebCore {
 
+// Animated property definitions
+DEFINE_ANIMATED_NUMBER_MULTIPLE_WRAPPERS(SVGFETurbulenceElement,
+                                         SVGNames::baseFrequencyAttr,
+                                         baseFrequencyXIdentifier(),
+                                         BaseFrequencyX,
+                                         baseFrequencyX)
+DEFINE_ANIMATED_NUMBER_MULTIPLE_WRAPPERS(SVGFETurbulenceElement,
+                                         SVGNames::baseFrequencyAttr,
+                                         baseFrequencyYIdentifier(),
+                                         BaseFrequencyY,
+                                         baseFrequencyY)
+DEFINE_ANIMATED_NUMBER(SVGFETurbulenceElement, SVGNames::seedAttr, Seed, seed)
+
 inline SVGFETurbulenceElement::SVGFETurbulenceElement(
     const QualifiedName& tagName,
     Document* document)

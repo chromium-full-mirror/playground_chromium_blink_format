@@ -22,7 +22,7 @@
 #define SVGStopElement_h
 
 #if ENABLE(SVG)
-#include "SVGAnimatedPropertyMacros.h"
+#include "SVGAnimatedNumber.h"
 #include "SVGStyledElement.h"
 
 namespace WebCore {
@@ -44,11 +44,8 @@ class SVGStopElement : public SVGStyledElement {
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
-  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGStopElement,
-                                       SVGNames::offsetAttr,
-                                       float,
-                                       Offset,
-                                       offset)
+  // Animated property declarations
+  DECLARE_ANIMATED_NUMBER(Offset, offset)
 };
 
 }  // namespace WebCore

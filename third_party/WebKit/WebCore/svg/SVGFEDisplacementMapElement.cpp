@@ -26,6 +26,12 @@
 
 namespace WebCore {
 
+// Animated property definitions
+DEFINE_ANIMATED_NUMBER(SVGFEDisplacementMapElement,
+                       SVGNames::scaleAttr,
+                       Scale,
+                       scale)
+
 inline SVGFEDisplacementMapElement::SVGFEDisplacementMapElement(
     const QualifiedName& tagName,
     Document* document)
