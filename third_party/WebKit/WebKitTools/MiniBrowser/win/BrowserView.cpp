@@ -95,7 +95,8 @@ void BrowserView::create(RECT webViewRect, BrowserWindow* parentWindow) {
 
   WKPageNamespaceRef pageNamespace = WKPageNamespaceCreate(context);
 
-  m_webView = WKViewCreate(webViewRect, pageNamespace, parentWindow->window());
+  m_webView =
+      WKViewCreate(webViewRect, pageNamespace, 0, parentWindow->window());
 
   WKPageUIClient uiClient = {
       0,            /* version */
