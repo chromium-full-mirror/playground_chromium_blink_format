@@ -39,8 +39,6 @@ namespace WebCore {
 
 struct PatternAttributes;
 
-class SVGLength;
-
 class SVGPatternElement : public SVGStyledElement,
                           public SVGURIReference,
                           public SVGTests,
@@ -70,26 +68,11 @@ class SVGPatternElement : public SVGStyledElement,
 
   virtual bool selfHasRelativeLengths() const;
 
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGPatternElement,
-                                SVGNames::xAttr,
-                                SVGLength,
-                                X,
-                                x)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGPatternElement,
-                                SVGNames::yAttr,
-                                SVGLength,
-                                Y,
-                                y)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGPatternElement,
-                                SVGNames::widthAttr,
-                                SVGLength,
-                                Width,
-                                width)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGPatternElement,
-                                SVGNames::heightAttr,
-                                SVGLength,
-                                Height,
-                                height)
+  // Animated property declarations
+  DECLARE_ANIMATED_LENGTH(X, x)
+  DECLARE_ANIMATED_LENGTH(Y, y)
+  DECLARE_ANIMATED_LENGTH(Width, width)
+  DECLARE_ANIMATED_LENGTH(Height, height)
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGPatternElement,
                                        SVGNames::patternUnitsAttr,
                                        int,

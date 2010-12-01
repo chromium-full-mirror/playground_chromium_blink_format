@@ -31,8 +31,6 @@
 
 namespace WebCore {
 
-class SVGLength;
-
 class SVGMaskElement : public SVGStyledLocatableElement,
                        public SVGTests,
                        public SVGLangSpace,
@@ -60,6 +58,7 @@ class SVGMaskElement : public SVGStyledLocatableElement,
 
   virtual bool selfHasRelativeLengths() const;
 
+  // Animated property declarations
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGMaskElement,
                                        SVGNames::maskUnitsAttr,
                                        int,
@@ -70,26 +69,10 @@ class SVGMaskElement : public SVGStyledLocatableElement,
                                        int,
                                        MaskContentUnits,
                                        maskContentUnits)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGMaskElement,
-                                SVGNames::xAttr,
-                                SVGLength,
-                                X,
-                                x)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGMaskElement,
-                                SVGNames::yAttr,
-                                SVGLength,
-                                Y,
-                                y)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGMaskElement,
-                                SVGNames::widthAttr,
-                                SVGLength,
-                                Width,
-                                width)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGMaskElement,
-                                SVGNames::heightAttr,
-                                SVGLength,
-                                Height,
-                                height)
+  DECLARE_ANIMATED_LENGTH(X, x)
+  DECLARE_ANIMATED_LENGTH(Y, y)
+  DECLARE_ANIMATED_LENGTH(Width, width)
+  DECLARE_ANIMATED_LENGTH(Height, height)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGMaskElement,

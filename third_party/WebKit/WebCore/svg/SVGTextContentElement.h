@@ -31,8 +31,6 @@
 
 namespace WebCore {
 
-class SVGLength;
-
 class SVGTextContentElement : public SVGStyledElement,
                               public SVGTests,
                               public SVGLangSpace,
@@ -74,11 +72,8 @@ class SVGTextContentElement : public SVGStyledElement,
  private:
   virtual bool isTextContent() const { return true; }
 
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGTextContentElement,
-                                SVGNames::textLengthAttr,
-                                SVGLength,
-                                TextLength,
-                                textLength)
+  // Animated property declarations
+  DECLARE_ANIMATED_LENGTH(TextLength, textLength)
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGTextContentElement,
                                        SVGNames::lengthAdjustAttr,
                                        int,

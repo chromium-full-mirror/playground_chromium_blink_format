@@ -54,16 +54,9 @@ class SVGCursorElement : public SVGElement,
 
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGCursorElement,
-                                SVGNames::xAttr,
-                                SVGLength,
-                                X,
-                                x)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGCursorElement,
-                                SVGNames::yAttr,
-                                SVGLength,
-                                Y,
-                                y)
+  // Animated property declarations
+  DECLARE_ANIMATED_LENGTH(X, x)
+  DECLARE_ANIMATED_LENGTH(Y, y)
 
   // SVGURIReference
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGCursorElement,

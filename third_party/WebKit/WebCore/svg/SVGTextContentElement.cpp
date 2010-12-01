@@ -33,6 +33,12 @@
 
 namespace WebCore {
 
+// Animated property definitions
+DEFINE_ANIMATED_LENGTH(SVGTextContentElement,
+                       SVGNames::textLengthAttr,
+                       TextLength,
+                       textLength)
+
 SVGTextContentElement::SVGTextContentElement(const QualifiedName& tagName,
                                              Document* document)
     : SVGStyledElement(tagName, document),

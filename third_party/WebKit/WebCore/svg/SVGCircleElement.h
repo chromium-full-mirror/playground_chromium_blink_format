@@ -51,21 +51,10 @@ class SVGCircleElement : public SVGStyledTransformableElement,
 
   virtual bool selfHasRelativeLengths() const;
 
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGCircleElement,
-                                SVGNames::cxAttr,
-                                SVGLength,
-                                Cx,
-                                cx)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGCircleElement,
-                                SVGNames::cyAttr,
-                                SVGLength,
-                                Cy,
-                                cy)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGCircleElement,
-                                SVGNames::rAttr,
-                                SVGLength,
-                                R,
-                                r)
+  // Animated property declarations
+  DECLARE_ANIMATED_LENGTH(Cx, cx)
+  DECLARE_ANIMATED_LENGTH(Cy, cy)
+  DECLARE_ANIMATED_LENGTH(R, r)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGCircleElement,

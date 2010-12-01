@@ -51,36 +51,13 @@ class SVGRectElement : public SVGStyledTransformableElement,
 
   virtual bool selfHasRelativeLengths() const;
 
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGRectElement,
-                                SVGNames::xAttr,
-                                SVGLength,
-                                X,
-                                x)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGRectElement,
-                                SVGNames::yAttr,
-                                SVGLength,
-                                Y,
-                                y)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGRectElement,
-                                SVGNames::widthAttr,
-                                SVGLength,
-                                Width,
-                                width)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGRectElement,
-                                SVGNames::heightAttr,
-                                SVGLength,
-                                Height,
-                                height)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGRectElement,
-                                SVGNames::rxAttr,
-                                SVGLength,
-                                Rx,
-                                rx)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGRectElement,
-                                SVGNames::ryAttr,
-                                SVGLength,
-                                Ry,
-                                ry)
+  // Animated property declarations
+  DECLARE_ANIMATED_LENGTH(X, x)
+  DECLARE_ANIMATED_LENGTH(Y, y)
+  DECLARE_ANIMATED_LENGTH(Width, width)
+  DECLARE_ANIMATED_LENGTH(Height, height)
+  DECLARE_ANIMATED_LENGTH(Rx, rx)
+  DECLARE_ANIMATED_LENGTH(Ry, ry)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGRectElement,

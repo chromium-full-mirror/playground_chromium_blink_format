@@ -34,7 +34,6 @@
 namespace WebCore {
 
 class SVGElementInstance;
-class SVGLength;
 class SVGShadowTreeRootElement;
 
 class SVGUseElement : public SVGStyledTransformableElement,
@@ -82,33 +81,6 @@ class SVGUseElement : public SVGStyledTransformableElement,
 
   virtual bool selfHasRelativeLengths() const;
 
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGUseElement, SVGNames::xAttr, SVGLength, X, x)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGUseElement, SVGNames::yAttr, SVGLength, Y, y)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGUseElement,
-                                SVGNames::widthAttr,
-                                SVGLength,
-                                Width,
-                                width)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGUseElement,
-                                SVGNames::heightAttr,
-                                SVGLength,
-                                Height,
-                                height)
-
-  // SVGURIReference
-  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGUseElement,
-                                       XLinkNames::hrefAttr,
-                                       String,
-                                       Href,
-                                       href)
-
-  // SVGExternalResourcesRequired
-  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGUseElement,
-                                       SVGNames::externalResourcesRequiredAttr,
-                                       bool,
-                                       ExternalResourcesRequired,
-                                       externalResourcesRequired)
-
   // Instance tree handling
   void buildInstanceTree(SVGElement* target,
                          SVGElementInstance* targetInstance,
@@ -142,6 +114,26 @@ class SVGUseElement : public SVGStyledTransformableElement,
 
   void updateContainerOffsets();
   void updateContainerSizes();
+
+  // Animated property declarations
+  DECLARE_ANIMATED_LENGTH(X, x)
+  DECLARE_ANIMATED_LENGTH(Y, y)
+  DECLARE_ANIMATED_LENGTH(Width, width)
+  DECLARE_ANIMATED_LENGTH(Height, height)
+
+  // SVGURIReference
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGUseElement,
+                                       XLinkNames::hrefAttr,
+                                       String,
+                                       Href,
+                                       href)
+
+  // SVGExternalResourcesRequired
+  DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGUseElement,
+                                       SVGNames::externalResourcesRequiredAttr,
+                                       bool,
+                                       ExternalResourcesRequired,
+                                       externalResourcesRequired)
 
   bool m_updatesBlocked;
   bool m_isPendingResource;

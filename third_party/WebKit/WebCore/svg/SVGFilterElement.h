@@ -64,6 +64,7 @@ class SVGFilterElement : public SVGStyledElement,
   static const AtomicString& filterResXIdentifier();
   static const AtomicString& filterResYIdentifier();
 
+  // Animated property declarations
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFilterElement,
                                        SVGNames::filterUnitsAttr,
                                        int,
@@ -74,26 +75,10 @@ class SVGFilterElement : public SVGStyledElement,
                                        int,
                                        PrimitiveUnits,
                                        primitiveUnits)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGFilterElement,
-                                SVGNames::xAttr,
-                                SVGLength,
-                                X,
-                                x)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGFilterElement,
-                                SVGNames::yAttr,
-                                SVGLength,
-                                Y,
-                                y)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGFilterElement,
-                                SVGNames::widthAttr,
-                                SVGLength,
-                                Width,
-                                width)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGFilterElement,
-                                SVGNames::heightAttr,
-                                SVGLength,
-                                Height,
-                                height)
+  DECLARE_ANIMATED_LENGTH(X, x)
+  DECLARE_ANIMATED_LENGTH(Y, y)
+  DECLARE_ANIMATED_LENGTH(Width, width)
+  DECLARE_ANIMATED_LENGTH(Height, height)
 
   DECLARE_ANIMATED_STATIC_PROPERTY_MULTIPLE_WRAPPERS_NEW(
       SVGFilterElement,

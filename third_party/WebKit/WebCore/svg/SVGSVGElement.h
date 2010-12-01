@@ -35,13 +35,14 @@
 #include "SVGZoomAndPan.h"
 
 namespace WebCore {
+
 class SVGAngle;
-class SVGLength;
 class SVGMatrix;
 class SVGTransform;
 class SVGViewSpec;
 class SVGViewElement;
 class SMILTimeContainer;
+
 class SVGSVGElement : public SVGStyledLocatableElement,
                       public SVGTests,
                       public SVGLangSpace,
@@ -153,18 +154,11 @@ class SVGSVGElement : public SVGStyledLocatableElement,
 
   virtual bool selfHasRelativeLengths() const;
 
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGSVGElement, SVGNames::xAttr, SVGLength, X, x)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGSVGElement, SVGNames::yAttr, SVGLength, Y, y)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGSVGElement,
-                                SVGNames::widthAttr,
-                                SVGLength,
-                                Width,
-                                width)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGSVGElement,
-                                SVGNames::heightAttr,
-                                SVGLength,
-                                Height,
-                                height)
+  // Animated property declarations
+  DECLARE_ANIMATED_LENGTH(X, x)
+  DECLARE_ANIMATED_LENGTH(Y, y)
+  DECLARE_ANIMATED_LENGTH(Width, width)
+  DECLARE_ANIMATED_LENGTH(Height, height)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGSVGElement,

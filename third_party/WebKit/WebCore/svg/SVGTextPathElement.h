@@ -26,6 +26,7 @@
 #include "SVGURIReference.h"
 
 namespace WebCore {
+
 enum SVGTextPathMethodType {
   SVG_TEXTPATH_METHODTYPE_UNKNOWN = 0,
   SVG_TEXTPATH_METHODTYPE_ALIGN = 1,
@@ -67,11 +68,8 @@ class SVGTextPathElement : public SVGTextContentElement,
 
   virtual bool selfHasRelativeLengths() const;
 
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGTextPathElement,
-                                SVGNames::startOffsetAttr,
-                                SVGLength,
-                                StartOffset,
-                                startOffset)
+  // Animated property declarations
+  DECLARE_ANIMATED_LENGTH(StartOffset, startOffset)
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGTextPathElement,
                                        SVGNames::methodAttr,
                                        int,

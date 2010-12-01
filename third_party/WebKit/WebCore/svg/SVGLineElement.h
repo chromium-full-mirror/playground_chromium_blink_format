@@ -31,8 +31,6 @@
 
 namespace WebCore {
 
-class SVGLength;
-
 class SVGLineElement : public SVGStyledTransformableElement,
                        public SVGTests,
                        public SVGLangSpace,
@@ -55,26 +53,11 @@ class SVGLineElement : public SVGStyledTransformableElement,
 
   virtual bool selfHasRelativeLengths() const;
 
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGLineElement,
-                                SVGNames::x1Attr,
-                                SVGLength,
-                                X1,
-                                x1)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGLineElement,
-                                SVGNames::y1Attr,
-                                SVGLength,
-                                Y1,
-                                y1)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGLineElement,
-                                SVGNames::x2Attr,
-                                SVGLength,
-                                X2,
-                                x2)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGLineElement,
-                                SVGNames::y2Attr,
-                                SVGLength,
-                                Y2,
-                                y2)
+  // Animated property declarations
+  DECLARE_ANIMATED_LENGTH(X1, x1)
+  DECLARE_ANIMATED_LENGTH(Y1, y1)
+  DECLARE_ANIMATED_LENGTH(X2, x2)
+  DECLARE_ANIMATED_LENGTH(Y2, y2)
 
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGLineElement,

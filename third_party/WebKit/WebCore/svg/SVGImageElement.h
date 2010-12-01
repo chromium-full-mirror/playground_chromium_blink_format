@@ -34,8 +34,6 @@
 
 namespace WebCore {
 
-class SVGLength;
-
 class SVGImageElement : public SVGStyledTransformableElement,
                         public SVGTests,
                         public SVGLangSpace,
@@ -66,26 +64,11 @@ class SVGImageElement : public SVGStyledTransformableElement,
   virtual bool selfHasRelativeLengths() const;
   virtual void willMoveToNewOwnerDocument();
 
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGImageElement,
-                                SVGNames::xAttr,
-                                SVGLength,
-                                X,
-                                x)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGImageElement,
-                                SVGNames::yAttr,
-                                SVGLength,
-                                Y,
-                                y)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGImageElement,
-                                SVGNames::widthAttr,
-                                SVGLength,
-                                Width,
-                                width)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGImageElement,
-                                SVGNames::heightAttr,
-                                SVGLength,
-                                Height,
-                                height)
+  // Animated property declarations
+  DECLARE_ANIMATED_LENGTH(X, x)
+  DECLARE_ANIMATED_LENGTH(Y, y)
+  DECLARE_ANIMATED_LENGTH(Width, width)
+  DECLARE_ANIMATED_LENGTH(Height, height)
   DECLARE_ANIMATED_PROPERTY_NEW(SVGImageElement,
                                 SVGNames::preserveAspectRatioAttr,
                                 SVGPreserveAspectRatio,

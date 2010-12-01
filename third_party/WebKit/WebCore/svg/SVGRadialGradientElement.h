@@ -29,7 +29,6 @@
 namespace WebCore {
 
 struct RadialGradientAttributes;
-class SVGLength;
 
 class SVGRadialGradientElement : public SVGGradientElement {
  public:
@@ -53,31 +52,12 @@ class SVGRadialGradientElement : public SVGGradientElement {
 
   virtual bool selfHasRelativeLengths() const;
 
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGRadialGradientElement,
-                                SVGNames::cxAttr,
-                                SVGLength,
-                                Cx,
-                                cx)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGRadialGradientElement,
-                                SVGNames::cyAttr,
-                                SVGLength,
-                                Cy,
-                                cy)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGRadialGradientElement,
-                                SVGNames::rAttr,
-                                SVGLength,
-                                R,
-                                r)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGRadialGradientElement,
-                                SVGNames::fxAttr,
-                                SVGLength,
-                                Fx,
-                                fx)
-  DECLARE_ANIMATED_PROPERTY_NEW(SVGRadialGradientElement,
-                                SVGNames::fyAttr,
-                                SVGLength,
-                                Fy,
-                                fy)
+  // Animated property declarations
+  DECLARE_ANIMATED_LENGTH(Cx, cx)
+  DECLARE_ANIMATED_LENGTH(Cy, cy)
+  DECLARE_ANIMATED_LENGTH(R, r)
+  DECLARE_ANIMATED_LENGTH(Fx, fx)
+  DECLARE_ANIMATED_LENGTH(Fy, fy)
 };
 
 }  // namespace WebCore
