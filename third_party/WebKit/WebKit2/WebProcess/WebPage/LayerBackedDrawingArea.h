@@ -93,6 +93,10 @@ class LayerBackedDrawingArea : public DrawingArea,
   virtual bool showDebugBorders() const;
   virtual bool showRepaintCounter() const;
 
+#if PLATFORM(MAC)
+  virtual void onPageClose();
+#endif
+
   void scheduleDisplay();
 
   // CoreIPC message handlers.
