@@ -38,7 +38,6 @@
 #include "SVGRenderSupport.h"
 #include "SVGSVGElement.h"
 #include "SVGStyledTransformableElement.h"
-#include "SVGTransformList.h"
 #include "SVGTransformable.h"
 #include "SVGUnitTypes.h"
 
@@ -49,6 +48,10 @@ DEFINE_ANIMATED_LENGTH(SVGPatternElement, SVGNames::xAttr, X, x)
 DEFINE_ANIMATED_LENGTH(SVGPatternElement, SVGNames::yAttr, Y, y)
 DEFINE_ANIMATED_LENGTH(SVGPatternElement, SVGNames::widthAttr, Width, width)
 DEFINE_ANIMATED_LENGTH(SVGPatternElement, SVGNames::heightAttr, Height, height)
+DEFINE_ANIMATED_TRANSFORM_LIST(SVGPatternElement,
+                               SVGNames::patternTransformAttr,
+                               PatternTransform,
+                               patternTransform)
 
 inline SVGPatternElement::SVGPatternElement(const QualifiedName& tagName,
                                             Document* document)

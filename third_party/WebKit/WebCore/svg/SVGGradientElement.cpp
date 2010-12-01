@@ -38,6 +38,12 @@
 
 namespace WebCore {
 
+// Animated property definitions
+DEFINE_ANIMATED_TRANSFORM_LIST(SVGGradientElement,
+                               SVGNames::gradientTransformAttr,
+                               GradientTransform,
+                               gradientTransform)
+
 SVGGradientElement::SVGGradientElement(const QualifiedName& tagName,
                                        Document* document)
     : SVGStyledElement(tagName, document),

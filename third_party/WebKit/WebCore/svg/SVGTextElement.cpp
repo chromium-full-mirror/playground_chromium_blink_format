@@ -35,9 +35,15 @@
 
 namespace WebCore {
 
+// Animated property definitions
+DEFINE_ANIMATED_TRANSFORM_LIST(SVGTextElement,
+                               SVGNames::transformAttr,
+                               Transform,
+                               transform)
+
 inline SVGTextElement::SVGTextElement(const QualifiedName& tagName,
                                       Document* doc)
-    : SVGTextPositioningElement(tagName, doc), SVGTransformable() {}
+    : SVGTextPositioningElement(tagName, doc) {}
 
 PassRefPtr<SVGTextElement> SVGTextElement::create(const QualifiedName& tagName,
                                                   Document* document) {

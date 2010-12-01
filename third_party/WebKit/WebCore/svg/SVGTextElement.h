@@ -59,11 +59,8 @@ class SVGTextElement : public SVGTextPositioningElement,
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 
-  DECLARE_ANIMATED_TRANSFORM_LIST_PROPERTY_NEW(SVGTextElement,
-                                               SVGNames::transformAttr,
-                                               SVGTransformList,
-                                               Transform,
-                                               transform)
+  // Animated property declarations
+  DECLARE_ANIMATED_TRANSFORM_LIST(Transform, transform)
 
   // Used by <animateMotion>
   OwnPtr<AffineTransform> m_supplementalTransform;

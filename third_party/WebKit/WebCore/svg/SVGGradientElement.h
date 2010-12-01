@@ -27,7 +27,6 @@
 #include "SVGAnimatedTransformList.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGStyledElement.h"
-#include "SVGTransformList.h"
 #include "SVGURIReference.h"
 
 namespace WebCore {
@@ -53,6 +52,7 @@ class SVGGradientElement : public SVGStyledElement,
                                Node* afterChange = 0,
                                int childCountDelta = 0);
 
+  // Animated property declarations
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGGradientElement,
                                        SVGNames::spreadMethodAttr,
                                        int,
@@ -63,11 +63,7 @@ class SVGGradientElement : public SVGStyledElement,
                                        int,
                                        GradientUnits,
                                        gradientUnits)
-  DECLARE_ANIMATED_TRANSFORM_LIST_PROPERTY_NEW(SVGGradientElement,
-                                               SVGNames::gradientTransformAttr,
-                                               SVGTransformList,
-                                               GradientTransform,
-                                               gradientTransform)
+  DECLARE_ANIMATED_TRANSFORM_LIST(GradientTransform, gradientTransform)
 
   // SVGURIReference
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGGradientElement,

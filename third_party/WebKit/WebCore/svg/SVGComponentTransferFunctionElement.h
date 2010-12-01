@@ -23,8 +23,8 @@
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "FEComponentTransfer.h"
+#include "SVGAnimatedNumberList.h"
 #include "SVGAnimatedPropertyMacros.h"
-#include "SVGNumberList.h"
 
 namespace WebCore {
 
@@ -39,16 +39,13 @@ class SVGComponentTransferFunctionElement : public SVGElement {
   virtual void synchronizeProperty(const QualifiedName&);
 
  private:
+  // Animated property declarations
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGComponentTransferFunctionElement,
                                        SVGNames::typeAttr,
                                        int,
                                        Type,
                                        type)
-  DECLARE_ANIMATED_LIST_PROPERTY_NEW(SVGComponentTransferFunctionElement,
-                                     SVGNames::tableValuesAttr,
-                                     SVGNumberList,
-                                     TableValues,
-                                     tableValues)
+  DECLARE_ANIMATED_NUMBER_LIST(TableValues, tableValues)
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGComponentTransferFunctionElement,
                                        SVGNames::slopeAttr,
                                        float,

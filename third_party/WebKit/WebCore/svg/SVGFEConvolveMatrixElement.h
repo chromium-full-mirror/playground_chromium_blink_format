@@ -22,8 +22,8 @@
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "FEConvolveMatrix.h"
+#include "SVGAnimatedNumberList.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
-#include "SVGNumberList.h"
 
 namespace WebCore {
 
@@ -47,6 +47,7 @@ class SVGFEConvolveMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   static const AtomicString& kernelUnitLengthXIdentifier();
   static const AtomicString& kernelUnitLengthYIdentifier();
 
+  // Animated property declarations
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEConvolveMatrixElement,
                                        SVGNames::inAttr,
                                        String,
@@ -66,11 +67,7 @@ class SVGFEConvolveMatrixElement : public SVGFilterPrimitiveStandardAttributes {
       long,
       OrderY,
       orderY)
-  DECLARE_ANIMATED_LIST_PROPERTY_NEW(SVGFEConvolveMatrixElement,
-                                     SVGNames::kernelMatrixAttr,
-                                     SVGNumberList,
-                                     KernelMatrix,
-                                     kernelMatrix)
+  DECLARE_ANIMATED_NUMBER_LIST(KernelMatrix, kernelMatrix)
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGFEConvolveMatrixElement,
                                        SVGNames::divisorAttr,
                                        float,

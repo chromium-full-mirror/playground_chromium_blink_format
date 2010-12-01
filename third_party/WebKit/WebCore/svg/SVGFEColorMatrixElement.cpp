@@ -29,6 +29,12 @@
 
 namespace WebCore {
 
+// Animated property definitions
+DEFINE_ANIMATED_NUMBER_LIST(SVGFEColorMatrixElement,
+                            SVGNames::valuesAttr,
+                            Values,
+                            values)
+
 inline SVGFEColorMatrixElement::SVGFEColorMatrixElement(
     const QualifiedName& tagName,
     Document* document)

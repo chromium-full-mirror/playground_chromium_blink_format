@@ -32,7 +32,6 @@
 #include "SVGRect.h"
 #include "SVGStyledElement.h"
 #include "SVGTests.h"
-#include "SVGTransformList.h"
 #include "SVGURIReference.h"
 
 namespace WebCore {
@@ -83,11 +82,7 @@ class SVGPatternElement : public SVGStyledElement,
                                        int,
                                        PatternContentUnits,
                                        patternContentUnits)
-  DECLARE_ANIMATED_TRANSFORM_LIST_PROPERTY_NEW(SVGPatternElement,
-                                               SVGNames::patternTransformAttr,
-                                               SVGTransformList,
-                                               PatternTransform,
-                                               patternTransform)
+  DECLARE_ANIMATED_TRANSFORM_LIST(PatternTransform, patternTransform)
 
   // SVGURIReference
   DECLARE_ANIMATED_STATIC_PROPERTY_NEW(SVGPatternElement,
