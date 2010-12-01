@@ -113,6 +113,10 @@ class InputType : public Noncopyable {
   virtual bool handleClickEvent(MouseEvent*);
   virtual bool handleDOMActivateEvent(Event*);
   virtual bool handleKeydownEvent(KeyboardEvent*);
+  virtual bool handleKeypressEvent(KeyboardEvent*);
+  virtual bool handleKeyupEvent(KeyboardEvent*);
+  // A helper for event handlers.
+  virtual bool shouldSubmitImplicitly(Event*);
 
   // Miscellaneous functions
 
@@ -142,6 +146,7 @@ class InputType : public Noncopyable {
  protected:
   InputType(HTMLInputElement* element) : m_element(element) {}
   HTMLInputElement* element() const { return m_element; }
+  void dispatchSimulatedClickIfActive(KeyboardEvent*) const;
   // We can't make this a static const data member because VC++ doesn't like it.
   static double defaultStepBase() { return 0.0; }
 

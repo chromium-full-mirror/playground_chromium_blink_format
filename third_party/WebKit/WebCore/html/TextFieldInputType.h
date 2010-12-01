@@ -44,6 +44,7 @@ class TextFieldInputType : public InputType {
   virtual bool valueMissing(const String&) const;
   virtual bool handleKeydownEvent(KeyboardEvent*);
   bool handleKeydownEventForSpinButton(KeyboardEvent*);
+  virtual bool shouldSubmitImplicitly(Event*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*) const;
 };
 

@@ -42,6 +42,7 @@
 #include "HiddenInputType.h"
 #include "ImageInputType.h"
 #include "IsIndexInputType.h"
+#include "KeyboardEvent.h"
 #include "LocalizedStrings.h"
 #include "MonthInputType.h"
 #include "NumberInputType.h"
@@ -273,6 +274,20 @@ bool InputType::handleKeydownEvent(KeyboardEvent*) {
   return false;
 }
 
+bool InputType::handleKeypressEvent(KeyboardEvent*) {
+  return false;
+}
+
+bool InputType::handleKeyupEvent(KeyboardEvent*) {
+  return false;
+}
+
+bool InputType::shouldSubmitImplicitly(Event* event) {
+  return event->isKeyboardEvent() &&
+         event->type() == eventNames().keypressEvent &&
+         static_cast<KeyboardEvent*>(event)->charCode() == '\r';
+}
+
 RenderObject* InputType::createRenderer(RenderArena*,
                                         RenderStyle* style) const {
   return RenderObject::createObject(element(), style);
@@ -299,6 +314,12 @@ bool InputType::parseToDateComponents(const String&, DateComponents*) const {
 String InputType::serialize(double) const {
   ASSERT_NOT_REACHED();
   return String();
+}
+
+void InputType::dispatchSimulatedClickIfActive(KeyboardEvent* event) const {
+  if (element()->active())
+    element()->dispatchSimulatedClick(event);
+  event->setDefaultHandled();
 }
 
 namespace InputTypeNames {

@@ -42,6 +42,9 @@ class BaseButtonInputType : public InputType {
 
  private:
   virtual bool appendFormData(FormDataList&, bool) const;
+  virtual bool handleKeydownEvent(KeyboardEvent*);
+  virtual bool handleKeypressEvent(KeyboardEvent*);
+  virtual bool handleKeyupEvent(KeyboardEvent*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*) const;
 };
 
