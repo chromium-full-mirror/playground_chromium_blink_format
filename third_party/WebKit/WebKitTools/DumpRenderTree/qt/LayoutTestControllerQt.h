@@ -173,6 +173,7 @@ class LayoutTestController : public QObject {
   void setSelectTrailingWhitespaceEnabled(bool enable);
   void execCommand(const QString& name, const QString& value = QString());
   bool isCommandEnabled(const QString& name) const;
+  bool findString(const QString& string, const QStringList& optionArray);
 
   bool pauseAnimationAtTimeOnElementWithId(const QString& animationName,
                                            double time,
