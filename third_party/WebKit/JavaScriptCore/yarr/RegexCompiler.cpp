@@ -538,7 +538,8 @@ class RegexPatternConstructor {
              (term.type == PatternTerm::TypeParentheticalAssertion));
 
       if ((term.type == PatternTerm::TypeParenthesesSubpattern) &&
-          term.invertOrCapture && (subpatternId == term.subpatternId)) {
+          term.invertOrCapture &&
+          (subpatternId == term.parentheses.subpatternId)) {
         m_alternative->m_terms.append(PatternTerm::ForwardReference());
         return;
       }
