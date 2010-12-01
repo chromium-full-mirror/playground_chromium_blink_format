@@ -633,7 +633,7 @@ class RegexGenerator : private MacroAssembler {
 
     add32(Imm32(1), countRegister);
     add32(Imm32(1), index);
-    if (term.quantityCount != 0xffffffff) {
+    if (term.quantityCount != quantifyInfinite) {
       branch32(NotEqual, countRegister, Imm32(term.quantityCount))
           .linkTo(loop, this);
       failures.append(jump());
@@ -671,7 +671,7 @@ class RegexGenerator : private MacroAssembler {
     loadFromFrame(term.frameLocation, countRegister);
 
     atEndOfInput().linkTo(hardFail, this);
-    if (term.quantityCount != 0xffffffff)
+    if (term.quantityCount != quantifyInfinite)
       branch32(Equal, countRegister, Imm32(term.quantityCount), hardFail);
     if (m_pattern.m_ignoreCase && isASCIIAlpha(ch)) {
       readCharacter(state.inputOffset(), character);
@@ -760,7 +760,7 @@ class RegexGenerator : private MacroAssembler {
 
     add32(Imm32(1), countRegister);
     add32(Imm32(1), index);
-    if (term.quantityCount != 0xffffffff) {
+    if (term.quantityCount != quantifyInfinite) {
       branch32(NotEqual, countRegister, Imm32(term.quantityCount))
           .linkTo(loop, this);
       failures.append(jump());

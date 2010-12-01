@@ -732,7 +732,7 @@ class Interpreter {
             // begin term's
             // inputPosition, but for repeats other than fixed these values
             // should be
-            // the same anyway! (we don't pre-check for greedy or non-greedy
+            // the same anyway! (We don't pre-check for greedy or non-greedy
             // matches.)
             ASSERT((&term - term.atom.parenthesesWidth)->type ==
                    ByteTerm::TypeParenthesesSubpatternOnceBegin);
@@ -755,7 +755,7 @@ class Interpreter {
                                      DisjunctionContext* context) {
     ASSERT(term.type == ByteTerm::TypeParenthesesSubpatternTerminalBegin);
     ASSERT(term.atom.quantityType == QuantifierGreedy);
-    ASSERT(term.atom.quantityCount == UINT_MAX);
+    ASSERT(term.atom.quantityCount == quantifyInfinite);
     ASSERT(!term.capture());
 
     BackTrackInfoParenthesesTerminal* backTrack =
@@ -785,7 +785,7 @@ class Interpreter {
                                          DisjunctionContext* context) {
     ASSERT(term.type == ByteTerm::TypeParenthesesSubpatternTerminalBegin);
     ASSERT(term.atom.quantityType == QuantifierGreedy);
-    ASSERT(term.atom.quantityCount == UINT_MAX);
+    ASSERT(term.atom.quantityCount == quantifyInfinite);
     ASSERT(!term.capture());
 
     // If we backtrack to this point, we have failed to match this iteration of
@@ -799,7 +799,7 @@ class Interpreter {
     // 'Terminal' parentheses are at the end of the regex, and as such a match
     // past end
     // should always be returned as a successful match - we should never
-    // becktrack to here.
+    // backtrack to here.
     ASSERT_NOT_REACHED();
     return false;
   }
