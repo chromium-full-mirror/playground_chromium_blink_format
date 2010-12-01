@@ -774,7 +774,7 @@ void RenderBox::paintRootBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
   // canvas including
   // its margins.
   int bx = tx - marginLeft() + view()->leftLayoutOverflow();
-  int by = ty - marginTop();
+  int by = ty - marginTop() + view()->topLayoutOverflow();
   int bw =
       max(w + marginLeft() + marginRight() + borderLeft() + borderRight(), rw);
   int bh =

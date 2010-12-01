@@ -52,8 +52,7 @@ ScrollView::ScrollView()
       m_drawPanScrollIcon(false),
       m_useFixedLayout(false),
       m_paintsEntireContents(false),
-      m_delegatesScrolling(false),
-      m_scrollOriginX(0) {
+      m_delegatesScrolling(false) {
   platformInit();
 }
 
@@ -268,14 +267,15 @@ void ScrollView::setContentsSize(const IntSize& newSize) {
 }
 
 IntPoint ScrollView::maximumScrollPosition() const {
-  IntPoint maximumOffset(contentsWidth() - visibleWidth() - m_scrollOriginX,
-                         contentsHeight() - visibleHeight());
+  IntPoint maximumOffset(
+      contentsWidth() - visibleWidth() - m_scrollOrigin.x(),
+      contentsHeight() - visibleHeight() - m_scrollOrigin.y());
   maximumOffset.clampNegativeToZero();
   return maximumOffset;
 }
 
 IntPoint ScrollView::minimumScrollPosition() const {
-  return IntPoint(-m_scrollOriginX, 0);
+  return IntPoint(-m_scrollOrigin.x(), -m_scrollOrigin.y());
 }
 
 IntPoint ScrollView::adjustScrollPositionWithinRange(
@@ -305,9 +305,9 @@ void ScrollView::valueChanged(Scrollbar* scrollbar) {
   IntSize newOffset = m_scrollOffset;
   if (scrollbar) {
     if (scrollbar->orientation() == HorizontalScrollbar)
-      newOffset.setWidth(scrollbar->value() - m_scrollOriginX);
+      newOffset.setWidth(scrollbar->value() - m_scrollOrigin.x());
     else if (scrollbar->orientation() == VerticalScrollbar)
-      newOffset.setHeight(scrollbar->value());
+      newOffset.setHeight(scrollbar->value() - m_scrollOrigin.y());
   }
 
   IntSize scrollDelta = newOffset - m_scrollOffset;
@@ -508,7 +508,7 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
       m_horizontalScrollbar->setSuppressInvalidation(true);
     m_horizontalScrollbar->setSteps(Scrollbar::pixelsPerLineStep(), pageStep);
     m_horizontalScrollbar->setProportion(clientWidth, contentsWidth());
-    m_horizontalScrollbar->setValue(scroll.width() + m_scrollOriginX,
+    m_horizontalScrollbar->setValue(scroll.width() + m_scrollOrigin.x(),
                                     Scrollbar::NotFromScrollAnimator);
     if (m_scrollbarsSuppressed)
       m_horizontalScrollbar->setSuppressInvalidation(false);
@@ -534,7 +534,7 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
       m_verticalScrollbar->setSuppressInvalidation(true);
     m_verticalScrollbar->setSteps(Scrollbar::pixelsPerLineStep(), pageStep);
     m_verticalScrollbar->setProportion(clientHeight, contentsHeight());
-    m_verticalScrollbar->setValue(scroll.height(),
+    m_verticalScrollbar->setValue(scroll.height() + m_scrollOrigin.y(),
                                   Scrollbar::NotFromScrollAnimator);
     if (m_scrollbarsSuppressed)
       m_verticalScrollbar->setSuppressInvalidation(false);
@@ -1066,17 +1066,21 @@ void ScrollView::removePanScrollIcon() {
       true /*immediate*/);
 }
 
-void ScrollView::setScrollOriginX(int x) {
-  if (platformWidget())
-    platformSetScrollOriginX(x);
+void ScrollView::setScrollOrigin(const IntPoint& origin, bool updatePosition) {
+  if (m_scrollOrigin == origin)
+    return;
 
-  m_scrollOriginX = x;
-}
+  m_scrollOrigin = origin;
 
-void ScrollView::updateScrollbars() {
-  if (!platformWidget())
+  if (platformWidget()) {
+    platformSetScrollOrigin(origin, updatePosition);
+    return;
+  }
+
+  // Update if the scroll origin changes, since our position will be different
+  // if the content size did not change.
+  if (updatePosition)
     updateScrollbars(scrollOffset());
-  // FIXME: need corresponding functionality from platformWidget.
 }
 
 #if !PLATFORM(WX) && !PLATFORM(GTK) && !PLATFORM(EFL)
@@ -1099,7 +1103,8 @@ void ScrollView::platformRemoveChild(Widget*) {}
 
 void ScrollView::platformSetScrollbarsSuppressed(bool) {}
 
-void ScrollView::platformSetScrollOriginX(int) {}
+void ScrollView::platformSetScrollOrigin(const IntPoint&, bool updatePosition) {
+}
 
 #endif
 
