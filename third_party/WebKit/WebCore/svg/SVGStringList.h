@@ -23,8 +23,8 @@
 
 #if ENABLE(SVG)
 #include "QualifiedName.h"
+#include "SVGPropertyTraits.h"
 #include <wtf/Vector.h>
-#include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
@@ -45,6 +45,11 @@ class SVGStringList : public Vector<String> {
 
  private:
   const QualifiedName& m_attributeName;
+};
+
+template <>
+struct SVGPropertyTraits<SVGStringList> {
+  typedef String ListItemType;
 };
 
 }  // namespace WebCore
