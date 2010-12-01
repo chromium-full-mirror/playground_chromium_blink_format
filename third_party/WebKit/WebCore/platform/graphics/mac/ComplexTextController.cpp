@@ -557,7 +557,7 @@ void ComplexTextController::adjustGlyphsAndAdvances() {
                                              widthSinceLastRounding,
                                          tabWidth);
       } else if (ch == zeroWidthSpace ||
-                 Font::treatAsZeroWidthSpace(ch) && !treatAsSpace) {
+                 (Font::treatAsZeroWidthSpace(ch) && !treatAsSpace)) {
         advance.width = 0;
         glyph = fontData->spaceGlyph();
       }
@@ -627,9 +627,9 @@ void ComplexTextController::adjustGlyphsAndAdvances() {
       // Check to see if the next character is a "rounding hack character", if
       // so, adjust the
       // width so that the total run width will be on an integer boundary.
-      if (m_run.applyWordRounding() && !lastGlyph &&
-              Font::isRoundingHackCharacter(nextCh) ||
-          m_run.applyRunRounding() && lastGlyph) {
+      if ((m_run.applyWordRounding() && !lastGlyph &&
+           Font::isRoundingHackCharacter(nextCh)) ||
+          (m_run.applyRunRounding() && lastGlyph)) {
         CGFloat totalWidth = widthSinceLastRounding + advance.width;
         widthSinceLastRounding = ceilCGFloat(totalWidth);
         CGFloat extraWidth = widthSinceLastRounding - totalWidth;
