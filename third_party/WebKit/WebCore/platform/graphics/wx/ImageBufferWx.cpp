@@ -36,7 +36,7 @@ namespace WebCore {
 ImageBufferData::ImageBufferData(const IntSize&) {}
 
 ImageBuffer::ImageBuffer(const IntSize&,
-                         ImageColorSpace imageColorSpace,
+                         ColorSpace imageColorSpace,
                          bool& success)
     : m_data(IntSize()) {
   notImplemented();
