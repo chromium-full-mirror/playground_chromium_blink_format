@@ -44,11 +44,6 @@ static URLSchemesMap& localURLSchemes() {
   return localSchemes;
 }
 
-static URLSchemesMap& displayIsolatedURLSchemes() {
-  DEFINE_STATIC_LOCAL(URLSchemesMap, displayIsolatedSchemes, ());
-  return displayIsolatedSchemes;
-}
-
 static URLSchemesMap& secureSchemes() {
   DEFINE_STATIC_LOCAL(URLSchemesMap, secureSchemes, ());
 
@@ -82,7 +77,7 @@ static URLSchemesMap& emptyDocumentSchemes() {
 }
 
 void SchemeRegistry::registerURLSchemeAsLocal(const String& scheme) {
-  localURLSchemes().add(scheme);
+  WebCore::localURLSchemes().add(scheme);
 }
 
 void SchemeRegistry::removeURLSchemeRegisteredAsLocal(const String& scheme) {
@@ -92,14 +87,14 @@ void SchemeRegistry::removeURLSchemeRegisteredAsLocal(const String& scheme) {
   if (scheme == "applewebdata")
     return;
 #endif
-  localURLSchemes().remove(scheme);
+  WebCore::localURLSchemes().remove(scheme);
 }
 
-const URLSchemesMap& SchemeRegistry::localSchemes() {
-  return localURLSchemes();
+const URLSchemesMap& SchemeRegistry::localURLSchemes() {
+  return WebCore::localURLSchemes();
 }
 
-bool SchemeRegistry::deprecatedShouldTreatURLAsLocal(const String& url) {
+bool SchemeRegistry::shouldTreatURLAsLocal(const String& url) {
   // This avoids an allocation of another String and the HashSet contains()
   // call for the file: and http: schemes.
   if (url.length() >= 5) {
@@ -115,7 +110,7 @@ bool SchemeRegistry::deprecatedShouldTreatURLAsLocal(const String& url) {
     return false;
 
   String scheme = url.left(loc);
-  return localURLSchemes().contains(scheme);
+  return WebCore::localURLSchemes().contains(scheme);
 }
 
 bool SchemeRegistry::shouldTreatURLSchemeAsLocal(const String& scheme) {
@@ -132,7 +127,7 @@ bool SchemeRegistry::shouldTreatURLSchemeAsLocal(const String& scheme) {
   if (scheme.isEmpty())
     return false;
 
-  return localURLSchemes().contains(scheme);
+  return WebCore::localURLSchemes().contains(scheme);
 }
 
 void SchemeRegistry::registerURLSchemeAsNoAccess(const String& scheme) {
@@ -141,15 +136,6 @@ void SchemeRegistry::registerURLSchemeAsNoAccess(const String& scheme) {
 
 bool SchemeRegistry::shouldTreatURLSchemeAsNoAccess(const String& scheme) {
   return schemesWithUniqueOrigins().contains(scheme);
-}
-
-void SchemeRegistry::registerURLSchemeAsDisplayIsolated(const String& scheme) {
-  displayIsolatedURLSchemes().add(scheme);
-}
-
-bool SchemeRegistry::shouldTreatURLSchemeAsDisplayIsolated(
-    const String& scheme) {
-  return displayIsolatedURLSchemes().contains(scheme);
 }
 
 void SchemeRegistry::registerURLSchemeAsSecure(const String& scheme) {
