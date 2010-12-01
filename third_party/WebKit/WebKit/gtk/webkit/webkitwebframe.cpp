@@ -835,7 +835,7 @@ int webkit_web_frame_page_number_for_element_by_id(WebKitWebFrame* frame,
                                                    const gchar* id,
                                                    float pageWidth,
                                                    float pageHeight) {
-  g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
+  g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), 0);
 
   Frame* coreFrame = core(frame);
   if (!coreFrame)
@@ -860,7 +860,7 @@ int webkit_web_frame_page_number_for_element_by_id(WebKitWebFrame* frame,
 int webkit_web_frame_number_of_pages(WebKitWebFrame* frame,
                                      float pageWidth,
                                      float pageHeight) {
-  g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
+  g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), 0);
 
   Frame* coreFrame = core(frame);
   if (!coreFrame)
