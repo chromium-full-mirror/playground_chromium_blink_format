@@ -53,14 +53,14 @@
 namespace WebCore {
 
 ScriptElement::ScriptElement(Element* element,
-                             bool createdByParser,
-                             bool isEvaluated)
+                             bool wasInsertedByParser,
+                             bool wasAlreadyStarted)
     : m_element(element),
       m_cachedScript(0),
-      m_createdByParser(createdByParser),
-      m_requested(false),
-      m_isEvaluated(isEvaluated),
-      m_firedLoad(false) {
+      m_wasInsertedByParser(wasInsertedByParser),
+      m_isExternalScript(false),
+      m_wasAlreadyStarted(wasAlreadyStarted),
+      m_haveFiredLoad(false) {
   ASSERT(m_element);
 }
 
@@ -69,7 +69,7 @@ ScriptElement::~ScriptElement() {
 }
 
 void ScriptElement::insertedIntoDocument(const String& sourceUrl) {
-  if (createdByParser() && !isAsynchronous())
+  if (wasInsertedByParser() && !isAsynchronous())
     return;
 
   // http://www.whatwg.org/specs/web-apps/current-work/#script
@@ -94,7 +94,7 @@ void ScriptElement::removedFromDocument() {
 }
 
 void ScriptElement::childrenChanged() {
-  if (createdByParser())
+  if (wasInsertedByParser())
     return;
 
   // If a node is inserted as a child of the script element
@@ -111,7 +111,7 @@ void ScriptElement::finishParsingChildren(const String& sourceUrl) {
   // The parser just reached </script>. If we have no src and no text,
   // allow dynamic loading later.
   if (sourceUrl.isEmpty() && scriptContent().isEmpty())
-    m_createdByParser = false;
+    m_wasInsertedByParser = false;
 }
 
 void ScriptElement::handleSourceAttribute(const String& sourceUrl) {
@@ -159,14 +159,14 @@ void ScriptElement::requestScript(const String& sourceUrl) {
   ASSERT(!m_cachedScript);
   m_cachedScript = document->cachedResourceLoader()->requestScript(
       sourceUrl, scriptCharset());
-  m_requested = true;
+  m_isExternalScript = true;
 
-  // m_createdByParser is never reset - always resied at the initial value set
-  // while parsing.
-  // m_evaluated is left untouched as well to avoid script reexecution, if a
-  // <script> element
+  // m_wasInsertedByParser is never reset - always resied at the initial value
+  // set while parsing.
+  // m_wasAlreadyStarted is left untouched as well to avoid script reexecution,
+  // if a <script> element
   // is removed and reappended to the document.
-  m_firedLoad = false;
+  m_haveFiredLoad = false;
 
   if (m_cachedScript) {
     m_cachedScript->addClient(this);
@@ -177,7 +177,8 @@ void ScriptElement::requestScript(const String& sourceUrl) {
 }
 
 void ScriptElement::evaluateScript(const ScriptSourceCode& sourceCode) {
-  if (m_isEvaluated || sourceCode.isEmpty() || !shouldExecuteAsJavaScript())
+  if (wasAlreadyStarted() || sourceCode.isEmpty() ||
+      !shouldExecuteAsJavaScript())
     return;
 
   RefPtr<Document> document = m_element->document();
@@ -186,14 +187,14 @@ void ScriptElement::evaluateScript(const ScriptSourceCode& sourceCode) {
     if (!frame->script()->canExecuteScripts(AboutToExecuteScript))
       return;
 
-    m_isEvaluated = true;
+    m_wasAlreadyStarted = true;
 
     // http://www.whatwg.org/specs/web-apps/current-work/#script
 
     {
       IgnoreDestructiveWriteCountIncrementer
-          ignoreDesctructiveWriteCountIncrementer(m_requested ? document.get()
-                                                              : 0);
+          ignoreDesctructiveWriteCountIncrementer(
+              m_isExternalScript ? document.get() : 0);
       // Create a script from the script element node, using the script
       // block's source and the script block's type.
       // Note: This is where the script is compiled and actually executed.
@@ -205,7 +206,7 @@ void ScriptElement::evaluateScript(const ScriptSourceCode& sourceCode) {
 }
 
 void ScriptElement::executeScript(const ScriptSourceCode& sourceCode) {
-  if (m_isEvaluated || sourceCode.isEmpty())
+  if (wasAlreadyStarted() || sourceCode.isEmpty())
     return;
   RefPtr<Document> document = m_element->document();
   ASSERT(document);
@@ -213,7 +214,7 @@ void ScriptElement::executeScript(const ScriptSourceCode& sourceCode) {
   if (!frame)
     return;
 
-  m_isEvaluated = true;
+  m_wasAlreadyStarted = true;
 
   frame->script()->executeScript(sourceCode);
 }
@@ -244,7 +245,7 @@ void ScriptElement::notifyFinished(CachedResource* o) {
 }
 
 bool ScriptElement::ignoresLoadRequest() const {
-  return m_isEvaluated || m_requested || m_createdByParser ||
+  return wasAlreadyStarted() || m_isExternalScript || wasInsertedByParser() ||
          !m_element->inDocument();
 }
 

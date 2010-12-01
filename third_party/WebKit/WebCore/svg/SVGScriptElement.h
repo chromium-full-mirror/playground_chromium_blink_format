@@ -37,7 +37,7 @@ class SVGScriptElement : public SVGElement,
  public:
   static PassRefPtr<SVGScriptElement> create(const QualifiedName&,
                                              Document*,
-                                             bool createdByParser);
+                                             bool wasInsertedByParser);
 
   String type() const;
   void setType(const String&);
@@ -45,8 +45,8 @@ class SVGScriptElement : public SVGElement,
  private:
   SVGScriptElement(const QualifiedName&,
                    Document*,
-                   bool createdByParser,
-                   bool isEvaluated);
+                   bool wasInsertedByParser,
+                   bool wasAlreadyStarted);
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void insertedIntoDocument();
