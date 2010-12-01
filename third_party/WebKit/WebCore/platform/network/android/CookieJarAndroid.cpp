@@ -31,20 +31,21 @@
 
 namespace WebCore {
 
-void setCookies(Document*, const KURL& url, const String& value) {
-  PlatformBridge::setCookies(url, value);
+void setCookies(Document* document, const KURL& url, const String& value) {
+  PlatformBridge::setCookies(document, url, value);
 }
 
-String cookies(const Document*, const KURL& url) {
-  return PlatformBridge::cookies(url);
+String cookies(const Document* document, const KURL& url) {
+  return PlatformBridge::cookies(document, url);
 }
 
-String cookieRequestHeaderFieldValue(const Document*, const KURL& url) {
+String cookieRequestHeaderFieldValue(const Document* document,
+                                     const KURL& url) {
   // FIXME: include HttpOnly cookie.
-  return PlatformBridge::cookies(url);
+  return PlatformBridge::cookies(document, url);
 }
 
-bool cookiesEnabled(const Document*) {
-  return PlatformBridge::cookiesEnabled();
+bool cookiesEnabled(const Document* document) {
+  return PlatformBridge::cookiesEnabled(document);
 }
 }
