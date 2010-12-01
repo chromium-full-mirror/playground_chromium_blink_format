@@ -683,15 +683,15 @@ void WebView::setIsInWindow(bool isInWindow) {
 
 void WebView::pageDidEnterAcceleratedCompositing() {
   switchToDrawingAreaTypeIfNecessary(
-      DrawingAreaProxy::LayerBackedDrawingAreaType);
+      DrawingAreaBase::LayerBackedDrawingAreaType);
 }
 
 void WebView::pageDidLeaveAcceleratedCompositing() {
   switchToDrawingAreaTypeIfNecessary(
-      DrawingAreaProxy::ChunkedUpdateDrawingAreaType);
+      DrawingAreaBase::ChunkedUpdateDrawingAreaType);
 }
 
-void WebView::switchToDrawingAreaTypeIfNecessary(DrawingAreaProxy::Type type) {
+void WebView::switchToDrawingAreaTypeIfNecessary(DrawingAreaBase::Type type) {
   DrawingAreaBase::Type existingDrawingAreaType =
       m_page->drawingArea() ? m_page->drawingArea()->info().type
                             : DrawingAreaBase::None;
@@ -700,13 +700,13 @@ void WebView::switchToDrawingAreaTypeIfNecessary(DrawingAreaProxy::Type type) {
 
   OwnPtr<DrawingAreaProxy> newDrawingArea;
   switch (type) {
-    case DrawingAreaProxy::None:
+    case DrawingAreaBase::None:
       break;
-    case DrawingAreaProxy::ChunkedUpdateDrawingAreaType: {
+    case DrawingAreaBase::ChunkedUpdateDrawingAreaType: {
       newDrawingArea = ChunkedUpdateDrawingAreaProxy::create(this);
       break;
     }
-    case DrawingAreaProxy::LayerBackedDrawingAreaType: {
+    case DrawingAreaBase::LayerBackedDrawingAreaType: {
       newDrawingArea = LayerBackedDrawingAreaProxy::create(this);
       break;
     }
