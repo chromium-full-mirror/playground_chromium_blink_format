@@ -64,7 +64,7 @@ class NetscapePlugin : public Plugin {
 #endif
 
   void invalidate(const NPRect*);
-  const char* userAgent();
+  static const char* userAgent(NPP);
   void loadURL(const String& method,
                const String& urlString,
                const String& target,
@@ -122,6 +122,8 @@ class NetscapePlugin : public Plugin {
   NetscapePluginStream* streamFromID(uint64_t streamID);
   void stopAllStreams();
   bool allowPopups() const;
+
+  const char* userAgent();
 
   bool platformPostInitialize();
   void platformDestroy();

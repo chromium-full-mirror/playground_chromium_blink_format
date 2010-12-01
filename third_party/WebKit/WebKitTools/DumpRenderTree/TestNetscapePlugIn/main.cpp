@@ -285,10 +285,10 @@ NPError NPP_New(NPMIMEType pluginType,
 
 #ifdef XP_UNIX
   // On Unix, plugins only get events if they are windowless.
-  return browser->setvalue(instance, NPPVpluginWindowBool, 0);
-#else
-  return NPERR_NO_ERROR;
+  browser->setvalue(instance, NPPVpluginWindowBool, 0);
 #endif
+
+  return obj->pluginTest->NPP_New(pluginType, mode, argc, argn, argv, saved);
 }
 
 NPError NPP_Destroy(NPP instance, NPSavedData** save) {

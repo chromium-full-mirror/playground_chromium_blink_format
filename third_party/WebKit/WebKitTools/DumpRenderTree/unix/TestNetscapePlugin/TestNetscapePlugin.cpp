@@ -53,13 +53,13 @@ char* NP_GetMIMEDescription(void);
 
 static void executeScript(const PluginObject* obj, const char* script);
 
-static NPError webkit_test_plugin_new_instance(NPMIMEType /*mimetype*/,
+static NPError webkit_test_plugin_new_instance(NPMIMEType mimetype,
                                                NPP instance,
-                                               uint16_t /*mode*/,
+                                               uint16_t mode,
                                                int16_t argc,
                                                char* argn[],
                                                char* argv[],
-                                               NPSavedData* /*savedData*/) {
+                                               NPSavedData* savedData) {
   if (browser->version >= 14) {
     PluginObject* obj =
         (PluginObject*)browser->createobject(instance, getPluginClass());
@@ -105,6 +105,9 @@ static NPError webkit_test_plugin_new_instance(NPMIMEType /*mimetype*/,
                       (void*)&obj->cachedPrivateBrowsingMode);
 
     obj->pluginTest = PluginTest::create(instance, testIdentifier);
+
+    return obj->pluginTest->NPP_New(mimetype, mode, argc, argn, argv,
+                                    savedData);
   }
 
   return NPERR_NO_ERROR;
