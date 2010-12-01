@@ -1318,15 +1318,28 @@ String AccessibilityRenderObject::ariaDescribedByAttribute() const {
   return accessibilityDescriptionForElements(elements);
 }
 
-String AccessibilityRenderObject::accessibilityDescription() const {
-  if (!m_renderer)
-    return String();
-
+String AccessibilityRenderObject::ariaAccessibilityDescription() const {
   const AtomicString& ariaLabel = getAttribute(aria_labelAttr);
   if (!ariaLabel.isEmpty())
     return ariaLabel;
 
   String ariaDescription = ariaDescribedByAttribute();
+  if (!ariaDescription.isEmpty())
+    return ariaDescription;
+
+  return String();
+}
+
+String AccessibilityRenderObject::accessibilityDescription() const {
+  if (!m_renderer)
+    return String();
+
+  // Static text should not have a description, it should only have a
+  // stringValue.
+  if (roleValue() == StaticTextRole)
+    return String();
+
+  String ariaDescription = ariaAccessibilityDescription();
   if (!ariaDescription.isEmpty())
     return ariaDescription;
 
@@ -1909,7 +1922,7 @@ int AccessibilityRenderObject::layoutCount() const {
 String AccessibilityRenderObject::text() const {
   // If this is a user defined static text, use the accessible name computation.
   if (ariaRoleAttribute() == StaticTextRole)
-    return accessibilityDescription();
+    return ariaAccessibilityDescription();
 
   if (!isTextControl() || isPasswordField())
     return String();
