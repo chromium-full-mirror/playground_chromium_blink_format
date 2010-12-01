@@ -183,7 +183,10 @@ bool InspectorStyle::setPropertyText(unsigned index,
                        &sourceData);
     Vector<CSSPropertySourceData>& propertyData = sourceData->propertyData;
     unsigned propertyCount = propertyData.size();
-    if (!propertyCount)
+
+    // At least one property + the bogus property added just above should be
+    // present.
+    if (propertyCount < 2)
       return false;
 
     // Check for a proper propertyText termination (the parser could at least
