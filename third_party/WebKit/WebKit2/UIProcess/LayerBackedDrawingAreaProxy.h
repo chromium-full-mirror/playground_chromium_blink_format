@@ -79,7 +79,7 @@ class LayerBackedDrawingAreaProxy : public DrawingAreaProxy {
   virtual void attachCompositingContext(uint32_t contextID);
   virtual void detachCompositingContext();
 
-  void didSetSize();
+  void didSetSize(const WebCore::IntSize&);
   void update();
 
   void platformSetSize();
