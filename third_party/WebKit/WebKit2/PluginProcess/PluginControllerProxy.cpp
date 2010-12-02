@@ -438,8 +438,11 @@ void PluginControllerProxy::windowFocusChanged(bool hasFocus) {
   m_plugin->windowFocusChanged(hasFocus);
 }
 
-void PluginControllerProxy::windowFrameChanged(const IntRect& windowFrame) {
-  m_plugin->windowFrameChanged(windowFrame);
+void PluginControllerProxy::windowAndViewFramesChanged(
+    const IntRect& windowFrameInScreenCoordinates,
+    const IntRect& viewFrameInWindowCoordinates) {
+  m_plugin->windowAndViewFramesChanged(windowFrameInScreenCoordinates,
+                                       viewFrameInWindowCoordinates);
 }
 
 void PluginControllerProxy::windowVisibilityChanged(bool isVisible) {

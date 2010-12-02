@@ -174,8 +174,10 @@ class Plugin : public RefCounted<Plugin> {
   // Tells the plug-in about window focus changes.
   virtual void windowFocusChanged(bool) = 0;
 
-  // Tells the plug-in about window frame changes.
-  virtual void windowFrameChanged(const WebCore::IntRect&) = 0;
+  // Tells the plug-in about window and plug-in frame changes.
+  virtual void windowAndViewFramesChanged(
+      const WebCore::IntRect& windowFrameInScreenCoordinates,
+      const WebCore::IntRect& viewFrameInWindowCoordinates) = 0;
 
   // Tells the plug-in about window visibility changes.
   virtual void windowVisibilityChanged(bool) = 0;

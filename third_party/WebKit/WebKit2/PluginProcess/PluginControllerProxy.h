@@ -154,7 +154,9 @@ class PluginControllerProxy : PluginController {
 
 #if PLATFORM(MAC)
   void windowFocusChanged(bool);
-  void windowFrameChanged(const WebCore::IntRect&);
+  void windowAndViewFramesChanged(
+      const WebCore::IntRect& windowFrameInScreenCoordinates,
+      const WebCore::IntRect& viewFrameInWindowCoordinates);
   void windowVisibilityChanged(bool);
 #endif
   void privateBrowsingStateChanged(bool);

@@ -114,7 +114,9 @@ class PluginProxy : public Plugin {
   virtual NPObject* pluginScriptableNPObject();
 #if PLATFORM(MAC)
   virtual void windowFocusChanged(bool);
-  virtual void windowFrameChanged(const WebCore::IntRect&);
+  virtual void windowAndViewFramesChanged(
+      const WebCore::IntRect& windowFrameInScreenCoordinates,
+      const WebCore::IntRect& viewFrameInWindowCoordinates);
   virtual void windowVisibilityChanged(bool);
 #endif
 

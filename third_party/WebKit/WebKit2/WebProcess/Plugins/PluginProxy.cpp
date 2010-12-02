@@ -377,9 +377,12 @@ void PluginProxy::windowFocusChanged(bool hasFocus) {
       m_pluginInstanceID);
 }
 
-void PluginProxy::windowFrameChanged(const IntRect& windowFrame) {
+void PluginProxy::windowAndViewFramesChanged(
+    const WebCore::IntRect& windowFrameInScreenCoordinates,
+    const WebCore::IntRect& viewFrameInWindowCoordinates) {
   m_connection->connection()->send(
-      Messages::PluginControllerProxy::WindowFrameChanged(windowFrame),
+      Messages::PluginControllerProxy::WindowAndViewFramesChanged(
+          windowFrameInScreenCoordinates, viewFrameInWindowCoordinates),
       m_pluginInstanceID);
 }
 
