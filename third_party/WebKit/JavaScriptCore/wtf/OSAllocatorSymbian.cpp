@@ -26,6 +26,8 @@
 #include "config.h"
 #include "OSAllocator.h"
 
+#if OS(SYMBIAN)
+
 #include <wtf/FastMalloc.h>
 
 namespace WTF {
@@ -47,3 +49,5 @@ void OSAllocator::release(void* address, size_t) {
 }
 
 }  // namespace WTF
+
+#endif
