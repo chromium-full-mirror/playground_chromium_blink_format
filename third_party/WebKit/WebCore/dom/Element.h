@@ -254,6 +254,10 @@ class Element : public ContainerNode {
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void recalcStyle(StyleChange = NoChange);
 
+  Node* shadowRoot();
+  void setShadowRoot(PassRefPtr<Node>);
+  void clearShadowRoot();
+
   RenderStyle* computedStyle(PseudoId = NOPSEUDO);
 
   AtomicString computeInheritedLanguage() const;
@@ -364,6 +368,8 @@ class Element : public ContainerNode {
 
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
+  virtual void insertedIntoTree(bool);
+  virtual void removedFromTree(bool);
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,
                                Node* afterChange = 0,

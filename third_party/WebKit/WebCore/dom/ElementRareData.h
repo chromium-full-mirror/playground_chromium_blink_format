@@ -41,6 +41,7 @@ class ElementRareData : public NodeRareData {
 
   IntSize m_minimumSizeForResizing;
   RefPtr<RenderStyle> m_computedStyle;
+  RefPtr<Node> m_shadowRoot;
 
   OwnPtr<DatasetDOMStringMap> m_datasetDOMStringMap;
   OwnPtr<ClassList> m_classList;
