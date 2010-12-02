@@ -231,19 +231,22 @@ class RenderLayer : public ScrollbarClient {
   void scrollByRecursively(int xDelta, int yDelta);
 
   IntSize scrolledContentOffset() const {
-    return IntSize(scrollXOffset() + m_scrollLeftOverflow, scrollYOffset());
+    return IntSize(scrollXOffset() + m_scrollLeftOverflow,
+                   scrollYOffset() + m_scrollTopOverflow);
   }
 
-  int scrollXOffset() const { return m_scrollX + m_scrollOriginX; }
-  int scrollYOffset() const { return m_scrollY; }
+  int scrollXOffset() const { return m_scrollX + m_scrollOrigin.x(); }
+  int scrollYOffset() const { return m_scrollY + m_scrollOrigin.y(); }
 
   void scrollToOffset(int x,
                       int y,
                       bool updateScrollbars = true,
                       bool repaint = true);
-  void scrollToXOffset(int x) { scrollToOffset(x, m_scrollY); }
+  void scrollToXOffset(int x) {
+    scrollToOffset(x, m_scrollY + m_scrollOrigin.y());
+  }
   void scrollToYOffset(int y) {
-    scrollToOffset(m_scrollX + m_scrollOriginX, y);
+    scrollToOffset(m_scrollX + m_scrollOrigin.x(), y);
   }
   void scrollRectToVisible(
       const IntRect&,
@@ -741,8 +744,23 @@ class RenderLayer : public ScrollbarClient {
   // Our scroll offsets if the view is scrolled.
   int m_scrollX;
   int m_scrollY;
-  int m_scrollOriginX;       // only non-zero for rtl content
-  int m_scrollLeftOverflow;  // only non-zero for rtl content
+
+  // There are 8 possible combinations of writing mode and direction.  Scroll
+  // origin (and its corresponding left/top overflow)
+  // will be non-zero in the x or y axis if there is any reversed direction or
+  // writing-mode.  The combinations are:
+  // writing-mode / direction     scrollOrigin.x() set    scrollOrigin.y() set
+  // horizontal-tb / ltr          NO                      NO
+  // horizontal-tb / rtl          YES                     NO
+  // horizontal-bt / ltr          NO                      YES
+  // horizontal-bt / rtl          YES                     YES
+  // vertical-lr / ltr            NO                      NO
+  // vertical-lr / rtl            NO                      YES
+  // vertical-rl / ltr            YES                     NO
+  // vertical-rl / rtl            YES                     YES
+  IntPoint m_scrollOrigin;
+  int m_scrollLeftOverflow;
+  int m_scrollTopOverflow;
 
   // The width/height of our scrolled area.
   int m_scrollWidth;

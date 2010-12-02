@@ -140,8 +140,8 @@ RenderLayer::RenderLayer(RenderBoxModelObject* renderer)
       m_height(0),
       m_scrollX(0),
       m_scrollY(0),
-      m_scrollOriginX(0),
       m_scrollLeftOverflow(0),
+      m_scrollTopOverflow(0),
       m_scrollWidth(0),
       m_scrollHeight(0),
       m_inResizeMode(false),
@@ -1415,11 +1415,12 @@ void RenderLayer::scrollToOffset(int x,
   // complicated (since it will involve testing whether our layer
   // is either occluded by another layer or clipped by an enclosing
   // layer or contains fixed backgrounds, etc.).
-  int newScrollX = x - m_scrollOriginX;
-  if (m_scrollY == y && m_scrollX == newScrollX)
+  int newScrollX = x - m_scrollOrigin.x();
+  int newScrollY = y - m_scrollOrigin.y();
+  if (m_scrollY == newScrollY && m_scrollX == newScrollX)
     return;
   m_scrollX = newScrollX;
-  m_scrollY = y;
+  m_scrollY = newScrollY;
 
   // Update the positions of our child layers. Don't have updateLayerPositions()
   // update
@@ -2137,22 +2138,38 @@ void RenderLayer::computeScrollDimensions(bool* needHBar, bool* needVBar) {
 
   m_scrollDimensionsDirty = false;
 
-  bool ltr = renderer()->style()->isLeftToRightDirection();
-
   int clientWidth = box->clientWidth();
   int clientHeight = box->clientHeight();
 
-  m_scrollLeftOverflow =
-      ltr ? 0 : min(0, box->leftmostPosition(true, false) - box->borderLeft());
+  bool hasLeftOverflow = (!box->style()->isHorizontalWritingMode() ||
+                          !box->style()->isLeftToRightDirection()) &&
+                         box->style()->writingMode() != LeftToRightWritingMode;
+  bool hasTopOverflow = (box->style()->isHorizontalWritingMode() ||
+                         !box->style()->isLeftToRightDirection()) &&
+                        box->style()->writingMode() != TopToBottomWritingMode;
 
-  int rightPos = ltr ? box->rightmostPosition(true, false) - box->borderLeft()
+  m_scrollLeftOverflow =
+      !hasLeftOverflow
+          ? 0
+          : min(0, box->leftmostPosition(true, false) - box->borderLeft());
+  m_scrollTopOverflow =
+      !hasTopOverflow
+          ? 0
+          : min(0, box->topmostPosition(true, false) - box->borderTop());
+
+  int rightPos = !hasLeftOverflow
+                     ? box->rightmostPosition(true, false) - box->borderLeft()
                      : clientWidth - m_scrollLeftOverflow;
-  int bottomPos = box->lowestPosition(true, false) - box->borderTop();
+  int bottomPos = !hasTopOverflow
+                      ? box->lowestPosition(true, false) - box->borderTop()
+                      : clientHeight - m_scrollTopOverflow;
 
   m_scrollWidth = max(rightPos, clientWidth);
   m_scrollHeight = max(bottomPos, clientHeight);
 
-  m_scrollOriginX = ltr ? 0 : m_scrollWidth - clientWidth;
+  m_scrollOrigin =
+      IntPoint(!hasLeftOverflow ? 0 : m_scrollWidth - clientWidth,
+               !hasTopOverflow ? 0 : m_scrollHeight - clientHeight);
 
   if (needHBar)
     *needHBar = rightPos > clientWidth;
@@ -2166,7 +2183,6 @@ void RenderLayer::updateOverflowStatus(bool horizontalOverflow,
     m_horizontalOverflow = horizontalOverflow;
     m_verticalOverflow = verticalOverflow;
     m_overflowStatusDirty = false;
-
     return;
   }
 
