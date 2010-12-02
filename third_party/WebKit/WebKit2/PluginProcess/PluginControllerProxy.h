@@ -116,6 +116,8 @@ class PluginControllerProxy : PluginController {
   virtual bool isPrivateBrowsingEnabled();
 
   // Message handlers.
+  void frameDidFinishLoading(uint64_t requestID);
+  void frameDidFail(uint64_t requestID, bool wasCancelled);
   void geometryDidChange(const WebCore::IntRect& frameRect,
                          const WebCore::IntRect& clipRect,
                          const SharedMemory::Handle& backingStoreHandle);
@@ -132,6 +134,14 @@ class PluginControllerProxy : PluginController {
                             const CoreIPC::DataReference& data);
   void streamDidFinishLoading(uint64_t streamID);
   void streamDidFail(uint64_t streamID, bool wasCancelled);
+  void manualStreamDidReceiveResponse(const String& responseURLString,
+                                      uint32_t streamLength,
+                                      uint32_t lastModifiedTime,
+                                      const String& mimeType,
+                                      const String& headers);
+  void manualStreamDidReceiveData(const CoreIPC::DataReference& data);
+  void manualStreamDidFinishLoading();
+  void manualStreamDidFail(bool wasCancelled);
   void handleMouseEvent(const WebMouseEvent&, bool& handled);
   void handleWheelEvent(const WebWheelEvent&, bool& handled);
   void handleMouseEnterEvent(const WebMouseEvent&, bool& handled);

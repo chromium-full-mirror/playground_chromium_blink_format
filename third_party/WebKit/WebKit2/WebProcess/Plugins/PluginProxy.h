@@ -143,6 +143,9 @@ class PluginProxy : public Plugin {
                 bool allowPopups,
                 bool& returnValue,
                 NPVariantData& resultData);
+  void cancelStreamLoad(uint64_t streamID);
+  void cancelManualStreamLoad();
+  void setStatusbarText(const String& statusbarText);
 
   RefPtr<PluginProcessConnection> m_connection;
   uint64_t m_pluginInstanceID;

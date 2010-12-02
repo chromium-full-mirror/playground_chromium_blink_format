@@ -32,7 +32,6 @@
 #include "NPRemoteObjectMap.h"
 #include "NPRuntimeUtilities.h"
 #include "NPVariantData.h"
-#include "NotImplemented.h"
 #include "PluginController.h"
 #include "PluginControllerProxyMessages.h"
 #include "PluginProcessConnection.h"
@@ -203,11 +202,15 @@ void PluginProxy::geometryDidChange(const IntRect& frameRect,
 }
 
 void PluginProxy::frameDidFinishLoading(uint64_t requestID) {
-  notImplemented();
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::FrameDidFinishLoading(requestID),
+      m_pluginInstanceID);
 }
 
 void PluginProxy::frameDidFail(uint64_t requestID, bool wasCancelled) {
-  notImplemented();
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::FrameDidFail(requestID, wasCancelled),
+      m_pluginInstanceID);
 }
 
 void PluginProxy::didEvaluateJavaScript(uint64_t requestID,
@@ -259,19 +262,31 @@ void PluginProxy::manualStreamDidReceiveResponse(const KURL& responseURL,
                                                  uint32_t lastModifiedTime,
                                                  const WTF::String& mimeType,
                                                  const WTF::String& headers) {
-  notImplemented();
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::ManualStreamDidReceiveResponse(
+          responseURL.string(), streamLength, lastModifiedTime, mimeType,
+          headers),
+      m_pluginInstanceID);
 }
 
 void PluginProxy::manualStreamDidReceiveData(const char* bytes, int length) {
-  notImplemented();
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::ManualStreamDidReceiveData(
+          CoreIPC::DataReference(reinterpret_cast<const uint8_t*>(bytes),
+                                 length)),
+      m_pluginInstanceID);
 }
 
 void PluginProxy::manualStreamDidFinishLoading() {
-  notImplemented();
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::ManualStreamDidFinishLoading(),
+      m_pluginInstanceID);
 }
 
 void PluginProxy::manualStreamDidFail(bool wasCancelled) {
-  notImplemented();
+  m_connection->connection()->send(
+      Messages::PluginControllerProxy::ManualStreamDidFail(wasCancelled),
+      m_pluginInstanceID);
 }
 
 bool PluginProxy::handleMouseEvent(const WebMouseEvent& mouseEvent) {
@@ -366,7 +381,6 @@ void PluginProxy::windowFrameChanged(const IntRect& windowFrame) {
   m_connection->connection()->send(
       Messages::PluginControllerProxy::WindowFrameChanged(windowFrame),
       m_pluginInstanceID);
-  notImplemented();
 }
 
 void PluginProxy::windowVisibilityChanged(bool isVisible) {
@@ -460,6 +474,18 @@ void PluginProxy::evaluate(const NPVariantData& npObjectAsVariantData,
   releaseNPVariantValue(&result);
 
   releaseNPVariantValue(&npObjectAsVariant);
+}
+
+void PluginProxy::cancelStreamLoad(uint64_t streamID) {
+  m_pluginController->cancelStreamLoad(streamID);
+}
+
+void PluginProxy::cancelManualStreamLoad() {
+  m_pluginController->cancelManualStreamLoad();
+}
+
+void PluginProxy::setStatusbarText(const String& statusbarText) {
+  m_pluginController->setStatusbarText(statusbarText);
 }
 
 void PluginProxy::update(const IntRect& paintedRect) {
