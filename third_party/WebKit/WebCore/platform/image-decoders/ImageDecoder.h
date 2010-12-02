@@ -315,6 +315,10 @@ class ImageDecoder : public Noncopyable {
   // transparency.
   virtual bool supportsAlpha() const { return true; }
 
+  void setIgnoreGammaAndColorProfile(bool flag) {
+    m_ignoreGammaAndColorProfile = flag;
+  }
+
   // Whether or not the gamma and color profile are applied.
   bool ignoresGammaAndColorProfile() const {
     return m_ignoreGammaAndColorProfile;
