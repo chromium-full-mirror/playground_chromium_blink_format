@@ -517,7 +517,9 @@ bool EditorClientWx::spellingUIIsShowing() {
   return false;
 }
 
-void EditorClientWx::getGuessesForWord(const String&, Vector<String>& guesses) {
+void EditorClientWx::getGuessesForWord(const String& word,
+                                       const String& context,
+                                       Vector<String>& guesses) {
   notImplemented();
 }
 

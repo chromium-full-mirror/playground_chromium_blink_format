@@ -654,6 +654,7 @@ class EmptyEditorClient : public EditorClient, public Noncopyable {
                                    const FloatRect&,
                                    const String&,
                                    const String&,
+                                   const Vector<String>&,
                                    Editor*) {}
   virtual void dismissCorrectionPanel(CorrectionWasRejectedOrNot) {}
   virtual bool isShowingCorrectionPanel() { return false; }
@@ -663,7 +664,9 @@ class EmptyEditorClient : public EditorClient, public Noncopyable {
   virtual void updateSpellingUIWithMisspelledWord(const String&) {}
   virtual void showSpellingUI(bool) {}
   virtual bool spellingUIIsShowing() { return false; }
-  virtual void getGuessesForWord(const String&, Vector<String>&) {}
+  virtual void getGuessesForWord(const String&,
+                                 const String&,
+                                 Vector<String>&) {}
   virtual void willSetInputMethodState() {}
   virtual void setInputMethodState(bool) {}
 };

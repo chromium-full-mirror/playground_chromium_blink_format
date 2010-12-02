@@ -462,6 +462,7 @@ bool EditorClientWinCE::spellingUIIsShowing() {
 }
 
 void EditorClientWinCE::getGuessesForWord(const String& word,
+                                          const String& context,
                                           WTF::Vector<String>& guesses) {
   notImplemented();
 }

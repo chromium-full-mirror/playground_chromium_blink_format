@@ -398,7 +398,9 @@ bool WebEditorClient::spellingUIIsShowing() {
   return false;
 }
 
-void WebEditorClient::getGuessesForWord(const String&, Vector<String>&) {
+void WebEditorClient::getGuessesForWord(const String&,
+                                        const String&,
+                                        Vector<String>&) {
   notImplemented();
 }
 

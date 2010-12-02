@@ -126,8 +126,9 @@ class WebEditorClient : public WebCore::EditorClient {
   virtual void updateSpellingUIWithMisspelledWord(const WTF::String&);
   virtual void showSpellingUI(bool show);
   virtual bool spellingUIIsShowing();
-  virtual void getGuessesForWord(const WTF::String&,
-                                 Vector<WTF::String>& guesses);
+  virtual void getGuessesForWord(const WTF::String& word,
+                                 const WTF::String& context,
+                                 WTF::Vector<WTF::String>& guesses);
 
   virtual void willSetInputMethodState();
   virtual void setInputMethodState(bool);

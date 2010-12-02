@@ -1023,6 +1023,7 @@ bool EditorClient::spellingUIIsShowing() {
 }
 
 void EditorClient::getGuessesForWord(const String& word,
+                                     const String& context,
                                      WTF::Vector<String>& guesses) {
   GSList* dicts = webkit_web_settings_get_enchant_dicts(m_webView);
   guesses.clear();

@@ -114,7 +114,9 @@ class EditorClientWx : public EditorClient {
   virtual void updateSpellingUIWithMisspelledWord(const String&);
   virtual void showSpellingUI(bool show);
   virtual bool spellingUIIsShowing();
-  virtual void getGuessesForWord(const String&, Vector<String>& guesses);
+  virtual void getGuessesForWord(const String& word,
+                                 const String& context,
+                                 Vector<String>& guesses);
   virtual String getAutoCorrectSuggestionForMisspelledWord(const WTF::String&);
 
   virtual void willSetInputMethodState();

@@ -353,7 +353,9 @@ class Editor {
 
   void handleCancelOperation();
   void startCorrectionPanelTimer(CorrectionPanelInfo::PanelType);
-  void handleRejectedCorrection();
+  // If user confirmed a correction in the correction panel, correction has
+  // non-zero length, otherwise it means that user has dismissed the panel.
+  void handleCorrectionPanelResult(const String& correction);
   bool isShowingCorrectionPanel();
 
   void pasteAsFragment(PassRefPtr<DocumentFragment>,
@@ -475,7 +477,8 @@ class Editor {
   Node* findEventTargetFromSelection() const;
   void stopCorrectionPanelTimer();
   void dismissCorrectionPanel(CorrectionWasRejectedOrNot);
-  void applyCorrectionPanelInfo(bool addCorrectionIndicatorMarker);
+  void applyCorrectionPanelInfo(
+      const Vector<DocumentMarker::MarkerType>& markerTypesToAdd);
 };
 
 inline void Editor::setStartNewKillRingSequence(bool flag) {

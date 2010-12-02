@@ -859,6 +859,7 @@ bool WebEditorClient::spellingUIIsShowing() {
 }
 
 void WebEditorClient::getGuessesForWord(const String& word,
+                                        const String& context,
                                         Vector<String>& guesses) {
   guesses.clear();
 

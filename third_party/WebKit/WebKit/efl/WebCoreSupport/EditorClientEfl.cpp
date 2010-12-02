@@ -453,7 +453,9 @@ bool EditorClientEfl::spellingUIIsShowing() {
   return false;
 }
 
-void EditorClientEfl::getGuessesForWord(const String&, Vector<String>&) {
+void EditorClientEfl::getGuessesForWord(const String& word,
+                                        const String& context,
+                                        Vector<String>& guesses) {
   notImplemented();
 }
 }

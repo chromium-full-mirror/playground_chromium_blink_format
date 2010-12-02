@@ -625,7 +625,7 @@ Vector<String> TextCheckingHelper::guessesForMisspelledOrUngrammaticalRange(
         paragraph.checkingRangeMatches(result->location, result->length)) {
       String misspelledWord = paragraph.checkingSubstring();
       ASSERT(misspelledWord.length());
-      m_client->getGuessesForWord(misspelledWord, guesses);
+      m_client->getGuessesForWord(misspelledWord, String(), guesses);
       m_client->updateSpellingUIWithMisspelledWord(misspelledWord);
       misspelled = true;
       return guesses;

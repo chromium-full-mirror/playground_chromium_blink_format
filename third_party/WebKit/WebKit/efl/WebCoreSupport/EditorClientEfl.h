@@ -122,7 +122,9 @@ class EditorClientEfl : public EditorClient {
   virtual void updateSpellingUIWithMisspelledWord(const String&);
   virtual void showSpellingUI(bool show);
   virtual bool spellingUIIsShowing();
-  virtual void getGuessesForWord(const String&, WTF::Vector<String>& guesses);
+  virtual void getGuessesForWord(const String& word,
+                                 const String& context,
+                                 WTF::Vector<String>& guesses);
   virtual void willSetInputMethodState();
   virtual void setInputMethodState(bool enabled);
 
