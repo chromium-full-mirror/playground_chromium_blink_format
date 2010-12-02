@@ -28,6 +28,7 @@
 
 #include "JSValue.h"
 #include <wtf/Noncopyable.h>
+#include <wtf/OSAllocator.h>
 
 namespace JSC {
 
@@ -84,8 +85,12 @@ class MarkStack : Noncopyable {
     MarkSetProperties m_properties;
   };
 
-  static void* allocateStack(size_t size);
-  static void releaseStack(void* addr, size_t size);
+  static void* allocateStack(size_t size) {
+    return OSAllocator::reserveAndCommit(size);
+  }
+  static void releaseStack(void* addr, size_t size) {
+    OSAllocator::release(addr, size);
+  }
 
   static void initializePagesize();
   static size_t pageSize() {
